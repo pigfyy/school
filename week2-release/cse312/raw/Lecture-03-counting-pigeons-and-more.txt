@@ -1,0 +1,820 @@
+CSE 312
+Foundations of Computing II
+Lecture 3: Even more counting
+Binomial Theorem, Inclusion-Exclusion, Pigeonhole Principle
+
+
+
+
+                                                              1
+Recap
+
+•
+
+
+
+
+        2
+Recap
+
+•
+
+
+
+
+        3
+Binomial Coefficients – Many interesting and useful properties
+
+
+
+
+                            Symmetry in Binomial Coefficients
+
+
+                                Follows from Binomial Theorem
+
+
+                                       Pascal’s Identity
+                                                                 4
+Binomial Theorem: Idea
+
+•
+
+
+
+
+                         5
+Binomial Theorem: Idea
+
+•
+
+
+
+
+                         6
+Binomial Theorem: Idea
+
+•
+
+
+
+
+                         7
+Binomial Theorem: Idea
+
+•
+
+
+
+
+                         8
+Binomial Theorem
+
+
+
+
+                   9
+Binomial Theorem
+
+
+
+
+                   10
+Binomial Theorem
+
+
+
+
+                   11
+Agenda
+
+• Binomial Theorem
+• Combinatorial Proofs
+• Inclusion-Exclusion
+• Pigeonhole Principle
+• Counting Practice
+
+
+
+
+                         12
+Recall: Symmetry in Binomial Coefficients
+Combinatorial argument/proof                              Algebraic argument
+●            Elegant                                      ●          Brute force
+●            Simple                                       ●          Less Intuitive
+●            Intuitive
+
+
+
+
+This Photo by Unknown Author is licensed under CC BY-SA
+                                                              This Photo by Unknown Author is licensed under CC BY-SA
+                                                                                                                        14
+Pascal’s Identity
+
+                    How to prove Pascal’s identity?
+
+
+
+
+                                               15
+Pascal’s Identity
+
+                             How to prove Pascal’s identity?
+
+     Algebraic argument:
+
+
+
+
+                           Hard work and not intuitive
+
+
+
+                                                        16
+Pascal’s Identity
+
+                                       How to prove Pascal’s identity?
+
+     Algebraic argument:
+
+
+
+
+                                    Hard work and not intuitive
+
+               Let’s see a combinatorial argument
+                                                                  17
+Example – Pascal’s Identity
+
+
+
+
+                              18
+Example – Pascal’s Identity
+
+
+
+
+                              19
+Example – Pascal’s Identity
+
+
+
+
+                              20
+Example – Pascal’s Identity
+
+
+
+
+                              21
+Example – Pascal’s Identity
+
+
+
+
+                              22
+Example – Pascal’s Identity
+
+
+
+
+                              23
+Example – Pascal’s Identity
+
+
+
+
+                              24
+Example – Pascal’s Identity
+
+
+
+
+                              25
+Example – Pascal’s Identity
+
+
+
+
+                              26
+Example – Pascal’s Identity
+
+
+
+
+                              27
+Example – Pascal’s Identity
+
+
+
+
+                              28
+Example – Pascal’s Identity
+
+
+
+
+                              29
+Example – Pascal’s Identity
+
+
+
+
+                              30
+Example – Pascal’s Identity
+
+
+
+
+                              31
+Example – Pascal’s Identity
+
+
+
+
+                              32
+Example – Pascal’s Identity
+
+
+
+
+                              33
+Example – Pascal’s Identity
+
+
+
+
+                              34
+Example – Pascal’s Identity
+
+
+
+
+                              35
+Agenda
+
+• Binomial Theorem
+• Combinatorial Proofs
+• Inclusion-Exclusion
+• Pigeonhole Principle
+• Counting Practice
+
+
+
+
+                         36
+Recap Disjoint Sets
+
+
+
+
+                      37
+Inclusion-Exclusion
+But what if the sets are not disjoint?
+
+                             B           |A|=43
+  A                                      |B|=20
+                                         |A∩B |=7
+                                         |A∪B|= ???
+
+
+
+
+                                                      38
+Inclusion-Exclusion
+But what if the sets are not disjoint?
+
+                             B           |A|=43
+  A                                      |B|=20
+                                         |A∩B |=7
+                                         |A∪B|= ???
+
+
+
+
+      Fact. |A∪B|=|A|+|B|−|A∩B|
+                                                      39
+Inclusion-Exclusion                Not drawn to scale
+
+
+
+                                 |A|=43
+What if there are three sets?    |B|=20 |C|=35
+                             B
+      A                          |A∩B |=7
+                                 |A∩C |=16
+                                  |B∩C |=11
+                                 |A∩B∩C |=4
+                                 |A∪B∪C|= ???
+
+
+
+                         C
+
+
+
+                                                        40
+  Inclusion-Exclusion                   Not drawn to scale
+
+
+
+                                      |A|=43
+  What if there are three sets?       |B|=20 |C|=35
+                               B
+        A                             |A∩B |=7
+                                      |A∩C |=16
+                                       |B∩C |=11
+                                      |A∩B∩C |=4
+                                      |A∪B∪C|= ???
+
+
+
+                            C
+Fact.
+                |A∪B∪C|=|A|+|B|+|C|
+                         − |A∩B|
+              − |A∩C|−|B∩C|+|A∩B∩C|                          41
+Inclusion-Exclusion
+
+•
+
+
+
+
+                      42
+Brain Break
+
+
+
+
+              43
+Agenda
+
+• Binomial Theorem
+• Combinatorial Proofs
+• Inclusion-Exclusion
+• Pigeonhole Principle
+• Counting Practice
+
+
+
+
+                         44
+Pigeonhole Principle (PHP): Idea
+
+10 pigeons, 9 pigeonholes
+
+
+
+
+                                   45
+Pigeonhole Principle: Idea
+
+
+
+
+If 11 children have to share 3 cakes, at least one cake must be
+shared by how many children?
+
+
+                                                                  46
+Pigeonhole Principle – More generally
+
+•
+
+
+
+
+                                        47
+Pigeonhole Principle – Better version
+
+•
+
+
+
+
+                                        48
+Pigeonhole Principle – Better version
+
+•
+
+
+
+
+                                        49
+Pigeonhole Principle – Better version
+
+•
+
+
+
+
+                                        50
+Pigeonhole Principle: Strategy
+
+To use the PHP to solve a problem, there are generally 4 steps
+
+1. Identify pigeons
+2. Identify pigeonholes
+3. Specify how pigeons are assigned to pigeonholes
+4. Apply PHP
+
+
+
+                                                                 51
+Pigeonhole Principle – Example
+
+In a room with 367 people, there are at
+least two with the same birthday.
+
+
+
+
+                                          52
+Pigeonhole Principle – Example
+
+In a room with 367 people, there are at
+least two with the same birthday.
+
+
+Solution:
+1. 367 pigeons = people
+2. 366 holes (365 for a normal year + Feb 29) = possible
+   birthdays
+3. Person goes into hole corresponding to own birthday
+4. By PHP, there must be two people with the same birthday
+                                                             53
+Pigeonhole Principle – Example (Surprising?)
+
+
+
+
+                                               54
+Pigeonhole Principle – Example (Surprising?)
+
+
+
+
+When solving a PHP problem:
+1.   Identify pigeons
+2.   Identify pigeonholes
+3.   Specify how pigeons are
+     assigned to pigeonholes
+4.   Apply PHP
+
+
+
+
+                                               55
+Pigeonhole Principle – Example (Surprising?)
+
+
+
+
+When solving a PHP problem:
+1.   Identify pigeons
+2.   Identify pigeonholes
+3.   Specify how pigeons are
+     assigned to pigeonholes
+4.   Apply PHP
+
+
+
+
+                                               56
+Agenda
+
+• Binomial Theorem
+• Combinatorial Proofs
+• Inclusion-Exclusion
+• Pigeonhole Principle
+• Counting Practice
+
+
+
+
+                         57
+Quick Review of Cards
+
+
+
+
+● 52 total cards
+● 13 different ranks: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+● 4 different suits: Hearts, Diamonds, Clubs, Spades
+Quick Review of Cards
+
+
+
+
+                                  How many possible 5 card hands?
+
+
+● 52 total cards
+● 13 different ranks: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+● 4 different suits: Hearts, Diamonds, Clubs, Spades
+Quick Review of Cards
+
+
+
+
+                                  How many possible 5 card hands?
+
+
+● 52 total cards
+● 13 different ranks: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+● 4 different suits: Hearts, Diamonds, Clubs, Spades
+                   ●   52 total cards
+Counting Cards I   ●
+                   ●
+                       13 different ranks: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+                       4 different suits: Hearts, Diamonds, Clubs, Spades
+                                    ●   52 total cards
+  Counting Cards I                  ●
+                                    ●
+                                        13 different ranks: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+                                        4 different suits: Hearts, Diamonds, Clubs, Spades
+
+
+● A "straight” is five consecutive rank cards of any suit (where
+  A,2,3,4,5 also counts as consecutive).
+  How many possible straights?
+                                    ●   52 total cards
+  Counting Cards I                  ●
+                                    ●
+                                        13 different ranks: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+                                        4 different suits: Hearts, Diamonds, Clubs, Spades
+
+
+● A "straight” is five consecutive rank cards of any suit (where
+  A,2,3,4,5 also counts as consecutive).
+  How many possible straights?
+                                 ●   52 total cards
+Counting Cards II                ●
+                                 ●
+                                     13 different ranks: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+                                     4 different suits: Hearts, Diamonds, Clubs, Spades
+
+● A flush is five card hand all of the same suit.
+ How many possible flushes?
+                                 ●   52 total cards
+Counting Cards II                ●
+                                 ●
+                                     13 different ranks: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+                                     4 different suits: Hearts, Diamonds, Clubs, Spades
+
+● A flush is five card hand all of the same suit.
+ How many possible flushes?
+                                      ●   52 total cards
+Counting Cards III                    ●
+                                      ●
+                                          13 different ranks: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+                                          4 different suits: Hearts, Diamonds, Clubs, Spades
+
+● A flush is five card hand all of the same suit.
+ How many possible flushes?
+                                      ●   52 total cards
+Counting Cards III                    ●
+                                      ●
+                                          13 different ranks: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+                                          4 different suits: Hearts, Diamonds, Clubs, Spades
+
+● A flush is five card hand all of the same suit.
+ How many possible flushes?
+
+
+
+ • How many flushes are NOT straights?
+                                      ●   52 total cards
+Counting Cards III                    ●
+                                      ●
+                                          13 different ranks: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+                                          4 different suits: Hearts, Diamonds, Clubs, Spades
+
+● A flush is five card hand all of the same suit.
+ How many possible flushes?
+
+
+
+ • How many flushes are NOT straights?
+   = #flush - #flush and straight
+                                      ●   52 total cards
+Counting Cards III                    ●
+                                      ●
+                                          13 different ranks: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+                                          4 different suits: Hearts, Diamonds, Clubs, Spades
+
+● A flush is five card hand all of the same suit.
+ How many possible flushes?
+
+
+
+ • How many flushes are NOT straights?
+   = #flush - #flush and straight
+Sleuth’s Criterion (Rudich)
+
+    For each object constructed, it should be possible to
+ reconstruct the unique sequence of choices that led to it.
+Sleuth’s Criterion (Rudich)
+
+    For each object constructed, it should be possible to
+ reconstruct the unique sequence of choices that led to it.
+   No sequence  under counting   Many sequences  over counting
+Sleuth’s Criterion (Rudich)
+
+    For each object constructed, it should be possible to
+ reconstruct the unique sequence of choices that led to it.
+    No sequence  under counting     Many sequences  over counting
+
+EXAMPLE: How many ways are there to choose a 5 card hand that contains
+at least 3 Aces?
+
+First choose 3 Aces. Then
+choose remaining two cards.
+Sleuth’s Criterion (Rudich)
+
+    For each object constructed, it should be possible to
+ reconstruct the unique sequence of choices that led to it.
+   No sequence  under counting      Many sequences  over counting
+
+EXAMPLE: How many ways are there to choose a 5 card hand that contains
+at least 3 Aces?
+                                                Poll:
+                                                A. Correct
+First choose 3 Aces. Then
+choose remaining two cards.
+                                                B. Overcount
+                                                C. Undercount
+                                           https://pollev.com/paulbeame028
+Sleuth’s Criterion (Rudich)
+
+    For each object constructed, it should be possible to
+ reconstruct the unique sequence of choices that led to it.
+   No sequence  under counting      Many sequences  over counting
+
+EXAMPLE: How many ways are there to choose a 5 card hand that contains
+at least 3 Aces?
+                                                Poll:
+                                                A. Correct
+First choose 3 Aces. Then                                              This Photo by
+
+
+
+choose remaining two cards.
+                                                B. Overcount           Unknown Author
+                                                                       is licensed under
+                                                                       CC BY-SA
+
+                                                C. Undercount
+                                           https://pollev.com/paulbeame028
+Sleuth’s Criterion (Rudich)
+
+    For each object constructed, it should be possible to
+ reconstruct the unique sequence of choices that led to it.
+                                        Many sequences  over counting
+
+EXAMPLE: How many ways are there to choose aProblem:   This counts
+                                             5 card hand            a hand with
+                                                             that contains
+                                            all 4 Aces in 4 different ways!
+at least 3 Aces?                            e.g. it counts A, A, A, A, 2
+                                                 four times:
+First choose 3 Aces. Then                        {A, A, A} {A, 2}
+choose remaining two cards.                      {A, A, A} {A, 2}
+                                                 {A, A, A} {A, 2}
+                                                 {A, A, A} {A, 2}
+Sleuth’s Criterion (Rudich)
+
+    For each object constructed, it should be possible to
+ reconstruct the unique sequence of choices that led to it.
+   No sequence  under counting         Many sequences  over counting
+
+EXAMPLE: How many ways are there to choose a 5 card hand that contains
+at least 3 Aces?
+Use the sum rule
+= # 5 card hand containing exactly 3 Aces
++ # 5 card hand containing exactly 4 Aces
+Sleuth’s Criterion (Rudich)
+
+    For each object constructed, it should be possible to
+ reconstruct the unique sequence of choices that led to it.
+   No sequence  under counting         Many sequences  over counting
+
+EXAMPLE: How many ways are there to choose a 5 card hand that contains
+at least 3 Aces?
+Use the sum rule
+= # 5 card hand containing exactly 3 Aces
++ # 5 card hand containing exactly 4 Aces
+Sleuth’s Criterion (Rudich)
+
+    For each object constructed, it should be possible to
+ reconstruct the unique sequence of choices that led to it.
+   No sequence  under counting         Many sequences  over counting
+
+EXAMPLE: How many ways are there to choose a 5 card hand that contains
+at least 3 Aces?
+Use the sum rule
+= # 5 card hand containing exactly 3 Aces
++ # 5 card hand containing exactly 4 Aces
+Counting when order only partly matters
+
+
+
+
+                                          79
+Rooks on chessboard
+
+How many ways to place two identical rooks on a
+chessboard so that they don’t share a row or a column
+Rooks on chessboard
+
+How many ways to place two identical rooks on a
+chessboard so that they don’t share a row or a column
+                           Fully ordered: Pretend Rooks are different
+                           1. Column for rook1
+                           2. Row for rook1
+                           3. Column for rook2
+                           4. Row for rook2
+Rooks on chessboard
+
+How many ways to place two identical rooks on a
+chessboard so that they don’t share a row or a column
+                           Fully ordered: Pretend Rooks are different
+                           1. Column for rook1
+                           2. Row for rook1
+                           3. Column for rook2
+                           4. Row for rook2
+Rooks on chessboard
+
+How many ways to place two identical rooks on a
+chessboard so that they don’t share a row or a column
+                           Fully ordered: Pretend Rooks are different
+                           1. Column for rook1
+                           2. Row for rook1
+                           3. Column for rook2
+                           4. Row for rook2
+
+                           “Remove” the order of the two
+                           rooks:
+Rooks on chessboard
+
+How many ways to place two identical rooks on a
+chessboard so that they don’t share a row or a column
+                           Fully ordered: Pretend Rooks are different
+                           1. Column for rook1
+                           2. Row for rook1
+                           3. Column for rook2
+                           4. Row for rook2
+
+                           “Remove” the order of the two
+                           rooks:
+Binomial Theorem
+
+
+
+
+                   85
+Binomial Theorem: A less obvious consequence
+
+
+
+
+                                               86
+Binomial Theorem: A less obvious consequence
+
+
+
+
+                                               87
+Binomial Theorem: A less obvious consequence
+
+
+
+
+                                          e.g., n=4: 1 4 6 4 1
+
+
+
+                                                                 88
+Binomial Theorem: A less obvious consequence
+
+
+
+
+                                          e.g., n=4: 1 4 6 4 1
+
+
+
+                                                                 89
+Tools and concepts
+
+●   Sum rule, Product rule
+●   Permutations, combinations
+●   Inclusion-exclusion
+●   Binomial Theorem
+●   Combinatorial proofs
+●   Pigeonhole principle
+●   Binary encoding/stars and bars
+

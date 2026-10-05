@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>CSE332 - Topic Summary - ADTs Stacks Queues</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="../style.css?v=2" />
+</head>
+<main>
+<body>
+    <div role="navigation" class="navbar navbar-static-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <span class="doc-title">CSE 332 &ndash; Topic Summary - ADTs
+Stacks Queues</span>
+        <ul class="nav pull-right doc-info">
+                    <li><p class="navbar-text"><a href="../index.html">Home</a></p></li>
+          <li><p class="navbar-text"><a href="../syllabus.html">Syllabus</a></p></li>
+          <li><p class="navbar-text"><a href="../calendar.html">Calendar</a></p></li>
+          <li><p class="navbar-text"><a href="../tasks.html">Tasks</a></p></li>
+          <li><p class="navbar-text"><a href="../exams.html">Exams</a></p></li>
+          <li><p class="navbar-text"><a href="../summaries.html">Summaries</a></p></li>
+          <li><p class="navbar-text"><a href="../oh.html">Office Hours</a></p></li>
+          <li><p class="navbar-text"><a href="../staff.html">Staff</a></p></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+    <div class="container">
+    <div class="row">
+            <div id="TOC" class="span3">
+        <div class="well toc">
+        <ul>
+          <li class="nav-header">Table of Contents</li>
+        </ul>
+        <ul>
+        <li><a href="#vocab-review" id="toc-vocab-review"><span
+        class="toc-section-number">1</span> Vocab Review</a></li>
+        <li><a href="#review-of-queue-data-structures"
+        id="toc-review-of-queue-data-structures"><span
+        class="toc-section-number">2</span> Review of Queue Data
+        Structures</a>
+        <ul>
+        <li><a href="#linked-nodes-queue"
+        id="toc-linked-nodes-queue"><span
+        class="toc-section-number">2.1</span> Linked Nodes
+        Queue</a></li>
+        <li><a href="#circular-array-queue"
+        id="toc-circular-array-queue"><span
+        class="toc-section-number">2.2</span> Circular Array
+        Queue</a></li>
+        </ul></li>
+        </ul>
+        </div>
+      </div>
+            <div class="span9">
+            <!--<blockquote style="background-color:#fbb; font-size:150%">This page is from a previous offering of the course. It has been left up for archival purposes.</blockquote>-->
+      <!--<blockquote style="background-color:#fbb; font-size:150%">This page is under construction. Any content you see now is subject to change until the first day of class. Expect some links to be broken until that time.</blockquote>-->
+      <!--<blockquote style="background-color:#FFD700; font-size:150%">Looking for someone to talk to about CSE332? Try the Study Center in CSE room 006! There's a table there just for working on and discussing CSE332!</blockquote>-->
+      <h1 data-number="1" id="vocab-review"><span
+      class="header-section-number">1</span> Vocab Review</h1>
+      <p>There are 4 new terms that we defined in this unit which we
+      will be using throughout the course:</p>
+      <ul>
+      <li>Abstract Data Type (ADT)</li>
+      <li>Data Structure</li>
+      <li>Implementation (of a data structure)</li>
+      <li>Algorithm</li>
+      </ul>
+      <p>Let’s start by looking at some examples of each, then we’ll
+      settle on a definition.</p>
+      <p>Examples of ADTs:</p>
+      <ol type="1">
+      <li>List</li>
+      <li>Set</li>
+      <li>Queue</li>
+      </ol>
+      <p>For each ADT, here are some data structures that we discussed
+      either in this course, or that you saw in a previous course:</p>
+      <ol type="1">
+      <li>List:
+      <ul>
+      <li>Array List</li>
+      <li>Linked List</li>
+      </ul></li>
+      <li>Set:
+      <ul>
+      <li>Binary Search Tree</li>
+      </ul></li>
+      <li>Queue:
+      <ul>
+      <li>Linked Nodes Queue</li>
+      <li>Circular Array Queue</li>
+      </ul></li>
+      </ol>
+      <p>From here, we can start making a distinction between the notion
+      of an ADT and a data structure. For starters, an ADT is a more
+      general idea. In particular, an ADT encapsulates how we would use
+      a particular data type.</p>
+      <p>For example, as experienced programmers we immediately
+      understand some of the ways that we might interact with a list. We
+      know lists may contain duplicate elements, that elements are
+      maintained in some sequence, and that there are certain operations
+      we can do on the list (e.g. add, remove, indexing).</p>
+      <p>For this class, <strong>defining an ADT requires providing two
+      things</strong>: 1. The notion of what the ADT represents 1. The
+      operations that we are able to do with the data</p>
+      <p>We can then define ADTs for list, set, and queue as follows
+      (note: the list of operations given is not intended to be
+      exhaustive, but should just give an idea of what makes each ADT
+      distinct from the others on this list):</p>
+      <ol type="1">
+      <li>List:
+      <ul>
+      <li>Notion: an ordered collection of elements</li>
+      <li>Operations:
+      <ul>
+      <li>add: inserts a new element at a given index</li>
+      <li>remove: deletes the element at a given index</li>
+      <li>indexing: returns the element at a given index</li>
+      </ul></li>
+      </ul></li>
+      <li>Set:
+      <ul>
+      <li>Notion: an unordered collection of distinct elements (i.e. no
+      duplicates allowed)</li>
+      <li>Operations:
+      <ul>
+      <li>add: inserts the given element if not already present</li>
+      <li>remove: deletes the given element</li>
+      </ul></li>
+      </ul></li>
+      <li>Queue:
+      <ul>
+      <li>Notion: a collection of elements in which we can only
+      access/remove the element which has been in the collection the
+      longest. In other words, we can only access items in
+      first-in-first-out (FIFO) order.</li>
+      <li>Operations:
+      <ul>
+      <li>enqueue: inserts the given element into the queue</li>
+      <li>dequeue: removes the oldest element from the queue</li>
+      <li>peek: returns the oldest element in the queue</li>
+      </ul></li>
+      </ul></li>
+      </ol>
+      <p><strong>A data structure is a strategy for satisfying an
+      ADT.</strong> For each of our data structures we will describe how
+      we will represent the contents, and we will describe the
+      algorithms we will use for each operation. The algorithms we
+      design for each operation should correctly update the
+      representation to match the behavior outlined in the ADT.</p>
+      <p>For example: - A linked list data structure stores its elements
+      in node objects, then maintains the sequence of elements by adding
+      a reference from each node to the next one in sequence. - An array
+      list data structure stores its elements in an array. The sequence
+      is maintained by the order of storage in the array itself. Because
+      the add operation’s functionality does not depend on the size of
+      the list, we will copy elements into a larger array if we ever
+      need to add an element when the array is full.</p>
+      <p>Between lists and queues we have seen two different designs for
+      data structure design: 1. Linked Nodes - Data is stored in node
+      objects, each of which has a reference to another node object -
+      List: the linked lists data structure - Queue: the linked nodes
+      queue data structure 1. Resizing Array - Data is stored in an
+      array, where contents must be copied into a new larger array if it
+      ever becomes full - List: the array list data structure - Queue:
+      the circular array data structure</p>
+      <blockquote style="background-color:#FFD700; font-size:100%">
+      Challenge Question: Which of these two designs does a binary
+      search tree most resemble? Can you think of a way to represent
+      trees that resembles the other design?
+      </blockquote>
+      <p>The final vocabulary term we presented was an
+      <strong>implementation of a data structure</strong>, which is
+      specifically <strong>computer code which puts a data structure
+      into effect</strong>.</p>
+      <p>When designing data structures it is important to keep your ADT
+      in mind as a guide. If the ADT which we’re satisfying is useful,
+      then a data structure that effectively implements that ADT (and
+      nothing more) will also be useful. For example, when building a
+      data structure for a queue, we do not need to care whether we can
+      efficiently perform a list-only operation (such as indexing). List
+      and queue are different ADTs and so it makes sense that we may
+      wish to design distinct data structures to be the best solution
+      for each ADT.</p>
+      <h1 data-number="2" id="review-of-queue-data-structures"><span
+      class="header-section-number">2</span> Review of Queue Data
+      Structures</h1>
+      <p>We’ll now provide an illustration of each of the queue data
+      structures presented in class. In exercise 0 you will build stacks
+      which behave similarly to the queue data structures.</p>
+      <h2 data-number="2.1" id="linked-nodes-queue"><span
+      class="header-section-number">2.1</span> Linked Nodes Queue</h2>
+      <p>Below we have some slides stepping through the behavior of the
+      enqueue and dequeue algorithms for a linked nodes queue. If you
+      need an accessible version, or wish to keep your own copy, you may
+      download the source pptx by clicking this link: <a
+      href="files/linked_nodes_queue.pptx">linked nodes pptx
+      download</a>.</p>
+      <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vRvO7uNIbHZCXEmIe4PvTCN_jpe2g6kwjXVN3x71tCIPec1FOzo2SVEACWvxbG3YQ/pubembed?start=false&amp;loop=false&amp;delayms=3000" frameborder="0" width="500" height="294" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" title="An embedding of the slide deck linked to above">
+      </iframe>
+      <h2 data-number="2.2" id="circular-array-queue"><span
+      class="header-section-number">2.2</span> Circular Array Queue</h2>
+      <p>Below we have some slides stepping through the behavior of the
+      enqueue and dequeue algorithms for a circular array queue. If you
+      need an accessible version, or wish to keep your own copy, you may
+      download the source pptx by clicking this link: <a
+      href="files/circular_array_queue.pptx">circular array pptx
+      download</a>. Note that this does not demonstrate resizing, as
+      this is a challenge we’ve reserved for exercise 0.</p>
+      <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQT_ZBGJSmRZYFv3vQQg7H_GB8POpZkFF8oL8TdZhd6t3CbcJdcD10R8Qf8JAUwwA/pubembed?start=false&amp;loop=false&amp;delayms=3000" frameborder="0" width="500" height="294" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" title="An embedding of the slide deck linked to above">
+      </iframe>
+            </div>
+    </div>
+  </div>
+  <footer>
+          Copyright © 2026 Paul G. Allen School of Computer Science & Engineering, University of Washington. Site design by Nathan Brunelle.
+              <p>Released under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /> CC-BY-NC-SA 4.0</a> license</a>.
+      </p>
+        <p>Last updated 2026-09-28 19:32</p>
+  </footer>
+</body>
+</main>
+</html>

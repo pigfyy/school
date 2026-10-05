@@ -1,0 +1,55 @@
+ 
+ CSE332 - Tasks 
+ CSE 332 – Tasks 
+ Home [index.html] 
+ Syllabus [syllabus.html] 
+ Calendar [calendar.html] 
+ Tasks 
+ Exams [exams.html] 
+ Summaries [summaries.html] 
+ Office Hours [oh.html] 
+ Staff [staff.html] 
+ Table of Contents 
+ 1 Surveys [#surveys] 
+ 2 Exercises [#exercises]
+ 2.1 Exercise 0 [#exercise-0] 
+ This page is from a previous offering of the course. It has been left up for archival purposes. -->
+ This page is under construction. Any content you see now is subject to change until the first day of class. Expect some links to be broken until that time. -->
+ Looking for someone to talk to about CSE332? Try the Study Center in CSE room 006! There's a table there just for working on and discussing CSE332! -->
+ 1 Surveys 
+ Preliminary
+ Survey 
+ 2 Exercises 
+ All exercises will be submitted and graded on this Gradescope for
+ exercises and exams . 
+ Some exercises may require submitting to multiple gradescope
+ assignments (e.g. if there is a programming component as well as a
+ written component). The assignment instructions will make it clear
+ when this is the case. 
+ 2.1 Exercise 0 
+ The objectives of this exercise are to: 
+ Set up your Java environment 
+ Refresh our Java programming skills 
+ Gain experience implementing data structures from an ADT 
+ Use Java generics 
+ Use benchmarking to study the running time of algorithms 
+ This assignment has three main parts. The first involves
+ setting up your java programming environment. The second involves
+ implementing some data structures. The third involves analyzing
+ the running times of your implementations using benchmarking.
+ There is no deliverable for part 1. Parts 2 and 3 each have a
+ separate Gradescope submission, which will combine together to
+ count as your exercise 0 grade. 
+ For this exercise, you will need: 
+ CSE332
+ VSCode Profile [files/exercises/cse332-Java.code-profile] - Our recommended configuration profile for
+ VSCode. This disables gen-AI tools for you. 
+ EX00 Starter Code [files/exercises/ex0.zip] -
+ which contains various classes that will be needed for this
+ assignment. 
+ EX00
+ Specification - which contains all instructions for what to do
+ for this assignment. 
+ Copyright © 2026 Paul G. Allen School of Computer Science & Engineering, University of Washington. Site design by Nathan Brunelle.
+ Released under the CC-BY-NC-SA 4.0 [http://creativecommons.org/licenses/by-nc-sa/4.0/] license .
+ Last updated 2026-09-30 17:35 

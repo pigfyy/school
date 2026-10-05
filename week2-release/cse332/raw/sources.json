@@ -1,0 +1,159 @@
+{
+  "course": "CSE 332 Autumn 2026 (26au)",
+  "week": "Week 2: 2026-10-05 to 2026-10-09 (America/Los_Angeles)",
+  "extractedText": "raw/text/ (pdftotext -layout for PDFs; slide text + speaker notes from the pptx XML; tag-stripped text for HTML). raw/png/ has every Lecture 3 slide rendered at 60 dpi (pdftoppm) for checking figures.",
+  "sources": [
+    {
+      "file": "raw/cse332-26au-lec03-Analysis2.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec03-Analysis2.pdf",
+      "what": "Lecture 3 slides (pdf, 37 pages)",
+      "covers": "lecture-3",
+      "fetchedAt": "2026-10-05T12:27:46-07:00",
+      "bytes": 486079,
+      "sha256": "d5fa3ddd4f2a3f3215b1161a4dfff32751ee43f6548048db4f41ef1c497b8e26"
+    },
+    {
+      "file": "raw/cse332-26au-lec03-Analysis2.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec03-Analysis2.pptx",
+      "what": "Lecture 3 slides (pptx; 37 slides, speaker notes on slide 18, one fade animation on slide 11, no hidden slides)",
+      "covers": "lecture-3",
+      "fetchedAt": "2026-10-05T12:27:47-07:00",
+      "bytes": 1340458,
+      "sha256": "816c30a61e304f03595bcefc39e15c2c0a7136190ffec6794dff56249bb7e783"
+    },
+    {
+      "file": "raw/math_identities_quick_reference.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/math_identities_quick_reference.pdf",
+      "what": "Math identities quick reference (summations, log rules)",
+      "covers": "lecture-3",
+      "fetchedAt": "2026-10-05T12:27:47-07:00",
+      "bytes": 129301,
+      "sha256": "fa2a42cd90a165deb150d2d3516f280616923b4a76845cd06a6d57504ceee315"
+    },
+    {
+      "file": "raw/calendar.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/calendar.html",
+      "what": "Course calendar (last updated 2026-10-05 11:54); no slide links for Oct 7-9",
+      "covers": "week",
+      "fetchedAt": "2026-10-05T12:27:47-07:00",
+      "bytes": 29607,
+      "sha256": "f452ae9ec92b089c422d835b436bad00bb94bcb69bbf2ef31840f886cfc5abd3"
+    },
+    {
+      "file": "raw/tasks.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/tasks.html",
+      "what": "Tasks page: Preliminary Survey, Exercise 0",
+      "covers": "week",
+      "fetchedAt": "2026-10-05T12:27:47-07:00",
+      "bytes": 31389,
+      "sha256": "290ad88ff34d4a5ba04ad1126c69bd9709635f1ff315b150e57f6df9529531c6"
+    },
+    {
+      "file": "raw/index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/index.html",
+      "what": "Course home page",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-05T12:27:47-07:00",
+      "bytes": 21308,
+      "sha256": "5e9bd5a34ae399d2a9d71ce9a577ed03c0fb1ed8a26546254c328e40f193ab98"
+    },
+    {
+      "file": "raw/syllabus.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/syllabus.html",
+      "what": "Syllabus: meetings, grading, late days",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-05T12:51:15-07:00",
+      "bytes": 28979,
+      "sha256": "f004044b0d3ea86ddc19c7e2028997dc8236489f02e2e2fe4e005abe708cb60f"
+    },
+    {
+      "file": "raw/staff.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/staff.html",
+      "what": "Staff page",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-05T12:51:15-07:00",
+      "bytes": 10687,
+      "sha256": "3366cabe82c1d23e8de0c50c50b53a69c36817626eebab6e604465d99f38902d"
+    },
+    {
+      "file": "raw/summaries.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries.html",
+      "what": "Topic summaries index",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-05T12:34:38-07:00",
+      "bytes": 5042,
+      "sha256": "98a955ea9ef31219fb6f1f45ba060c28f8b5d3263c0aa1870b0b47afabab52e8"
+    },
+    {
+      "file": "raw/summary_asymptotics.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries/asymptotics.html",
+      "what": "Topic summary: Asymptotic Notation (same definitions as slide 15)",
+      "covers": "lecture-3",
+      "fetchedAt": "2026-10-05T12:34:49-07:00",
+      "bytes": 249202,
+      "sha256": "fc3628460422907408ff615131676489be279d82c1431c76f982da01dad8ebe8"
+    },
+    {
+      "file": "raw/summary_heaps.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries/heaps.html",
+      "what": "Topic summary: Heaps. Fetched for the record only; NOT taught (PQ lectures not yet given, slides not posted)",
+      "covers": "upcoming",
+      "fetchedAt": "2026-10-05T12:34:49-07:00",
+      "bytes": 52689,
+      "sha256": "382bcc857b08f60fdeadaeb59b60fea312d9dae672d57b6372922c7344678c6e"
+    }
+  ],
+  "notPosted": {
+    "checkedAt": [
+      "2026-10-05T12:27:40-07:00",
+      "2026-10-05T13:23:27-07:00"
+    ],
+    "note": "The calendar shows Priority Queues 1 (Wed Oct 7), Section 2 (Thu Oct 8) and Priority Queues 2 (Fri Oct 9) with readings only, no slide links. Guessed URLs returned HTTP 404 at both checks.",
+    "probes": [
+      {
+        "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section02.pdf",
+        "status": 404
+      },
+      {
+        "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section02.pptx",
+        "status": 404
+      },
+      {
+        "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec04-PriorityQueues1.pdf",
+        "status": 404
+      },
+      {
+        "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec04-PQ1.pdf",
+        "status": 404
+      },
+      {
+        "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec05-PriorityQueues2.pdf",
+        "status": 404
+      },
+      {
+        "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec05-PQ2.pdf",
+        "status": 404
+      }
+    ],
+    "ignored": "files/slides/ also lists lecture4_analysis2_pqs.*, lecture5_pqs.* etc. dated 2026-09-29. They are not linked from the 26au calendar and don't follow the 26au file naming (cse332-26au-lecNN-*), so they were not used."
+  },
+  "notFetched": [
+    {
+      "url": "https://canvas.uw.edu/courses/1916767/quizzes/2447449",
+      "why": "Preliminary survey on Canvas (login)"
+    },
+    {
+      "url": "https://canvas.uw.edu/courses/1916767/external_tools/21130",
+      "why": "Lecture recordings (login)"
+    },
+    {
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/exercises/ex0.zip",
+      "why": "Exercise 0 starter code: graded work, deliberately not downloaded or worked"
+    },
+    {
+      "url": "Weiss, Data Structures & Algorithm Analysis in Java, 2.1-2.4, 1.1-1.6, 6.1-6.5",
+      "why": "Textbook not available; listed, not summarized"
+    }
+  ],
+  "fetchTimeSource": "fetchedAt = the file's modification time right after curl wrote it"
+}

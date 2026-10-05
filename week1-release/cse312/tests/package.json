@@ -1,0 +1,15 @@
+{
+  "name": "cse312-26au-week1-tests",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test:answers": "node answers.test.js",
+    "test:store": "node store.test.js",
+    "test:inventory": "node ../scripts/build-inventory.js --check",
+    "test:browser": "node browser.test.js",
+    "test": "node run-all.js"
+  },
+  "devDependencies": {
+    "playwright-core": "1.63.0"
+  }
+}

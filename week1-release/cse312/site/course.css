@@ -1,0 +1,184 @@
+/* CSE 312 week 1 · course.css: widget styles only. Loaded after base.css; uses only base tokens.
+   Series colors: a1 (teal) = chosen / in the count, a2 (rust) = repeats / overcount, a3 (violet) = totals and finals. */
+
+.page { max-width: 62rem; }
+.rule p:first-child strong:first-child { display: inline; font-family: inherit; font-size: inherit; letter-spacing: 0; text-transform: none; margin: 0; }
+.rule.warn p:first-child strong:first-child { color: var(--err); }
+.hero .question { font-size: var(--step-2); line-height: 1.2; font-weight: 600; max-width: 26ch; margin: 0 0 1.25rem; }
+.hero-count { font-size: var(--step-1); }
+.hero-count strong { color: var(--a3); font-size: var(--step-2); }
+.out, output { display: block; font-size: var(--step-0); }
+.mono-set { word-break: break-word; }
+code { overflow-wrap: anywhere; }
+table.plain { max-width: 100%; }
+table.plain td, table.plain th { overflow-wrap: anywhere; }
+.week .day strong { font-family: var(--mono); font-size: 1rem; letter-spacing: 0.02em; }
+
+/* ---------------------------------------------------------------- the slot strip */
+.slots { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.5rem 0.6rem; margin: 1rem 0 1.25rem; }
+.slot { display: flex; flex-direction: column; align-items: center; min-width: 3.4rem; }
+.slot b {
+  display: block; min-width: 3.4rem; padding: 0.3rem 0.6rem 0.2rem; font-family: var(--mono); font-size: var(--step-2); font-weight: 600; text-align: center;
+  background: var(--a1-tint); color: var(--ink); border-bottom: 4px solid var(--a1); border-radius: var(--r) var(--r) 0 0;
+}
+.slot span { font-size: 0.8rem; color: var(--ink-soft); margin-top: 0.3rem; text-align: center; line-height: 1.2; max-width: 7rem; }
+.op { font-family: var(--mono); font-size: var(--step-2); color: var(--ink-soft); padding-bottom: 1.6rem; }
+.slot.total b { background: var(--a3); color: #fff; border-bottom-color: var(--ink); }
+.letter-slots .slot input {
+  width: 3.4rem; height: 3.6rem; font: inherit; font-family: var(--mono); font-size: var(--step-3); font-weight: 600; text-align: center; text-transform: uppercase;
+  border: 1.5px solid var(--line-strong); border-bottom: 4px solid var(--a1); border-radius: var(--r) var(--r) 0 0; background: var(--surface); color: var(--ink); padding: 0;
+}
+.letter-slots .slot input.bad { border-color: var(--wrong); border-bottom-color: var(--wrong); background: var(--wrong-tint); }
+.alphabet { display: flex; flex-wrap: wrap; gap: 0.2rem; margin: 0.5rem 0 0.75rem; max-width: 46rem; }
+.alphabet span { width: 1.65rem; text-align: center; font-family: var(--mono); font-weight: 500; border-radius: 3px; background: var(--surface); border: 1px solid var(--line); font-size: 0.85rem; }
+.alphabet span.used { background: transparent; color: var(--ink-faint); text-decoration: line-through; border-style: dashed; }
+
+/* ---------------------------------------------------------------- set operations, subsets, bits */
+.setops-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0.75rem; }
+.setops-grid button {
+  font: inherit; width: 4.6rem; padding: 0.3rem 0; cursor: pointer; line-height: 1.15; color: var(--ink);
+  border: 1.5px solid var(--line-strong); border-radius: var(--r); background: var(--surface); display: flex; flex-direction: column; align-items: center;
+}
+.setops-grid button b { font-family: var(--mono); font-size: var(--step-1); }
+.setops-grid button small { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-soft); }
+.setops-grid button.in-a { border-color: var(--a1); background: var(--a1-tint); }
+.setops-grid button.in-b { border-color: var(--a2); background: var(--a2-tint); }
+.setops-grid button.in-a.in-b { background: linear-gradient(135deg, var(--a1-tint) 50%, var(--a2-tint) 50%); border-color: var(--ink); }
+.setops-table td:first-child { white-space: nowrap; }
+.sub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.35rem; margin-top: 0.75rem; }
+.sub-grid div { font-size: 0.82rem; padding: 0.3rem 0.45rem; border: 1px solid var(--line); border-radius: var(--r); line-height: 1.25; }
+.sub-grid div.on { background: var(--a1); color: #fff; border-color: var(--a1); }
+.sub-grid div.near { background: var(--a1-tint); }
+.choice-col { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin-bottom: 0.5rem; }
+.choice-col > span:first-child { min-width: 5.5rem; font-weight: 600; }
+.bits { display: flex; gap: 0.35rem; margin: 0.5rem 0; flex-wrap: wrap; }
+.bits button {
+  font: inherit; width: 3.2rem; padding: 0.3rem 0; cursor: pointer; color: var(--ink);
+  border: 1.5px solid var(--line-strong); border-radius: var(--r); background: var(--surface); display: flex; flex-direction: column; align-items: center; line-height: 1.15;
+}
+.bits button small { color: var(--ink-soft); font-family: var(--mono); font-size: 0.72rem; }
+.bits button[aria-pressed="true"] { border-color: var(--a1); background: var(--a1-tint); }
+.bits button b { font-family: var(--mono); font-size: var(--step-1); }
+.subset-list { columns: 4 9rem; column-gap: 1rem; font-size: 0.9rem; margin-top: 0.75rem; }
+.subset-list div { padding: 0.1rem 0.3rem; border-radius: 3px; break-inside: avoid; }
+.subset-list div.on { background: var(--a1); color: #fff; }
+.subset-list code { background: none; padding: 0; color: var(--ink-soft); font-weight: 600; margin-right: 0.4rem; }
+.subset-list div.on code { color: var(--a1-on-dark); }
+.venn { width: 100%; max-width: 22rem; height: auto; display: block; }
+
+/* ---------------------------------------------------------------- tree */
+.tree-wrap { overflow-x: auto; }
+.tree { width: 100%; min-width: 40rem; height: auto; }
+.tree text { font-family: var(--mono); font-size: 14px; fill: var(--ink); }
+.tree .edge { stroke: var(--line-strong); stroke-width: 1.5; }
+.tree .root { fill: var(--a1); }
+.tree .lvl { fill: var(--ink-soft); }
+.tree .leaf-ok { fill: var(--a1); font-weight: 700; }
+.tree .leaf-rep { fill: var(--a2); }
+.legend { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.95rem; }
+.legend .sw { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px; }
+.legend .sw-ok { background: var(--a1); }
+.legend .sw-rep { background: var(--a2); }
+
+/* ---------------------------------------------------------------- lunch, books */
+.lunch-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.75rem; }
+.lunch-grid h4 { margin: 0 0 0.35rem; font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft); }
+.lunch-grid ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.lunch-grid li { font-size: 0.85rem; border: 1px solid var(--line); border-radius: var(--r); padding: 0.15rem 0.45rem; }
+.lunch-grid li.dup { background: var(--a2-tint); border-color: var(--a2); color: var(--a2); font-weight: 600; }
+.panel h4 { margin: 0 0 0.5rem; font-size: var(--step-0); }
+.panel > h3:first-child, .panel > h4:first-child { margin-top: 0; }
+.book-shelf { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0; }
+.book-shelf button { font: inherit; cursor: pointer; padding: 0.35rem 0.6rem; border-radius: var(--r); border: 2px solid var(--line-strong); background: var(--surface); color: var(--ink); min-width: 5.5rem; }
+.book-shelf button[data-owner="0"] { border-color: var(--a1); background: var(--a1-tint); }
+.book-shelf button[data-owner="1"] { border-color: var(--a2); background: var(--a2-tint); }
+.book-shelf button[data-owner="2"] { border-color: var(--a3); background: var(--a3-tint); }
+.book-people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; margin-bottom: 0.75rem; }
+.book-people div { border: 1px solid var(--line); border-radius: var(--r); padding: 0.4rem 0.6rem; font-size: 0.95rem; }
+.people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; }
+.person { border: 1px solid var(--line); border-radius: var(--r); padding: 0.6rem 0.7rem; }
+.book-rows { display: grid; gap: 0.35rem; }
+.book-row { display: grid; grid-template-columns: 7rem repeat(3, auto) 1fr; gap: 0.35rem; align-items: center; }
+.status { margin-top: 0.75rem; padding: 0.5rem 0.75rem; border-radius: var(--r); font-weight: 600; }
+.status.ok { background: var(--right-tint); color: var(--right); }
+.status.bad { background: var(--wrong-tint); color: var(--wrong); }
+
+/* ---------------------------------------------------------------- enumerator */
+.enum .controls input[type="text"] { width: 9rem; text-transform: uppercase; font-family: var(--mono); }
+.enum-list { font-family: var(--mono); font-size: 0.85rem; display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.5rem 0; min-height: 1.6rem; }
+.enum-list span { border: 1px solid var(--line); border-radius: 3px; padding: 0 0.35rem; background: var(--surface); }
+.enum-list span.ok { border-color: var(--a1); background: var(--a1-tint); }
+.enum-list span.no { color: var(--ink-faint); text-decoration: line-through; }
+.enum-stats { font-family: var(--mono); font-size: 0.9rem; font-weight: 600; }
+.enum-stats.done { color: var(--right); }
+.enum-stats.partial { color: var(--note); }
+.enum-keys { font-family: var(--mono); font-size: 0.8rem; color: var(--ink-soft); margin-top: 0.4rem; overflow-wrap: anywhere; }
+.enum progress { width: 100%; max-width: 24rem; height: 0.6rem; accent-color: var(--a1); }
+
+/* ---------------------------------------------------------------- symmetry, grid paths */
+.sym-rows { display: grid; gap: 0.3rem; margin: 0.4rem 0; }
+.sym-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem; }
+.sym-row .cells { display: flex; gap: 2px; }
+.sym-row .cells span { width: 1.9rem; height: 1.5rem; border-radius: 3px; border: 1px solid var(--line); background: var(--paper); font-family: var(--mono); font-size: 0.75rem; text-align: center; line-height: 1.5rem; }
+.sym-row .cells span.on { background: var(--a1); color: #fff; border-color: var(--a1); }
+.sym-row .cells span.off { background: var(--a2-tint); border-color: var(--a2); }
+.sym-row small { color: var(--ink-soft); }
+.grid-wrap { max-width: 26rem; }
+.grid-svg { width: 100%; height: auto; display: block; }
+.grid-svg .street { stroke: var(--line-strong); stroke-width: 3; }
+.grid-svg .node { fill: var(--ink-faint); }
+.grid-svg .step { stroke: var(--a2); stroke-width: 5; stroke-linecap: round; }
+.grid-svg .me { fill: var(--a1); }
+.grid-svg text { font-family: var(--mono); font-size: 12px; fill: var(--ink); font-weight: 600; }
+
+/* ---------------------------------------------------------------- stars and bars, SEATTLE, binomial expansion */
+.sb-bins { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0; }
+.sb-bin { border: 1.5px solid var(--line-strong); border-radius: var(--r); padding: 0.35rem 0.5rem; text-align: center; min-width: 5.2rem; background: var(--surface); }
+.sb-bin .val { display: block; font-family: var(--mono); font-size: var(--step-2); font-weight: 600; color: var(--a3); }
+.sb-bin button { font: inherit; width: 1.8rem; cursor: pointer; border: 1.5px solid var(--ink); background: var(--surface); color: var(--ink); border-radius: var(--r); }
+.sb-bin button:disabled { opacity: 0.4; cursor: default; }
+.sb-code { font-family: var(--mono); font-size: var(--step-1); overflow-wrap: anywhere; margin: 0.25rem 0; }
+.sb-code .bar { color: var(--a2); font-weight: 700; }
+.sb-code .sb-line { display: block; }
+.seattle-slots { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.25rem 0 0.75rem; }
+.seattle-slots span {
+  width: 2.6rem; height: 2.8rem; display: flex; align-items: center; justify-content: center; font-family: var(--mono);
+  font-size: var(--step-1); font-weight: 600; border: 1.5px solid var(--line-strong); border-radius: var(--r); background: var(--surface);
+}
+.seattle-slots span.filled { border-color: var(--a1); color: var(--a1); }
+.seattle-slots span.new { background: var(--a1-tint); border-color: var(--a1); }
+.expand-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); gap: 0.4rem; margin: 0.4rem 0; }
+.expand-col { border: 1.5px solid var(--line-strong); border-radius: var(--r); padding: 0.35rem; cursor: pointer; background: var(--surface); font: inherit; text-align: left; color: var(--ink); }
+.expand-col[aria-pressed="true"] { border-color: var(--a3); background: var(--a3-tint); }
+.expand-col h4 { margin: 0 0 0.2rem; font-size: 0.95rem; }
+.expand-col .prods { font-family: var(--mono); font-size: 0.78rem; line-height: 1.35; overflow-wrap: anywhere; }
+
+/* ---------------------------------------------------------------- checks, problems, notices */
+.check .hint-text { font-size: 0.85rem; color: var(--ink-soft); margin: 0.4rem 0 0; }
+.check .feedback .tag, .my-work .feedback .tag, .cyu .feedback .tag { display: block; font-weight: 400; color: var(--ink); margin-top: 0.15rem; }
+.cyu .feedback { margin: 0.5rem 0 0.25rem; }
+.brute { font-size: 0.95rem; color: var(--ink-soft); }
+.brute.ok { color: var(--right); font-weight: 600; }
+.work-preview { white-space: pre-wrap; background: var(--paper); border-radius: var(--r); padding: 0.5rem 0.65rem; margin-top: 0.4rem; font-size: 0.95rem; }
+.inline-notice { font-size: 0.85rem; color: var(--wrong); margin: 0.3rem 0 0; }
+.inline-notice:empty { display: none; }
+.task-progress .row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.toasts { pointer-events: none; }
+.toast { pointer-events: auto; }
+.toast.conflict { border-left-color: var(--a3-on-dark); }
+.toast.recovered { border-left-color: var(--a1-on-dark); }
+@media (prefers-reduced-motion: no-preference) { .toast { animation: reveal 0.25s ease-out; } }
+
+@media (max-width: 860px) {
+  .lunch-grid, .book-people, .people { grid-template-columns: 1fr; }
+  .book-row { grid-template-columns: 1fr repeat(3, auto); }
+  .book-row .note { grid-column: 1 / -1; }
+  .slot b { font-size: var(--step-1); min-width: 2.8rem; }
+  .slot { min-width: 2.8rem; }
+  .op { font-size: var(--step-1); }
+  .letter-slots .slot input { width: 2.9rem; height: 3.1rem; font-size: var(--step-2); }
+  .cyu { padding-left: 2.8rem; }
+  .task { padding: 1.1rem 1rem; }
+  .sb-code { font-size: var(--step-0); }
+}
+@media print { .toasts { display: none !important; } }

@@ -1,0 +1,43 @@
+ 
+ CSE332 - Topic Summaries 
+ CSE 332 – Topic Summaries 
+ Home [index.html] 
+ Syllabus [syllabus.html] 
+ Calendar [calendar.html] 
+ Tasks [tasks.html] 
+ Exams [exams.html] 
+ Summaries 
+ Office Hours [oh.html] 
+ Staff [staff.html] 
+ Table of Contents 
+ 1 List of Summaries [#list-of-summaries]
+ 1.1 Midterm Content [#midterm-content] 
+ 1.2 Final Content [#final-content] 
+ This page is from a previous offering of the course. It has been left up for archival purposes. -->
+ This page is under construction. Any content you see now is subject to change until the first day of class. Expect some links to be broken until that time. -->
+ Looking for someone to talk to about CSE332? Try the Study Center in CSE room 006! There's a table there just for working on and discussing CSE332! -->
+ 1 List of Summaries 
+ Nathan Brunelle has written a summary write-up for many of the
+ topics covered in lecture. These are intended as a slightly
+ different presentation of the same materials, and an opportunity
+ to provide additional discussion or examples that we would not
+ otherwise have time for in class. 
+ Be advised that these are still under development (summaries
+ are not yet available for all topics in the course). 
+ Remember that we also have alternative readings in the optional
+ course text (Weiss) listed for each lecture in the course
+ calendar. 
+ 1.1 Midterm Content 
+ ADTs, Stacks, and
+ Queues summary [summaries/adt_stacks_queues.html] 
+ Running time [summaries/runningtime.html] 
+ Asymptotics [summaries/asymptotics.html] 
+ Heaps [summaries/heaps.html] 
+ Recurrences [summaries/recurrences.html] 
+ AVL Trees [summaries/avl.html] 
+ 1.2 Final Content 
+ Hash Functions and Hash
+ Tables [summaries/hashing.html] 
+ Copyright © 2026 Paul G. Allen School of Computer Science & Engineering, University of Washington. Site design by Nathan Brunelle.
+ Released under the CC-BY-NC-SA 4.0 [http://creativecommons.org/licenses/by-nc-sa/4.0/] license .
+ Last updated 2026-09-29 20:55 

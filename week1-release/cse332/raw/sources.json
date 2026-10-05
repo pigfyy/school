@@ -1,0 +1,232 @@
+{
+  "course": "CSE 332 Autumn 2026 (26au)",
+  "week": "Week 1: 2026-09-30 to 2026-10-02 (America/Los_Angeles)",
+  "extractedText": "raw/text/ (pdftotext -layout for PDFs; slide text + speaker notes + OMML math for pptx; paragraph text for docx)",
+  "notFetched": [
+    {
+      "url": "https://canvas.uw.edu/courses/1916767/external_tools/21130",
+      "why": "Lecture recordings (Panopto via Canvas) require UW login"
+    },
+    {
+      "url": "https://canvas.uw.edu/courses/1916767/quizzes/2447449",
+      "why": "Preliminary survey on Canvas requires UW login"
+    },
+    {
+      "url": "https://edstem.org/us/courses/107515",
+      "why": "Ed board requires login"
+    },
+    {
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/exercises/ex0.zip",
+      "why": "Exercise 0 starter code: graded work, deliberately not downloaded or taught"
+    }
+  ],
+  "sources": [
+    {
+      "file": "raw/index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/",
+      "what": "course home page",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-02T20:50:20-07:00",
+      "bytes": 21308,
+      "sha256": "5e9bd5a34ae399d2a9d71ce9a577ed03c0fb1ed8a26546254c328e40f193ab98"
+    },
+    {
+      "file": "raw/calendar.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/calendar.html",
+      "what": "calendar (schedule, readings, slide/section links)",
+      "covers": "2026-09-30..2026-10-02 (whole quarter listed)",
+      "fetchedAt": "2026-10-02T20:50:26-07:00",
+      "bytes": 28868,
+      "sha256": "7d38c8aa1cd4ea6abcc25e41517f4bf272ed4c3f5524bba93b79bb114ff7d42c"
+    },
+    {
+      "file": "raw/syllabus.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/syllabus.html",
+      "what": "syllabus and policies",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-02T20:50:26-07:00",
+      "bytes": 28977,
+      "sha256": "cc055a7f1af049065328f5dfbc76e10aac638ce5795aca23b08b1ba4b4ef732a"
+    },
+    {
+      "file": "raw/tasks.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/tasks.html",
+      "what": "tasks page (surveys, exercises)",
+      "covers": "course-wide; EX0 due 2026-10-09",
+      "fetchedAt": "2026-10-02T20:50:26-07:00",
+      "bytes": 31389,
+      "sha256": "290ad88ff34d4a5ba04ad1126c69bd9709635f1ff315b150e57f6df9529531c6"
+    },
+    {
+      "file": "raw/exams.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/exams.html",
+      "what": "exams page",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-02T20:50:26-07:00",
+      "bytes": 16392,
+      "sha256": "53876bdd368d15197a1afcdf6176f1bc841c3509e9cd11d2d96b52df8f23f463"
+    },
+    {
+      "file": "raw/summaries.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries.html",
+      "what": "topic summary index",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-02T20:50:27-07:00",
+      "bytes": 5042,
+      "sha256": "98a955ea9ef31219fb6f1f45ba060c28f8b5d3263c0aa1870b0b47afabab52e8"
+    },
+    {
+      "file": "raw/oh.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/oh.html",
+      "what": "office hours page (calendar embed only)",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-02T20:50:27-07:00",
+      "bytes": 6366,
+      "sha256": "1572f3364cad916e537264e8a7193f5152449dd209d785197b09733d841ca079"
+    },
+    {
+      "file": "raw/staff.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/staff.html",
+      "what": "staff page",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-02T20:50:27-07:00",
+      "bytes": 10687,
+      "sha256": "3366cabe82c1d23e8de0c50c50b53a69c36817626eebab6e604465d99f38902d"
+    },
+    {
+      "file": "raw/course-style.css",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/style.css?v=2",
+      "what": "course site stylesheet (colors)",
+      "covers": "n/a",
+      "fetchedAt": "2026-10-02T21:02:33-07:00",
+      "bytes": 4803,
+      "sha256": "4adcb6cb6682d9d342923c1d7e78033c1e7528dab0421478a77c784010610f12"
+    },
+    {
+      "file": "raw/files_math_identities_quick_reference.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/math_identities_quick_reference.pdf",
+      "what": "math identities quick reference",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-02T20:50:27-07:00",
+      "bytes": 129301,
+      "sha256": "fa2a42cd90a165deb150d2d3516f280616923b4a76845cd06a6d57504ceee315"
+    },
+    {
+      "file": "raw/cse332-26au-lec01-Intro.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec01-Intro.pptx",
+      "what": "Lecture 1 slides (pptx, with speaker notes)",
+      "covers": "2026-09-30",
+      "fetchedAt": "2026-10-02T20:50:40-07:00",
+      "bytes": 2303883,
+      "sha256": "b723b980c03e9366f022661a44988440800f8c88c973901e425cc2f2be6a515d"
+    },
+    {
+      "file": "raw/cse332-26au-lec01-Intro.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec01-Intro.pdf",
+      "what": "Lecture 1 slides (pdf)",
+      "covers": "2026-09-30",
+      "fetchedAt": "2026-10-02T20:50:40-07:00",
+      "bytes": 547886,
+      "sha256": "fd0dbba551f315620b6d31eb84dd1020960468c01378b4baeab8d7ac36bfe633"
+    },
+    {
+      "file": "raw/Section01.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section01.pptx",
+      "what": "Section 1 slides (pptx, with speaker notes)",
+      "covers": "2026-10-01",
+      "fetchedAt": "2026-10-02T20:50:40-07:00",
+      "bytes": 154229,
+      "sha256": "d2105dc94c1dfbe380da699915b65b324fa2d97e6855b3bf63ba475bce74adae"
+    },
+    {
+      "file": "raw/Section01.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section01.pdf",
+      "what": "Section 1 slides (pdf)",
+      "covers": "2026-10-01",
+      "fetchedAt": "2026-10-02T20:50:41-07:00",
+      "bytes": 229603,
+      "sha256": "5a4a0f33dcd9e20e31fb480f5e75747573605b268fc9342c741d08241f1b57cf"
+    },
+    {
+      "file": "raw/worksheet.docx",
+      "url": "https://docs.google.com/document/d/1HtlbsYXqDWFWuuBhYM9XXytHLz5K7t1i/export?format=docx",
+      "what": "Section 1 worksheet (Google Doc linked from calendar, exported as docx)",
+      "covers": "2026-10-01",
+      "fetchedAt": "2026-10-02T20:50:42-07:00",
+      "bytes": 12493,
+      "sha256": "38a8d9513e86fa28ff71651adca6d82f724b3835d0837bdc7df893afe31f9d79"
+    },
+    {
+      "file": "raw/solutions.docx",
+      "url": "https://docs.google.com/document/d/1D1oLDdE35-Jd3uWbMeNRZdrNy45pcHOb/export?format=docx",
+      "what": "Section 1 worksheet solutions (Google Doc linked from calendar, exported as docx)",
+      "covers": "2026-10-01",
+      "fetchedAt": "2026-10-02T20:50:43-07:00",
+      "bytes": 13939,
+      "sha256": "6ec45533c17c5c5a485381e27ff95911fc02a072cba213ef86cee1a3a97b9509"
+    },
+    {
+      "file": "raw/cse332-26au-lec02-Analysis1.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec02-Analysis1.pptx",
+      "what": "Lecture 2 slides (pptx; includes hidden answer slides 16 and 18)",
+      "covers": "2026-10-02",
+      "fetchedAt": "2026-10-02T20:50:41-07:00",
+      "bytes": 1035164,
+      "sha256": "4049894d6c74ffbd5cfb148043e4d23cbf2de46ef463018edf331f9651ad5d53"
+    },
+    {
+      "file": "raw/cse332-26au-lec02-Analysis1.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec02-Analysis1.pdf",
+      "what": "Lecture 2 slides (pdf; omits hidden slides)",
+      "covers": "2026-10-02",
+      "fetchedAt": "2026-10-02T20:50:41-07:00",
+      "bytes": 417321,
+      "sha256": "ad66f2b628ed82ea2c8ec0130ac3fe8308571751a981d82de176f1679db83266"
+    },
+    {
+      "file": "raw/summary_adt_stacks_queues.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries/adt_stacks_queues.html",
+      "what": "topic summary: ADTs, Stacks, and Queues",
+      "covers": "2026-09-30 (Lecture 1 topic)",
+      "fetchedAt": "2026-10-02T20:53:09-07:00",
+      "bytes": 11949,
+      "sha256": "973fd3b320f07055c36b4cf54ff0ad122440aad7b593609e40d3276224d84e75"
+    },
+    {
+      "file": "raw/summary_runningtime.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries/runningtime.html",
+      "what": "topic summary: Running time",
+      "covers": "2026-10-02 (Lecture 2 topic)",
+      "fetchedAt": "2026-10-02T20:53:09-07:00",
+      "bytes": 31745,
+      "sha256": "49c838e520dd67d5c7225edb2d0c4a53a57d1aa22c2947ec9b38de5c4350e268"
+    },
+    {
+      "file": "raw/summary_asymptotics.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries/asymptotics.html",
+      "what": "topic summary: Asymptotics",
+      "covers": "2026-10-02 (Lecture 2 topic)",
+      "fetchedAt": "2026-10-02T20:53:09-07:00",
+      "bytes": 249202,
+      "sha256": "fc3628460422907408ff615131676489be279d82c1431c76f982da01dad8ebe8"
+    },
+    {
+      "file": "raw/ex0-spec.html",
+      "url": "https://docs.google.com/document/d/e/2PACX-1vR0GRTeP7W9dpbt8qXjRbUHwsTUc96gjcl52jsqOxRRshWVV6deFczg229H735iFeGrCGEatdWObce0/pub",
+      "what": "Exercise 0 specification (read only to know what NOT to solve; not taught on the site)",
+      "covers": "due 2026-10-09",
+      "fetchedAt": "2026-10-02T21:20:11-07:00",
+      "bytes": 221591,
+      "sha256": "e5d17cc5284e9650a19c709d779f1269817937ebc77ef90a2ad63a62400150a4"
+    },
+    {
+      "file": "raw/ai_policy.txt",
+      "url": "https://docs.google.com/document/d/1XV_YeBqceJFZXUYnuDdiVdtyhw1KZNn9cxxJ2O5VJGY/export?format=txt",
+      "what": "Allen School AI policy linked from syllabus",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-02T20:53:10-07:00",
+      "bytes": 5895,
+      "sha256": "e6dfc64d33c911195839cec9485dd85e69d1223a3f94ccb15657dcb7d7c99701"
+    }
+  ]
+}

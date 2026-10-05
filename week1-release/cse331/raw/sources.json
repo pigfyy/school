@@ -1,0 +1,248 @@
+{
+  "course": "CSE 331 Autumn 2026 (26au)",
+  "week": "Week 1: Wed 2026-09-30 to Fri 2026-10-02 (America/Los_Angeles)",
+  "fetchedBy": "curl",
+  "notes": "Lecture 1 notes/slides, calendar, info, staff, resources, topics, reading1 and hw1 are byte-identical to the copies in cse331-skill-trial/raw (fetched earlier on 2026-10-02). Lecture 2 is new.",
+  "sources": [
+    {
+      "file": "page_index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/",
+      "title": "Course home: schedule, section times, office hours",
+      "covers": "2026-09-30..2026-10-02 (standing info)",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 14682,
+      "sha256": "780b0bc7824dd32d42708feddd6265768efe7b774505e5ae3de53e53bb2a33c9",
+      "status": "ok"
+    },
+    {
+      "file": "page_calendar_calendar.html.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/calendar/calendar.html",
+      "title": "Course calendar",
+      "covers": "2026-09-30..2026-12 (used for 2026-09-30..2026-10-02)",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 39115,
+      "sha256": "33c5db8d9a60c35fd0c4f3efcd61707b9cc39cda747a38274330bd82cca535cd",
+      "status": "ok"
+    },
+    {
+      "file": "page_topics_.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/topics/",
+      "title": "Topics index (topic 1: Assertions and Specifications)",
+      "covers": "2026-09-30..2026-10-09",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 7681,
+      "sha256": "7f3c84136cf8e641a7cf0d3b653647fcaf7f0ab616b7ef5042d84ebb7ef44aa1",
+      "status": "ok"
+    },
+    {
+      "file": "page_info_.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/info/",
+      "title": "Syllabus: grading, late, collaboration, AI policy",
+      "covers": "standing",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 30142,
+      "sha256": "d2f5241f1d94af22eedd1fba2cb12f85e097e73a5bc86e3288ec1e76553df7e7",
+      "status": "ok"
+    },
+    {
+      "file": "page_staff_.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/staff/",
+      "title": "Staff",
+      "covers": "standing",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 17880,
+      "sha256": "00abc2ffdcef134d02a782203210105e8b470533361521a266262d47b5558471",
+      "status": "ok"
+    },
+    {
+      "file": "page_resources_.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/resources/",
+      "title": "Resources (JDK 25, no AI tool needed for HW0/HW1)",
+      "covers": "standing",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 9188,
+      "sha256": "149c3e58234043d616f96218b9c93b40fbc5289d1f428d90810e45a001d22670",
+      "status": "ok"
+    },
+    {
+      "file": "page_section_.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/",
+      "title": "Section directory listing",
+      "covers": "2026-10-06 (Section 1)",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 1142,
+      "sha256": "d36152cbf12d13ff29fc35bf33a1e26d51db9c14cf20735a38c9f96c43864385",
+      "status": "ok"
+    },
+    {
+      "file": "page_lectures_.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/",
+      "title": "Lectures directory listing",
+      "covers": "2026-09-30, 2026-10-02",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 1294,
+      "sha256": "56c515266ee41f1cbde5e7155d556b7356ddf7e71e9af3a0e82bf5d3e1e1b159",
+      "status": "ok"
+    },
+    {
+      "file": "page_readings_.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/readings/",
+      "title": "Readings index (reflection rules)",
+      "covers": "2026-10-02 (Reading 1 due)",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 10734,
+      "sha256": "5dfad4ad18ea542e6d27cd2650dad2c576895ea706ff343d748842cf6607a3a5",
+      "status": "ok"
+    },
+    {
+      "file": "page_homework_.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/homework/",
+      "title": "Homework directory listing",
+      "covers": "2026-10-02, 2026-10-09",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 1259,
+      "sha256": "c86f5d8b8074763524de38baa387a8d37c95d2578dc5f450d00b9d63e7182308",
+      "status": "ok"
+    },
+    {
+      "file": "lecture01/index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture01-assertions/",
+      "title": "Lecture 1 summary page",
+      "covers": "2026-09-30",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 8372,
+      "sha256": "4262698a5f6c351a7bc431ef09dabe4691d63c4feaf1243730b1ca9fede55cb7",
+      "status": "ok"
+    },
+    {
+      "file": "lecture01/notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture01-assertions/notes.html",
+      "title": "Lecture 1 notes: Welcome! Whole program assertions",
+      "covers": "2026-09-30",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 62628,
+      "sha256": "054ce1c83c57dcb443ae63acf71b61cb2d224bab6a5ec4aa2c7c56025ff2b00f",
+      "status": "ok"
+    },
+    {
+      "file": "lecture01/slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture01-assertions/slides.html",
+      "title": "Lecture 1 slides",
+      "covers": "2026-09-30",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 36571,
+      "sha256": "3a25842c7fc6d77e8a2bb48315d7782eba8c0e7badb0f0f3a092fb7761f44688",
+      "status": "ok"
+    },
+    {
+      "file": "lecture02/index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture02-specifications/",
+      "title": "Lecture 2 summary page",
+      "covers": "2026-10-02",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 8856,
+      "sha256": "c71dea72f76ecdbb7e6acf3c3493c7967278bedf47f0d0c0d9e667ff5b81b8b6",
+      "status": "ok"
+    },
+    {
+      "file": "lecture02/notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture02-specifications/notes.html",
+      "title": "Lecture 2 notes: Procedural abstraction and specification",
+      "covers": "2026-10-02",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 64109,
+      "sha256": "3004fb84d3cf026ec3c194cecea05845105d5cca8154c431dfb2464f30d2d4ab",
+      "status": "ok"
+    },
+    {
+      "file": "lecture02/slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture02-specifications/slides.html",
+      "title": "Lecture 2 slides",
+      "covers": "2026-10-02",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 58662,
+      "sha256": "71da60abc27192dc653b805b3f673c7bdb7b069f4068e1dc18c7ad39b32ceb5a",
+      "status": "ok"
+    },
+    {
+      "file": "testing/notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/testing/notes.html",
+      "title": "Future testing lecture notes (placeholder, not in scope)",
+      "covers": "2026-10-07 (not in scope)",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 7219,
+      "sha256": "3c78f85bbb4649f0ffe16b082b8dcf35b14321782900595bdff4e440103578dd",
+      "status": "placeholder: 'This content is not yet available. Please check back later.'"
+    },
+    {
+      "file": "section01/section01.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section01.html",
+      "title": "Section 1 handout",
+      "covers": "2026-10-06 (outside Sept 30-Oct 2)",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 7219,
+      "sha256": "3c78f85bbb4649f0ffe16b082b8dcf35b14321782900595bdff4e440103578dd",
+      "status": "placeholder: 'This content is not yet available. Please check back later.'"
+    },
+    {
+      "file": "section01/section01-solution.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section01-solution.html",
+      "title": "Section 1 solution",
+      "covers": "2026-10-06 (outside Sept 30-Oct 2)",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 7219,
+      "sha256": "3c78f85bbb4649f0ffe16b082b8dcf35b14321782900595bdff4e440103578dd",
+      "status": "placeholder: 'This content is not yet available. Please check back later.'"
+    },
+    {
+      "file": "readings/index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/readings/",
+      "title": "Readings index (same as page_readings_)",
+      "covers": "2026-10-02",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 10734,
+      "sha256": "5dfad4ad18ea542e6d27cd2650dad2c576895ea706ff343d748842cf6607a3a5",
+      "status": "ok"
+    },
+    {
+      "file": "readings/reading1.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/readings/reading1.html",
+      "title": "Reading 1 assignment",
+      "covers": "due 2026-10-02",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 15383,
+      "sha256": "ffc9f2b7fe32824aba43843a6e64a126505ff09431f666aa0d168d3484b6c756",
+      "status": "ok"
+    },
+    {
+      "file": "homework/hw0.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/homework/hw0.html",
+      "title": "Homework 0 (due date only used)",
+      "covers": "due 2026-10-02",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 11022,
+      "sha256": "2371198a4627c90d3727a79112d860dc0193cce61f73aee84997378554feb526",
+      "status": "ok"
+    },
+    {
+      "file": "homework/hw1.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/homework/hw1.html",
+      "title": "Homework 1 (due date and task titles only used)",
+      "covers": "due 2026-10-09",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 23849,
+      "sha256": "3648ecaa0119c8af7b0e52ccab113963e9804aebd7c854e11576c60e83390993",
+      "status": "ok"
+    },
+    {
+      "file": "homework/hw1-solution.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/homework/hw1-solution.html",
+      "title": "Homework 1 solution",
+      "covers": "not used",
+      "fetchedAt": "2026-10-02T20:58:00-07:00",
+      "bytes": 7219,
+      "sha256": "3c78f85bbb4649f0ffe16b082b8dcf35b14321782900595bdff4e440103578dd",
+      "status": "placeholder: 'This content is not yet available. Please check back later.'"
+    }
+  ]
+}

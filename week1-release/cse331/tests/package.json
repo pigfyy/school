@@ -1,0 +1,16 @@
+{
+  "name": "cse331-week1-site-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:java": "node compare-java.mjs",
+    "test:unit": "node unit.mjs",
+    "test:browser": "node browser.mjs",
+    "test:grading": "node grading-state.mjs",
+    "export": "node ../tools/build-export.mjs",
+    "test": "node compare-java.mjs && node unit.mjs && node ../tools/build-export.mjs && node browser.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "1.58.2"
+  }
+}

@@ -1,0 +1,2316 @@
+<!doctype html>
+<!--
+  CSE 312 (Autumn 2026) · Week 2 teaching site, Mon Oct 5 – Fri Oct 9, 2026.
+    Lecture 3 (Mon Oct 5, today): Inclusion-Exclusion, Pigeonhole Principle and More · reading 1.3
+    Lecture 4 (Wed Oct 7, upcoming; slides posted early): Discrete Probability · reading 2.1
+    Lecture 5 (Fri Oct 9, upcoming; slides posted early): Conditional Probability, Bayes Theorem · reading 2.2
+    Section 2 (Thu Oct 8): handout and solutions not posted when checked (404); shown as "not posted yet", no invented problems.
+  Built with the course-teaching-site skill from the official 26au materials (see ../raw/sources.json and ../COVERAGE.md).
+  Static: no build step and no network requests (KaTeX and fonts are vendored under vendor/).
+
+  Stateful items. Every one has a stable semantic id; see ../INTEGRATION.md for the rules.
+    article.task[data-id]            problem       (.answer-spec[data-part-id] = one answer box / part)
+    div.check[data-id]               quick check   (one box at the end of a lecture module)
+    li.cyu[data-id]                  quiz question (data-kind="mc" with label[data-opt] options, or "num")
+  Answer specs: data-answer (exact value, compared exactly with BigInt rationals), data-near (flag rounded decimals),
+  data-type="formula" + data-vars, data-type="yesno", data-type="self". ul.miscon > li[data-expr][data-tag] lists
+  answers that signal a known mistake. Change an id whenever the question or its answer changes.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE 312 week 2 · From counting to probability</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="course.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="shell">
+
+<nav class="rail" id="rail" aria-label="Week 2 pages">
+  <div class="rail-top">
+    <a class="brand" href="#home"><span class="brand-cmd">cse312 <b>week 2</b></span><small>From counting to probability · Oct 5–9</small></a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="rail-body">Contents</button>
+  </div>
+  <div class="rail-body" id="rail-body">
+    <div>
+      <h2>Lecture 3 <span class="today">Today · Mon Oct 5</span></h2>
+      <ol class="modules">
+      <li><a href="#l3-binomial"><span>The binomial theorem</span></a></li>
+      <li><a href="#l3-proofs"><span>Combinatorial proofs</span></a></li>
+      <li><a href="#l3-ie"><span>Inclusion-exclusion</span></a></li>
+      <li><a href="#l3-php"><span>The pigeonhole principle</span></a></li>
+      <li><a href="#l3-cards"><span>Counting cards</span></a></li>
+      <li><a href="#l3-rooks"><span>When order partly matters</span></a></li>
+      <li class="extra"><a href="#l3-problems"><span>Problems from the slides</span></a></li>
+      <li class="extra"><a href="#l3-quiz"><span>Check your understanding</span></a></li>
+    </ol>
+    </div>
+    <div>
+      <h2>Lecture 4 <span class="later">Upcoming · Wed Oct 7</span></h2>
+      <ol class="modules">
+      <li><a href="#l4-events"><span>Sample spaces and events</span></a></li>
+      <li><a href="#l4-probability"><span>Probability spaces</span></a></li>
+      <li><a href="#l4-uniform"><span>Equally likely outcomes</span></a></li>
+      <li><a href="#l4-axioms"><span>Axioms and unequal outcomes</span></a></li>
+      <li><a href="#l4-dice"><span>Example: at least one 3</span></a></li>
+      <li class="extra"><a href="#l4-problems"><span>Problems from the slides</span></a></li>
+      <li class="extra"><a href="#l4-quiz"><span>Check your understanding</span></a></li>
+    </ol>
+    </div>
+    <div>
+      <h2>Lecture 5 <span class="later">Upcoming · Fri Oct 9</span></h2>
+      <ol class="modules">
+      <li><a href="#l5-conditional"><span>Conditional probability</span></a></li>
+      <li><a href="#l5-reversing"><span>Reversing the condition</span></a></li>
+      <li><a href="#l5-bayes"><span>Bayes’ theorem</span></a></li>
+      <li><a href="#l5-ltp"><span>Law of total probability</span></a></li>
+      <li><a href="#l5-zika"><span>Example: Zika testing</span></a></li>
+      <li class="extra"><a href="#l5-problems"><span>Problems from the slides</span></a></li>
+      <li class="extra"><a href="#l5-quiz"><span>Check your understanding</span></a></li>
+    </ol>
+    </div>
+    <div>
+      <h2>Later this week</h2>
+      <ul class="later-list">
+        <li><span>Thu Oct 8 · Section 2: “Probability problems”</span><em>handout not posted yet · <a href="#home" data-jump="section-status">details</a></em></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Reference</h2>
+      <ul class="plain-links">
+      <li><a href="#readings"><span>Readings 1.3, 2.1, 2.2</span></a></li>
+      <li><a href="#cheatsheet"><span>Cheat sheet</span></a></li>
+      <li><a href="#home"><span>Week overview</span></a></li>
+    </ul>
+    </div>
+    <p class="rail-foot"><kbd>←</kbd> <kbd>→</kbd> pages · <kbd>N</kbd> next step · <kbd>H</kbd> next hint</p>
+  </div>
+</nav>
+
+<main id="main" tabindex="-1">
+
+<!-- ================================================================ HOME -->
+<section class="page" id="home" data-title="Week overview">
+  <div class="hero">
+    <p class="eyebrow">CSE 312 · Week 2 · Mon Oct 5 – Fri Oct 9, 2026 · <span class="today-chip">Today · Mon Oct 5</span></p>
+    <h1>From counting to probability</h1>
+    <p class="lede">One survey, three lectures. 70 students were asked whether they like ice cream (\(A\)) and donuts (\(B\)). Monday counts the picture, Wednesday picks a student at random, and Friday learns something about that student first.</p>
+
+    <div class="hero-grid">
+      <figure class="venn-figure">
+        <svg class="venn" id="hero-venn" viewBox="0 0 420 270" role="img" aria-label="Venn diagram: 36 like only ice cream, 7 like both, 13 like only donuts, 14 like neither"></svg>
+        <figcaption>36 only ice cream · 7 both · 13 only donuts · 14 neither. The numbers come from Lecture 3 and Lecture 5.</figcaption>
+      </figure>
+      <div class="hero-panel">
+        <div class="lens-tabs" role="group" aria-label="Choose a question">
+          <button class="lens" data-lens="union" aria-pressed="true"><span class="tag-today">Mon</span>How many like at least one?</button>
+          <button class="lens" data-lens="pa" aria-pressed="false"><span class="tag-later">Wed</span>Random student: P(likes ice cream)?</button>
+          <button class="lens" data-lens="cond" aria-pressed="false"><span class="tag-later">Fri</span>They like donuts. Now P(ice cream)?</button>
+          <button class="lens" data-lens="rev" aria-pressed="false"><span class="tag-later">Fri</span>They like ice cream. P(donuts)?</button>
+        </div>
+        <div class="lens-out" id="hero-out" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="prose">
+    <p>The week is one idea used three ways. Monday finishes counting: inclusion-exclusion fixes the sum rule when sets overlap, and the pigeonhole principle turns a count into a guarantee. Wednesday turns counts into probabilities: when every outcome is equally likely, \(P(E) = |E|/|\Omega|\). Friday conditions on new information: shrink the sample space to what you know, then count again.</p>
+  </div>
+
+  <h2>This week</h2>
+  <div class="week">
+    <a class="day now" href="#l3-binomial">
+      <span class="tag-today">Today · Mon Oct 5</span>
+      <strong>Lecture 3</strong>
+      <span class="day-title">Inclusion-exclusion, pigeonhole principle and more</span>
+      <span>Binomial theorem, combinatorial proofs, cards, rooks · Reading 1.3</span>
+    </a>
+    <a class="day later" href="#l4-events">
+      <span class="tag-later">Upcoming · Wed Oct 7</span>
+      <strong>Lecture 4</strong>
+      <span class="day-title">Discrete probability</span>
+      <span>Sample spaces, events, axioms, equally likely outcomes · Reading 2.1 · slides posted early</span>
+    </a>
+    <div class="day later is-missing" id="section-status">
+      <span class="tag-later">Thu Oct 8</span>
+      <strong>Section 2</strong>
+      <span class="day-title">Probability problems</span>
+      <span class="missing-note"><b>Not posted yet.</b> The handout and its solutions returned “not found” when checked on Mon Oct 5 at 12:28 pm. This site doesn’t make up section problems; use the lecture problems below until the handout is up.</span>
+    </div>
+    <a class="day later" href="#l5-conditional">
+      <span class="tag-later">Upcoming · Fri Oct 9</span>
+      <strong>Lecture 5</strong>
+      <span class="day-title">Conditional probability, Bayes’ theorem</span>
+      <span>Restricting the sample space, law of total probability, Zika testing · Reading 2.2 · slides posted early</span>
+    </a>
+  </div>
+  <p class="small">Lectures 4 and 5 haven’t happened yet. Their slides were posted early, so their pages work as previews.</p>
+
+  <h2>Due dates</h2>
+  <table class="plain">
+    <tr><th>Concept check, Lecture 2</th><td>Gradescope, due 1:00 pm today, Mon Oct 5</td></tr>
+    <tr><th>Concept check, Lecture 3</th><td>Gradescope, due 1:00 pm Wed Oct 7 (the next lecture)</td></tr>
+    <tr><th>Problem Set 1</th><td>Due <strong>Wed Oct 7, 11:59 pm</strong> on Gradescope · <a href="https://courses.cs.washington.edu/courses/cse312/26au/homework/pset1.pdf" target="_blank" rel="noopener">pset1.pdf</a></td></tr>
+    <tr><th>Problem Set 2</th><td>Out Wed Oct 7 (Lecture 4 says “posted this evening, due next Wednesday”). <span class="missing-inline">Not posted yet</span> when checked on Mon Oct 5.</td></tr>
+    <tr><th>Concept checks, Lectures 4 and 5</th><td>Due 1:00 pm on the day of the next lecture (Fri Oct 9 and Mon Oct 12)</td></tr>
+  </table>
+  <p class="note-box">Concept checks and problem sets are graded on Gradescope and aren’t reproduced here. Everything on this site is ungraded practice built from the slides and the textbook.</p>
+
+  <h2>How to use this site</h2>
+  <div class="prose">
+    <ul>
+      <li>Each lecture is split into modules in slide order. A module has a short explanation, a rule box, something to click, and a quick check you can put to the room.</li>
+      <li><strong>Teaching notes</strong> (open by default; click the heading to collapse) hold talking points, questions to ask and common mistakes.</li>
+      <li><strong>Problems from the slides</strong> can be answered on the page. Type your answer, write your work, and ask for hints if you need them. Solutions stay hidden until you press <strong>Show solution</strong>, then appear one step at a time. Several have a <strong>Check by brute force</strong> button that lists every case.</li>
+      <li>Each lecture ends with <strong>Check your understanding</strong>, a 10-question wrap-up quiz written for this site.</li>
+      <li>Answer boxes take exact expressions: <code>43+20-7</code>, <code>C(13,5)</code>, <code>(8*7)^2/2</code>, <code>7/20</code>, <code>0.005*0.98/0.01485</code> or <code>98%</code>. Answers are compared exactly, so a rounded decimal like <code>0.33</code> isn’t accepted where an exact fraction is wanted; the feedback tells you when that’s what happened.</li>
+      <li>Your answers and work are kept in this browser and come back when you return.</li>
+    </ul>
+  </div>
+
+  <h2>Course essentials</h2>
+  <table class="plain">
+    <tr><th>Instructors</th><td>Anup Rao, Paul Beame, plus TAs (see the staff page)</td></tr>
+    <tr><th>Lectures</th><td>MWF, recorded (Panopto, UW login). Poll Everywhere with your UW NetID.</td></tr>
+    <tr><th>Sections</th><td>Thursdays, not recorded</td></tr>
+    <tr><th>Grading</th><td>Concept checks 3% (lowest 4 dropped) · 9 problem sets 25% · Midterm 24% (in class, Wed Nov 4) · Final 48% (Mon Dec 14)</td></tr>
+    <tr><th>Slides</th><td><a href="https://courses.cs.washington.edu/courses/cse312/26au/slides/Lecture-03-counting-pigeons-and-more.pdf" target="_blank" rel="noopener">Lecture 3</a> (<a href="https://uw.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=f4b12416-5e3f-44e2-bf70-b4d1000f1d39" target="_blank" rel="noopener">recording A</a>) · <a href="https://courses.cs.washington.edu/courses/cse312/26au/slides/Lecture-04-discrete-probability.pdf" target="_blank" rel="noopener">Lecture 4</a> · <a href="https://courses.cs.washington.edu/courses/cse312/26au/slides/Lecture-05-conditional-probability.pdf" target="_blank" rel="noopener">Lecture 5</a></td></tr>
+    <tr><th>Links</th><td><a href="https://courses.cs.washington.edu/courses/cse312/26au/" target="_blank" rel="noopener">Schedule</a> · <a href="https://courses.cs.washington.edu/courses/cse312/26au/syllabus.php" target="_blank" rel="noopener">Syllabus</a> · <a href="https://courses.cs.washington.edu/courses/cse312/26au/staff.php" target="_blank" rel="noopener">Staff and office hours</a> · <a href="https://courses.cs.washington.edu/courses/cse312/26au/files/Prob_Stat_for_CS_Book.pdf" target="_blank" rel="noopener">Textbook</a></td></tr>
+  </table>
+
+  <details class="notes" open>
+    <summary>Teaching notes: the arc of the week</summary>
+    <ul>
+      <li>Lecture 4 opens with the “Review summary of counting” list from the end of Lecture 3: sum and product rules, permutations and combinations, inclusion-exclusion, stars and bars, pigeonhole, combinatorial proofs, binomial theorem. That list is the whole counting unit, and it all gets used again on Wednesday.</li>
+      <li>The ice cream and donut numbers appear twice in the slides: Lecture 3 asks for \(|A\cup B|\) from \(|A|=43\), \(|B|=20\), \(|A\cap B|=7\). Lecture 5 reuses the same picture (36, 7, 13, plus 14 who like neither) to introduce \(P(A\mid B) = 7/20\). The hero above uses both, so you can point back to it on Friday.</li>
+      <li>Ask on Monday: “If we pick one of the 70 students at random, what’s the chance they like at least one?” Students can answer \(56/70\) before Wednesday’s definitions. That’s the bridge to Lecture 4.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3 BINOMIAL -->
+<section class="page" id="l3-binomial" data-title="The binomial theorem" data-lecture="3">
+  <p class="where">Lecture 3 · <span class="today-chip">Today · Mon Oct 5</span> · Reading 1.3.1</p>
+  <h1>The binomial theorem</h1>
+  <div class="prose">
+    <p>Lecture 3 opens with a recap. The <strong>sum rule</strong> breaks a set into disjoint pieces and adds; the <strong>product rule</strong> builds each element by a series of choices and multiplies. On top of that sit \(k\)-sequences (\(n^k\)), \(k\)-permutations (\(\frac{n!}{(n-k)!}\)) and \(k\)-combinations (\(\binom nk = \frac{n!}{k!(n-k)!}\)). The binomial coefficients have a list of useful properties, and today proves them.</p>
+  </div>
+
+  <div class="rule">
+    <p class="rule-tag">Facts about \(\binom nk\)</p>
+    <p>\(\binom nn = 1,\quad \binom n1 = n,\quad \binom n0 = 1\)</p>
+    <p><strong>Symmetry:</strong> \(\binom nk = \binom n{n-k}\) · <strong>Row sum:</strong> \(\sum_{k=0}^n \binom nk = 2^n\) · <strong>Pascal’s identity:</strong> \(\binom nk = \binom{n-1}{k-1} + \binom{n-1}k\)</p>
+  </div>
+
+  <h2>Where the coefficients come from</h2>
+  <div class="prose">
+    <p>Multiply out \((x+y)^4 = (x+y)(x+y)(x+y)(x+y)\) without collecting terms. Every product picks one letter from each of the 4 copies, so you get \(2^4 = 16\) words like \(xxxx\), \(xyxy\), \(yxyy\). A word with \(k\) \(x\)’s simplifies to \(x^ky^{4-k}\). How many words do that? Exactly as many as ways to choose <em>which</em> \(k\) of the 4 copies give \(x\): \(\binom 4k\).</p>
+  </div>
+
+  <div class="panel" id="expand">
+    <div class="controls">
+      <label>\(n =\) <input type="number" id="ex-n" min="1" max="6" value="4" aria-label="n"></label>
+      <span class="hint-line">Click a column to see why its count is \(\binom nk\).</span>
+    </div>
+    <div class="expand-cols" id="ex-cols"></div>
+    <p class="out" id="ex-out" aria-live="polite"></p>
+  </div>
+
+  <div class="rule theorem">
+    <p class="rule-tag">Theorem (binomial theorem)</p>
+    <p>Let \(x, y\in\mathbb R\) and \(n\in\mathbb N\) a positive integer. Then</p>
+    <p>\[(x+y)^n = \sum_{k=0}^{n}\binom nk x^k y^{n-k}.\]</p>
+  </div>
+
+  <h2>Plug in numbers, get identities</h2>
+  <div class="prose">
+    <p>The slides’ trick: many facts about sums of binomial coefficients drop out when you choose \(x\) and \(y\).</p>
+  </div>
+  <div class="panel" id="plugin">
+    <div class="controls">
+      <span>Substitute:</span>
+      <button class="chip" data-xy="1,1" aria-pressed="true">\(x = y = 1\)</button>
+      <button class="chip" data-xy="-1,1" aria-pressed="false">\(x=-1,\ y=1\)</button>
+      <button class="chip" data-xy="2,1" aria-pressed="false">\(x=2,\ y=1\)</button>
+      <label>\(n =\) <input type="number" id="pl-n" min="1" max="12" value="4" aria-label="n for substitution"></label>
+    </div>
+    <div class="pascal-row" id="pl-row"></div>
+    <p class="out" id="pl-out" aria-live="polite"></p>
+  </div>
+  <div class="rule">
+    <p class="rule-tag">Corollaries</p>
+    <p>\(x=y=1\): \(\displaystyle\sum_{k=0}^n\binom nk = 2^n\). &nbsp; \(x=-1, y=1\) (for \(n\ge1\)): \(\displaystyle\sum_{k\text{ odd}}\binom nk = \sum_{k\text{ even}}\binom nk\). For \(n=4\): \(4+4 = 1+6+1\).</p>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l3-qc-coefficient-x2y3" data-answer="10">
+    <p>Quick check: what is the coefficient of \(x^2y^3\) in \((x+y)^5\)?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="2^5" data-tag="counted-all-products">That’s every product in the expansion. Only the ones with exactly two \(x\)’s become \(x^2y^3\).</li>
+      <li data-expr="1" data-tag="forgot-coefficient">Several different products simplify to \(x^2y^3\). Count how many.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The slide poll asks for the coefficient of \(xy^3\) in \((x+y)^4\). The slide marks three answers right: 4, \(\binom41\) and \(\binom43\). That is symmetry in action: choosing which copy gives \(x\) is the same as choosing which three give \(y\). Only “3” is wrong.</li>
+      <li>With \(n=4\) in the widget, click the \(x^1y^3\) column: \(xyyy, yxyy, yyxy, yyyx\). The position of the lone \(x\) is the choice.</li>
+      <li>The \(x=-1\) substitution gives \(\sum_k (-1)^k\binom nk = 0\): odd-size and even-size subsets of \([n]\) are equally many. Ask for a combinatorial reason (toggle element 1 in or out; that pairs odd subsets with even ones).</li>
+      <li>Reading 1.3.1 works a harder coefficient: \(a^{45}b^{14}\) in \((4a^3-5b^2)^{22}\). It’s on the Readings page.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3 PROOFS -->
+<section class="page" id="l3-proofs" data-title="Combinatorial proofs" data-lecture="3">
+  <p class="where">Lecture 3 · <span class="today-chip">Today · Mon Oct 5</span> · Reading 1.3.4</p>
+  <h1>Combinatorial proofs</h1>
+  <div class="prose">
+    <p>Two ways to prove \(a = b\) about counts. The <em>algebraic</em> argument expands factorials until both sides match: brute force, less intuitive. The <em>combinatorial</em> argument finds one set and counts it twice. Lecture 2 already did this for symmetry: choosing the \(k\) elements to <em>include</em> is the same as choosing the \(n-k\) elements to <em>exclude</em>, so \(\binom nk = \binom n{n-k}\).</p>
+  </div>
+
+  <div class="rule">
+    <p class="rule-tag">Format for a combinatorial proof of \(a = b\)</p>
+    <ol>
+      <li>Let \(S\) be a set of objects.</li>
+      <li>Show how to count \(|S|\) one way \(\Rightarrow |S| = a\).</li>
+      <li>Show how to count \(|S|\) another way \(\Rightarrow |S| = b\).</li>
+    </ol>
+  </div>
+
+  <h2>Pascal’s identity</h2>
+  <div class="prose">
+    <p>\(\binom nk = \binom{n-1}{k-1} + \binom{n-1}{k}\). The algebra (“20 years later…”) works but explains nothing. The combinatorial proof idea: find <strong>disjoint</strong> sets \(A\) and \(B\) with \(S = A\cup B\) and the right sizes. Then the identity is just the sum rule.</p>
+    <ul>
+      <li>\(S\): the size-\(k\) subsets of \([n] = \{1,2,\dots,n\}\). So \(|S| = \binom nk\).</li>
+      <li>\(A\): those that <em>do</em> include \(n\). Since \(n\) is in, choose the other \(k-1\) from \([n-1]\): \(|A| = \binom{n-1}{k-1}\).</li>
+      <li>\(B\): those that <em>don’t</em> include \(n\). Choose all \(k\) from \([n-1]\): \(|B| = \binom{n-1}{k}\).</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="pascal-split">
+    <div class="controls">
+      <label>\(n =\) <input type="number" id="ps-n" min="2" max="7" value="4" aria-label="n"></label>
+      <label>\(k =\) <input type="number" id="ps-k" min="1" max="6" value="2" aria-label="k"></label>
+      <span class="hint-line">The slide’s example is \(n = 4,\ k = 2\).</span>
+    </div>
+    <div class="split-cols">
+      <div><h4 id="ps-a-title"></h4><div class="subset-chips" id="ps-a"></div></div>
+      <div><h4 id="ps-b-title"></h4><div class="subset-chips" id="ps-b"></div></div>
+    </div>
+    <p class="out" id="ps-out" aria-live="polite"></p>
+  </div>
+
+  <h2>Pascal’s triangle</h2>
+  <div class="prose"><p>Each entry is the sum of the two above it, which is exactly Pascal’s identity. Click any entry.</p></div>
+  <div class="panel" id="triangle">
+    <div class="triangle" id="tri"></div>
+    <p class="out" id="tri-out" aria-live="polite"></p>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l3-qc-subsets-containing-n" data-answer="10">
+    <p>Quick check: how many 3-element subsets of \(\{1,2,3,4,5,6\}\) contain 6?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="20" data-tag="counted-all-subsets">That’s all 3-element subsets. Fix 6 inside; how many more elements do you choose, and from what?</li>
+      <li data-expr="15" data-tag="chose-wrong-k">With 6 already in, you need 2 more, not 3. From how many elements?</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The slide’s example: \(n=4, k=2\). \(S = \{\{1,2\},\{1,3\},\{1,4\},\{2,3\},\{2,4\},\{3,4\}\}\), \(A = \{\{1,4\},\{2,4\},\{3,4\}\}\), \(B = \{\{1,2\},\{1,3\},\{2,3\}\}\). Write those on the board before the general argument.</li>
+      <li>The textbook singles out element 1 instead of \(n\). Any fixed element works; ask why.</li>
+      <li>Common slip: students prove \(|A| + |B| = |S|\) without saying why \(A\) and \(B\) are disjoint and cover \(S\). Every subset either contains \(n\) or doesn’t, never both. Make them say it.</li>
+      <li>Reading 1.3.4 has two more for practice: \(\binom nm\binom mk = \binom nk\binom{n-k}{m-k}\) (committee with subcommittee) and \(2^n = \sum_k\binom nk\) (count subsets of \([n]\) by size). Both are on the Readings page.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3 INCLUSION-EXCLUSION -->
+<section class="page" id="l3-ie" data-title="Inclusion-exclusion" data-lecture="3">
+  <p class="where">Lecture 3 · <span class="today-chip">Today · Mon Oct 5</span> · Reading 1.3.2</p>
+  <h1>Inclusion-exclusion</h1>
+  <div class="prose">
+    <p>The sum rule says \(|A\cup B| = |A| + |B|\) when \(A\cap B = \varnothing\). The slides’ question: what if the sets are <em>not</em> disjoint? In the survey, 43 students like ice cream (\(A\)), 20 like donuts (\(B\)) and 7 like both. Adding \(43 + 20\) counts those 7 twice, so take them out once.</p>
+  </div>
+
+  <div class="rule">
+    <p class="rule-tag">Inclusion-exclusion</p>
+    <p>\(|A\cup B| = |A| + |B| - |A\cap B|\)</p>
+    <p>\(|A\cup B\cup C| = |A|+|B|+|C| - |A\cap B| - |A\cap C| - |B\cap C| + |A\cap B\cap C|\)</p>
+    <p>In general, \(|A_1\cup\cdots\cup A_n| = \text{singles} - \text{doubles} + \text{triples} - \text{quads} + \cdots\)</p>
+  </div>
+
+  <h2>Count every region exactly once</h2>
+  <div class="prose">
+    <p>The slide’s three-set numbers (“not drawn to scale”): \(|A| = 43\), \(|B| = 20\), \(|C| = 35\), \(|A\cap B| = 7\), \(|A\cap C| = 16\), \(|B\cap C| = 11\), \(|A\cap B\cap C| = 4\). Step through the formula and watch how many times each region has been counted so far. The goal is a 1 in every region.</p>
+  </div>
+  <div class="panel" id="ie">
+    <div class="controls">
+      <button class="chip" data-sets="2" aria-pressed="false">Two sets</button>
+      <button class="chip" data-sets="3" aria-pressed="true">Three sets</button>
+    </div>
+    <div class="ie-grid">
+      <svg class="venn ie-venn" id="ie-venn" viewBox="0 0 360 300" role="img" aria-label="Venn diagram with the count of each region"></svg>
+      <div>
+        <div class="ie-inputs" id="ie-inputs"></div>
+        <div class="ie-steps" id="ie-steps" role="group" aria-label="Formula steps"></div>
+        <p class="out" id="ie-out" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l3-qc-three-set-union" data-answer="68">
+    <p>Quick check: with the slide’s three-set numbers, what is \(|A\cup B\cup C|\)?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="64" data-tag="forgot-triple">Close. After subtracting the doubles, the middle region has been counted 3 − 3 = 0 times. Add it back.</li>
+      <li data-expr="98" data-tag="singles-only">That’s just the singles. People in two sets were counted twice.</li>
+      <li data-expr="72" data-tag="subtracted-triple">The triple intersection gets added back, not subtracted: singles − doubles <em>+</em> triples.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Two sets: \(43 + 20 - 7 = 56\). The textbook draws it as \(36 + 7 + 13\). The same picture returns in Lecture 5 as the first conditional-probability example, with 14 more students who like neither.</li>
+      <li>Three sets: run the stepper and ask after each step, “which region is wrong now?” After singles, the center is counted 3 times; after the doubles, 0 times; the triple fixes it. Answer: 68.</li>
+      <li>The widget refuses inconsistent inputs (for example \(|A\cap B| &lt; |A\cap B\cap C|\)). Ask the class why those can’t happen.</li>
+      <li>Reading 1.3.2 example: numbers in \([360]\) divisible by 4, 6 or 9. It uses the least common multiples for the intersections (\(\text{lcm}(4,6)=12\), not 24). It’s on the Readings page with a brute-force check.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3 PIGEONHOLE -->
+<section class="page" id="l3-php" data-title="The pigeonhole principle" data-lecture="3">
+  <p class="where">Lecture 3 · <span class="today-chip">Today · Mon Oct 5</span> · Reading 1.3.3</p>
+  <h1>The pigeonhole principle</h1>
+  <div class="prose">
+    <p>10 pigeons, 9 pigeonholes: some hole gets two. The slide then asks a sharper question: if 11 children share 3 cakes, at least one cake must be shared by how many children? Try to spread them out.</p>
+  </div>
+
+  <div class="panel" id="php">
+    <div class="controls">
+      <label>pigeons \(n =\) <input type="number" id="php-n" min="1" max="40" value="11" aria-label="pigeons"></label>
+      <label>holes \(k =\) <input type="number" id="php-k" min="1" max="12" value="3" aria-label="holes"></label>
+      <button class="btn" id="php-spread">Spread evenly</button>
+      <button class="btn quiet" id="php-reset">Empty the holes</button>
+    </div>
+    <p class="small" id="php-left"></p>
+    <div class="holes" id="php-holes"></div>
+    <p class="out" id="php-out" aria-live="polite"></p>
+  </div>
+
+  <div class="rule">
+    <p class="rule-tag">Pigeonhole principle</p>
+    <p>If there are \(n\) pigeons in \(k &lt; n\) holes, then one hole must contain at least \(\left\lceil \frac nk\right\rceil\) pigeons.</p>
+    <p class="small">Proof: if every hole had fewer than \(\frac nk\) pigeons, there would be fewer than \(k\cdot\frac nk = n\) pigeons overall. Contradiction. Round up because you can’t have a fractional pigeon. (Ceiling: \(\lceil 2.731\rceil = 3\); floor: \(\lfloor 2.731\rfloor = 2\).)</p>
+  </div>
+
+  <h2>The four-step strategy</h2>
+  <div class="steps-card">
+    <ol>
+      <li>Identify the pigeons.</li>
+      <li>Identify the pigeonholes.</li>
+      <li>Say how pigeons are assigned to holes.</li>
+      <li>Apply the PHP.</li>
+    </ol>
+  </div>
+  <div class="prose">
+    <p><strong>367 people.</strong> Pigeons: 367 people. Holes: 366 possible birthdays (365 plus Feb 29). Each person goes to the hole of their birthday. \(367 &gt; 366\), so two people share a birthday.</p>
+    <p><strong>A surprising one.</strong> In every set \(S\) of 100 integers, at least two elements differ by a multiple of 37. Pigeons: the integers \(x\in S\). Holes: \(\{0,1,\dots,36\}\). Assignment: \(x\) goes to \(x \bmod 37\). Since \(100 &gt; 37\), there are \(x\ne y\) in \(S\) with \(x\bmod 37 = y\bmod 37\), so \(x - y = 37k\) for some integer \(k\).</p>
+  </div>
+
+  <div class="panel" id="mod37">
+    <div class="controls">
+      <button class="btn primary" id="m37-random">Draw 100 random integers</button>
+      <button class="btn" id="m37-38">Draw only 38</button>
+      <span class="hint-line">Each integer drops into the hole \(x \bmod 37\).</span>
+    </div>
+    <div class="mod-holes" id="m37-holes" aria-hidden="true"></div>
+    <p class="out" id="m37-out" aria-live="polite"></p>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l3-qc-twenty-students" data-answer="7">
+    <p>Quick check (from the reading): 20 students are split among 3 classes. The largest class must have at least how many students?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="6" data-tag="rounded-down">\(20/3 \approx 6.67\). If every class had 6 or fewer, that’s at most 18 students. Round which way?</li>
+      <li data-expr="2" data-tag="basic-php-only">That’s the plain “two in one hole” version. With 20 pigeons and 3 holes you can say much more.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Let a student drive the widget with 11 and 3 and try to keep every cake at 3 children or fewer. They get stuck at 9 children. That is the proof.</li>
+      <li>The hard part of PHP problems is choosing holes. For the 37 example, ask “what do two numbers whose difference is a multiple of 37 have in common?” before showing the mod trick.</li>
+      <li>Press <em>Draw only 38</em> a few times: a collision always shows up. With 37 numbers it might not (37 different remainders are possible). The guarantee needs \(n &gt; k\).</li>
+      <li>Reading 1.3.3 has a nice one: in any group of \(n\ge2\) people, two have the same number of friends. And reading 1.3.5 exercise 3 asks how many cards guarantee a pair, two pairs, a full house, a straight or a flush. Those are on the Readings page.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3 CARDS -->
+<section class="page" id="l3-cards" data-title="Counting cards" data-lecture="3">
+  <p class="where">Lecture 3 · <span class="today-chip">Today · Mon Oct 5</span> · counting practice</p>
+  <h1>Counting cards</h1>
+  <div class="prose">
+    <p>A standard deck has 52 cards: 13 ranks (2, 3, …, 10, J, Q, K, A) in each of 4 suits (♥ hearts, ♦ diamonds, ♣ clubs, ♠ spades). A <em>hand</em> is a set of 5 cards, so order doesn’t matter: there are \(\binom{52}5 = 2{,}598{,}960\) hands.</p>
+  </div>
+
+  <div class="panel" id="deck">
+    <div class="controls">
+      <span class="hint-line">Click up to 5 cards to build a hand.</span>
+      <button class="btn quiet" id="deck-clear">Clear hand</button>
+      <button class="btn" data-hand="straight">Example straight</button>
+      <button class="btn" data-hand="flush">Example flush</button>
+      <button class="btn" data-hand="four-aces">A hand with 4 aces</button>
+    </div>
+    <div class="deck" id="deck-grid" role="group" aria-label="Deck of 52 cards"></div>
+    <div class="hand-report" id="deck-report" aria-live="polite"></div>
+  </div>
+
+  <h2>Straights</h2>
+  <div class="prose">
+    <p>A <strong>straight</strong> is five consecutive ranks of any suits, where A,2,3,4,5 also counts. Choose the lowest rank (A, 2, …, 10: 10 options), then a suit for each of the 5 cards: \(10\cdot 4^5 = 10{,}240\).</p>
+  </div>
+  <h2>Flushes, and flushes that aren’t straights</h2>
+  <div class="prose">
+    <p>A <strong>flush</strong> is five cards of the same suit: choose the suit, then 5 of its 13 ranks, \(4\cdot\binom{13}5 = 5{,}148\). Flushes that are <em>not</em> straights: \(\#\text{flush} - \#\text{flush and straight} = 5148 - 10\cdot 4 = 5{,}108\). A straight flush is a lowest rank (10 ways) and a single suit (4 ways).</p>
+  </div>
+
+  <h2>Sleuth’s criterion</h2>
+  <div class="rule warn">
+    <p class="rule-tag">Sleuth’s criterion (Rudich)</p>
+    <p>For each object constructed, it should be possible to reconstruct the <strong>unique</strong> sequence of choices that led to it.</p>
+    <p class="small">No sequence → undercounting. Many sequences → overcounting.</p>
+  </div>
+  <div class="prose">
+    <p>How many 5-card hands contain at least 3 aces? Proposed: “First choose 3 aces, then choose the remaining two cards”: \(\binom43\binom{49}2\). Build a hand with all four aces above and look at the report. The method produces it 4 different ways, once for each ace that lands in the “remaining two”. So it overcounts. Fix it with the sum rule:</p>
+    <p>\[\#\text{exactly 3 aces} + \#\text{exactly 4 aces} = \binom43\binom{48}2 + \binom44\binom{48}1 = 4512 + 48 = 4560.\]</p>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l3-qc-straight-flushes" data-answer="10*4">
+    <p>Quick check: how many 5-card hands are both a straight and a flush?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="9*4" data-tag="forgot-ace-low">Don’t forget A,2,3,4,5. How many possible lowest ranks are there?</li>
+      <li data-expr="10*4^5" data-tag="counted-all-straights">That’s every straight. In a flush, all five cards have the same suit.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Every count on this page has a brute-force button on the Problems page that walks all 2,598,960 hands in the browser (a couple of seconds).</li>
+      <li>The poll (“Correct / Overcount / Undercount” for \(\binom43\binom{49}2\)): the answer is overcount. The slide lists the 4 ways it builds A♣ A♦ A♥ A♠ 2♥. Use the “A hand with 4 aces” button to show the same list.</li>
+      <li>Ask: “Is \(\binom43\binom{49}2 - 3\cdot 48\) right?” Each 4-ace hand was counted 4 times but should count once, so subtract \(3\cdot48\): \(4704 - 144 = 4560\). Same answer, a second method.</li>
+      <li>In \(10\cdot4^5\), why is there no division by \(5!\)? Choosing a suit for “the lowest card”, “the second lowest”… names each card by its rank, so each hand comes from exactly one sequence of choices. That’s Sleuth’s criterion passing.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3 ROOKS -->
+<section class="page" id="l3-rooks" data-title="When order only partly matters" data-lecture="3">
+  <p class="where">Lecture 3 · <span class="today-chip">Today · Mon Oct 5</span> · counting practice</p>
+  <h1>When order only partly matters</h1>
+  <div class="prose">
+    <p>Often it’s easy to count <em>fully ordered</em> lists, and the thing you want is a <em>partly ordered</em> version of them.</p>
+  </div>
+  <div class="rule">
+    <p class="rule-tag">Dividing out order</p>
+    <p>Let \(M\) = # of fully ordered lists, \(P\) = # of partly ordered lists, and \(N\) = # of ways to turn one partly ordered list into a fully ordered one. Then \(M = P\cdot N\) by the product rule, so</p>
+    <p>\[P = M/N.\]</p>
+    <p class="small">Dividing by \(N\) “removes” part of the order.</p>
+  </div>
+
+  <h2>Rooks on a chessboard</h2>
+  <div class="prose">
+    <p>How many ways can you place two <strong>identical</strong> rooks on a chessboard so that they don’t share a row or a column? Pretend the rooks are different: column for rook 1 (8), row for rook 1 (8), column for rook 2 (7), row for rook 2 (7). That’s \((8\cdot7)^2\) ordered placements. Each placement of identical rooks comes from exactly 2 of them (swap the labels), so divide by 2.</p>
+  </div>
+
+  <div class="panel" id="rooks">
+    <div class="controls">
+      <label>board size \(n =\) <input type="number" id="rk-n" min="2" max="8" value="8" aria-label="board size"></label>
+      <span class="hint-line">Click two squares to place the rooks.</span>
+      <button class="btn quiet" id="rk-clear">Clear</button>
+    </div>
+    <div class="rook-grid">
+      <div class="board" id="rk-board" role="grid" aria-label="Chessboard"></div>
+      <div>
+        <div id="rk-status" class="rook-status" aria-live="polite"></div>
+        <div class="slots" id="rk-strip"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l3-qc-rooks-4x4" data-answer="(4*3)^2/2">
+    <p>Quick check: on a 4×4 board, how many ways are there to place two identical rooks that don’t share a row or a column?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="(4*3)^2" data-tag="forgot-identical">That treats the rooks as different. Each placement is counted twice.</li>
+      <li data-expr="C(16,2)" data-tag="ignored-constraint">That’s every pair of squares, including ones in the same row or column.</li>
+    </ul>
+  </div>
+
+  <h2>Tools so far</h2>
+  <div class="prose">
+    <p>The slide deck ends with the counting toolbox: sum rule, product rule, permutations, combinations, inclusion-exclusion, the binomial theorem, combinatorial proofs, the pigeonhole principle, binary encoding and stars and bars. Wednesday starts probability with all of them in hand.</p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Same move as Lecture 2’s anagrams: count with labels, then divide by the number of labelings of each object.</li>
+      <li>Set the widget to \(n = 3\) and place two rooks. It lists the 2 labeled placements behind the one unlabeled placement. Ask for \(n=3\) before showing it: \((3\cdot2)^2/2 = 18\).</li>
+      <li>Alternative: choose 2 of the 8 columns, then match them to 2 distinct rows in order: \(\binom82\cdot 8\cdot 7 = 1568\). Same answer; a good “check with a second method” moment.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3 PROBLEMS -->
+<section class="page" id="l3-problems" data-title="Lecture 3: problems from the slides" data-lecture="3">
+  <p class="where">Lecture 3 · <span class="today-chip">Today · Mon Oct 5</span> · practice</p>
+  <h1>Problems from the slides</h1>
+  <div class="prose">
+    <p>Every problem here is a question or example from the Lecture 3 slides, with the slides’ own answer. Section 2’s handout isn’t posted yet, so these stand in for section practice. Answer on the page, write your work, and use hints if you’re stuck. The card and rook counts have a <strong>Check by brute force</strong> button in their solutions.</p>
+  </div>
+
+  <article class="task" data-id="cse312-w2-l3-p-coefficient-xy3">
+    <h2>Coefficient of \(xy^3\)</h2>
+    <p class="prompt">What is the coefficient of \(xy^3\) in the expansion of \((x+y)^4\)?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-coefficient-xy3.ans" data-answer="4">
+      <ul class="miscon" hidden>
+        <li data-expr="3" data-tag="used-exponent">That’s the exponent of \(y\). The coefficient counts how many products simplify to \(xy^3\).</li>
+        <li data-expr="16" data-tag="counted-all-products">That’s all \(2^4\) products. Only some of them have exactly one \(x\).</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Write \((x+y)^4\) as four copies of \((x+y)\). Each product picks \(x\) or \(y\) from each copy.</li>
+      <li>A product becomes \(xy^3\) when exactly one copy gives \(x\). How many ways to choose that copy?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Each term of the expansion picks one letter from each of the 4 copies of \((x+y)\).</li>
+      <li>The product is \(xy^3\) exactly when one copy gives \(x\) and the other three give \(y\): \(xyyy, yxyy, yyxy, yyyx\).</li>
+      <li>That’s \(\binom41\) choices, which also equals \(\binom43\) (choose the copies that give \(y\)).</li>
+      <li class="answer">\(4 = \binom41 = \binom43\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l3-p-pascal-proof">
+    <h2>Pascal’s identity, combinatorially</h2>
+    <p class="prompt">Give a combinatorial proof that \(\binom nk = \binom{n-1}{k-1} + \binom{n-1}{k}\) for \(1\le k\le n-1\). Write it in the work box, then compare with the solution.</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-pascal-proof.set" data-type="self" data-label="Your set \(S\)" data-placeholder="what does S contain?"></div>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-pascal-proof.split" data-type="self" data-label="How you split \(S\)" data-placeholder="the two disjoint pieces"></div>
+    <ol class="hints">
+      <li>Let \(S\) be the size-\(k\) subsets of \([n]\). Then \(|S|\) is the left side.</li>
+      <li>Split \(S\) into two disjoint pieces according to one particular element.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Let \(S\) be the set of size-\(k\) subsets of \([n] = \{1,\dots,n\}\). Counting directly, \(|S| = \binom nk\).</li>
+      <li>Let \(A\) be the subsets in \(S\) that include \(n\). With \(n\) already in, choose the other \(k-1\) elements from \([n-1]\): \(|A| = \binom{n-1}{k-1}\).</li>
+      <li>Let \(B\) be the subsets in \(S\) that don’t include \(n\). All \(k\) elements come from \([n-1]\): \(|B| = \binom{n-1}{k}\).</li>
+      <li>Every subset either includes \(n\) or doesn’t, so \(A\) and \(B\) are disjoint and \(S = A\cup B\).</li>
+      <li class="answer">By the sum rule, \(\binom nk = |S| = |A| + |B| = \binom{n-1}{k-1} + \binom{n-1}{k}\).</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul>
+        <li>Grade the structure: one set, two counts. The most common gap is not saying why \(A\) and \(B\) are disjoint and cover \(S\).</li>
+        <li>The Combinatorial proofs page shows \(A\) and \(B\) for any small \(n,k\).</li>
+      </ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l3-p-ice-cream-donuts">
+    <h2>Ice cream or donuts</h2>
+    <p class="prompt">43 students like ice cream (\(A\)), 20 like donuts (\(B\)) and 7 like both. How many like ice cream or donuts?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-ice-cream-donuts.ans" data-answer="56">
+      <ul class="miscon" hidden>
+        <li data-expr="63" data-tag="ignored-overlap">The 7 who like both were counted in both groups. That’s the sum rule used on overlapping sets.</li>
+        <li data-expr="49" data-tag="subtracted-twice">The overlap was counted twice, so it should come out once, not twice.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Are \(A\) and \(B\) disjoint? If not, which students does \(|A| + |B|\) count twice?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(|A| + |B| = 63\) counts the 7 students in \(A\cap B\) twice.</li>
+      <li>Inclusion-exclusion: \(|A\cup B| = |A| + |B| - |A\cap B| = 43 + 20 - 7\).</li>
+      <li class="answer">\(56\) (equivalently \(36 + 7 + 13\))</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l3-p-three-set-union">
+    <h2>Three sets</h2>
+    <p class="prompt">\(|A| = 43\), \(|B| = 20\), \(|C| = 35\), \(|A\cap B| = 7\), \(|A\cap C| = 16\), \(|B\cap C| = 11\), \(|A\cap B\cap C| = 4\). What is \(|A\cup B\cup C|\)?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-three-set-union.ans" data-answer="68">
+      <ul class="miscon" hidden>
+        <li data-expr="64" data-tag="forgot-triple">The center region was added 3 times and subtracted 3 times, so it’s now counted 0 times.</li>
+        <li data-expr="98" data-tag="singles-only">That’s only the singles. Elements in two or three sets were counted more than once.</li>
+        <li data-expr="72" data-tag="subtracted-triple">Check the sign of the last term: singles − doubles <em>+</em> triples.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Singles − doubles + triples.</li>
+      <li>Track the center region \(A\cap B\cap C\): how many times is it counted after the singles? After the doubles?</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>Singles: \(43 + 20 + 35 = 98\).</li>
+        <li>Doubles: \(7 + 16 + 11 = 34\), so \(98 - 34 = 64\). Now the center has been counted \(3 - 3 = 0\) times.</li>
+        <li>Triples: add back \(|A\cap B\cap C| = 4\).</li>
+        <li class="answer">\(98 - 34 + 4 = 68\)</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="three-sets">Check by brute force</button><span class="brute"></span></div>
+    </div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul>
+        <li>The brute-force check builds a population with exactly these region sizes (24, 6, 12 in one set only; 3, 12, 7 in exactly two; 4 in all three; plus 10 in none) and counts who is in at least one set.</li>
+      </ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l3-p-children-cakes">
+    <h2>Children sharing cakes</h2>
+    <p class="prompt">If 11 children have to share 3 cakes, at least one cake must be shared by how many children?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-children-cakes.ans" data-answer="4">
+      <ul class="miscon" hidden>
+        <li data-expr="3" data-tag="rounded-down">If every cake had at most 3 children, that would cover at most 9 children. Round \(11/3\) which way?</li>
+        <li data-expr="2" data-tag="basic-php-only">That’s true but weak. With 11 children and 3 cakes you can guarantee more.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Pigeons are children, holes are cakes. Use the “better version” of the PHP.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>11 pigeons (children), 3 holes (cakes), each child assigned to the cake they share.</li>
+      <li>By the PHP, some hole has at least \(\lceil 11/3\rceil = \lceil 3.67\rceil\) pigeons.</li>
+      <li class="answer">\(4\). (Spreading 4, 4, 3 shows 4 is the best guarantee.)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l3-p-birthdays">
+    <h2>367 people</h2>
+    <p class="prompt">In a room with 367 people, must there be two with the same birthday? Answer yes or no, and give the four PHP steps in your work.</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-birthdays.ans" data-type="yesno" data-answer="yes" data-placeholder="yes or no"></div>
+    <ol class="hints">
+      <li>How many possible birthdays are there, counting Feb 29?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Pigeons: the 367 people.</li>
+      <li>Holes: 366 possible birthdays (365 for a normal year, plus Feb 29).</li>
+      <li>Each person goes into the hole for their own birthday.</li>
+      <li class="answer">Yes. \(367 &gt; 366\), so by the PHP two people share a birthday.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l3-p-mod-37-difference">
+    <h2>A difference that’s a multiple of 37</h2>
+    <p class="prompt">Show that in every set \(S\) of 100 integers, at least two elements have a difference that is a multiple of 37. Fill in the PHP steps, then compare with the solution.</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-mod-37-difference.pigeons" data-type="self" data-label="Pigeons"></div>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-mod-37-difference.holes" data-type="self" data-label="Holes"></div>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-mod-37-difference.assignment" data-type="self" data-label="Assignment"></div>
+    <ol class="hints">
+      <li>When is \(x - y\) a multiple of 37? Think about remainders.</li>
+      <li>There are 37 possible remainders when dividing by 37.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Pigeons: the integers \(x\in S\) (100 of them).</li>
+      <li>Holes: \(\{0, 1, \dots, 36\}\) (37 of them).</li>
+      <li>Assignment: \(x\) goes to \(x \bmod 37\).</li>
+      <li class="answer">Since \(100 &gt; 37\), the PHP gives \(x\ne y\in S\) with \(x\bmod 37 = y\bmod 37\). Then \(x - y = 37k\) for some integer \(k\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l3-p-five-card-hands">
+    <h2>Five-card hands</h2>
+    <p class="prompt">From a standard 52-card deck, how many …</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-five-card-hands.hands" data-label="a) 5-card hands are there?" data-answer="C(52,5)">
+      <ul class="miscon" hidden><li data-expr="P(52,5)" data-tag="ordered-instead-of-unordered">That counts ordered sequences of 5 cards. A hand is a set.</li></ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-five-card-hands.straights" data-label="b) straights (five consecutive ranks, any suits; A,2,3,4,5 counts)?" data-answer="10*4^5">
+      <ul class="miscon" hidden>
+        <li data-expr="9*4^5" data-tag="forgot-ace-low">How many lowest ranks are possible? A can start a straight too.</li>
+        <li data-expr="10*4" data-tag="one-suit-for-all">The five cards can have different suits. Each card picks its own suit.</li>
+      </ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-five-card-hands.flushes" data-label="c) flushes (all five the same suit)?" data-answer="4*C(13,5)">
+      <ul class="miscon" hidden><li data-expr="C(13,5)" data-tag="forgot-suit">That’s the flushes in one suit. Which suit?</li></ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-five-card-hands.flush-not-straight" data-label="d) flushes that are not straights?" data-answer="4*C(13,5)-10*4">
+      <ul class="miscon" hidden><li data-expr="4*C(13,5)-10*4^5" data-tag="subtracted-all-straights">Only straights that are also flushes need removing. Most straights aren’t flushes.</li></ul>
+    </div>
+    <ol class="hints">
+      <li>A straight is determined by its lowest rank and a suit for each card.</li>
+      <li>For (d): \(\#\text{flush} - \#\text{flush and straight}\). A straight flush is a lowest rank plus one suit.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>(a) A hand is a 5-element subset of 52 cards: \(\binom{52}5 = 2{,}598{,}960\).</li>
+        <li>(b) Lowest rank: A, 2, …, 10 (10 options). Then a suit for each of the 5 ranks: \(10\cdot 4^5 = 10{,}240\).</li>
+        <li>(c) Choose the suit (4), then 5 of its 13 ranks: \(4\cdot\binom{13}5 = 5{,}148\).</li>
+        <li>(d) Straight flushes: lowest rank (10) and one suit (4), so 40. Subtract them from the flushes.</li>
+        <li class="answer">(a) 2,598,960 · (b) 10,240 · (c) 5,148 · (d) \(5148 - 40 = 5{,}108\)</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="straights">Brute force: straights</button><span class="brute"></span></div>
+      <div class="step-bar"><button class="btn" data-brute="flush-not-straight">Brute force: flushes, not straights</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l3-p-three-aces">
+    <h2>At least three aces</h2>
+    <p class="prompt">How many 5-card hands contain at least 3 aces?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-three-aces.ans" data-answer="C(4,3)*C(48,2)+C(4,4)*C(48,1)">
+      <ul class="miscon" hidden>
+        <li data-expr="C(4,3)*C(49,2)" data-tag="sleuth-overcount">That’s “choose 3 aces, then any 2 cards”. A hand with all four aces is built 4 different ways. Check Sleuth’s criterion.</li>
+        <li data-expr="C(4,3)*C(48,2)" data-tag="exactly-three-only">That’s exactly 3 aces. “At least 3” includes hands with 4.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Is “choose 3 aces, then any 2 other cards” a unique sequence of choices for every hand?</li>
+      <li>Split into disjoint cases: exactly 3 aces, exactly 4 aces.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>The tempting count \(\binom43\binom{49}2 = 4704\) overcounts: A♣A♦A♥A♠2♥ is built 4 times, once per choice of which ace is “extra”.</li>
+        <li>Exactly 3 aces: choose them (\(\binom43\)), then 2 non-aces (\(\binom{48}2\)): \(4\cdot1128 = 4512\).</li>
+        <li>Exactly 4 aces: all of them (\(\binom44\)), then 1 non-ace (\(\binom{48}1\)): 48.</li>
+        <li class="answer">\(4512 + 48 = 4{,}560\)</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="three-aces">Check by brute force</button><span class="brute"></span></div>
+    </div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul>
+        <li>This is the slides’ poll. Ask for the vote before revealing: most students say “correct”.</li>
+        <li>Fix by subtraction as a second method: \(4704 - 3\cdot48 = 4560\), since each 4-ace hand was counted 4 times instead of once.</li>
+      </ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l3-p-rooks">
+    <h2>Two identical rooks</h2>
+    <p class="prompt">How many ways are there to place two identical rooks on an 8×8 chessboard so that they don’t share a row or a column?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l3-p-rooks.ans" data-answer="(8*7)^2/2">
+      <ul class="miscon" hidden>
+        <li data-expr="(8*7)^2" data-tag="forgot-identical">That counts labeled rooks. Swapping two identical rooks gives the same placement.</li>
+        <li data-expr="64*49" data-tag="forgot-identical">That counts labeled rooks (rook 2 avoids rook 1’s row and column). Now remove the labels.</li>
+        <li data-expr="C(64,2)" data-tag="ignored-constraint">That allows two rooks in the same row or column.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Pretend the rooks are different. Choose column and row for rook 1, then for rook 2.</li>
+      <li>How many labeled placements give the same unlabeled one?</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>Fully ordered: column for rook 1 (8), row for rook 1 (8), column for rook 2 (7), row for rook 2 (7). That’s \((8\cdot7)^2 = 3136\).</li>
+        <li>Each placement of identical rooks comes from exactly 2 labeled placements, so \(N = 2\).</li>
+        <li class="answer">\(P = M/N = (8\cdot 7)^2/2 = 1{,}568\)</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="rooks">Check by brute force</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3 QUIZ -->
+<section class="page" id="l3-quiz" data-title="Lecture 3: check your understanding" data-lecture="3">
+  <p class="where">Lecture 3 wrap-up · <span class="today-chip">Today · Mon Oct 5</span> · original questions written for this site</p>
+  <h1>Check your understanding: Lecture 3</h1>
+  <div class="prose">
+    <p>Ten questions on Lecture 3 only: the binomial theorem, combinatorial proofs, inclusion-exclusion, the pigeonhole principle, Sleuth’s criterion and dividing out order. The score counts first tries only.</p>
+  </div>
+  <div class="cyu-score" data-score role="status"></div>
+  <ol class="cyu-list">
+    <li class="cyu" data-id="cse312-w2-l3-quiz-coefficient-x3y4" data-kind="num" data-answer="C(7,3)" data-topic="l3-binomial">
+      <p class="q">What is the coefficient of \(x^3y^4\) in \((x+y)^7\)?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="1" data-tag="forgot-coefficient">Many products of seven letters simplify to \(x^3y^4\). How many?</li>
+        <li data-expr="12" data-tag="multiplied-exponents">The coefficient isn’t built from the exponents. Choose which copies of \((x+y)\) give \(x\).</li>
+      </ul>
+      <p class="why" hidden>Choose which 3 of the 7 copies give \(x\): \(\binom73 = 35\).</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l3-quiz-row-sum-six" data-kind="num" data-answer="2^6" data-topic="l3-binomial">
+      <p class="q">What is \(\binom60 + \binom61 + \cdots + \binom66\)?</p>
+      <ul class="miscon" hidden><li data-expr="6^2" data-tag="wrong-corollary">Set \(x = y = 1\) in the binomial theorem. What is \((1+1)^6\)?</li></ul>
+      <p class="why" hidden>Set \(x=y=1\): \((1+1)^6 = 2^6 = 64\). It also counts all subsets of a 6-element set, grouped by size.</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l3-quiz-pascal-sets" data-kind="mc" data-topic="l3-proofs">
+      <p class="q">In the combinatorial proof of \(\binom nk = \binom{n-1}{k-1}+\binom{n-1}k\), which set has size \(\binom{n-1}{k-1}\)?</p>
+      <div class="opts">
+        <label data-opt="contain-n" data-correct><input type="radio"> Size-\(k\) subsets of \([n]\) that contain \(n\)<span class="why" hidden>Correct. With \(n\) in, you choose the other \(k-1\) elements from \([n-1]\).</span></label>
+        <label data-opt="avoid-n" data-tag="swapped-cases"><input type="radio"> Size-\(k\) subsets of \([n]\) that don’t contain \(n\)<span class="why" hidden>Those pick all \(k\) elements from \([n-1]\), so there are \(\binom{n-1}{k}\) of them.</span></label>
+        <label data-opt="size-k-minus-1" data-tag="wrong-universe"><input type="radio"> Size-\((k-1)\) subsets of \([n]\)<span class="why" hidden>There are \(\binom n{k-1}\) of those. The proof only ever looks at size-\(k\) subsets of \([n]\).</span></label>
+        <label data-opt="all-subsets" data-tag="wrong-universe"><input type="radio"> All subsets of \([n-1]\)<span class="why" hidden>There are \(2^{n-1}\) of those, which is usually much bigger.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l3-quiz-french-spanish" data-kind="num" data-answer="45" data-topic="l3-ie">
+      <p class="q">In a dorm, 30 students take French, 25 take Spanish and 10 take both. How many take at least one of the two?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="55" data-tag="ignored-overlap">The 10 who take both are in both counts.</li>
+        <li data-expr="35" data-tag="subtracted-twice">Subtract the overlap once, not twice.</li>
+      </ul>
+      <p class="why" hidden>\(30 + 25 - 10 = 45\).</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l3-quiz-divisible-by-two-three-five" data-kind="num" data-answer="44" data-topic="l3-ie">
+      <p class="q">How many integers in \(\{1, 2, \dots, 60\}\) are divisible by 2, 3 or 5?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="62" data-tag="singles-only">That’s \(30 + 20 + 12\). Numbers like 6 were counted twice.</li>
+        <li data-expr="43" data-tag="forgot-triple">Close. Multiples of 30 were added 3 times and subtracted 3 times.</li>
+      </ul>
+      <p class="why" hidden>Singles \(30+20+12 = 62\), doubles (multiples of 6, 10, 15) \(10+6+4 = 20\), triple (multiples of 30) \(2\): \(62 - 20 + 2 = 44\).</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l3-quiz-socks-drawers" data-kind="num" data-answer="8" data-topic="l3-php">
+      <p class="q">50 socks go into 7 drawers. The fullest drawer must hold at least how many socks?</p>
+      <ul class="miscon" hidden><li data-expr="7" data-tag="rounded-down">If every drawer held at most 7, that’s at most 49 socks.</li></ul>
+      <p class="why" hidden>\(\lceil 50/7\rceil = \lceil 7.14\rceil = 8\).</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l3-quiz-pigeons-thirteen-people" data-kind="mc" data-topic="l3-php">
+      <p class="q">To show that among any 13 people two were born in the same month, what are the pigeons and the holes?</p>
+      <div class="opts">
+        <label data-opt="people-months" data-correct><input type="radio"> Pigeons: the 13 people. Holes: the 12 months.<span class="why" hidden>Correct. Each person goes to their birth month, and \(13 &gt; 12\).</span></label>
+        <label data-opt="months-people" data-tag="swapped-roles"><input type="radio"> Pigeons: the 12 months. Holes: the 13 people.<span class="why" hidden>Backwards. There are fewer months than people, so this gives no collision.</span></label>
+        <label data-opt="days" data-tag="wrong-holes"><input type="radio"> Pigeons: the 13 people. Holes: the 366 possible birthdays.<span class="why" hidden>With 366 holes and 13 pigeons, the PHP guarantees nothing.</span></label>
+        <label data-opt="pairs" data-tag="wrong-pigeons"><input type="radio"> Pigeons: the 78 pairs of people. Holes: the 12 months.<span class="why" hidden>A pair of people doesn’t have one birth month to be assigned to.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l3-quiz-exactly-two-kings" data-kind="num" data-answer="C(4,2)*C(48,3)" data-topic="l3-cards">
+      <p class="q">How many 5-card hands contain exactly two kings?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="C(4,2)*C(50,3)" data-tag="allowed-more-kings">The other three cards must not be kings, or the hand has more than two.</li>
+        <li data-expr="C(4,2)*C(48,3)*2" data-tag="ordered-kings">The two kings are a set; their order doesn’t matter.</li>
+      </ul>
+      <p class="why" hidden>Choose 2 of the 4 kings, then 3 of the 48 non-kings: \(\binom42\binom{48}3 = 6\cdot17{,}296 = 103{,}776\).</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l3-quiz-sleuth-one-heart" data-kind="mc" data-topic="l3-cards">
+      <p class="q">Someone counts 5-card hands with at least one heart as “choose a heart (13 ways), then any 4 of the other 51 cards”: \(13\cdot\binom{51}4\). What does Sleuth’s criterion say?</p>
+      <div class="opts">
+        <label data-opt="overcount" data-correct><input type="radio"> It overcounts: a hand with two or more hearts comes from several choice sequences<span class="why" hidden>Correct. A hand with hearts \(h_1, h_2\) is built once with \(h_1\) as “the” heart and once with \(h_2\).</span></label>
+        <label data-opt="undercount" data-tag="direction-of-error"><input type="radio"> It undercounts: some hands can’t be built<span class="why" hidden>Every hand with a heart can be built. The trouble is that some are built more than once.</span></label>
+        <label data-opt="correct" data-tag="missed-overcount"><input type="radio"> It’s correct<span class="why" hidden>Try a hand with two hearts and count how many ways the method produces it.</span></label>
+        <label data-opt="needs-order" data-tag="irrelevant-fix"><input type="radio"> It’s correct once you multiply by \(5!\) for order<span class="why" hidden>Hands are unordered. Multiplying makes the overcount worse.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l3-quiz-rooks-five-board" data-kind="num" data-answer="(5*4)^2/2" data-topic="l3-rooks">
+      <p class="q">How many ways are there to place two identical rooks on a 5×5 board so they don’t share a row or a column?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="(5*4)^2" data-tag="forgot-identical">That treats the rooks as labeled. Each placement is counted twice.</li>
+        <li data-expr="C(25,2)" data-tag="ignored-constraint">That includes rooks in the same row or column.</li>
+      </ul>
+      <p class="why" hidden>Labeled: \((5\cdot4)^2 = 400\). Identical: divide by 2, \(200\).</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-summary role="status"></div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Good as an exit ticket today or a warm-up Wednesday. Questions 3, 7 and 9 are conceptual; ask students to explain the wrong options too.</li>
+      <li>Every numeric answer was checked by brute force in the tests (including all 2,598,960 hands for question 8).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L4 EVENTS -->
+<section class="page" id="l4-events" data-title="Sample spaces and events" data-lecture="4">
+  <p class="where">Lecture 4 · <span class="tag-later">Upcoming · Wed Oct 7</span> · Reading 2.1.1 · preview from the posted slides</p>
+  <h1>Sample spaces and events</h1>
+  <div class="prose">
+    <p>Probability models a process that is <em>not deterministic</em>: the outcome isn’t fixed in advance, like throwing dice or flipping a coin. We want a number that measures how likely each outcome is, and we want to make complex statements about those numbers. The course doesn’t argue <em>why</em> a coin flip is “really” random; it studies the model. The first part is <em>discrete</em> probability: a finite or countable set of outcomes.</p>
+  </div>
+
+  <div class="rule">
+    <p class="rule-tag">Definitions</p>
+    <p>A <strong>sample space</strong> \(\Omega\) is the set of all possible outcomes of an experiment.</p>
+    <p>An <strong>event</strong> \(E\subseteq\Omega\) is a subset of the sample space.</p>
+    <p>Events \(E\) and \(F\) are <strong>mutually exclusive</strong> if \(E\cap F = \varnothing\) (they can’t happen at the same time).</p>
+  </div>
+  <div class="prose">
+    <p>Single coin flip: \(\Omega = \{H, T\}\). Two flips: \(\Omega = \{HH, HT, TH, TT\}\). A die: \(\Omega = \{1,\dots,6\}\). “At least one head in two flips” is the event \(\{HH, HT, TH\}\). “Roll an even number” is \(\{2,4,6\}\), which is mutually exclusive with \(\{1,5\}\).</p>
+  </div>
+
+  <h2>Two 4-sided dice</h2>
+  <div class="prose">
+    <p>Roll a blue die (\(D_1\)) and a red die (\(D_2\)), each 4-sided. The sample space is the 16 ordered pairs \((D_1, D_2)\). Pick an event to see which outcomes match, or click cells to build your own.</p>
+  </div>
+  <div class="panel" id="dice4">
+    <div class="controls" role="group" aria-label="Events">
+      <button class="chip ev-a" data-event="A" aria-pressed="true">A: \(D_1 = 1\)</button>
+      <button class="chip ev-b" data-event="B" aria-pressed="false">B: \(D_1 + D_2 = 6\)</button>
+      <button class="chip ev-c" data-event="C" aria-pressed="false">C: \(D_1 = 2 D_2\)</button>
+    </div>
+    <div class="dice-layout">
+      <div class="dice-grid" id="d4-grid" role="grid" aria-label="Sample space of two 4-sided dice"></div>
+      <div class="dice-side">
+        <p class="set-line" id="d4-sets"></p>
+        <p class="out" id="d4-out" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l4-qc-two-dice-sum-five" data-answer="4">
+    <p>Quick check: for the two 4-sided dice, how many outcomes are in the event \(D_1 + D_2 = 5\)?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="2" data-tag="unordered-outcomes">The dice are different colors, so \((1,4)\) and \((4,1)\) are different outcomes.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide question: are \(A\) and \(B\) mutually exclusive? Yes: \(A\cap B = \varnothing\) (with \(D_1 = 1\) the sum is at most 5). Are \(B\) and \(C\)? No: \(B\cap C = \{(4,2)\}\). Select \(B\) then \(C\) in the widget to see the overlap.</li>
+      <li>Stress that the dice are distinguishable (blue and red). That’s why \((2,4)\) and \((4,2)\) are different outcomes, and it’s what makes the outcomes equally likely later.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L4 PROBABILITY -->
+<section class="page" id="l4-probability" data-title="Probability spaces" data-lecture="4">
+  <p class="where">Lecture 4 · <span class="tag-later">Upcoming · Wed Oct 7</span> · Reading 2.1.2 · preview from the posted slides</p>
+  <h1>Probability spaces</h1>
+  <div class="prose">
+    <p>A probability is a number between 0 and 1 describing how likely an outcome is. The slides define a function \(\mathbb P:\Omega\to[0,1]\) that maps outcomes \(x\in\Omega\) to probabilities. Notation: \(\mathbb P(x) = P(x) = \Pr(x)\); the slides mostly write \(P\).</p>
+    <p>Toss one coin: \(\Omega = \{H,T\}\). What is \(P\)? <em>It depends on what you want to model.</em> A fair coin has \(P(H) = P(T) = \tfrac12\). A bent coin might have \(P(H) = 0.85\), \(P(T) = 0.15\). Same \(\Omega\), different \(P\).</p>
+  </div>
+
+  <div class="rule">
+    <p class="rule-tag">Definition: probability space</p>
+    <p>A (discrete) probability space is a pair \((\Omega, P)\) where \(\Omega\) is a set (finite or countably infinite) called the sample space, and \(P\) is the probability measure, a function \(P:\Omega\to\mathbb R\) such that</p>
+    <ul>
+      <li>\(P(x)\ge 0\) for all \(x\in\Omega\) (each outcome has non-negative likelihood), and</li>
+      <li>\(\sum_{x\in\Omega}P(x) = 1\) (some outcome must show up).</li>
+    </ul>
+  </div>
+  <div class="rule">
+    <p class="rule-tag">Definition: probability of an event</p>
+    <p>For an event \(E\subseteq\Omega\), \(\displaystyle P(E) = \sum_{x\in E}P(x)\).</p>
+    <p class="small">Abuse of notation: for a one-outcome event \(\{x\}\) we write \(P(x)\) instead of \(P(\{x\})\). They are equal by definition.</p>
+  </div>
+
+  <h2>Build a probability space</h2>
+  <div class="prose"><p>Set the weight of each outcome. The widget checks the two conditions and computes \(P(E)\) for the event you select.</p></div>
+  <div class="panel" id="pspace">
+    <div class="controls">
+      <span>Preset:</span>
+      <button class="chip" data-preset="fair" aria-pressed="true">Fair coin</button>
+      <button class="chip" data-preset="bent" aria-pressed="false">Bent coin</button>
+      <button class="chip" data-preset="die" aria-pressed="false">Fair die</button>
+      <button class="chip" data-preset="bag" aria-pressed="false">Bag of balls</button>
+    </div>
+    <div class="weights" id="ps-weights"></div>
+    <p class="out" id="ps-check" aria-live="polite"></p>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l4-qc-bent-coin-tails" data-answer="0.15">
+    <p>Quick check: a bent coin has \(P(H) = 0.85\). What must \(P(T)\) be?</p>
+    <ul class="miscon" hidden><li data-expr="0.85" data-tag="assumed-fair">The outcomes don’t have to be equally likely, but they must add up to 1.</li></ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Try the “Bag of balls” preset: the slide’s bag has 3 red, 4 green, 2 yellow and 1 blue ball, so \(P(\text{red}) = 3/10\). The physical experiment (drawing a ball) and the model (\(\Omega\) = colors, with weights) are different things; the slides put them side by side.</li>
+      <li>Type a negative weight or make the total 1.2 to show the widget refusing it. Ask which condition failed.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L4 UNIFORM -->
+<section class="page" id="l4-uniform" data-title="Equally likely outcomes" data-lecture="4">
+  <p class="where">Lecture 4 · <span class="tag-later">Upcoming · Wed Oct 7</span> · Reading 2.1.3 · preview from the posted slides</p>
+  <h1>Equally likely outcomes</h1>
+
+  <div class="rule">
+    <p class="rule-tag">Definition: uniform probability space</p>
+    <p>\((\Omega, P)\) is uniform if \(P(x) = \dfrac1{|\Omega|}\) for all \(x\in\Omega\). Fair coin: \(P(x) = \tfrac12\). Fair 6-sided die: \(P(x) = \tfrac16\).</p>
+  </div>
+  <div class="rule theorem">
+    <p class="rule-tag">Equally likely outcomes</p>
+    <p>If \((\Omega,P)\) is a uniform probability space, then for any event \(E\subseteq\Omega\),</p>
+    <p>\[P(E) = \frac{|E|}{|\Omega|}.\]</p>
+    <p class="small">This follows from the two definitions: \(P(E) = \sum_{x\in E}\frac1{|\Omega|}\), which is \(|E|\) copies of \(\frac1{|\Omega|}\).</p>
+  </div>
+  <div class="prose">
+    <p>This is why we spent two weeks counting. With fair dice, the probability that \(D_1 + D_2 = 6\) is \(|B|/|\Omega| = 3/16\).</p>
+  </div>
+
+  <h2>Event enumerator</h2>
+  <div class="prose"><p>Pick an experiment and an event. The enumerator lists every outcome, marks the ones in the event, and divides. It only works because each outcome is equally likely.</p></div>
+  <div class="panel" id="enum">
+    <div class="controls">
+      <label>Experiment
+        <select id="en-exp" aria-label="Experiment">
+          <option value="d4">two 4-sided dice</option>
+          <option value="d6">two 6-sided dice</option>
+          <option value="coins3">3 coin flips</option>
+          <option value="coins4">4 coin flips</option>
+        </select>
+      </label>
+      <label>Event
+        <select id="en-ev" aria-label="Event"></select>
+      </label>
+    </div>
+    <div class="enum-list" id="en-list"></div>
+    <p class="out" id="en-out" aria-live="polite"></p>
+  </div>
+
+  <h2>100 coin flips</h2>
+  <div class="prose">
+    <p>The slides’ poll: toss a coin 100 times, every outcome equally likely. What is the probability of seeing exactly 50 heads? Options: (a) \(\frac12\), (b) \(\frac1{2^{50}}\), (c) \(\binom{100}{50}/2^{100}\), (d) not sure.</p>
+    <p>\(\Omega\) is all \(2^{100}\) strings of H and T. The event is the strings with exactly 50 H’s; choose their positions: \(\binom{100}{50}\). So the answer is (c), about 0.0796. Use the slider to see how the count spreads out.</p>
+  </div>
+  <div class="panel" id="flips">
+    <div class="controls">
+      <label>flips \(n =\) <input type="range" id="fl-n" min="2" max="100" value="100" aria-label="number of flips"></label>
+      <span id="fl-n-out"></span>
+      <label>heads \(k =\) <input type="range" id="fl-k" min="0" max="100" value="50" aria-label="number of heads"></label>
+      <span id="fl-k-out"></span>
+    </div>
+    <svg class="bars" id="fl-bars" viewBox="0 0 600 160" role="img" aria-label="Number of outcomes with each count of heads"></svg>
+    <p class="out" id="fl-out" aria-live="polite"></p>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l4-qc-sum-six-prob" data-answer="3/16">
+    <p>Quick check: two fair 4-sided dice. What is \(P(D_1 + D_2 = 6)\)? Give an exact fraction.</p>
+    <ul class="miscon" hidden>
+      <li data-expr="3" data-tag="count-not-probability">That’s \(|B|\), the number of outcomes. A probability divides by \(|\Omega|\).</li>
+      <li data-expr="3/7" data-tag="sums-as-outcomes">Sums 2 through 8 are not equally likely. Use the 16 equally likely ordered pairs.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Reading 2.1.3 has the warning example: flip two coins, say \(\Omega = \{0,1,2\}\) heads and claim \(P(\ge 1\text{ head}) = 2/3\). That \(\Omega\) is fine, but its outcomes aren’t equally likely (\(1/4, 2/4, 1/4\)), so \(|E|/|\Omega|\) doesn’t apply. The real answer is \(3/4\). Quiz question 5 is built on this.</li>
+      <li>In the poll, (a) treats “50 heads” as a coin flip; (b) is the probability of one specific sequence such as HTHT…; (c) counts all the sequences with 50 heads.</li>
+      <li>Drag \(k\) in the flips widget to 0 or 100: exactly one outcome each, \(1/2^{100}\).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L4 AXIOMS -->
+<section class="page" id="l4-axioms" data-title="Axioms and unequal outcomes" data-lecture="4">
+  <p class="where">Lecture 4 · <span class="tag-later">Upcoming · Wed Oct 7</span> · Reading 2.1.2 · preview from the posted slides</p>
+  <h1>Axioms and unequal outcomes</h1>
+
+  <div class="rule">
+    <p class="rule-tag">Axioms of probability</p>
+    <p>Let \((\Omega,P)\) be a probability space. For any events \(E, F\subseteq\Omega\):</p>
+    <p><strong>Axiom 1 (non-negativity):</strong> \(P(E)\ge0\).<br><strong>Axiom 2 (normalization):</strong> \(P(\Omega) = 1\).<br><strong>Axiom 3 (countable additivity):</strong> if \(E\) and \(F\) are mutually exclusive, \(P(E\cup F) = P(E)+P(F)\).</p>
+    <p class="small">They’re called axioms because every other property of \(P\) follows from them.</p>
+  </div>
+  <div class="rule theorem">
+    <p class="rule-tag">Corollaries</p>
+    <p><strong>Complementation:</strong> \(P(E^c) = 1 - P(E)\).<br><strong>Monotonicity:</strong> if \(E\subseteq F\), then \(P(E)\le P(F)\).<br><strong>Inclusion-exclusion:</strong> \(P(E\cup F) = P(E)+P(F) - P(E\cap F)\).</p>
+  </div>
+  <div class="prose">
+    <p>Each corollary is a counting rule in probability form. Complementation is complementary counting; inclusion-exclusion is Monday’s formula with sizes replaced by probabilities. For complementation: \(E\) and \(E^c\) are mutually exclusive and \(E\cup E^c = \Omega\), so \(P(E)+P(E^c) = P(\Omega) = 1\).</p>
+  </div>
+
+  <h2>Non-equally likely outcomes</h2>
+  <div class="prose"><p>The slides’ three coin models. Each has the same sample space for two coins, but different probabilities. Pick an event and compare.</p></div>
+  <div class="panel" id="coins">
+    <div class="coin-models" id="cm-models"></div>
+    <div class="controls" role="group" aria-label="Event">
+      <span>Event:</span>
+      <button class="chip" data-cev="same" aria-pressed="true">both coins match</button>
+      <button class="chip" data-cev="atleast-h" aria-pressed="false">at least one H</button>
+      <button class="chip" data-cev="hh" aria-pressed="false">HH</button>
+    </div>
+    <p class="out" id="cm-out" aria-live="polite"></p>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l4-qc-attached-coins-differ" data-answer="0.2">
+    <p>Quick check: for the attached coins (\(P(HH)=P(TT)=0.4\), \(P(HT)=P(TH)=0.1\)), what is the probability that the two coins show different faces?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="1/2" data-tag="assumed-uniform">That’s \(|E|/|\Omega| = 2/4\), which assumes equally likely outcomes. These aren’t.</li>
+      <li data-expr="0.1" data-tag="one-outcome-only">That’s only \(HT\). The event also contains \(TH\).</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Biased coin: \(P(H) = p\), \(P(T) = 1-p\). Glued coins: \(P(HT) = P(TH) = 0.5\), \(P(HH) = P(TT) = 0\). Attached coins: \(P(HH) = P(TT) = 0.4\), \(P(HT) = P(TH) = 0.1\).</li>
+      <li>Ask for a proof of monotonicity from the axioms: \(F = E\cup(F\setminus E)\), disjoint, so \(P(F) = P(E) + P(F\setminus E)\ge P(E)\) by Axiom 1. The textbook leaves inclusion-exclusion “to the reader”; it’s a good board exercise.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L4 DICE -->
+<section class="page" id="l4-dice" data-title="Example: at least one 3" data-lecture="4">
+  <p class="where">Lecture 4 · <span class="tag-later">Upcoming · Wed Oct 7</span> · worked example · preview from the posted slides</p>
+  <h1>Example: at least one 3</h1>
+  <div class="prose">
+    <p>Two fair 6-sided dice are rolled once each. What is the probability of seeing at least one 3?</p>
+    <p>All 36 ordered pairs are equally likely, so count the event. The first die is 3 in 6 outcomes; the second die is 3 in 6 outcomes; \((3,3)\) is in both. By inclusion-exclusion the event has \(6 + 6 - 1 = 11\) outcomes, and \(P(\ge\text{one }3) = 11/36\).</p>
+  </div>
+  <div class="panel" id="dice6">
+    <div class="controls">
+      <button class="chip" data-d6="row" aria-pressed="false">First die is 3</button>
+      <button class="chip" data-d6="col" aria-pressed="false">Second die is 3</button>
+      <button class="chip" data-d6="both" aria-pressed="true">At least one 3</button>
+      <button class="chip" data-d6="none" aria-pressed="false">No 3 (complement)</button>
+      <button class="btn" id="d6-roll">Roll 1,000 times</button>
+    </div>
+    <div class="dice-layout">
+      <div class="dice-grid six" id="d6-grid" role="grid" aria-label="Sample space of two 6-sided dice"></div>
+      <div class="dice-side"><p class="out" id="d6-out" aria-live="polite"></p><p class="out sim" id="d6-sim" aria-live="polite"></p></div>
+    </div>
+  </div>
+  <div class="prose">
+    <p>A second route, by complementation: no 3 on either die is \(5\cdot5 = 25\) outcomes, so \(P(\ge\text{one }3) = 1 - 25/36 = 11/36\).</p>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l4-qc-at-least-one-six" data-answer="11/36">
+    <p>Quick check: two fair 6-sided dice. What is the probability of at least one 6?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="12/36" data-tag="ignored-overlap">\((6,6)\) was counted twice. Inclusion-exclusion.</li>
+      <li data-expr="1/3" data-tag="ignored-overlap">That’s \(1/6 + 1/6\), which counts \((6,6)\) twice.</li>
+      <li data-expr="25/36" data-tag="counted-complement">That’s the probability of <em>no</em> 6.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The slide highlights a row and a column of the 6×6 grid; the cell where they cross is the one counted twice. Toggle “First die is 3” and “Second die is 3” to show it.</li>
+      <li>“Roll 1,000 times” simulates. The fraction lands near \(11/36\approx0.306\) but not exactly on it. Good moment to say the course defines probability by the model, not by simulation.</li>
+      <li>Lecture 4 announcements: PSet 1 is due that night; PSet 2 is posted that evening, due the next Wednesday.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L4 PROBLEMS -->
+<section class="page" id="l4-problems" data-title="Lecture 4: problems from the slides" data-lecture="4">
+  <p class="where">Lecture 4 · <span class="tag-later">Upcoming · Wed Oct 7</span> · practice from the posted slides</p>
+  <h1>Problems from the slides</h1>
+  <div class="prose">
+    <p>Each problem is a question or example from the Lecture 4 slides, with the slides’ answer. Probabilities are graded exactly, so type fractions such as <code>3/16</code> or expressions such as <code>C(100,50)/2^100</code>.</p>
+  </div>
+
+  <article class="task" data-id="cse312-w2-l4-p-dice-events">
+    <h2>Outcomes in each event</h2>
+    <p class="prompt">Roll a blue 4-sided die (\(D_1\)) and a red 4-sided die (\(D_2\)). How many outcomes are in each event?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l4-p-dice-events.a" data-label="\(A\): \(D_1 = 1\)" data-answer="4"></div>
+    <div class="answer-spec" data-part-id="cse312-w2-l4-p-dice-events.b" data-label="\(B\): \(D_1 + D_2 = 6\)" data-answer="3">
+      <ul class="miscon" hidden><li data-expr="2" data-tag="unordered-outcomes">\((2,4)\) and \((4,2)\) are different outcomes: the dice are different colors.</li></ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w2-l4-p-dice-events.c" data-label="\(C\): \(D_1 = 2D_2\)" data-answer="2">
+      <ul class="miscon" hidden><li data-expr="4" data-tag="swapped-condition">Check which die is twice the other: \(D_1 = 2 D_2\), so the blue die is the bigger one.</li></ul>
+    </div>
+    <ol class="hints">
+      <li>Write the sample space as a 4×4 table of ordered pairs \((D_1, D_2)\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(A = \{(1,1),(1,2),(1,3),(1,4)\}\), so \(|A| = 4\).</li>
+      <li>\(B = \{(2,4),(3,3),(4,2)\}\), so \(|B| = 3\).</li>
+      <li>\(C = \{(2,1),(4,2)\}\), so \(|C| = 2\).</li>
+      <li class="answer">\(|A| = 4,\ |B| = 3,\ |C| = 2\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l4-p-mutually-exclusive">
+    <h2>Mutually exclusive?</h2>
+    <p class="prompt">With the events \(A\), \(B\), \(C\) above:</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l4-p-mutually-exclusive.a-b" data-type="yesno" data-answer="yes" data-label="Are \(A\) and \(B\) mutually exclusive?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part-id="cse312-w2-l4-p-mutually-exclusive.b-c" data-type="yesno" data-answer="no" data-label="Are \(B\) and \(C\) mutually exclusive?" data-placeholder="yes or no"></div>
+    <ol class="hints">
+      <li>Mutually exclusive means the intersection is empty. Look for an outcome in both.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(A\) needs \(D_1 = 1\); then \(D_1 + D_2\le 5\). No outcome is in both, so \(A\cap B = \varnothing\).</li>
+      <li>\((4,2)\) has sum 6 and \(4 = 2\cdot 2\), so \(B\cap C = \{(4,2)\}\ne\varnothing\).</li>
+      <li class="answer">\(A\) and \(B\): yes. \(B\) and \(C\): no.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l4-p-prob-sum-six">
+    <h2>Probability of event \(B\)</h2>
+    <p class="prompt">Each 4-sided die is fair, so all outcomes are equally likely. What is \(P(B)\), the probability that \(D_1 + D_2 = 6\)?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l4-p-prob-sum-six.ans" data-answer="3/16" data-near="0.005">
+      <ul class="miscon" hidden>
+        <li data-expr="3/7" data-tag="sums-as-outcomes">The 7 possible sums aren’t equally likely. Use the 16 ordered pairs.</li>
+        <li data-expr="3" data-tag="count-not-probability">That’s the number of outcomes in \(B\). Divide by \(|\Omega|\).</li>
+      </ul>
+    </div>
+    <ol class="hints"><li>Uniform space: \(P(E) = |E|/|\Omega|\).</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(|\Omega| = 4\cdot 4 = 16\) equally likely outcomes.</li>
+      <li>\(|B| = 3\).</li>
+      <li class="answer">\(P(B) = 3/16\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l4-p-fifty-heads">
+    <h2>Exactly 50 heads in 100 tosses</h2>
+    <p class="prompt">Toss a coin 100 times. Each outcome is equally likely (and one toss doesn’t affect another). What is the probability of seeing exactly 50 heads? Give an exact expression.</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l4-p-fifty-heads.ans" data-answer="C(100,50)/2^100" data-near="0.0005">
+      <ul class="miscon" hidden>
+        <li data-expr="1/2" data-tag="heads-as-coin-flip">“Exactly 50 heads” is not a single fair coin flip. Count the sequences.</li>
+        <li data-expr="1/2^50" data-tag="one-sequence">That’s about one specific half of the tosses. Many different sequences have 50 heads.</li>
+        <li data-expr="1/2^100" data-tag="one-sequence">That’s the probability of one specific sequence. How many sequences have exactly 50 H’s?</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>\(\Omega\) is all H/T strings of length 100. How big is it?</li>
+      <li>A string with exactly 50 H’s is determined by which 50 positions are H.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(|\Omega| = 2^{100}\), all equally likely.</li>
+      <li>The event: choose the 50 positions of the heads, \(\binom{100}{50}\) strings.</li>
+      <li class="answer">\(\binom{100}{50}/2^{100}\approx 0.0796\) (poll answer (c))</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l4-p-at-least-one-three">
+    <h2>At least one 3</h2>
+    <p class="prompt">Two fair 6-sided dice are rolled once each. What is the probability of seeing at least one 3?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l4-p-at-least-one-three.ans" data-answer="11/36" data-near="0.005">
+      <ul class="miscon" hidden>
+        <li data-expr="12/36" data-tag="ignored-overlap">\((3,3)\) is in both “first die is 3” and “second die is 3”. Count it once.</li>
+        <li data-expr="1/36" data-tag="both-not-either">That’s two 3’s. “At least one” also includes exactly one.</li>
+        <li data-expr="25/36" data-tag="counted-complement">That’s the probability of no 3 at all.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>36 equally likely outcomes. Count the ones with a 3 on the first die, on the second, and on both.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(|\Omega| = 36\).</li>
+      <li>First die 3: 6 outcomes. Second die 3: 6 outcomes. Both: 1 outcome, \((3,3)\).</li>
+      <li>Inclusion-exclusion: \(6 + 6 - 1 = 11\) outcomes. (Check: no 3 on either is \(5\cdot5 = 25\), and \(36 - 25 = 11\).)</li>
+      <li class="answer">\(11/36\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l4-p-glued-coins">
+    <h2>Glued coins</h2>
+    <p class="prompt">Two coins are glued so that \(P(HT) = P(TH) = 0.5\) and \(P(HH) = P(TT) = 0\). Is \((\{HH,HT,TH,TT\}, P)\) a probability space? Then find the probability of at least one head.</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l4-p-glued-coins.valid" data-type="yesno" data-answer="yes" data-label="A probability space?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part-id="cse312-w2-l4-p-glued-coins.prob" data-label="\(P(\text{at least one }H)\)" data-answer="1">
+      <ul class="miscon" hidden><li data-expr="3/4" data-tag="assumed-uniform">\(3/4\) assumes all four outcomes are equally likely. Add up the given probabilities instead.</li></ul>
+    </div>
+    <ol class="hints">
+      <li>Check the two conditions: every \(P(x)\ge0\), and they sum to 1. Probability 0 is allowed.</li>
+      <li>\(P(E) = \sum_{x\in E}P(x)\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>All four values are \(\ge 0\), and \(0.5 + 0.5 + 0 + 0 = 1\). So yes.</li>
+      <li>At least one head: \(\{HH, HT, TH\}\), so \(P = 0 + 0.5 + 0.5\).</li>
+      <li class="answer">Yes, and \(P(\text{at least one }H) = 1\).</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L4 QUIZ -->
+<section class="page" id="l4-quiz" data-title="Lecture 4: check your understanding" data-lecture="4">
+  <p class="where">Lecture 4 wrap-up · <span class="tag-later">Upcoming · Wed Oct 7</span> · original questions written for this site</p>
+  <h1>Check your understanding: Lecture 4</h1>
+  <div class="prose">
+    <p>Ten questions on Lecture 4 only: sample spaces, events, probability spaces, equally likely outcomes and the axioms. Lecture 4 is on Wednesday; use this after it, or as a preview. The score counts first tries only.</p>
+  </div>
+  <div class="cyu-score" data-score role="status"></div>
+  <ol class="cyu-list">
+    <li class="cyu" data-id="cse312-w2-l4-quiz-sample-space-size" data-kind="num" data-answer="2^3" data-topic="l4-events">
+      <p class="q">You flip a coin 3 times and record the sequence. How many outcomes are in \(\Omega\)?</p>
+      <ul class="miscon" hidden><li data-expr="4" data-tag="counted-heads">That’s the number of possible <em>head counts</em> (0 to 3). The outcome is the whole sequence.</li></ul>
+      <p class="why" hidden>Each flip is H or T: \(2^3 = 8\) sequences.</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l4-quiz-mutually-exclusive-pick" data-kind="mc" data-topic="l4-events">
+      <p class="q">One fair die is rolled. Which pair of events is mutually exclusive?</p>
+      <div class="opts">
+        <label data-opt="even-and-prime" data-tag="overlap-missed"><input type="radio"> “even” and “prime”<span class="why" hidden>2 is both even and prime.</span></label>
+        <label data-opt="odd-and-four" data-correct><input type="radio"> “odd” and “roll a 4”<span class="why" hidden>Correct. \(\{1,3,5\}\cap\{4\} = \varnothing\).</span></label>
+        <label data-opt="small-and-even" data-tag="overlap-missed"><input type="radio"> “at most 3” and “even”<span class="why" hidden>2 is in both.</span></label>
+        <label data-opt="complement-confusion" data-tag="exclusive-vs-complement"><input type="radio"> None: mutually exclusive events must cover all of \(\Omega\)<span class="why" hidden>That’s not required. Mutually exclusive only means no overlap; they don’t have to cover \(\Omega\).</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l4-quiz-valid-space" data-kind="mc" data-topic="l4-probability">
+      <p class="q">For \(\Omega = \{a, b, c\}\), which assignment gives a probability space?</p>
+      <div class="opts">
+        <label data-opt="half-half-zero" data-correct><input type="radio"> \(P(a) = 0.5,\ P(b) = 0.5,\ P(c) = 0\)<span class="why" hidden>Correct. All values are non-negative and they sum to 1. Probability 0 is allowed.</span></label>
+        <label data-opt="negative" data-tag="negative-prob"><input type="radio"> \(P(a) = 0.7,\ P(b) = 0.5,\ P(c) = -0.2\)<span class="why" hidden>It sums to 1, but \(P(c) &lt; 0\) breaks non-negativity.</span></label>
+        <label data-opt="thirds-plus" data-tag="sum-not-one"><input type="radio"> \(P(a) = P(b) = P(c) = 0.4\)<span class="why" hidden>The total is 1.2, not 1.</span></label>
+        <label data-opt="uniform-only" data-tag="assumed-uniform"><input type="radio"> Only \(P(a)=P(b)=P(c)=\tfrac13\)<span class="why" hidden>Uniform is one valid choice, not the only one.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l4-quiz-event-from-weights" data-kind="num" data-answer="7/10" data-topic="l4-probability">
+      <p class="q">A bag has 3 red, 4 green, 2 yellow and 1 blue ball, and one ball is drawn uniformly at random. What is \(P(\text{red or green})\)?</p>
+      <ul class="miscon" hidden><li data-expr="1/2" data-tag="colors-as-uniform">Two of four colors, but the colors aren’t equally likely. Count balls.</li></ul>
+      <p class="why" hidden>\(3/10 + 4/10 = 7/10\).</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l4-quiz-heads-count-trap" data-kind="mc" data-topic="l4-uniform">
+      <p class="q">Flip two fair coins. Someone uses \(\Omega = \{0, 1, 2\}\) (the number of heads) and says \(P(\text{at least one head}) = 2/3\). What’s wrong?</p>
+      <div class="opts">
+        <label data-opt="not-uniform" data-correct><input type="radio"> \(|E|/|\Omega|\) needs equally likely outcomes, and 0, 1, 2 heads aren’t<span class="why" hidden>Correct. \(P(0)=\frac14, P(1)=\frac24, P(2)=\frac14\), so the answer is \(\frac34\).</span></label>
+        <label data-opt="bad-omega" data-tag="omega-illegal"><input type="radio"> \(\{0,1,2\}\) isn’t allowed as a sample space<span class="why" hidden>It is a fine sample space. The mistake is treating its outcomes as equally likely.</span></label>
+        <label data-opt="nothing" data-tag="missed-trap"><input type="radio"> Nothing; it’s right<span class="why" hidden>List the 4 equally likely sequences: HH, HT, TH, TT. Three have a head.</span></label>
+        <label data-opt="should-be-half" data-tag="wrong-fix"><input type="radio"> The answer should be \(1/2\)<span class="why" hidden>Three of the four equally likely sequences have a head.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l4-quiz-pair-same-value" data-kind="num" data-answer="1/6" data-topic="l4-uniform">
+      <p class="q">Two fair 6-sided dice. What is the probability that they show the same value?</p>
+      <ul class="miscon" hidden><li data-expr="1/36" data-tag="one-specific-double">That’s one specific double, like \((3,3)\). There are six doubles.</li></ul>
+      <p class="why" hidden>6 doubles out of 36: \(6/36 = 1/6\).</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l4-quiz-three-heads-of-five" data-kind="num" data-answer="C(5,3)/2^5" data-topic="l4-uniform">
+      <p class="q">Five fair coin flips. What is the probability of exactly 3 heads?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="1/2^5" data-tag="one-sequence">That’s one specific sequence, such as HHHTT.</li>
+        <li data-expr="3/5" data-tag="ratio-not-probability">That’s a fraction of the flips, not a probability of the event.</li>
+      </ul>
+      <p class="why" hidden>Choose the positions of the 3 heads: \(\binom53 = 10\) of the \(2^5 = 32\) sequences, so \(10/32 = 5/16\).</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l4-quiz-complement" data-kind="num" data-answer="1-(5/6)^3" data-topic="l4-axioms">
+      <p class="q">Three fair dice are rolled. What is the probability that at least one shows a 6?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="1/2" data-tag="added-overlapping">\(\frac16+\frac16+\frac16\) counts outcomes with two or three 6’s more than once.</li>
+        <li data-expr="(5/6)^3" data-tag="counted-complement">That’s the probability of no 6.</li>
+      </ul>
+      <p class="why" hidden>Complement: no 6 on any die is \(5^3\) of \(6^3\) outcomes, so \(1 - 125/216 = 91/216\).</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l4-quiz-monotonicity" data-kind="mc" data-topic="l4-axioms">
+      <p class="q">\(E\subseteq F\) and \(P(F) = 0.3\). Which value is possible for \(P(E)\)?</p>
+      <div class="opts">
+        <label data-opt="point-two" data-correct><input type="radio"> \(0.2\)<span class="why" hidden>Correct. Monotonicity: \(P(E)\le P(F) = 0.3\).</span></label>
+        <label data-opt="point-four" data-tag="reversed-monotonicity"><input type="radio"> \(0.4\)<span class="why" hidden>\(E\) is inside \(F\), so it can’t be more likely.</span></label>
+        <label data-opt="point-seven" data-tag="used-complement"><input type="radio"> \(0.7\)<span class="why" hidden>That’s \(P(F^c)\), which is unrelated to \(E\).</span></label>
+        <label data-opt="minus" data-tag="negative-prob"><input type="radio"> \(-0.1\)<span class="why" hidden>Axiom 1: probabilities are never negative.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l4-quiz-ie-probability" data-kind="num" data-answer="0.6" data-topic="l4-axioms">
+      <p class="q">\(P(E) = 0.4\), \(P(F) = 0.5\) and \(P(E\cap F) = 0.3\). What is \(P(E\cup F)\)?</p>
+      <ul class="miscon" hidden><li data-expr="0.9" data-tag="ignored-overlap">\(E\) and \(F\) overlap, so Axiom 3 doesn’t apply directly.</li></ul>
+      <p class="why" hidden>\(0.4 + 0.5 - 0.3 = 0.6\).</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-summary role="status"></div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Question 5 is the textbook’s warning example; it’s the most important one. Every numeric answer here was checked by enumeration in the tests.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L5 CONDITIONAL -->
+<section class="page" id="l5-conditional" data-title="Conditional probability" data-lecture="5">
+  <p class="where">Lecture 5 · <span class="tag-later">Upcoming · Fri Oct 9</span> · Reading 2.2.1 · preview from the posted slides</p>
+  <h1>Conditional probability</h1>
+  <div class="prose">
+    <p>Lecture 5 starts from the ice cream and donut picture again: 36 like only ice cream, 7 like both, 13 like only donuts, 14 like neither. Pick a person at random, everyone equally likely. What’s the probability they like ice cream <strong>given</strong> that they like donuts?</p>
+    <p>Knowing they like donuts throws away everyone outside \(B\). The new sample space is the 20 donut lovers, and 7 of them like ice cream: \(\frac{7}{7+13} = \frac7{20}\).</p>
+  </div>
+
+  <div class="rule">
+    <p class="rule-tag">Definition: conditional probability</p>
+    <p>The conditional probability of event \(A\) given that event \(B\) happened (assuming \(P(B)\ne0\)) is</p>
+    <p>\[P(A\mid B) = \frac{P(A\cap B)}{P(B)}.\]</p>
+    <p>A useful rearrangement: \(P(A\cap B) = P(A\mid B)\,P(B)\).</p>
+  </div>
+
+  <h2>Restrict the sample space</h2>
+  <div class="prose"><p>Pick what you learned, then what you’re asking about. Outcomes outside the condition fade out; the probability is recomputed inside what’s left.</p></div>
+  <div class="panel" id="restrict">
+    <div class="controls">
+      <label>Experiment
+        <select id="rs-exp" aria-label="Experiment">
+          <option value="coins2">flip a fair coin twice</option>
+          <option value="d6">roll two fair 6-sided dice</option>
+          <option value="survey">survey: one random student of 70</option>
+        </select>
+      </label>
+    </div>
+    <div class="controls">
+      <label>Given \(B\): <select id="rs-given" aria-label="Condition"></select></label>
+      <label>Find \(A\): <select id="rs-ask" aria-label="Event"></select></label>
+    </div>
+    <div class="restrict-layout">
+      <div class="restrict-grid" id="rs-grid" aria-hidden="true"></div>
+      <div class="restrict-math" id="rs-out" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <h2>The slides’ coin examples</h2>
+  <div class="prose">
+    <p>Flip a fair coin twice. <strong>Both heads, given at least one head?</strong> Let \(O\) = at least one head and \(B\) = both heads. \(P(O) = \frac34\), \(P(B\cap O) = P(B) = \frac14\), so \(P(B\mid O) = \frac{1/4}{3/4} = \frac13\).</p>
+    <p><strong>At least one head, given at least one tail?</strong> \(P(H) = P(T) = \frac34\) and \(P(H\cap T) = \frac12\) (that’s \(HT\) and \(TH\)), so \(P(H\mid T) = \frac{1/2}{3/4} = \frac23\).</p>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l5-qc-ice-cream-given-donuts" data-answer="7/20">
+    <p>Quick check: in the survey, what is \(P(\text{likes ice cream}\mid\text{likes donuts})\)?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="7/70" data-tag="joint-not-conditional">That’s \(P(A\cap B)\), out of everyone. Given donuts, only the donut lovers remain.</li>
+      <li data-expr="7/43" data-tag="reversed-condition">That’s \(P(\text{donuts}\mid\text{ice cream})\). Which group are you restricting to?</li>
+      <li data-expr="43/70" data-tag="ignored-condition">That ignores what you learned. Restrict to people who like donuts.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The definition is the formula version of restricting: with equally likely outcomes, \(\frac{|A\cap B|}{|B|} = \frac{|A\cap B|/|\Omega|}{|B|/|\Omega|} = \frac{P(A\cap B)}{P(B)}\). The textbook derives it exactly this way.</li>
+      <li>In the coin example, students often say \(\frac12\) (“the other coin is 50/50”). Restrict on the grid: \(HH, HT, TH\) remain, one of them is \(HH\). Reading 2.2.2’s sibling problem makes the same point: “older sibling is male” gives \(\frac12\), but “at least one is male” gives \(\frac13\).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L5 REVERSING -->
+<section class="page" id="l5-reversing" data-title="Reversing the condition" data-lecture="5">
+  <p class="where">Lecture 5 · <span class="tag-later">Upcoming · Fri Oct 9</span> · preview from the posted slides</p>
+  <h1>Reversing the condition</h1>
+  <div class="prose">
+    <p>Does \(P(A\mid B) = P(B\mid A)\)? <strong>No.</strong> Let \(A\) be “you are wet” and \(B\) be “you are swimming”. \(P(A\mid B) = 1\): swimmers are wet. But \(P(B\mid A)\ne1\): you can be wet from rain or a shower. In the survey, \(P(\text{ice cream}\mid\text{donuts}) = \frac7{20}\) while \(P(\text{donuts}\mid\text{ice cream}) = \frac7{43}\). Same overlap, different denominators.</p>
+  </div>
+
+  <h2>Two dice, one red</h2>
+  <div class="prose">
+    <p>The slides’ poll. Toss a red die and a blue die, both 6-sided, all outcomes equally likely. Let \(B\) = “red die is 1” and \(A\) = “sum is 4”. What are \(P(B)\) and \(P(B\mid A)\)? Options: (a) \(\frac16, \frac16\) (b) \(\frac16, \frac13\) (c) \(\frac16, \frac3{36}\) (d) \(\frac19, \frac13\).</p>
+  </div>
+  <div class="panel" id="poll-dice">
+    <div class="controls">
+      <button class="chip" data-pd="omega" aria-pressed="true">Whole sample space</button>
+      <button class="chip" data-pd="given-a" aria-pressed="false">Given \(A\): sum is 4</button>
+      <button class="chip" data-pd="given-b" aria-pressed="false">Given \(B\): red is 1</button>
+    </div>
+    <div class="dice-layout">
+      <div class="dice-grid six" id="pd-grid" aria-hidden="true"></div>
+      <div class="dice-side"><p class="out" id="pd-out" aria-live="polite"></p></div>
+    </div>
+  </div>
+
+  <h2>The gambler’s fallacy</h2>
+  <div class="prose">
+    <p>Toss 51 fair coins. The first 50 all came up tails. What is the probability the 51st is heads? Let \(A\) = first 50 are tails and \(B\) = first 50 are tails and the 51st is heads. Among the \(2^{51}\) equally likely sequences, \(A\) has 2 and \(B\) has 1:</p>
+    <p>\[P(B\mid A) = \frac{P(A\cap B)}{P(A)} = \frac{1/2^{51}}{2/2^{51}} = \frac12.\]</p>
+    <p>The 51st coin doesn’t depend on the first 50. The <em>gambler’s fallacy</em> is the feeling that heads is “due”.</p>
+  </div>
+  <div class="panel" id="gambler">
+    <div class="controls">
+      <label>tails in a row before the next flip: <input type="number" id="gb-run" min="1" max="12" value="5" aria-label="streak length"></label>
+      <button class="btn" id="gb-go">Simulate 20,000 sequences</button>
+    </div>
+    <p class="out" id="gb-out" aria-live="polite"></p>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l5-qc-poll-dice" data-answer="1/3">
+    <p>Quick check: in the poll, what is \(P(B\mid A)\), the probability the red die is 1 given the sum is 4?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="1/6" data-tag="ignored-condition">That’s \(P(B)\) without the condition. Restrict to the outcomes with sum 4.</li>
+      <li data-expr="1/36" data-tag="joint-not-conditional">That’s \(P(A\cap B)\). Divide by \(P(A)\).</li>
+      <li data-expr="3/36" data-tag="reported-pa">That’s \(P(A)\), the chance the sum is 4.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Poll answer: (b). \(A = \{(1,3),(2,2),(3,1)\}\) (red, blue), and only \((1,3)\) has red = 1. Option (c) is \(P(A)\), a common slip.</li>
+      <li>Also ask for \(P(A\mid B)\): given red is 1, the sum is 4 only for \((1,3)\), so \(\frac16\). Different from \(P(B\mid A) = \frac13\).</li>
+      <li>The gambler’s simulation is a nice contrast with the math: the fraction of heads after a streak hovers near 0.5. The slide says the 51st coin is independent of the first 50; independence is next week’s topic (Lecture 6).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L5 BAYES -->
+<section class="page" id="l5-bayes" data-title="Bayes’ theorem" data-lecture="5">
+  <p class="where">Lecture 5 · <span class="tag-later">Upcoming · Fri Oct 9</span> · Reading 2.2.2 · preview from the posted slides</p>
+  <h1>Bayes’ theorem</h1>
+  <div class="prose"><p>A formula that “reverses” the conditional.</p></div>
+  <div class="rule theorem">
+    <p class="rule-tag">Theorem (Bayes’ rule)</p>
+    <p>For events \(A\) and \(B\) with \(P(A), P(B) &gt; 0\),</p>
+    <p>\[P(A\mid B) = \frac{P(B\mid A)\,P(A)}{P(B)}.\]</p>
+    <p>\(P(A)\) is the <strong>prior</strong>: our belief without knowing anything. \(P(A\mid B)\) is the <strong>posterior</strong>: our belief after learning \(B\).</p>
+  </div>
+
+  <h2>Proof, one line at a time</h2>
+  <div class="panel proof">
+    <div class="steps"><ol>
+      <li>By the definition of conditional probability, \(P(A\cap B) = P(A\mid B)\,P(B)\).</li>
+      <li>Swapping \(A\) and \(B\) gives \(P(B\cap A) = P(B\mid A)\,P(A)\).</li>
+      <li>But \(P(A\cap B) = P(B\cap A)\), so \(P(A\mid B)\,P(B) = P(B\mid A)\,P(A)\).</li>
+      <li class="answer">Dividing both sides by \(P(B) &gt; 0\): \(P(A\mid B) = \dfrac{P(B\mid A)\,P(A)}{P(B)}\).</li>
+    </ol></div>
+  </div>
+
+  <h2>Check it on the survey</h2>
+  <div class="prose">
+    <p>With \(A\) = ice cream and \(B\) = donuts among the 70 students: \(P(B\mid A) = \frac7{43}\), \(P(A) = \frac{43}{70}\), \(P(B) = \frac{20}{70}\). Bayes gives \(P(A\mid B) = \frac{(7/43)(43/70)}{20/70} = \frac7{20}\), the same as restricting directly.</p>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l5-qc-bayes-plug-in" data-answer="0.4">
+    <p>Quick check: \(P(A) = 0.2\), \(P(B\mid A) = 0.5\) and \(P(B) = 0.25\). What is \(P(A\mid B)\)?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="0.5" data-tag="reversed-condition">That’s \(P(B\mid A)\). Bayes turns it around.</li>
+      <li data-expr="0.1" data-tag="forgot-denominator">That’s \(P(B\mid A)P(A) = P(A\cap B)\). Divide by \(P(B)\).</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The proof is two uses of the definition. Ask a student to produce line 2 before showing it.</li>
+      <li>Bayes is useful when \(P(B\mid A)\) is easy to know (how a test behaves on sick people) and \(P(A\mid B)\) is what you want (whether a person who tested positive is sick). The Zika example puts this to work.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L5 LTP -->
+<section class="page" id="l5-ltp" data-title="Law of total probability" data-lecture="5">
+  <p class="where">Lecture 5 · <span class="tag-later">Upcoming · Fri Oct 9</span> · Reading 2.2.3 · preview from the posted slides</p>
+  <h1>Law of total probability</h1>
+
+  <div class="rule">
+    <p class="rule-tag">Definition: partition</p>
+    <p>Non-empty events \(E_1, E_2, \dots, E_n\) <strong>partition</strong> \(\Omega\) if they are exhaustive, \(E_1\cup E_2\cup\cdots\cup E_n = \Omega\), and pairwise mutually exclusive, \(E_i\cap E_j = \varnothing\) for all \(i\ne j\).</p>
+    <p class="small">For any event \(E\) other than \(\varnothing\) and \(\Omega\), the pair \(E, E^c\) is a partition.</p>
+  </div>
+  <div class="rule theorem">
+    <p class="rule-tag">Theorem (law of total probability, LTP)</p>
+    <p>If \(E_1,\dots,E_n\) partition \(\Omega\), then for any event \(A\subseteq\Omega\),</p>
+    <p>\[P(A) = \sum_{i=1}^n P(A\cap E_i) = \sum_{i=1}^n P(A\mid E_i)\,P(E_i).\]</p>
+    <p class="small">Why care? \(P(A)\) is often easier to compute this way: split into cases where \(A\) is easy, then take a weighted average.</p>
+  </div>
+
+  <h2>Alice’s pockets</h2>
+  <div class="prose">
+    <p>Alice has two pockets. Left: 2 blue balls, 2 green balls. Right: 1 blue ball, 2 green balls. She picks a random pocket (both equally likely), then a random ball from it (each ball equally likely). What is \(P(\text{blue})\)?</p>
+  </div>
+  <div class="panel" id="pockets">
+    <div class="pockets-layout">
+      <svg class="tree" id="pk-tree" viewBox="0 0 420 230" role="img" aria-label="Probability tree for Alice's pockets"></svg>
+      <div>
+        <div class="pocket-edit" id="pk-edit"></div>
+        <div class="controls">
+          <button class="chip" data-pk="B" aria-pressed="true">Event: blue</button>
+          <button class="chip" data-pk="G" aria-pressed="false">Event: green</button>
+          <button class="btn" id="pk-reset">Slide’s numbers</button>
+        </div>
+        <div class="out" id="pk-out" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l5-qc-pockets-blue" data-answer="5/12">
+    <p>Quick check: with the slide’s pockets, what is \(P(\text{blue})\)?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="3/7" data-tag="pooled-balls">That pools all 7 balls as if equally likely. A ball in the right pocket is more likely to be picked than one in the left.</li>
+      <li data-expr="5/6" data-tag="forgot-pocket-weight">Each case has to be weighted by \(P(\text{pocket}) = \frac12\).</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The common wrong answer is \(3/7\): it treats all 7 balls as equally likely. They aren’t; each right-pocket ball has probability \(\frac12\cdot\frac13 = \frac16\), each left-pocket ball \(\frac12\cdot\frac14 = \frac18\).</li>
+      <li>Change the pockets in the widget so both have the same number of balls. Then pooling gives the right answer. Ask why.</li>
+      <li>Reading 2.2.3’s chemistry example: teachers with \(P(E_i) = \frac68, \frac18, \frac18\) and fail rates \(1, 0, \frac12\), so \(P(F) = \frac{13}{16}\). It’s on the Readings page.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L5 ZIKA -->
+<section class="page" id="l5-zika" data-title="Example: Zika testing" data-lecture="5">
+  <p class="where">Lecture 5 · <span class="tag-later">Upcoming · Fri Oct 9</span> · Reading 2.2.4 · preview from the posted slides</p>
+  <h1>Example: Zika testing</h1>
+  <div class="prose">
+    <p>Zika usually causes no or mild symptoms, but during pregnancy it may cause birth defects. Suppose you take a Zika test and it comes back positive. How likely is it that you actually have the disease? The slides’ numbers:</p>
+    <ul>
+      <li>The test is 98% effective at detecting Zika (“true positive”): \(P(T\mid Z) = 0.98\).</li>
+      <li>It gives a “false positive” 1% of the time: \(P(T\mid Z^c) = 0.01\).</li>
+      <li>0.5% of the US population has Zika: \(P(Z) = 0.005\).</li>
+    </ul>
+  </div>
+
+  <div class="rule theorem">
+    <p class="rule-tag">Bayes with the LTP</p>
+    <p>\[P(Z\mid T) = \frac{P(T\mid Z)\,P(Z)}{P(T\mid Z)\,P(Z) + P(T\mid Z^c)\,P(Z^c)}\]</p>
+  </div>
+
+  <h2>Bayes calculator: 100,000 people</h2>
+  <div class="prose"><p>The slides also count it out: imagine 100,000 people. Change the numbers and watch the population.</p></div>
+  <div class="panel" id="bayes">
+    <div class="bayes-controls">
+      <label>prior \(P(Z)\) <input type="range" id="bz-prior" min="1" max="200" value="5" aria-label="prior in tenths of a percent"><output id="bz-prior-out"></output></label>
+      <label>true positive \(P(T\mid Z)\) <input type="range" id="bz-tp" min="50" max="100" value="98" aria-label="true positive rate in percent"><output id="bz-tp-out"></output></label>
+      <label>false positive \(P(T\mid Z^c)\) <input type="range" id="bz-fp" min="0" max="200" value="10" aria-label="false positive rate in tenths of a percent"><output id="bz-fp-out"></output></label>
+      <button class="btn" id="bz-reset">Slide’s numbers</button>
+    </div>
+    <div class="bayes-layout">
+      <div class="pop" id="bz-pop" aria-hidden="true"></div>
+      <div>
+        <ul class="pop-legend" id="bz-legend"></ul>
+        <div class="bayes-math" id="bz-math" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Updating beliefs</h2>
+  <div class="belief">
+    <div class="cloud">“I have a 0.5% chance of having Zika.”<span>Prior: \(P(Z)\)</span></div>
+    <div class="arrow">Receive positive test result</div>
+    <div class="cloud warn">“I now have a 33% chance of having Zika after the test!”<span>Posterior: \(P(Z\mid T)\)</span></div>
+  </div>
+  <div class="prose">
+    <p>It’s not 98%, but the belief changed drastically: from 0.5% to about 33%, a factor of 66. And the other direction, the chance of testing negative if you have Zika, is just the complement inside the condition: \(P(T^c\mid Z) = 1 - P(T\mid Z) = 0.02\).</p>
+  </div>
+
+  <div class="rule">
+    <p class="rule-tag">Conditional probability defines a probability space</p>
+    <p>If \((\Omega, P)\) is a probability space and \(P(A) &gt; 0\), then \((A, P(\cdot\mid A))\) is a probability space. So conditional probabilities follow every rule unconditional ones do, for example \(P(B^c\mid A) = 1 - P(B\mid A)\).</p>
+  </div>
+
+  <div class="check" data-id="cse312-w2-l5-qc-zika-positives" data-answer="490+995">
+    <p>Quick check: out of the slides’ 100,000 people, how many test positive?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="490" data-tag="true-positives-only">Those are the true positives. People without Zika can test positive too.</li>
+      <li data-expr="500" data-tag="sick-not-positive">That’s how many have Zika, not how many test positive.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Ask for a gut guess before computing. Most say 98% or close. The 100,000-people picture explains the surprise: 995 false positives swamp 490 true ones, because healthy people outnumber sick ones 199 to 1.</li>
+      <li>Exact value: \(P(Z\mid T) = \frac{0.0049}{0.01485} = \frac{98}{297}\approx 0.330\). The slide rounds to 0.33.</li>
+      <li>Drag the prior up to 10% and the posterior jumps to over 90%. Same test, different population. Reading 2.2.5’s llama flu (prior 0.1%, 98% accurate both ways) gives under 5%.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L5 PROBLEMS -->
+<section class="page" id="l5-problems" data-title="Lecture 5: problems from the slides" data-lecture="5">
+  <p class="where">Lecture 5 · <span class="tag-later">Upcoming · Fri Oct 9</span> · practice from the posted slides</p>
+  <h1>Problems from the slides</h1>
+  <div class="prose">
+    <p>Each problem is a question or example from the Lecture 5 slides, with the slides’ answer. Answers are exact: type <code>7/20</code>, <code>1/3</code>, or an expression such as <code>0.005*0.98/(0.005*0.98+0.995*0.01)</code>. A rounded decimal like <code>0.33</code> is marked wrong, and the feedback says it’s close.</p>
+  </div>
+
+  <article class="task" data-id="cse312-w2-l5-p-both-heads-given-one">
+    <h2>Both heads, given at least one head</h2>
+    <p class="prompt">You flip a fair coin twice. What is the probability that both flips are heads, given that at least one flip is heads?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l5-p-both-heads-given-one.ans" data-answer="1/3" data-near="0.005">
+      <ul class="miscon" hidden>
+        <li data-expr="1/2" data-tag="other-coin-reasoning">“The other coin is 50/50” assumes you know <em>which</em> coin was heads. You only know at least one was.</li>
+        <li data-expr="1/4" data-tag="ignored-condition">That’s \(P(HH)\) with no information. Restrict to outcomes with at least one head.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>List \(\Omega = \{HH, HT, TH, TT\}\). Which outcomes are left once you know there’s at least one head?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Let \(O\) = at least one head, \(B\) = both heads. \(P(O) = \frac34\), \(P(B) = \frac14\), and \(B\cap O = B\), so \(P(B\cap O) = \frac14\).</li>
+      <li>\(P(B\mid O) = \frac{P(B\cap O)}{P(O)} = \frac{1/4}{3/4}\).</li>
+      <li class="answer">\(\frac13\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l5-p-head-given-tail">
+    <h2>At least one head, given at least one tail</h2>
+    <p class="prompt">You flip a fair coin twice. What is the probability that at least one flip is heads, given that at least one flip is tails?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l5-p-head-given-tail.ans" data-answer="2/3" data-near="0.005">
+      <ul class="miscon" hidden>
+        <li data-expr="3/4" data-tag="ignored-condition">That’s \(P(\text{at least one head})\) with no condition.</li>
+        <li data-expr="1/2" data-tag="joint-not-conditional">That’s \(P(H\cap T)\). Divide by \(P(T)\).</li>
+      </ul>
+    </div>
+    <ol class="hints"><li>Restrict to \(\{HT, TH, TT\}\). How many have a head?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(P(H) = P(T) = \frac34\); \(H\cap T = \{HT, TH\}\), so \(P(H\cap T) = \frac12\).</li>
+      <li>\(P(H\mid T) = \frac{1/2}{3/4}\).</li>
+      <li class="answer">\(\frac23\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l5-p-red-blue-poll">
+    <h2>Red die and blue die</h2>
+    <p class="prompt">Toss a red die and a blue die, both fair and 6-sided. Let \(B\) = “red die is 1” and \(A\) = “sum is 4”.</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l5-p-red-blue-poll.pb" data-label="\(P(B)\)" data-answer="1/6" data-near="0.005"></div>
+    <div class="answer-spec" data-part-id="cse312-w2-l5-p-red-blue-poll.pba" data-label="\(P(B\mid A)\)" data-answer="1/3" data-near="0.005">
+      <ul class="miscon" hidden>
+        <li data-expr="3/36" data-tag="reported-pa">That’s \(P(A)\). You want the share of \(A\) where red is 1.</li>
+        <li data-expr="1/6" data-tag="ignored-condition">That ignores the condition. Restrict to sum = 4.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>List \(A\). How many outcomes does it have, and how many of them have red = 1?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(B\) is 6 of the 36 outcomes: \(P(B) = \frac16\).</li>
+      <li>\(A = \{(1,3),(2,2),(3,1)\}\) written as (red, blue). Only \((1,3)\) is in \(B\).</li>
+      <li>\(P(B\mid A) = \frac{1/36}{3/36} = \frac13\).</li>
+      <li class="answer">\(P(B) = \frac16\), \(P(B\mid A) = \frac13\) (poll option b)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l5-p-gamblers-fallacy">
+    <h2>The 51st coin</h2>
+    <p class="prompt">Toss 51 fair coins. The first 50 were all tails. What is the probability that the 51st is heads?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l5-p-gamblers-fallacy.ans" data-answer="1/2">
+      <ul class="miscon" hidden>
+        <li data-expr="1/2^51" data-tag="joint-not-conditional">That’s the probability of the whole sequence, \(P(A\cap B)\). You already know the first 50.</li>
+        <li data-expr="1" data-tag="gamblers-fallacy">Heads isn’t “due”. Compute \(P(A\cap B)/P(A)\).</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Let \(A\) = first 50 tails and \(B\) = first 50 tails then heads. Among \(2^{51}\) sequences, how many are in each?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(A\) contains 2 sequences (the 51st is H or T): \(P(A) = 2/2^{51}\).</li>
+      <li>\(A\cap B = B\) is 1 sequence: \(P(A\cap B) = 1/2^{51}\).</li>
+      <li class="answer">\(P(B\mid A) = \frac{1/2^{51}}{2/2^{51}} = \frac12\). Thinking heads is “due” is the gambler’s fallacy.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l5-p-pockets">
+    <h2>Alice’s pockets</h2>
+    <p class="prompt">Left pocket: 2 blue, 2 green. Right pocket: 1 blue, 2 green. Alice picks a pocket at random (each equally likely), then a ball from it (each equally likely).</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l5-p-pockets.blue" data-label="\(P(\text{blue})\)" data-answer="5/12" data-near="0.005">
+      <ul class="miscon" hidden>
+        <li data-expr="3/7" data-tag="pooled-balls">Not all 7 balls are equally likely. Weight each pocket by \(\frac12\).</li>
+      </ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w2-l5-p-pockets.left-given-blue" data-label="\(P(\text{left}\mid\text{blue})\)" data-answer="3/5" data-near="0.005">
+      <ul class="miscon" hidden>
+        <li data-expr="1/2" data-tag="reversed-condition">That’s \(P(\text{blue}\mid\text{left})\), or the prior on the pocket. Use Bayes.</li>
+        <li data-expr="2/3" data-tag="pooled-balls">2 of the 3 blue balls are on the left, but they aren’t equally likely to be drawn.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Split by pocket: \(P(B) = P(B\mid L)P(L) + P(B\mid R)P(R)\).</li>
+      <li>For the second part, Bayes: \(P(L\mid B) = P(B\mid L)P(L)/P(B)\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(P(B\mid L) = \frac24 = \frac12\), \(P(B\mid R) = \frac13\), and \(P(L) = P(R) = \frac12\).</li>
+      <li>LTP: \(P(B) = \frac12\cdot\frac12 + \frac12\cdot\frac13 = \frac14 + \frac16 = \frac5{12}\).</li>
+      <li>Bayes: \(P(L\mid B) = \frac{(1/2)(1/2)}{5/12} = \frac{1/4}{5/12} = \frac35\).</li>
+      <li class="answer">\(P(\text{blue}) = \frac5{12}\), \(P(\text{left}\mid\text{blue}) = \frac35\)</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul>
+        <li>The first part is the slide’s. The second (reverse the condition) is added here as the natural follow-up and uses only Lecture 5’s Bayes’ rule.</li>
+      </ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse312-w2-l5-p-zika">
+    <h2>Zika testing</h2>
+    <p class="prompt">\(P(T\mid Z) = 0.98\), \(P(T\mid Z^c) = 0.01\) and \(P(Z) = 0.005\).</p>
+    <div class="answer-spec" data-part-id="cse312-w2-l5-p-zika.pt" data-label="a) \(P(T)\), the probability of testing positive" data-answer="0.01485" data-near="0.0002">
+      <ul class="miscon" hidden>
+        <li data-expr="0.0049" data-tag="true-positives-only">That’s only \(P(T\cap Z)\). Add the false positives, \(P(T\mid Z^c)P(Z^c)\).</li>
+        <li data-expr="0.98*0.005+0.01*0.005" data-tag="wrong-weight">The false-positive term is weighted by \(P(Z^c) = 0.995\), not \(P(Z)\).</li>
+      </ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w2-l5-p-zika.pzt" data-label="b) \(P(Z\mid T)\), exactly" data-answer="0.005*0.98/0.01485" data-near="0.005">
+      <ul class="miscon" hidden>
+        <li data-expr="0.98" data-tag="reversed-condition">That’s \(P(T\mid Z)\). Bayes reverses it.</li>
+        <li data-expr="0.0049" data-tag="forgot-denominator">That’s \(P(Z\cap T)\). Divide by \(P(T)\).</li>
+      </ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w2-l5-p-zika.neg" data-label="c) \(P(T^c\mid Z)\)" data-answer="0.02">
+      <ul class="miscon" hidden><li data-expr="0.99" data-tag="wrong-complement">That’s \(P(T^c\mid Z^c)\). Stay inside the condition \(Z\).</li></ul>
+    </div>
+    <ol class="hints">
+      <li>For (a), split by whether you have Zika: law of total probability with the partition \(Z, Z^c\).</li>
+      <li>For (b), Bayes with your answer to (a) in the denominator. For (c), conditional probabilities obey the complement rule.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>(a) LTP: \(P(T) = P(T\mid Z)P(Z) + P(T\mid Z^c)P(Z^c) = 0.98\cdot0.005 + 0.01\cdot0.995 = 0.0049 + 0.00995 = 0.01485\).</li>
+      <li>(b) Bayes: \(P(Z\mid T) = \frac{0.0049}{0.01485} = \frac{98}{297}\approx0.33\).</li>
+      <li>Counting check with 100,000 people: 490 have Zika and test positive; 995 don’t and test positive. \(\frac{490}{490+995} = \frac{98}{297}\).</li>
+      <li>(c) \(P(T^c\mid Z) = 1 - P(T\mid Z) = 0.02\).</li>
+      <li class="answer">(a) 0.01485 · (b) \(98/297\approx0.33\) · (c) 0.02</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L5 QUIZ -->
+<section class="page" id="l5-quiz" data-title="Lecture 5: check your understanding" data-lecture="5">
+  <p class="where">Lecture 5 wrap-up · <span class="tag-later">Upcoming · Fri Oct 9</span> · original questions written for this site</p>
+  <h1>Check your understanding: Lecture 5</h1>
+  <div class="prose">
+    <p>Ten questions on Lecture 5 only: conditional probability, reversing the condition, Bayes’ theorem, partitions and the law of total probability. Lecture 5 is on Friday; use this after it, or as a preview. The score counts first tries only.</p>
+  </div>
+  <div class="cyu-score" data-score role="status"></div>
+  <ol class="cyu-list">
+    <li class="cyu" data-id="cse312-w2-l5-quiz-die-even-given-big" data-kind="num" data-answer="2/3" data-topic="l5-conditional">
+      <p class="q">One fair die is rolled. What is \(P(\text{even}\mid\text{at least }4)\)?</p>
+      <ul class="miscon" hidden><li data-expr="1/2" data-tag="ignored-condition">That’s \(P(\text{even})\) with no information.</li></ul>
+      <p class="why" hidden>Restrict to \(\{4,5,6\}\): two of them are even, \(\frac23\).</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l5-quiz-definition-pick" data-kind="mc" data-topic="l5-conditional">
+      <p class="q">Which expression equals \(P(A\mid B)\) when \(P(B) &gt; 0\)?</p>
+      <div class="opts">
+        <label data-opt="cap-over-b" data-correct><input type="radio"> \(P(A\cap B)/P(B)\)<span class="why" hidden>Correct. That’s the definition.</span></label>
+        <label data-opt="cap-over-a" data-tag="reversed-condition"><input type="radio"> \(P(A\cap B)/P(A)\)<span class="why" hidden>That’s \(P(B\mid A)\).</span></label>
+        <label data-opt="product" data-tag="joint-not-conditional"><input type="radio"> \(P(A)\,P(B)\)<span class="why" hidden>That isn’t a conditional probability in general.</span></label>
+        <label data-opt="ratio" data-tag="ratio-of-marginals"><input type="radio"> \(P(A)/P(B)\)<span class="why" hidden>That ignores the overlap; it can even be bigger than 1.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l5-quiz-two-dice-sum-eight" data-kind="num" data-answer="1/5" data-topic="l5-conditional">
+      <p class="q">Two fair 6-sided dice. Given that the sum is 8, what is the probability that both dice show 4?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="1/36" data-tag="ignored-condition">That’s \(P((4,4))\) with no condition.</li>
+        <li data-expr="1/3" data-tag="unordered-outcomes">Sum 8 has 5 ordered outcomes, not 3: \((2,6), (6,2)\) and so on are different.</li>
+      </ul>
+      <p class="why" hidden>Sum 8: \((2,6),(3,5),(4,4),(5,3),(6,2)\). One of five: \(\frac15\).</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l5-quiz-not-symmetric" data-kind="mc" data-topic="l5-reversing">
+      <p class="q">Most people who play professional basketball are tall. Which statement follows?</p>
+      <div class="opts">
+        <label data-opt="high-given-pro" data-correct><input type="radio"> \(P(\text{tall}\mid\text{pro player})\) is high<span class="why" hidden>Correct. That’s exactly what the sentence says.</span></label>
+        <label data-opt="high-given-tall" data-tag="reversed-condition"><input type="radio"> \(P(\text{pro player}\mid\text{tall})\) is high<span class="why" hidden>That reverses the condition. Almost no tall people are pro players.</span></label>
+        <label data-opt="equal" data-tag="assumed-symmetric"><input type="radio"> The two conditional probabilities are equal<span class="why" hidden>\(P(A\mid B)\) and \(P(B\mid A)\) have different denominators, \(P(B)\) and \(P(A)\).</span></label>
+        <label data-opt="nothing" data-tag="too-strict"><input type="radio"> Nothing about either<span class="why" hidden>The sentence is a statement about \(P(\text{tall}\mid\text{pro player})\).</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l5-quiz-streak" data-kind="num" data-answer="1/2" data-topic="l5-reversing">
+      <p class="q">A fair coin has landed heads 8 times in a row. What is the probability the next flip is heads?</p>
+      <ul class="miscon" hidden><li data-expr="1/2^9" data-tag="joint-not-conditional">That’s the probability of 9 heads in a row before any flip. The first 8 already happened.</li></ul>
+      <p class="why" hidden>\(\frac{1/2^9}{1/2^8} = \frac12\). The coin doesn’t remember.</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l5-quiz-bayes-numbers" data-kind="num" data-answer="0.6*0.3/0.45" data-topic="l5-bayes">
+      <p class="q">\(P(A) = 0.3\), \(P(B) = 0.45\) and \(P(B\mid A) = 0.6\). What is \(P(A\mid B)\)?</p>
+      <ul class="miscon" hidden><li data-expr="0.6" data-tag="reversed-condition">That’s \(P(B\mid A)\).</li><li data-expr="0.18" data-tag="forgot-denominator">That’s \(P(A\cap B)\); divide by \(P(B)\).</li></ul>
+      <p class="why" hidden>\(\frac{0.6\cdot0.3}{0.45} = \frac{0.18}{0.45} = 0.4\).</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l5-quiz-prior-posterior" data-kind="mc" data-topic="l5-bayes">
+      <p class="q">In \(P(A\mid B) = \frac{P(B\mid A)P(A)}{P(B)}\), which term is the <em>prior</em>?</p>
+      <div class="opts">
+        <label data-opt="pa" data-correct><input type="radio"> \(P(A)\)<span class="why" hidden>Correct. Your belief in \(A\) before learning \(B\).</span></label>
+        <label data-opt="pab" data-tag="posterior-as-prior"><input type="radio"> \(P(A\mid B)\)<span class="why" hidden>That’s the posterior: the belief after learning \(B\).</span></label>
+        <label data-opt="pba" data-tag="likelihood-as-prior"><input type="radio"> \(P(B\mid A)\)<span class="why" hidden>That’s how likely the evidence is if \(A\) holds, not a belief about \(A\).</span></label>
+        <label data-opt="pb" data-tag="evidence-as-prior"><input type="radio"> \(P(B)\)<span class="why" hidden>That’s the overall probability of the evidence.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l5-quiz-partition-pick" data-kind="mc" data-topic="l5-ltp">
+      <p class="q">One fair die is rolled. Which events partition \(\Omega = \{1,\dots,6\}\)?</p>
+      <div class="opts">
+        <label data-opt="three-pairs" data-correct><input type="radio"> \(\{1,2\}, \{3,4\}, \{5,6\}\)<span class="why" hidden>Correct. Non-empty, no overlaps, and together they cover \(\Omega\).</span></label>
+        <label data-opt="overlap" data-tag="not-exclusive"><input type="radio"> \(\{1,2,3\}, \{3,4,5,6\}\)<span class="why" hidden>3 is in both, so they aren’t mutually exclusive.</span></label>
+        <label data-opt="gap" data-tag="not-exhaustive"><input type="radio"> \(\{1,3,5\}, \{2,4\}\)<span class="why" hidden>6 is missing, so they aren’t exhaustive.</span></label>
+        <label data-opt="empty" data-tag="empty-part"><input type="radio"> \(\varnothing, \{1,\dots,6\}\)<span class="why" hidden>Partitions use non-empty events.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l5-quiz-chemistry-fail" data-kind="num" data-answer="13/16" data-topic="l5-ltp">
+      <p class="q">You get one of three teachers with probabilities \(\frac68, \frac18, \frac18\). They fail you with probabilities \(1, 0, \frac12\). What is \(P(\text{fail})\)?</p>
+      <ul class="miscon" hidden><li data-expr="1/2" data-tag="unweighted-average">That averages the fail rates without weighting by how likely each teacher is.</li></ul>
+      <p class="why" hidden>\(1\cdot\frac68 + 0\cdot\frac18 + \frac12\cdot\frac18 = \frac{12}{16} + \frac1{16} = \frac{13}{16}\). (Reading 2.2.3.)</p>
+    </li>
+    <li class="cyu" data-id="cse312-w2-l5-quiz-screening" data-kind="num" data-answer="0.9*0.01/(0.9*0.01+0.05*0.99)" data-topic="l5-zika">
+      <p class="q">1% of people have a condition. A test is positive for 90% of those who have it and for 5% of those who don’t. Given a positive test, what is the probability of having the condition? Give an exact expression or fraction.</p>
+      <ul class="miscon" hidden>
+        <li data-expr="0.9" data-tag="reversed-condition">That’s \(P(\text{positive}\mid\text{condition})\), not the reverse.</li>
+        <li data-expr="0.009" data-tag="forgot-denominator">That’s \(P(\text{condition and positive})\). Divide by \(P(\text{positive})\).</li>
+      </ul>
+      <p class="why" hidden>\(\frac{0.9\cdot0.01}{0.9\cdot0.01 + 0.05\cdot0.99} = \frac{0.009}{0.0585} = \frac{2}{13}\approx 0.154\).</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-summary role="status"></div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Questions 4 and 10 are the classic traps (reversing the condition; ignoring the base rate). Every numeric answer here was checked with exact fractions in the tests.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ READINGS -->
+<section class="page" id="readings" data-title="Readings 1.3, 2.1, 2.2">
+  <p class="where">Reference · Textbook: <em>Probability &amp; Statistics with Applications to Computing</em> (Tsun)</p>
+  <h1>Readings</h1>
+  <div class="prose">
+    <p>The schedule assigns three sections this week. Each one covers the same lecture material, often with different examples. Below is what each section adds, and its worked examples as answerable problems, with the textbook’s answers.</p>
+  </div>
+
+  <div class="reading-cards">
+    <div class="reading-card">
+      <span class="tag-today">Mon Oct 5 · Lecture 3</span>
+      <h3>1.3 No More Counting Please</h3>
+      <p>1.3.1 binomial theorem (and a harder coefficient example) · 1.3.2 inclusion-exclusion (ice cream and donuts; divisibility in [360]) · 1.3.3 pigeonhole (20 students in 3 classes; friends; numbers made of 1’s) · 1.3.4 combinatorial proofs (Pascal; committees) · 1.3.5 exercises.</p>
+    </div>
+    <div class="reading-card">
+      <span class="tag-later">Wed Oct 7 · Lecture 4</span>
+      <h3>2.1 Intro to Discrete Probability</h3>
+      <p>2.1.1 definitions (the same 4-sided dice) · 2.1.2 axioms and proofs of the corollaries · 2.1.3 equally likely outcomes (election of 100 voters; the \(\{0,1,2\}\) warning) · 2.1.4 exercises.</p>
+    </div>
+    <div class="reading-card">
+      <span class="tag-later">Fri Oct 9 · Lecture 5</span>
+      <h3>2.2 Conditional Probability</h3>
+      <p>2.2.1 the definition from the donut picture · 2.2.2 Bayes (two siblings) · 2.2.3 LTP (chemistry teachers) · 2.2.4 Bayes with LTP · 2.2.5 exercises (llama flu; which die?).</p>
+    </div>
+  </div>
+
+  <h2>Section 1.3</h2>
+
+  <article class="task" data-id="cse312-w2-rd-1-3-coefficient-a45-b14">
+    <h2>A harder coefficient</h2>
+    <p class="prompt">Find the coefficient of \(a^{45}b^{14}\) in the expansion of \((4a^3 - 5b^2)^{22}\).</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-1-3-coefficient-a45-b14.ans" data-answer="-C(22,15)*4^15*5^7">
+      <ul class="miscon" hidden>
+        <li data-expr="C(22,15)*4^15*5^7" data-tag="dropped-sign">Check the sign: \(y = -5b^2\), raised to an odd power.</li>
+        <li data-expr="C(22,15)" data-tag="forgot-constants">The 4 and the \(-5\) are raised to powers too.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Let \(x = 4a^3\) and \(y = -5b^2\). Which powers of \(x\) and \(y\) give \(a^{45}b^{14}\)?</li>
+      <li>\(a^{45} = (a^3)^{15}\) and \(b^{14} = (b^2)^7\), and \(15 + 7 = 22\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>With \(x = 4a^3\), \(y = -5b^2\), we need \(x^{15}y^7\).</li>
+      <li>Its term is \(\binom{22}{15}x^{15}y^7 = \binom{22}{15}(4a^3)^{15}(-5b^2)^7\).</li>
+      <li>\((-5)^7 = -5^7\), so the coefficient is \(-\binom{22}{15}4^{15}5^7\).</li>
+      <li class="answer">\(-\binom{22}{15}\,4^{15}\,5^7 = -14{,}306{,}267{,}627{,}520{,}000{,}000\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-rd-1-3-divisible-four-six-nine">
+    <h2>Divisible by 4, 6 or 9</h2>
+    <p class="prompt">How many numbers in \([360] = \{1, 2, \dots, 360\}\) are divisible by …</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-1-3-divisible-four-six-nine.all" data-label="a) 4, 6 and 9?" data-answer="10">
+      <ul class="miscon" hidden><li data-expr="1" data-tag="used-product">\(4\cdot6\cdot9 = 216\) isn’t the right step size. Use the least common multiple.</li></ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-1-3-divisible-four-six-nine.any" data-label="b) 4, 6 or 9?" data-answer="140">
+      <ul class="miscon" hidden>
+        <li data-expr="190" data-tag="singles-only">That’s just \(90 + 60 + 40\). Multiples of 12 and 18 were counted twice.</li>
+        <li data-expr="142" data-tag="product-not-lcm">The intersections use least common multiples: \(\text{lcm}(4,6) = 12\), not 24.</li>
+      </ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-1-3-divisible-four-six-nine.none" data-label="c) neither 4, 6 nor 9?" data-answer="220"></div>
+    <ol class="hints">
+      <li>Let \(D_i\) be the multiples of \(i\) in \([360]\). Then \(|D_i| = 360/i\), and \(D_i\cap D_j = D_{\text{lcm}(i,j)}\).</li>
+      <li>For (c), use the complement of (b).</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>(a) Multiples of \(\text{lcm}(4,6,9) = 36\): \(360/36 = 10\).</li>
+        <li>(b) Singles: \(90 + 60 + 40\). Doubles: \(\text{lcm}\)s 12, 36, 18 give \(30 + 10 + 20\). Triple: 10.</li>
+        <li>\(190 - 60 + 10 = 140\).</li>
+        <li>(c) \(360 - 140 = 220\).</li>
+        <li class="answer">(a) 10 · (b) 140 · (c) 220</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="div-4-6-9">Check (b) by brute force</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-rd-1-3-same-friend-count">
+    <h2>Same number of friends</h2>
+    <p class="prompt">Friendship is mutual. Show that in any group of \(n\ge2\) people, two have the same number of friends within the group. (Check yourself against the solution.)</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-1-3-same-friend-count.argument" data-type="self" data-label="Pigeons, holes, and the catch"></div>
+    <ol class="hints">
+      <li>Each person has between 0 and \(n-1\) friends. That’s \(n\) holes for \(n\) people. What’s stopping a collision-free assignment?</li>
+      <li>Can someone have 0 friends while someone else has \(n-1\)?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Suppose exactly \(k\) people have 0 friends. If \(k\ge2\), those two have the same count and we’re done.</li>
+      <li>Otherwise the remaining \(n-k\) people each have between 1 and \(n-k-1\) friends (not themselves, and not the friendless).</li>
+      <li class="answer">That’s \(n-k\) pigeons in \(n-k-1\) holes, so by the PHP two have the same number of friends.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-rd-1-3-subset-chains">
+    <h2>Pairs \(A\subseteq B\subseteq[n]\)</h2>
+    <p class="prompt">How many ordered pairs of subsets \((A, B)\) are there with \(A\subseteq B\subseteq[n]\)? Give a formula in \(n\).</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-1-3-subset-chains.ans" data-type="formula" data-answer="3^n" data-vars='{"n":[1,2,3,5,8]}' data-placeholder="in terms of n">
+      <ul class="miscon" hidden><li data-expr="4^n" data-tag="ignored-constraint">That allows every element to be in \(A\) but not \(B\). Which of the four options is not allowed?</li></ul>
+    </div>
+    <ol class="hints">
+      <li>Ask each element of \([n]\) where it goes: only in \(A\), only in \(B\), in both, or in neither.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Each element has 4 possible places, but “in \(A\), not in \(B\)” breaks \(A\subseteq B\).</li>
+      <li>So each element has 3 choices: in both, only in \(B\), or in neither.</li>
+      <li>Second method: choose \(B\) of size \(k\) (\(\binom nk\) ways), then \(A\subseteq B\) (\(2^k\) ways), and sum: \(\sum_k\binom nk2^k1^{n-k} = (2+1)^n\) by the binomial theorem.</li>
+      <li class="answer">\(3^n\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-rd-1-3-a-not-first-h-not-last">
+    <h2>A not first, H not last</h2>
+    <p class="prompt">How many orderings of the 8 letters A, B, C, D, E, F, G, H have A not at the beginning and H not at the end?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-1-3-a-not-first-h-not-last.ans" data-answer="8!-2*7!+6!">
+      <ul class="miscon" hidden>
+        <li data-expr="8!-2*7!" data-tag="forgot-intersection">Orderings with A first <em>and</em> H last were subtracted twice.</li>
+        <li data-expr="7*7*6!" data-tag="dependent-choices">Placing A then H this way breaks when A sits in the last spot. Use the complement.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Count the bad orderings with inclusion-exclusion: \(S_A\) = A first, \(S_H\) = H last.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>All orderings: \(8!\). \(|S_A| = |S_H| = 7!\), and \(|S_A\cap S_H| = 6!\).</li>
+        <li>\(|S_A\cup S_H| = 7! + 7! - 6!\).</li>
+        <li class="answer">\(8! - 2\cdot7! + 6! = 30{,}960\)</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="a-not-first-h-not-last">Check by brute force</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-rd-1-3-cards-guarantee">
+    <h2>How many cards guarantee …</h2>
+    <p class="prompt">How many cards must you draw from a standard deck to be guaranteed …</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-1-3-cards-guarantee.pair" data-label="a) a pair?" data-answer="14">
+      <ul class="miscon" hidden><li data-expr="13" data-tag="off-by-one">With 13 cards you can still have 13 different ranks.</li></ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-1-3-cards-guarantee.two-pairs" data-label="b) two different pairs?" data-answer="17"></div>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-1-3-cards-guarantee.full-house" data-label="c) a full house (a triple and a pair)?" data-answer="27"></div>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-1-3-cards-guarantee.flush" data-label="d) a flush (5 of one suit)?" data-answer="17">
+      <ul class="miscon" hidden><li data-expr="5" data-tag="best-case">That’s the best case. A guarantee must survive the worst draw.</li></ul>
+    </div>
+    <ol class="hints">
+      <li>Build the worst possible draw that still fails. Then add one card.</li>
+      <li>For (d): how many cards can you hold with at most 4 of each suit?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>(a) 13 different ranks can fail; the 14th card makes a pair.</li>
+      <li>(b) 13 different ranks, then the other 3 cards of one rank (one pair, plus extras): 16 can fail. 17.</li>
+      <li>(c) Two of every rank (26 cards) has no triple. The 27th card makes a triple, and a pair is already there. 27.</li>
+      <li>(d) 4 of each suit (16 cards) has no flush. 17.</li>
+      <li class="answer">(a) 14 · (b) 17 · (c) 27 · (d) 17</li>
+    </ol></div></div>
+  </article>
+
+  <h2>Section 2.1</h2>
+
+  <article class="task" data-id="cse312-w2-rd-2-1-washington-wins">
+    <h2>Washington wins 74 to 26</h2>
+    <p class="prompt">100 voters each vote W or L, all \(2^{100}\) voting patterns equally likely. What is the probability that W wins exactly 74 to 26?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-2-1-washington-wins.ans" data-answer="C(100,74)/2^100">
+      <ul class="miscon" hidden><li data-expr="74/100" data-tag="ratio-not-probability">That’s W’s share of the vote, not the probability of this result.</li></ul>
+    </div>
+    <ol class="hints"><li>The event is the patterns with exactly 74 W’s. Choose which voters they are.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(|\Omega| = 2^{100}\); \(|E| = \binom{100}{74}\).</li>
+      <li class="answer">\(\binom{100}{74}/2^{100}\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-rd-2-1-a-b-adjacent">
+    <h2>A and B next to each other</h2>
+    <p class="prompt">A, B, C, D, E are arranged in a random row, all orderings equally likely. What is the probability that A and B are next to each other?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-2-1-a-b-adjacent.ans" data-answer="2!*4!/5!">
+      <ul class="miscon" hidden><li data-expr="4!/5!" data-tag="forgot-internal-order">The A–B block can be AB or BA.</li></ul>
+    </div>
+    <ol class="hints"><li>Glue A and B into one block. How many orderings of 4 items, and how many orders inside the block?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(|\Omega| = 5! = 120\).</li>
+      <li>Glue AB into a block: \(4!\) orderings of the block and C, D, E, times 2 orders inside: \(48\).</li>
+      <li class="answer">\(48/120 = 2/5\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-rd-2-1-four-aces">
+    <h2>Four aces</h2>
+    <p class="prompt">You draw 4 cards from a standard deck. What is the probability that they are all aces?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-2-1-four-aces.ans" data-answer="1/C(52,4)">
+      <ul class="miscon" hidden><li data-expr="4!/C(52,4)" data-tag="mixed-ordered-unordered">Ordered numerator over an unordered denominator. Be consistent.</li></ul>
+    </div>
+    <ol class="hints"><li>Unordered: one hand out of \(\binom{52}4\). Ordered: \(4!\) sequences out of \(P(52,4)\). Same answer.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Unordered: \(|\Omega| = \binom{52}4\) and exactly one hand is all aces.</li>
+      <li>Ordered: \(\frac{4\cdot3\cdot2\cdot1}{52\cdot51\cdot50\cdot49}\), the same number.</li>
+      <li class="answer">\(1/\binom{52}4 = 1/270{,}725\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-rd-2-1-alternating-suits">
+    <h2>Alternating suits</h2>
+    <p class="prompt">3 different spades and 3 different hearts are shuffled. What is the probability that the suits alternate (SHSHSH or HSHSHS)?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-2-1-alternating-suits.ans" data-answer="2*3!^2/6!">
+      <ul class="miscon" hidden><li data-expr="3!^2/6!" data-tag="one-pattern">Either suit can lead.</li></ul>
+    </div>
+    <ol class="hints"><li>Choose the leading suit, then order the spades among their spots and the hearts among theirs.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(|\Omega| = 6!\).</li>
+      <li>\(|E| = 2\cdot3!\cdot3!\): lead suit, then the orders within each suit.</li>
+      <li class="answer">\(2\cdot 3!^2/6! = 1/10\)</li>
+    </ol></div></div>
+  </article>
+
+  <h2>Section 2.2</h2>
+
+  <article class="task" data-id="cse312-w2-rd-2-2-siblings">
+    <h2>Two siblings</h2>
+    <p class="prompt">A family has two children, each equally likely to be male or female at birth. A child who answers the phone is male.</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-2-2-siblings.older" data-label="a) He says “let me get my older sibling.” P(both male)?" data-answer="1/2"></div>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-2-2-siblings.other" data-label="b) He says “let me get my other sibling.” P(both male)?" data-answer="1/3">
+      <ul class="miscon" hidden><li data-expr="1/2" data-tag="other-coin-reasoning">You only know at least one child is male, not which one. Restrict to MM, MF, FM.</li></ul>
+    </div>
+    <ol class="hints"><li>Outcomes (older, younger): MM, MF, FM, FF. What does each statement rule out?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>(a) The younger child is male: MM, FM remain. One of two: \(\frac12\).</li>
+      <li>(b) At least one is male: MM, MF, FM remain. One of three: \(\frac13\).</li>
+      <li class="answer">(a) \(\frac12\) · (b) \(\frac13\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-rd-2-2-hard-teacher">
+    <h2>Which teacher?</h2>
+    <p class="prompt">Teachers: Mean (\(P = \frac68\), fails you with probability 1), Nice (\(\frac18\), fails 0), Hard (\(\frac18\), fails \(\frac12\)).</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-2-2-hard-teacher.fail" data-label="a) \(P(\text{fail})\)" data-answer="13/16"></div>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-2-2-hard-teacher.hard" data-label="b) \(P(\text{Hard}\mid\text{fail})\)" data-answer="1/13">
+      <ul class="miscon" hidden><li data-expr="1/2" data-tag="reversed-condition">That’s \(P(\text{fail}\mid\text{Hard})\).</li></ul>
+    </div>
+    <ol class="hints"><li>(a) is the LTP over the three teachers. (b) is Bayes with (a) as the denominator.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>(a) \(1\cdot\frac68 + 0\cdot\frac18 + \frac12\cdot\frac18 = \frac{13}{16}\).</li>
+      <li>(b) \(\frac{(1/2)(1/8)}{13/16} = \frac{1/16}{13/16} = \frac1{13}\).</li>
+      <li class="answer">(a) \(\frac{13}{16}\) · (b) \(\frac1{13}\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-rd-2-2-llama-flu">
+    <h2>Llama flu</h2>
+    <p class="prompt">0.1% of the population has llama flu. A test is 98% accurate (wrong 2% of the time, either way). Given a positive test, what is the probability you have it? Give an exact expression or fraction.</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-2-2-llama-flu.ans" data-answer="0.98*0.001/(0.98*0.001+0.02*0.999)" data-near="0.001">
+      <ul class="miscon" hidden><li data-expr="0.98" data-tag="reversed-condition">That’s \(P(T\mid L)\). Bayes reverses it.</li></ul>
+    </div>
+    <ol class="hints"><li>Same shape as Zika: Bayes on top, LTP below, with \(P(T\mid L^c) = 0.02\).</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(P(T) = 0.98\cdot0.001 + 0.02\cdot0.999\).</li>
+      <li>\(P(L\mid T) = \frac{0.00098}{0.00098 + 0.01998} = \frac{49}{1048}\).</li>
+      <li class="answer">\(\frac{49}{1048}\approx 0.0468\), under 5% (but 47 times the prior)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w2-rd-2-2-which-die">
+    <h2>Which die was it?</h2>
+    <p class="prompt">You pick one of four fair dice (3, 4, 5 or 6 sides) uniformly at random and roll it three times. You get 4, 4, 4. What is the probability you picked the 5-sided die?</p>
+    <div class="answer-spec" data-part-id="cse312-w2-rd-2-2-which-die.ans" data-answer="1728/6103" data-near="0.001">
+      <ul class="miscon" hidden><li data-expr="1/4" data-tag="ignored-evidence">That’s the prior. The rolls are evidence.</li><li data-expr="1/3" data-tag="uniform-over-possible">The three dice that can show 4 aren’t equally likely to produce 444.</li></ul>
+    </div>
+    <ol class="hints">
+      <li>\(P(444\mid D_i) = 1/i^3\) for \(i = 4, 5, 6\), and 0 for the 3-sided die.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Bayes with LTP over the four dice, each prior \(\frac14\).</li>
+      <li>\(P(D_5\mid 444) = \frac{1/125}{0 + 1/64 + 1/125 + 1/216}\).</li>
+      <li class="answer">\(\frac{1728}{6103}\approx 0.283\)</li>
+    </ol></div></div>
+  </article>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>All answers here are the textbook’s; the tests recompute each one by enumeration or exact fractions.</li>
+      <li>The textbook’s 1.3.5 exercise 3 also asks about a straight and a straight flush (45 each); those are left out above to keep the problem short.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CHEATSHEET -->
+<section class="page" id="cheatsheet" data-title="Cheat sheet">
+  <p class="where">Reference · print with <kbd>Ctrl</kbd>+<kbd>P</kbd>; only this page prints</p>
+  <h1>Week 2 cheat sheet</h1>
+  <div class="cheat">
+    <section>
+      <h3>Binomial theorem</h3>
+      <p>\((x+y)^n = \sum_{k=0}^n\binom nk x^ky^{n-k}\)</p>
+      <p>\(\sum_k\binom nk = 2^n\) (set \(x=y=1\)) · \(\sum_{k\text{ odd}}\binom nk = \sum_{k\text{ even}}\binom nk\) (set \(x=-1, y=1\))</p>
+    </section>
+    <section>
+      <h3>Identities</h3>
+      <p>Symmetry: \(\binom nk = \binom n{n-k}\)</p>
+      <p>Pascal: \(\binom nk = \binom{n-1}{k-1} + \binom{n-1}k\)</p>
+      <p>Combinatorial proof: one set \(S\), counted two ways.</p>
+    </section>
+    <section>
+      <h3>Inclusion-exclusion</h3>
+      <p>\(|A\cup B| = |A|+|B|-|A\cap B|\)</p>
+      <p>\(|A\cup B\cup C| = \) singles \(-\) doubles \(+\) triple</p>
+      <p>Divisibility: \(D_i\cap D_j = D_{\text{lcm}(i,j)}\)</p>
+    </section>
+    <section>
+      <h3>Pigeonhole principle</h3>
+      <p>\(n\) pigeons in \(k &lt; n\) holes ⇒ some hole has \(\ge\lceil n/k\rceil\).</p>
+      <p>Steps: pigeons, holes, assignment, apply.</p>
+    </section>
+    <section>
+      <h3>Counting traps</h3>
+      <p><strong>Sleuth’s criterion:</strong> each object must come from a unique sequence of choices. Several ⇒ overcount; none ⇒ undercount.</p>
+      <p><strong>Partly ordered:</strong> \(P = M/N\) (e.g. rooks \((8\cdot7)^2/2\)).</p>
+    </section>
+    <section>
+      <h3>Cards</h3>
+      <table class="plain">
+        <tr><td>5-card hands</td><td>\(\binom{52}5 = 2{,}598{,}960\)</td></tr>
+        <tr><td>Straights</td><td>\(10\cdot4^5 = 10{,}240\)</td></tr>
+        <tr><td>Flushes</td><td>\(4\binom{13}5 = 5{,}148\)</td></tr>
+        <tr><td>Flush, not straight</td><td>\(5148 - 40 = 5{,}108\)</td></tr>
+        <tr><td>\(\ge3\) aces</td><td>\(\binom43\binom{48}2+\binom{48}1 = 4{,}560\)</td></tr>
+      </table>
+    </section>
+    <section>
+      <h3>Probability space \((\Omega, P)\)</h3>
+      <p>\(P(x)\ge0\), \(\sum_{x\in\Omega}P(x) = 1\), \(P(E) = \sum_{x\in E}P(x)\).</p>
+      <p>Uniform: \(P(E) = |E|/|\Omega|\), <em>only</em> when outcomes are equally likely.</p>
+    </section>
+    <section>
+      <h3>Axioms and corollaries</h3>
+      <p>\(P(E)\ge0\) · \(P(\Omega)=1\) · disjoint ⇒ \(P(E\cup F)=P(E)+P(F)\)</p>
+      <p>\(P(E^c) = 1-P(E)\) · \(E\subseteq F\Rightarrow P(E)\le P(F)\) · \(P(E\cup F) = P(E)+P(F)-P(E\cap F)\)</p>
+    </section>
+    <section>
+      <h3>Conditional probability</h3>
+      <p>\(P(A\mid B) = \dfrac{P(A\cap B)}{P(B)}\), so \(P(A\cap B) = P(A\mid B)P(B)\)</p>
+      <p>In general \(P(A\mid B)\ne P(B\mid A)\). \(P(B^c\mid A) = 1 - P(B\mid A)\).</p>
+    </section>
+    <section>
+      <h3>Bayes and LTP</h3>
+      <p>Bayes: \(P(A\mid B) = \dfrac{P(B\mid A)P(A)}{P(B)}\) (prior \(P(A)\), posterior \(P(A\mid B)\))</p>
+      <p>LTP: \(P(A) = \sum_i P(A\mid E_i)P(E_i)\) for a partition \(E_1,\dots,E_n\)</p>
+      <p>Zika: \(P(Z\mid T) = \frac{0.98\cdot0.005}{0.01485}\approx0.33\)</p>
+    </section>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+</main>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script src="vendor/katex/katex.min.js"></script>
+<script src="vendor/katex/auto-render.min.js"></script>
+<script src="js/grader.js"></script>
+<script src="js/prob.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

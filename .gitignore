@@ -1,0 +1,23 @@
+# Dependencies (reinstall with `npm install` in each tests/ folder)
+node_modules/
+
+# Build and test output
+*.class
+tests/java/**/out/
+*.log
+npm-debug.log*
+coverage/
+test-results/
+playwright-report/
+
+# Local tool and editor state
+.claude/settings.local.json
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS clutter
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,184 @@
+CSE 312: Foundations of Computing II                                                         Autumn 2026
+
+Quiz Section 1 – Solutions
+Review
+
+1) Sum rule. If you can choose from EITHER one of n options, OR one of m options with NO overlap
+   with the previous n, then the number of possible outcomes of the experiment is.             .
+
+
+2) Product rule. In a sequential process with m steps, if there are n1 choices for the 1st step, n2
+   choices for the 2nd step (given the first choice), ..., and nm choices for the mth step (given the
+   previous choices), then the total number of outcomes is                                .
+
+3) Permutations. The number of ways to re-order n elements is                       .
+
+4) k-permutations. The number of ways to choose a sequence of k distinct elements from a set of n
+   elements is      .
+
+5) Set difference. Is it always true that |AzB| “ |A| ´ |B|?
+
+Task 1 – Sets
+
+a) For each one of the following sets, give its cardinality, i.e., indicate how many elements it contains:
+
+      - A“H                        - B “ tHu                    - C “ ttHuu             - D “ tH, tHuu
+
+
+           - |A| “ 0                 - |B| “ 1                 - |C| “ 1            - |D| “ 2
+
+b) Let S “ ta, b, cu and T “ tc, du. Compute:
+
+      - SYT                  - SXT                  - SzT                  - 2SzT           - SˆT
+
+           - S Y T “ ta, b, c, du
+           - S X T “ tcu
+           - SzT “ ta, bu
+           - 2SzT “ tH, tau, tbu, ta, buu
+           - S ˆ T “ tpa, cq, pa, dq, pb, cq, pb, dq, pc, cq, pc, dqu
+
+
+Task 2 – Basic Counting
+
+a) Credit-card numbers are made of 15 decimal digits, and a 16th checksum digit (which is uniquely
+   determined by the first 15 digits). How many credit-card numbers are there?
+
+                                                        1
+         1015
+
+b) How many positive divisors does 1440 “ 25 32 5 have?
+
+         6 ¨ 3 ¨ 2 “ 36.
+         Every positive divisor of 1440 can be written as 2i 3j 5k where i P t0, . . . , 5u, j P t0, 1, 2u,
+         and k P t0, 1u.
+
+c) How many ways are there to arrange the CSE 312 staff on a line (11 TAs, 2 professors) for a group
+   picture?
+
+         13!.
+
+d) How many ways are there to arrange the CSE 312 staff on a line so that Anup is at one of the ends
+   or exactly in the middle?
+
+         3 ˆ 12!.
+         Three options for the choice for Anup and 12! ways to order everyone else.
+
+
+Task 3 – Weird Card Game
+
+In how many ways can a pack of fifty-two cards (in four suits of thirteen cards each) be dealt to thirteen
+players, four to each, so that every player has one card from each of the suits?
+
+      Apply the product rule: First deal the hearts, one to each person, then the spades, one
+      to each person, then diamonds, then the clubs. For each of these steps, there are 13!
+      possibilities. Therefore, the answer is 13!4 .
+
+
+Task 4 – Seating
+
+How many ways are there to seat 10 people, consisting of 5 couples, in a row of 10 seats if . . .
+
+a) . . . all couples are to get adjacent seats?
+
+         Consider each couple as a unit. Apply the product rule, first choosing one of the 5!
+         permutations of the 5 couples, and then, for each couple in turn, choosing one of the 2
+         permutations for how they sit (for a total of 25 ). Therefore, the answer is: 5! ¨ 25 .
+
+b) . . . anyone can sit anywhere, except that one couple insists on not sitting in adjacent seats?
+
+
+
+
+                                                       2
+        Apply complementary counting to first compute the total number of arrangements of
+        the 10 people, and then subtract from this the number of arrangements in which that
+        particular couple does get adjacent seats. There are 10! for the former, and there are
+        9! ¨ 2 arrangements in which this couple does sit in adjacent seats, since you can treat the
+        couple as a unit, permute the 9 ”individuals” (consisting of 8 people plus the couple) and
+        then consider the 2 permutations for that couple. That means the answer to the question
+        is 10! ´ 9! ¨ 2 “ 8 ¨ 9! .
+        Alternatively, we can do casework. Name the two people in the couple A and B. There
+        are two cases: A can sit on one of the ends, or not. If A sits on an end seat, A has 2
+        choices and B has 8 possible seats. If A doesn’t sit on the end, A has 8 choices and B
+        only has 7. So there are a total of 2 ¨ 8 ` 8 ¨ 7 ways A and B can sit. Once they do, the
+        other 8 people can sit in 8! ways since there are no other restrictions. Hence the total
+        number of ways is p2 ¨ 8 ` 8 ¨ 7q8! “ 9 ¨ 8 ¨ 8! “ 8 ¨ 9! .
+
+
+Task 5 – HBCDEFGA
+
+How many ways are there to permute the 8 letters A, B, C, D, E, F, G, H so that A is not at the
+beginning and H is not at the end?
+
+     The total number of permutations is 8!. The number of permutations with A at the
+     beginning is 7! and the number with H at the end is 7!. By inclusion/exclusion, the number
+     that have either A at the beginning or H at the end or both is 2 ¨ 7! ´ 6! since there are
+     6! that have A at the beginning and H at the end. Finally, using complementary counting,
+     the number that have neither A at the end or H at the end is 8! ´ p2 ¨ 7! ´ 6!q.
+
+
+Task 6 – Lizards and Snakes!
+
+Loudon has three pet lizards, Rango, a gecko named Gordon, and a goanna named Joanna, as well as
+two small pet snakes, Kaa and Basilisk, but only 4 terrariums to put them in. In how many different
+ways can he put his 7 pets in these 4 terrariums so that no terrarium has both a snake and a lizard?
+
+     Find the number of possibilities when Kaa and Basilisk go in the same terrarium, and find
+     the number of possibilities when they go to different terrariums, and then use the sum rule
+     to get the final answer.
+     If Kaa and Basilisk go in the same terrarium, there are 4 terrarium it could be. For each
+     such choice, there are 3 choices of terrarium for each of the 3 lizards, so 33 choices for all
+     the lizards.
+     If Kaa and Basilisk go in different terrariums, there are 4 ¨ 3 “ 12 pairs of terrariums they
+     could go in. For each such choice, there are 2 choices of terrarium for each of the 3 lizards,
+     so 23 choices for all the lizards.
+     Therefore the answer is 4 ¨ 33 ` 12 ¨ 23 .
+
+
+
+                                                   3
+Task 7 – Birthday Cake
+A chef is preparing desserts for the week, starting on a Sunday. On each day, only one of five desserts
+(apple pie, cherry pie, strawberry pie, pineapple pie, and cake) may be served. On Thursday there is
+a birthday, so cake must be served that day. On no two consecutive days can the chef serve the same
+dessert. How many dessert menus are there for the week?
+      Apply the product rule. Start from Thursday and work forward and backward in the week:
+      More precisely, given the 1 choice on Thursday, for each of Wednesday and Friday, there are
+      4 choices (the different pie options). Given the choice on Wednesday, there are 4 choices
+      for Tuesday, and given the choice on Tuesday, there are 4 choices for Monday, and given
+      the choice on Monday, there are 4 choices on Sunday. Similarly, given the choice on Friday,
+      there are 4 choices on Saturday.
+      Therefore the answer is 4 ¨ 4 ¨ 4 ¨ 4 ¨ 1 ¨ 4 ¨ 4 “ 46
+
+Task 8 – Photographs
+Suppose that 8 people, including you and a friend, line up for a picture. In how many ways can the
+photographer organize the line if she wants to have fewer than 2 people between you and your friend?
+      This is most easily solved using the sum rule. Count the number of ways the line can be
+      organized if you are next to your friend. Then count the number of ways the line can be
+      organized if there is one person between you and your friend. Then use the sum rule to add
+      these up.
+      Case 1: You are next to your friend. So we can think of you and your friend as being a
+      ”unit”. Now apply the product rule: there are 7! ways to arrange the other 6 people together
+      with the unit (of you and your friend). Once arranged, there are 2 ways to rearrange you
+      and your friend in the order. So there are 7! ¨ 2 ways to to line people up if you are next to
+      your friend.
+      Case 2: There is exactly 1 person between you and your friend. Apply the product rule
+      by first picking the person who is between you (6 choices). Then, thinking of you, your
+      friend and that person as a ”unit”, consider all arrangements of the 5 people plus the unit
+      (6! ways). Finally, there are two ways for you and your friend to be placed within the trio.
+      Therefore, altogether there are 6 ¨ 6! ¨ 2 possibilities.
+      Therefore, the final answer is p2 ¨ 7 ` 2 ¨ 6q ¨ 6!
+
+
+Task 9 – Extended Family Portrait
+A group of n families, each with m members, are to be lined up for a photograph. In how many ways
+can the nm people be arranged if members of a family must stay together?
+      Apply the product rule. First order the families; there are n! ways to do this. Then consider
+      the families one by one and reorder their members. Within each family, there are m! ways
+      to order their members. So there are a total of n!pm!qn ways to line these people up
+      according to the given constraints.
+
+
+
+                                                        4
+

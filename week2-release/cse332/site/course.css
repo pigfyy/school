@@ -1,0 +1,182 @@
+/* CSE 332 week 2 · course.css: widget styles only. Loaded after base.css; uses only base tokens.
+   Chart series follow the house order: f(n) = a1 (teal), g(n) / c·g(n) / c₂·g(n) = a2 (rust), c₁·g(n) = a3 (violet).
+   Series are always named by legend and direct end labels too, never by color alone. */
+
+h1 em { font-style: italic; color: var(--a1); }
+.hero .question { color: var(--ink); font-weight: 500; max-width: 46ch; margin: 0 0 1.25rem; }
+.rail .katex { font-size: 1em; }
+.where .tag-later, .where .today-chip { margin: 0 0.1rem; }
+.note { font-size: 0.9rem; color: var(--ink-soft); }
+.out { display: block; }
+.out > div + div { margin-top: 0.2rem; }
+output { font-family: var(--mono); font-weight: 600; min-width: 2ch; }
+input[type="number"] { width: 7rem; }
+input.short { width: 5.5rem; }
+input.wide { width: 22rem; max-width: 100%; }
+input.mono { font-family: var(--mono); font-size: 0.95rem; }
+input[type="range"] { accent-color: var(--a1); }
+.chip .katex { font-size: 1em; }
+.table-wrap { overflow-x: auto; max-width: 100%; }
+.panel > h3:first-child, .panel > h4:first-child { margin-top: 0; }
+.panel h4 { margin: 0 0 0.6rem; font-family: var(--mono); font-size: 0.76rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+.panel h4 .katex { text-transform: none; }
+.rule ul { padding-left: 1.2rem; }
+.rule li strong:first-child { display: inline; font-family: inherit; font-size: inherit; letter-spacing: 0; text-transform: none; margin: 0; } /* bold words in a list, not a box label */
+/* box labels are mono caps, but math inside them must keep its case (g(n) is not G(N)) */
+.rule strong:first-child .katex { text-transform: none; letter-spacing: 0; }
+/* slide 15's definitions: the bold term starts a sentence, so it stays inline and in prose type */
+.rule.defn strong:first-child { display: inline; font-family: inherit; font-size: inherit; letter-spacing: 0; text-transform: none; margin: 0; }
+.rule.honest { border-left-color: var(--line-strong); border-left-style: dashed; background: var(--paper-2); }
+.rule, .cheat section, .prose, .proof { min-width: 0; overflow-wrap: anywhere; }
+.cyu-score:empty { display: none; }
+.check .opts { margin-bottom: 0.5rem; }
+
+/* side-by-side code / proof pairs */
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+.split pre.code { margin-top: 0; }
+pre.code { padding: 0.85rem 1.05rem; font-size: 0.84rem; }
+pre.code .cm { color: var(--ink-faint); font-style: italic; }
+
+/* ---------------------------------------------------------------- home hero: n^50 vs 1.1^n */
+.race-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 1.15rem 1.3rem 1rem; box-shadow: 0 10px 30px -18px rgba(19, 21, 26, 0.35); }
+.race-card input[type="range"] { flex: 1 1 14rem; min-width: 8rem; }
+.duel { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 0.75rem; align-items: stretch; margin: 0.5rem 0 0.75rem; }
+.duel-side { border: 1px solid var(--line); border-radius: var(--r); padding: 0.6rem 0.85rem; display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; background: var(--paper); transition: background 0.2s, border-color 0.2s; }
+.duel-side.s1 { box-shadow: inset 0 4px 0 var(--a1); }
+.duel-side.s2 { box-shadow: inset 0 4px 0 var(--a2); }
+.duel-side.lead { background: var(--surface); border-color: var(--ink); }
+.duel-side.s1.lead { background: var(--a1-tint); }
+.duel-side.s2.lead { background: var(--a2-tint); }
+.duel-label { font-size: 1.1rem; }
+.duel-side b { font-family: var(--mono); font-size: 1.12rem; font-weight: 600; overflow-wrap: anywhere; }
+.duel-sub { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.04em; color: var(--ink-soft); }
+.duel-vs { align-self: center; font-family: var(--mono); font-size: 1.9rem; font-weight: 600; color: var(--ink); min-width: 2rem; text-align: center; }
+.duel.compact .duel-side b { font-size: 1.02rem; }
+
+/* ---------------------------------------------------------------- slide 8/9: the sorted list and its gap */
+.cells { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: flex-end; margin: 0.75rem 0; }
+.cell { display: flex; flex-direction: column; align-items: center; min-width: 2.8rem; }
+.cell b { display: block; min-width: 2.8rem; padding: 0.4rem 0.35rem 0.3rem; font-family: var(--mono); font-size: 1.02rem; font-weight: 600; text-align: center; background: var(--a1-tint); border: 1.5px solid var(--a1); border-radius: var(--r); transition: background 0.2s, opacity 0.2s; }
+.cell.out b { background: transparent; border-color: var(--line-strong); color: var(--ink-faint); border-style: dashed; }
+.cell.mid b { background: var(--a1); color: #fff; }
+.cell .idx { font-size: 0.72rem; color: var(--ink-faint); margin-top: 0.15rem; font-family: var(--mono); }
+.cell .ptr { font-family: var(--mono); font-size: 0.7rem; font-weight: 600; min-height: 1.1rem; color: var(--a1); text-transform: uppercase; letter-spacing: 0.06em; }
+.gap-bars { display: grid; gap: 0.3rem; margin: 0.25rem 0 0.75rem; }
+.gap-bar { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr) 9.5rem; align-items: center; gap: 0.6rem; font-size: 0.86rem; }
+.gap-it { font-family: var(--mono); color: var(--ink-faint); }
+.gap-fill { display: block; height: 0.8rem; background: var(--a1); border-radius: 0 3px 3px 0; min-width: 4px; }
+.gap-num { font-family: var(--mono); color: var(--ink); }
+.gap-chain { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; margin: 0.25rem 0 0.75rem; }
+.gchip { font-family: var(--mono); font-size: 0.84rem; background: var(--a1-tint); border: 1px solid var(--a1); border-radius: 999px; padding: 0.02rem 0.55rem; }
+.garrow { color: var(--ink-faint); }
+.brute { font-size: 0.93rem; color: var(--ink-soft); }
+.brute.ok { color: var(--right); font-weight: 600; }
+
+/* ---------------------------------------------------------------- tables */
+table.num td.r, table.num th.r { text-align: right; padding-right: 1.25rem; font-family: var(--mono); font-size: 0.88rem; }
+table.num th.r { font-weight: 600; }
+table.num tr.win td { background: var(--a2-tint); }
+table.due th { font-family: var(--mono); font-size: 0.85rem; font-weight: 500; color: var(--ink); }
+table.cats td:first-child { padding-right: 2rem; }
+table.grid6 th, table.grid6 td { padding: 0.35rem 0.75rem 0.35rem 0; }
+.grid-cell { font: inherit; font-size: 0.9rem; background: var(--right-tint); color: var(--right); border: 1.5px solid transparent; border-radius: var(--r); padding: 0.3rem 0.7rem; cursor: pointer; font-weight: 600; }
+.grid-cell:hover, .grid-cell.on { border-color: var(--right); }
+
+/* ---------------------------------------------------------------- slide 15: clickable quantifiers */
+.rule.defn { max-width: 46rem; }
+.quant { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; font-size: 1.06rem; margin: 0.6rem 0 0.4rem; }
+.q-part { font: inherit; background: var(--surface); border: 1.5px dashed var(--a1); color: var(--ink); border-radius: var(--r); padding: 0.12rem 0.5rem; cursor: pointer; }
+.q-part:hover { background: var(--a1-tint); }
+.q-part.on { background: var(--a1); color: #fff; border-style: solid; }
+.q-explain { min-height: 3em; font-size: 0.96rem; background: var(--paper); border-radius: var(--r); padding: 0.5rem 0.75rem; }
+
+/* ---------------------------------------------------------------- proofs (slides 23, 26) */
+.proof { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--a3); border-radius: 0 0 var(--r-lg) var(--r-lg); padding: 0.9rem 1.15rem 0.5rem; }
+.proof-head { font-family: var(--mono); font-size: 0.76rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--a3); margin-bottom: 0.4rem; }
+.proof .katex-display { margin: 0.5rem 0; }
+
+/* ---------------------------------------------------------------- charts */
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { font-family: var(--mono); font-size: 11.5px; fill: var(--ink-soft); }
+.chart .grid { stroke: var(--line); stroke-width: 1; opacity: 0.7; }
+.chart .axis { stroke: var(--line-strong); stroke-width: 1; }
+.chart .axis-title { fill: var(--ink-soft); letter-spacing: 0.04em; }
+.chart .series { fill: none; stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.chart .dot { stroke: var(--surface); stroke-width: 2; }
+.chart .dot.now { fill: var(--ink); r: 6; }
+.chart .label { fill: var(--ink); font-family: var(--sans); font-size: 13px; font-weight: 600; }
+.chart .hover-line { stroke: var(--ink-soft); stroke-width: 1; }
+.chart .marker { stroke: var(--ink); stroke-width: 1.25; stroke-dasharray: 4 3; }
+.chart .marker-label { fill: var(--ink); font-weight: 600; }
+.chart .shade { fill: var(--a2-tint); opacity: 0.75; }
+.chart .shade-label { fill: var(--ink); font-weight: 500; }
+.chart-box { position: relative; margin: 0.25rem 0 0.5rem; }
+.legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; font-size: 0.92rem; margin: 0.25rem 0 0.5rem; }
+.legend .key { display: inline-block; width: 1.3rem; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 0.4rem; border-radius: 2px; }
+.tip { position: absolute; pointer-events: none; background: var(--night); color: var(--night-ink); border-radius: var(--r); padding: 0.4rem 0.6rem; font-family: var(--mono); font-size: 0.78rem; line-height: 1.45; white-space: nowrap; transform: translate(-50%, -110%); z-index: 5; box-shadow: 0 8px 24px -12px rgba(19, 21, 26, 0.45); }
+.tip strong { color: #fff; font-weight: 600; }
+.sw-claim label { display: flex; flex-wrap: nowrap; width: 100%; max-width: 36rem; min-width: 0; }
+.sw-claim select { flex: 1 1 auto; min-width: 0; width: 100%; }
+.claim-text { font-weight: 600; }
+
+/* ---------------------------------------------------------------- slides 27–29: simplifier ladder */
+#simp-out { font-size: 1.08rem; font-weight: 600; min-height: 1.6em; }
+.ladder { list-style: none; padding: 0; margin: 0.75rem 0 0.5rem; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 0.3rem; }
+.ladder li { display: flex; flex-direction: column; gap: 0.1rem; padding: 0.45rem 0.4rem; border: 1px solid var(--line); border-radius: var(--r); background: var(--paper); font-size: 0.76rem; color: var(--ink-soft); min-width: 0; position: relative; }
+.ladder li b { font-family: var(--mono); font-size: 0.84rem; font-weight: 600; color: var(--ink); }
+.ladder li.on { background: var(--a1); border-color: var(--a1); color: var(--a1-tint); }
+.ladder li.on b { color: #fff; }
+.ladder li.between { border-style: dashed; border-color: var(--a1); background: var(--a1-tint); }
+
+/* ---------------------------------------------------------------- slides 31–32: O / Ω / Θ verdicts */
+.verdicts .v-head { font-weight: 600; margin: 0.25rem 0 0.6rem; }
+.v-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+.v-row .verdict { margin: 0; border: 1.5px solid var(--line); border-radius: var(--r-lg); padding: 0.6rem 0.8rem; display: flex; flex-direction: column; gap: 0.1rem; background: var(--surface); }
+.v-row .verdict b { font-family: var(--mono); font-size: 1.15rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.v-row .verdict.yes { border-color: var(--right); background: var(--right-tint); }
+.v-row .verdict.yes b { color: var(--right); }
+.v-row .verdict.no { border-color: var(--wrong); background: var(--wrong-tint); }
+.v-row .verdict.no b { color: var(--wrong); }
+.v-sym { font-family: var(--mono); font-size: 0.88rem; }
+.v-why { font-size: 0.85rem; color: var(--ink-soft); }
+
+/* ---------------------------------------------------------------- slide 34 statements */
+.statements { display: grid; gap: 0.5rem; margin: 0.5rem 0 1.25rem; max-width: var(--measure); }
+.stmt { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 0.55rem 0.8rem; }
+.badge { display: inline-block; font-family: var(--mono); font-size: 0.68rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; background: var(--ink); color: var(--paper); border-radius: 3px; padding: 0.04rem 0.4rem; margin-right: 0.6rem; vertical-align: 0.12em; }
+.badge.quiet { background: transparent; color: var(--ink-soft); border: 1px dashed var(--line-strong); }
+
+/* ---------------------------------------------------------------- upcoming */
+.upcoming { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin: 1rem 0 1.5rem; }
+.up-card { border: 1px dashed var(--line-strong); border-radius: var(--r-lg); padding: 0.85rem 1rem; display: flex; flex-direction: column; align-items: flex-start; }
+.up-card h3 { margin: 0.35rem 0 0.35rem; font-size: var(--step-1); }
+.up-card p { margin: 0 0 0.3rem; }
+.up-card .status-line { font-family: var(--mono); font-size: 0.78rem; color: var(--ink-soft); }
+.up-card.due { border-style: solid; border-color: #ecd9a3; background: var(--note-tint); }
+.up-card.due .tag-later { border-color: var(--note); color: var(--note); }
+
+/* ---------------------------------------------------------------- problems: work box extras */
+.work-preview { white-space: pre-wrap; background: var(--paper); border-radius: var(--r); padding: 0.5rem 0.65rem; margin-top: 0.4rem; font-size: 0.95rem; }
+.conflict-copy { font-size: 0.9rem; background: var(--paper); border-left: 3px solid var(--note); padding: 0.4rem 0.6rem; margin-top: 0.4rem; white-space: pre-wrap; }
+
+/* ---------------------------------------------------------------- toasts (app.js uses ok / bad / info) */
+.toast.bad { border-left-color: var(--a2-on-dark); }
+.toast.info { border-left-color: var(--a3-on-dark); }
+.toast > button { background: none; border: none; color: inherit; font: inherit; font-size: 1rem; cursor: pointer; line-height: 1.3; padding: 0; opacity: 0.8; }
+
+@media (max-width: 1100px) {
+  .ladder { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 860px) {
+  .split, .upcoming, .v-row { grid-template-columns: minmax(0, 1fr); }
+  .task { padding: 1.1rem 1rem 1rem; }
+  .panel, .race-card { padding: 1rem; }
+  .cyu { padding-left: 3rem; }
+  .cyu::before { left: 0.8rem; }
+  .duel-vs { font-size: 1.5rem; }
+  .cell, .cell b { min-width: 2.35rem; }
+  .cell b { font-size: 0.95rem; }
+  .gap-bar { grid-template-columns: 2rem minmax(0, 1fr) 8.2rem; font-size: 0.8rem; }
+  .ladder { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero h1 { font-size: 2.5rem; }
+}

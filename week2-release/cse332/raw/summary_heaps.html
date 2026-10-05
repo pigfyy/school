@@ -1,0 +1,730 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>CSE332 - Topic Summary - Priority Queues and Heaps</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">q { quotes: "“" "”" "‘" "’"; }</style>
+  <link rel="stylesheet" href="../style.css?v=2" />
+</head>
+<main>
+<body>
+    <div role="navigation" class="navbar navbar-static-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <span class="doc-title">CSE 332 &ndash; Topic Summary - Priority
+Queues and Heaps</span>
+        <ul class="nav pull-right doc-info">
+                    <li><p class="navbar-text"><a href="../index.html">Home</a></p></li>
+          <li><p class="navbar-text"><a href="../syllabus.html">Syllabus</a></p></li>
+          <li><p class="navbar-text"><a href="../calendar.html">Calendar</a></p></li>
+          <li><p class="navbar-text"><a href="../tasks.html">Tasks</a></p></li>
+          <li><p class="navbar-text"><a href="../exams.html">Exams</a></p></li>
+          <li><p class="navbar-text"><a href="../summaries.html">Summaries</a></p></li>
+          <li><p class="navbar-text"><a href="../oh.html">Office Hours</a></p></li>
+          <li><p class="navbar-text"><a href="../staff.html">Staff</a></p></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+    <div class="container">
+    <div class="row">
+            <div id="TOC" class="span3">
+        <div class="well toc">
+        <ul>
+          <li class="nav-header">Table of Contents</li>
+        </ul>
+        <ul>
+        <li><a href="#priority-queue-adt"
+        id="toc-priority-queue-adt"><span
+        class="toc-section-number">1</span> Priority Queue ADT</a>
+        <ul>
+        <li><a href="#priority-queues-using-lists"
+        id="toc-priority-queues-using-lists"><span
+        class="toc-section-number">1.1</span> Priority Queues Using
+        Lists</a>
+        <ul>
+        <li><a href="#unsorted-array-priority-queue"
+        id="toc-unsorted-array-priority-queue"><span
+        class="toc-section-number">1.1.1</span> Unsorted Array Priority
+        Queue</a></li>
+        <li><a href="#sorted-array-priority-queue"
+        id="toc-sorted-array-priority-queue"><span
+        class="toc-section-number">1.1.2</span> Sorted Array Priority
+        Queue</a></li>
+        <li><a href="#lessons" id="toc-lessons"><span
+        class="toc-section-number">1.1.3</span> Lessons</a></li>
+        </ul></li>
+        </ul></li>
+        <li><a href="#binary-heap-data-structure"
+        id="toc-binary-heap-data-structure"><span
+        class="toc-section-number">2</span> Binary Heap Data
+        Structure</a>
+        <ul>
+        <li><a href="#the-shape-of-the-tree"
+        id="toc-the-shape-of-the-tree"><span
+        class="toc-section-number">2.1</span> The Shape of the
+        Tree</a></li>
+        <li><a href="#somewhat-ordering-the-array"
+        id="toc-somewhat-ordering-the-array"><span
+        class="toc-section-number">2.2</span> Somewhat Ordering the
+        Array</a></li>
+        <li><a href="#the-tree-representation-using-an-array"
+        id="toc-the-tree-representation-using-an-array"><span
+        class="toc-section-number">2.3</span> The Tree Representation
+        Using an Array</a></li>
+        <li><a href="#insert-and-extract-algorithms"
+        id="toc-insert-and-extract-algorithms"><span
+        class="toc-section-number">2.4</span> Insert and Extract
+        Algorithms</a>
+        <ul>
+        <li><a href="#insert" id="toc-insert"><span
+        class="toc-section-number">2.4.1</span> Insert</a></li>
+        <li><a href="#extract" id="toc-extract"><span
+        class="toc-section-number">2.4.2</span> Extract</a></li>
+        <li><a href="#running-time-analysis"
+        id="toc-running-time-analysis"><span
+        class="toc-section-number">2.4.3</span> Running time
+        analysis</a></li>
+        <li><a href="#percolate-up-and-down"
+        id="toc-percolate-up-and-down"><span
+        class="toc-section-number">2.4.4</span> Percolate Up and
+        Down</a></li>
+        <li><a href="#increasedecrease-key"
+        id="toc-increasedecrease-key"><span
+        class="toc-section-number">2.4.5</span> Increase/Decrease
+        Key</a></li>
+        </ul></li>
+        </ul></li>
+        <li><a href="#max-heaps" id="toc-max-heaps"><span
+        class="toc-section-number">3</span> Max Heaps</a></li>
+        <li><a href="#floyds-build-heap-method"
+        id="toc-floyds-build-heap-method"><span
+        class="toc-section-number">4</span> Floyd’s Build Heap
+        Method</a></li>
+        </ul>
+        </div>
+      </div>
+            <div class="span9">
+            <!--<blockquote style="background-color:#fbb; font-size:150%">This page is from a previous offering of the course. It has been left up for archival purposes.</blockquote>-->
+      <!--<blockquote style="background-color:#fbb; font-size:150%">This page is under construction. Any content you see now is subject to change until the first day of class. Expect some links to be broken until that time.</blockquote>-->
+      <!--<blockquote style="background-color:#FFD700; font-size:150%">Looking for someone to talk to about CSE332? Try the Study Center in CSE room 006! There's a table there just for working on and discussing CSE332!</blockquote>-->
+      <h1 data-number="1" id="priority-queue-adt"><span
+      class="header-section-number">1</span> Priority Queue ADT</h1>
+      <p>In this section we introduced a new ADT called a
+      <strong>priority queue</strong>. As a reminder, the <em>queue</em>
+      ADT allows for insertion and removal where the only item that may
+      be removed is the least frequently added (yielding the <q>first in
+      first out</q> behavior). In this way, a queue operates like a
+      checkout line at a store where each shopper joins the line behind
+      the person who arrived before them so that the one who had been
+      there the longest is the next to be served.</p>
+      <p>For a <em>priority queue</em>, instead of removing the least
+      frequently added item, we will remove the most important item. We
+      can think of this as a line where more important people are
+      allowed to cut in front of less important people. For example, in
+      an emergency room someone with an urgent need would see a doctor
+      before someone with a less serious condition. In this case the
+      urgency of the patient’s condition would determine the order that
+      we service those waiting.</p>
+      <p>With this motivation, here’s how we’ll define the priority
+      queue ADT:</p>
+      <ul>
+      <li>Notion: A collection of items along with their priority
+      levels</li>
+      <li>Operations:
+      <ul>
+      <li>insert: adds a new element into the priority queue along with
+      a given priority value</li>
+      <li>extract: deletes and returns the most important element
+      according to its priority value</li>
+      <li>increaseKey: changes the priority value of the given element
+      to make it larger</li>
+      <li>decreaseKey: changes the priority value of the given element
+      to make it smaller</li>
+      </ul></li>
+      </ul>
+      <p><strong>Convention</strong>: By convention for priority queues
+      we understand the item with the <em>smallest</em> priority value
+      to be the <q>most important</q>, and it is therefore what gets
+      returned by the extract operation. This comes from the idea that
+      priorities are communicated as rankings in the English language,
+      and so saying <q>you’re my number one priority</q> is saying
+      <q>you’re the most important to me</q>. We can also define
+      priority queues so that the item with the largest priority value
+      is the most important with only trivial changes. Because of this
+      convention, though, all the examples below consider the smaller
+      priority values more important.</p>
+      <p><strong>Analogy Limitation</strong>: There is one way that the
+      emergency room and line cutting analogies are <em>unlike</em> the
+      priority queue ADT. In both of these analogies it’s most likely
+      going to be the case that among people with the same level of
+      priority that they are serviced in first-in-first-out order. In a
+      priority queue, however, we will allow for items with same
+      priority to be extracted in <em>any</em> order.</p>
+      <h2 data-number="1.1" id="priority-queues-using-lists"><span
+      class="header-section-number">1.1</span> Priority Queues Using
+      Lists</h2>
+      <p>Next we can look at some examples of data structures for
+      priority queues. With the queue ADT, we were able to effectively
+      use list-like approaches for designing out data structures, so
+      let’s try that same thing here. This can give us to better
+      understand the challenges of creating a priority queue data
+      structure, and help us to see what we might need to do to improve
+      upon some relatively more straight forward approaches.</p>
+      <h3 data-number="1.1.1" id="unsorted-array-priority-queue"><span
+      class="header-section-number">1.1.1</span> Unsorted Array Priority
+      Queue</h3>
+      <p>First, let’s look at what we might do if we just store the
+      elements (and priorities) in an unsorted array. In this case we
+      might have a field that we could call <em>back</em> to indicate
+      the index of the last item in the array. From here we could use
+      the following algorithms for the priority queue ADT operations
+      insert and extract:</p>
+      <ul>
+      <li>insert: add the item and its priority into the array at the
+      index referenced by <em>back</em>, resizing if necessary. Then
+      increment <em>back</em>.</li>
+      <li>extract: iterating from index 0 of the array up through index
+      <em>back</em>, save the index and priority of the item with the
+      smallest priority seen so far. Return the corresponding item, and
+      remove it from the array by shifting all elements after it over by
+      1 index.</li>
+      </ul>
+      <p>Because we do not care to impose any kind of ordering of the
+      elements in our array, our insert algorithm runs in constant time
+      (amortized). However, because we have no indication for where we
+      might find the item with smallest priority, the extract operation
+      requires linear time.</p>
+      <h3 data-number="1.1.2" id="sorted-array-priority-queue"><span
+      class="header-section-number">1.1.2</span> Sorted Array Priority
+      Queue</h3>
+      <p>Because priority queues require removing items in a sorted
+      order, perhaps we could improve our data structure by requiring
+      the items be stored in descending order (largest priority value at
+      index 0, smallest at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">n-1</annotation></semantics></math>).
+      In this data structure we will also have the field <em>back</em>
+      that indicates the index of the last item in the array (in this
+      case this will be the one with the smallest priority value).
+      Here’s what insert and extract might look like in this case:</p>
+      <ul>
+      <li>insert: starting from index 0, check to see if the new item
+      has higher priority than the one at that current index, if not
+      then check the next index, repeat until we reach an item with
+      lower priority or until we reach <em>back</em>. Next insert the
+      new item at the current index by shifting all items after that
+      index over by one position. Increment back. Resize if
+      necessary.</li>
+      <li>extract: because we sorted in descending order, the index
+      <em>back</em> has the minimum priority. Decrement the value of
+      <em>back</em> and return the value at the index
+      <em>back</em>.</li>
+      </ul>
+      <p>Because we need to keep our array sorted, we need to be very
+      careful about where we add values into our array, and so the
+      running time of insert is linear time. On the other hand, extract
+      requires only constant time because we know exactly where the
+      element with minimum priority might be.</p>
+      <h3 data-number="1.1.3" id="lessons"><span
+      class="header-section-number">1.1.3</span> Lessons</h3>
+      <p>From these two examples it appears that there’s a trade-off in
+      our data structure design: stricter ordering makes insert harder
+      and extract easier, more relaxed ordering makes insert easier and
+      extract harder. This provides the insight for the binary heap data
+      structure that we will soon introduce for priority queues. In a
+      binary heap we will store our elements in an array, but they will
+      be only <em>somewhat</em> ordered so that we can have sublinear
+      running time for <em>both</em> insert and extract. Specifically,
+      we will achieve running times of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log n)</annotation></semantics></math>
+      for both insert and extract.</p>
+      <h1 data-number="2" id="binary-heap-data-structure"><span
+      class="header-section-number">2</span> Binary Heap Data
+      Structure</h1>
+      <p>In implementation, our binary heap data structure will store
+      elements in an array, but manipulate the positions of elements as
+      if they were stored in a binary tree. In other words, it will be
+      representing a tree using an array. To describe this data
+      structure we will first describe it as a tree, then later describe
+      how we represent the tree using an array.</p>
+      <h2 data-number="2.1" id="the-shape-of-the-tree"><span
+      class="header-section-number">2.1</span> The Shape of the
+      Tree</h2>
+      <p>Binary heaps have <em>very</em> strict requirements on the
+      structure of the tree that stores the elements. Specifically, the
+      <em>structure property</em> of a heap requires:</p>
+      <ul>
+      <li>Every level of the tree be <em>completely full</em> before any
+      items may be included on the next level</li>
+      <li>If the last level is only partially full, the items
+      <em>must</em> be filled in from left to right (so for example the
+      left child of the left-most node of the second from last level
+      must be the first to be filled in).</li>
+      </ul>
+      <p>There are two motives for this:</p>
+      <ol type="1">
+      <li>This shape will help us to achieve the
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log n)</annotation></semantics></math>
+      worst case running times for insert and extract</li>
+      <li>This shape will help us to represent the tree using an
+      array</li>
+      </ol>
+      <!--To help understand the requirements, here are a few *valid* tree shapes:
+
+      TODO!
+
+      Here are a few trees that are *not* a valid shape:
+
+      TODO!-->
+      <h2 data-number="2.2" id="somewhat-ordering-the-array"><span
+      class="header-section-number">2.2</span> Somewhat Ordering the
+      Array</h2>
+      <p>In addition to requiring a particular shape to the tree, heaps
+      also require restrictions on where certain values may appear. For
+      a min heap (i.e. one where the most important element has the
+      lowest priority value) the following property must be true of
+      every node in the tree:</p>
+      <p><strong>Min Heap Property</strong>: For every node in the tree,
+      the priority value of that node must be less than or equal to that
+      of its children.</p>
+      <p>This heap property ensures that for every node, the priority of
+      the value held there is the smallest of all nodes in its subtree.
+      This is because if there was any node within a subtree with a
+      smaller priority value then that node or one of its ancestors must
+      violate the heap property with its parent. Since this applies to
+      all nodes, that implies that the overall root of the heap
+      <em>must</em> contain the element with the smallest priority.
+      Therefore this heap property gives us one of the advantages of a
+      sorted array in that we know exactly where to find the most
+      important item.</p>
+      <p>The heap property also doesn’t require our array to be
+      <em>too</em> sorted. Note that the heap property only enforces a
+      priority relationship between a node and any values in its
+      subtree. It does not have any restrictions on how a node’s
+      priority value might relate to those of nodes in different
+      branches of the tree (e.g. <q>cousin</q> nodes or
+      <q>aunt/uncle</q> nodes). The result here will be that it does not
+      require too much effort to maintain the heap property when
+      adding/removing items from the heap (at least, it requires much
+      less effort than maintaining a total ordering). Namely, since the
+      heap property can be checked by just checking how parents relate
+      to children, the heap property ensures that we need to do only a
+      constant number of operations per level of the tree to restore the
+      heap property after any insert/extract operation. The shape
+      property then guarantees that the tree will not have many levels.
+      The combination of these two rules therefore enables our fast
+      (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log n)</annotation></semantics></math>)
+      running time for each operation.</p>
+      <h2 data-number="2.3"
+      id="the-tree-representation-using-an-array"><span
+      class="header-section-number">2.3</span> The Tree Representation
+      Using an Array</h2>
+      <p>Now let’s discuss how we can represent our heap using an array.
+      When you learned about binary trees in your prerequisite course,
+      you likely used nodes where each stored the value it contains and
+      then had a reference to two other nodes representing its left and
+      right children. For heaps we will store our values in an array,
+      and then identify a node’s left and right children by doing
+      arithmetic on array indices.</p>
+      <p>To represent our heap as an array we will leverage the heap
+      structure property. The structure property is so strict that all
+      trees of the same size <em>must</em> have the same shape. This is
+      because there is a unique position that must be added to
+      accommodate that new node. To represent our tree using an array,
+      we will designate that the position added when adding the
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
+      node will be stored at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+      In summary, we can identify each node’s index by <q>counting
+      off</q> one level at a time, and then left-to-right within a
+      level. The structure property insures that this assignment will
+      never skip nodes and will never skip array indices. We will always
+      start the <q>counting off</q> from the root. We could decide to
+      start that count with the number
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+      (thereby putting the root at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+      of the array), however the arithmetic we’ll need to apply to the
+      array indices in order to navigate the tree is a bit easier if we
+      start of with
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+      instead (thereby not using index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+      of the array at all).</p>
+      <!--Here's an example of how we can store a heap using an array:
+
+      TODO-->
+      <p>For a node at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+      here’s how we can calculate the index of the following other nodes
+      in relation to
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>:</p>
+      <ul>
+      <li>Its left child:
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>i</mi></mrow><annotation encoding="application/x-tex">2i</annotation></semantics></math></li>
+      <li>Its right child:
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>i</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2i+1</annotation></semantics></math></li>
+      <li>Its parent
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">⌊</mo><mfrac><mi>i</mi><mn>2</mn></mfrac><mo stretchy="false" form="postfix">⌋</mo></mrow><annotation encoding="application/x-tex">\lfloor \frac{i}{2}\rfloor</annotation></semantics></math></li>
+      <li>Its left sibling:
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">i-1</annotation></semantics></math>
+      (this requires that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      is itself a right child)</li>
+      <li>Its right sibling:
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">i+1</annotation></semantics></math>
+      (this requires that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      is itself a left child)</li>
+      </ul>
+      <h2 data-number="2.4" id="insert-and-extract-algorithms"><span
+      class="header-section-number">2.4</span> Insert and Extract
+      Algorithms</h2>
+      <p>Since we’ve fully described how we’re representing our data,
+      let’s discuss our algorithms for the priority queue ADT
+      operations.</p>
+      <h3 data-number="2.4.1" id="insert"><span
+      class="header-section-number">2.4.1</span> Insert</h3>
+      <p>When inserting an element, the structure property of heaps
+      designates a unique position that must be created in the heap.
+      Namely, if the last level of the heap is not full then after
+      adding a new item the new position must be the leftmost available
+      slot of that last level. If the last level of the heap is full,
+      then the new position must be the leftmost on the next level.</p>
+      <p>While the structure property designates a specific new
+      position, we cannot necessarily just put the new item there. The
+      heap property requires each node’s priority be less than or equal
+      to its children. It could be that the newly-added item has a
+      priority smaller than the parent of the new position we were
+      required to create. In this case, we must rearrange values of the
+      heap in order to maintain the heap property.</p>
+      <p>The idea of our algorithm is as follows:</p>
+      <ol type="1">
+      <li>Place the new item at the position dictated by the structure
+      property</li>
+      <li>Compare that item’s priority with that of it’s parent. If the
+      new item has a lower priority than its parent then swap the new
+      item’s position with that of its parent.</li>
+      <li>Repeat the previous step (compare the new item with its
+      parent, swap less than) until either the new item’s priority value
+      is greater than or equal to its parent, or the new item becomes
+      the new root.</li>
+      </ol>
+      <!--
+      Keeping in mind that the tree itself is represented using an array, this results in the following near-Java code:
+
+      ```
+      public void insert(T item){
+          if(this.size() == arr.length){
+              resize();  // replace with a larger array, copy over the contents
+          }
+          arr[size+1] = item; // we're 1-indexing so we need to use size+1
+          size++;
+          int currIndex = size; // tindex currently holding the new item
+          while(currIndex//2 > 0 && arr[currIndex].priority < arr[currIndex//2]){ // until the new item is either the root or its priority is larger than its parent's
+              T oldParent = arr[currIndex//2]; // save the parent
+              arr[currIndex//2]= arr[currIndex]; // move item to the parent's position
+              arr[currIndex] = oldParent; // move the parent to item's former position
+              currIndex = currIndex // 2; // update the index of item
+          }
+      }
+      ```
+      -->
+      <h3 data-number="2.4.2" id="extract"><span
+      class="header-section-number">2.4.2</span> Extract</h3>
+      <p>When extracting, the priority queue ADT requires that the item
+      in the root of the heap be the one removed. However, the structure
+      property of the heap requires that the position that be removed
+      from the tree is the right-most node on the bottom-most level. In
+      order to reconcile this, we will take a similar approach to what
+      we saw with insert – we will first make a change to satisfy the
+      structure property, and then we’ll rearrange values to satisfy the
+      heap property. So what we’ll the take the right-most item of the
+      last level (i.e. the item in the position that must be
+      eliminated), move that to become the new root (eliminating the
+      item at the root, so that the tree contains all the correct
+      elements), and then swap the item we just moved with its children
+      until we’ve restored the heap property.</p>
+      <p>Here are the overall steps:</p>
+      <ol type="1">
+      <li>Save the value of the current root</li>
+      <li>Move the item in the last index of the array to index 1
+      (overwriting and taking the place of the old root)</li>
+      <li>Compare the new roots priority with that of its children. If
+      any child has a smaller priority than the parent, swap the parent
+      with the smaller child.</li>
+      <li>Repeat the previous step (if smaller than any child, swap with
+      the smallest child) until either the value we’re moving is smaller
+      than both of its children, or until it becomes a leaf in the
+      tree.</li>
+      <li>Return the saved value of the original root</li>
+      </ol>
+      <h3 data-number="2.4.3" id="running-time-analysis"><span
+      class="header-section-number">2.4.3</span> Running time
+      analysis</h3>
+      <p>Now let’s look at the running time of these operations. When
+      identifying the running time, we will use the number of items
+      currently in the heap as our measure for input size (i.e. this
+      will be the value
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      in our running time function). To measure the running time we will
+      count comparisons (an operation where we compare the priorities of
+      two items in the heap to detect which is larger/smaller).</p>
+      <p>When inserting, in the worst case the newly added item will
+      become the new root of the heap. In this case the item will be
+      compared to each of its ancestors (nodes along the path from the
+      root to the original location of the new node) exactly once. This
+      means that the number of comparisons will be linear in the height
+      of the tree.</p>
+      <p>We see a similar story when extracting. In the worst case the
+      item moved to the root will end up back on the deepest level of
+      the heap. In this case the item will be compared to each node
+      along the path from the root to the final destination, plus each
+      sibling of those nodes. This means that the number of comparisons
+      will again be linear in the height of the tree (this time it will
+      be 2 times the height of the tree).</p>
+      <p>To determine our worst case running time for both algorithms,
+      all we need to do now is determine the height of the tree relative
+      to the number of items the heap contains. To do this, let’s begin
+      by approaching this in the opposite direction. We’ll start by
+      fixing the height of the tree, then using that to identify how
+      many items might be in the heap.</p>
+      <p>Suppose we have a heap that has height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>.
+      Because of the structure property, we know that all of the first
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">h-1</annotation></semantics></math>
+      levels must be completely full. A binary tree with
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">h-1</annotation></semantics></math>
+      levels, all completely full, will contain exactly
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>h</mi></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^{h}-1</annotation></semantics></math>
+      nodes (given by the geometric series
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>4</mn><mo>+</mo><mn>8</mn><mo>+</mo><mn>16</mn><mo>+</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>+</mo><msup><mn>2</mn><mrow><mi>h</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">1+2+4+8+16+...+2^{h-1}</annotation></semantics></math>).
+      The final layer may then have between
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+      and
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><mi>h</mi></msup><annotation encoding="application/x-tex">2^h</annotation></semantics></math>
+      nodes in the tree. This means that the number of nodes in a tree
+      of height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+      must be between
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><mi>h</mi></msup><annotation encoding="application/x-tex">2^h</annotation></semantics></math>
+      and
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><mrow><mi>h</mi><mo>+</mo><mn>1</mn></mrow></msup><annotation encoding="application/x-tex">2^{h+1}</annotation></semantics></math>.</p>
+      <p>We can this use this observation to derive the height from the
+      number of nodes. Suppose we have
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      nodes. We can identify an upper bound on the height of the tree by
+      finding the smallest value of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+      such that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>≤</mo><msup><mn>2</mn><mi>h</mi></msup></mrow><annotation encoding="application/x-tex">n\leq 2^h</annotation></semantics></math>.
+      Solving for
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+      we have
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>=</mo><mo stretchy="false" form="prefix">⌈</mo><mi>l</mi><mi>o</mi><msub><mi>g</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">⌉</mo></mrow><annotation encoding="application/x-tex">h = \lceil log_2(n) \rceil</annotation></semantics></math>.
+      This means that the height of a heap is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log(n))</annotation></semantics></math>,
+      where
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      is the number of items it contains.</p>
+      <p>Finally, we can see that because each of insert and extract are
+      linear in terms of the height of the tree, their running times
+      must be worst case
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log n)</annotation></semantics></math>.</p>
+      <h3 data-number="2.4.4" id="percolate-up-and-down"><span
+      class="header-section-number">2.4.4</span> Percolate Up and
+      Down</h3>
+      <p>Within the insert and extract algorithms there are two
+      subroutines that are <em>very</em> helpful when manipulating
+      heaps.</p>
+      <p>In insert we had a problem where a item was somewhere deep in
+      the tree (near to a leaf), and it’s possible that it belongs
+      somewhere shallower (near to the root) in order to restore the
+      heap property. In this case we repeatedly swapped that potentially
+      misplaced item with its parent until the heap property was
+      restored. This procedure is given the name <strong>percolate
+      up</strong>. The percolate up procedure can be started from any
+      item in the tree. The idea is that if there is some item that we
+      believe might be too deep (i.e. it might have a priority value
+      smaller than its parent), then we can begin swapping it upward
+      until it’s in the right position.</p>
+      <p>With extract we had the opposite problem. After moving the last
+      item into the root’s position we had a item that was shallow that
+      might need to go deeper in order to restore the heap property. In
+      this case we repeated swapped that item with its smaller child
+      until the heap property was restored. We call this procedure
+      <strong>percolate down</strong>. If there is some item that we
+      believe might be too shallow in the tree (i.e. it might have a
+      priority value larger than one of its children’s), then we can
+      begin swapping it downward until it’s in the right position.</p>
+      <p>With these subroutines, we can then rephrase the algorithm for
+      insert as:</p>
+      <ol type="1">
+      <li>Place the new item at the position dictated by the structure
+      property</li>
+      <li>Percolate up beginning from that item</li>
+      </ol>
+      <p>and the algorithm or extract as:</p>
+      <ol type="1">
+      <li>Save the value of the current root</li>
+      <li>Move the item in the last index of the array to index 1
+      (overwriting and taking the place of the old root)</li>
+      <li>Percolate down starting from index 1</li>
+      <li>Return the saved value of the original root</li>
+      </ol>
+      <p>Observe that both of these procedures’ worst case running times
+      are linear in the height of the tree, and therefore
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log n)</annotation></semantics></math>.</p>
+      <h3 data-number="2.4.5" id="increasedecrease-key"><span
+      class="header-section-number">2.4.5</span> Increase/Decrease
+      Key</h3>
+      <p>There are two more priority queue ADT operations that we have
+      thus far ignored - increase and decrease key. The idea here is
+      that if I want to change the priority value of an item, we might
+      need to rearrange items to restore the heap property.</p>
+      <p>If we want to increase the priority value of an item then we
+      will call <em>increase key</em>. Increasing the priority value
+      will result a item potentially being too high in the heap (too
+      near a root). This is because we previously knew that the item’s
+      priority was at least that of its parent, and no more than those
+      of its children. If we increase the priority value then it must
+      still be at least that of its parent, but it might not be less
+      than or equal to its children any longer. For this reason, we will
+      need to percolate down on the item whose priority changed.</p>
+      <p>If we want to decrease the priority value of an item then we
+      will call <em>decrease key</em>. This has the opposite effect. It
+      could now be that the item is too low in the tree because it’s
+      priority may have fallen below that of its parent. Therefore we
+      want to percolate up on that item.</p>
+      <h1 data-number="3" id="max-heaps"><span
+      class="header-section-number">3</span> Max Heaps</h1>
+      <p>Thus far our entire discussion has focused on heaps where the
+      minimum priority value is considered the most important. This
+      means that the heap property insures that each item’s priority is
+      not more than its children’s, and that the root holds the minimum
+      priority value. When we arrange elements in this way we call the
+      data structure a min heap.</p>
+      <p>All of our discussion is equally valid if we reverse all of our
+      inequalities. We could have defined our heap such that the largest
+      priority value is considered most important, and therefore would
+      be stored at the root. Such a heap is called a <strong>max
+      heap</strong>. Max heaps are exactly the same as min heaps except
+      the they must enforce the <strong>max heap property</strong>,
+      which states that the priority each item in the heap must be
+      <em>greater than or equal to</em> its children’s.</p>
+      <p>Be advised! The increase/decrease key operations in a max heap
+      cause percolation to happen in the opposite direction compared to
+      a min heap.</p>
+      <h1 data-number="4" id="floyds-build-heap-method"><span
+      class="header-section-number">4</span> Floyd’s Build Heap
+      Method</h1>
+      <p>Suppose we have a collection of items, and we want to create a
+      new heap containing all of those items. We could certainly do this
+      by simply adding all of the items into the heap one-by-one. If
+      there are
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      items to insert, and each insert operation in a heap requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">\log n</annotation></semantics></math>
+      time, the running time of this process is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n \log n)</annotation></semantics></math>.
+      It turns out there is a way we can build a heap containing a set
+      of elements in linear time! This algorithm is called
+      <strong>Floyd’s Build Heap Method</strong>.</p>
+      <p>Let’s start by describing the algorithm, and then we’ll
+      evaluated the running time.</p>
+      <p>Here’s how the algorithm operates:</p>
+      <ol type="1">
+      <li>Create an array of length
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">n+1</annotation></semantics></math>.</li>
+      <li>Add all the items into the array in any arbitrary order from
+      indices
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+      to
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>.</li>
+      <li>For each index in the array, starting from index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      and going down to index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>,
+      percolate down starting with that item.</li>
+      </ol>
+      <p>At first this might look no different from the naive <q>insert
+      into the heap one at a time</q> algorithm because we’re still
+      doing a percolation per item in the heap. There is one very
+      important observation about a binary tree that makes Floyd’s
+      method more efficient, though. That is that binary trees are much
+      bigger on the bottom compared to the top. In a completely full
+      heap for example (i.e. one where every level is completely full),
+      half of the nodes are leaves, one quarter of the nodes are in the
+      second-from-last level, one eighth of the nodes are in the
+      third-from-last level, and so on. By working from back to front in
+      the array, and percolating down, we ensure that the majority of
+      items (the leaves) have less distance to travel when percolating,
+      because they’re already close to the bottom.</p>
+      <p>Now let’s do a more formal analysis of the running time.
+      Because the first
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>n</mi><mn>2</mn></mfrac><annotation encoding="application/x-tex">\frac{n}{2}</annotation></semantics></math>
+      nodes are already leaves, percolating down requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+      comparisons. For the next
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>n</mi><mn>4</mn></mfrac><annotation encoding="application/x-tex">\frac{n}{4}</annotation></semantics></math>
+      nodes, each must participate in
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>
+      comparisons each in the worst case (each node must be compared
+      with both of its children). For the next
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>n</mi><mn>8</mn></mfrac><annotation encoding="application/x-tex">\frac{n}{8}</annotation></semantics></math>
+      nodes, each must participate in
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4</mn><annotation encoding="application/x-tex">4</annotation></semantics></math>
+      comparisons in the worst case (each must be compared to its
+      children, and then if we swap the children of the node we swapped
+      with). The next
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>n</mi><mn>16</mn></mfrac><annotation encoding="application/x-tex">\frac{n}{16}</annotation></semantics></math>
+      nodes, each must participate in
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>6</mn><annotation encoding="application/x-tex">6</annotation></semantics></math>
+      comparisons in the worst case. Continuing this process, the worst
+      case number of comparisons is given by the series
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mn>2</mn><mi>n</mi></mrow><mn>4</mn></mfrac><mo>+</mo><mfrac><mrow><mn>4</mn><mi>n</mi></mrow><mn>8</mn></mfrac><mo>+</mo><mfrac><mrow><mn>6</mn><mi>n</mi></mrow><mn>16</mn></mfrac><mo>+</mo><mfrac><mrow><mn>8</mn><mi>n</mi></mrow><mn>32</mn></mfrac><mo>+</mo><mfrac><mrow><mn>10</mn><mi>n</mi></mrow><mn>64</mn></mfrac><mo>+</mo><mi>.</mi><mi>.</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">\frac{2n}{4}+\frac{4n}{8}+\frac{6n}{16}+\frac{8n}{32}+\frac{10n}{64}+...</annotation></semantics></math>,
+      where we have one term per level of the tree. Or expressed using
+      sigma notation
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><msub><mo>log</mo><mn>2</mn></msub><mi>n</mi></mrow></msubsup><mfrac><mrow><mn>2</mn><mi>i</mi><mi>n</mi></mrow><msup><mn>2</mn><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msup></mfrac></mrow><annotation encoding="application/x-tex">\sum_{i=1}^{\log_2 n}\frac{2in}{2^{i+1}}</annotation></semantics></math>.</p>
+      <p>Let’s now figure out what this sums to. Let’s being with some
+      rearranging.</p>
+      <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><msub><mo>log</mo><mn>2</mn></msub><mi>n</mi></mrow></msubsup><mfrac><mrow><mn>2</mn><mi>i</mi><mi>n</mi></mrow><msup><mn>2</mn><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msup></mfrac><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><msub><mo>log</mo><mn>2</mn></msub><mi>n</mi></mrow></msubsup><mi>n</mi><mfrac><mi>i</mi><msup><mn>2</mn><mi>i</mi></msup></mfrac><mo>=</mo><mi>n</mi><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><msub><mo>log</mo><mn>2</mn></msub><mi>n</mi></mrow></msubsup><mfrac><mi>i</mi><msup><mn>2</mn><mi>i</mi></msup></mfrac></mrow><annotation encoding="application/x-tex">\sum_{i=1}^{\log_2 n}\frac{2in}{2^{i+1}} = \sum_{i=1}^{\log_2 n}n\frac{i}{2^i} = n \sum_{i=1}^{\log_2 n}\frac{i}{2^i}</annotation></semantics></math></p>
+      <p>It turns out that this will be easier to analyze if we consider
+      this as an infinite series. So far we’ve expressed the running
+      time as
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><msub><mo>log</mo><mn>2</mn></msub><mi>n</mi></mrow></msubsup><mfrac><mi>i</mi><msup><mn>2</mn><mi>i</mi></msup></mfrac></mrow><annotation encoding="application/x-tex">n\sum_{i=1}^{\log_2 n}\frac{i}{2^i}</annotation></semantics></math>,
+      and we can be certain that the following sum is an upper bound on
+      the running time:
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>∞</mi></msubsup><mfrac><mi>i</mi><msup><mn>2</mn><mi>i</mi></msup></mfrac></mrow><annotation encoding="application/x-tex">n\sum_{i=1}^{\infty}\frac{i}{2^i}</annotation></semantics></math>.
+      We’re going to skip the calculus on this, but the series
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>∞</mi></msubsup><mfrac><mi>i</mi><msup><mn>2</mn><mi>i</mi></msup></mfrac></mrow><annotation encoding="application/x-tex">\sum_{i=1}^{\infty}\frac{i}{2^i}</annotation></semantics></math>
+      converges to
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>,
+      and so our running time is upper bounded by
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>n</mi></mrow><annotation encoding="application/x-tex">2n</annotation></semantics></math>,
+      giving a worst case running time of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math>.
+      Because we upper bounded our running time by swapping out a finite
+      series for an infinite series we only have an upper bound at the
+      moment. We can easily establish that the running time is also
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Ω</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Omega(n)</annotation></semantics></math>
+      because the first time in this summation is itself
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>.
+      Therefore our final running time is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>.</p>
+            </div>
+    </div>
+  </div>
+  <footer>
+          Copyright © 2026 Paul G. Allen School of Computer Science & Engineering, University of Washington. Site design by Nathan Brunelle.
+              <p>Released under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /> CC-BY-NC-SA 4.0</a> license</a>.
+      </p>
+        <p>Last updated 2026-09-28 19:32</p>
+  </footer>
+</body>
+</main>
+</html>

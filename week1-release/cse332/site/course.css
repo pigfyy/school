@@ -1,0 +1,106 @@
+/* CSE 332 week 1 · course.css: widget styles only. Loaded after base.css; uses only base tokens.
+   Series colors: a1 (teal) = live cells, nodes, series 1; a2 (rust) = back pointer, amortized spikes, series 2; a3 (violet) = series 3, ranges. */
+
+/* ---------------------------------------------------------------- shared small pieces */
+.hero .question { font-size: var(--step-2); line-height: 1.2; font-weight: 600; max-width: 30ch; margin: 0 0 1.25rem; letter-spacing: -0.01em; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+.hero-grid .panel { margin: 0; min-width: 0; }
+.panel { min-width: 0; }
+.panel h4 { margin: 0 0 0.6rem; font-family: var(--mono); font-size: 0.76rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+.split { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+.note { font-size: 0.92rem; color: var(--ink-soft); }
+.out { display: block; }
+.trunc { background: var(--note-tint); border-left: 4px solid var(--note); padding: 0.4rem 0.7rem; border-radius: 0 var(--r) var(--r) 0; font-size: 0.95rem; }
+.log { font-family: var(--mono); font-size: 0.82rem; max-height: 9rem; overflow-y: auto; background: var(--paper); border-radius: var(--r); padding: 0.4rem 0.6rem; margin: 0.5rem 0 0; }
+.log div { white-space: pre-wrap; }
+.table-wrap { overflow-x: auto; max-width: 100%; }
+table.num td.r, table.num th.r { text-align: right; padding-right: 1.25rem; }
+table.num tr.win td { background: var(--right-tint); }
+.brute { font-size: 0.93rem; color: var(--ink-soft); }
+.brute.ok { color: var(--right); font-weight: 600; }
+.java-blank { display: inline-flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+input.mono { font-family: var(--mono); font-size: 0.92rem; }
+input[type="number"] { width: 6rem; }
+.work-preview { white-space: pre-wrap; background: var(--paper); border-radius: var(--r); padding: 0.5rem 0.65rem; margin-top: 0.4rem; font-size: 0.95rem; }
+.conflict-copy { font-size: 0.9rem; background: var(--paper); border-left: 3px solid var(--note); padding: 0.4rem 0.6rem; margin-top: 0.4rem; white-space: pre-wrap; }
+.check .opts { margin-bottom: 0.5rem; }
+.check .why, .opts + .why { display: block; font-size: 0.93rem; color: var(--ink-soft); margin: 0.35rem 0 0; }
+.check .why[hidden] { display: none; }
+.rule.honest { border-left-color: var(--note); background: var(--note-tint); }
+.rule.honest strong:first-child { color: var(--note); }
+.rule, .cheat section, .prose { min-width: 0; overflow-wrap: anywhere; }
+.week { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.week span { display: block; }
+.answer { list-style-position: inside; }
+
+/* ---------------------------------------------------------------- code (listings are base pre.code; the stepper is dark) */
+pre.code .cm { color: var(--ink-faint); font-style: italic; }
+.code-wrap { background: var(--night); color: var(--night-ink); border-radius: var(--r-lg); padding: 0.75rem; overflow-x: auto; min-width: 0; }
+.code-wrap .code-lines { width: max-content; min-width: 100%; }
+.code-lines { list-style: none; margin: 0; padding: 0; counter-reset: ln; font-family: var(--mono); font-size: 0.86rem; }
+.code-lines li { counter-increment: ln; white-space: pre; padding: 0 0.5rem 0 0; border-radius: 3px; display: grid; grid-template-columns: 2.2rem max-content 1fr; gap: 0.5rem; align-items: baseline; }
+.code-lines li::before { content: counter(ln); color: var(--night-soft); text-align: right; }
+.code-lines li .tally { color: var(--a2-on-dark); font-family: var(--mono); font-size: 0.78rem; justify-self: end; }
+.code-lines li.on { background: var(--night-3); box-shadow: inset 3px 0 0 var(--a1-on-dark); }
+.code-lines li.on::before { color: var(--a1-on-dark); }
+
+/* ---------------------------------------------------------------- memory cells, nodes, stacks */
+.cells { display: flex; flex-wrap: wrap; gap: 0.35rem 0.3rem; align-items: flex-end; margin: 0.75rem 0 1rem; }
+.cell { display: flex; flex-direction: column; align-items: center; min-width: 2.9rem; }
+.cell b {
+  display: block; min-width: 2.9rem; min-height: 2.6rem; padding: 0.35rem 0.4rem 0.25rem;
+  font-family: var(--mono); font-size: var(--step-0); font-weight: 600; text-align: center;
+  background: var(--a1-tint); border: 1.5px solid var(--a1); border-radius: var(--r);
+}
+.cell.empty b { background: var(--surface); border-style: dashed; border-color: var(--line-strong); color: transparent; }
+.cell .idx { font-family: var(--mono); font-size: 0.74rem; color: var(--ink-soft); margin-top: 0.15rem; }
+.cell .ptr { font-family: var(--mono); font-size: 0.72rem; font-weight: 600; min-height: 1.1rem; color: var(--a1); white-space: nowrap; }
+.cell .ptr.back { color: var(--a2); }
+.cell.just b { animation: pop 0.35s ease-out; }
+.nodes { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem; margin: 0.75rem 0 1rem; }
+.node { display: flex; flex-direction: column; align-items: center; }
+.node b { display: flex; align-items: center; justify-content: center; min-width: 3rem; height: 2.6rem; font-family: var(--mono); font-size: var(--step-0); font-weight: 600; background: var(--a1-tint); border: 1.5px solid var(--a1); border-radius: var(--r); }
+.node .ptr { font-family: var(--mono); font-size: 0.72rem; font-weight: 600; color: var(--a1); min-height: 1.1rem; }
+.node .ptr.back { color: var(--a2); }
+.arrow { color: var(--ink-soft); font-family: var(--mono); font-size: var(--step-1); padding: 0 0.15rem 1.1rem; }
+.null { color: var(--ink-soft); font-family: var(--mono); padding-bottom: 1.1rem; }
+.stackcol { display: flex; flex-direction: column-reverse; gap: 0.25rem; min-height: 3rem; width: 7rem; border-bottom: 3px solid var(--ink); padding-bottom: 0.25rem; }
+.stackcol b { text-align: center; padding: 0.3rem; font-family: var(--mono); font-weight: 600; background: var(--a1-tint); border: 1.5px solid var(--a1); border-radius: var(--r); }
+.stackcol b.top { background: var(--a1); color: var(--surface); }
+.counter { display: inline-flex; align-items: baseline; gap: 0.5rem; background: var(--a1-tint); border-radius: var(--r); padding: 0.35rem 0.75rem; font-weight: 600; }
+.counter b { font-family: var(--mono); font-size: var(--step-2); color: var(--a1); }
+
+/* ---------------------------------------------------------------- charts */
+.chart-box { position: relative; }
+.chart { width: 100%; height: auto; display: block; }
+.chart text { font-family: var(--mono); font-size: 12px; fill: var(--ink-soft); }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .axis { stroke: var(--line-strong); stroke-width: 1; }
+.chart .series { fill: none; stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.chart .dot { stroke: var(--surface); stroke-width: 2; }
+.chart .label { fill: var(--ink); font-weight: 600; }
+.chart .hover-line { stroke: var(--ink-soft); stroke-width: 1; }
+.legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; font-family: var(--mono); font-size: 0.82rem; margin: 0.25rem 0 0.5rem; }
+.legend .key { display: inline-block; width: 1.2rem; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 0.4rem; border-radius: 2px; }
+.tip { position: absolute; pointer-events: none; background: var(--night); color: var(--night-ink); border-radius: var(--r); padding: 0.4rem 0.6rem; font-family: var(--mono); font-size: 0.78rem; line-height: 1.4; white-space: nowrap; transform: translate(-50%, -110%); }
+
+/* ---------------------------------------------------------------- notices (transient only) */
+.toast.bad { border-left-color: var(--a2-on-dark); }
+.toast.info { border-left-color: var(--a3-on-dark); }
+.toast > span { flex: 1; }
+.toast button { background: none; border: 0; color: inherit; font: inherit; cursor: pointer; padding: 0; opacity: 0.8; }
+
+/* ---------------------------------------------------------------- long content stays inside its box */
+#cn .controls label { flex-wrap: wrap; max-width: 100%; }
+#cn-claim { max-width: 100%; min-width: 0; width: 34rem; }
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pop { from { transform: scale(0.85); } to { transform: none; } }
+}
+
+@media (max-width: 860px) {
+  .split, .hero-grid, .week { grid-template-columns: minmax(0, 1fr); }
+  .cell, .cell b { min-width: 2.4rem; }
+  .cell b { font-size: var(--step-0); }
+  .task { padding: 1.1rem 1rem 1rem; }
+}

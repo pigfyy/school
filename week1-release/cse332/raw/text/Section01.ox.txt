@@ -1,0 +1,316 @@
+=== SLIDE 1
+Section 1
+ADTs, Data Structures, Java Generics
+=== SLIDE 2
+Hello, We’re [TAs]
+Name
+Pronouns
+Year
+Hometown
+Hobbies
+Fun fact
+Name
+Pronouns
+Year
+Hometown
+Hobbies
+Fun fact
+=== SLIDE 3
+Icebreaker Activity
+Describe an icebreaker activity here
+Should allow folks to get up and introduce themselves to each other
+=== SLIDE 4
+Abstract Data Type (ADT)
+From lecture: 
+Mathematical description of a “thing” with set of operations on that “thing”
+Main Idea:
+Based on the point of view from the USER (as opposed to the implementer)
+3 Descriptors:
+Operation (e.g. stack has a push method operation)
+Behaviour (e.g. stack has LIFO behaviour)
+Data Type (e.g. stack can store any elements)
+--- NOTES:
+Review Definition here
+=== SLIDE 5
+Data Structure
+From lecture: 
+A specific organization of data and family of algorithms for implementing an ADT
+Main Idea:
+Based on the point of view from the IMPLEMENTER (as opposed to the user)
+i.e. it is the specification (data + algorithms) of an ADT
+e.g. stack can use an underlying array data structure and specific pop/push algorithms
+--- NOTES:
+Review Definition here
+=== SLIDE 6
+List Abstract Data Type
+Summary/Idea: An indexable collection of items held in a sequence
+Identify List operations:
+Identify List Data Structures:
+--- NOTES:
+Ask students to identify operations they would expect to be able to do on this type of collection
+Next ask for data structures that could be used to achieve that (ask for good examples and bad examples)
+Then discuss at a high level how you might be able to perform those operations using that data structure
+=== SLIDE 7
+List Abstract Data Type (Answers)
+Summary/Idea: An indexable collection of items held in a sequence
+Identify List operations:
+Get
+Add
+Remove 
+Identify List Data Structures:
+Linked List
+Array List 
+--- NOTES:
+Some examples
+=== SLIDE 8
+Stack Abstract Data Type
+Summary/Idea: A collection of items accesses in LIFO order
+Identify Stack Operations:
+Identify Stack Data Structures:
+--- NOTES:
+Ask students to identify operations they would expect to be able to do on this type of collection
+Next ask for data structures that could be used to achieve that (ask for good examples and bad examples)
+Then discuss at a high level how you might be able to perform those operations using that data structure
+=== SLIDE 9
+Stack Abstract Data Type (Answers)
+Summary/Idea: A collection of items accesses in LIFO order
+Identify Stack Operations:
+Push
+Pop
+Peek
+Identify Stack Data Structures:
+Linked list
+Array List (resizable array)
+--- NOTES:
+Some examples
+=== SLIDE 10
+Queue Abstract Data Type
+Summary/Idea: A collection of items accessed in FIFO order
+Identify Queue Operations:
+Identify Queue Data Structures:
+--- NOTES:
+Ask students to identify operations they would expect to be able to do on this type of collection
+Next ask for data structures that could be used to achieve that (ask for good examples and bad examples)
+Then discuss at a high level how you might be able to perform those operations using that data structure
+=== SLIDE 11
+Queue Abstract Data Type (Answers)
+Summary/Idea: A collection of items accessed in FIFO order
+Identify Queue Operations:
+Enqueue 
+Dequeue 
+Peek 
+Identify Queue Data Structures:
+Linked List
+Array List (resizable array)
+Circular Array
+--- NOTES:
+Some examples
+=== SLIDE 12
+Set Abstract Data Type
+Summary/Idea: An unordered collection of items without duplicates
+Identify Set Operations:
+Identify Set Data Structures:
+--- NOTES:
+Ask students to identify operations they would expect to be able to do on this type of collection
+Next ask for data structures that could be used to achieve that (ask for good examples and bad examples)
+Then discuss at a high level how you might be able to perform those operations using that data structure
+=== SLIDE 13
+Set Abstract Data Type (Answers)
+Summary/Idea: An unordered collection of items without duplicates
+Identify Set Operations:
+Add
+Remove
+Contains
+Identify Set Data Structures:
+Linked List
+Array List
+Binary Tree
+Hash Set
+--- NOTES:
+Some examples
+=== SLIDE 14
+Pair ADT
+Idea: One object which holds an ordered pair of items
+Operations:
+Set first
+Get first
+Set second
+Get second
+Data Structure:
+An object with a first and second parameter
+--- NOTES:
+All generics code examples we’ll see relate to this Pair ADT. The idea is simple, it represents an ordered pair of things. One object to contain 2 things.
+=== SLIDE 15
+IntPair Data structure
+public class IntPair {
+    private int first;
+    private int second;
+    public IntPair(int first, int second){
+        this.first = first;
+        this.second = second;
+    }
+    public int getFirst(){
+        return first;
+    }
+    public int getSecond(){
+        return second;
+    }
+    public void setFirst(int newFirst){
+        this.first = newFirst;
+    }
+    public void setSecond(int newSecond){
+        this.second = newSecond;
+    }
+}
+This Pair data structure is set up to work exclusively with Integers. We cannot easily use this to hold pairs of doubles, strings, nodes, etc. 
+We would need to re-implement the class for each type!
+--- NOTES:
+This is how you might have done this in cse123/143. You pick the type, then hard-code the type (in this case ints).
+When we use things like ArrayList, though, we must provide the type. The java developers made it work for any “generic” type you might want! You just provide the type (almost like an argument, but in <>), and you can only add things of that type, and you’re guaranteed that what you remove will also be of that type!
+Let’s see how to do that for ourselves!
+=== SLIDE 16
+Java Generics
+Java is a strongly typed language, meaning everything needs a type
+Java requires it know what type of things every collection holds
+“Generics” is the name of the strategy Java uses to do this
+Example: ArrayList<String> myArrayList = new ArrayList<>();
+Name of the type that the array list contains goes inside <>
+The ArrayList implementation is written to work for any kind of Object
+Since we’re going to be implementing data structures this quarter, we need to know how to use these!
+Note: different programming languages solve this problem in different ways, we’re just presenting on how Java does it.
+=== SLIDE 17
+LikePair Data structure
+public class LikePair<T> {
+    private T first;
+    private T second;
+    public LikePair(T first, T second){
+        this.first = first;
+        this.second = second;
+    }
+    public T getFirst(){
+        return first;
+    }
+    public T getSecond(){
+        return second;
+    }
+    public void setFirst(T newFirst){
+        this.first = newFirst;
+    }
+    public void setSecond(T newSecond){
+        this.second = newSecond;
+    }
+}
+Using generics we essentially treat the type itself as a field in the class.
+We put <T> to indicate that the type that the pair will contain will be called “T”, and now we can use it just like we might use int or String!
+--- NOTES:
+We will also use the <> (diamond operator) to indicate when we are talking about a type. In this case we declare that the class is going to need a generic type defined for it. Whatever that type may be, we’re going to be calling it T in this implementation, because T is in the diamond operator.
+Within the class we can now use T as if it is a known type (i.e. instead of saying String or Integer we can just say T).
+Then we can construct this object just like we saw with ArrayLists. Example: LikePair<String> lp = new LikePair<>(“A”,”B”)
+=== SLIDE 18
+UnlikePair Data structure
+public class UnlikePair<A,B> {
+    private A first;
+    private B second;
+    public UnlikePair(T first, T second){
+        this.first = first;
+        this.second = second;
+    }
+    public T getFirst(){
+        return first;
+    }
+    public T getSecond(){
+        return second;
+    }
+    public void setFirst(T newFirst){
+        this.first = newFirst;
+    }
+    public void setSecond(T newSecond){
+        this.second = newSecond;
+    }
+}
+We can even have multiple types!
+Here, the first item will be of type A, the second item will be of type B.
+Replace the Ts in the rest of the implementation to finish it! 
+--- NOTES:
+We can also require multiple types. Here we have 2 types that we’ve called A and B. This is what the HashMap class does in java! You need a type for the keys and a type for the objects.
+=== SLIDE 19
+Tuple ADT
+Idea: One object which holds a fixed number of items. 
+Operations:
+Get ith
+Return the ith object in the tuple
+Set ith
+Change the ith object in the tuple
+Data Structure:
+An object with an array
+--- NOTES:
+For this next example we have a Tuple ADT, that really isn’t any different from a fixed-size array, but we wanted to talk about it just to demonstrate a weird java quirk when it comes to arrays.
+=== SLIDE 20
+Tuple Data structure
+public class Tuple<T> {
+    private final T[] data;
+    public Tuple(T[] tuple){
+  data = (T[]) new Object[tuple.length]; // this is a weird thing, but is necessary. Java does not allow    "new T[5]", so instead we must do "(T[]) new Object[5]". That is, create an array of Objects and then cast it to an array of Ts.
+        for(int i = 0; i < tuple.length; i++){
+            data[i] = tuple[i];
+        }
+    }
+    public T getIth(int i){
+        return data[i];
+    }
+    public void setIth(int i, T value){
+        data[i] = value;
+    }
+}
+--- NOTES:
+Notice that in the constructor here we want to copy everything over to a new array of type T. To do this, though, we first create an array of Objects, then cast that array to an array of type T. Why do we do it that way? The short answer is because Java makes us! You cannot do something like “new T[10]”. This strategy is a workaround.
+The reason why this is a problem is complex and is a side-effect of java wanting to add support for generics after its initial release, plus a desire for backwards compatibility. If you’re curious to see more details, search for “java type erasure”.
+=== SLIDE 21
+LikeAnimalPair Data structure
+public class LikeAnimalPair<T extends Animal> {
+    private T first;
+    private T second;
+    public LikeAnimalPair(T first, T second){
+        this.first = first;
+        this.second = second;
+    }
+    public T getFirst(){
+        return first;
+    }
+    public T getSecond(){
+        return second;
+    }
+    public void setFirst(T newFirst){
+        this.first = newFirst;
+    }
+    public void setSecond(T newSecond){
+        this.second = newSecond;
+    }
+    public String toString(){
+        return "(" + first + "," + second+ ")";
+    }
+}
+Suppose we wanted to be able to assume that a type inherited from a particular class. We can actually use the “extends” keyword to require a type to have a superclass!
+In this example, both items need to be the same animal
+--- NOTES:
+We may sometimes want to be able to guarantee that a generic type has a specific superclass. We can do that by saying that it “extends Superclass”.
+In this example can have any type T here, as long as T is an Animal or a subclass of Animal. Why is this useful? We may want to have pairs of animals, but don’t want those animals to be different. For example, I may want to have a pair of dogs, meaning no cats allowed! If we just said “first” and “second” had type “Animal” then we can’t enforce that first and second are the same type. Here we declare T to be “Dog”, and now first and second must both be dogs.
+LikeAnimalPair<Animal> p = new LikeAnimalPair<>(new Dog(), new Cat())
+=== SLIDE 22
+Your turn!
+Implement the following pair data structures:
+TypeSubtypePair
+The first item is of some type, the second item is of a subtype of the first
+IntOtherPair
+The first item is an integer, the second item is some other type
+ItemPairPair
+The first item is of some type, the second item is a LikePair of things whose type inherits the first item’s
+ItemArrayPair
+The first item is of some type, the second item is an array of objects of another type
+ComparablePair (challenge!!!)
+A pair of items such that both of them implement the comparable interface.
+A comparable pair must itself be comparable!
+--- NOTES:
+Have students pair up and work on as many of these as they can. Solutions are in the “code” folder (which will be released to the students). Recommend they attempt them in this order
+Wander the room and offer help. 
+When there are 3 minutes left, get a show of hands to see how far people got. Go over the first example that many people did not complete.

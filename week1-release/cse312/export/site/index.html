@@ -1,0 +1,1642 @@
+<!doctype html>
+<!--
+  CSE 312 (Autumn 2026) · Week 1 teaching site: Lecture 1 (Wed Sept 30), Section 1 (Thu Oct 1), Lecture 2 (Fri Oct 2).
+  Built with the course-teaching-site skill from the official 26au materials (see ../raw/sources.json and ../COVERAGE.md).
+  Static: no build step and no network requests (KaTeX is vendored under vendor/ and the fonts under fonts/).
+
+  Stateful items. Every one has a stable semantic id; see ../INTEGRATION.md for the rules.
+    article.task[data-id]            problem       (.answer-spec[data-part-id] = one answer box / part)
+    div.check[data-id]               quick check   (one box at the end of a lecture module)
+    li.cyu[data-id]                  quiz question (data-kind="mc" with label[data-opt] options, or "num")
+  Answer specs: data-answer (exact value, compared exactly with BigInt rationals), data-type="formula" + data-vars,
+  data-type="yesno", data-type="self". ul.miscon > li[data-expr][data-tag] lists answers that signal a known mistake.
+  Change an id whenever the question or its answer changes.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE 312 week 1 · So you think you can count?</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="course.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+
+<nav class="rail" aria-label="Week 1 modules">
+  <div class="rail-top">
+    <a class="brand" href="#home"><span class="brand-cmd">cse312 <b>week 1</b></span><small>Counting: Sept 30 – Oct 2</small></a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="rail-body">Contents</button>
+  </div>
+  <div class="rail-body" id="rail-body">
+  <div>
+    <h2>Lecture 1 · Wed Sept 30</h2>
+    <ol class="modules">
+      <li><a href="#l1-sets"><span>Counting means finding \(|S|\)</span></a></li>
+      <li><a href="#l1-sum"><span>The sum rule</span></a></li>
+      <li><a href="#l1-product"><span>The product rule</span></a></li>
+      <li><a href="#l1-perms"><span>Permutations and complements</span></a></li>
+      <li><a href="#l1-kperms"><span>\(k\)-permutations</span></a></li>
+      <li><a href="#l1-books"><span>Representation matters</span></a></li>
+      <li><a href="#l1-quiz"><span>Check your understanding</span></a></li>
+    </ol>
+  </div>
+  <div>
+    <h2>Section 1 · Thu Oct 1</h2>
+    <ol class="modules">
+      <li><a href="#s1-review"><span>Review and sets</span></a></li>
+      <li><a href="#s1-basic"><span>Basic counting</span></a></li>
+      <li><a href="#s1-more"><span>Harder counting</span></a></li>
+    </ol>
+  </div>
+  <div>
+    <h2>Lecture 2 · Fri Oct 2</h2>
+    <ol class="modules">
+      <li><a href="#l2-combos"><span>Combinations</span></a></li>
+      <li><a href="#l2-paths"><span>Counting paths</span></a></li>
+      <li><a href="#l2-stars"><span>Stars and bars</span></a></li>
+      <li><a href="#l2-anagrams"><span>Anagrams and multinomials</span></a></li>
+      <li><a href="#l2-binomial"><span>The binomial theorem</span></a></li>
+      <li><a href="#l2-quiz"><span>Check your understanding</span></a></li>
+    </ol>
+  </div>
+  <div>
+    <h2>Later</h2>
+    <ul class="later-list">
+      <li><span>Wed Oct 7, 11:59 pm · Problem Set 1 due</span><em><a href="https://courses.cs.washington.edu/courses/cse312/26au/homework/pset1.pdf" target="_blank" rel="noopener">pset1.pdf</a></em></li>
+    </ul>
+  </div>
+  <div>
+    <h2>Reference</h2>
+    <ul class="plain-links">
+      <li><a href="#readings">Readings</a></li>
+      <li><a href="#cheatsheet">Cheat sheet</a></li>
+      <li><a href="#home">Week overview</a></li>
+    </ul>
+  </div>
+
+  <p class="rail-foot"><kbd>←</kbd> <kbd>→</kbd> modules · <kbd>N</kbd> next step · <kbd>H</kbd> next hint</p>
+  </div>
+</nav>
+
+<main id="main" tabindex="-1">
+
+<!-- ================================================================ HOME -->
+<section class="page" id="home" data-title="Week overview">
+  <div class="hero">
+    <h1>So you think you can count?</h1>
+    <p class="question">How many 5-letter strings use 5 different letters? And how many 5-letter <em>sets</em> are there?</p>
+    <p class="where">Type a word into the slots. Each slot has fewer choices because earlier letters are used up. Then switch on “ignore order”.</p>
+
+    <div class="slots letter-slots" id="hero-slots"></div>
+    <div class="alphabet" id="hero-alpha" aria-hidden="true"></div>
+    <div class="controls">
+      <button class="chip" id="hero-repeat" aria-pressed="false">Allow repeated letters</button>
+      <button class="chip" id="hero-order" aria-pressed="false">Ignore order (count sets)</button>
+      <button class="btn" id="hero-clear">Clear</button>
+    </div>
+    <p class="out" id="hero-msg" role="status"></p>
+    <div class="slots" id="hero-strip"></div>
+  </div>
+
+  <div class="prose">
+    <p>That strip of slots is Lecture 1: break an outcome into a sequence of choices, write how many options each choice has <em>given the earlier ones</em>, and multiply. Turning on “ignore order” is Lecture 2: every set of 5 letters was counted once for each of its \(5!\) orderings, so divide by \(5!\).</p>
+  </div>
+
+  <h2>This week</h2>
+  <div class="week">
+    <a class="day" href="#l1-sets"><strong>Wed Sept 30</strong><span>Lecture 1: Introduction · So you think you can count?</span><span>Reading 1.1–1.2.1 · optional set theory review · PSet 1 out</span></a>
+    <a class="day" href="#s1-review"><strong>Thu Oct 1</strong><span>Section 1: Counting practice</span><span>Review + 9 tasks, with the official solutions</span></a>
+    <a class="day" href="#l2-combos"><strong>Fri Oct 2</strong><span>Lecture 2: Combinations and binomial coefficients</span><span>Reading 1.2.2–1.3.1</span></a>
+  </div>
+
+  <h2>Due dates</h2>
+  <table class="plain">
+    <tr><th>Concept check, Lecture 1</th><td>Gradescope, due 1:00 pm Fri, Oct 2 (before Lecture 2)</td></tr>
+    <tr><th>Concept check, Lecture 2</th><td>Gradescope, due 1:00 pm on the day of the next lecture (Lecture 3 is Mon, Oct 5)</td></tr>
+    <tr><th>Problem Set 1</th><td>Out Wed, Sept 30 · due <strong>Wed, Oct 7, 11:59 pm</strong> on Gradescope · <a href="https://courses.cs.washington.edu/courses/cse312/26au/homework/pset1.pdf" target="_blank" rel="noopener">pset1.pdf</a></td></tr>
+  </table>
+  <p class="rule"><strong>Graded work isn't on this site.</strong> Concept checks and problem sets are graded, and the course’s <a href="https://courses.cs.washington.edu/courses/cse312/26au/aipolicy.php" target="_blank" rel="noopener">AI policy</a> doesn’t allow AI on graded work. This site has no PSet or concept-check problems or answers. Everything here is ungraded practice built from the lectures, the section handout and its posted solutions, and the textbook.</p>
+
+  <h2>How to use this site</h2>
+  <div class="prose">
+    <ul>
+      <li>Each lecture is split into modules in the lecture’s order. Each module has a short explanation, something to click, and a quick check you can put to the room.</li>
+      <li><strong>Teaching notes</strong> (gold, open by default; click the heading to collapse) hold talking points, questions to ask, and common mistakes.</li>
+      <li><strong>Section problems</strong> can be answered on the page. Type your answer, write your work, and ask for hints if you need them. Solutions stay hidden until you press <strong>Show solution</strong>, then appear one step at a time. Many have a <strong>Check by brute force</strong> button that tries every case.</li>
+      <li>Each lecture ends with <strong>Check your understanding</strong>, a 10-question wrap-up quiz.</li>
+      <li>Answer boxes accept exact expressions such as <code>26*25*24</code>, <code>2^5</code>, <code>13!</code>, <code>C(10,3)</code>, <code>P(8,3)</code> or <code>10!/(3!7!)</code>. They’re compared exactly, digit for digit, even for huge numbers.</li>
+      <li>Your answers and work are kept in this browser and come back when you return.</li>
+    </ul>
+  </div>
+
+  <h2>Course essentials</h2>
+  <table class="plain">
+    <tr><th>Instructors</th><td>Anup Rao, Paul Beame, plus 11 TAs</td></tr>
+    <tr><th>Lectures</th><td>MWF, CSE2 G01 9:30 and MGH 389 1:30. Recorded, not streamed. Poll Everywhere with your UW NetID.</td></tr>
+    <tr><th>Sections</th><td>Thursdays, not recorded. Started this week.</td></tr>
+    <tr><th>Help</th><td>Office hours start Friday (see the staff page). Ed Discussion for questions; private posts reach staff only. Don’t post solutions to current homework.</td></tr>
+    <tr><th>Grading</th><td>Concept checks 3% (1 per lecture, lowest 4 dropped) · 9 problem sets 25% · Midterm 24% (in class, Wed Nov 4) · Final 48% (Mon Dec 14, 12:30–2:20)</td></tr>
+    <tr><th>Problem sets</th><td>Solved individually. Discussion is allowed, but list your collaborators and write your own solution. Show your work. Six late days total, at most two per PSet.</td></tr>
+    <tr><th>Links</th><td><a href="https://courses.cs.washington.edu/courses/cse312/26au/" target="_blank" rel="noopener">Schedule</a> · <a href="https://courses.cs.washington.edu/courses/cse312/26au/syllabus.php" target="_blank" rel="noopener">Syllabus</a> · <a href="https://courses.cs.washington.edu/courses/cse312/26au/aipolicy.php" target="_blank" rel="noopener">AI policy</a> · <a href="https://courses.cs.washington.edu/courses/cse312/26au/staff.php" target="_blank" rel="noopener">Staff and office hours</a> · <a href="https://courses.cs.washington.edu/courses/cse312/26au/files/defs_thms.pdf" target="_blank" rel="noopener">Theorems and definitions</a> · <a href="https://courses.cs.washington.edu/courses/cse312/22au/files/Prob_Stat_for_CS_Book.pdf" target="_blank" rel="noopener">Textbook</a></td></tr>
+    <tr><th>Slides</th><td><a href="https://courses.cs.washington.edu/courses/cse312/26au/slides/Lecture-01-counting-rules.pdf" target="_blank" rel="noopener">Lecture 1</a> (recordings <a href="https://uw.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=fb0cca90-a9b7-4adb-a2a2-b4d1000f16a7" target="_blank" rel="noopener">A</a>, <a href="https://uw.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=f5c45427-4c11-4ee0-9955-b4d0016c5a6f" target="_blank" rel="noopener">B</a>) · <a href="https://courses.cs.washington.edu/courses/cse312/26au/slides/Lecture-02-combinations-and-binomial-coefficients.pdf" target="_blank" rel="noopener">Lecture 2</a> (recordings <a href="https://uw.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=17de599d-f5e7-4be5-96af-b4d1000f1c39" target="_blank" rel="noopener">A</a>, <a href="https://uw.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=cc4fd935-fc7a-4261-a751-b4d0016c5b8a" target="_blank" rel="noopener">B</a>) · <a href="https://courses.cs.washington.edu/courses/cse312/26au/sections/section01.pdf" target="_blank" rel="noopener">Section 1</a> (<a href="https://courses.cs.washington.edu/courses/cse312/26au/sections/section01_solutions.pdf" target="_blank" rel="noopener">solutions</a>)</td></tr>
+  </table>
+
+  <details class="notes" open>
+    <summary>Teaching notes: opening the course</summary>
+    <ul>
+      <li>Lecture 1 lays out the course as <em>counting → what is probability → properties of probability → continuous probability → applications</em>. Counting comes first because discrete probability is counting: \(P(\text{black hair}) = \frac{\#\text{ students with black hair}}{\#\text{ students}}\).</li>
+      <li>Where randomness shows up in CS: modeling inputs (ML, fuzzing, algorithm analysis), validating designs (user studies, HCI), hiding information (crypto, privacy, fault tolerance, security), and simpler, faster designs (data structures, algorithms, ML).</li>
+      <li>The motivating questions from the slides: “How many ways to assign 7 TAs to 5 sections, two TAs per section, no TA in more than two sections?” and “How many positive integer solutions \((x,y,z)\) does \(x^3+y^3=z^3\) have?” Every counting question comes down to finding \(|S|\) for some set \(S\). Counting can be very hard: the second question is a famous theorem (Fermat’s Last Theorem for \(n=3\); there are none).</li>
+      <li>Lecture 2 opened with logistics: PSet 1 is due 11:59 pm next Wednesday; read its first page on how to write up solutions; section solutions are good examples of write-ups. On Ed it’s fine to discuss course content and ask what a homework problem is asking, but not to discuss solutions to current homework.</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ================================================================ L1: SETS -->
+<section class="page" id="l1-sets" data-title="Counting means finding |S|">
+  <p class="where">Lecture 1 · Wed Sept 30 · optional set theory review · Reading 1.1</p>
+  <h1>Counting means finding \(|S|\)</h1>
+  <div class="prose">
+    <p>Every counting question in this course has the same shape: describe the objects as a set \(S\), then find its size \(|S|\). This week’s tools need a few set ideas from the optional review.</p>
+  </div>
+
+  <div class="rule">
+    <p><strong>Sets vs. sequences.</strong> A set \(\{a,b,c\}\) ignores order and repeats: \(\{3,1,2,3,1\} = \{1,2,3\}\). A sequence (tuple) \((a,b,c)\) keeps both: \((1,2) \ne (2,1)\).</p>
+    <p>\(|S|\) is the number of distinct elements of \(S\). \(|\varnothing| = 0\), but \(|\{\varnothing\}| = 1\).</p>
+  </div>
+
+  <h2>Set operations</h2>
+  <div class="panel" id="setops">
+    <p class="where">Click elements to move them between \(A\) and \(B\). The universe is \(U=\{1,\dots,8\}\).</p>
+    <div class="setops-grid" id="setops-grid"></div>
+    <table class="plain setops-table" id="setops-table"></table>
+  </div>
+  <div class="prose">
+    <p>Union \(A\cup B\), intersection \(A\cap B\), difference \(A\setminus B\) (in \(A\), not in \(B\)), complement \(A^c = U\setminus A\). De Morgan: \((A\cup B)^c = A^c\cap B^c\) and \((A\cap B)^c = A^c\cup B^c\).</p>
+  </div>
+
+  <div class="check" data-id="cse312-w1-l1-qc-set-size" data-legacy-ids="qc-sets" data-answer="3">
+    <p>Quick check: what is \(|\{3,1,2,3,1\}|\)?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="5" data-tag="counted-repeats">Looks like you counted the repeats. A set has each element once, so \(\{3,1,2,3,1\}\) is the same set as \(\{1,2,3\}\).</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The set review is optional, but Section 1 Task 1 depends on it. Ask: “Is \(\varnothing\) the same as \(\{\varnothing\}\)?” A box holding an empty box isn’t empty.</li>
+      <li>Have students move 4 into both sets in the widget and watch \(|A\cup B|\) stop being \(|A|+|B|\). That’s why the sum rule needs “no overlap”.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L1: SUM -->
+<section class="page" id="l1-sum" data-title="The sum rule">
+  <p class="where">Lecture 1 · Wed Sept 30 · Reading 1.1.1</p>
+  <h1>The sum rule</h1>
+  <div class="rule">
+    <p><strong>Sum rule.</strong> If you can choose from EITHER one of \(n\) options, OR one of \(m\) options with NO overlap with the previous \(n\), then the number of possible outcomes of the experiment is</p>
+    <p>\[n + m.\]</p>
+    <p>As sets: if \(A\cap B=\varnothing\) then \(|A\cup B| = |A|+|B|\).</p>
+  </div>
+
+  <h2>Counting “lunches”</h2>
+  <div class="prose"><p>A lunch order is either one of 6 soups or one of 9 salads. You get one item, not one of each.</p></div>
+  <div class="panel" id="lunch">
+    <div class="lunch-grid" id="lunch-grid"></div>
+    <p class="out" id="lunch-out" aria-live="polite"></p>
+    <div class="controls"><button class="chip" id="lunch-overlap" aria-pressed="false">Put one dish on both lists</button></div>
+  </div>
+
+  <div class="check" data-id="cse312-w1-l1-qc-lunch" data-answer="15">
+    <p>Quick check: a lunch order is either one of 6 soups or one of 9 salads. How many lunch orders are possible?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="54" data-tag="multiplied-instead-of-added">Looks like you multiplied. Multiplying counts pairs (a soup <em>and</em> a salad). Here you pick one item: a soup <em>or</em> a salad.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>“Or” with no overlap means add; “and then” (a sequence of steps) means multiply. Ask the room which keyword each example has.</li>
+      <li>The overlap button shows what goes wrong: one item appears in both lists, so adding counts it twice. Lecture 3 (inclusion–exclusion) fixes that. This week we only add disjoint pieces.</li>
+      <li>The textbook’s version: a baby outfit is a top <em>or</em> a bottom (3 + 4 = 7), and a real outfit is a top <em>and</em> a bottom (3 · 4 = 12).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L1: PRODUCT -->
+<section class="page" id="l1-product" data-title="The product rule">
+  <p class="where">Lecture 1 · Wed Sept 30 · Reading 1.1.2</p>
+  <h1>The product rule</h1>
+
+  <div class="rule">
+    <p><strong>Product rule.</strong> In a sequential process, if there are \(n_1\) choices for the first step, \(n_2\) choices for the second step (<em>given the first choice</em>), …, and \(n_m\) choices for the \(m\)th step (<em>given the previous choices</em>), then the total number of outcomes is</p>
+    <p>\[n_1 \times n_2 \times \cdots \times n_m.\]</p>
+  </div>
+  <div class="prose">
+    <p>The options at each step can be different sets. What has to stay fixed is how many there are, whatever was chosen earlier.</p>
+  </div>
+
+  <h2>How many subs?</h2>
+  <div class="panel" id="subs">
+    <div id="sub-choices"></div>
+    <div class="slots">
+      <div class="slot"><b>2</b><span>cheeses</span></div><span class="op">×</span>
+      <div class="slot"><b>3</b><span>meats</span></div><span class="op">×</span>
+      <div class="slot"><b>3</b><span>veggies</span></div><span class="op">=</span>
+      <div class="slot total"><b>18</b><span>subs</span></div>
+    </div>
+    <p class="out" id="sub-out" aria-live="polite"></p>
+    <div class="sub-grid" id="sub-grid"></div>
+  </div>
+
+  <h2>Strings</h2>
+  <div class="prose">
+    <p>Strings of length 5 over \(\{A,\dots,Z\}\) (AZURE, BINGO, TANGO, STEVE, SARAH, …): each position has 26 options regardless of the others.</p>
+  </div>
+  <div class="slots">
+    <div class="slot"><b>26</b></div><span class="op">×</span><div class="slot"><b>26</b></div><span class="op">×</span><div class="slot"><b>26</b></div><span class="op">×</span><div class="slot"><b>26</b></div><span class="op">×</span><div class="slot"><b>26</b></div><span class="op">=</span>
+    <div class="slot total"><b>26<sup>5</sup></b><span>11,881,376</span></div>
+  </div>
+  <div class="prose"><p>Binary strings of length \(n\) over \(\{0,1\}\): \(2\cdot 2\cdots 2 = 2^n\).</p></div>
+
+  <h2>Cartesian products</h2>
+  <div class="prose">
+    <p><strong>Definition.</strong> \(S\times T = \{(a,b) : a\in S,\ b\in T\}\), the set of 2-sequences. Order matters: \((a,b)\ne(b,a)\). Choosing a pair is a two-step process, so</p>
+    <p>\[|S\times T| = |S|\cdot|T| \qquad |A_1\times\cdots\times A_n| = |A_1|\cdot|A_2|\cdots|A_n|.\]</p>
+  </div>
+
+  <h2>Power sets: \(|2^S| = 2^{|S|}\)</h2>
+  <div class="prose">
+    <p><strong>Definition.</strong> The power set of \(S\) is the set of all subsets of \(S\), \(\{X : X\subseteq S\}\). The lecture writes it \(2^S\) (another notation is \(\mathcal P(S)\)). For example \(2^{\{\star,\spadesuit\}} = \{\varnothing,\{\star\},\{\spadesuit\},\{\star,\spadesuit\}\}\) and \(2^{\varnothing}=\{\varnothing\}\).</p>
+    <p>To build a subset of \(S=\{e_1,\dots,e_n\}\), go through the elements and decide <em>in</em> or <em>out</em>: \(n\) steps with 2 choices each.</p>
+  </div>
+  <div class="panel" id="power">
+    <div class="controls">
+      <label>\(|S| = n =\) <input type="number" aria-label="Size of S" id="pow-n" min="1" max="5" value="3"></label>
+      <span>Click an element to put it in or out of the subset.</span>
+    </div>
+    <div class="bits" id="pow-bits"></div>
+    <p class="out" id="pow-out" aria-live="polite"></p>
+    <div class="subset-list" id="pow-list"></div>
+  </div>
+
+  <div class="check" data-id="cse312-w1-l1-qc-subsets-abcd" data-answer="2^4">
+    <p>Quick check: how many subsets does \(\{a,b,c,d\}\) have?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="15" data-tag="forgot-empty-set">Close. Did you leave out \(\varnothing\) (or the whole set)? Both are subsets.</li>
+      <li data-expr="14" data-tag="forgot-empty-and-full">Did you leave out \(\varnothing\) and \(\{a,b,c,d\}\)? Both are subsets of \(\{a,b,c,d\}\).</li>
+      <li data-expr="8" data-tag="added-instead-of-multiplied">Each element is a step with 2 choices (in or out). Steps multiply, they don’t add.</li>
+      <li data-expr="4" data-tag="counted-elements">That’s the number of elements. A subset is any choice of in/out for each one.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Stress “given the previous choices”. The count at each step must not depend on <em>which</em> earlier option was picked. Section Task 7 (birthday cake) is built to break that if you go in the obvious order.</li>
+      <li>Ask: “How many subsets does \(\varnothing\) have?” \(2^0 = 1\): just \(\varnothing\). The slide writes \(2^{\varnothing}=\{\varnothing\}\).</li>
+      <li>Ask the room to list \(2^{\{a,b\}}\) before showing it. Students often forget \(\varnothing\) or the whole set.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L1: PERMS -->
+<section class="page" id="l1-perms" data-title="Permutations and complements">
+  <p class="where">Lecture 1 · Wed Sept 30 · Reading 1.1.3–1.1.4</p>
+  <h1>Permutations and complements</h1>
+
+  <div class="prose">
+    <p>“How many sequences in \(\{1,2,3\}^3\) have no repeated element?” The first entry has 3 options. The second has 2, though <em>which</em> 2 depends on the first. The third has 1. The sets change but the counts don’t, so the product rule gives \(3\cdot2\cdot1 = 6\).</p>
+  </div>
+  <div class="panel">
+    <div class="controls">
+      <button class="chip" id="tree-mode" aria-pressed="false">Show all 27 sequences, including repeats</button>
+    </div>
+    <div class="tree-wrap"><svg class="tree" id="tree" role="img" aria-label="Tree of sequences over 1, 2, 3"></svg></div>
+    <div class="legend" id="tree-legend"></div>
+  </div>
+
+  <h2>Factorial</h2>
+  <div class="rule">
+    <p><strong>Definition.</strong> The number of ways to order the elements of \(S\), where \(|S|=n\) (the permutations of \(S\)), is the factorial</p>
+    <p>\[n! = n\times(n-1)\times\cdots\times 2\times 1, \qquad 0! = 1.\]</p>
+  </div>
+
+  <h2>Counting with complements</h2>
+  <div class="prose">
+    <p>“How many sequences in \(\{1,2,3\}^3\) <em>have</em> repeating elements?” Call that \(m\), and let \(n\) be the number with no repeats. Every sequence is in exactly one group, so by the sum rule</p>
+    <p>\[27 = 3^3 = m + n = m + 3! \quad\Longrightarrow\quad m = 27 - 6 = 21.\]</p>
+  </div>
+
+  <h3>Enumerate it</h3>
+  <div class="panel enum" data-space="seq123" data-params='{"cond":"repeat"}' data-formula="3^3-3!" data-label="sequences in {1,2,3}³ with a repeat"></div>
+
+  <div class="check" data-id="cse312-w1-l1-qc-repeats-four-symbols" data-answer="4^4-4!">
+    <p>Quick check: how many sequences in \(\{1,2,3,4\}^4\) have at least one repeated element?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="24" data-tag="counted-complement">That’s the number <em>without</em> repeats, the complement. Subtract it from the total.</li>
+      <li data-expr="256" data-tag="counted-everything">That’s every sequence. Some of those have no repeats; take them out.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Why \(0! = 1\): there is exactly one way to order nothing, the empty sequence.</li>
+      <li>Complementary counting is just the sum rule rearranged: \(|S| = |U| - |U\setminus S|\). Ask: “Why is counting repeats directly hard?” (Which position repeats, and how many times? Lots of cases.)</li>
+      <li>Have students step the enumerator a few times before pressing “Run all”. The tally only becomes the answer once every case has been checked.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L1: KPERMS -->
+<section class="page" id="l1-kperms" data-title="k-permutations">
+  <p class="where">Lecture 1 · Wed Sept 30 · Reading 1.2.1</p>
+  <h1>\(k\)-permutations</h1>
+
+  <div class="prose">
+    <p>“How many sequences of 5 <em>distinct</em> letters from \(\{A,\dots,Z\}\)?” AZURE, BINGO and TANGO count; STEVE and SARAH don’t. The answer is \(26\cdot25\cdot24\cdot23\cdot22 = 7{,}893{,}600\).</p>
+  </div>
+  <div class="rule">
+    <p><strong>Fact (\(k\)-permutations).</strong> The number of \(k\)-element sequences of distinct symbols from an \(n\)-element set is</p>
+    <p>\[P(n,k) = n\times(n-1)\times\cdots\times(n-k+1) = \frac{n!}{(n-k)!}.\]</p>
+  </div>
+  <div class="panel" id="kperm">
+    <div class="controls">
+      <label>\(n =\) <input type="number" aria-label="n" id="kp-n" min="1" max="60" value="26"></label>
+      <label>\(k =\) <input type="number" aria-label="k" id="kp-k" min="0" max="60" value="5"></label>
+    </div>
+    <div class="slots" id="kp-strip"></div>
+  </div>
+
+  <h3>Enumerate small cases</h3>
+  <div class="prose"><p>Pick an alphabet size and a length. The enumerator goes through every string and keeps the ones with distinct letters. Try 26 letters and length 5: that’s more strings than it will check, so it stops early and says so.</p></div>
+  <div class="panel enum" data-space="strings" data-params='{"a":5,"k":3,"cond":"distinct"}' data-inputs='{"a":[1,26,"letters"],"k":[1,6,"length"]}' data-formula="P(a,k)" data-label="strings with distinct letters"></div>
+
+  <div class="check" data-id="cse312-w1-l1-qc-medals" data-legacy-ids="qc-kperms" data-answer="10*9*8">
+    <p>Quick check: 10 runners finish a race. How many ways can gold, silver and bronze be awarded?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="1000" data-tag="allowed-repeats">Looks like you let one runner win more than one medal. Each runner finishes once, so the choices shrink: 10, then 9, then 8.</li>
+      <li data-expr="120" data-tag="ignored-order">Looks like you treated the medals as interchangeable. Gold for Ann and silver for Bo is a different result from the reverse. Does order matter here?</li>
+      <li data-expr="30" data-tag="added-instead-of-multiplied">The three medals are awarded in sequence, so the counts multiply.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>\(P(n,n) = n!\), so permutations are the special case \(k=n\). The \(\frac{n!}{(n-k)!}\) form works at \(k=n\) because \(0!=1\).</li>
+      <li>Students mix up \(n^k\) (repeats allowed) and \(P(n,k)\) (no repeats). The home page widget has an “allow repeated letters” switch that shows both.</li>
+      <li>Lecture 2 picks this up by asking what happens if order <em>doesn’t</em> matter.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L1: BOOKS -->
+<section class="page" id="l1-books" data-title="Representation matters">
+  <p class="where">Lecture 1 · Wed Sept 30 · last example</p>
+  <h1>Representation matters</h1>
+  <div class="prose">
+    <p>“How many ways are there to distribute 5 books among Alice, Bob and Charlie?” Every book goes to one person; anyone may get 0 books.</p>
+  </div>
+
+  <div class="panel" id="books">
+    <p class="where">Click a book to pass it to the next person.</p>
+    <div class="book-shelf" id="book-shelf"></div>
+    <div class="book-people" id="book-people"></div>
+    <div class="controls"><button class="btn" id="books-random">Random assignment</button><button class="btn" id="books-reset">Everything to Alice</button></div>
+  </div>
+
+  <h2>First attempt: a subset per person</h2>
+  <div class="prose">
+    <p>Pick Alice’s set of books (\(2^5=32\) options), then Bob’s (32), then Charlie’s (32): \(32^3 = 32{,}768\). <strong>That overcounts.</strong> The three choices don’t interact, so a book can land with two people or with nobody. After giving a book to Alice, it’s no longer a valid option for Bob, so “32 options” for Bob doesn’t hold.</p>
+  </div>
+  <div class="panel enum" data-space="booksBySubsets" data-formula="3^5" data-label="subset triples where every book has exactly one owner" data-note="Only the triples where every book has exactly one owner are real assignments."></div>
+
+  <h2>The clever approach: ask each book</h2>
+  <div class="prose">
+    <p>Look at it from each book’s point of view: who gets it? 3 options, for each of 5 books.</p>
+  </div>
+  <div class="slots">
+    <div class="slot"><b>3</b><span>book 1</span></div><span class="op">×</span><div class="slot"><b>3</b><span>book 2</span></div><span class="op">×</span><div class="slot"><b>3</b><span>book 3</span></div><span class="op">×</span><div class="slot"><b>3</b><span>book 4</span></div><span class="op">×</span><div class="slot"><b>3</b><span>book 5</span></div><span class="op">=</span>
+    <div class="slot total"><b>3<sup>5</sup></b><span>243</span></div>
+  </div>
+  <div class="rule">
+    <p><strong>Lesson.</strong> How you represent what you’re counting is very important. Use different methods to double-check yourself, and look for counterexamples to your own solution.</p>
+  </div>
+
+  <div class="check" data-id="cse312-w1-l1-qc-four-books" data-legacy-ids="qc-books" data-answer="3^4">
+    <p>Quick check: in how many ways can 4 different books go to 3 people, if anyone may get none?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="4^3" data-tag="swapped-base-exponent">Looks like you asked each person which book they get. Ask each <em>book</em> which person gets it: how many options does one book have?</li>
+      <li data-expr="(2^4)^3" data-tag="subset-per-person-overcount">That’s the “subset for each person” count, which includes books given to two people or to nobody.</li>
+      <li data-expr="12" data-tag="multiplied-sizes">The 4 books and 3 people aren’t two steps of 4 and 3 choices. Each book is a step.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Run the enumerator on the subset triples and point at the counts: 32,768 triples checked, only 243 valid. The rest give some book to two people or to nobody.</li>
+      <li>Ask: “Can you fix the per-person approach?” (Alice picks any subset, Bob picks from what’s left, Charlie gets the rest. Then Bob’s count depends on Alice’s choice, so the plain product rule doesn’t apply. Asking each book avoids all that.)</li>
+      <li>The first concept check was due 1:00 pm before Friday’s lecture.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L1 QUIZ -->
+<section class="page" id="l1-quiz" data-title="Lecture 1: check your understanding">
+  <p class="where">Lecture 1 · Wed Sept 30 · wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: Lecture 1</h1>
+  <div class="prose">
+    <p>Ten questions on Lecture 1 only: sets, the sum and product rules, power sets, permutations, complements, \(k\)-permutations and representation. Answer without looking back, then use the review links for anything you missed. The score counts first tries only.</p>
+  </div>
+
+  <div class="cyu-score" data-score role="status"></div>
+
+  <ol class="cyu-list">
+    <li class="cyu" data-id="cse312-w1-l1-quiz-set-equality" data-kind="mc" data-topic="l1-sets">
+      <p class="q">Which of these is equal to the set \(\{1,2,3\}\)?</p>
+      <div class="opts">
+        <label data-opt="tuple" data-tag="set-vs-sequence"><input type="radio"> \((1,2,3)\)<span class="why" hidden>That’s a sequence. Sequences care about order, and a sequence is a different kind of object from a set.</span></label>
+        <label data-opt="with-repeats" data-correct><input type="radio"> \(\{3,2,1,1\}\)<span class="why" hidden>Correct. Order doesn’t matter in a set and repeats collapse, so this is \(\{1,2,3\}\).</span></label>
+        <label data-opt="nested" data-tag="nested-set"><input type="radio"> \(\{\{1,2,3\}\}\)<span class="why" hidden>That set has one element, the set \(\{1,2,3\}\). Its size is 1, not 3.</span></label>
+        <label data-opt="missing-3" data-tag="missing-element"><input type="radio"> \(\{1,2\}\)<span class="why" hidden>It’s missing 3. Sets are equal only if they have exactly the same elements.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l1-quiz-lunch-special" data-legacy-ids="l1-cyu-02" data-kind="num" data-answer="12" data-topic="l1-sum">
+      <p class="q">A café’s lunch special is exactly one item: one of 4 soups, one of 3 sandwiches, or one of 5 salads. No item is in two groups. How many specials are there?</p>
+      <ul class="miscon" hidden><li data-expr="60" data-tag="multiplied-instead-of-added">Looks like you multiplied. That counts meals with one item from <em>each</em> group. The special is one item from <em>one</em> group.</li></ul>
+      <p class="why" hidden>Three groups with no overlap, so add them (sum rule): \(4 + 3 + 5 = 12\).</p>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l1-quiz-sum-rule-overlap" data-kind="mc" data-topic="l1-sum">
+      <p class="q">10 students in a club code in Python and 8 code in Java. When can you conclude that exactly 18 club members code in at least one of them?</p>
+      <div class="opts">
+        <label data-opt="always" data-tag="ignored-overlap"><input type="radio"> Always<span class="why" hidden>A student who codes in both languages would be counted twice.</span></label>
+        <label data-opt="no-overlap" data-correct><input type="radio"> Only if nobody codes in both<span class="why" hidden>Correct. The sum rule needs the two groups to have no overlap.</span></label>
+        <label data-opt="equal-sizes" data-tag="irrelevant-condition"><input type="radio"> Only if the two groups have the same size<span class="why" hidden>The sizes don’t matter. What matters is whether the groups overlap.</span></label>
+        <label data-opt="never" data-tag="too-strict"><input type="radio"> Never<span class="why" hidden>It can happen: if no student codes in both, the groups are disjoint and the sum rule gives 18.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l1-quiz-powerset-product" data-legacy-ids="l1-cyu-04" data-kind="num" data-answer="12" data-topic="l1-product">
+      <p class="q">What is \(\left|\,2^{\{x,y\}}\times\{1,2,3\}\,\right|\)?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="6" data-tag="powerset-size-as-set-size">Looks like you used \(|\{x,y\}| = 2\). The first factor is the power set \(2^{\{x,y\}}\). How many subsets does \(\{x,y\}\) have?</li>
+        <li data-expr="7" data-tag="added-instead-of-multiplied">For a Cartesian product, multiply the sizes: \(|S\times T| = |S|\cdot|T|\).</li>
+      </ul>
+      <p class="why" hidden>\(|2^{\{x,y\}}| = 2^2 = 4\) subsets, and \(|S\times T| = |S|\cdot|T|\), so \(4\cdot3 = 12\).</p>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l1-quiz-product-rule-applies" data-kind="mc" data-topic="l1-product">
+      <p class="q">Which of these can you <em>not</em> count with the product rule, using the steps in the order given?</p>
+      <div class="opts">
+        <label data-opt="outfits" data-tag="rule-does-apply"><input type="radio"> Pick one of 5 shirts, then one of 4 pants, then one of 3 pairs of shoes<span class="why" hidden>This one works. Each step has the same number of options whatever came before: \(5\cdot4\cdot3\).</span></label>
+        <label data-opt="distinct-letters" data-tag="rule-does-apply"><input type="radio"> Pick 3 different letters, first letter first<span class="why" hidden>This one works. The sets of remaining letters differ, but the counts are always 26, 25, 24.</span></label>
+        <label data-opt="vowel-second" data-correct><input type="radio"> Pick a 2-letter string with different letters whose second letter is a vowel (A, E, I, O, U), choosing the first letter first<span class="why" hidden>Correct. If the first letter was a vowel, the second has 4 options; otherwise it has 5. The count depends on the earlier choice. Pick the vowel first instead: \(5\cdot 25 = 125\).</span></label>
+        <label data-opt="books" data-tag="rule-does-apply"><input type="radio"> Give each of 5 books to one of 3 people, book by book<span class="why" hidden>This one works: every book has 3 options no matter what, \(3^5\).</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l1-quiz-eight-runners" data-legacy-ids="l1-cyu-06" data-kind="num" data-answer="336" data-topic="l1-kperms">
+      <p class="q">8 runners finish a race. In how many ways can gold, silver and bronze be awarded?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="512" data-tag="allowed-repeats">Looks like you let one runner win two medals. Each medal goes to a different runner.</li>
+        <li data-expr="56" data-tag="ignored-order">Looks like you counted groups of 3 winners. Gold, silver and bronze are different, so does order matter here?</li>
+      </ul>
+      <p class="why" hidden>A sequence of 3 distinct runners: \(P(8,3) = 8\cdot7\cdot6 = 336\).</p>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l1-quiz-repeat-strings" data-legacy-ids="l1-cyu-07" data-kind="num" data-answer="65" data-topic="l1-perms">
+      <p class="q">How many 3-letter strings over \(\{A,B,C,D,E\}\) have at least one repeated letter?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="60" data-tag="counted-complement">That’s the number with <em>no</em> repeats. You want the rest of the strings.</li>
+        <li data-expr="125" data-tag="counted-everything">That’s every string. Take out the ones with no repeated letter.</li>
+      </ul>
+      <p class="why" hidden>Complement: all strings \(5^3 = 125\), no repeats \(5\cdot4\cdot3 = 60\), so \(125 - 60 = 65\).</p>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l1-quiz-prizes-to-students" data-kind="mc" data-topic="l1-books">
+      <p class="q">4 different prizes go to 6 students, and one student may win several. Which count is right?</p>
+      <div class="opts">
+        <label data-opt="six-to-the-four" data-correct><input type="radio"> \(6^4\)<span class="why" hidden>Correct. Each prize picks a winner: 6 options, 4 times, with repeats allowed.</span></label>
+        <label data-opt="p-6-4" data-tag="assumed-distinct"><input type="radio"> \(P(6,4)\)<span class="why" hidden>That counts 4 <em>different</em> winners. Here a student can win more than once.</span></label>
+        <label data-opt="four-to-the-six" data-tag="swapped-base-exponent"><input type="radio"> \(4^6\)<span class="why" hidden>That asks each student which prize they get, but a student can get no prize or several. Ask each prize instead.</span></label>
+        <label data-opt="six-times-four" data-tag="multiplied-sizes"><input type="radio"> \(6\cdot 4\)<span class="why" hidden>That counts a single (student, prize) pair. There are 4 prizes to give out, each its own step.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l1-quiz-six-books-two-people" data-legacy-ids="l1-cyu-09" data-kind="num" data-answer="64" data-topic="l1-books">
+      <p class="q">In how many ways can 6 different books go to Ana and Ben, if every book goes to one of them and either may get none?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="4096" data-tag="subset-per-person-overcount">That’s a subset for Ana times a subset for Ben, which includes books given to both or to neither.</li>
+        <li data-expr="36" data-tag="swapped-base-exponent">Looks like you asked each person. Ask each book: how many choices does one book have?</li>
+      </ul>
+      <p class="why" hidden>Ask each book: 2 options, 6 times, so \(2^6 = 64\). (Same as choosing Ana’s subset, since Ben gets the rest.)</p>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l1-quiz-subset-overcount" data-kind="mc" data-topic="l1-books">
+      <p class="q">Someone counts the ways to give 5 books to Alice, Bob and Charlie as \(2^5\cdot2^5\cdot2^5\), a subset for each person. What’s wrong?</p>
+      <div class="opts">
+        <label data-opt="invalid-assignments" data-correct><input type="radio"> It includes assignments where a book goes to two people, or to nobody<span class="why" hidden>Correct. The subsets are chosen independently, so nothing stops them from overlapping or missing a book.</span></label>
+        <label data-opt="should-add" data-tag="added-instead-of-multiplied"><input type="radio"> It should add the three counts, not multiply them<span class="why" hidden>Each person’s subset is a separate step, so multiplying is the right idea. The problem is which outcomes get counted.</span></label>
+        <label data-opt="undercounts" data-tag="direction-of-error"><input type="radio"> It undercounts, because people can share books<span class="why" hidden>It overcounts: \(32^3 = 32{,}768\) is far more than the true \(3^5 = 243\).</span></label>
+        <label data-opt="nothing" data-tag="missed-overcount"><input type="radio"> Nothing; it’s correct<span class="why" hidden>Try a single book and two people: the subset method gives \(2\cdot 2=4\) outcomes, but only 2 are real.</span></label>
+      </div>
+    </li>
+  </ol>
+
+  <div class="cyu-score" data-summary role="status"></div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Use it as an exit ticket for the last minutes of lecture or a warm-up in section. Have students commit to an answer before anyone presses Check.</li>
+      <li>Questions 3, 5 and 10 are the conceptual ones: “when does the sum rule apply?”, “when does the product rule apply?” and “spot the overcount”. Ask a student to explain the wrong options too.</li>
+      <li>Everything here uses only Lecture 1 material. Every numeric answer was checked by brute force (see the tests).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S1: REVIEW -->
+<section class="page" id="s1-review" data-title="Section 1: review and sets">
+  <p class="where">Quiz Section 1 · Thu Oct 1 · problems and answers from the official handout and its posted solutions</p>
+  <h1>Section 1: review and sets</h1>
+  <div class="prose">
+    <p>Answer each problem on the page, and use the work box for your reasoning. Hints and solutions stay hidden until you ask for them. Section 1 is spread over three pages: this one, <a href="#s1-basic">basic counting</a> and <a href="#s1-more">harder counting</a>.</p>
+  </div>
+
+  <article class="task" data-id="cse312-w1-s1-review-sum-rule" data-legacy-ids="s1-review-1 s1-r1">
+    <h2>Review 1: sum rule</h2>
+    <p class="prompt">If you can choose from EITHER one of \(n\) options, OR one of \(m\) options with NO overlap with the previous \(n\), then the number of possible outcomes of the experiment is ___.</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-review-sum-rule.ans" data-type="formula" data-answer="n+m" data-vars='{"n":[1,2,5,9],"m":[1,3,4,7]}' data-placeholder="in terms of n and m">
+      <ul class="miscon" hidden><li data-expr="n*m" data-tag="multiplied-instead-of-added">That’s the product rule. Here you pick ONE option, from either group.</li></ul>
+    </div>
+    <ol class="hints">
+      <li>Two groups that don’t overlap. Are you picking one from each group, or one thing overall?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Every outcome is in exactly one of the two groups, so count each group and add.</li>
+      <li class="answer">\(n + m\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-review-product-rule" data-legacy-ids="s1-review-2">
+    <h2>Review 2: product rule</h2>
+    <p class="prompt">In a sequential process with \(m\) steps, if there are \(n_1\) choices for the 1st step, \(n_2\) choices for the 2nd step (given the first choice), …, and \(n_m\) choices for the \(m\)th step (given the previous choices), then the total number of outcomes is ___.</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-review-product-rule.ans" data-type="self" data-placeholder="e.g. n_1 + ... or n_1 * ..."></div>
+    <ol class="hints">
+      <li>Each choice at step 1 can be followed by any of the \(n_2\) choices at step 2. How many pairs is that?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Each of the \(n_1\) first choices pairs with \(n_2\) second choices: \(n_1 n_2\) ways to do two steps. Keep going.</li>
+      <li class="answer">\(n_1\cdot n_2\cdots n_m\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-review-permutations" data-legacy-ids="s1-review-3">
+    <h2>Review 3: permutations</h2>
+    <p class="prompt">The number of ways to re-order \(n\) elements is ___.</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-review-permutations.ans" data-type="formula" data-answer="n!" data-vars='{"n":[0,1,2,3,5,7]}' data-placeholder="in terms of n">
+      <ul class="miscon" hidden><li data-expr="n^n" data-tag="allowed-repeats">\(n^n\) lets the same element appear twice. A re-ordering uses each element once.</li></ul>
+    </div>
+    <ol class="hints">
+      <li>How many elements can go first? Then how many are left for second place?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(n\) choices for the first position, \(n-1\) for the second, …, 1 for the last.</li>
+      <li class="answer">\(n!\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-review-k-permutations" data-legacy-ids="s1-review-4">
+    <h2>Review 4: \(k\)-permutations</h2>
+    <p class="prompt">The number of ways to choose a sequence of \(k\) distinct elements from a set of \(n\) elements is ___.</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-review-k-permutations.ans" data-type="formula" data-answer="n!/(n-k)!" data-vars='{"n":[3,5,6,8],"k":[0,1,2,3]}' data-placeholder="in terms of n and k, e.g. P(n,k)">
+      <ul class="miscon" hidden>
+        <li data-expr="n^k" data-tag="allowed-repeats">\(n^k\) allows repeats. The \(k\) elements must be distinct.</li>
+        <li data-expr="n!/(k!(n-k)!)" data-tag="ignored-order">That counts sets, where order doesn’t matter. A <em>sequence</em> keeps order.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>It’s a permutation that stops after \(k\) steps.</li>
+      <li>Write \(n(n-1)\cdots(n-k+1)\) using factorials.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(n\) choices, then \(n-1\), …, and the \(k\)th step has \(n-k+1\).</li>
+      <li class="answer">\(P(n,k) = n(n-1)\cdots(n-k+1) = \dfrac{n!}{(n-k)!}\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-review-set-difference" data-legacy-ids="s1-review-5 s1-r5">
+    <h2>Review 5: set difference</h2>
+    <p class="prompt">Is it always true that \(|A\setminus B| = |A| - |B|\)? Answer yes or no, and explain in your work.</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-review-set-difference.ans" data-type="yesno" data-answer="no" data-placeholder="yes or no"></div>
+    <ol class="hints">
+      <li>Try tiny sets. What happens if \(B\) has elements that aren’t in \(A\)?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Counterexample: \(A=\{1\}\), \(B=\{2,3\}\). Then \(|A\setminus B| = 1\), but \(|A|-|B| = -1\), and a size can’t be negative.</li>
+      <li>Only the part of \(B\) inside \(A\) gets removed: \(|A\setminus B| = |A| - |A\cap B|\).</li>
+      <li class="answer">No. It holds exactly when \(B\subseteq A\).</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>The posted solutions leave the review blanks empty; the answers here are the rules as stated in Lecture 1. Review 5’s explanation is ours.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-t1a-cardinality" data-legacy-ids="s1-t1a">
+    <h2>Task 1a: cardinalities</h2>
+    <p class="prompt">For each one of the following sets, give its cardinality, i.e., indicate how many elements it contains.</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t1a-cardinality.a" data-label="\(|A|\), \(A=\varnothing\)" data-answer="0"></div>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t1a-cardinality.b" data-label="\(|B|\), \(B=\{\varnothing\}\)" data-answer="1">
+      <ul class="miscon" hidden><li data-expr="0" data-tag="empty-in-braces">\(\{\varnothing\}\) isn’t empty: it holds one thing, the empty set.</li></ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t1a-cardinality.c" data-label="\(|C|\), \(C=\{\{\varnothing\}\}\)" data-answer="1"></div>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t1a-cardinality.d" data-label="\(|D|\), \(D=\{\varnothing,\{\varnothing\}\}\)" data-answer="2"></div>
+    <ol class="hints">
+      <li>Count only the top-level elements: the things separated by commas inside the outermost braces.</li>
+      <li>\(\varnothing\) is an object too. A box holding an empty box isn’t empty.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(|A| = 0\): the empty set has no elements.</li>
+      <li>\(|B| = 1\): its one element is \(\varnothing\).</li>
+      <li>\(|C| = 1\): its one element is \(\{\varnothing\}\).</li>
+      <li class="answer">\(|A|=0,\ |B|=1,\ |C|=1,\ |D|=2\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-t1b-set-operations" data-legacy-ids="s1-t1b">
+    <h2>Task 1b: set operations</h2>
+    <p class="prompt">Let \(S=\{a,b,c\}\) and \(T=\{c,d\}\). Compute \(S\cup T\), \(S\cap T\), \(S\setminus T\), \(2^{S\setminus T}\) and \(S\times T\). (Check yourself against the solution; a set can be written in many orders.)</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t1b-set-operations.union" data-type="self" data-label="\(S\cup T\)"></div>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t1b-set-operations.intersection" data-type="self" data-label="\(S\cap T\)"></div>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t1b-set-operations.difference" data-type="self" data-label="\(S\setminus T\)"></div>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t1b-set-operations.power-set" data-type="self" data-label="\(2^{S\setminus T}\)"></div>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t1b-set-operations.product" data-type="self" data-label="\(S\times T\)"></div>
+    <ol class="hints">
+      <li>\(S\setminus T\) keeps what’s in \(S\) but not in \(T\). The power set of a 2-element set has \(2^2\) elements.</li>
+      <li>\(S\times T\) pairs every element of \(S\) with every element of \(T\). Don’t skip a pair whose two coordinates are the same.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(S\cup T = \{a,b,c,d\}\) and \(S\cap T = \{c\}\).</li>
+      <li>\(S\setminus T = \{a,b\}\).</li>
+      <li>\(2^{S\setminus T} = \{\varnothing, \{a\}, \{b\}, \{a,b\}\}\).</li>
+      <li class="answer">\(S\times T = \{(a,c),(a,d),(b,c),(b,d),(c,c),(c,d)\}\), which has \(3\cdot 2 = 6\) elements.</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S1: BASIC -->
+<section class="page" id="s1-basic" data-title="Section 1: basic counting">
+  <p class="where">Quiz Section 1 · Thu Oct 1 · Tasks 2–3 · problems and answers from the official handout and its posted solutions</p>
+  <h1>Section 1: basic counting</h1>
+  <div class="prose"><p>Answers can be left as expressions, like the PSet allows: \(13!\), <code>3*12!</code>, <code>10^15</code>.</p></div>
+
+  <article class="task" data-id="cse312-w1-s1-t2a-credit-cards" data-legacy-ids="s1-t2a">
+    <h2>Task 2a: credit-card numbers</h2>
+    <p class="prompt">Credit-card numbers are made of 15 decimal digits, and a 16th checksum digit (which is uniquely determined by the first 15 digits). How many credit-card numbers are there?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t2a-credit-cards.ans" data-answer="10^15">
+      <ul class="miscon" hidden><li data-expr="10^16" data-tag="counted-determined-digit">The 16th digit isn’t a free choice: the first 15 decide it. How many options does it really have?</li></ul>
+    </div>
+    <ol class="hints">
+      <li>How many digits can you actually choose?</li>
+      <li>Once the first 15 digits are set, how many options are left for the checksum?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Each of the first 15 digits has 10 options, and the checksum has exactly 1.</li>
+      <li class="answer">\(10^{15}\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-t2b-divisors" data-legacy-ids="s1-t2b">
+    <h2>Task 2b: divisors of 1440</h2>
+    <p class="prompt">How many positive divisors does \(1440 = 2^5\,3^2\,5\) have?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t2b-divisors.ans" data-answer="36">
+      <ul class="miscon" hidden>
+        <li data-expr="10" data-tag="forgot-exponent-zero">Looks like you didn’t allow an exponent of 0. Is \(1 = 2^0 3^0 5^0\) a divisor?</li>
+        <li data-expr="8" data-tag="added-exponents">Choosing three exponents is three steps, so the counts multiply.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Every divisor looks like \(2^i3^j5^k\). What values can each exponent take?</li>
+      <li>Don’t forget that an exponent can be 0.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>Every positive divisor of 1440 can be written as \(2^i3^j5^k\) with \(i\in\{0,\dots,5\}\), \(j\in\{0,1,2\}\), \(k\in\{0,1\}\), and different triples give different divisors.</li>
+        <li>Choose \(i\) (6 options), then \(j\) (3), then \(k\) (2).</li>
+        <li class="answer">\(6\cdot3\cdot2 = 36\)</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="divisors">Check by brute force</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-t2c-staff-line" data-legacy-ids="s1-t2c">
+    <h2>Task 2c: staff photo</h2>
+    <p class="prompt">How many ways are there to arrange the CSE 312 staff on a line (11 TAs, 2 professors) for a group picture?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t2c-staff-line.ans" data-answer="13!">
+      <ul class="miscon" hidden>
+        <li data-expr="11!*2!" data-tag="grouped-by-role">That keeps TAs and professors in separate blocks. Anyone can stand anywhere.</li>
+        <li data-expr="13^13" data-tag="allowed-repeats">That lets one person stand in two spots.</li>
+      </ul>
+    </div>
+    <ol class="hints"><li>13 different people, 13 spots. Fill the spots left to right.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>13 choices for the first spot, 12 for the second, and so on.</li>
+      <li class="answer">\(13!\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-t2d-anup-ends-middle" data-legacy-ids="s1-t2d">
+    <h2>Task 2d: Anup at an end or in the middle</h2>
+    <p class="prompt">How many ways are there to arrange the CSE 312 staff on a line so that Anup is at one of the ends or exactly in the middle?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t2d-anup-ends-middle.ans" data-answer="3*12!">
+      <ul class="miscon" hidden>
+        <li data-expr="2*12!" data-tag="missed-a-position">Close. Count Anup’s allowed spots again: two ends <em>and</em> the middle.</li>
+        <li data-expr="3*13!" data-tag="double-counted-anup">After placing Anup, only 12 people are left to arrange.</li>
+        <li data-expr="12!" data-tag="forgot-anup-choice">Anup has more than one allowed spot. Multiply by his options.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Place Anup first. Which spots is he allowed in? (The middle of 13 spots is spot 7.)</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Anup’s allowed positions are 1, 7 and 13: 3 options.</li>
+      <li>Arrange the other 12 people in the remaining 12 spots: \(12!\).</li>
+      <li class="answer">\(3\times 12! = 1{,}437{,}004{,}800\)</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul>
+        <li>The first “place the constrained thing first” problem. Ask what happens if you fill spots left to right instead: spot 1’s options depend on whether Anup still has to go somewhere.</li>
+        <li>In 2b, the “steps” don’t have to be physical. Choosing an exponent is a step.</li>
+      </ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-t3-card-game" data-legacy-ids="s1-t3">
+    <h2>Task 3: weird card game</h2>
+    <p class="prompt">In how many ways can a pack of fifty-two cards (in four suits of thirteen cards each) be dealt to thirteen players, four to each, so that every player has one card from each of the suits?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t3-card-game.ans" data-answer="(13!)^4">
+      <ul class="miscon" hidden>
+        <li data-expr="52!" data-tag="ignored-constraint">That orders all 52 cards with no suit rule. Each player must get one card of each suit.</li>
+        <li data-expr="13^4" data-tag="one-player-only">That’s the choices for just the first player. The other 12 players still need cards.</li>
+        <li data-expr="4*13!" data-tag="added-suits">Dealing the four suits is four steps one after another, so multiply.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Deal one suit at a time instead of one player at a time.</li>
+      <li>How many ways are there to give the 13 hearts to 13 players, one each?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>First deal the hearts, one to each person: \(13!\) ways.</li>
+      <li>Then the spades, then the diamonds, then the clubs: \(13!\) ways each.</li>
+      <li class="answer">\((13!)^4\)</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Dealing player by player also works: \(13^4\cdot12^4\cdots1^4\), which equals \((13!)^4\) (Reading 1.1.3). A good “two methods” check.</li></ul>
+    </details>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S1: MORE -->
+<section class="page" id="s1-more" data-title="Section 1: harder counting">
+  <p class="where">Quiz Section 1 · Thu Oct 1 · Tasks 4–9 · problems and answers from the official handout and its posted solutions</p>
+  <h1>Section 1: harder counting</h1>
+  <div class="prose"><p>Strategies for this page: glue things that must be together, place the most constrained thing first, count the complement, and split into cases.</p></div>
+
+  <article class="task" data-id="cse312-w1-s1-t4-seating" data-legacy-ids="s1-t4">
+    <h2>Task 4: seating</h2>
+    <p class="prompt">How many ways are there to seat 10 people, consisting of 5 couples, in a row of 10 seats if …</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t4-seating.a" data-label="a) all couples are to get adjacent seats?" data-answer="5!*2^5">
+      <ul class="miscon" hidden>
+        <li data-expr="5!" data-tag="forgot-internal-order">Each couple can sit in two orders, left/right. Did you count that?</li>
+        <li data-expr="10!" data-tag="ignored-constraint">That’s every seating. Couples must be next to each other.</li>
+        <li data-expr="5!*2" data-tag="internal-order-once">Each of the five couples picks its own order, so that factor of 2 appears five times.</li>
+      </ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t4-seating.b" data-label="b) anyone can sit anywhere, except that one couple insists on not sitting in adjacent seats?" data-answer="10!-2*9!">
+      <ul class="miscon" hidden>
+        <li data-expr="10!-9!" data-tag="forgot-internal-order">Close. When the couple sits together, they can be in two orders.</li>
+        <li data-expr="2*9!" data-tag="counted-complement">That’s the number of seatings where they <em>are</em> adjacent. Subtract it from the total.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>(a) Treat each couple as one unit.</li>
+      <li>(b) It’s easier to count the seatings where the couple <em>does</em> sit together.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>(a) Consider each couple as a unit. Choose one of the \(5!\) permutations of the 5 couples, then for each couple choose one of 2 orders for how they sit (\(2^5\) in total).</li>
+        <li>(a) \(5!\cdot 2^5 = 3{,}840\).</li>
+        <li>(b) Complementary counting: there are \(10!\) arrangements in total. In \(9!\cdot 2\) of them the couple is adjacent (treat the couple as a unit, permute the 9 “individuals”, then pick the couple’s order).</li>
+        <li>(b) Alternative by cases: if A sits at an end, A has 2 choices and B has 8; otherwise A has 8 choices and B has 7. Then \((2\cdot8+8\cdot7)\,8! = 8\cdot 9!\).</li>
+        <li class="answer">(a) \(5!\cdot2^5\) &nbsp;&nbsp; (b) \(10! - 2\cdot 9! = 8\cdot 9!\)</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="seatingAdjacent">Brute-force (a)</button><span class="brute"></span></div>
+      <div class="step-bar"><button class="btn" data-brute="seatingApart">Brute-force (b)</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-t5-hbcdefga" data-legacy-ids="s1-t5">
+    <h2>Task 5: HBCDEFGA</h2>
+    <p class="prompt">How many ways are there to permute the 8 letters A, B, C, D, E, F, G, H so that A is not at the beginning and H is not at the end?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t5-hbcdefga.ans" data-answer="8!-(2*7!-6!)">
+      <ul class="miscon" hidden>
+        <li data-expr="8!-2*7!" data-tag="double-subtracted-overlap">You subtracted the permutations with A first <em>and</em> H last twice. Add them back once.</li>
+        <li data-expr="2*7!-6!" data-tag="counted-complement">That’s the number of “bad” permutations. Subtract it from the total.</li>
+        <li data-expr="7*7!" data-tag="dependent-choices">“7 choices for the first letter, then …” breaks the product rule: whether H is still available for the end depends on the first choice.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Count the “bad” permutations: A at the beginning, or H at the end.</li>
+      <li>Some permutations have both. Make sure they’re removed once, not twice.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>There are \(8!\) permutations in total. \(7!\) have A at the beginning and \(7!\) have H at the end.</li>
+        <li>\(6!\) have both, so (inclusion–exclusion) \(2\cdot7! - 6!\) have A at the beginning or H at the end or both.</li>
+        <li>Complementary counting: subtract those from the total.</li>
+        <li class="answer">\(8! - (2\cdot 7! - 6!) = 30{,}960\)</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="hbcdefga">Check by brute force</button><span class="brute"></span></div>
+    </div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>The official solution uses inclusion–exclusion for two sets, which Lecture 3 covers properly on Mon, Oct 5. Here it’s enough to notice that “both” got subtracted twice.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-t6-lizards-snakes" data-legacy-ids="s1-t6">
+    <h2>Task 6: lizards and snakes!</h2>
+    <p class="prompt">Loudon has three pet lizards, Rango, a gecko named Gordon, and a goanna named Joanna, as well as two small pet snakes, Kaa and Basilisk, but only 4 terrariums to put them in. In how many different ways can he put his 7 pets in these 4 terrariums so that no terrarium has both a snake and a lizard?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t6-lizards-snakes.ans" data-answer="4*3^3+12*2^3">
+      <ul class="miscon" hidden>
+        <li data-expr="4*3^3" data-tag="one-case-only">That covers the case where the snakes share a terrarium. What if they’re in different ones?</li>
+        <li data-expr="12*2^3" data-tag="one-case-only">That covers the case where the snakes are apart. What if they share a terrarium?</li>
+        <li data-expr="4^5" data-tag="ignored-constraint">That ignores the rule about snakes and lizards.</li>
+        <li data-expr="4^7" data-tag="miscounted-pets">How many pets does Loudon really have? Count the lizards and snakes named in the problem.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Place the snakes first. Then the number of options for each lizard depends on one thing: do the snakes share a terrarium?</li>
+      <li>Split into two cases and add (sum rule).</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>The problem says “7 pets”, but it names three lizards and two snakes, so there are 5 animals to place. (The official solution counts 3 lizards and 2 snakes.)</li>
+        <li>Snakes together: 4 choices of terrarium; each of the 3 lizards then has 3 choices: \(4\cdot 3^3\).</li>
+        <li>Snakes apart: \(4\cdot3 = 12\) ordered pairs of terrariums; each lizard has 2 choices: \(12\cdot 2^3\).</li>
+        <li class="answer">\(4\cdot 3^3 + 12\cdot 2^3 = 204\)</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="lizards">Check by brute force</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-t7-birthday-cake" data-legacy-ids="s1-t7">
+    <h2>Task 7: birthday cake</h2>
+    <p class="prompt">A chef is preparing desserts for the week, starting on a Sunday. On each day, only one of five desserts (apple pie, cherry pie, strawberry pie, pineapple pie, and cake) may be served. On Thursday there is a birthday, so cake must be served that day. On no two consecutive days can the chef serve the same dessert. How many dessert menus are there for the week?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t7-birthday-cake.ans" data-answer="4^6">
+      <ul class="miscon" hidden>
+        <li data-expr="5*4^5" data-tag="dependent-choices">Going Sunday to Saturday, Wednesday’s options depend on whether Tuesday was cake. Start from the day that’s fixed.</li>
+        <li data-expr="5*4^6" data-tag="ignored-fixed-day">Thursday has only one option: cake.</li>
+        <li data-expr="4^7" data-tag="ignored-fixed-day">Thursday is fixed, so it contributes 1, not 4.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>If you start on Sunday, you get stuck on Wednesday. Why?</li>
+      <li>Start from Thursday and work outward in both directions.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>Thursday: 1 choice (cake). Wednesday and Friday: 4 choices each (anything but the day next to them).</li>
+        <li>Tuesday, given Wednesday: 4. Monday: 4. Sunday: 4. Saturday, given Friday: 4.</li>
+        <li class="answer">\(4\cdot4\cdot4\cdot4\cdot1\cdot4\cdot4 = 4^6 = 4{,}096\)</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="cake">Check by brute force</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-t8-photographs" data-legacy-ids="s1-t8">
+    <h2>Task 8: photographs</h2>
+    <p class="prompt">Suppose that 8 people, including you and a friend, line up for a picture. In how many ways can the photographer organize the line if she wants to have fewer than 2 people between you and your friend?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t8-photographs.ans" data-answer="(2*7+2*6)*6!">
+      <ul class="miscon" hidden>
+        <li data-expr="2*7!" data-tag="one-case-only">That’s only the case where you’re next to each other. “Fewer than 2” also allows exactly 1 person between you.</li>
+        <li data-expr="6*6!*2" data-tag="one-case-only">That’s only the case with exactly one person between you. You can also be adjacent.</li>
+        <li data-expr="7!+6*6!" data-tag="forgot-internal-order">You and your friend can stand in either order. Did both cases count that?</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>“Fewer than 2 people between” means 0 or 1. Two cases.</li>
+      <li>In the 1-between case, pick the person in the middle and glue the three of you into a unit.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>Case 1, adjacent: glue you and your friend into a unit. \(7!\) arrangements of the unit and the other 6, times 2 orders inside the unit: \(2\cdot 7!\).</li>
+        <li>Case 2, one person between: pick that person (6 choices), glue the trio, arrange 5 people plus the unit (\(6!\)), and 2 orders for you and your friend: \(6\cdot 6!\cdot 2\).</li>
+        <li>The cases don’t overlap, so add.</li>
+        <li class="answer">\((2\cdot 7 + 2\cdot 6)\cdot 6! = 18{,}720\)</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="photos">Check by brute force</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-s1-t9-family-portrait" data-legacy-ids="s1-t9">
+    <h2>Task 9: extended family portrait</h2>
+    <p class="prompt">A group of \(n\) families, each with \(m\) members, are to be lined up for a photograph. In how many ways can the \(nm\) people be arranged if members of a family must stay together?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-s1-t9-family-portrait.ans" data-type="formula" data-answer="n!*(m!)^n" data-vars='{"n":[1,2,3,4],"m":[1,2,3]}' data-placeholder="in terms of n and m">
+      <ul class="miscon" hidden>
+        <li data-expr="n!*m!" data-tag="internal-order-once">Every family reorders its own members, so the factor \(m!\) appears once per family.</li>
+        <li data-expr="(n*m)!" data-tag="ignored-constraint">That lets families split up.</li>
+      </ul>
+    </div>
+    <ol class="hints">
+      <li>Order the families as blocks first.</li>
+      <li>Then, inside each block, how many ways can that family stand?</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>Order the families: \(n!\) ways.</li>
+        <li>Then reorder each family’s members: \(m!\) ways per family, \(n\) families.</li>
+        <li class="answer">\(n!\,(m!)^n\)</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="families">Brute-force n = 3, m = 2</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <details class="notes" open>
+    <summary>Teaching notes for Section 1</summary>
+    <ul>
+      <li>Tasks 4b and 8 are the “two methods” problems. Have half the room do 4b by complement and half by cases, then compare.</li>
+      <li>Task 6’s statement says “7 pets” but names 5 animals (3 lizards, 2 snakes). The official solution uses 3 lizards and 2 snakes. Point this out so nobody gets stuck.</li>
+      <li>Every brute-force button checks every case and says how many it checked. Seating checks all \(10! = 3{,}628{,}800\) orders, so it runs in chunks and reports progress. It only reports a final total after the last chunk.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: COMBINATIONS -->
+<section class="page" id="l2-combos" data-title="Combinations">
+  <p class="where">Lecture 2 · Fri Oct 2 · Reading 1.2.2</p>
+  <h1>Combinations</h1>
+  <div class="prose">
+    <p>“How many size-5 subsets of \(\{A,B,\dots,Z\}\)?” \(\{A,Z,U,R,E\}\), \(\{B,I,N,G,O\}\) and \(\{T,A,N,G,O\}\) count; \(\{S,T,E,V\}\) doesn’t (only 4 letters). The difference from \(k\)-permutations: <strong>no order</strong>. TANGO, OGNAT, ATNGO and NATGO are different sequences, but \(\{T,A,N,G,O\} = \{O,G,N,A,T\}\) is one set.</p>
+  </div>
+
+  <h2>The idea: a two-step process</h2>
+  <div class="prose">
+    <p>Build a sequence of 5 distinct letters in two steps: (1) choose a subset \(S\) of size 5, then (2) choose an ordering of \(S\). Every sequence comes out exactly once, so</p>
+  </div>
+  <div class="slots">
+    <div class="slot"><b>???</b><span>5-letter sets</span></div><span class="op">×</span>
+    <div class="slot"><b>5!</b><span>orderings of each</span></div><span class="op">=</span>
+    <div class="slot total"><b>26!/21!</b><span>sequences</span></div>
+  </div>
+  <div class="prose"><p>\[\text{???} = \frac{26!}{21!\,5!} = 65{,}780.\]</p></div>
+
+  <div class="rule">
+    <p><strong>Fact (binomial coefficient).</strong> The number of subsets of size \(k\) of a set of size \(n\) is</p>
+    <p>\[\binom{n}{k} = \frac{n!}{k!\,(n-k)!},\]</p>
+    <p>read “\(n\) choose \(k\)”. These subsets are also called combinations. Notation: \(\binom{S}{k}\) is the set of all \(k\)-element subsets of \(S\), and \(\left|\binom{S}{k}\right| = \binom{|S|}{k}\).</p>
+  </div>
+
+  <h3>See the grouping</h3>
+  <div class="prose"><p>The enumerator lists every sequence of \(k\) distinct letters and files it under the set of letters it uses. Each set should collect exactly \(k!\) sequences.</p></div>
+  <div class="panel enum" data-space="kseqToSets" data-params='{"n":5,"k":3}' data-inputs='{"n":[1,9,"letters"],"k":[1,6,"size"]}' data-formula="C(n,k)" data-label="different sets" data-distinct="1"></div>
+
+  <h2>Symmetry</h2>
+  <div class="rule">
+    <p><strong>Fact.</strong> \(\displaystyle\binom{n}{k} = \binom{n}{n-k}\).</p>
+  </div>
+  <div class="prose">
+    <p><em>Algebraic proof:</em> \(\binom{n}{n-k} = \frac{n!}{(n-k)!\,(n-(n-k))!} = \frac{n!}{(n-k)!\,k!} = \binom nk\). This proves it, but it doesn’t explain <em>why</em>.</p>
+    <p><em>A different proof:</em> there are two equivalent ways to choose \(k\) out of \(n\) objects (unordered): choose which \(k\) are <strong>included</strong>, or choose which \(n-k\) are <strong>excluded</strong>.</p>
+  </div>
+  <div class="panel" id="symmetry">
+    <div class="controls">
+      <label>\(n =\) <input type="number" id="sym-n" aria-label="n" min="1" max="6" value="4"></label>
+      <label>\(k =\) <input type="number" id="sym-k" aria-label="k" min="0" max="6" value="1"></label>
+    </div>
+    <div class="sym-rows" id="sym-rows"></div>
+    <p class="out" id="sym-out" aria-live="polite"></p>
+  </div>
+
+  <div class="check" data-id="cse312-w1-l2-qc-smear-colors" data-answer="C(7,3)">
+    <p>Quick check: a kindergartener smears together 3 different colors out of 7 to make a new color. Order doesn’t matter. How many smeared colors are possible?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="210" data-tag="ordered-instead-of-unordered">Looks like you counted ordered arrangements (\(P(7,3)\)). Red-then-blue makes the same smear as blue-then-red. Does order matter here?</li>
+      <li data-expr="343" data-tag="allowed-repeats">\(7^3\) lets a color be used twice and keeps order. The 3 colors are different and unordered.</li>
+      <li data-expr="21" data-tag="wrong-k">Check \(k\): you’re choosing 3 colors, so \(\binom 73\).</li>
+    </ul>
+  </div>
+  <div class="check" data-id="cse312-w1-l2-qc-symmetry-shortcut" data-answer="C(100,98)">
+    <p>Quick check: compute \(\binom{100}{98}\) (as a number or an expression).</p>
+    <ul class="miscon" hidden>
+      <li data-expr="9900" data-tag="forgot-divide-by-k-factorial">That’s \(100\cdot 99\), the ordered count. Divide by the \(2!\) orderings.</li>
+      <li data-expr="100" data-tag="used-n-choose-1">\(\binom{100}{98} = \binom{100}{2}\), not \(\binom{100}{1}\).</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The key move is dividing out overcounting: \(P(n,k)\) counts each set \(k!\) times. Run the enumerator with \(n=5,k=3\): 60 sequences, 10 sets, 6 each.</li>
+      <li>For \(\binom{100}{98}\), symmetry turns it into \(\binom{100}{2} = 4{,}950\). Ask the room to do it without a calculator.</li>
+      <li>The textbook’s version is “mini rainbows” (ordered, \(P(7,3)=210\)) vs. “smeared colors” (unordered, \(210/3! = 35\)).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: PATHS -->
+<section class="page" id="l2-paths" data-title="Counting paths">
+  <p class="where">Lecture 2 · Fri Oct 2 · Reading 1.2.2 (walking example)</p>
+  <h1>Counting paths</h1>
+  <div class="prose">
+    <p>“How many shortest paths from Gates to Starbucks?” On the lecture’s grid a shortest path makes 7 moves: 4 right and 3 up, in some order. How do we represent a shortest path? As a string in \(\{\uparrow,\rightarrow\}^7\) with exactly three \(\uparrow\)’s and four \(\rightarrow\)’s, for example \((\uparrow,\rightarrow,\uparrow,\rightarrow,\rightarrow,\uparrow,\rightarrow)\).</p>
+  </div>
+
+  <div class="panel" id="grid">
+    <div class="grid-wrap"><svg class="grid-svg" id="grid-svg" viewBox="0 0 330 250" role="img" aria-label="Street grid from Gates (bottom left) to Starbucks (top right)"></svg></div>
+    <div class="controls">
+      <button class="btn" id="grid-up" aria-label="Move up">↑ up</button>
+      <button class="btn" id="grid-right" aria-label="Move right">→ right</button>
+      <button class="btn" id="grid-undo">Undo</button>
+      <button class="btn" id="grid-random">Random path</button>
+      <button class="btn quiet" id="grid-reset">Start over</button>
+    </div>
+    <p class="out" id="grid-out" aria-live="polite"></p>
+  </div>
+
+  <div class="check" data-id="cse312-w1-l2-qc-gates-starbucks" data-answer="C(7,3)">
+    <p>Poll from lecture: how many shortest paths go from Gates to Starbucks (4 moves right, 3 moves up)?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="2^7" data-tag="ignored-move-counts">\(2^7\) counts every string of 7 arrows, including ones that end in the wrong place. A shortest path needs exactly 3 ups.</li>
+      <li data-expr="7!/4!" data-tag="ordered-instead-of-unordered">\(7!/4!\) treats the 3 up-moves as different from each other. Swapping two ↑’s gives the same path. Does order among the ups matter?</li>
+      <li data-expr="7!" data-tag="ordered-instead-of-unordered">\(7!\) treats every move as distinct. All the ↑’s are alike, and so are all the →’s.</li>
+    </ul>
+  </div>
+
+  <h3>Enumerate the arrow strings</h3>
+  <div class="panel enum" data-space="paths" data-params='{"r":4,"u":3}' data-inputs='{"r":[0,10,"right moves r"],"u":[0,10,"up moves u"]}' data-formula="C(r+u,u)" data-label="strings with the right number of ups"></div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The poll options were \(2^7\), \(\frac{7!}{4!}\), \(\binom74 = \frac{7!}{4!3!}\) and “no idea”. Run the poll before showing the widget, then let students build a path and see that it’s just a choice of which 3 of the 7 moves are ↑.</li>
+      <li>\(\binom73 = \binom74\): choosing the positions of the ups is the same as choosing the positions of the rights. That’s symmetry again.</li>
+      <li>Problem Set 1 has grid-path questions; this page sticks to the lecture’s example and doesn’t touch them.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: STARS AND BARS -->
+<section class="page" id="l2-stars" data-title="Stars and bars">
+  <p class="where">Lecture 2 · Fri Oct 2 · Reading 1.2.4</p>
+  <h1>Stars and bars</h1>
+  <div class="prose">
+    <p>“How many solutions \((x_1,\dots,x_k)\) are there with \(x_1,\dots,x_k\ge 0\) and \(\sum_{i=1}^k x_i = n\)?” Example: \(k=3\), \(n=5\): \((0,0,5)\), \((5,0,0)\), \((1,0,4)\), \((2,1,2)\), \((3,1,1)\), \((2,3,0)\), …</p>
+    <p>Hint from the slide: represent each solution as a binary string. Write \(x_1\) ones, a 0, \(x_2\) ones, a 0, …, then \(x_k\) ones.</p>
+  </div>
+
+  <div class="panel" id="stars">
+    <div class="controls">
+      <label>\(k\) (bins) <input type="number" id="sb-k" aria-label="number of bins k" min="1" max="6" value="3"></label>
+      <label>\(n\) (total) <input type="number" id="sb-n" aria-label="total n" min="0" max="12" value="5"></label>
+    </div>
+    <div class="sb-bins" id="sb-bins"></div>
+    <p class="sb-code" id="sb-code" aria-live="polite"></p>
+    <p class="out" id="sb-out"></p>
+  </div>
+
+  <div class="prose">
+    <p>\((3,1,1)\mapsto 1110101\), \((2,1,2)\mapsto 1101011\), \((1,0,4)\mapsto 1001111\). Each string has 7 symbols, exactly two of them 0. Every such string decodes back to exactly one solution, so</p>
+    <p>\[\#\text{sols} = \#\text{strings in }\{0,1\}^7\text{ with exactly two 0s} = \binom72 = 21.\]</p>
+    <p>In general there are \(n+k-1\) symbols with \(k-1\) zeros. After a change in representation, the problem reduces to counting combinations.</p>
+  </div>
+
+  <div class="rule">
+    <p><strong>Stars and bars.</strong> The number of ways to distribute \(n\) indistinguishable balls into \(k\) distinguishable bins is</p>
+    <p>\[\binom{n+k-1}{k-1} = \binom{n+k-1}{n}.\]</p>
+    <p>For \(k\) non-negative integers summing to \(n\): the bins are the \(k\) integers, and the balls are the \(n\) ones that add up to \(n\).</p>
+  </div>
+
+  <h3>Enumerate the solutions</h3>
+  <div class="panel enum" data-space="sums" data-params='{"k":3,"n":5}' data-inputs='{"k":[1,6,"bins k"],"n":[0,12,"total n"]}' data-formula="C(n+k-1,k-1)" data-label="tuples that sum to n"></div>
+
+  <div class="check" data-id="cse312-w1-l2-qc-coins" data-answer="C(32+5-1,5-1)">
+    <p>Quick check from lecture: how many ways can you distribute 32 identical coins among Alex, Barbara, Charlie, Dana and Eve? (Identify the balls, then the bins.)</p>
+    <ul class="miscon" hidden>
+      <li data-expr="5^32" data-tag="treated-identical-as-distinct">\(5^{32}\) asks each coin who gets it, which treats the coins as different. They’re identical: only how many each person gets matters.</li>
+      <li data-expr="C(36,5)" data-tag="wrong-number-of-bars">Count the bars: 5 bins need \(5-1\) bars, not 5.</li>
+      <li data-expr="C(32,4)" data-tag="forgot-bars-in-length">The string has the 32 stars <em>and</em> the 4 bars: \(32+4\) symbols in all.</li>
+      <li data-expr="32^5" data-tag="swapped-base-exponent">Exponents count ordered choices from distinct objects. Use stars and bars here.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Ask: “Which are the balls and which are the bins?” Balls are what’s identical (coins, ones); bins are what’s distinguishable (people, variables).</li>
+      <li>In the widget, set a bin to 0 and watch two bars become adjacent. Empty bins are allowed here.</li>
+      <li>Problem Set 1 asks about a variation of this formula. This page only covers the lecture’s version, where every \(x_i \ge 0\).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: ANAGRAMS -->
+<section class="page" id="l2-anagrams" data-title="Anagrams and multinomials">
+  <p class="where">Lecture 2 · Fri Oct 2 · Reading 1.2.3</p>
+  <h1>Anagrams and multinomial coefficients</h1>
+  <div class="prose">
+    <p>“How many ways to re-arrange the letters in the word SEATTLE?” (STALEET, TEALEST, LASTTEE, …) Guess: \(7!\). Correct? No! Swapping the two T’s gives SEATTLE again, and so does swapping the two E’s. Those were counted as separate permutations but give the same word.</p>
+  </div>
+
+  <h2>Step through the count</h2>
+  <div class="panel" id="seattle">
+    <div class="seattle-slots" id="seattle-slots" aria-live="polite"></div>
+    <div class="slots" id="seattle-strip"></div>
+    <p class="out" id="seattle-out"></p>
+    <div class="controls">
+      <button class="btn" id="seattle-back">Back</button>
+      <button class="btn primary" id="seattle-next">Next step</button>
+      <button class="btn" id="seattle-other">Different example</button>
+    </div>
+  </div>
+  <div class="prose">
+    <p>\[\binom72\times\binom52\times3\times2\times1 = \frac{7!}{2!\,5!}\times\frac{5!}{2!\,3!}\times3! = \frac{7!}{2!\,2!} = 1260.\]</p>
+    <p><strong>Another interpretation:</strong> arrange the 7 letters as if they were distinct, then divide by \(2!\) for the duplicate T’s and by \(2!\) again for the duplicate E’s.</p>
+  </div>
+
+  <div class="rule">
+    <p><strong>Multinomial coefficients.</strong> If we have \(k\) types of objects (\(n\) total), with \(n_1\) of the first type, \(n_2\) of the second, …, and \(n_k\) of the \(k\)th, then the number of orderings possible is</p>
+    <p>\[\binom{n}{n_1,n_2,\dots,n_k} = \frac{n!}{n_1!\,n_2!\cdots n_k!}.\]</p>
+    <p>“Godoggy”: \(n=7\) letters, \(k=4\) types \(\{G,O,D,Y\}\), \(n_1=3,n_2=2,n_3=1,n_4=1\), so \(\frac{7!}{3!\,2!\,1!\,1!} = \binom{7}{3,2,1,1}\).</p>
+  </div>
+
+  <h3>Enumerate anagrams</h3>
+  <div class="prose"><p>Type a word of up to 8 letters. The enumerator goes through all \(n!\) orderings of its letters (as if they were distinct) and counts the different words produced.</p></div>
+  <div class="panel enum" data-space="anagrams" data-params='{"word":"SEATTLE"}' data-inputs='{"word":["text",8,"word"]}' data-formula="multinomial" data-label="different words" data-distinct="1"></div>
+
+  <div class="check" data-id="cse312-w1-l2-qc-godoggy" data-answer="7!/(3!*2!*1!*1!)">
+    <p>Quick check: how many ways can you arrange the letters in “GODOGGY”?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="7!" data-tag="treated-identical-as-distinct">\(7!\) treats the three G’s (and two O’s) as different letters. Swapping two G’s gives the same word.</li>
+      <li data-expr="7!/3!" data-tag="divided-for-one-type-only">You divided out the G’s. The two O’s are also duplicates.</li>
+      <li data-expr="7!/2!" data-tag="divided-for-one-type-only">You divided out the O’s. The three G’s are duplicates too.</li>
+      <li data-expr="7!/(3+2)" data-tag="divided-by-count-not-factorial">Each group of \(n_i\) identical letters was counted \(n_i!\) times, so divide by factorials.</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Step through the SEATTLE count: the running product isn’t the answer until every letter has a spot. Ask “why \(\binom52\) for the E’s and not \(\binom72\)?” (Two spots are already taken by T’s.)</li>
+      <li>Placing the letters in a different order (E’s first, then T’s, …) gives the same product. The bottom numbers of a multinomial can go in any order, but they must add up to the top.</li>
+      <li>Problem Set 1 has word-arrangement questions. This page uses only the lecture’s words (SEATTLE, Godoggy) and the textbook’s.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: BINOMIAL THEOREM -->
+<section class="page" id="l2-binomial" data-title="The binomial theorem">
+  <p class="where">Lecture 2 · Fri Oct 2 · Reading 1.3.1</p>
+  <h1>The binomial theorem</h1>
+  <div class="prose">
+    <p>\[(x+y)^2 = (x+y)(x+y) = xx + xy + yx + yy = x^2 + 2xy + y^2.\]</p>
+    <p>Each term of \((x+y)^n = (x+y)\cdots(x+y)\) is made by picking \(x\) or \(y\) from each of the \(n\) copies, so it has the form \(x^ky^{n-k}\). How many times do we get \(x^ky^{n-k}\)? As many as there are ways to choose which \(k\) of the \(n\) copies give \(x\) (the other \(n-k\) give \(y\)): \(\binom nk = \binom{n}{n-k}\).</p>
+  </div>
+
+  <div class="panel" id="expand">
+    <div class="controls">
+      <label>\(n =\) <input type="number" id="ex-n" aria-label="n" min="1" max="6" value="4"></label>
+      <span>Click a column to highlight its products.</span>
+    </div>
+    <div class="expand-cols" id="ex-cols"></div>
+    <p class="out" id="ex-out" aria-live="polite"></p>
+  </div>
+
+  <div class="rule">
+    <p><strong>Binomial theorem.</strong> Let \(x,y\in\mathbb R\) and \(n\in\mathbb N\) a positive integer. Then</p>
+    <p>\[(x+y)^n = \sum_{k=0}^{n}\binom nk x^ky^{n-k}.\]</p>
+    <p>Many properties of sums of binomial coefficients follow from plugging in values of \(x\) and \(y\). With \(x=y=1\): \(\displaystyle\sum_{k=0}^n\binom nk = 2^n\).</p>
+  </div>
+
+  <div class="check" data-id="cse312-w1-l2-qc-coefficient-xy3" data-answer="4">
+    <p>Poll from lecture: what is the coefficient of \(xy^3\) in \((x+y)^4\)?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="4^3" data-tag="exponent-confusion">\(4^3\) counts ordered choices with repeats. You want the number of ways to choose which one copy gives the \(x\).</li>
+      <li data-expr="3" data-tag="read-off-exponent">3 is the exponent of \(y\), not the coefficient. Count the products \(xyyy, yxyy, \dots\)</li>
+      <li data-expr="1" data-tag="forgot-like-terms">Several different products (\(xyyy\), \(yxyy\), …) all simplify to \(xy^3\). Count them all.</li>
+      <li data-expr="16" data-tag="counted-all-products">16 is the total number of products, \(2^4\). Only some of them have exactly one \(x\).</li>
+    </ul>
+  </div>
+  <div class="check" data-id="cse312-w1-l2-qc-sum-of-row" data-answer="2^7">
+    <p>Quick check: what is \(\binom70+\binom71+\cdots+\binom77\)?</p>
+    <ul class="miscon" hidden>
+      <li data-expr="7^2" data-tag="exponent-confusion">Plug \(x=y=1\) into the binomial theorem: \((1+1)^7\).</li>
+      <li data-expr="7" data-tag="counted-terms">There are 8 terms, and they aren’t all 1. Use the binomial theorem with \(x=y=1\).</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Poll options from the slides: 4, \(\binom41\), \(\binom43\), 3. Both \(\binom41\) and \(\binom43\) equal 4, which is symmetry again.</li>
+      <li>The last slide sums up the week: \(k\)-sequences \(n^k\) (product rule), \(k\)-permutations \(\frac{n!}{(n-k)!}\) (no repetition), \(k\)-combinations \(\binom nk = \frac{n!}{k!(n-k)!}\) (no repetition, no order).</li>
+      <li>Pascal’s identity \(\binom nk = \binom{n-1}{k-1}+\binom{n-1}k\) is on the slide, marked “next lecture”. It isn’t covered here.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2 QUIZ -->
+<section class="page" id="l2-quiz" data-title="Lecture 2: check your understanding">
+  <p class="where">Lecture 2 · Fri Oct 2 · wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: Lecture 2</h1>
+  <div class="prose">
+    <p>Ten questions on Lecture 2 only: combinations, symmetry, paths, stars and bars, multinomials and the binomial theorem. The score counts first tries only.</p>
+  </div>
+
+  <div class="cyu-score" data-score role="status"></div>
+
+  <ol class="cyu-list">
+    <li class="cyu" data-id="cse312-w1-l2-quiz-committee" data-kind="num" data-answer="C(10,3)" data-topic="l2-combos">
+      <p class="q">A club of 10 people chooses a 3-person committee. How many committees are possible?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="720" data-tag="ordered-instead-of-unordered">Looks like you counted ordered arrangements. A committee has no first or second member. Does order matter here?</li>
+        <li data-expr="1000" data-tag="allowed-repeats">That allows the same person to be picked more than once, and keeps order.</li>
+      </ul>
+      <p class="why" hidden>Unordered, no repeats: \(\binom{10}{3} = \frac{10\cdot9\cdot8}{3!} = 120\).</p>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l2-quiz-order-matters" data-kind="mc" data-topic="l2-combos">
+      <p class="q">From 20 students, which of these is counted by \(\binom{20}{3}\)?</p>
+      <div class="opts">
+        <label data-opt="officers" data-tag="ordered-instead-of-unordered"><input type="radio"> Choosing a president, a vice president and a treasurer<span class="why" hidden>The three roles are different, so order matters: that’s \(P(20,3)\).</span></label>
+        <label data-opt="study-group" data-correct><input type="radio"> Choosing a 3-person study group<span class="why" hidden>Correct. A group is a set: no order, no repeats.</span></label>
+        <label data-opt="prizes-with-repeats" data-tag="allowed-repeats"><input type="radio"> Giving 3 different prizes, where one student can win several<span class="why" hidden>Each prize picks a winner with repeats allowed: \(20^3\).</span></label>
+        <label data-opt="line-up" data-tag="ordered-instead-of-unordered"><input type="radio"> Lining up 3 students for a photo<span class="why" hidden>A line has an order: \(P(20,3)\).</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l2-quiz-symmetry" data-kind="mc" data-topic="l2-combos">
+      <p class="q">Which of these is equal to \(\binom{12}{5}\)?</p>
+      <div class="opts">
+        <label data-opt="c-12-7" data-correct><input type="radio"> \(\binom{12}{7}\)<span class="why" hidden>Correct. Choosing the 5 to include is the same as choosing the 7 to leave out.</span></label>
+        <label data-opt="c-7-5" data-tag="symmetry-misapplied"><input type="radio"> \(\binom{7}{5}\)<span class="why" hidden>Symmetry changes the bottom number to \(n-k\); the top stays \(n=12\).</span></label>
+        <label data-opt="p-12-5" data-tag="ordered-instead-of-unordered"><input type="radio"> \(P(12,5)\)<span class="why" hidden>\(P(12,5)\) counts ordered sequences, \(5!\) times as many as the sets.</span></label>
+        <label data-opt="12-fact-over-5-fact" data-tag="forgot-a-factorial"><input type="radio"> \(\frac{12!}{5!}\)<span class="why" hidden>The formula divides by both \(5!\) and \(7!\).</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l2-quiz-robot-routes" data-kind="num" data-answer="C(6,2)" data-topic="l2-paths">
+      <p class="q">A robot takes 6 unit steps, each one either up or right, and ends 4 to the right of and 2 above where it started. How many different routes can it take?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="64" data-tag="ignored-move-counts">\(2^6\) counts every up/right string of length 6, including ones that end in the wrong place.</li>
+        <li data-expr="30" data-tag="ordered-instead-of-unordered">Looks like you treated the two up-steps as different. Swapping them gives the same route. Does order among the ups matter?</li>
+        <li data-expr="720" data-tag="ordered-instead-of-unordered">\(6!\) treats all six steps as different. All ups look alike, and so do all rights.</li>
+      </ul>
+      <p class="why" hidden>A route is a string of 6 arrows with exactly 2 ups. Choose which 2 of the 6 steps are up: \(\binom62 = 15\).</p>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l2-quiz-cookies" data-kind="num" data-answer="C(13,3)" data-topic="l2-stars">
+      <p class="q">In how many ways can 10 identical cookies be given to 4 children, if a child may get none?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="4^10" data-tag="treated-identical-as-distinct">\(4^{10}\) asks each cookie who gets it, as if the cookies were different. They’re identical.</li>
+        <li data-expr="C(13,4)" data-tag="wrong-number-of-bars">4 children need \(4-1 = 3\) bars, not 4.</li>
+        <li data-expr="C(10,3)" data-tag="forgot-bars-in-length">The string has 10 stars and 3 bars: 13 symbols, not 10.</li>
+        <li data-expr="C(14,4)" data-tag="wrong-number-of-bars">Check the length: \(n+k-1 = 10+4-1\) symbols, of which \(k-1\) are bars.</li>
+      </ul>
+      <p class="why" hidden>Stars and bars with \(n=10\) balls and \(k=4\) bins: \(\binom{10+4-1}{4-1} = \binom{13}{3} = 286\).</p>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l2-quiz-sum-to-four" data-kind="num" data-answer="C(6,2)" data-topic="l2-stars">
+      <p class="q">How many solutions \((x_1,x_2,x_3)\) in non-negative integers does \(x_1+x_2+x_3 = 4\) have?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="C(6,3)" data-tag="wrong-number-of-bars">3 variables need 2 dividers (zeros), not 3.</li>
+        <li data-expr="C(4,2)" data-tag="forgot-bars-in-length">The binary string has 4 ones <em>and</em> 2 zeros: length 6.</li>
+        <li data-expr="3^4" data-tag="treated-identical-as-distinct">\(3^4\) gives each of the 4 units its own label. The units are identical; only the totals matter.</li>
+      </ul>
+      <p class="why" hidden>Strings of four 1s and two 0s: \(\binom{6}{2} = 15\).</p>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l2-quiz-banana" data-kind="num" data-answer="6!/(3!*2!*1!)" data-topic="l2-anagrams">
+      <p class="q">How many different words can be made by rearranging the letters of BANANA?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="720" data-tag="treated-identical-as-distinct">\(6!\) treats the three A’s as different letters. Swapping two A’s gives the same word.</li>
+        <li data-expr="120" data-tag="divided-for-one-type-only">You divided out the A’s. The two N’s are duplicates too.</li>
+        <li data-expr="360" data-tag="divided-for-one-type-only">You divided out the N’s. The three A’s are duplicates too.</li>
+      </ul>
+      <p class="why" hidden>6 letters: 3 A’s, 2 N’s, 1 B. \(\binom{6}{3,2,1} = \frac{6!}{3!\,2!\,1!} = 60\).</p>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l2-quiz-why-not-7-factorial" data-kind="mc" data-topic="l2-anagrams">
+      <p class="q">Why is \(7!\) <em>not</em> the number of rearrangements of SEATTLE?</p>
+      <div class="opts">
+        <label data-opt="duplicates" data-correct><input type="radio"> Swapping the two T’s (or the two E’s) gives the same word, so words get counted more than once<span class="why" hidden>Correct. Each word is counted \(2!\cdot2! = 4\) times, so the answer is \(7!/4 = 1260\).</span></label>
+        <label data-opt="seven-letters" data-tag="miscounted-letters"><input type="radio"> SEATTLE doesn’t have 7 letters<span class="why" hidden>It does: S, E, A, T, T, L, E.</span></label>
+        <label data-opt="undercount" data-tag="direction-of-error"><input type="radio"> \(7!\) is too small, because repeated letters create extra words<span class="why" hidden>It’s the other way round: repeated letters mean fewer different words, so \(7!\) is too big.</span></label>
+        <label data-opt="real-words" data-tag="misread-question"><input type="radio"> Most rearrangements aren’t real English words<span class="why" hidden>In counting, a “word” is any string of the letters. English doesn’t matter.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l2-quiz-coefficient-x2y3" data-kind="num" data-answer="C(5,2)" data-topic="l2-binomial">
+      <p class="q">What is the coefficient of \(x^2y^3\) in \((x+y)^5\)?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="1" data-tag="forgot-like-terms">Many different products (\(xxyyy\), \(xyxyy\), …) all simplify to \(x^2y^3\). Count them.</li>
+        <li data-expr="32" data-tag="counted-all-products">32 is the total number of products, \(2^5\). Only some have exactly two \(x\)’s.</li>
+        <li data-expr="20" data-tag="ordered-instead-of-unordered">You picked the two \(x\)-copies in order. Which two copies give \(x\) is a set, not a sequence.</li>
+      </ul>
+      <p class="why" hidden>Choose which 2 of the 5 copies of \((x+y)\) give \(x\): \(\binom52 = 10\).</p>
+    </li>
+
+    <li class="cyu" data-id="cse312-w1-l2-quiz-row-sum" data-kind="num" data-answer="2^6" data-topic="l2-binomial">
+      <p class="q">What is \(\displaystyle\sum_{k=0}^{6}\binom6k\)?</p>
+      <ul class="miscon" hidden>
+        <li data-expr="36" data-tag="exponent-confusion">Plug \(x=y=1\) into the binomial theorem: \((1+1)^6\), not \(6^2\).</li>
+        <li data-expr="7" data-tag="counted-terms">There are 7 terms, but they aren’t all 1.</li>
+      </ul>
+      <p class="why" hidden>Binomial theorem with \(x=y=1\): \((1+1)^6 = 2^6 = 64\). Also: it counts all subsets of a 6-element set, grouped by size.</p>
+    </li>
+  </ol>
+
+  <div class="cyu-score" data-summary role="status"></div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Questions 2, 3 and 8 are the conceptual ones: does order matter, what does symmetry change, why divide. Ask students to explain a wrong option too.</li>
+      <li>None of these overlap with Problem Set 1. The route and cookie questions use different setups from the PSet’s grid and stars-and-bars tasks.</li>
+      <li>Every numeric answer was checked by brute force (see the tests).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ READINGS -->
+<section class="page" id="readings" data-title="Readings">
+  <p class="where">Textbook: Alex Tsun, <em>Probability &amp; Statistics with Applications to Computing</em> · worked examples from the reading, with the book’s answers</p>
+  <h1>Readings</h1>
+  <table class="plain">
+    <tr><th>For Lecture 1 (Wed, Sept 30)</th><td>1.1 So You Think You Can Count? (sum rule, product rule, permutations, complementary counting) and 1.2.1 \(k\)-permutations · plus the <a href="https://courses.cs.washington.edu/courses/cse312/26au/files/optional-set-review.pdf" target="_blank" rel="noopener">optional set theory review</a></td></tr>
+    <tr><th>For Lecture 2 (Fri, Oct 2)</th><td>1.2.2 \(k\)-combinations, 1.2.3 multinomial coefficients, 1.2.4 stars and bars, 1.2.5 exercises, 1.3.1 binomial theorem</td></tr>
+    <tr><th>Link</th><td><a href="https://courses.cs.washington.edu/courses/cse312/26au/files/Prob_Stat_for_CS_Book.pdf" target="_blank" rel="noopener">Prob_Stat_for_CS_Book.pdf</a> (Chapter 1, pages 20–37; the schedule links Lecture 1’s reading to the <a href="https://courses.cs.washington.edu/courses/cse312/22au/files/Prob_Stat_for_CS_Book.pdf" target="_blank" rel="noopener">identical 22au copy</a>)</td></tr>
+  </table>
+  <div class="prose"><p>The book’s examples make good extra practice. Each one below is answerable, with the book’s solution condensed into steps.</p></div>
+
+  <h2>Reading 1.1–1.2.1</h2>
+  <article class="task" data-id="cse312-w1-rd-1-1-flamingos" data-legacy-ids="rd-flamingos">
+    <h2>1.1.2: flamingos</h2>
+    <p class="prompt">Flamingos Fanny and Freddy have three offspring: Happy, Glee, and Joy. These five flamingos are to be distributed to seven different zoos so that no zoo gets both a parent and a child. It is not required that every zoo gets a flamingo. In how many different ways can this be done?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-rd-1-1-flamingos.ans" data-answer="7*6^3+7*6*5^3">
+      <ul class="miscon" hidden>
+        <li data-expr="7*6^3" data-tag="one-case-only">That’s only the case where the parents share a zoo.</li>
+        <li data-expr="7*6*5^3" data-tag="one-case-only">That’s only the case where the parents are in different zoos.</li>
+        <li data-expr="7^5" data-tag="ignored-constraint">That ignores the parent/child rule.</li>
+      </ul>
+    </div>
+    <ol class="hints"><li>Same idea as the lizards and snakes: place the parents first, and split on whether they share a zoo.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Parents together: 7 zoos for them, then each child has 6 zoos: \(7\cdot6^3\).</li>
+      <li>Parents apart: \(7\cdot6\) ways, then each child has 5 zoos: \(7\cdot6\cdot5^3\).</li>
+      <li class="answer">\(7\cdot6^3 + 7\cdot6\cdot5^3 = 6{,}762\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-rd-1-1-5-ex1-a-b-apart" data-legacy-ids="rd-ex1">
+    <h2>1.1.5 exercise 1: A and B apart</h2>
+    <p class="prompt">6 people want to line up in a row for a picture, but two of them, A and B, refuse to sit next to each other. How many ways can they sit in a row?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-rd-1-1-5-ex1-a-b-apart.ans" data-answer="480">
+      <ul class="miscon" hidden>
+        <li data-expr="240" data-tag="counted-complement">240 is the number where A and B <em>are</em> together. Subtract from all \(6!\).</li>
+        <li data-expr="600" data-tag="forgot-internal-order">When A and B sit together, they can be AB or BA.</li>
+      </ul>
+    </div>
+    <ol class="hints"><li>Complement: glue A and B together, count, and subtract from \(6!\).</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Together: treat AB as one unit: \(5!\) orders, times 2 for AB/BA: 240.</li>
+      <li>Or by cases: A at an end (\(2\cdot4\cdot4!\)) or in the middle (\(4\cdot3\cdot4!\)).</li>
+      <li class="answer">\(6! - 2\cdot5! = 480\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-rd-1-2-1-professors-between-tas">
+    <h2>1.2.1: professors between TAs</h2>
+    <p class="prompt">We have 13 chairs in a row, to seat 9 TAs and Professors Sunny, Rainy, Windy, and Cloudy. How many seatings have every professor with a TA immediately to their left and right?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-rd-1-2-1-professors-between-tas.ans" data-answer="9!*P(8,4)">
+      <ul class="miscon" hidden>
+        <li data-expr="9!*C(8,4)" data-tag="ordered-instead-of-unordered">The professors are different people, so which professor sits in which gap matters.</li>
+        <li data-expr="9!*P(10,4)" data-tag="counted-end-gaps">A professor at either end has no TA on one side. Only the gaps <em>between</em> TAs work.</li>
+      </ul>
+    </div>
+    <ol class="hints"><li>Line up the TAs first. Where can a professor go so they have a TA on both sides?</li><li>There are 8 gaps between 9 TAs. At most one professor per gap.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Order the 9 TAs: \(9!\).</li>
+      <li>Choose gaps for the 4 professors, in order, from the 8 inner gaps: \(P(8,4)\).</li>
+      <li class="answer">\(9!\cdot P(8,4) = 609{,}638{,}400\)</li>
+    </ol></div></div>
+  </article>
+
+  <h2>Reading 1.2.2–1.3.1</h2>
+  <article class="task" data-id="cse312-w1-rd-1-2-2-escape-room-pairs">
+    <h2>1.2.2: escape room pairs</h2>
+    <p class="prompt">6 AI professors and 7 theory professors take part in an escape room. 4 AI professors and 4 theory professors are chosen and divided into 4 pairs (one AI professor with one theory professor per pair). How many pairings are possible?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-rd-1-2-2-escape-room-pairs.ans" data-answer="C(6,4)*C(7,4)*4!">
+      <ul class="miscon" hidden>
+        <li data-expr="C(6,4)*C(7,4)" data-tag="forgot-matching">After picking the 8 professors you still have to match them up.</li>
+        <li data-expr="P(6,4)*P(7,4)" data-tag="ordered-instead-of-unordered">Ordering both groups counts each pairing \(4!\) times. Order the pairs only once.</li>
+      </ul>
+    </div>
+    <ol class="hints"><li>Choose who plays, then match them up.</li><li>For the first theory professor, how many AI partners are possible? The second?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Choose 4 of 6 AI professors and 4 of 7 theory professors: \(\binom64\binom74\).</li>
+      <li>Match: the first theory professor has 4 choices of partner, the next 3, …: \(4!\).</li>
+      <li class="answer">\(\binom64\binom74\cdot4! = 12{,}600\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-rd-1-2-3-babyyybay">
+    <h2>1.2.3: BABYYYBAY</h2>
+    <p class="prompt">How many ways can you rearrange the letters of “BABYYYBAY” (3 B’s, 2 A’s, 4 Y’s)?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-rd-1-2-3-babyyybay.ans" data-answer="9!/(3!*2!*4!)">
+      <ul class="miscon" hidden><li data-expr="9!" data-tag="treated-identical-as-distinct">\(9!\) treats the repeated letters as different.</li></ul>
+    </div>
+    <ol class="hints"><li>Choose where the B’s go, then the A’s among the remaining spots.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(\binom93\) spots for the B’s, \(\binom62\) for the A’s, \(\binom44=1\) for the Y’s.</li>
+      <li class="answer">\(\binom{9}{3,2,4} = \frac{9!}{3!\,2!\,4!} = 1{,}260\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-rd-1-2-4-students-to-professors">
+    <h2>1.2.4: students to professors</h2>
+    <p class="prompt">There are 20 students and 4 professors. The professors only care how many students they get, not which ones. With no restrictions, how many ways can the students be assigned to professors?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-rd-1-2-4-students-to-professors.ans" data-answer="C(23,3)">
+      <ul class="miscon" hidden>
+        <li data-expr="4^20" data-tag="treated-identical-as-distinct">\(4^{20}\) tracks <em>which</em> students each professor gets. Here only the numbers matter.</li>
+        <li data-expr="C(24,4)" data-tag="wrong-number-of-bars">4 professors need 3 bars, so the string has \(20+3\) symbols.</li>
+      </ul>
+    </div>
+    <ol class="hints"><li>Balls: students (indistinguishable here). Bins: professors.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>20 stars and 3 bars.</li>
+      <li class="answer">\(\binom{23}{3} = \binom{23}{20} = 1{,}771\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-rd-1-2-5-ex3-die-rolls">
+    <h2>1.2.5 exercise 3: die rolls</h2>
+    <p class="prompt">If we roll a fair 3-sided die 11 times, what is the number of ways that we can get 4 1’s, 5 2’s, and 2 3’s?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-rd-1-2-5-ex3-die-rolls.ans" data-answer="11!/(4!*5!*2!)">
+      <ul class="miscon" hidden><li data-expr="3^11" data-tag="ignored-constraint">That’s every sequence of 11 rolls. Only those with exactly four 1’s, five 2’s and two 3’s count.</li></ul>
+    </div>
+    <ol class="hints"><li>The outcome is a sequence like 11112222233. How many orderings of those digits are there?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Count orderings of 11112222233.</li>
+      <li class="answer">\(\binom{11}{4,5,2} = \frac{11!}{4!\,5!\,2!} = 6{,}930\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-rd-1-2-5-ex4-phone-numbers">
+    <h2>1.2.5 exercise 4: phone numbers</h2>
+    <p class="prompt">How many 7-digit phone numbers are such that the digits are (a) strictly increasing (e.g. 014-5689), and (b) monotone increasing, so digits can stay the same or go up (e.g. 011-5566)?</p>
+    <div class="answer-spec" data-part-id="cse312-w1-rd-1-2-5-ex4-phone-numbers.strict" data-label="a) strictly increasing" data-answer="C(10,7)">
+      <ul class="miscon" hidden><li data-expr="P(10,7)" data-tag="ordered-instead-of-unordered">Once you pick the 7 digits, there’s only one increasing order. Don’t count the orderings.</li></ul>
+    </div>
+    <div class="answer-spec" data-part-id="cse312-w1-rd-1-2-5-ex4-phone-numbers.monotone" data-label="b) monotone increasing" data-answer="C(16,7)">
+      <ul class="miscon" hidden><li data-expr="C(17,7)" data-tag="wrong-number-of-bars">The counter goes from 0 to 9, so it needs 9 bars, not 10.</li></ul>
+    </div>
+    <ol class="hints">
+      <li>(a) Choosing which 7 digits appear decides the number.</li>
+      <li>(b) Use 7 stars for the digits and bars to move a counter from 0 up to 9.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>(a) Choose 7 of the 10 digits; they can only go in increasing order: \(\binom{10}{7}\).</li>
+      <li>(b) Bijection with arrangements of 7 stars and 9 bars: start a counter at 0; a bar adds 1, a star writes the current digit. 011-5566 is \(*|**||||**|**|||\).</li>
+      <li class="answer">(a) \(\binom{10}{7} = 120\) &nbsp;&nbsp; (b) \(\binom{16}{7} = 11{,}440\)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse312-w1-rd-1-3-1-coefficient-a45-b14">
+    <h2>1.3.1: a big coefficient</h2>
+    <p class="prompt">Calculate the coefficient of \(a^{45}b^{14}\) in the expansion of \((4a^3 - 5b^2)^{22}\). Give an exact integer or an exact expression; it’s large and negative.</p>
+    <div class="answer-spec" data-part-id="cse312-w1-rd-1-3-1-coefficient-a45-b14.ans" data-answer="-C(22,15)*4^15*5^7">
+      <ul class="miscon" hidden>
+        <li data-expr="C(22,15)*4^15*5^7" data-tag="dropped-sign">Check the sign: \(y = -5b^2\) is raised to an odd power.</li>
+        <li data-expr="-C(22,15)" data-tag="forgot-constants">The 4 and the −5 get raised to powers too.</li>
+        <li data-expr="-C(22,45)*4^15*5^7" data-tag="used-exponent-of-a">\(a^{45}\) comes from \((a^3)^{15}\), so \(k = 15\), not 45.</li>
+      </ul>
+    </div>
+    <ol class="hints"><li>Let \(x = 4a^3\) and \(y = -5b^2\). Which power of \(x\) gives \(a^{45}\)?</li><li>You need \(x^{15}y^{7}\).</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(x^{15}\) gives \(a^{45}\) and \(y^7\) gives \(b^{14}\), so the term is \(\binom{22}{15}x^{15}y^7\).</li>
+      <li>\(\binom{22}{15}(4a^3)^{15}(-5b^2)^7 = -\binom{22}{15}4^{15}5^7a^{45}b^{14}\).</li>
+      <li class="answer">\(-\binom{22}{15}\,4^{15}\,5^{7} = -14{,}306{,}267{,}627{,}520{,}000{,}000\)</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>This answer has 20 digits, past where floating point is exact. The checker compares exact integers, so typing a neighbouring number like …001 is marked wrong.</li></ul>
+    </details>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CHEATSHEET -->
+<section class="page" id="cheatsheet" data-title="Cheat sheet">
+  <h1>Week 1 cheat sheet</h1>
+  <p class="where">Print with <kbd>Ctrl</kbd>+<kbd>P</kbd>; only this page prints.</p>
+  <div class="cheat">
+    <section>
+      <h3>Sum rule</h3>
+      <p>Disjoint options: \(|A\cup B| = |A|+|B|\) when \(A\cap B=\varnothing\).</p>
+      <p>Complement: \(|S| = |U| - |U\setminus S|\).</p>
+    </section>
+    <section>
+      <h3>Product rule</h3>
+      <p>\(n_1\cdot n_2\cdots n_m\), where \(n_i\) is the number of choices <em>given</em> the earlier ones (it can’t depend on which ones were made).</p>
+      <p>\(|A_1\times\cdots\times A_n| = |A_1|\cdots|A_n|\) · \(|2^S| = 2^{|S|}\)</p>
+    </section>
+    <section>
+      <h3>The three basic counts</h3>
+      <table class="plain">
+        <tr><td>\(k\)-sequences over \(n\) symbols</td><td>\(n^k\)</td></tr>
+        <tr><td>\(k\)-permutations (no repeats)</td><td>\(P(n,k)=\frac{n!}{(n-k)!}\)</td></tr>
+        <tr><td>\(k\)-combinations (no repeats, no order)</td><td>\(\binom nk=\frac{n!}{k!(n-k)!}\)</td></tr>
+        <tr><td>Orderings of \(n\) items</td><td>\(n!\), \(0!=1\)</td></tr>
+      </table>
+      <p>\(n!\) is huge. Stirling (Lecture 2): \(\sqrt{2\pi}\,n^{n+\frac12}e^{-n} \le n! \le e\,n^{n+\frac12}e^{-n}\).</p>
+    </section>
+    <section>
+      <h3>Lecture 2 tools</h3>
+      <p>\(\binom nk = \binom n{n-k}\), \(\binom n0=\binom nn=1\), \(\binom n1=n\).</p>
+      <p>Stars and bars: \(n\) identical balls into \(k\) bins: \(\binom{n+k-1}{k-1}\).</p>
+      <p>Multinomial: \(\binom{n}{n_1,\dots,n_k} = \frac{n!}{n_1!\cdots n_k!}\).</p>
+      <p>Binomial theorem: \((x+y)^n = \sum_{k=0}^n\binom nk x^ky^{n-k}\), so \(\sum_k\binom nk = 2^n\).</p>
+    </section>
+    <section>
+      <h3>Strategies</h3>
+      <ul>
+        <li>Choose a representation (books choose people; paths are arrow strings).</li>
+        <li>Glue “must be together” items into blocks.</li>
+        <li>Place the most constrained item first.</li>
+        <li>Split into disjoint cases and add.</li>
+        <li>Count the complement.</li>
+        <li>Divide out overcounting (sets, repeated letters).</li>
+        <li>Check with a second method or a small example.</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Section 1 answers</h3>
+      <table class="plain">
+        <tr><td>2a</td><td>\(10^{15}\)</td><td>2b</td><td>36</td></tr>
+        <tr><td>2c</td><td>\(13!\)</td><td>2d</td><td>\(3\cdot12!\)</td></tr>
+        <tr><td>3</td><td>\((13!)^4\)</td><td>4a</td><td>\(5!\,2^5\)</td></tr>
+        <tr><td>4b</td><td>\(10!-2\cdot9!\)</td><td>5</td><td>\(8!-(2\cdot7!-6!)\)</td></tr>
+        <tr><td>6</td><td>\(4\cdot3^3+12\cdot2^3\)</td><td>7</td><td>\(4^6\)</td></tr>
+        <tr><td>8</td><td>\((2\cdot7+2\cdot6)\,6!\)</td><td>9</td><td>\(n!\,(m!)^n\)</td></tr>
+      </table>
+    </section>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+</main>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script src="vendor/katex/katex.min.js"></script>
+<script src="vendor/katex/auto-render.min.js"></script>
+<script src="js/grader.js"></script>
+<script src="js/counting.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

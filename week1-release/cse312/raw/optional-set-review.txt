@@ -1,0 +1,86 @@
+CSE 312
+Foundations of Computing II
+Optional Review: Set Theory and Notation
+
+
+
+
+                                           1
+Sets
+
+
+
+
+       2
+Common sets
+
+
+
+
+              3
+Implicit descriptions
+
+Often, sets are described implicitly.
+
+
+                                                unambiguous
+What is this set?
+
+
+
+
+What is this set?
+                                        ambiguous         4
+Set operations
+
+                 set union
+
+
+
+                 set intersection
+
+
+
+                 set diﬀerence
+
+                                    5
+Set operations (cont’d)
+
+
+
+
+  set complement
+
+
+
+
+                          “De Morgan’s Laws”
+                                               6
+Sequences
+
+
+
+
+•
+
+
+Equivalent naming: 2-sequence = 2-tuple = ordered pair.
+                                                          7
+Cartesian product – cont’d
+
+•
+
+
+Example.
+
+
+
+
+                             8
+Cartesian product – even more notation
+
+
+
+
+                                         9
+

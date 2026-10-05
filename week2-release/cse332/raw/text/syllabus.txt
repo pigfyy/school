@@ -1,0 +1,370 @@
+ 
+ CSE332 - Syllabus 
+ CSE 332 – Syllabus 
+ Home [index.html] 
+ Syllabus 
+ Calendar [calendar.html] 
+ Tasks [tasks.html] 
+ Exams [exams.html] 
+ Summaries [summaries.html] 
+ Office Hours [oh.html] 
+ Staff [staff.html] 
+ Table of Contents 
+ 1 Logistics [#logistics]
+ 1.1 Meetings [#meetings] 
+ 1.2 Contact [#contact] 
+ 1.3 Readings [#readings] 
+ 1.4 Assessments [#tasks] 
+ 1.5 Participation
+ Activities [#participation-activities] 
+ 1.6 Late Policy [#late-policy] 
+ 2 Grading [#grading]
+ 2.1 Gradepoint
+ Guarantee [#gradepoint-guarantee] 
+ 2.2 Regrades [#regrades] 
+ 3 Miscellanea [#miscellanea]
+ 3.1 Professionalism [#professionalism] 
+ 3.2 Honesty [#honesty]
+ 3.2.1 No plagiarism (nor
+ anything like it) [#no-plagiarism-nor-anything-like-it] 
+ 3.2.2 Course AI Policy: AI
+ as a Reference Tool [#course-ai-policy-ai-as-a-reference-tool] 
+ 3.3 Personal
+ accommodations [#personal-accommodations]
+ 3.3.1 Disability
+ Resources [#disability-resources] 
+ 3.3.2 Religious
+ Accommodations [#religious-accommodations] 
+ 3.3.3 Extenuating
+ Circumstances [#extenuating-circumstances] 
+ 3.3.4 Life [#life] 
+ This page is from a previous offering of the course. It has been left up for archival purposes. -->
+ This page is under construction. Any content you see now is subject to change until the first day of class. Expect some links to be broken until that time. -->
+ Looking for someone to talk to about CSE332? Try the Study Center in CSE room 006! There's a table there just for working on and discussing CSE332! -->
+ 1 Logistics 
+ 1.1 Meetings 
+ In-person lectures will be held Mondays, Wednesdays, and
+ Fridays in CSE2
+ (Gates Hall) [https://www.washington.edu/maps/#!/CSE2] room G20 at 12:30pm-1:20pm and room G10 at
+ 3:30pm-4:20pm. 
+ You should plan on attending the lecture you are registered
+ for, although occasionally attending the other lecture will be
+ fine as long as there is space. Attendance at lecture is strongly
+ encouraged. If you are unable to attend a lecture, both lectures
+ will be recorded (and live streamed) on Panopto and recordings
+ will be posted in Canvas. Slides for lecture will be posted on the
+ course calendar, generally before lecture. 
+ Sections will be held on Thursdays in rooms indicated on the
+ course time schedule. Section attendance is strongly encouraged.
+ You should plan on attending the section you are registered for.
+ Occasionally attending another section should be fine as long as
+ there is space. If you do this, please ask permission from the
+ leading TA(s) and let them know you are present. Slides, and
+ handouts for section will be posted on the course calendar.
+ Sections will NOT be recorded as we want students to feel
+ comfortable asking and answering questions in the smaller
+ classroom environment. 
+ Office Hours will be held throughout the week both in person
+ and on Zoom. You may attend the office hours of any staff member,
+ not just the TA who leads your section. A schedule of office hours
+ and more information can be found on the office hours page. 
+ Both A and B sections of the course will share the same
+ assignments, deadlines, TA office hours, etc. I will do my best to
+ cover the same content in lectures on the same days, but there may
+ be occasional drift. 
+ 1.2 Contact 
+ Info 
+ Instructor 
+ TAs 
+ Name 
+ Ruth Anderson 
+ Profiles [staff.html] 
+ Location 
+ Allen Center (CSE) 558 and on zoom 
+ See Calendar [oh.html] 
+ Office Hours 
+ M 1:30pm-2:30, W 4:30pm-5:30 or by Appointment 
+ See Calendar [oh.html] 
+ Email 
+ rea@cs.washington.edu [mailto:rea@cs.washington.edu?subject=CSE332] 
+ use Ed Discussion Board 
+ For communication about course content, the Ed Discussion Board
+ is preferred to email. For communication about personal
+ circumstances, email to Ruth Anderson is preferred. If you email,
+ include CSE 332 in the subject line to prevent your email
+ from skipping my inbox and never getting read. 
+ Our TAs are students too, with duties and work outside of their
+ TAing. Please do not ask them to act as your TA except in section
+ or at the scheduled times they have listed as their office hours.
+ They are also kind people; please don’t put them in the position
+ of having to say no or (worse) being nice to you at the expense of
+ their own schooling. 
+ 1.3 Readings 
+ (Optional) Data Structures and Algorithm Analysis in Java
+ 3rd Ed. , Mark Allen Weiss, Addison Wesley: 2012, ISBN-10:
+ 0132576279. Our course calendar will list sections of the textbook
+ that are most relevant to the topic discussed in class that day.
+ You may find the textbook useful to clarify topics and find more
+ examples as well as to examine Java implementations of the data
+ structures and algorithms discussed during lecture. We will not be
+ assigning problems from the textbook. A copy of the textbook is
+ available at the Odegaard Library Reserves Desk. A copy of the
+ second edition of the text will also work for most of the material
+ we will cover. We will use a set of free on-line notes for the
+ material on parallelism and concurrency. 
+ 1.4 Assessments 
+ Your learning in the course will be assessed via individual
+ exercises, an in-person midterm exam, and an in-person cumulative
+ final exam. We will also have a few surveys and other in-person
+ activities that will contribute to a participation portion of your
+ grade. 
+ Exercises : There will be a total of 13
+ individual exercises, which you will complete individually. These
+ are intended to help you to gain experience and familiarity with
+ course concepts by applying them to novel scenarios beyond those
+ presented in lecture and section. These will sometimes be written
+ assignments, but many will be programming tasks (perhaps paired
+ with written activities). You will have at least one exercise due
+ per week. Several weeks will have two exercises due. In all cases
+ the exercises will be released as soon as you can reasonably begin
+ making progress on them, and you will have roughly one week to
+ complete them. 
+ Exams : There will be an in-person midterm
+ and an in-person cumulative final exam. These are intended to
+ evaluate the quality of your learning of the most important topics
+ in the course, and to motivate you to study, review, and
+ retroactively reflect upon all that you’ve learned. The midterm
+ exam is set for Monday November 9, 2026 in the afternoon/evening
+ TBA. The final exam will be Thursday December 17, 2026
+ 12:30-2:20pm in BAG 131 & BAG 154. More information about the
+ midterm and final exam will be posted on the exams page. 
+ 1.5 Participation
+ Activities 
+ A small part of your grade will be determined by your
+ participation in various parts of the course. These include: 
+ Completing course Surveys : We will have 2-3
+ of these in total. 
+ Meet the staff : Attending one staff
+ office hour (in person or on zoom) during the first four weeks of
+ the quarter. 
+ In class activities : Participating in
+ activities, in person, during lectures. There will be an activity
+ most but not all lectures, and participating in at least 10 of
+ these is enough to get full credit for this portion of your
+ participation grade. 
+ 1.6 Late Policy 
+ You will have six late day tokens to use during the quarter for
+ exercises. A late day token allows you to turn in an exercise up
+ to 24 hours later without penalty. Simply submit late and we will
+ keep track of your usage internally. 
+ An exception is made for weekends, which count as a single late
+ day. That is, if an exercise is due at 11:59 pm on Friday,
+ submitting before Sunday at 11:59 pm counts as using only ONE late
+ day (submitting by 11:59 pm on Monday would count as using TWO
+ late days). 
+ Regardless of how many late days you have, you cannot submit an
+ exercise more than 2 days after it is due without prior permission
+ from course staff. 
+ If you run out of late days, you may still turn in an exercise
+ late, at a penalty of 10% per day (but still may not turn in an
+ exercise after the 2 day-late-deadline without prior permission
+ from the course staff). 
+ At the end of the quarter, we will apply late days to the first
+ exercises turned in late, and late penalties to any remaining late
+ submissions. Late penalties are applied before dropping
+ exercises. 
+ Late days are intended to help you manage your time and
+ unexpected life circumstances; please save them for this purpose!
+ Leftover late days will not contribute to your grade in any way.
+ If there are extenuating circumstances that prevent you from
+ submitting an exercise on time, you should discuss this with the
+ instructor (preferably in advance). 
+ 2 Grading 
+ Course grades will be computed approximately as follows
+ (weights may be modified): 
+ Task 
+ Weight 
+ Comments 
+ Exercises 
+ 42% 
+ 13 total, each worth the same
+ amount, with the lowest exercise (other than EX12 1 [#fn1]) being dropped. 
+ Participation 
+ 3% 
+ Surveys, Meet the staff, In class
+ activities 
+ Exams 
+ 55% 
+ A midterm (counting for 20%) and a
+ cumulative final exam (counting for 35%). 
+ 2.1 Gradepoint Guarantee 
+ To help you to keep track of your standing in the course and to
+ interpret grades as they are returned, we will provide the
+ following Gradepoint Guarantees . If your score in the
+ course using the weighted average above is at or above the
+ thresholds below, we guarantee you will receive a course GPA that
+ is at least the amount shown. At the end of the quarter we may
+ adjust these thresholds in order to maintain consistent grading
+ with past offerings of the course, but we guarantee we will only
+ relax them. That is, your final GPA may possibly be higher than
+ those given, but will definitely not be lower. 
+ If your grade is 
+ Then your course GPA will be 
+ ≥92% 
+ ≥3.5 
+ ≥85% 
+ ≥3.0 
+ ≥65% 
+ ≥2.0 
+ 2.2 Regrades 
+ We acknowledge that professors and TAs are people (glad to get
+ that confession off of my chest!), and people make mistakes. For
+ this reason, you are able to request regrades on exercises and
+ exams within one week of your grade being returned. 
+ Please only submit a regrade request if you believe the rubric
+ was misapplied to your submission or if there was a keying error
+ for the task. In the case of a misapplication of the rubric,
+ identify specifically what in your submission demonstrates the
+ misapplication and suggest how you believe the rubric should be
+ correctly applied. In the case of a keying error, state and
+ justify why you believe your answer should be considered correct.
+ Rubrics are produced and revised throughout the grading process to
+ ensure they reflect the learning objectives of the course and can
+ be applied equitably to all submissions. As such, disagreement
+ with the existence or weighting of a rubric item is not considered
+ a valid reason for a regrade request. 
+ 3 Miscellanea 
+ 3.1 Professionalism 
+ Behave professionally. 
+ Never abuse anyone, including the emotional abuse of blaming
+ others for your mistakes. Kindness is more important than
+ correctness. 
+ Let our TAs be students when they are not on the clock as
+ TAs. 
+ Lack of professionalism has an overall detrimental impact on
+ our community of learning. 
+ 3.2 Honesty 
+ I always hope everyone will behave honestly. I know we all are
+ sometimes tempted by the easy path that dishonesty can enable; if
+ you do something you regret, the sooner you tell me the sooner
+ (and more leniently) we can correct it. 
+ 3.2.1 No plagiarism (nor
+ anything like it) 
+ For Exercises (graded work) you may use external materials with
+ the following restrictions: 
+ You must attempt each task individually first, you should not
+ consult other resources until you are stuck . 
+ You must understand everything you submit. Do not submit
+ anything you could not explain to a member of the course
+ staff. 
+ You may not collaborate or seek help from any
+ interactive source except for members of the course staff or other
+ currently-enrolled CSE332 students (this means you may not seek
+ assistance from former CSE332 students, online forums like Chegg
+ or Stackoverflow, or generative AI systems like Chat-GPT or
+ CoPilot). 
+ You must cite any and every source you
+ consult beyond officially-provided materials (i.e. the optional
+ course textbook, the course webpage, the course staff, or any
+ resources provided through official course channels). Included in
+ your citation, you must identify which components of your
+ submission came from each source (it will be understood that
+ content with no citation is your own exclusive work). Your
+ collaborators are considered to be sources, and so should be
+ cited. An example citation might look like: I collaborated with
+ Brett Wortzman on the implementation of the peek method, I
+ consulted for help with java print syntax, Miya Natsuhara helped
+ me to debug the for loop that begins on line 107 of my
+ code. 
+ All collaborations with classmates must be whiteboard
+ only (defined below). 
+ Do not seek hints or entire solutions to the problems.
+ Limit your searching to background information only. (For example,
+ do not consult a GitHub repository posted by a former
+ student.) 
+ 3.2.1.1 Whiteboard Only
+ Collaboration 
+ Whiteboard Only collaboration is meant to convey the
+ type of discussion where participants gather around a whiteboard
+ to solve a problem together, without taking any notes from their
+ discussion, and then erasing the whiteboard before they
+ disperse. 
+ In particular, you may discuss tasks and their solutions, but
+ the only thing you may take away from your discussion is your
+ brain. This means you may not produce any records or artifacts
+ from your collaborations, including: notes, screenshots, photos,
+ figures, code, audio/video recordings, documents (including google
+ docs), links, or any other digital or tangible thing. Nor may you
+ share any files, links, etc. with other students outside of a
+ collaboration session. Any substantially similar expression of the
+ same solution can only occur if collaboration extends beyond
+ whiteboard only , and so will be considered as evidence of a
+ policy violation. 
+ 3.2.2 Course AI Policy: AI
+ as a Reference Tool 
+ In this course we will follow the Allen
+ School’s AI as a Reference Tool Policy . AI may help with
+ general questions and ungraded work, but not graded assignments or
+ assessments. Please read the full policy linked above and ask if
+ you have questions about how the policy applies in CSE 332. 
+ 3.3 Personal
+ accommodations 
+ 3.3.1 Disability
+ Resources 
+ The University of Washington strives to provide accessibility
+ to all students. If you require an accommodation to fully access
+ this course, please work with the Disability Resources for
+ Students (DRS). If you are unsure if you require an accommodation,
+ or to learn more about their services, begin by visiting the DRS website .
+ For this course, we ask that students with special circumstances
+ let us know as soon as possible, preferably during the
+ first week of class or as soon as accommodations
+ are approved. 
+ 3.3.2 Religious
+ Accommodations 
+ Washington state law requires that UW develop a policy for
+ accommodation of student absences or significant hardship due to
+ reasons of faith or conscience, or for organized religious
+ activities. The UW’s policy, including more information about how
+ to request an accommodation, is available at Religious
+ Accommodations Policy . Accommodations must be requested within
+ the first two weeks of this course using the Religious
+ Accommodations Request form. 
+ 3.3.3 Extenuating
+ Circumstances 
+ We recognize that our students come from varied backgrounds and
+ can have widely-varying circumstances. If you have any unforeseen
+ or extenuating circumstance that arise during the course, please
+ do not hesitate to contact the instructor in office hours, via
+ email, or private message board post to discuss your situation.
+ The sooner we are made aware, the more easily these situations can
+ be resolved. Extenuating circumstances include work-school
+ balance, familial responsibilities, military duties, unexpected
+ travel, or anything else beyond your control that may negatively
+ impact your performance in the class. 
+ Additionally, if at any point you are made to feel
+ uncomfortable, disrespected, or excluded by a staff member or
+ fellow student, please report the incident so that we may address
+ the issue and maintain a supportive and inclusive learning
+ environment. Should you feel uncomfortable bringing up an issue
+ with a me or another staff member directly, you may consider
+ contacting the Office
+ of the Ombud [https://www.washington.edu/ombud/]. 
+ 3.3.4 Life 
+ If you are feeling overwhelmed, stressed, or isolated, there
+ are many individuals here who are ready and wanting to help. In
+ the Allen School you may set up a meeting with John
+ Rumney . The University of Washington also provides many
+ resources. The Counseling Center offers short-term counseling for
+ students and crisis service for urgent situations. Call
+ 206-543-1240 to get started and schedule an appointment. There are
+ many resources for 24-hour
+ support as well. The Husky HelpLine provides 24-7 support in
+ multiple languages (call (206) 616-7777). 
+ The P vs. NP material will not be included on the
+ final exam, meaning that the ONLY place were that material is
+ assessed is on EX12. For this reason, EX12 is not eligible to be
+ dropped.↩︎ [#fnref1] 
+ Copyright © 2026 Paul G. Allen School of Computer Science & Engineering, University of Washington. Site design by Nathan Brunelle.
+ Released under the CC-BY-NC-SA 4.0 [http://creativecommons.org/licenses/by-nc-sa/4.0/] license .
+ Last updated 2026-10-04 10:20 

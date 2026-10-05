@@ -1,0 +1,128 @@
+{
+  "course": "CSE 331, University of Washington, Autumn 2026",
+  "week": "Week 2 (Mon Oct 5 - Fri Oct 9, 2026)",
+  "recheckedUnavailableAt": "2026-10-05T12:36-07:00",
+  "sources": [
+    {
+      "file": "lecture03/index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/",
+      "fetchedAt": "2026-10-05T12:27:32-07:00",
+      "bytes": 9037,
+      "sha256": "c7e65b5807baebd0d9dbfcf45de2f6a4f265c0cfbdc0f3b55cdcf4f4576964ba"
+    },
+    {
+      "file": "lecture03/notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html",
+      "fetchedAt": "2026-10-05T12:27:32-07:00",
+      "bytes": 65854,
+      "sha256": "b95987668b957d12184642e6950c87004b6fecc2bd3fc1a65dfefee5eedc6d4f",
+      "note": "Main source for Lecture 3. The 99-line Sum listing was extracted from it into tests/java/Sum.java."
+    },
+    {
+      "file": "lecture03/slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/slides.html",
+      "fetchedAt": "2026-10-05T12:27:36-07:00",
+      "bytes": 34351,
+      "sha256": "3f525e28b942d561bd1ae5915da24be3380ee8472b724d6161dc1311301cd33f"
+    },
+    {
+      "file": "lecture03/slides.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/slides.pdf",
+      "fetchedAt": "2026-10-05T12:27:36-07:00",
+      "bytes": 381022,
+      "sha256": "99e28790d9a468ba877ef1786cd05affdead42ce5e3b973ec6f56504a1e88561"
+    },
+    {
+      "file": "readings/reading1.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/readings/reading1.html",
+      "fetchedAt": "2026-10-05T12:27:36-07:00",
+      "bytes": 15222,
+      "sha256": "6602379c1bb47c556c386dbdd9ef62d5b3b8d698911f6f6d5383d752207def13"
+    },
+    {
+      "file": "readings/index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/readings/",
+      "fetchedAt": "2026-10-05T12:35:29-07:00",
+      "bytes": 10550,
+      "sha256": "baf9f2c69e788728d744595f617fd052605f2060cecb0afba10e23860a20c4ee"
+    },
+    {
+      "file": "calendar/calendar.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/calendar/calendar.html",
+      "fetchedAt": "2026-10-05T12:27:36-07:00",
+      "bytes": 40715,
+      "sha256": "74913acc964d88c13b7473b1d8ee0b2d74c1daa59484d4c4da7a70d376be2c8f"
+    },
+    {
+      "file": "section/section01.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section01.html",
+      "fetchedAt": "2026-10-05T12:27:36-07:00",
+      "bytes": 7058,
+      "sha256": "ce169b3f05ccc0a282aaed8bb20cf33e181a2e452e91e75671251b8a2fdf402e",
+      "note": "Placeholder: title 'CSE 331: Not Yet Available' (checked twice on 2026-10-05). Not used for content."
+    },
+    {
+      "file": "section/section01-solution.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section01-solution.html",
+      "fetchedAt": "2026-10-05T12:27:36-07:00",
+      "bytes": 7058,
+      "sha256": "ce169b3f05ccc0a282aaed8bb20cf33e181a2e452e91e75671251b8a2fdf402e",
+      "note": "Placeholder: 'Not Yet Available' (checked twice on 2026-10-05). Not used."
+    },
+    {
+      "file": "testing/notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/testing/notes.html",
+      "fetchedAt": "2026-10-05T12:27:36-07:00",
+      "bytes": 7058,
+      "sha256": "ce169b3f05ccc0a282aaed8bb20cf33e181a2e452e91e75671251b8a2fdf402e",
+      "note": "Placeholder: 'Not Yet Available' (checked twice on 2026-10-05). lectures/testing/ contains only this file; lectures/lecture04/ is 404."
+    },
+    {
+      "file": "homework/hw1.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/homework/hw1.html",
+      "fetchedAt": "2026-10-05T12:27:36-07:00",
+      "bytes": 23688,
+      "sha256": "ee420a5a8fabe7f8a8a7dbf1fb5063244790a6e4a36816303a6f8b1243225685",
+      "note": "Saved for the due date only (Fri Oct 9, 11:59pm). Its problems are not worked or previewed on the site."
+    },
+    {
+      "file": "lectures-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/",
+      "fetchedAt": "2026-10-05T12:27:36-07:00",
+      "bytes": 1448,
+      "sha256": "d48f0bfb3508ee903fb9eb6f5bddf998a24d47040f65a58298cc8afd0cbd1b64",
+      "note": "Directory listing: lecture01-assertions/, lecture02-specifications/, lecture03-batch/, testing/ (no lecture04)."
+    },
+    {
+      "file": "index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/",
+      "fetchedAt": "2026-10-05T12:28:02-07:00",
+      "bytes": 14488,
+      "sha256": "b5e834ef7c82333279482bc0d4479eb067125b42a4b0017875b25290cfb4d20e"
+    },
+    {
+      "file": "lecture02/notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture02-specifications/notes.html",
+      "fetchedAt": "2026-10-05T13:08:03-07:00",
+      "bytes": 69921,
+      "sha256": "0d2e86416a38bb51dca5f5801e875f97fcff8699d32e02bb351e8e9c8ee09072",
+      "note": "Lecture 2 notes: Lecture 3's notes say to read its last sections (Stronger and weaker through Knowing a program in pieces) there."
+    },
+    {
+      "file": "readings/reading2.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/readings/reading2.html",
+      "fetchedAt": "2026-10-05T13:16:41-07:00",
+      "bytes": 19310,
+      "sha256": "4f1c1a8f2273cb733bb4f23836f3b67117d66fa79d387d2c3fd5f1e4aedd677c",
+      "note": "Saved for its due date only (Fri Oct 16)."
+    },
+    {
+      "file": "info.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/info/",
+      "fetchedAt": "2026-10-05T12:35:29-07:00",
+      "bytes": 29981,
+      "sha256": "970bf59625552247dd0ffe2494e6fb09d7a1e6776b63a0321c0be5e689fe5721",
+      "note": "Syllabus: lecture times, sections, late policy (logistics only)."
+    }
+  ]
+}

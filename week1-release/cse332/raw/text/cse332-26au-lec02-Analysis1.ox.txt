@@ -1,0 +1,428 @@
+=== SLIDE 1
+CSE 332 Autumn 2026Lecture 2: Algorithm Analysis pt.1
+Ruth Anderson
+http://www.cs.uw.edu/332
+1
+=== SLIDE 2
+Announcements
+Preliminary Survey
+Due Monday 10/05
+On Canvas
+Exercise 0 released
+Due Friday 10/09/2026
+There are 2 separate Gradescope submissions
+“Meet the staff” activity
+Sometime during the first 4 weeks of class, visit a CSE 332 office hour (in person or on zoom)
+Tell the staff member you want to get checked off
+You do not have to have a question about course content
+We just want to meet you!
+Exercise 1 Running Time:  coming early next week, due Mon Oct 12
+2
+=== SLIDE 3
+What do we care about in an algorithm?
+Correctness:
+Does the algorithm do what is intended.
+Performance:
+Speed 		time complexity
+Memory 		space complexity
+Why analyze?
+To make good design decisions
+Enable you to look at an algorithm (or code) and identify the bottlenecks, etc.
+3
+=== SLIDE 4
+Pick an algorithm with the best running time
+4
+=== SLIDE 5
+How should we compare two algorithms?
+Uh, why NOT just run the program and time it??
+Too much variability, not reliable or portable:
+Hardware: processor(s), memory, etc.
+OS, Java version, libraries, drivers
+Other programs running
+Implementation dependent
+Choice of input
+Testing (inexhaustive) may miss worst-case input
+Timing does not explain relative timing among inputs (what happens when n doubles in size)
+Often want to evaluate an algorithm, not an implementation
+Even before creating the implementation (“coding it up”)
+5
+=== SLIDE 6
+Wish list for algorithm comparison method:
+So we are not going to run the program and time it…what should we do?
+Ideally we want a method to compare two algorithms that is:
+Independent of CPU speed, programming language, coding tricks, etc.
+Tells us how algorithms compare on large input sizes (Input size = n)
+E.g. any correct sorting algorithm is fast enough if you are only sorting 10 things
+We can use without implementing the algorithm and running it
+6
+=== SLIDE 7
+We will do “Resource Analysis”
+Allows us to compare algorithms, not implementations
+Using observations necessarily couples the algorithm with its implementation
+If my implementation on my computer takes more time than your implementation on your computer, we cannot conclude your algorithm is better
+We can predict an algorithm’s running time before implementing 
+Understand where the bottlenecks are in our algorithm
+7
+=== SLIDE 8
+Process for Resource Analysis
+End Result: A function which maps the algorithm’s input size to count of resources used
+Input of the function: sizes of the input 
+Number of characters in a string, number of items in a list, number of pixels in an image
+Output of the function: counts of resources used
+Typically we think of this as “amount of time” but we will specifically count things like: number of times the algorithm adds two numbers together, number times the algorithm does a > or < comparison, maximum number of bytes of memory the algorithm uses at any time 
+Important note: Make sure you know the “units” of your input and output!
+8
+=== SLIDE 9
+Running Time Analysis
+Units of “time”
+Operations
+Whichever operations we pick
+How do we express running time?
+Function
+Domain (input): size of the input
+(e.g., number of elements in our array, number of characters in our string)
+Range: count of operations
+9
+=== SLIDE 10
+Scenarios to analyze for an algorithm
+Worst-case complexity: 
+max number of steps algorithm takes on “most challenging” input 
+Best-case complexity: 
+min number of steps algorithm takes on “easiest” input 
+Average/expected complexity: 
+avg number of steps algorithm takes on random inputs (context-dependent) 
+Amortized complexity: 
+max total number of steps algorithm takes on M “most challenging” consecutive inputs, divided by M (i.e., divide the max total sum by M).
+10
+=== SLIDE 11
+Usually: Worst Case Running Time Analysis
+If an algorithm has a worst case running time of 
+Among all possible size- inputs, the “worst” one will do  “operations”
+ gives the maximum count of operations needed from among all inputs of size 
+11
+=== SLIDE 12
+Analysis Process From CSE 123/143
+Count the number of “primitive operations”
++, -, compare, arr[i], arr.length, etc
+Write that count as an expression using  (the input size)
+Put that expression into a “bucket” by 
+ignoring constants and 
+Ignoring “non-dominant” terms, 
+then put a  around it.
+Examples:
+ ends up as 
+ ends up as 
+ ends up as  
+12
+=== SLIDE 13
+Analysis Process For Us
+Pick a Scenario/Case to analyze (usually worst)
+Count the number of chosen operation(s)
+Factors to consider when choosing which operation(s) to count
+Necessity: should be necessary for solving the problem
+Frequency: should be the most frequently done (up to a constant factor)
+Magnitude: should be expensive to perform each chosen operation
+Write that count as an expression using  (the input size)
+Put an asymptotic bound on it (one of , , )
+More on this next class
+13
+=== SLIDE 14
+Worst Case Running Time – General Guide
+Add together the time of consecutive statements
+Loops: Sum up the time required through each iteration of the loop
+If each takes the same time, then [time per loop  number of iterations]
+Conditionals: Sum together the time to check the condition and time of the slowest branch
+Function Calls: Time of the function’s body
+Recursion: Solve a recurrence relation
+14
+=== SLIDE 15
+Worst Case – Example 1 (Questions)
+myFunction(List n){
+    b = 55 + 5; 
+    c = b / 3;  
+    b = c + 100;  
+    for (i = 0; i < n.size(); i++) { 
+        b++; 
+   } 
+    if (b % 2 == 0) {  
+        c++;
+    } 
+    else { 
+        for (i = 0; i < n.size(); i++) { 
+            c++;
+        } 
+    }
+    return c;
+}
+Questions to ask:
+What are the units of the input size?
+What are the operations we’re counting?
+For each line:
+How many times will it run?
+How long does it take to run?
+Does this change with different inputs?
+Answer:
+15
+=== SLIDE 16
+Worst Case – Example 1 (Answers)
+myFunction(List n){
+    b = 55 + 5; // 1
+    c = b / 3;  // 1
+    b = c + 100;  // 1
+    for (i = 0; i < n.size(); i++) { // 1, n times
+        b++; // 1
+   } 
+    if (b % 2 == 0) { // 1 
+        c++; // 1
+    } 
+    else { 
+        for (i = 0; i < n.size(); i++) { // 1, n times 
+            c++; // 1
+        } 
+    }
+    return c;
+}
+Questions to ask:
+What are the units of the input size?
+# of items in the list
+What are the operations we’re counting?
+Arithmetic ops (+-*/)
+For each line:
+How many times will it run?
+How long does it take to run?
+Does this change with different inputs?
+Answer:
+16
+=== SLIDE 17
+Worst Case – Example 2 (Questions)
+beAnnoying(List n){
+    List m = [];
+    for (i=0; i < n.size(); i++){ 
+        m.add(n[i]);
+        for (j=0; j< n.size(); j++){ 
+            print (“Hi, I’m annoying”); 
+        } 
+    }
+}
+Questions to ask:
+What are the units of the input size?
+What are the operations we’re counting?
+For each line:
+How many times will it run?
+How long does it take to run?
+Does this change with the input size?
+17
+=== SLIDE 18
+Worst Case – Example 2 (Answers)
+beAnnoying(List n){
+    List m = [];
+    for (i=0; i < n.size(); i++){ // n times
+        m.add(n[i]);
+        for (j=0; j< n.size(); j++){ // n times
+            print (“Hi, I’m annoying”); // 1
+        } 
+    }
+}
+Questions to ask:
+What are the units of the input size?
+# items
+What are the operations we’re counting?
+Adding or printing
+Printing: 
+For each line:
+How many times will it run?
+How long does it take to run?
+Does this change with the input size?
+18
+=== SLIDE 19
+Reminder: Scenarios for your running time function
+Worst-case complexity: 
+max number of steps algorithm takes on “most challenging” input 
+Best-case complexity: 
+min number of steps algorithm takes on “easiest” input 
+Average/expected complexity: 
+avg number of steps algorithm takes on random inputs (distribution-dependent) 
+Amortized complexity: 
+max total number of steps algorithm takes on M “most challenging” consecutive inputs, divided by M (i.e., divide the max total sum by M).
+19
+=== SLIDE 20
+ArrayList - Worst Case Time of Add
+public void add(int value){
+    if(data.length == size)
+        resize();
+    data[size] = value;
+    size++;
+}
+private void resize(){
+    int[] oldData = data;
+    data = new int[data.length*2];
+    for(int i = 0; i < oldData.length; i++)
+        data[i] = oldData[i];
+}
+What is the worst case running time of add?
+Input size: size of “this”
+Operations counted: indexing
+20
+=== SLIDE 21
+ArrayList – Amortized Time of Add
+public void add(int value){
+    if(data.length == size)
+        resize();
+    data[size] = value;
+    size++;
+}
+private void resize(){
+    int[] oldData = data;
+    data = new int[data.length*2];
+    for(int i = 0; i < oldData.length; i++)
+        data[i] = oldData[i];
+}
+Every time we resize, we earn data.length more adds before the next resize!
+Amortized Analysis Idea:
+Suppose we have a program that in total does  adds.
+How much time was spent “on average” across all ?
+Let  be the initial size of data
+The first  adds take: 
+The next  adds: 
+The next  adds: 
+Overall: 
+21
+--- NOTES:
+Amortized: “running average”
+=== SLIDE 22
+Amortized Analysis Analogy
+Suppose I’d like to park in a lot where they charge $10 per day to park
+If you are caught in the lot without paying you are given a warning
+If you get 3 warnings, you are charged a $25 fine, and your warnings reset.
+Should you actually pay to park?
+If you pay every day then you pay an average of $10 per day
+If you do not pay then for every three days parking costs $0+$0+$25, for an average of $8.33 per day
+This is an amortized analysis
+22
+=== SLIDE 23
+Searching in a Sorted List
+4
+5
+6
+7
+3
+2
+1
+8
+0
+9
+75
+79
+88
+90
+42
+13
+8
+95
+5
+99
+public static boolean contains(List<Integer> a, int k){
+    for(int i=0; i< a.size(); i++){
+        if (a.get(i) == k)
+            return true;
+    }
+    return false;
+}
+23
+=== SLIDE 24
+Faster way?
+4
+5
+6
+7
+3
+2
+1
+8
+0
+9
+75
+79
+88
+90
+42
+13
+8
+95
+5
+99
+Can you think of a faster algorithm to solve this problem?
+24
+=== SLIDE 25
+Binary Search
+4
+5
+6
+7
+3
+2
+1
+8
+0
+9
+75
+79
+88
+90
+42
+13
+8
+95
+5
+99
+public static boolean binary_contains(List<Integer> a, int k){
+    int start = 0;
+    int end = a.size();
+    while(start < end){
+        int mid = start + (end-start)/2;
+        if(a.get(mid) == k)
+            return true;
+        else if(a.get(mid) < k)
+            start = mid+1;
+        else
+            end = mid;
+    }
+    return false;
+}
+25
+=== SLIDE 26
+Why is this ?
+In the beginning: end-start=
+After 1 iteration: end-start=
+mid-start = (start+(end-start)/2)-start
+end-mid = end-(start+(end-start)/2)
+Each iteration cuts the “gap” in half!
+ iterations the size is 
+We stop when the gap is 1
+Solve for :  
+26
+=== SLIDE 27
+Running Time Graphed
+27
+=== SLIDE 28
+Comparing Running Times
+Suppose I have these algorithms, all of which have the same input/output behavior:
+Algorithm A’s worst case running time is 
+Algorithm B’s worst case running time is 
+Algorithm C’s worst case running time is 
+Which algorithm is best?
+28
+=== SLIDE 29
+Asymptotically comparing  with 
+29
+=== SLIDE 30
+Asymptotic Notation
+The set of functions with asymptotic behavior less than or equal to 
+Upper-bounded by a constant times  for large enough values 
+the set of functions with asymptotic behavior greater than or equal to 
+Lower-bounded by a constant times  for large enough values 
+“Tightly” within constant of  for large 
+30
+=== SLIDE 31
+Idea of 
+31

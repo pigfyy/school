@@ -1,0 +1,52 @@
+﻿AI as a Reference Tool
+Overview
+You may use AI for general course questions and ungraded work, but not for graded assignments, quizzes, exams, or any deliverable that counts toward your grade. Read the full policy carefully so you understand what counts as general support versus graded work.
+Definition of AI
+For this policy, "AI" refers to generative AI systems that can produce or modify text, code, images, audio, video, or other content — whether in a single response to a prompt or by operating autonomously across multiple steps (e.g., chatbots such as ChatGPT, Claude, and Gemini; code assistants and agents such as GitHub Copilot, Cursor, and Claude Code; and AI-powered writing, translation, and image-generation tools). This includes AI features built into IDEs, operating systems, or browsers when they generate or substantially rewrite content, but excludes non-generative tools such as basic spell-check, grammar/syntax highlighting, and linters. 
+Rationale
+AI can be used as a helpful learning aid for understanding concepts, exploring ideas, and practicing on ungraded work. However, the course is intended to develop and assess your individual skills, and graded assessments must reflect your own knowledge and work. AI may not be used in any way to produce or modify your graded work.
+Permitted Actions
+* You may use AI tools for purposes  such as:
+   * explaining concepts,
+   * clarifying terminology,
+   * helping you understand examples,
+   * answering study questions,
+   * producing additional examples,
+   * suggesting ways to approach a topic at a high level.
+* You may use AI on ungraded work, including:
+   * practice problems,
+   * ungraded in-class exercises,
+   * exploratory work that is not turned in for credit.
+Prohibited Actions
+* You may not use AI on assignments or graded assessments, including homework or labs submitted for a grade, quizzes, exams, graded projects, take-home assessments, or any other deliverable identified by the instructor as graded.
+* You may not paste a graded assignment prompt into an AI tool to request guidance or a solution.
+* You may not ask AI to write, debug, review, or modify work that you will submit for credit.
+* If an assignment has stricter rules, those rules override this policy for that assignment.
+Examples
+* Allowed: using AI to explain dynamic programming, help you review a concept for a quiz, or suggest practice problems for studying.
+* Allowed: using AI to brainstorm ideas for an ungraded worksheet or to check your understanding of a concept before class.
+* Allowed: prompting AI to “Explain recursion with a new example.”
+* Not allowed: pasting a graded assignment prompt into an AI tool and prompting for guidance or a solution.
+* Not allowed: using AI to write or debug homework solutions that you will submit for credit.
+* Not allowed: using AI to review graded work to suggest changes or correct errors.
+* Not allowed: using AI to answer quiz or exam questions, even if the quiz or exam is take-home.
+Required Attribution
+* For ungraded work, include a brief note if AI meaningfully contributed to your process. Identify the specific tool and how it was used.
+   * Example: “Used ChatGPT to clarify the definition of induction and check my understanding.”
+* For graded assessments, no AI use is allowed, so no attribution should appear because any AI assistance would be a policy violation.
+Guidelines for Effective AI Use
+* Consider first whether you have the time to ask your TAs, the professor, or peers for help and then use AI for subsequent clarification.
+* Use AI as a tutor, not a substitute for your own work.
+* Ask for explanations, hints, or examples rather than full solutions.
+* Verify AI output against course materials and official documentation.
+* If AI starts doing the work for you, stop and switch to a more limited prompt.
+Data Privacy Expectations
+* Do not upload course-specific materials—including assignment prompts, course code, datasets, class notes, hidden tests, solution keys, or other restricted content—to AI tools without the instructor’s explicit approval.
+   * Some AI tools (e.g., Cursor, Claude Code, and similar coding agents) can automatically access files beyond what you explicitly share — including your entire local repository, file system, or connected accounts. Before using such a tool, confirm what it can access and restrict or scope that access so it does not read private repositories, hidden test files, other students' code, solution keys, or other restricted materials without your intent.
+* Do not submit personal, sensitive, or university-protected information into AI tools.
+* Be aware that prompts and outputs may be stored or reused by third-party AI providers.
+* UW’s Purple tool and certain GenAI tools provided by the Allen School for use in courses are designed specifically for UW students and staff and have stronger privacy protections than public commercial tools. When AI usage is permitted, using Purple or Allen School-provided tools is advised if possible.
+Academic Integrity
+Using AI in ways prohibited by this policy or by assignment-specific instructions will be considered academic misconduct and referred to CSSC. Students found responsible for violating this policy will, at minimum, receive no credit for the affected assignment. Stronger penalties, up to and including failing the course, may apply for repeated or egregious violations. In cases of group work, all students will be held equally responsible for violation unless there is clear evidence that a subset of team members were not involved or aware.
+Accommodations and Approved Exceptions
+Students with accessibility needs or other extenuating circumstances should contact the instructor to discuss exceptions. Accommodations or exceptions require instructor approval before they are used.

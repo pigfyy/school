@@ -1,0 +1,175 @@
+{
+  "course": "CSE 312 Autumn 2026 (26au)",
+  "scope": "Week 1: Wed 2026-09-30 through Fri 2026-10-02 (America/Los_Angeles)",
+  "fetchedBy": "curl, 2026-10-02 evening Seattle time",
+  "textExtraction": "pdftotext -layout (poppler); HTML pages stripped to *.page.txt",
+  "sources": [
+    {
+      "file": "index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse312/26au/",
+      "title": "Course home + schedule (Week 1 rows: Lecture 1, Section 1, Lecture 2)",
+      "kind": "calendar",
+      "covers": "2026-09-30..2026-10-02",
+      "fetchedAt": "2026-10-02T20:49:40-07:00",
+      "bytes": 38425,
+      "sha256": "cef6b4aff33b69cc0d200fceb2bd36d8ee088f68d52bd8a4a88748fccb724a23"
+    },
+    {
+      "file": "Lecture-01-counting-rules.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse312/26au/slides/Lecture-01-counting-rules.pdf",
+      "title": "Lecture 1: Introduction / So you think you can count? (slides)",
+      "kind": "lecture-slides",
+      "covers": "2026-09-30",
+      "fetchedAt": "2026-10-02T20:49:49-07:00",
+      "bytes": 2404485,
+      "sha256": "9dc5005c781e29cb35eb98bbcc1543f5bf238f54c07df3f9511c55887f904fff",
+      "text": "Lecture-01-counting-rules.txt"
+    },
+    {
+      "file": "Lecture-02-combinations-and-binomial-coefficients.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse312/26au/slides/Lecture-02-combinations-and-binomial-coefficients.pdf",
+      "title": "Lecture 2: Combinations and Binomial Coefficients (slides)",
+      "kind": "lecture-slides",
+      "covers": "2026-10-02",
+      "fetchedAt": "2026-10-02T20:49:49-07:00",
+      "bytes": 1018896,
+      "sha256": "057395390e8d15c53ba86851f5ddea24a8f43a64e8acedafb80413dba475dafa",
+      "text": "Lecture-02-combinations-and-binomial-coefficients.txt"
+    },
+    {
+      "file": "optional-set-review.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse312/26au/files/optional-set-review.pdf",
+      "title": "Optional set theory review (linked from Lecture 1)",
+      "kind": "reading",
+      "covers": "2026-09-30",
+      "fetchedAt": "2026-10-02T20:49:49-07:00",
+      "bytes": 3855045,
+      "sha256": "87369a98b73dd589b5fb9b491be92f16e598901653951926eb4bafd2432cf576",
+      "text": "optional-set-review.txt"
+    },
+    {
+      "file": "section01.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse312/26au/sections/section01.pdf",
+      "title": "Quiz Section 1: Counting practice (handout)",
+      "kind": "section-handout",
+      "covers": "2026-10-01",
+      "fetchedAt": "2026-10-02T20:49:49-07:00",
+      "bytes": 90544,
+      "sha256": "f63efc3312ecce6aabd11e43314e7623f4a66cc7d6368e5674a92243df88deff",
+      "text": "section01.txt"
+    },
+    {
+      "file": "section01_solutions.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse312/26au/sections/section01_solutions.pdf",
+      "title": "Quiz Section 1 solutions",
+      "kind": "section-solutions",
+      "covers": "2026-10-01",
+      "fetchedAt": "2026-10-02T20:49:49-07:00",
+      "bytes": 103485,
+      "sha256": "15fef936f9f7b81a79aac135adfa92af615dbea760484e23e63590c40c611c56",
+      "text": "section01_solutions.txt"
+    },
+    {
+      "file": "Prob_Stat_for_CS_Book.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse312/22au/files/Prob_Stat_for_CS_Book.pdf",
+      "title": "Textbook (Tsun). Lecture 1 reading 1.1-1.2.1 (linked to the 22au copy); Lecture 2 reading 1.2.2-1.3.1 (linked as files/Prob_Stat_for_CS_Book.pdf, byte-identical)",
+      "kind": "reading",
+      "covers": "2026-09-30,2026-10-02",
+      "fetchedAt": "2026-10-02T20:49:51-07:00",
+      "bytes": 19220755,
+      "sha256": "09b2eba40e649bb30cbc64568e51ae3231879392d808cb3402745e873c2d3f84",
+      "text": "Prob_Stat_for_CS_Book.txt"
+    },
+    {
+      "file": "pset1.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse312/26au/homework/pset1.pdf",
+      "title": "Problem Set 1 (GRADED). Fetched only to read the due date and avoid overlap; no content used on the site",
+      "kind": "graded-homework",
+      "covers": "2026-09-30 (out), due 2026-10-07",
+      "fetchedAt": "2026-10-02T20:49:49-07:00",
+      "bytes": 108401,
+      "sha256": "190122e20aa9a66464200eb8c87064d084e176198df31c7f9e3761ed7203c70a",
+      "text": "pset1.txt"
+    },
+    {
+      "file": "syllabus.php",
+      "url": "https://courses.cs.washington.edu/courses/cse312/26au/syllabus.php",
+      "title": "Syllabus (grading, concept checks, collaboration, late days)",
+      "kind": "policy",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-02T20:49:49-07:00",
+      "bytes": 13520,
+      "sha256": "6f14dc6fbddc72f06e36d679260466088e9681ad4bb3a1c92bbd8a72ec1f2c92",
+      "text": "syllabus.page.txt"
+    },
+    {
+      "file": "aipolicy.php",
+      "url": "https://courses.cs.washington.edu/courses/cse312/26au/aipolicy.php",
+      "title": "AI policy (no AI on graded work)",
+      "kind": "policy",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-02T20:49:50-07:00",
+      "bytes": 10572,
+      "sha256": "103b4b55720bd9a1599cbe9922effe29215202c78865aef8278b0f40accf8876",
+      "text": "aipolicy.page.txt"
+    },
+    {
+      "file": "staff.php",
+      "url": "https://courses.cs.washington.edu/courses/cse312/26au/staff.php",
+      "title": "Staff and office hours",
+      "kind": "logistics",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-02T20:49:50-07:00",
+      "bytes": 16476,
+      "sha256": "7cbcf16fb520a2862d3973e3101fc2e92fcfbf9d8db27b68fb04481a73ca88b9",
+      "text": "staff.page.txt"
+    },
+    {
+      "file": "defs_thms.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse312/26au/files/defs_thms.pdf",
+      "title": "Theorems and definitions sheet (notation cross-check)",
+      "kind": "reference",
+      "covers": "course-wide",
+      "fetchedAt": "2026-10-02T20:49:50-07:00",
+      "bytes": 334107,
+      "sha256": "4f2b24553be424d29bba66e6c8ca329b7018a463837f70ee957929e440794119",
+      "text": "defs_thms.txt"
+    }
+  ],
+  "linkedNotFetched": [
+    {
+      "url": "https://uw.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=fb0cca90-a9b7-4adb-a2a2-b4d1000f16a7",
+      "title": "Lecture 1 recording A",
+      "covers": "2026-09-30",
+      "reason": "video behind UW login; linked only"
+    },
+    {
+      "url": "https://uw.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=f5c45427-4c11-4ee0-9955-b4d0016c5a6f",
+      "title": "Lecture 1 recording B",
+      "covers": "2026-09-30",
+      "reason": "video behind UW login; linked only"
+    },
+    {
+      "url": "https://uw.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=17de599d-f5e7-4be5-96af-b4d1000f1c39",
+      "title": "Lecture 2 recording A",
+      "covers": "2026-10-02",
+      "reason": "video behind UW login; linked only"
+    },
+    {
+      "url": "https://uw.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=cc4fd935-fc7a-4261-a751-b4d0016c5b8a",
+      "title": "Lecture 2 recording B",
+      "covers": "2026-10-02",
+      "reason": "video behind UW login; linked only"
+    },
+    {
+      "url": "https://www.gradescope.com/",
+      "title": "Concept checks for Lectures 1 and 2",
+      "covers": "2026-09-30, 2026-10-02",
+      "reason": "graded, on Gradescope; not fetched or reproduced"
+    }
+  ],
+  "notes": [
+    "Lecture 1 slides, set review, section01 (+solutions) and the textbook are byte-identical (md5) to the copies in cse312-skill-trial/raw/; Lecture 2 slides are new.",
+    "Lecture 2 slides Last-Modified: Fri, 02 Oct 2026 18:00:22 GMT. section01_solutions.pdf Last-Modified: Fri, 02 Oct 2026 04:36:53 GMT."
+  ]
+}

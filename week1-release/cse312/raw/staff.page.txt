@@ -1,0 +1,61 @@
+ 
+ CSE 312, Autumn 2026 
+ CSE 312: Foundations of Computing II, Autumn 2026 
+ Materials 
+ Schedule
+ Gradescope
+ Discussion Board
+ Syllabus
+ Course Staff (Office Hours)
+ AI Policy
+ Resources 
+ Feedback 
+ Textbook 
+ Distributions 
+ Z Table 
+ Theorems and Definitions 
+ LaTeX Resources 
+ Course Staff/Office Hours 
+ In addition to the staff contact information, this page contains the most up-to-date listing of staff office hours (and their location), also given as a calendar. Office hours are
+ subject to change , but we'll try to keep this page accurate at least a week into the future. 
+ Anup Rao (Instructor) 
+ anuprao [at] cs.washington.edu 
+ Office: CSE 656 
+ My research is broadly in theoretical computer science. I love thinking about clean mathematical questions that are relevant to computer science. Most of my research papers involve advanced applications of the topics that are taught in this class! I have a youtube channel where I post videos about topics in math, computer science and finance that I find interesting: https://www.youtube.com/channel/UCbVGFH5BbNixiAdgZ42ERyQ . Like and subscribe! 
+ Paul Beame (Instructor) 
+ beame [at] cs.washington.edu 
+ Office: CSE 668 
+ Welcome to CSE 312! I've been here long enough to have worked with the design teams for both the Gates and Allen Centers. My primary research is in computational complexity, with interests both in pure theory and in its applications to other areas of CS. Randomness comes up in my research both as an algorithmic technique to solve problems and as a way of constructing challenging examples to show that problems are hard solve. 
+ Adin Aberbach (he/him) 
+ aberbach [at] cs.washington.edu 
+ Hi all! My name is Adin, and I'm a first year PhD student studying complexity theory. Outside of school I love to paint, look at art, play/watch sports (Ultimate Frisbee, Spikeball, basketball, etc.), eat good food, read, and be in nature. I'm excited to meet y'all and please reach out if you have any questions! 
+ Beta Chen 
+ bchen35 [at] uw.edu 
+ Hello! I’m a fourth year computer science and math major interested in pursuing the academia route. In my spare time I like to cook, play piano, and play board games as well as other strategy games. I like interesting math puzzles as well. Feel free to ask about or share any! 
+ Darin Ershov 
+ dkershov [at] uw.edu 
+ Hi, I'm Darin. I'm a junior majoring in Computer Science and Mathematics. I really love math and my research interests are in theoretical computer science, more specifically I'm working with the quantum group. Outside of classes, I like playing board games and grand strategy video games. Excited to meet you guys! 
+ Arnav Mazumder 
+ am2107 [at] cs.washington.edu 
+ Hi, I'm Arnav! I am a CSE Master's student and this is my 2nd quarter TA-ing for 312. My current research interests are in causal inference and multilingual LMs. In my free time, I enjoy tennis, playing music, and hiking. 
+ Medha Mittal 
+ mmittal2 [at] cs.washington.edu 
+ Hi everyone! My name is Medha and I'm a junior majoring in computer science. This is my fifth quarter as a TA, and my second quarter in 312. I'm excited to meet you all! In my free time, I love traveling, playing the guitar, and binge watching law/crime shows. Feel free to reach out throughout the quarter! :) 
+ Gaurang Pendharkar 
+ gaurap [at] cs.washington.edu 
+ Hello, I’m Gaurang! I’m a BS/MS student at UW currently from Renton, WA. This is my 2nd time teaching CSE 312, and it has remained one of my favorite courses at the Allen school. Outside of class, I love reading, games, traveling, and movies. My research interests include computational biology and AI4Math. Looking forward to this quarter and meeting y’all! 
+ Jack Scott 
+ jscott26 [at] cs.washington.edu 
+ Hi everyone, I'm Jack and I'm a senior studying CS! I am very excited to be TA'ing 312 this quarter. Also, a fun fact is that I was in San Francisco this summer and went on a lot of hikes. If you have any questions about anything then feel free to reach out or come to office hours :) 
+ Sam Sullivan 
+ samues28 [at] uw.edu 
+ Hey, I'm Sam. I'm a BS/MS student this year, and this is my second time TAing for CSE 312. I like board and card games and most aspects of the Pokémon TCG. Feel free to reach out to me with any questions about the course, life at UW, career, Pokémon, or anything else! 
+ Mayee Sun 
+ mayeesun [at] cs.washington.edu 
+ Hi everyone! I'm Mayee, a senior double majoring in Computer Science and Mathematics. In my free time, I like to play tennis, volleyball, run, and bake. Super excited to meet everyone this quarter! 
+ Glenn Sun 
+ glennsun [at] cs.washington.edu 
+ Hi, my name is Glenn. I'm a 4th year PhD student in the theory group, currently working on SAT solving, which is a general framework for solving many NP-complete problems in a reasonable amount of time. Non-academically, I enjoy cooking, all kinds of transportation, and thinking about government and policy. Excited to get to know all of you, and I'm always happy to help if you have questions. 
+ Toby Thornburg 
+ tthornb1 [at] cs.washington.edu 
+ Hi! I'm an MS student in the theory and quantum groups. I love playing sports and hiking in the Cascades. Come talk about 312, theory, or whatever's on your mind! 

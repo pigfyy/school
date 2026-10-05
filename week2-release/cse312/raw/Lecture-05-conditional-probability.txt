@@ -1,0 +1,436 @@
+CSE 312
+Foundations of Computing II
+Lecture 5: Conditional Probability and Bayes Theorem
+
+
+
+
+                                                       1
+Review Probability
+                                             Examples:
+Definition. A sample space Ω is the set of
+                                             • Single coin flip: Ω = {𝐻, 𝑇}
+all possible outcomes of an experiment.
+                                             • Two coin flips: Ω = {𝐻𝐻, 𝐻𝑇, 𝑇𝐻, 𝑇𝑇}
+                                             • Roll of a die: Ω = 1, 2, 3, 4, 5, 6
+
+
+
+                                             Examples:
+Definition. An event 𝐸 ⊆ Ω is a subset of    • Getting at least one head in two coin flips:
+possible outcomes.                              𝐸 = {𝐻𝐻, 𝐻𝑇, 𝑇𝐻}
+                                             • Rolling an even number on a die :
+                                                             𝐸 = {2, 4, 6}
+
+
+
+
+                                                                                          2
+Review Probability space               Either finite or infinite
+                                       countable (e.g., integers)
+
+                                                      Set of possible
+Definition. A (discrete) probability space            outcomess
+is a pair (Ω, 𝑃) where:
+• Ω is a set called the sample space.
+• 𝑃 is the probability measure,                            𝐴 ⊆ Ω: 𝑃 𝐴 = ෍ 𝑃 𝑥
+                                                                        𝑥∈A
+
+   a function 𝑃: Ω → ℝ such that:
+   – 𝑃 𝑥 ≥ 0 for all 𝑥 ∈ Ω
+                                                      Specify Likelihood
+   – σ𝑥∈Ω 𝑃 𝑥 = 1                                     (or probability) of each
+                                                      outcome
+Some outcome must show   The likelihood (or
+up                       probability) of each
+                         outcome is non-negative.                                3
+Agenda
+
+• Conditional Probability
+• Bayes Theorem
+• Law of Total Probability
+• More Examples
+
+
+
+
+                             4
+Conditional Probability (Idea)
+
+                   A                        B
+
+                         36         7     13
+
+                                                     14
+What’s the probability that a randomly chosen person (everyone equally likely) likes
+ice cream given they like donuts?
+
+
+                                  7     7
+                                      =                                            5
+                                7 + 13 20
+Conditional Probability
+
+Definition. The conditional probability of event 𝐴 given an event 𝐵
+happened (assuming 𝑃 𝐵 ≠ 0) is
+                                    𝑃(𝐴 ∩ 𝐵)
+                         𝑃 𝐴𝐵 =
+                                       𝑃(𝐵)
+
+
+A useful formula is
+
+                      𝑃 𝐴 ∩ 𝐵 = 𝑃 𝐴 𝐵 𝑃(𝐵)
+
+
+                                                                      6
+Conditional Probability Examples
+
+Suppose that you flip a fair coin twice.
+  What is the probability that both flips are heads given that you have at
+  least one head?
+
+Let 𝑂 be the event that at least one flip is heads
+                                                               Ω
+Let 𝐵 be the event that both flips are heads
+                                                            𝐻𝐻     𝐻𝑇
+𝑃 𝑂 = 3/4         𝑃 𝐵 = 1/4       𝑃 𝐵 ∩ 𝑂 = 1/4
+                                                            𝑇𝐻     𝑇𝑇
+                      𝑃(𝐵 ∩ 𝑂) 1/4 1
+              𝑃 𝐵|𝑂 =         =    =
+                        𝑃(𝑂)    3/4 3
+                                                                             7
+Conditional Probability Examples
+
+Suppose that you flip a fair coin twice.
+  What is the probability that at least one flip is heads given that at least
+  one flip is tails?
+
+Let 𝐻 be the event that at least one flip is heads
+                                                                 Ω
+Let 𝑇 be the event that at least one flip is tails
+                                                              𝐻𝐻     𝐻𝑇
+𝑃 𝐻 = 3/4        𝑃 𝑇 = 3/4       𝑃 𝐻 ∩ 𝑇 = 1/2
+                                                              𝑇𝐻     𝑇𝑇
+                      𝑃(𝐻 ∩ 𝑇) 1/2 2
+              𝑃 𝐻|𝑇 =         =    =
+                        𝑃(𝑇)    3/4 3
+                                                                                8
+Reversing Conditional Probability
+
+Question: Does 𝑃 𝐴 𝐵 = 𝑃(𝐵|𝐴)?
+
+No!
+• Let 𝐴 be the event you are wet
+• Let 𝐵 be the event you are swimming
+
+                        𝑃 𝐴𝐵 =1
+                        𝑃 𝐵𝐴 ≠1
+
+                                        9
+Example with Conditional Probability
+                                            pollev.com/stefanotessaro617
+
+Suppose we toss a red die and a blue die:      𝑃(𝐵)     𝑃(𝐵|𝐴)
+                                            a) 1/6        1/6
+both 6 sided and all outcomes equally
+                                            b) 1/6        1/3
+likely.                                     c) 1/6       3/36
+What is 𝑃 𝐵 ? What is 𝑃(𝐵|𝐴)?               d) 1/9        1/3
+
+     𝑃: Uniform on 
+
+
+
+
+                                                                      10
+Gambler’s fallacy
+Assume we toss 51 fair coins.
+Assume we have seen 50 coins, and they are all “tails”.
+What are the odds the 51st coin is “heads”?
+
+𝐴 = first 50 coins are “tails”
+𝐵 = first 50 coins are “tails”, 51st coin is ”heads”
+                                                 51st coin is independent of
+              𝑃 𝐴∩𝐵          1/251 1             outcomes of first 50 tosses!
+𝑃 𝐵𝐴 =                   =           =
+                𝑃(𝐴)         2/251       2
+
+Gambler’s fallacy = Feels like it’s time for “heads”!?
+                                                                            11
+Agenda
+
+• Conditional Probability
+• Bayes Theorem
+• Law of Total Probability
+• More Examples
+
+
+
+
+                             12
+Bayes Theorem
+
+A formula to let us “reverse” the conditional.
+
+Theorem. (Bayes Rule) For events 𝐴 and 𝐵, where 𝑃 𝐴 , 𝑃 𝐵 > 0,
+
+                             𝑃 𝐵 𝐴 𝑃(𝐴)
+                      𝑃 𝐴𝐵 =
+                                𝑃(𝐵)
+
+
+𝑃 𝐴 is called the prior (our belief without knowing anything)
+𝑃 𝐴 𝐵 is called the posterior (our belief after learning 𝐵)
+                                                                 13
+                                     Claim:
+Bayes Theorem Proof                               𝑃 𝐵 𝐴 𝑃(𝐴)
+                      𝑃 𝐴 ,𝑃 𝐵 > 0     ⇒   𝑃 𝐴𝐵 =
+                                                     𝑃(𝐵)
+
+
+
+
+                                                         14
+                                                           Claim:
+Bayes Theorem Proof                                                     𝑃 𝐵 𝐴 𝑃(𝐴)
+                                            𝑃 𝐴 ,𝑃 𝐵 > 0     ⇒   𝑃 𝐴𝐵 =
+                                                                           𝑃(𝐵)
+
+
+By definition of conditional probability
+                             𝑃 𝐴 ∩ 𝐵 = 𝑃 𝐴 𝐵 𝑃(𝐵)
+Swapping 𝐴, 𝐵 gives
+                         𝑃 𝐵∩𝐴 =𝑃 𝐵 𝐴 𝑃 𝐴
+But 𝑃 𝐴 ∩ 𝐵 = 𝑃(𝐵 ∩ 𝐴), so
+                          𝑃 𝐴 𝐵 𝑃 𝐵 = 𝑃 𝐵 𝐴 𝑃(𝐴)
+Dividing both sides by 𝑃(𝐵) gives
+
+                                     𝑃 𝐵 𝐴 𝑃(𝐴)
+                              𝑃 𝐴𝐵 =
+                                        𝑃(𝐵)
+
+                                                                               15
+Brain Break
+
+
+
+
+              16
+Agenda
+
+• Conditional Probability
+• Bayes Theorem
+• Law of Total Probability
+• More Examples
+
+
+
+
+                             17
+Partitions (Idea)
+
+These events partition the sample space
+1. They “cover” the whole space
+2. They don’t overlap, i.e., they are mutually exclusive
+
+
+
+
+                                                           18
+Partition
+
+Definition. Non-empty events 𝐸1 , 𝐸2 , … , 𝐸𝑛 partition sample space Ω if
+(Exhaustive)
+                                                𝑛
+                     𝐸1 ∪ 𝐸2 ∪ ⋯ ∪ 𝐸𝑛 = ራ             𝐸𝑖 = Ω
+                                                𝑖=1
+(Pairwise Mutually Exclusive)
+                                ∀𝑖 ∀𝑖≠𝑗 𝐸𝑖 ∩ 𝐸𝑗 = ∅
+
+
+
+    𝐸1      𝐸2       𝐸3     𝐸4
+                                                𝐸𝑐             𝐸
+
+                                                                        19
+Law of Total Probability (Idea)
+
+If we know 𝐸1 , 𝐸2 , … , 𝐸𝑛 partition Ω, what can we say about 𝑃(𝐴)?
+
+
+
+
+    𝐸1       𝐸2            𝐸3         𝐸4
+
+
+            𝐴
+
+                                                                       20
+Law of Total Probability (LTP)
+
+Theorem. If events 𝐸1 , 𝐸2 , … , 𝐸𝑛 partition the sample space Ω, then for any event
+𝐴⊆Ω
+                                                          𝑛
+
+                𝑃 𝐴 = 𝑃 𝐴 ∩ 𝐸1 + … + 𝑃 𝐴 ∩ 𝐸𝑛 = ෍ 𝑃(𝐴 ∩ 𝐸𝑖 )
+                                                         𝑖=1
+
+
+
+Using the definition of conditional probability 𝑃 𝐴 ∩ 𝐸 = 𝑃 𝐴 𝐸 𝑃(𝐸) we can get
+the alternate form of this that shows
+                                        𝑛
+
+                              𝑃 𝐴 = ෍ 𝑃 𝐴 𝐸𝑖 𝑃(𝐸𝑖 )
+                                       𝑖=1
+
+
+Why do we care? Often easier to compute 𝑃 𝐴 this way!
+                                                                                       21
+LTP Example
+
+Alice has two pockets:
+• Left pocket: Two blue balls, two green balls
+• Right pocket: One blue ball, two green balls.
+
+Alice picks a random ball from a random pocket.
+[Both pockets equally likely, each ball equally likely.]
+
+
+
+                                                           22
+                                      Left pocket: 2 blue, 2 green
+LTP Example                           Right pocket: 1 blue, 2 green
+
+                 1/3    RB
+   1/2   Right
+                 2/3    RG
+                 1/2              1/3 = 𝑃 B Right) and 2/3 = 𝑃 G Right)
+                        LB
+   1/2   Left
+                 1/2    LG
+
+𝑃 B = 𝑃 B ∩ Left + 𝑃 B ∩ Right   (Law of total probability)
+    = 𝑃 Left × 𝑃 B|Left + 𝑃 Right × 𝑃 B|Right
+      1 1 1 1 1 1            5
+    = × + × = + =
+      2 2 2 3 4 6 12                                       23
+Agenda
+
+• Conditional Probability
+• Bayes Theorem
+• Law of Total Probability
+• More Examples
+
+
+
+
+                             24
+Example – Zika Testing
+                         Usually no or mild symptoms (rash); sometimes
+                         severe symptoms (paralysis).
+
+                         During pregnancy: may cause birth defects.
+
+
+
+
+                         Suppose you took a Zika test, and it returns
+                         “positive”, what is the likelihood that you
+                         actually have the disease?
+
+
+
+                                                                        25
+Example – Zika Testing
+
+Suppose we know the following Zika stats
+   – A test is 98% effective at detecting Zika (“true positive”)  𝑃(𝑇|𝑍)
+                                                                         𝑐
+   – However, the test may yield a “false positive” 1% of the time 𝑃(𝑇|𝑍 )
+   – 0.5% of the US population has Zika. 𝑃(𝑍)
+
+
+What is the probability you have Zika (event 𝑍) if you test positive (event 𝑇)?
+
+                          𝑃 𝑍 ⋅ 𝑃(𝑇|𝑍)   0.005 ⋅ 0.98
+Bayes Theorem      𝑃 𝑍𝑇 =              =              ≈ 0.33
+                             𝑃(𝑇)          0.01485
+
+
+LTP     𝑃 𝑇 = 𝑃 𝑍 ⋅ 𝑃 𝑇 𝑍 + 𝑃 𝑍 𝑐 𝑃(𝑇|𝑍 𝑐 )= 0.005 ⋅ 0.98 + 0.995 ⋅ 0.01 = 0.01485
+
+                                                                                  26
+Example – Zika Testing
+Suppose we know the following Zika stats
+   – A test is 98% effective at detecting Zika (“true positive”)  𝑃(𝑇|𝑍)
+   – However, the test may yield a “false positive” 1% of the time 𝑃(𝑇|𝑍 𝑐 )
+                                                                               500 have Zika (0.5%)
+   – 0.5% of the US population has Zika. 𝑃(𝑍)                                  99,500 do not
+
+
+What is the probability you have Zika (event 𝑍) if you test positive (event 𝑇)?
+                                                                                       98% of those
+                                             Suppose we had 100,000 people:            with Zika
+                                                • 490 have Zika and test positive 2% of those
+                                                • 10 have Zika and test negative    with Zika
+
+                                                • 995 do not have Zika and test positive
+                                                • 98,505 do not have Zika and test negative
+                                                                                          1% of those
+                                                                  490                     without Zika
+                                                                         ≈ 0.33
+                                                               490 + 995
+                                             Demo                                            27
+Philosophy – Updating Beliefs
+
+While it’s not 98% that you have the disease, your beliefs changed drastically
+
+𝑍 = you have Zika
+𝑇 = you test positive for Zika
+
+
+                                                              I now have a 33%
+      I have a 0.5% chance        Receive positive          chance of having Zika
+          of having Zika            test result                 after the test!!!
+
+
+
+
+   Prior: 𝑃(𝑍)                                         Posterior: 𝑃(𝑍|𝑇)
+                                                                                    28
+Example – Zika Testing
+Suppose we know the following Zika stats
+   – A test is 98% effective at detecting Zika (“true positive”)  𝑃(𝑇|𝑍)
+   – However, the test may yield a “false positive” 1% of the time 𝑃(𝑇|𝑍 𝑐 )
+   – 0.5% of the US population has Zika. 𝑃(𝑍)
+
+
+What is the probability you test negative (event 𝑇 𝑐 ) if you have Zika (event 𝑍)?
+
+
+
+
+                         𝑃 𝑇 𝑐 𝑍 = 1 − 𝑃 𝑇 𝑍 = 0.02
+
+
+
+
+                                                                                     29
+Conditional Probability Defines a Probability Space
+The probability conditioned on 𝐴 follows the same properties as
+(unconditional) probability.
+
+Example. 𝑃 𝐵 𝑐 𝐴 = 1 − 𝑃(𝐵|𝐴)
+
+
+
+Formally. (Ω, 𝑃) is a probability space and 𝑃 𝐴 > 0
+
+                      (𝐴, 𝑃(⋅ |𝐴)) is a probability space
+
+
+
+                                                                  30
+

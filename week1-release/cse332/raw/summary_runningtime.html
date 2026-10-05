@@ -1,0 +1,468 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>CSE332 - Topic Summary - Running Time Analaysis</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">q { quotes: "“" "”" "‘" "’"; }</style>
+  <link rel="stylesheet" href="../style.css?v=2" />
+</head>
+<main>
+<body>
+    <div role="navigation" class="navbar navbar-static-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <span class="doc-title">CSE 332 &ndash; Topic Summary - Running
+Time Analaysis</span>
+        <ul class="nav pull-right doc-info">
+                    <li><p class="navbar-text"><a href="../index.html">Home</a></p></li>
+          <li><p class="navbar-text"><a href="../syllabus.html">Syllabus</a></p></li>
+          <li><p class="navbar-text"><a href="../calendar.html">Calendar</a></p></li>
+          <li><p class="navbar-text"><a href="../tasks.html">Tasks</a></p></li>
+          <li><p class="navbar-text"><a href="../exams.html">Exams</a></p></li>
+          <li><p class="navbar-text"><a href="../summaries.html">Summaries</a></p></li>
+          <li><p class="navbar-text"><a href="../oh.html">Office Hours</a></p></li>
+          <li><p class="navbar-text"><a href="../staff.html">Staff</a></p></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+    <div class="container">
+    <div class="row">
+            <div id="TOC" class="span3">
+        <div class="well toc">
+        <ul>
+          <li class="nav-header">Table of Contents</li>
+        </ul>
+        <ul>
+        <li><a href="#example-of-sorting"
+        id="toc-example-of-sorting"><span
+        class="toc-section-number">1</span> Example of Sorting</a>
+        <ul>
+        <li><a href="#one-algorithm-is-wildly-less-efficient"
+        id="toc-one-algorithm-is-wildly-less-efficient"><span
+        class="toc-section-number">1.1</span> One algorithm is wildly
+        less efficient</a></li>
+        </ul></li>
+        <li><a href="#defining-algorithm-running-time"
+        id="toc-defining-algorithm-running-time"><span
+        class="toc-section-number">2</span> Defining Algorithm Running
+        Time</a></li>
+        <li><a href="#how-we-define-running-time"
+        id="toc-how-we-define-running-time"><span
+        class="toc-section-number">3</span> How we define running
+        time</a>
+        <ul>
+        <li><a href="#definine-operations"
+        id="toc-definine-operations"><span
+        class="toc-section-number">3.1</span> Definine
+        <q>operations</q></a></li>
+        </ul></li>
+        <li><a href="#comparing-running-times"
+        id="toc-comparing-running-times"><span
+        class="toc-section-number">4</span> Comparing running
+        times</a></li>
+        </ul>
+        </div>
+      </div>
+            <div class="span9">
+            <!--<blockquote style="background-color:#fbb; font-size:150%">This page is from a previous offering of the course. It has been left up for archival purposes.</blockquote>-->
+      <!--<blockquote style="background-color:#fbb; font-size:150%">This page is under construction. Any content you see now is subject to change until the first day of class. Expect some links to be broken until that time.</blockquote>-->
+      <!--<blockquote style="background-color:#FFD700; font-size:150%">Looking for someone to talk to about CSE332? Try the Study Center in CSE room 006! There's a table there just for working on and discussing CSE332!</blockquote>-->
+      <h1 data-number="1" id="example-of-sorting"><span
+      class="header-section-number">1</span> Example of Sorting</h1>
+      <p>To help us see why we might care so much about running time
+      analysis we’ll compare two different sorting algorithms.</p>
+      <p>The first sorting algorithm we will look at is selection sort,
+      which we discussed in class in the future. To summarize, though,
+      selection sort will sort a list into descending order by
+      repeatedly selecting the next largest element in the array. More
+      precisely, for each index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      of the array, we will swap the value at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      with the value at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+      where index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+      contains the largest value between index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      (inclusive) and the end of the array. To use selection sort to
+      sort you’re bookshelf, you’ll find the book that goes first, then
+      put it first. Next you’ll find the book that goes second, then put
+      it second, etc.</p>
+      <p>The second algorithm we will look at is permutation sort. This
+      algorithm will sort the array by repeatedly producing (and
+      checking) a different permutation of the array until it is in
+      descending order.</p>
+      <h2 data-number="1.1"
+      id="one-algorithm-is-wildly-less-efficient"><span
+      class="header-section-number">1.1</span> One algorithm is wildly
+      less efficient</h2>
+      <p>I implemented both algorithms in Java so that we could try
+      running each one. I then timed how long each algorithm took to run
+      on arrays of various sizes. The following table shows the
+      results:</p>
+      <table>
+      <colgroup>
+      
+      
+      
+      </colgroup>
+      <thead>
+      <tr class="header">
+      <th>length</th>
+      <th>Selection Sort</th>
+      <th>Permutation Sort</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr class="odd">
+      <td>1</td>
+      <td>2.3 ms</td>
+      <td>7.1 ms</td>
+      </tr>
+      <tr class="even">
+      <td>2</td>
+      <td>2.6 ms</td>
+      <td>10.0 ms</td>
+      </tr>
+      <tr class="odd">
+      <td>3</td>
+      <td>2.9 ms</td>
+      <td>14.1 ms</td>
+      </tr>
+      <tr class="even">
+      <td>4</td>
+      <td>3.0 ms</td>
+      <td>20.5 ms</td>
+      </tr>
+      <tr class="odd">
+      <td>5</td>
+      <td>3.2 ms</td>
+      <td>104.6 ms</td>
+      </tr>
+      <tr class="even">
+      <td>6</td>
+      <td>3.7 ms</td>
+      <td>581.5 ms</td>
+      </tr>
+      <tr class="odd">
+      <td>7</td>
+      <td>3.8 ms</td>
+      <td>1253.3 ms</td>
+      </tr>
+      <tr class="even">
+      <td>8</td>
+      <td>4.1 ms</td>
+      <td>5576.2 ms</td>
+      </tr>
+      <tr class="odd">
+      <td>9</td>
+      <td>4.3 ms</td>
+      <td>23513.1 ms</td>
+      </tr>
+      <tr class="even">
+      <td>10</td>
+      <td>4.4 ms</td>
+      <td>164403.8 ms</td>
+      </tr>
+      <tr class="odd">
+      <td>11</td>
+      <td>4.8 ms</td>
+      <td>854988.4 ms
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≈</mo><annotation encoding="application/x-tex">\approx</annotation></semantics></math>
+      0.85 s</td>
+      </tr>
+      <tr class="even">
+      <td>12</td>
+      <td>5.4 ms</td>
+      <td>8442984.5 ms
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≈</mo><annotation encoding="application/x-tex">\approx</annotation></semantics></math>
+      8.4 s</td>
+      </tr>
+      <tr class="odd">
+      <td>13</td>
+      <td>6.4 ms</td>
+      <td>120.35 s</td>
+      </tr>
+      <tr class="even">
+      <td>14</td>
+      <td>6.6 ms</td>
+      <td>1595.23 s
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≈</mo><annotation encoding="application/x-tex">\approx</annotation></semantics></math>
+      26 minutes</td>
+      </tr>
+      <tr class="odd">
+      <td>15</td>
+      <td>7.1 ms</td>
+      <td>I didn’t bother trying, but I think it would be over 6
+      hours</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>Nathan (the author of this particular reading) is a pretty
+      patient dude, so clearly there’s a problem if he couldn’t stand to
+      wait for permutation sort to sort an array of length only 15. In
+      practice we’d like to sort lists that are millions of items long
+      in reasonable amounts of time, so selection sort is clearly
+      better!</p>
+      <p>Perhaps it’s intuitive to you why selection sort is better.
+      After all, selection sort tries to carefully construct a sorted
+      list piece-by-piece, whereas permutation sort exhaustively tries
+      every reordering of elements until it happens upon one that works.
+      What we’d like, though, is a way where we could predict which
+      algorithm might be more efficient without going through all this
+      effort of timing them.</p>
+      <h1 data-number="2" id="defining-algorithm-running-time"><span
+      class="header-section-number">2</span> Defining Algorithm Running
+      Time</h1>
+      <p>Timing algorithms with a stop watch to see how long they run is
+      called <q>Benchmarking</q>. Benchmarking has a lot of value for
+      many applications such as: testing to see how well a program runs
+      on specific hardware, testing to see how well a program runs on
+      real-world input, and testing to see how different implementations
+      compare. In summary, benchmarking is most helpful in testing
+      <em>code that has already been written</em>. It is not at all
+      helpful for helping us to decide <em>which</em> algorithm to turn
+      into a code, or in identifying how to make an algorithm
+      faster.</p>
+      <p>When designing our algorithms, we’ll need a way to talk about
+      running time that is <em>predictive</em> rather than
+      <em>measured</em>. Specifically, we will define algorithm running
+      time so that it has the following properties:</p>
+      <ul>
+      <li>It does not require us to implement or run our algorithm to
+      determine its running time</li>
+      <li>The running time will be the same, regardless of how the
+      algorithm is run (i.e. we would not accidentally conclude that an
+      algorithm was faster just because it was run on a faster computer
+      or implemented using a more performant programming language)</li>
+      <li>We can use it to compare algorithms (i.e. we have a way of
+      saying that one algorithm is faster than another)</li>
+      <li>We do not need to select an input size in advance (some
+      algorithms may be slower for small inputs, but faster for large
+      inputs, and so we don’t want to have to pre-decide what input size
+      we might care about)</li>
+      </ul>
+      <p>All of these properties will help us because they make running
+      time a property of the algorithm itself in that it does not depend
+      on how the algorithm is implemented or deployed. This allows us to
+      evaluate the efficiency of algorithms before we ever write
+      code!</p>
+      <h1 data-number="3" id="how-we-define-running-time"><span
+      class="header-section-number">3</span> How we define running
+      time</h1>
+      <p>To achieve all of these properties, we will define algorithm
+      running time in the following way:</p>
+      <p>We say that the running time of algorithm
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+      is a function
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>:</mo><mi>ℕ</mi><mo>→</mo><mi>ℕ</mi></mrow><annotation encoding="application/x-tex">f: \mathbb{N} \rightarrow \mathbb{N}</annotation></semantics></math>
+      (i.e. a function mapping integers to integers) such that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>
+      is the worst case number of <q>operations</q> the algorithm would
+      perform for an input of size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>.</p>
+      <p>In other words, we express the running time of an algorithm
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+      as a function
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>.
+      The input and outputs to that function
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+      will both be integers. The input value to
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+      will be the size of the input given to the algorithm
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>.
+      The output value from
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+      will be the maximum (worst case) number of <q>operations</q> that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+      will perform among all inputs of the given size.</p>
+      <p>Let’s see how this definition gives us some of the properties
+      that we’re after. For one, this definition does not depend on the
+      speed of the computer that may run our algorithm. Faster computers
+      just do each operation more quickly, they do not do fewer
+      operations. Also, by making running time a function of the input
+      size, it does not require us to pick a specific input in advance.
+      It turns out this definition gives us ALL of the properties we
+      want, but we need to do a bit more work first to see this.</p>
+      <h2 data-number="3.1" id="definine-operations"><span
+      class="header-section-number">3.1</span> Definine
+      <q>operations</q></h2>
+      <p>In this definition of running time, we said that we need to
+      count the number of <q>operations.</q> However, we did not really
+      state what an <q>operation</q> is. If you talked about running
+      time in a prior course (e.g. cse123, cse143, or equivalent) you
+      most likely used the phrase <q>primitive operation</q> or similar
+      to describe the things that you’d count. From there, you typically
+      said that a primitive operation is something like arithmetic,
+      array indexing, variable assignment, etc. This choice is not
+      wrong, and it will pretty much always give you essentially the
+      same result as what we’ll do in this course, but we’re going to
+      select something different for our <q>operations</q> in order to
+      make the task easier.</p>
+      <p>Instead of counting <em>all primitive operations</em> for our
+      algorithms, we’ll instead pick just a small number of steps of our
+      algorithm and just count those. As long as we’re careful about
+      what steps we pick, this should give us the same general answer as
+      counting primitive operations, but with less work.</p>
+      <p>For example, when we’re analyzing the selection sort algorithm,
+      we’ll say <q>selection sort requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>n</mi><mn>2</mn></msup><annotation encoding="application/x-tex">n^2</annotation></semantics></math>
+      comparisons</q>. In this case, the operation we’re counting for
+      running time is <q>comparison</q> operations (checking if one
+      element is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>&gt;</mo><annotation encoding="application/x-tex">&gt;</annotation></semantics></math>
+      or
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>&lt;</mo><annotation encoding="application/x-tex">&lt;</annotation></semantics></math>
+      another). When doing this, we could ignore all array indexing,
+      variable assignments, arithmetic etc. when identifying our running
+      time.</p>
+      <p>There are generally a few ways that we could select our
+      operation(s), but here are some things to consider when selecting
+      which operation or operations to count:</p>
+      <ul>
+      <li><strong>Necessity</strong>: The selected operations should be
+      <em>necessary</em> for solving the given problem. By this we mean
+      that any algorithm that solves the same problem should need to do
+      these operations. For the sorting example, comparisons is a good
+      choice because any algorithm needs to compare elements’ values to
+      determine their order. This is probably the most important
+      consideration, since it will be most useful in helping us to
+      compare running times of wildly different algorithms.</li>
+      <li><strong>Frequency</strong>: Looking ahead, we’re eventually
+      going to be considering our running times asymptotically, meaning
+      we’ll ignore constant coefficients. If we select the <em>most
+      frequent</em> operation, then that should give us the same
+      asymptotic answer as if we selected several operations.</li>
+      <li><strong>Magnitude</strong>: Some operations will be more
+      expensive to perform. Instead of looking at all operations, we
+      could just look at the most expensive one, since that will have a
+      greater impact on the real-world time our final implementation
+      requires. For example, when sorting we often count comparisons
+      because complex objects may require complex procedures to compare.
+      The other operations we most often see in sorting algorithms
+      (e.g. arithmetic, array indexing, array allocation, etc.) each
+      typically take less time than a comparison of a complex
+      object.</li>
+      </ul>
+      <p>In most cases, there will be a clear choice of one or a few
+      operations that is best according to all three considerations
+      above. There may be times, however, when different considerations
+      may lead you to select different operations. We’ll just ignore
+      that circumstance for this class. In case you’re curious what we’d
+      do with this dilemma, though… typically in this situation we would
+      give our audience a running time for each choice of operation,
+      that person would then determine which operation they might care
+      more about based on their application. For example, we might say
+      something like <q>our sorting algorithm’s running time is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(n \log n)</annotation></semantics></math>
+      comparisons and
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math>
+      array operations</q>. This signals to the audience that if their
+      comparison operations are really expensive, then this algorithm
+      would run faster than one requiring
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math>
+      comparisons, even if the running time is still a quadratic number
+      of primitive operations.</p>
+      <h1 data-number="4" id="comparing-running-times"><span
+      class="header-section-number">4</span> Comparing running
+      times</h1>
+      <p>Now that we have a definition of what a running time is, we
+      need a way to compare algorithms by their running times to see
+      which is faster. This means that we need to have some way of
+      comparing <em>functions</em> to determine which is the larger
+      function. To do this we will use a concept that you likely have
+      seen in your prerequisite courses - asymptotic notation.</p>
+      <p>Asymptotic notation is used to compare functions based on their
+      long term rate of growth. Put overly simplistically, when using
+      asymptotic notation, we will conclude that the bigger function is
+      the one that has larger output for really big inputs. This means
+      that when comparing functions, we will completely ignore their
+      behavior on <q>small</q> inputs. (We prefer this because when
+      comparing algorithms, both will likely be reasonably fast on small
+      inputs, so the efficiency difference is most important when inputs
+      become large.)</p>
+      <p>In addition to ignoring small inputs, we’ll also ignore
+      constant coefficients of the output. This is because of the
+      peculiar way we selected the running time function for our
+      algorithms. For example, if <em>I</em> only selected the most
+      frequent operation when expressing my running time, but
+      <em>you</em> counted all of the most frequent 3 operations, then
+      it would be misleading to say that your algorithm took 3 times as
+      long just because we counted differently. Because it would get
+      tedious to exactly communicate the specific operations that were
+      counted, and because different computers might take different
+      amounts of time to do the same operation anyway, we’ll have better
+      results by just ignoring constant coefficients, meaning we’ll
+      consider running times that are off by a factor of 3 (for example)
+      to simply be the same running time.</p>
+      <p>For now, in this reading, we will only give high-level
+      descriptions of our asymptotic notation. In the next one we’ll
+      work with more precise definitions.</p>
+      <ul>
+      <li>Big-Oh
+      (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>O</mi><annotation encoding="application/x-tex">O</annotation></semantics></math>):
+      We say a function
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>
+      is in
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(g(n))</annotation></semantics></math>
+      provided that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">g(n)</annotation></semantics></math>
+      eventually exceeds and then stays above
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>⋅</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">c\cdot f(n)</annotation></semantics></math>
+      for some constant
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">c&gt;0</annotation></semantics></math>.
+      We generally would understand this to mean
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>
+      is asymptotically less than or equal to
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">g(n)</annotation></semantics></math>.</li>
+      <li>Big-Omega
+      (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Ω</mi><annotation encoding="application/x-tex">\Omega</annotation></semantics></math>):
+      We say a function
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>
+      is in
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Ω</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Omega(g(n))</annotation></semantics></math>
+      provided that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">g(n)</annotation></semantics></math>
+      eventually falls below and the stays below
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>⋅</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">c\cdot f(n)</annotation></semantics></math>
+      for some constant
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">c&gt;0</annotation></semantics></math>.
+      We generally would understand this to mean
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>
+      is asymptotically greater than or equal to
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">g(n)</annotation></semantics></math>.</li>
+      <li>Big-Theta
+      (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Θ</mi><annotation encoding="application/x-tex">\Theta</annotation></semantics></math>):
+      We say a function
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>
+      is in
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(g(n))</annotation></semantics></math>
+      provided that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>
+      is in both
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(g(n))</annotation></semantics></math>
+      and
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Ω</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Omega(g(n))</annotation></semantics></math>.
+      We generally would understand this to mean
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>
+      is asymptotically equal to
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">g(n)</annotation></semantics></math>.</li>
+      </ul>
+            </div>
+    </div>
+  </div>
+  <footer>
+          Copyright © 2026 Paul G. Allen School of Computer Science & Engineering, University of Washington. Site design by Nathan Brunelle.
+              <p>Released under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /> CC-BY-NC-SA 4.0</a> license</a>.
+      </p>
+        <p>Last updated 2026-09-28 19:32</p>
+  </footer>
+</body>
+</main>
+</html>

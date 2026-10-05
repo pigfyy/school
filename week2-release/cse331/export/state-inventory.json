@@ -1,0 +1,2840 @@
+{
+  "siteId": "cse331-26au-week2",
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-05T23:09:23.297Z",
+  "generatedBy": "tools/build-export.mjs from site/index.html (live DOM, headless Chromium)",
+  "notes": [
+    "IDs are stable and semantic. Problems: cse331-w2-l3-<slug>; parts: <problemId>.<part-slug>; quick checks: cse331-w2-l3-qc-<slug>; sorter cards (graded quick checks, format 'sort'): cse331-w2-l3-sort-<slug>; quiz: cse331-w2-l3-quiz-<slug>.",
+    "Only Lecture 3 (Mon Oct 5) has items. Section 1 (Tue Oct 6) and Testing 1/2 (Wed Oct 7, Fri Oct 9) were not posted when this was built, so they have no items.",
+    "No content-version namespace is baked into IDs; the host assigns one.",
+    "Answer keys are deliberately absent. They live in site/js/keys.js.",
+    "Attempts: every Check press and every self-mark appends one Attempt { attemptId, seq, itemId, submittedAt, kind, answer, result, feedbackKind, hintsRevealedAtSubmit, solutionViewedBeforeSubmit } under store.attempts[itemId] (problem id for problems; parts are inside answer.parts / result.parts)."
+  ],
+  "counts": {
+    "problem": 9,
+    "part": 35,
+    "quickcheck": 16,
+    "quiz": 11
+  },
+  "items": [
+    {
+      "id": "cse331-w2-l3-qc-junit-kind",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-discuss",
+      "page": "Reading 1 discussion",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Quick check: a JUnit test runs your method and compares its result with the expected one, every time the suite runs. Is that manual or automated testing?",
+        "html": "Quick check: a JUnit test runs your method and compares its result with the expected one, every time the suite runs. Is that manual or automated testing?"
+      },
+      "answerType": "text",
+      "grader": "exact-text (normalized: trim, case, spaces)",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-qc-b-vs-d",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-strength",
+      "page": "Stronger and weaker, again",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Quick check: Lecture 2's B and D have the same precondition. B promises the smallest index of a match (or −1); D promises some index of a match (or −1). B is ___ than D.",
+        "html": "Quick check: Lecture 2's B and D have the same precondition. B promises the smallest index of a match (or −1); D promises some index of a match (or −1). B is ___ than D."
+      },
+      "answerType": "strength",
+      "grader": "exact-text (stronger | weaker | incomparable | same)",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-qc-average-of-four",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-sum",
+      "page": "Sum, from the command line",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Quick check: you run java Sum -a and type 1 2 3 4, then end the input. What exactly does Sum print?",
+        "html": "Quick check: you run <code>java Sum -a</code> and type <code>1 2 3 4</code>, then end the input. What exactly does <code>Sum</code> print?"
+      },
+      "answerType": "output",
+      "grader": "exact program output (ends trimmed; case, spacing and punctuation must match; 'nothing' = no output)",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-qc-status-after-bad",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-batch",
+      "page": "Batch programs",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Quick check: right after java Sum bad.txt > total.txt, you type echo $?. What does it print?",
+        "html": "Quick check: right after <code>java Sum bad.txt &gt; total.txt</code>, you type <code>echo $?</code>. What does it print?"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-qc-message-stream",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-batch",
+      "page": "Batch programs",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Quick check: on which stream does Sum print Sum: cannot average zero values?",
+        "html": "Quick check: on which stream does <code>Sum</code> print <code>Sum: cannot average zero values</code>?"
+      },
+      "answerType": "stream",
+      "grader": "stdout | stderr (accepts standard output / System.out / 1, standard error / System.err / 2)",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-sort-file-sum",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-manual",
+      "page": "The user manual, on every run",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Sort this run against Sum's user manual (lines 5-19): described, silent or contradicted? $ java Sum nums.txt",
+        "html": "<div class=\"term\" data-session=\"[[&quot;java Sum nums.txt&quot;,&quot;&quot;]]\"><div class=\"term-head\"><span class=\"dots\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span class=\"term-title\">bash</span><button class=\"plain-toggle\" aria-pressed=\"false\" title=\"Show both streams as a real terminal does\">as a terminal shows it</button></div><pre class=\"term-body\" tabindex=\"0\"><span class=\"tl cmd\"><span class=\"ps1\" aria-hidden=\"true\">$ </span>java Sum nums.txt<span class=\"st-badge zero\" title=\"Exit status. A real terminal doesn't show it; echo $? prints it.\">status 0</span></span>\n<span class=\"tl out\">12</span>\n</pre></div>"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "format": "sort",
+      "options": [
+        {
+          "index": 0,
+          "id": "described",
+          "text": "described"
+        },
+        {
+          "index": 1,
+          "id": "silent",
+          "text": "silent"
+        },
+        {
+          "index": 2,
+          "id": "contradicted",
+          "text": "contradicted"
+        }
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-sort-average-two-decimals",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-manual",
+      "page": "The user manual, on every run",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Sort this run against Sum's user manual (lines 5-19): described, silent or contradicted? $ java Sum -a --precision=2",
+        "html": "<div class=\"term\" data-session=\"[[&quot;java Sum -a --precision=2&quot;,&quot;1 2\\n&quot;]]\"><div class=\"term-head\"><span class=\"dots\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span class=\"term-title\">bash</span><button class=\"plain-toggle\" aria-pressed=\"false\" title=\"Show both streams as a real terminal does\">as a terminal shows it</button></div><pre class=\"term-body\" tabindex=\"0\"><span class=\"tl cmd\"><span class=\"ps1\" aria-hidden=\"true\">$ </span>java Sum -a --precision=2<span class=\"st-badge zero\" title=\"Exit status. A real terminal doesn't show it; echo $? prints it.\">status 0</span></span>\n<span class=\"tl typed\">1 2</span>\n<span class=\"tl eof\">⌃D</span>\n<span class=\"tl out\">1.50</span>\n</pre></div>"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "format": "sort",
+      "options": [
+        {
+          "index": 0,
+          "id": "described",
+          "text": "described"
+        },
+        {
+          "index": 1,
+          "id": "silent",
+          "text": "silent"
+        },
+        {
+          "index": 2,
+          "id": "contradicted",
+          "text": "contradicted"
+        }
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-sort-too-big-integer",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-manual",
+      "page": "The user manual, on every run",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Sort this run against Sum's user manual (lines 5-19): described, silent or contradicted? $ java Sum",
+        "html": "<div class=\"term\" data-session=\"[[&quot;java Sum&quot;,&quot;2147483648\\n&quot;]]\"><div class=\"term-head\"><span class=\"dots\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span class=\"term-title\">bash</span><button class=\"plain-toggle\" aria-pressed=\"false\" title=\"Show both streams as a real terminal does\">as a terminal shows it</button></div><pre class=\"term-body\" tabindex=\"0\"><span class=\"tl cmd\"><span class=\"ps1\" aria-hidden=\"true\">$ </span>java Sum<span class=\"st-badge nonzero\" title=\"Exit status. A real terminal doesn't show it; echo $? prints it.\">status 1</span></span>\n<span class=\"tl typed\">2147483648</span>\n<span class=\"tl eof\">⌃D</span>\n<span class=\"tl err\">Sum: not an integer: 2147483648</span>\n</pre></div>"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "format": "sort",
+      "options": [
+        {
+          "index": 0,
+          "id": "described",
+          "text": "described"
+        },
+        {
+          "index": 1,
+          "id": "silent",
+          "text": "silent"
+        },
+        {
+          "index": 2,
+          "id": "contradicted",
+          "text": "contradicted"
+        }
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-sort-empty-sum",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-manual",
+      "page": "The user manual, on every run",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Sort this run against Sum's user manual (lines 5-19): described, silent or contradicted? $ java Sum (Count it as described if the sum of no numbers is 0, as Lecture 1 granted.)",
+        "html": "<div class=\"term\" data-session=\"[[&quot;java Sum&quot;,&quot;&quot;]]\"><div class=\"term-head\"><span class=\"dots\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span class=\"term-title\">bash</span><button class=\"plain-toggle\" aria-pressed=\"false\" title=\"Show both streams as a real terminal does\">as a terminal shows it</button></div><pre class=\"term-body\" tabindex=\"0\"><span class=\"tl cmd\"><span class=\"ps1\" aria-hidden=\"true\">$ </span>java Sum<span class=\"st-badge zero\" title=\"Exit status. A real terminal doesn't show it; echo $? prints it.\">status 0</span></span>\n<span class=\"tl eof\">⌃D  (nothing typed: input ended at once)</span>\n<span class=\"tl out\">0</span>\n</pre></div>"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "format": "sort",
+      "options": [
+        {
+          "index": 0,
+          "id": "described",
+          "text": "described"
+        },
+        {
+          "index": 1,
+          "id": "silent",
+          "text": "silent"
+        },
+        {
+          "index": 2,
+          "id": "contradicted",
+          "text": "contradicted"
+        }
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-sort-empty-average",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-manual",
+      "page": "The user manual, on every run",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Sort this run against Sum's user manual (lines 5-19): described, silent or contradicted? $ java Sum -a",
+        "html": "<div class=\"term\" data-session=\"[[&quot;java Sum -a&quot;,&quot;&quot;]]\"><div class=\"term-head\"><span class=\"dots\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span class=\"term-title\">bash</span><button class=\"plain-toggle\" aria-pressed=\"false\" title=\"Show both streams as a real terminal does\">as a terminal shows it</button></div><pre class=\"term-body\" tabindex=\"0\"><span class=\"tl cmd\"><span class=\"ps1\" aria-hidden=\"true\">$ </span>java Sum -a<span class=\"st-badge nonzero\" title=\"Exit status. A real terminal doesn't show it; echo $? prints it.\">status 1</span></span>\n<span class=\"tl eof\">⌃D  (nothing typed: input ended at once)</span>\n<span class=\"tl err\">Sum: cannot average zero values</span>\n</pre></div>"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "format": "sort",
+      "options": [
+        {
+          "index": 0,
+          "id": "described",
+          "text": "described"
+        },
+        {
+          "index": 1,
+          "id": "silent",
+          "text": "silent"
+        },
+        {
+          "index": 2,
+          "id": "contradicted",
+          "text": "contradicted"
+        }
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-sort-word-in-input",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-manual",
+      "page": "The user manual, on every run",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Sort this run against Sum's user manual (lines 5-19): described, silent or contradicted? $ java Sum",
+        "html": "<div class=\"term\" data-session=\"[[&quot;java Sum&quot;,&quot;1 2 three 4\\n&quot;]]\"><div class=\"term-head\"><span class=\"dots\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span class=\"term-title\">bash</span><button class=\"plain-toggle\" aria-pressed=\"false\" title=\"Show both streams as a real terminal does\">as a terminal shows it</button></div><pre class=\"term-body\" tabindex=\"0\"><span class=\"tl cmd\"><span class=\"ps1\" aria-hidden=\"true\">$ </span>java Sum<span class=\"st-badge nonzero\" title=\"Exit status. A real terminal doesn't show it; echo $? prints it.\">status 1</span></span>\n<span class=\"tl typed\">1 2 three 4</span>\n<span class=\"tl eof\">⌃D</span>\n<span class=\"tl err\">Sum: not an integer: three</span>\n</pre></div>"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "format": "sort",
+      "options": [
+        {
+          "index": 0,
+          "id": "described",
+          "text": "described"
+        },
+        {
+          "index": 1,
+          "id": "silent",
+          "text": "silent"
+        },
+        {
+          "index": 2,
+          "id": "contradicted",
+          "text": "contradicted"
+        }
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-sort-exit-status",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-manual",
+      "page": "The user manual, on every run",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Sort this run against Sum's user manual (lines 5-19): described, silent or contradicted? $ java Sum nums.txt ; $ echo $? (Sort the exit status of this run.)",
+        "html": "<div class=\"term\" data-session=\"[[&quot;java Sum nums.txt&quot;,&quot;&quot;],[&quot;echo $?&quot;,&quot;&quot;]]\"><div class=\"term-head\"><span class=\"dots\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span class=\"term-title\">bash</span><button class=\"plain-toggle\" aria-pressed=\"false\" title=\"Show both streams as a real terminal does\">as a terminal shows it</button></div><pre class=\"term-body\" tabindex=\"0\"><span class=\"tl cmd\"><span class=\"ps1\" aria-hidden=\"true\">$ </span>java Sum nums.txt<span class=\"st-badge zero\" title=\"Exit status. A real terminal doesn't show it; echo $? prints it.\">status 0</span></span>\n<span class=\"tl out\">12</span>\n<span class=\"tl cmd\"><span class=\"ps1\" aria-hidden=\"true\">$ </span>echo $?<span class=\"st-badge zero\" title=\"Exit status. A real terminal doesn't show it; echo $? prints it.\">status 0</span></span>\n<span class=\"tl out\">0</span>\n</pre></div>"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "format": "sort",
+      "options": [
+        {
+          "index": 0,
+          "id": "described",
+          "text": "described"
+        },
+        {
+          "index": 1,
+          "id": "silent",
+          "text": "silent"
+        },
+        {
+          "index": 2,
+          "id": "contradicted",
+          "text": "contradicted"
+        }
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-sort-help",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-manual",
+      "page": "The user manual, on every run",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Sort this run against Sum's user manual (lines 5-19): described, silent or contradicted? $ java Sum --help",
+        "html": "<div class=\"term\" data-session=\"[[&quot;java Sum --help&quot;,&quot;&quot;]]\"><div class=\"term-head\"><span class=\"dots\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span class=\"term-title\">bash</span><button class=\"plain-toggle\" aria-pressed=\"false\" title=\"Show both streams as a real terminal does\">as a terminal shows it</button></div><pre class=\"term-body\" tabindex=\"0\"><span class=\"tl cmd\"><span class=\"ps1\" aria-hidden=\"true\">$ </span>java Sum --help<span class=\"st-badge nonzero\" title=\"Exit status. A real terminal doesn't show it; echo $? prints it.\">status 1</span></span>\n<span class=\"tl err\">Sum: unknown option: --help</span>\n</pre></div>"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "format": "sort",
+      "options": [
+        {
+          "index": 0,
+          "id": "described",
+          "text": "described"
+        },
+        {
+          "index": 1,
+          "id": "silent",
+          "text": "silent"
+        },
+        {
+          "index": 2,
+          "id": "contradicted",
+          "text": "contradicted"
+        }
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-qc-hasnextint-line",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-manual",
+      "page": "The user manual, on every run",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Quick check: which line of Sum.java decides that 2147483648 is \"not an integer\"?",
+        "html": "Quick check: which line of <code>Sum.java</code> decides that <code>2147483648</code> is \"not an integer\"?"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-qc-nan-status",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-edge",
+      "page": "Checks at the edge",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Quick check: in the copy without lines 73–75, what exit status does java Sum -a leave when nothing is typed?",
+        "html": "Quick check: in the copy without lines 73–75, what exit status does <code>java Sum -a</code> leave when nothing is typed?"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-qc-negative-before-input",
+      "kind": "quickcheck",
+      "parentId": null,
+      "route": "#l3-edge",
+      "page": "Checks at the edge",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Quick check: with every check in place, does java Sum -a --precision=-1 bad.txt ever read bad.txt?",
+        "html": "Quick check: with every check in place, does <code>java Sum -a --precision=-1 bad.txt</code> ever read <code>bad.txt</code>?"
+      },
+      "answerType": "yesno",
+      "grader": "yes/no",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quickcheck'",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int (readable checks)",
+          "firstTryCorrect": "true|false|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { raw, normalized } (sorter cards add choiceId), result { overall, correct }, feedbackKind (misconception tag | 'correct' | 'incorrect' | 'unreadable' | 'chose-<option>' for sorter cards)",
+        "events": "none"
+      },
+      "hintCount": 0,
+      "hasSolution": false,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-quiz-not-input",
+      "kind": "quiz",
+      "parentId": null,
+      "route": "#l3-quiz",
+      "page": "Check your understanding",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Which of these is not part of Sum's input?",
+        "html": "Which of these is <em>not</em> part of <code>Sum</code>'s input?"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "options": [
+        {
+          "index": 0,
+          "id": "args",
+          "text": "The words typed after java Sum"
+        },
+        {
+          "index": 1,
+          "id": "file",
+          "text": "The contents of a file named on the command line"
+        },
+        {
+          "index": 2,
+          "id": "exit-status",
+          "text": "The exit status"
+        },
+        {
+          "index": 3,
+          "id": "stdin",
+          "text": "What the user types after starting it"
+        }
+      ],
+      "feedbackKinds": [
+        "args-not-input",
+        "file-not-input",
+        "stdin-not-input"
+      ],
+      "reviewRoute": "#l3-batch",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quiz'",
+          "choiceId": "option id|null (multiple choice)",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int",
+          "firstTryCorrect": "bool",
+          "done": "bool",
+          "revealed": "bool",
+          "lastMessage": "string|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { choiceId, choiceIndex, raw, normalized } (MC) or { raw, normalized }, result { overall, correct }, feedbackKind (option's misconception tag | 'correct' | ...), solutionViewedBeforeSubmit = answer was revealed first",
+        "events": "Event[] with type 'reveal' (Show answer) | 'clear' (Start over)"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-quiz-not-batch",
+      "kind": "quiz",
+      "parentId": null,
+      "route": "#l3-quiz",
+      "page": "Check your understanding",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Which of these is not a batch program?",
+        "html": "Which of these is <em>not</em> a batch program?"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "options": [
+        {
+          "index": 0,
+          "id": "sum1",
+          "text": "Lecture 1's Sum, which prints a prompt first"
+        },
+        {
+          "index": 1,
+          "id": "web-browser",
+          "text": "A web browser"
+        },
+        {
+          "index": 2,
+          "id": "sort",
+          "text": "A program that sorts the lines of a file and prints them"
+        },
+        {
+          "index": 3,
+          "id": "sum3",
+          "text": "Lecture 3's Sum run with -a"
+        }
+      ],
+      "feedbackKinds": [
+        "file-not-batch",
+        "options-not-batch",
+        "prompt-not-batch"
+      ],
+      "reviewRoute": "#l3-batch",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quiz'",
+          "choiceId": "option id|null (multiple choice)",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int",
+          "firstTryCorrect": "bool",
+          "done": "bool",
+          "revealed": "bool",
+          "lastMessage": "string|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { choiceId, choiceIndex, raw, normalized } (MC) or { raw, normalized }, result { overall, correct }, feedbackKind (option's misconception tag | 'correct' | ...), solutionViewedBeforeSubmit = answer was revealed first",
+        "events": "Event[] with type 'reveal' (Show answer) | 'clear' (Start over)"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-quiz-two-files-status",
+      "kind": "quiz",
+      "parentId": null,
+      "route": "#l3-quiz",
+      "page": "Check your understanding",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "You run java Sum nums.txt bad.txt and then echo $?. What number does echo print?",
+        "html": "You run <code>java Sum nums.txt bad.txt</code> and then <code>echo $?</code>. What number does <code>echo</code> print?"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "reviewRoute": "#l3-batch",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quiz'",
+          "choiceId": "option id|null (multiple choice)",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int",
+          "firstTryCorrect": "bool",
+          "done": "bool",
+          "revealed": "bool",
+          "lastMessage": "string|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { choiceId, choiceIndex, raw, normalized } (MC) or { raw, normalized }, result { overall, correct }, feedbackKind (option's misconception tag | 'correct' | ...), solutionViewedBeforeSubmit = answer was revealed first",
+        "events": "Event[] with type 'reveal' (Show answer) | 'clear' (Start over)"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-quiz-precision-without-a",
+      "kind": "quiz",
+      "parentId": null,
+      "route": "#l3-quiz",
+      "page": "Check your understanding",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "What does java Sum --precision=2 nums.txt do?",
+        "html": "What does <code>java Sum --precision=2 nums.txt</code> do?"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "options": [
+        {
+          "index": 0,
+          "id": "prints-sum",
+          "text": "Prints 12, ignoring the precision"
+        },
+        {
+          "index": 1,
+          "id": "prints-1200",
+          "text": "Prints 12.00"
+        },
+        {
+          "index": 2,
+          "id": "stderr-message-status-1",
+          "text": "Prints a message on standard error and exits with status 1"
+        },
+        {
+          "index": 3,
+          "id": "stack-trace",
+          "text": "Ends in a stack trace"
+        }
+      ],
+      "feedbackKinds": [
+        "expects-crash",
+        "option-ignored",
+        "precision-applies-to-sum"
+      ],
+      "reviewRoute": "#l3-sum",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quiz'",
+          "choiceId": "option id|null (multiple choice)",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int",
+          "firstTryCorrect": "bool",
+          "done": "bool",
+          "revealed": "bool",
+          "lastMessage": "string|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { choiceId, choiceIndex, raw, normalized } (MC) or { raw, normalized }, result { overall, correct }, feedbackKind (option's misconception tag | 'correct' | ...), solutionViewedBeforeSubmit = answer was revealed first",
+        "events": "Event[] with type 'reveal' (Show answer) | 'clear' (Start over)"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-quiz-why-stderr",
+      "kind": "quiz",
+      "parentId": null,
+      "route": "#l3-quiz",
+      "page": "Check your understanding",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Why does Sum print its messages on standard error rather than standard output?",
+        "html": "Why does <code>Sum</code> print its messages on standard error rather than standard output?"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "options": [
+        {
+          "index": 0,
+          "id": "color",
+          "text": "So the terminal shows them in a different color"
+        },
+        {
+          "index": 1,
+          "id": "keep-results-separate",
+          "text": "So a file or program that receives its output never gets a message where a result should be"
+        },
+        {
+          "index": 2,
+          "id": "status",
+          "text": "Because printing on standard error is what makes the exit status 1"
+        },
+        {
+          "index": 3,
+          "id": "java",
+          "text": "Because Java throws an exception if a program prints a message on standard output"
+        }
+      ],
+      "feedbackKinds": [
+        "java-requires",
+        "stderr-sets-status",
+        "terminal-shows-difference"
+      ],
+      "reviewRoute": "#l3-batch",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quiz'",
+          "choiceId": "option id|null (multiple choice)",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int",
+          "firstTryCorrect": "bool",
+          "done": "bool",
+          "revealed": "bool",
+          "lastMessage": "string|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { choiceId, choiceIndex, raw, normalized } (MC) or { raw, normalized }, result { overall, correct }, feedbackKind (option's misconception tag | 'correct' | ...), solutionViewedBeforeSubmit = answer was revealed first",
+        "events": "Event[] with type 'reveal' (Show answer) | 'clear' (Start over)"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-quiz-redirect-bad",
+      "kind": "quiz",
+      "parentId": null,
+      "route": "#l3-quiz",
+      "page": "Check your understanding",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "You run java Sum bad.txt > total.txt. What happens?",
+        "html": "You run <code>java Sum bad.txt &gt; total.txt</code>. What happens?"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "options": [
+        {
+          "index": 0,
+          "id": "file-has-message",
+          "text": "Nothing shows; total.txt contains the message"
+        },
+        {
+          "index": 1,
+          "id": "message-shows-file-empty",
+          "text": "The message shows on the terminal; total.txt is empty"
+        },
+        {
+          "index": 2,
+          "id": "message-shows-file-has-3",
+          "text": "The message shows; total.txt contains 3"
+        },
+        {
+          "index": 3,
+          "id": "file-unchanged",
+          "text": "The message shows; total.txt keeps whatever it held before"
+        }
+      ],
+      "feedbackKinds": [
+        "partial-sum-written",
+        "redirect-after-success",
+        "redirect-takes-both"
+      ],
+      "reviewRoute": "#l3-batch",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quiz'",
+          "choiceId": "option id|null (multiple choice)",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int",
+          "firstTryCorrect": "bool",
+          "done": "bool",
+          "revealed": "bool",
+          "lastMessage": "string|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { choiceId, choiceIndex, raw, normalized } (MC) or { raw, normalized }, result { overall, correct }, feedbackKind (option's misconception tag | 'correct' | ...), solutionViewedBeforeSubmit = answer was revealed first",
+        "events": "Event[] with type 'reveal' (Show answer) | 'clear' (Start over)"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-quiz-stack-trace-status",
+      "kind": "quiz",
+      "parentId": null,
+      "route": "#l3-quiz",
+      "page": "Check your understanding",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "A Java program never calls System.exit, and ends in a stack trace. What exit status does Java set?",
+        "html": "A Java program never calls <code>System.exit</code>, and ends in a stack trace. What exit status does Java set?"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "reviewRoute": "#l3-batch",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quiz'",
+          "choiceId": "option id|null (multiple choice)",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int",
+          "firstTryCorrect": "bool",
+          "done": "bool",
+          "revealed": "bool",
+          "lastMessage": "string|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { choiceId, choiceIndex, raw, normalized } (MC) or { raw, normalized }, result { overall, correct }, feedbackKind (option's misconception tag | 'correct' | ...), solutionViewedBeforeSubmit = answer was revealed first",
+        "events": "Event[] with type 'reveal' (Show answer) | 'clear' (Start over)"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-quiz-nan-worse",
+      "kind": "quiz",
+      "parentId": null,
+      "route": "#l3-quiz",
+      "page": "Check your understanding",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Without lines 73–75, java Sum -a on empty input prints NaN. Why does the lecture call that worse than a crash?",
+        "html": "Without lines 73–75, <code>java Sum -a</code> on empty input prints <code>NaN</code>. Why does the lecture call that worse than a crash?"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "options": [
+        {
+          "index": 0,
+          "id": "status-zero-success",
+          "text": "The run reports success, so a script would take NaN for an average"
+        },
+        {
+          "index": 1,
+          "id": "nan-not-number",
+          "text": "NaN isn't a number, so it can't be printed"
+        },
+        {
+          "index": 2,
+          "id": "slower",
+          "text": "Dividing by zero is slow"
+        },
+        {
+          "index": 3,
+          "id": "stderr",
+          "text": "NaN goes to standard error, so the user never sees it"
+        }
+      ],
+      "feedbackKinds": [
+        "nan-on-stderr",
+        "nan-unreadable",
+        "performance"
+      ],
+      "reviewRoute": "#l3-edge",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quiz'",
+          "choiceId": "option id|null (multiple choice)",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int",
+          "firstTryCorrect": "bool",
+          "done": "bool",
+          "revealed": "bool",
+          "lastMessage": "string|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { choiceId, choiceIndex, raw, normalized } (MC) or { raw, normalized }, result { overall, correct }, feedbackKind (option's misconception tag | 'correct' | ...), solutionViewedBeforeSubmit = answer was revealed first",
+        "events": "Event[] with type 'reveal' (Show answer) | 'clear' (Start over)"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-quiz-who-has-precondition",
+      "kind": "quiz",
+      "parentId": null,
+      "route": "#l3-quiz",
+      "page": "Check your understanding",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Split Sum into methods. Why may a method inside require a count that is not zero, while main may require nothing of the user?",
+        "html": "Split <code>Sum</code> into methods. Why may a method inside require a count that is not zero, while <code>main</code> may require nothing of the user?"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "options": [
+        {
+          "index": 0,
+          "id": "client-is-main",
+          "text": "The method's client is main, which can be held to a promise; the user owes Sum nothing"
+        },
+        {
+          "index": 1,
+          "id": "private",
+          "text": "Private methods are allowed preconditions and public ones aren't"
+        },
+        {
+          "index": 2,
+          "id": "faster",
+          "text": "Checks are slow, so only main should have them"
+        },
+        {
+          "index": 3,
+          "id": "user-reads",
+          "text": "The user reads the manual, so the user can be held to it too"
+        }
+      ],
+      "feedbackKinds": [
+        "checks-are-slow",
+        "private-means-safe",
+        "user-reads-spec"
+      ],
+      "reviewRoute": "#l3-edge",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quiz'",
+          "choiceId": "option id|null (multiple choice)",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int",
+          "firstTryCorrect": "bool",
+          "done": "bool",
+          "revealed": "bool",
+          "lastMessage": "string|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { choiceId, choiceIndex, raw, normalized } (MC) or { raw, normalized }, result { overall, correct }, feedbackKind (option's misconception tag | 'correct' | ...), solutionViewedBeforeSubmit = answer was revealed first",
+        "events": "Event[] with type 'reveal' (Show answer) | 'clear' (Start over)"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-quiz-unknown-program",
+      "kind": "quiz",
+      "parentId": null,
+      "route": "#l3-quiz",
+      "page": "Check your understanding",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "\"Expect the output of every program to become the input to another, as yet unknown, program.\" What does \"as yet unknown\" mean for Sum's author?",
+        "html": "\"Expect the output of every program to become the input to another, as yet unknown, program.\" What does \"as yet unknown\" mean for <code>Sum</code>'s author?"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "options": [
+        {
+          "index": 0,
+          "id": "put-in-spec",
+          "text": "Whatever those programs rely on has to be in Sum's specification"
+        },
+        {
+          "index": 1,
+          "id": "test-all",
+          "text": "Test Sum with every program that might read its output"
+        },
+        {
+          "index": 2,
+          "id": "no-output",
+          "text": "Print as little as possible, ideally nothing"
+        },
+        {
+          "index": 3,
+          "id": "mixed-ok",
+          "text": "It's fine to mix messages into the output, since the other program can filter them"
+        }
+      ],
+      "feedbackKinds": [
+        "avoid-output",
+        "clutter-ok",
+        "test-every-client"
+      ],
+      "reviewRoute": "#l3-batch",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quiz'",
+          "choiceId": "option id|null (multiple choice)",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int",
+          "firstTryCorrect": "bool",
+          "done": "bool",
+          "revealed": "bool",
+          "lastMessage": "string|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { choiceId, choiceIndex, raw, normalized } (MC) or { raw, normalized }, result { overall, correct }, feedbackKind (option's misconception tag | 'correct' | ...), solutionViewedBeforeSubmit = answer was revealed first",
+        "events": "Event[] with type 'reveal' (Show answer) | 'clear' (Start over)"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-quiz-promises-more",
+      "kind": "quiz",
+      "parentId": null,
+      "route": "#l3-quiz",
+      "page": "Check your understanding",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "A specification that promises more is met by ___ implementations.",
+        "html": "A specification that promises more is met by ___ implementations."
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "options": [
+        {
+          "index": 0,
+          "id": "more",
+          "text": "more"
+        },
+        {
+          "index": 1,
+          "id": "fewer",
+          "text": "fewer (or the same)"
+        },
+        {
+          "index": 2,
+          "id": "same",
+          "text": "exactly the same"
+        }
+      ],
+      "feedbackKinds": [
+        "promises-dont-matter",
+        "stronger-is-more"
+      ],
+      "reviewRoute": "#l3-strength",
+      "recordShape": {
+        "snapshot": {
+          "kind": "'quiz'",
+          "choiceId": "option id|null (multiple choice)",
+          "raw": "string",
+          "normalized": "string|null",
+          "correct": "true|false|null",
+          "tries": "int",
+          "firstTryCorrect": "bool",
+          "done": "bool",
+          "revealed": "bool",
+          "lastMessage": "string|null",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check', answer { choiceId, choiceIndex, raw, normalized } (MC) or { raw, normalized }, result { overall, correct }, feedbackKind (option's misconception tag | 'correct' | ...), solutionViewedBeforeSubmit = answer was revealed first",
+        "events": "Event[] with type 'reveal' (Show answer) | 'clear' (Start over)"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-lecture1-runs",
+      "kind": "problem",
+      "parentId": null,
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "title": "1. Predict: the runs that broke Lecture 1's manual",
+      "prompt": {
+        "text": "Before reading on, the notes ask you to predict what this Sum does on the two runs that broke Lecture 1's \"user manual\" sentence. What does each print, and where?",
+        "html": "<p class=\"prompt\">Before reading on, the notes ask you to predict what this <code>Sum</code> does on the two runs that broke Lecture 1's \"user manual\" sentence. What does each print, and where?</p>"
+      },
+      "answerType": "multi-part",
+      "grader": "per part (see partIds)",
+      "partIds": [
+        "cse331-w2-l3-predict-lecture1-runs.word-output",
+        "cse331-w2-l3-predict-lecture1-runs.word-stream",
+        "cse331-w2-l3-predict-lecture1-runs.big-output"
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'problem'",
+          "parts": "{ [partId]: { raw: string, normalized: string|null, correct: true|false|null } }",
+          "work": "string",
+          "result": "'correct'|'partial'|'incorrect'|null",
+          "selfMark": "'got'|'missed'|null",
+          "checks": "int",
+          "hintsRevealed": "int",
+          "solutionViewed": "bool",
+          "solutionOpen": "bool",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check' (answer.parts per part, result.parts per part + overall, feedbackKind per part) or 'self-mark' (result.overall 'self-correct'|'self-incorrect')",
+        "events": "Event[] with type 'hint' (level, of) | 'solution-view' (attemptedFirst) | 'solution-hide' | 'clear'"
+      },
+      "hintCount": 2,
+      "hasSolution": true,
+      "solutionSteps": 3,
+      "gradable": false
+    },
+    {
+      "id": "cse331-w2-l3-predict-lecture1-runs.word-output",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-lecture1-runs",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "java Sum, typing 1 2 three 4: it prints",
+        "placeholder": "exactly as printed"
+      },
+      "answerType": "output",
+      "grader": "exact program output (ends trimmed; case, spacing and punctuation must match; 'nothing' = no output)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-lecture1-runs.word-stream",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-lecture1-runs",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "… on which stream?",
+        "placeholder": "standard output or standard error"
+      },
+      "answerType": "stream",
+      "grader": "stdout | stderr (accepts standard output / System.out / 1, standard error / System.err / 2)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-lecture1-runs.big-output",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-lecture1-runs",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "java Sum, typing 2147483647 1: it prints",
+        "placeholder": "exactly as printed"
+      },
+      "answerType": "output",
+      "grader": "exact program output (ends trimmed; case, spacing and punctuation must match; 'nothing' = no output)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-redirect",
+      "kind": "problem",
+      "parentId": null,
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "title": "2. Predict: sending standard output to a file",
+      "prompt": {
+        "text": "Run these two command lines one after the other, each followed by echo $?. For each, predict what shows on the terminal, what is left in total.txt, and what echo $? prints.\njava Sum nums.txt > total.txtjava Sum bad.txt > total.txt",
+        "html": "<p class=\"prompt\">Run these two command lines one after the other, each followed by <code>echo $?</code>. For each, predict what shows on the terminal, what is left in <code>total.txt</code>, and what <code>echo $?</code> prints.</p>\n<div class=\"prompt-cmds\"><code>java Sum nums.txt &gt; total.txt</code><code>java Sum bad.txt &gt; total.txt</code></div>"
+      },
+      "answerType": "multi-part",
+      "grader": "per part (see partIds)",
+      "partIds": [
+        "cse331-w2-l3-predict-redirect.good-terminal",
+        "cse331-w2-l3-predict-redirect.good-file",
+        "cse331-w2-l3-predict-redirect.good-status",
+        "cse331-w2-l3-predict-redirect.bad-terminal",
+        "cse331-w2-l3-predict-redirect.bad-file",
+        "cse331-w2-l3-predict-redirect.bad-status"
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'problem'",
+          "parts": "{ [partId]: { raw: string, normalized: string|null, correct: true|false|null } }",
+          "work": "string",
+          "result": "'correct'|'partial'|'incorrect'|null",
+          "selfMark": "'got'|'missed'|null",
+          "checks": "int",
+          "hintsRevealed": "int",
+          "solutionViewed": "bool",
+          "solutionOpen": "bool",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check' (answer.parts per part, result.parts per part + overall, feedbackKind per part) or 'self-mark' (result.overall 'self-correct'|'self-incorrect')",
+        "events": "Event[] with type 'hint' (level, of) | 'solution-view' (attemptedFirst) | 'solution-hide' | 'clear'"
+      },
+      "hintCount": 2,
+      "hasSolution": true,
+      "solutionSteps": 3,
+      "gradable": false
+    },
+    {
+      "id": "cse331-w2-l3-predict-redirect.good-terminal",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-redirect",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Run 1: the terminal shows",
+        "placeholder": "exact text, or nothing"
+      },
+      "answerType": "output",
+      "grader": "exact program output (ends trimmed; case, spacing and punctuation must match; 'nothing' = no output)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-redirect.good-file",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-redirect",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Run 1: total.txt contains",
+        "placeholder": "exact text, or nothing"
+      },
+      "answerType": "output",
+      "grader": "exact program output (ends trimmed; case, spacing and punctuation must match; 'nothing' = no output)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-redirect.good-status",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-redirect",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Run 1: echo $? prints",
+        "placeholder": "a number"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-redirect.bad-terminal",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-redirect",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Run 2: the terminal shows",
+        "placeholder": "exact text, or nothing"
+      },
+      "answerType": "output",
+      "grader": "exact program output (ends trimmed; case, spacing and punctuation must match; 'nothing' = no output)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-redirect.bad-file",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-redirect",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Run 2: total.txt contains",
+        "placeholder": "exact text, or nothing"
+      },
+      "answerType": "output",
+      "grader": "exact program output (ends trimmed; case, spacing and punctuation must match; 'nothing' = no output)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-redirect.bad-status",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-redirect",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Run 2: echo $? prints",
+        "placeholder": "a number"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-no-negative-check",
+      "kind": "problem",
+      "parentId": null,
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "title": "3. Predict: the copy without lines 40–43",
+      "prompt": {
+        "text": "In the copy of Sum with lines 40–43 blank, you run java Sum -a --precision=-1 and type 1 2. What happens?",
+        "html": "<p class=\"prompt\">In the copy of <code>Sum</code> with lines 40–43 blank, you run <code>java Sum -a --precision=-1</code> and type <code>1 2</code>. What happens?</p>"
+      },
+      "answerType": "multi-part",
+      "grader": "per part (see partIds)",
+      "partIds": [
+        "cse331-w2-l3-predict-no-negative-check.format",
+        "cse331-w2-l3-predict-no-negative-check.exception",
+        "cse331-w2-l3-predict-no-negative-check.line",
+        "cse331-w2-l3-predict-no-negative-check.status"
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'problem'",
+          "parts": "{ [partId]: { raw: string, normalized: string|null, correct: true|false|null } }",
+          "work": "string",
+          "result": "'correct'|'partial'|'incorrect'|null",
+          "selfMark": "'got'|'missed'|null",
+          "checks": "int",
+          "hintsRevealed": "int",
+          "solutionViewed": "bool",
+          "solutionOpen": "bool",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check' (answer.parts per part, result.parts per part + overall, feedbackKind per part) or 'self-mark' (result.overall 'self-correct'|'self-incorrect')",
+        "events": "Event[] with type 'hint' (level, of) | 'solution-view' (attemptedFirst) | 'solution-hide' | 'clear'"
+      },
+      "hintCount": 2,
+      "hasSolution": true,
+      "solutionSteps": 4,
+      "gradable": false
+    },
+    {
+      "id": "cse331-w2-l3-predict-no-negative-check.format",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-no-negative-check",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "The format string line 78 builds",
+        "placeholder": "the string passed to printf"
+      },
+      "answerType": "output",
+      "grader": "exact program output (ends trimmed; case, spacing and punctuation must match; 'nothing' = no output)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-no-negative-check.exception",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-no-negative-check",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "The exception thrown",
+        "placeholder": "its class name"
+      },
+      "answerType": "text",
+      "grader": "exact-text (normalized: trim, case, spaces)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-no-negative-check.line",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-no-negative-check",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "The line of Sum.java in the stack trace",
+        "placeholder": "a line number"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-predict-no-negative-check.status",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-predict-no-negative-check",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "The exit status",
+        "placeholder": "a number"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-read-the-program",
+      "kind": "problem",
+      "parentId": null,
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "title": "4. Read the program",
+      "prompt": {
+        "text": "The slide \"A different Sum\" asks three questions about the 99-line program (it's on the Sum, from the command line page). Answer each in a sentence or two, then compare with what the lecture found.",
+        "html": "<p class=\"prompt\">The slide \"A different Sum\" asks three questions about the 99-line program (it's on the <a href=\"#l3-sum\">Sum, from the command line</a> page). Answer each in a sentence or two, then compare with what the lecture found.</p>"
+      },
+      "answerType": "multi-part",
+      "grader": "per part (see partIds)",
+      "partIds": [
+        "cse331-w2-l3-read-the-program.does",
+        "cse331-w2-l3-read-the-program.good",
+        "cse331-w2-l3-read-the-program.not-good"
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'problem'",
+          "parts": "{ [partId]: { raw: string, normalized: string|null, correct: true|false|null } }",
+          "work": "string",
+          "result": "'correct'|'partial'|'incorrect'|null",
+          "selfMark": "'got'|'missed'|null",
+          "checks": "int",
+          "hintsRevealed": "int",
+          "solutionViewed": "bool",
+          "solutionOpen": "bool",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check' (answer.parts per part, result.parts per part + overall, feedbackKind per part) or 'self-mark' (result.overall 'self-correct'|'self-incorrect')",
+        "events": "Event[] with type 'hint' (level, of) | 'solution-view' (attemptedFirst) | 'solution-hide' | 'clear'"
+      },
+      "hintCount": 2,
+      "hasSolution": true,
+      "solutionSteps": 4,
+      "gradable": false
+    },
+    {
+      "id": "cse331-w2-l3-read-the-program.does",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-read-the-program",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "What does Sum do?",
+        "placeholder": "It reads …"
+      },
+      "answerType": "self",
+      "grader": "self-check (learner marks 'I got it' / 'I missed something' against the solution)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-read-the-program.good",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-read-the-program",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "What is good about it?",
+        "placeholder": "It …"
+      },
+      "answerType": "self",
+      "grader": "self-check (learner marks 'I got it' / 'I missed something' against the solution)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-read-the-program.not-good",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-read-the-program",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "What is not?",
+        "placeholder": "It …"
+      },
+      "answerType": "self",
+      "grader": "self-check (learner marks 'I got it' / 'I missed something' against the solution)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-repair-manual",
+      "kind": "problem",
+      "parentId": null,
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "title": "5. Exercise 1: repair the user manual",
+      "prompt": {
+        "text": "Repair Sum's user manual until it is true of every run of Sum in the notes, error messages and exit status included. Then answer the four questions your manual has to settle.",
+        "html": "<p class=\"prompt\">Repair <code>Sum</code>'s user manual until it is true of every run of <code>Sum</code> in the notes, error messages and exit status included. Then answer the four questions your manual has to settle.</p>"
+      },
+      "answerType": "multi-part",
+      "grader": "per part (see partIds)",
+      "partIds": [
+        "cse331-w2-l3-repair-manual.manual",
+        "cse331-w2-l3-repair-manual.error-status",
+        "cse331-w2-l3-repair-manual.message-stream",
+        "cse331-w2-l3-repair-manual.smallest-int",
+        "cse331-w2-l3-repair-manual.empty-sum"
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'problem'",
+          "parts": "{ [partId]: { raw: string, normalized: string|null, correct: true|false|null } }",
+          "work": "string",
+          "result": "'correct'|'partial'|'incorrect'|null",
+          "selfMark": "'got'|'missed'|null",
+          "checks": "int",
+          "hintsRevealed": "int",
+          "solutionViewed": "bool",
+          "solutionOpen": "bool",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check' (answer.parts per part, result.parts per part + overall, feedbackKind per part) or 'self-mark' (result.overall 'self-correct'|'self-incorrect')",
+        "events": "Event[] with type 'hint' (level, of) | 'solution-view' (attemptedFirst) | 'solution-hide' | 'clear'"
+      },
+      "hintCount": 3,
+      "hasSolution": true,
+      "solutionSteps": 5,
+      "gradable": false
+    },
+    {
+      "id": "cse331-w2-l3-repair-manual.manual",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-repair-manual",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Your additions to the manual",
+        "placeholder": "Each integer must be …"
+      },
+      "answerType": "self",
+      "grader": "self-check (learner marks 'I got it' / 'I missed something' against the solution)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-repair-manual.error-status",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-repair-manual",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Exit status on a mistake",
+        "placeholder": "a number"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-repair-manual.message-stream",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-repair-manual",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Where the message goes",
+        "placeholder": "standard output or standard error"
+      },
+      "answerType": "stream",
+      "grader": "stdout | stderr (accepts standard output / System.out / 1, standard error / System.err / 2)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-repair-manual.smallest-int",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-repair-manual",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "The smallest integer Sum accepts",
+        "placeholder": "a number"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-repair-manual.empty-sum",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-repair-manual",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "What java Sum prints on no integers",
+        "placeholder": "exactly as printed"
+      },
+      "answerType": "output",
+      "grader": "exact program output (ends trimmed; case, spacing and punctuation must match; 'nothing' = no output)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-misleading-message",
+      "kind": "problem",
+      "parentId": null,
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "title": "6. Exercise 2: a misleading message",
+      "prompt": {
+        "text": "Find an input whose error message misleads the user. First predict two runs from the course's answer; then give your own input and say what's misleading about its message.",
+        "html": "<p class=\"prompt\">Find an input whose error message misleads the user. First predict two runs from the course's answer; then give your own input and say what's misleading about its message.</p>"
+      },
+      "answerType": "multi-part",
+      "grader": "per part (see partIds)",
+      "partIds": [
+        "cse331-w2-l3-misleading-message.dashes-missing",
+        "cse331-w2-l3-misleading-message.precision-too-big",
+        "cse331-w2-l3-misleading-message.your-input"
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'problem'",
+          "parts": "{ [partId]: { raw: string, normalized: string|null, correct: true|false|null } }",
+          "work": "string",
+          "result": "'correct'|'partial'|'incorrect'|null",
+          "selfMark": "'got'|'missed'|null",
+          "checks": "int",
+          "hintsRevealed": "int",
+          "solutionViewed": "bool",
+          "solutionOpen": "bool",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check' (answer.parts per part, result.parts per part + overall, feedbackKind per part) or 'self-mark' (result.overall 'self-correct'|'self-incorrect')",
+        "events": "Event[] with type 'hint' (level, of) | 'solution-view' (attemptedFirst) | 'solution-hide' | 'clear'"
+      },
+      "hintCount": 2,
+      "hasSolution": true,
+      "solutionSteps": 4,
+      "gradable": false
+    },
+    {
+      "id": "cse331-w2-l3-misleading-message.dashes-missing",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-misleading-message",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "java Sum precision=4 nums.txt prints",
+        "placeholder": "exactly as printed"
+      },
+      "answerType": "output",
+      "grader": "exact program output (ends trimmed; case, spacing and punctuation must match; 'nothing' = no output)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-misleading-message.precision-too-big",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-misleading-message",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "java Sum -a --precision=2147483648 prints",
+        "placeholder": "exactly as printed"
+      },
+      "answerType": "output",
+      "grader": "exact program output (ends trimmed; case, spacing and punctuation must match; 'nothing' = no output)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-misleading-message.your-input",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-misleading-message",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Your input, and why its message misleads",
+        "placeholder": "java Sum …"
+      },
+      "answerType": "self",
+      "grader": "self-check (learner marks 'I got it' / 'I missed something' against the solution)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-split-sum",
+      "kind": "problem",
+      "parentId": null,
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "title": "7. Exercise 3: split Sum",
+      "prompt": {
+        "text": "Leave in main the code that deals with the user: the arguments, the input, the messages, and the exit status. Move into a method the code that computes what Sum prints from the numbers read, and write that method's specification. Which of Sum's checks does the method's precondition rely on, and why may it rely on them?\nlines 44–45: an unknown option\n lines 34–39: a precision that is not an integer\n lines 40–43: a precision that is negative\n lines 46–50: more than one file\n lines 53–55: --precision without -a\n lines 61–66: a word that is not an int\n lines 73–75: nothing to average",
+        "html": "<p class=\"prompt\">Leave in <code>main</code> the code that deals with the user: the arguments, the input, the messages, and the exit status. Move into a method the code that computes what <code>Sum</code> prints from the numbers read, and write that method's specification. Which of <code>Sum</code>'s checks does the method's precondition rely on, and why may it rely on them?</p>\n<ol class=\"abcd\" type=\"A\">\n      <li>lines 44–45: an unknown option</li>\n      <li>lines 34–39: a precision that is not an integer</li>\n      <li>lines 40–43: a precision that is negative</li>\n      <li>lines 46–50: more than one file</li>\n      <li>lines 53–55: <code>--precision</code> without <code>-a</code></li>\n      <li>lines 61–66: a word that is not an <code>int</code></li>\n      <li>lines 73–75: nothing to average</li>\n    </ol>"
+      },
+      "answerType": "multi-part",
+      "grader": "per part (see partIds)",
+      "partIds": [
+        "cse331-w2-l3-split-sum.spec",
+        "cse331-w2-l3-split-sum.relies-on",
+        "cse331-w2-l3-split-sum.missing-check"
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'problem'",
+          "parts": "{ [partId]: { raw: string, normalized: string|null, correct: true|false|null } }",
+          "work": "string",
+          "result": "'correct'|'partial'|'incorrect'|null",
+          "selfMark": "'got'|'missed'|null",
+          "checks": "int",
+          "hintsRevealed": "int",
+          "solutionViewed": "bool",
+          "solutionOpen": "bool",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check' (answer.parts per part, result.parts per part + overall, feedbackKind per part) or 'self-mark' (result.overall 'self-correct'|'self-incorrect')",
+        "events": "Event[] with type 'hint' (level, of) | 'solution-view' (attemptedFirst) | 'solution-hide' | 'clear'"
+      },
+      "hintCount": 2,
+      "hasSolution": true,
+      "solutionSteps": 5,
+      "gradable": false
+    },
+    {
+      "id": "cse331-w2-l3-split-sum.spec",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-split-sum",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Your method and its specification",
+        "placeholder": "static String answer(…)"
+      },
+      "answerType": "self",
+      "grader": "self-check (learner marks 'I got it' / 'I missed something' against the solution)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-split-sum.relies-on",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-split-sum",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Checks the precondition relies on",
+        "placeholder": "letters, e.g. AB"
+      },
+      "answerType": "letters",
+      "grader": "letter-set (exact set of the listed letters; 'none' = empty)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-split-sum.missing-check",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-split-sum",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Does writing the precondition reveal a check Sum lacks?",
+        "placeholder": "yes or no"
+      },
+      "answerType": "yesno",
+      "grader": "yes/no",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-compare-manuals",
+      "kind": "problem",
+      "parentId": null,
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "title": "8. Exercise 4: two manuals for a bad word",
+      "prompt": {
+        "text": "Two manuals for what Sum does on a word that is not a whole number:\nM1. It prints Sum: not an integer: and the word on standard error, and exits with status 1.\n M2. It exits with a nonzero status.",
+        "html": "<p class=\"prompt\">Two manuals for what <code>Sum</code> does on a word that is not a whole number:</p>\n<ul class=\"manuals\">\n      <li><b>M1.</b> It prints <code>Sum: not an integer:</code> and the word on standard error, and exits with status 1.</li>\n      <li><b>M2.</b> It exits with a nonzero status.</li>\n    </ul>"
+      },
+      "answerType": "multi-part",
+      "grader": "per part (see partIds)",
+      "partIds": [
+        "cse331-w2-l3-compare-manuals.m1-vs-m2",
+        "cse331-w2-l3-compare-manuals.status-script",
+        "cse331-w2-l3-compare-manuals.message-script",
+        "cse331-w2-l3-compare-manuals.publish"
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'problem'",
+          "parts": "{ [partId]: { raw: string, normalized: string|null, correct: true|false|null } }",
+          "work": "string",
+          "result": "'correct'|'partial'|'incorrect'|null",
+          "selfMark": "'got'|'missed'|null",
+          "checks": "int",
+          "hintsRevealed": "int",
+          "solutionViewed": "bool",
+          "solutionOpen": "bool",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check' (answer.parts per part, result.parts per part + overall, feedbackKind per part) or 'self-mark' (result.overall 'self-correct'|'self-incorrect')",
+        "events": "Event[] with type 'hint' (level, of) | 'solution-view' (attemptedFirst) | 'solution-hide' | 'clear'"
+      },
+      "hintCount": 3,
+      "hasSolution": true,
+      "solutionSteps": 5,
+      "gradable": false
+    },
+    {
+      "id": "cse331-w2-l3-compare-manuals.m1-vs-m2",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-compare-manuals",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "M1 is ___ than M2",
+        "placeholder": "stronger, weaker or incomparable"
+      },
+      "answerType": "strength",
+      "grader": "exact-text (stronger | weaker | incomparable | same)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-compare-manuals.status-script",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-compare-manuals",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "A script checks only whether Sum succeeded. It is correct against"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "options": [
+        {
+          "index": 0,
+          "id": "both",
+          "text": "M1 and M2"
+        },
+        {
+          "index": 1,
+          "id": "m1",
+          "text": "M1 only"
+        },
+        {
+          "index": 2,
+          "id": "m2",
+          "text": "M2 only"
+        },
+        {
+          "index": 3,
+          "id": "neither",
+          "text": "Neither"
+        }
+      ],
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-compare-manuals.message-script",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-compare-manuals",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "A script reports the bad word by reading what follows Sum: not an integer:. It is correct against"
+      },
+      "answerType": "choice",
+      "grader": "multiple-choice (option id)",
+      "options": [
+        {
+          "index": 0,
+          "id": "both",
+          "text": "M1 and M2"
+        },
+        {
+          "index": 1,
+          "id": "m1",
+          "text": "M1 only"
+        },
+        {
+          "index": 2,
+          "id": "m2",
+          "text": "M2 only"
+        },
+        {
+          "index": 3,
+          "id": "neither",
+          "text": "Neither"
+        }
+      ],
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-compare-manuals.publish",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-compare-manuals",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Which manual would you publish, and why?",
+        "placeholder": "I'd publish …"
+      },
+      "answerType": "self",
+      "grader": "self-check (learner marks 'I got it' / 'I missed something' against the solution)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-add-help",
+      "kind": "problem",
+      "parentId": null,
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "title": "9. Exercise 5: a --help option",
+      "prompt": {
+        "text": "Sum's manual is a comment in its source, where someone running Sum never sees it, and java Sum --help prints only Sum: unknown option: --help. Give Sum a --help option that prints the manual. When the arguments contain a mistake, make Sum say how to get the manual. Then add to the manual what each case prints, where, and with what exit status. Answer the design questions as the course's answer does.",
+        "html": "<p class=\"prompt\"><code>Sum</code>'s manual is a comment in its source, where someone running <code>Sum</code> never sees it, and <code>java Sum --help</code> prints only <code>Sum: unknown option: --help</code>. Give <code>Sum</code> a <code>--help</code> option that prints the manual. When the arguments contain a mistake, make <code>Sum</code> say how to get the manual. Then add to the manual what each case prints, where, and with what exit status. Answer the design questions as the course's answer does.</p>"
+      },
+      "answerType": "multi-part",
+      "grader": "per part (see partIds)",
+      "partIds": [
+        "cse331-w2-l3-add-help.help-stream",
+        "cse331-w2-l3-add-help.help-status",
+        "cse331-w2-l3-add-help.usage-status",
+        "cse331-w2-l3-add-help.changes"
+      ],
+      "recordShape": {
+        "snapshot": {
+          "kind": "'problem'",
+          "parts": "{ [partId]: { raw: string, normalized: string|null, correct: true|false|null } }",
+          "work": "string",
+          "result": "'correct'|'partial'|'incorrect'|null",
+          "selfMark": "'got'|'missed'|null",
+          "checks": "int",
+          "hintsRevealed": "int",
+          "solutionViewed": "bool",
+          "solutionOpen": "bool",
+          "updatedAt": "ISO string"
+        },
+        "attempts": "Attempt[] with kind 'check' (answer.parts per part, result.parts per part + overall, feedbackKind per part) or 'self-mark' (result.overall 'self-correct'|'self-incorrect')",
+        "events": "Event[] with type 'hint' (level, of) | 'solution-view' (attemptedFirst) | 'solution-hide' | 'clear'"
+      },
+      "hintCount": 2,
+      "hasSolution": true,
+      "solutionSteps": 5,
+      "gradable": false
+    },
+    {
+      "id": "cse331-w2-l3-add-help.help-stream",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-add-help",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "--help prints the manual on",
+        "placeholder": "standard output or standard error"
+      },
+      "answerType": "stream",
+      "grader": "stdout | stderr (accepts standard output / System.out / 1, standard error / System.err / 2)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-add-help.help-status",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-add-help",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "--help exits with status",
+        "placeholder": "a number"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-add-help.usage-status",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-add-help",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "A mistake in the arguments exits with status",
+        "placeholder": "a number"
+      },
+      "answerType": "int",
+      "grader": "exact-integer (BigInt; no tolerance)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    },
+    {
+      "id": "cse331-w2-l3-add-help.changes",
+      "kind": "part",
+      "parentId": "cse331-w2-l3-add-help",
+      "route": "#l3-exercises",
+      "page": "Problems",
+      "source": {
+        "unit": "Lecture 3",
+        "title": "Reading 1 discussion; Batch processing",
+        "date": "2026-10-05",
+        "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html"
+      },
+      "prompt": {
+        "text": "Your code and the manual's new lines",
+        "placeholder": "} else if (arg.equals(\"--help\")) { …"
+      },
+      "answerType": "self",
+      "grader": "self-check (learner marks 'I got it' / 'I missed something' against the solution)",
+      "recordShape": {
+        "storedIn": "the parent problem's snapshot.parts[partId] and in each attempt's answer.parts[partId] / result.parts[partId]",
+        "record": "{ raw: string, normalized: string|null, correct: true|false|null }"
+      },
+      "hintCount": 0,
+      "hasSolution": true,
+      "gradable": true
+    }
+  ],
+  "statefulDomIds": [
+    "cse331-w2-l3-qc-junit-kind",
+    "cse331-w2-l3-qc-b-vs-d",
+    "cse331-w2-l3-qc-average-of-four",
+    "cse331-w2-l3-qc-status-after-bad",
+    "cse331-w2-l3-qc-message-stream",
+    "cse331-w2-l3-sort-file-sum",
+    "cse331-w2-l3-sort-average-two-decimals",
+    "cse331-w2-l3-sort-too-big-integer",
+    "cse331-w2-l3-sort-empty-sum",
+    "cse331-w2-l3-sort-empty-average",
+    "cse331-w2-l3-sort-word-in-input",
+    "cse331-w2-l3-sort-exit-status",
+    "cse331-w2-l3-sort-help",
+    "cse331-w2-l3-qc-hasnextint-line",
+    "cse331-w2-l3-qc-nan-status",
+    "cse331-w2-l3-qc-negative-before-input",
+    "cse331-w2-l3-quiz-not-input",
+    "cse331-w2-l3-quiz-not-batch",
+    "cse331-w2-l3-quiz-two-files-status",
+    "cse331-w2-l3-quiz-precision-without-a",
+    "cse331-w2-l3-quiz-why-stderr",
+    "cse331-w2-l3-quiz-redirect-bad",
+    "cse331-w2-l3-quiz-stack-trace-status",
+    "cse331-w2-l3-quiz-nan-worse",
+    "cse331-w2-l3-quiz-who-has-precondition",
+    "cse331-w2-l3-quiz-unknown-program",
+    "cse331-w2-l3-quiz-promises-more",
+    "cse331-w2-l3-predict-lecture1-runs",
+    "cse331-w2-l3-predict-redirect",
+    "cse331-w2-l3-predict-no-negative-check",
+    "cse331-w2-l3-read-the-program",
+    "cse331-w2-l3-repair-manual",
+    "cse331-w2-l3-misleading-message",
+    "cse331-w2-l3-split-sum",
+    "cse331-w2-l3-compare-manuals",
+    "cse331-w2-l3-add-help",
+    "cse331-w2-l3-predict-lecture1-runs.word-output",
+    "cse331-w2-l3-predict-lecture1-runs.word-stream",
+    "cse331-w2-l3-predict-lecture1-runs.big-output",
+    "cse331-w2-l3-predict-redirect.good-terminal",
+    "cse331-w2-l3-predict-redirect.good-file",
+    "cse331-w2-l3-predict-redirect.good-status",
+    "cse331-w2-l3-predict-redirect.bad-terminal",
+    "cse331-w2-l3-predict-redirect.bad-file",
+    "cse331-w2-l3-predict-redirect.bad-status",
+    "cse331-w2-l3-predict-no-negative-check.format",
+    "cse331-w2-l3-predict-no-negative-check.exception",
+    "cse331-w2-l3-predict-no-negative-check.line",
+    "cse331-w2-l3-predict-no-negative-check.status",
+    "cse331-w2-l3-read-the-program.does",
+    "cse331-w2-l3-read-the-program.good",
+    "cse331-w2-l3-read-the-program.not-good",
+    "cse331-w2-l3-repair-manual.manual",
+    "cse331-w2-l3-repair-manual.error-status",
+    "cse331-w2-l3-repair-manual.message-stream",
+    "cse331-w2-l3-repair-manual.smallest-int",
+    "cse331-w2-l3-repair-manual.empty-sum",
+    "cse331-w2-l3-misleading-message.dashes-missing",
+    "cse331-w2-l3-misleading-message.precision-too-big",
+    "cse331-w2-l3-misleading-message.your-input",
+    "cse331-w2-l3-split-sum.spec",
+    "cse331-w2-l3-split-sum.relies-on",
+    "cse331-w2-l3-split-sum.missing-check",
+    "cse331-w2-l3-compare-manuals.m1-vs-m2",
+    "cse331-w2-l3-compare-manuals.status-script",
+    "cse331-w2-l3-compare-manuals.message-script",
+    "cse331-w2-l3-compare-manuals.publish",
+    "cse331-w2-l3-add-help.help-stream",
+    "cse331-w2-l3-add-help.help-status",
+    "cse331-w2-l3-add-help.usage-status",
+    "cse331-w2-l3-add-help.changes"
+  ]
+}

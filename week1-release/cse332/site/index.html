@@ -1,0 +1,1457 @@
+<!doctype html>
+<!--
+  CSE 332 (26au) · Week 1 teaching site. Built from the course-teaching-site template.
+  Every stateful element carries a stable semantic data-id (problems: article.task, parts: .answer-spec[data-part],
+  quick checks: .check, quiz questions: li.cyu). Change the id when the question changes. See ../INTEGRATION.md.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE 332 week 1</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="course.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+
+<nav class="rail" aria-label="Week 1 modules">
+  <div class="rail-top">
+    <a class="brand" href="#home"><span class="brand-cmd">cse332 <b>week 1</b></span><small>ADTs, queues &amp; stacks · algorithm analysis</small></a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="rail-body">Contents</button>
+  </div>
+  <div class="rail-body" id="rail-body">
+
+  <div>
+    <h2>Lecture 1 · Wed Sept 30</h2>
+    <ol class="modules">
+      <li><a href="#adt">ADTs and terminology</a></li>
+      <li><a href="#queues">Queues: two data structures</a></li>
+      <li><a href="#stacks">Stacks</a></li>
+      <li><a href="#l1-problems">Lecture 1 exercises</a></li>
+      <li><a href="#cyu-l1">Check your understanding</a></li>
+    </ol>
+  </div>
+  <div>
+    <h2>Section 1 · Thu Oct 1</h2>
+    <ol class="modules">
+      <li><a href="#generics">Java generics</a></li>
+      <li><a href="#section">Section problems</a></li>
+    </ol>
+  </div>
+  <div>
+    <h2>Lecture 2 · Fri Oct 2</h2>
+    <ol class="modules">
+      <li><a href="#analysis">Why count operations?</a></li>
+      <li><a href="#counting">Counting worst-case operations</a></li>
+      <li><a href="#amortized">Amortized analysis</a></li>
+      <li><a href="#search">Binary search</a></li>
+      <li><a href="#asymptotic">Comparing running times</a></li>
+      <li><a href="#l2-problems">Lecture 2 exercises</a></li>
+      <li><a href="#cyu-l2">Check your understanding</a></li>
+    </ol>
+  </div>
+  <div>
+    <h2>Reference</h2>
+    <ul class="plain-links">
+      <li><a href="#readings">Readings</a></li>
+      <li><a href="#cheatsheet">Cheat sheet</a></li>
+      <li><a href="#home">Week overview</a></li>
+    </ul>
+  </div>
+  <p class="rail-foot"><kbd>←</kbd> <kbd>→</kbd> move between modules · <kbd>N</kbd> next step · <kbd>H</kbd> next hint</p>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ================================================================ HOME -->
+<section class="page" id="home" data-title="Week overview">
+  <div class="hero">
+    <h1>One ADT, two data structures</h1>
+    <p class="question">A queue promises first in, first out. How do you keep that promise in memory?</p>
+    <p class="where">Both panels start from the queue on the Lecture 1 slides: 5, 8, 3, 4, 7. Enqueue and dequeue and watch them change together.</p>
+    <div class="controls">
+      <label>Value <input type="number" id="hero-val" value="9" min="0" max="99" aria-label="Value to enqueue"></label>
+      <button class="btn primary" id="hero-enq">enqueue</button>
+      <button class="btn" id="hero-deq">dequeue</button>
+      <button class="btn quiet" id="hero-reset">Reset to slide</button>
+      <span id="hero-msg" role="status" class="note"></span>
+    </div>
+    <div class="hero-grid">
+      <div class="panel"><h4>Linked queue (slide 15)</h4><div class="nodes" id="hero-linked"></div></div>
+      <div class="panel"><h4>Circular array queue (slide 18), length 10</h4><div class="cells" id="hero-circ"></div><p class="note" id="hero-circ-note"></p></div>
+    </div>
+  </div>
+
+  <div class="prose">
+    <p>Both structures give the same answers to every <code>enqueue</code>, <code>dequeue</code> and <code>isEmpty</code>. That's the queue ADT. They store the items very differently, and that difference is what Lecture 2 starts to measure: count the operations each one does, then compare those counts as \(n\) grows.</p>
+  </div>
+
+  <h2>This week</h2>
+  <div class="week">
+    <a href="#adt"><strong>Wed, Sept 30</strong><span>Lecture 1: Intro; ADTs; Queues &amp; Stacks</span><span>Reading: Weiss 3.1–3.7</span></a>
+    <a href="#generics"><strong>Thu, Oct 1</strong><span>Section 1: Intros, Java Generics</span><span>ADT warm-up + 5 generic pair classes, with posted solutions</span></a>
+    <a href="#analysis"><strong>Fri, Oct 2</strong><span>Lecture 2: Algorithm Analysis 1</span><span>Reading: Weiss 2.1–2.4; math review Weiss 1.1–1.6</span></a>
+  </div>
+
+  <h2>Due soon</h2>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Mon Oct 5</th><td>Preliminary survey (on Canvas)</td></tr>
+    <tr><th>Fri Oct 9</th><td>Exercise 0: Generics, stacks and queues, benchmarking. Two separate Gradescope submissions. <a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html" target="_blank" rel="noopener">Tasks page</a></td></tr>
+    <tr><th>Mon Oct 12</th><td>Exercise 1: Running Time (released early next week)</td></tr>
+    <tr><th>First 4 weeks</th><td>"Meet the staff": visit any CSE 332 office hour (in person or on Zoom) and ask to be checked off</td></tr>
+  </table>
+  </div>
+  <p class="note">This site teaches the lectures and the section. It doesn't work any exercise problems; use the links above for those.</p>
+
+  <h2>How to use this site</h2>
+  <div class="prose">
+    <ul>
+      <li>Modules follow the lecture order. Each has a short explanation, something to click, and a quick check you can pose to the room.</li>
+      <li><strong>Teaching notes</strong> (gold, open by default) hold talking points, questions to ask, and common mistakes.</li>
+      <li><strong>Exercises and section problems</strong> are answerable on the page. Type an answer, write your work, ask for hints. Solutions stay hidden until you press <strong>Show solution</strong>, then reveal one step at a time. Your work is kept in this browser as you type.</li>
+      <li>Each lecture ends with <strong>Check your understanding</strong>, a 10-question wrap-up quiz.</li>
+      <li>Number boxes accept arithmetic like <code>4*7+4</code> or <code>2^10</code>. Formula boxes take expressions in \(n\) (or \(c\)) like <code>4n+4</code>. Big-O boxes take a class like <code>O(n^2)</code> or <code>n log n</code>.</li>
+    </ul>
+  </div>
+
+  <h2>Course essentials</h2>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Instructor</th><td>Ruth Anderson, plus the TAs on the <a href="https://courses.cs.washington.edu/courses/cse332/26au/staff.html" target="_blank" rel="noopener">staff page</a></td></tr>
+    <tr><th>Lectures</th><td>MWF in CSE2 G20 (12:30–1:20) and CSE2 G10 (3:30–4:20). Recorded on Panopto; recordings are posted in Canvas.</td></tr>
+    <tr><th>Sections</th><td>Thursdays, not recorded. Practice problems; not optional.</td></tr>
+    <tr><th>Questions</th><td>Ed Discussion first; office hours in person and on Zoom</td></tr>
+    <tr><th>Grading</th><td>13 exercises 42% (lowest dropped, except EX12) · participation 3% · midterm 20% (Mon Nov 9) · final 35% (Thu Dec 17, 12:30)</td></tr>
+    <tr><th>Textbook</th><td>Weiss, <em>Data Structures &amp; Algorithm Analysis in Java</em>, 3rd ed. (optional; 2nd ed. also fine)</td></tr>
+    <tr><th>Links</th><td><a href="https://courses.cs.washington.edu/courses/cse332/26au/calendar.html" target="_blank" rel="noopener">Calendar</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/syllabus.html" target="_blank" rel="noopener">Syllabus</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries.html" target="_blank" rel="noopener">Topic summaries</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/math_identities_quick_reference.pdf" target="_blank" rel="noopener">Math identities</a></td></tr>
+  </table>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes: opening the course</summary>
+    <ul>
+      <li>The course has three threads: data structures (specific "classic" ones), an introduction to algorithms and analysis, and parallelism and concurrency. Parallelism means using multiple processors to finish sooner. Concurrency means correct access to shared resources.</li>
+      <li>Week 1 sets up the vocabulary for the rest of the quarter: <em>ADT</em> vs <em>data structure</em> vs <em>implementation</em>, then a way to compare data structures without running them.</li>
+      <li>Ask the room before showing the hero: "If both panels always give the same answers, why would anyone prefer one?" Hold the answers until Lecture 2.</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ================================================================ L1: ADT -->
+<section class="page" id="adt" data-title="ADTs and terminology">
+  <p class="where">Lecture 1 · Wed Sept 30 · slides 2–11</p>
+  <h1>ADTs and terminology</h1>
+  <div class="prose">
+    <p>Four words from Lecture 1 get used all quarter. They go from most abstract to most concrete.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Abstract Data Type (ADT).</strong> A mathematical description of a "thing" with a set of operations on that "thing".</p>
+    <p><strong>Algorithm.</strong> A high-level, language-independent description of a step-by-step process.</p>
+    <p><strong>Data structure.</strong> An organization of data and a family of algorithms for implementing an ADT.</p>
+    <p><strong>Implementation</strong> of a data structure. The data organization and algorithms written in a programming language.</p>
+  </div>
+
+  <h2>Sort the examples</h2>
+  <div class="panel" id="term-sort">
+    <p>Click a term to cycle it through the four categories. Then press <strong>Check sort</strong>.</p>
+    <div id="term-list" class="opts"></div>
+    <div class="row controls"><button class="btn primary" id="term-check">Check sort</button><button class="btn quiet" id="term-reset">Reset</button></div>
+    <p class="out" id="term-out" role="status"></p>
+  </div>
+
+  <div class="prose">
+    <p>The topic summary puts the split this way: an ADT says how we would <em>use</em> a kind of data (what it represents and which operations it has). A data structure is a strategy for satisfying an ADT: how it represents the contents and which algorithm runs for each operation. Section 1 adds the point of view. The ADT is the <em>user's</em> view, and the data structure is the <em>implementer's</em> view.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w1-l1-adt-circular-is" data-grader="mc">
+    <p>Quick check: "A circular array queue" is…</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w1-l1-adt-circular-is"> an ADT<span class="why" hidden>The ADT is "queue": FIFO with enqueue, dequeue, isEmpty. "Circular array" is a choice about how to store it.</span></label>
+      <label data-correct><input type="radio" name="cse332-w1-l1-adt-circular-is"> a data structure<span class="why" hidden>Yes. It's an organization of data (an array plus front and back indices) and the algorithms for each queue operation.</span></label>
+      <label><input type="radio" name="cse332-w1-l1-adt-circular-is"> an implementation<span class="why" hidden>An implementation is the code in a specific language. The idea of a circular array queue exists before anyone writes the Java.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Course logistics on slides 4–10: the textbook is optional, Ed is the first stop for questions, and section is "an important part of the course (not optional)". Collaboration on exercises is "whiteboard only".</li>
+      <li>The common confusion is ADT vs data structure. Test it by asking "could I swap this for something else and the user wouldn't notice?" Swapping a linked queue for a circular array queue is invisible to the user, so both are data structures for one ADT.</li>
+      <li>Exercise 0 asks students to build linked and resizing-array stacks and queues. The rest of this lecture is the queue half of that picture; keep the resizing details for the exercise.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L1: QUEUES -->
+<section class="page" id="queues" data-title="Queues: two data structures">
+  <p class="where">Lecture 1 · slides 12–20 · Weiss 3.6–3.7</p>
+  <h1>Queues: two data structures</h1>
+  <div class="rule">
+    <p><strong>Queue ADT.</strong> A collection of items that we interact with in a "First In First Out" (FIFO) way.</p>
+    <p><code>enqueue</code>: add a new item to the queue. <code>dequeue</code>: remove the "oldest" item. <code>isEmpty</code>: are there items still on the queue?</p>
+  </div>
+
+  <h2>Linked queue</h2>
+  <div class="prose">
+    <p>The queue is a "chain" of items. A <code>front</code> reference points to the oldest item, a <code>back</code> reference to the most recent one, and each node references the item enqueued after it.</p>
+  </div>
+  <pre class="code">enqueue(x){
+    last = new ListNode(x);
+    back.next = last;
+    back = last;
+}
+dequeue(){
+    first = front.value;
+    front = front.next;
+    if (front == null) {back = null;}
+    return first
+}
+isEmpty(){
+    return front == null;
+}</pre>
+  <div class="panel" id="lq">
+    <div class="controls">
+      <label>Value <input type="number" id="lq-val" value="9" min="0" max="99" aria-label="Value to enqueue"></label>
+      <button class="btn primary" id="lq-enq">enqueue</button>
+      <button class="btn" id="lq-deq">dequeue</button>
+      <button class="btn quiet" id="lq-reset">Reset to slide</button>
+    </div>
+    <div class="nodes" id="lq-nodes"></div>
+    <div class="log" id="lq-log" aria-live="polite"></div>
+  </div>
+
+  <h2>Circular array queue</h2>
+  <div class="prose">
+    <p>The queue is an array of items. <code>front</code> is the index of the oldest item. <code>back</code> is the index of the first <em>open</em> slot. When an index goes past the last slot, it wraps back around to 0, so the array behaves like a circle.</p>
+  </div>
+  <pre class="code">enqueue(x){
+    queue[back] = x;
+    back = (back + 1) % queue.length;
+    size++;
+}
+dequeue(){
+    <span class="cm">// Assumes queue is not empty</span>
+    first = queue[front];
+    front = (front + 1) % queue.length;
+    size--;
+    return first;
+}
+isEmpty(){
+    return size == 0;
+}</pre>
+  <div class="panel" id="cq">
+    <div class="controls">
+      <label>Value <input type="number" id="cq-val" value="9" min="0" max="99" aria-label="Value to enqueue"></label>
+      <button class="btn primary" id="cq-enq">enqueue</button>
+      <button class="btn" id="cq-deq">dequeue</button>
+      <button class="btn quiet" id="cq-reset">Reset to slide</button>
+      <button class="chip" id="cq-ring" aria-pressed="false">Show as a circle</button>
+    </div>
+    <div class="cells" id="cq-cells"></div>
+    <svg class="chart" id="cq-svg" viewBox="0 0 320 320" role="img" aria-label="Circular view of the array" hidden style="max-width:20rem"></svg>
+    <p class="out" id="cq-state" role="status"></p>
+    <div class="log" id="cq-log" aria-live="polite"></div>
+  </div>
+  <div class="prose">
+    <p>"What if we run out of space?!" Slide 19 adds a check that calls <code>resize()</code> before the array fills. How to resize is Exercise 0, so this visualizer stops at a full array and tells you so.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w1-l1-queues-back-after-two" data-grader="exact" data-answer="6" data-miscon='{"7":"back-points-last","4":"back-points-last"}'>
+    <p>Quick check: start from the slide (5 8 3 4 7, front = 0, back = 5, length 10). Do <code>dequeue()</code>, <code>dequeue()</code>, <code>enqueue(9)</code>. What is <code>back</code> now?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w1-l1-queues-back-wrap" data-grader="exact" data-answer="2" data-miscon='{"12":"no-wrap","11":"no-wrap"}'>
+    <p>Quick check: start from the slide again. Do 3 dequeues, then 7 enqueues. What is <code>back</code> now?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2>Linked list vs. circular array</h2>
+  <div class="prose">
+    <p>Slide 20 asks the room to "summarize the benefits and drawbacks of each". The slide itself is blank, so here are discussion prompts rather than the official answer:</p>
+    <ul>
+      <li>How much memory does each use per item? What does each waste?</li>
+      <li>What happens when there are more items than you planned for?</li>
+      <li>Which operations do the same amount of work no matter how many items are in the queue?</li>
+    </ul>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The slide code assumes things the exercise must handle. The linked <code>enqueue</code> does <code>back.next = last</code>, which fails when the queue is empty (<code>back == null</code>). The visualizer refuses that move and says why. Ask the room what the fix should be, but leave it there: it's part of Exercise 0.</li>
+      <li><code>back</code> is the first <em>open</em> slot, not the last item. Students who think "back = last item" get the first quick check wrong by one.</li>
+      <li>With the slide-18 code, a full array has <code>front == back</code>, which is the same as an empty one. That's why <code>isEmpty</code> uses <code>size</code>. Turn on "Show as a circle" and fill the array to make the point.</li>
+      <li><code>dequeue</code> doesn't erase the old value; it only moves <code>front</code>. The visualizer greys out slots outside the queue.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L1: STACKS -->
+<section class="page" id="stacks" data-title="Stacks">
+  <p class="where">Lecture 1 · slide 21 · Weiss 3.6</p>
+  <h1>Stacks</h1>
+  <div class="rule">
+    <p><strong>Stack ADT.</strong> A "Last In First Out" (LIFO) collection of items (sometimes called FILO).</p>
+    <p><code>push</code>: add a new item onto the stack. <code>peek</code>: return the value of the most recently pushed item. <code>pop</code>: return the value of the most recently pushed item <em>and remove it</em>. <code>isEmpty</code>: are there items still on the stack?</p>
+  </div>
+
+  <h2>Same inputs, two ADTs</h2>
+  <div class="panel" id="sq">
+    <p>Type a script of operations. <code>+5</code> adds 5 (push or enqueue), <code>-</code> removes (pop or dequeue). The stack and the queue get the same script.</p>
+    <div class="controls">
+      <label>Script <input type="text" id="sq-script" class="mono" value="+5 +8 +3 - +4 -" aria-label="Operation script" style="width:16rem"></label>
+      <button class="btn primary" id="sq-run">Run</button>
+    </div>
+    <div class="split">
+      <div><h4>Stack (LIFO)</h4><div class="stackcol" id="sq-stack"></div><p class="out" id="sq-stack-out"></p></div>
+      <div><h4>Queue (FIFO)</h4><div class="cells" id="sq-queue"></div><p class="out" id="sq-queue-out"></p></div>
+    </div>
+  </div>
+
+  <div class="check" data-id="cse332-w1-l1-stacks-second-pop" data-grader="exact" data-answer="4" data-miscon='{"8":"fifo","5":"fifo","3":"first-pop"}'>
+    <p>Quick check: <code>push(5)</code>, <code>push(8)</code>, <code>push(3)</code>, <code>pop()</code>, <code>push(4)</code>, <code>pop()</code>. What does the second <code>pop()</code> return?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li><code>peek</code> vs <code>pop</code>: both return the most recent item, but only <code>pop</code> removes it. A quick way to test it: "push 1, push 2, peek, peek. What did the second peek return?"</li>
+      <li>Section 1 lists the data structures for a stack: a linked list, or an array list (resizable array). Exercise 0 has students build both, so keep the code discussion at the idea level.</li>
+      <li>The default script is the one in the quick check. Run it and compare the two columns: the stack returns 3 then 4, the queue returns 5 then 8.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L1 PROBLEMS -->
+<section class="page" id="l1-problems" data-title="Lecture 1 exercises">
+  <p class="where">Lecture 1 · exercises 1–2 are the lecture's own questions (slides 12–13 and 21) · exercises 3–4 are trace exercises written for this site on the slides' example queue</p>
+  <h1>Lecture 1 exercises</h1>
+  <div class="prose"><p>Answer on the page and use the work box for your reasoning. Hints and solutions stay hidden until you ask.</p></div>
+
+  <article class="task" data-id="cse332-w1-l1-queue-adt">
+    <h2>Exercise 1: ADT: Queue</h2>
+    <p class="prompt">Slide 12 asks three questions about the queue ADT. Answer each in a few words, then compare with the solution.</p>
+    <div class="answer-spec" data-part="what" data-grader="self" data-label="What is it?"></div>
+    <div class="answer-spec" data-part="ops" data-grader="self" data-label="What operations do we need?"></div>
+    <ol class="hints">
+      <li>Think of a line at a coffee shop. Who gets served next?</li>
+      <li>You need a way to add, a way to remove, and a way to ask whether there's anything left.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>A collection of items that we interact with in a "First In First Out" (FIFO) way.</li>
+      <li>Enqueue adds a new item to the queue. Dequeue removes the "oldest" item from the queue.</li>
+      <li class="answer">IsEmpty indicates whether or not there are items still on the queue. (Section 1 also lists Peek.)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l1-stack-adt">
+    <h2>Exercise 2: ADT: Stack</h2>
+    <p class="prompt">Slide 21: what is a stack, and what operations do we need?</p>
+    <div class="answer-spec" data-part="what" data-grader="self" data-label="What is it?"></div>
+    <div class="answer-spec" data-part="ops" data-grader="self" data-label="Operations"></div>
+    <ol class="hints">
+      <li>Think of a stack of plates. Which plate do you take?</li>
+      <li>There are four operations: one adds, one removes, one looks without removing, and one checks for nothing left.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>A "Last In First Out" (LIFO) collection of items (sometimes called FILO).</li>
+      <li>push adds a new item onto the stack. pop returns the most recently pushed item and removes it.</li>
+      <li class="answer">peek returns the most recently pushed item without removing it. isEmpty says whether there are items still on the stack.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l1-circular-trace">
+    <h2>Exercise 3: trace the circular array</h2>
+    <p class="prompt">Start from the slide: <code>queue</code> has length 10 and holds 5, 8, 3, 4, 7 in indices 0–4, with <code>front = 0</code>, <code>back = 5</code>, <code>size = 5</code>. Run the slide-18 code for <code>dequeue()</code> three times, then <code>enqueue(1)</code>, <code>enqueue(2)</code>, <code>enqueue(3)</code>, <code>enqueue(4)</code>, <code>enqueue(5)</code>, <code>enqueue(6)</code>.</p>
+    <div class="answer-spec" data-part="front" data-grader="exact" data-answer="3" data-label="front"></div>
+    <div class="answer-spec" data-part="back" data-grader="exact" data-answer="1" data-miscon='{"11":"no-wrap","0":"back-points-last"}' data-label="back"></div>
+    <div class="answer-spec" data-part="size" data-grader="exact" data-answer="8" data-label="size"></div>
+    <div class="answer-spec" data-part="slot0" data-grader="exact" data-answer="6" data-miscon='{"5":"stale-slot"}' data-label="queue[0]"></div>
+    <ol class="hints">
+      <li>Each dequeue moves <code>front</code> by one. Each enqueue writes at <code>back</code>, then moves <code>back</code> by one, wrapping with <code>% queue.length</code>.</li>
+      <li>After the three dequeues, <code>front = 3</code>. The first enqueue writes at index 5. Which index does the sixth enqueue write to?</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>Three dequeues return 5, 8, 3. <code>front</code> goes 0 → 1 → 2 → 3, and <code>size</code> goes 5 → 2.</li>
+        <li>The enqueues write 1, 2, 3, 4, 5 at indices 5, 6, 7, 8, 9. Then <code>back = (9 + 1) % 10 = 0</code>.</li>
+        <li>The sixth enqueue writes 6 at index 0 (over the old 5, which was already dequeued), and <code>back = 1</code>.</li>
+        <li class="answer"><code>front = 3</code>, <code>back = 1</code>, <code>size = 8</code>, <code>queue[0] = 6</code>.</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="circular-trace">Run it in the visualizer's code</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l1-linked-trace">
+    <h2>Exercise 4: trace the linked queue</h2>
+    <p class="prompt">Start from the slide's linked queue: front → 5 → 8 → 3 → 4 → 7 ← back. Run <code>dequeue()</code>, <code>dequeue()</code>, <code>enqueue(9)</code>.</p>
+    <div class="answer-spec" data-part="second-return" data-grader="exact" data-answer="8" data-miscon='{"4":"lifo-q","7":"lifo-q"}' data-label="2nd dequeue returns"></div>
+    <div class="answer-spec" data-part="front-value" data-grader="exact" data-answer="3" data-label="front.value"></div>
+    <div class="answer-spec" data-part="back-value" data-grader="exact" data-answer="9" data-label="back.value"></div>
+    <ol class="hints">
+      <li><code>dequeue</code> takes from <code>front</code>; <code>enqueue</code> attaches after <code>back</code>.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The first dequeue returns 5 and moves front to the node holding 8. The second returns 8 and moves front to 3.</li>
+      <li>enqueue(9) makes a new node, links it after 7 (<code>back.next = last</code>), and moves back to it.</li>
+      <li class="answer">Second dequeue returns 8; front.value = 3; back.value = 9.</li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CYU L1 -->
+<section class="page" id="cyu-l1" data-title="Check your understanding (Lecture 1)">
+  <p class="where">Lecture 1 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose"><p>Ten questions on Lecture 1 only. Answer without looking back, then follow the review links for anything you missed. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="l1" role="status"></div>
+  <ol class="cyu-list" data-quiz="l1">
+    <li class="cyu" data-id="cse332-w1-l1-cyu-implementation" data-kind="mc" data-topic="adt">
+      <p class="q">You write <code>LinkedQueue.java</code>, a Java class that stores a queue as linked nodes. Which of the four terms is that file?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w1-l1-cyu-implementation"> An ADT<span class="why" hidden>The ADT is "queue". It's the description of the behavior, with no code.</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-implementation"> A data structure<span class="why" hidden>The data structure is "linked queue", the idea. You asked about the Java file.</span></label>
+        <label data-correct><input type="radio" name="cse332-w1-l1-cyu-implementation"> An implementation<span class="why" hidden>Correct. An implementation is the data organization and algorithms written in a programming language.</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-implementation"> An algorithm<span class="why" hidden>An algorithm is a language-independent description of one step-by-step process, like "how to dequeue".</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l1-cyu-queue-notion" data-kind="mc" data-topic="queues">
+      <p class="q">Which describes the queue ADT?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w1-l1-cyu-queue-notion"> Items come out most-recent first<span class="why" hidden>That's LIFO, a stack.</span></label>
+        <label data-correct><input type="radio" name="cse332-w1-l1-cyu-queue-notion"> Items come out oldest first<span class="why" hidden>Correct: first in, first out.</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-queue-notion"> Items can be read at any index<span class="why" hidden>That's the list ADT.</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-queue-notion"> Items are stored in an array<span class="why" hidden>That's one data structure for a queue, not what the ADT promises. A linked queue uses no array.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l1-cyu-back-after-enqueues" data-kind="num" data-answer="7" data-topic="queues" data-miscon='{"6":"back-points-last"}'>
+      <p class="q">Slide state: length 10, holding 5 8 3 4 7, <code>front = 0</code>, <code>back = 5</code>. After <code>enqueue(1)</code> and <code>enqueue(2)</code>, what is <code>back</code>?</p>
+      <p class="why" hidden>Each enqueue writes at <code>back</code> then adds 1: 5 → 6 → 7.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l1-cyu-back-wraps" data-kind="num" data-answer="2" data-topic="queues" data-miscon='{"12":"no-wrap"}'>
+      <p class="q">Same start. Do 3 dequeues, then 7 enqueues. What is <code>back</code>?</p>
+      <p class="why" hidden>Seven steps from 5: \((5+7) \bmod 10 = 2\). The queue holds \(5-3+7 = 9\) items, so nothing overflows.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l1-cyu-back-null" data-kind="mc" data-topic="queues">
+      <p class="q">In the linked queue's <code>dequeue</code>, why does it set <code>back = null</code> when <code>front</code> becomes <code>null</code>?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w1-l1-cyu-back-null"> So <code>back</code> doesn't keep pointing at a node that is no longer in the queue<span class="why" hidden>Correct. The queue is empty, so neither reference should point at an old node.</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-back-null"> To free the node's memory<span class="why" hidden>Java's garbage collector does that once nothing refers to the node. The point is that the queue's state should say "empty".</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-back-null"> Because <code>isEmpty</code> checks <code>back</code><span class="why" hidden>Slide 15's <code>isEmpty</code> checks <code>front == null</code>.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l1-cyu-full-overwrite" data-kind="mc" data-topic="queues">
+      <p class="q">With slide 18's code (no resize), what happens if you <code>enqueue</code> into a full array?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w1-l1-cyu-full-overwrite"> An ArrayIndexOutOfBoundsException<span class="why" hidden><code>back</code> is always taken <code>% queue.length</code>, so it's always a valid index.</span></label>
+        <label data-correct><input type="radio" name="cse332-w1-l1-cyu-full-overwrite"> It overwrites the oldest item<span class="why" hidden>Correct. When the array is full, <code>back == front</code>, so <code>queue[back] = x</code> writes over the item at the front. That's why slide 19 resizes first.</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-full-overwrite"> It resizes the array<span class="why" hidden>That's slide 19's version, which adds a check before writing. Slide 18 has no such check.</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-full-overwrite"> Nothing; the value is dropped<span class="why" hidden>The code always writes <code>queue[back] = x</code>.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l1-cyu-isempty-size" data-kind="mc" data-topic="queues">
+      <p class="q">Why does the circular array's <code>isEmpty</code> check <code>size == 0</code> instead of <code>front == back</code>?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w1-l1-cyu-isempty-size"> <code>front == back</code> is slower to compute<span class="why" hidden>Both are a single comparison.</span></label>
+        <label data-correct><input type="radio" name="cse332-w1-l1-cyu-isempty-size"> <code>front == back</code> is also true when the array is full<span class="why" hidden>Correct. After filling every slot, <code>back</code> has wrapped around to <code>front</code>, so the indices alone can't tell empty from full.</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-isempty-size"> <code>front</code> and <code>back</code> are never equal<span class="why" hidden>They start equal (both 0) on an empty queue.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l1-cyu-peek-after-pop" data-kind="num" data-answer="2" data-topic="stacks" data-miscon='{"1":"fifo","3":"first-pop"}'>
+      <p class="q"><code>push(1)</code>, <code>push(2)</code>, <code>push(3)</code>, <code>pop()</code>, <code>peek()</code>. What does <code>peek</code> return?</p>
+      <p class="why" hidden><code>pop</code> removes 3, the most recent. The most recent item left is 2, and <code>peek</code> returns it without removing it.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l1-cyu-not-stack-op" data-kind="mc" data-topic="stacks">
+      <p class="q">Which is <em>not</em> one of the stack ADT's operations on slide 21?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w1-l1-cyu-not-stack-op"> push<span class="why" hidden>push adds an item onto the stack.</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-not-stack-op"> peek<span class="why" hidden>peek returns the most recently pushed item.</span></label>
+        <label data-correct><input type="radio" name="cse332-w1-l1-cyu-not-stack-op"> get(i), read the item at index i<span class="why" hidden>Correct. Indexing belongs to the list ADT. A stack only gives access to the top.</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-not-stack-op"> isEmpty<span class="why" hidden>isEmpty is on the slide.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l1-cyu-same-adt" data-kind="mc" data-topic="adt">
+      <p class="q">A linked queue and a circular array queue get the same operations in the same order. What is guaranteed?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w1-l1-cyu-same-adt"> They return the same values<span class="why" hidden>Correct. Both implement the queue ADT, and the ADT defines the behavior.</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-same-adt"> They use the same memory<span class="why" hidden>Memory is a data-structure choice. One stores nodes and references, the other an array and indices.</span></label>
+        <label><input type="radio" name="cse332-w1-l1-cyu-same-adt"> They take the same time<span class="why" hidden>Time also depends on the data structure. Measuring that is what Lecture 2 is about.</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="l1" role="status"></div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Use it as an exit ticket. Questions 6 and 7 are the conceptual ones: they explain <em>why</em> the slide code looks the way it does.</li>
+      <li>Every numeric answer was checked by running the slide's code in the visualizer's simulator (see <code>tests/</code>).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S1: GENERICS -->
+<section class="page" id="generics" data-title="Java generics">
+  <p class="where">Section 1 · Thu Oct 1 · "ADTs, Data Structures, Java Generics"</p>
+  <h1>Java generics</h1>
+  <div class="prose">
+    <p>Section 1 starts with an icebreaker and reviews ADTs from the user's point of view (operations, behavior, data type) and data structures from the implementer's. Then it builds every example around one small ADT.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Pair ADT.</strong> One object which holds an ordered pair of items. Operations: set first, get first, set second, get second. Data structure: an object with a first and a second field.</p>
+  </div>
+
+  <h2>From IntPair to LikePair&lt;T&gt;</h2>
+  <div class="split">
+    <pre class="code">public class IntPair {
+    private int first;
+    private int second;
+    public IntPair(int first, int second){
+        this.first = first;
+        this.second = second;
+    }
+    public int getFirst(){ return first; }
+    ...
+}</pre>
+    <pre class="code">public class LikePair&lt;T&gt; {
+    private T first;
+    private T second;
+    public LikePair(T first, T second){
+        this.first = first;
+        this.second = second;
+    }
+    public T getFirst(){ return first; }
+    ...
+}</pre>
+  </div>
+  <div class="prose">
+    <p><code>IntPair</code> only works with integers; for doubles or strings you'd re-implement the class. With generics we treat the type itself almost like a field. <code>&lt;T&gt;</code> says "the type of thing in this pair will be called <code>T</code>", and then <code>T</code> is used like <code>int</code> or <code>String</code>. You pick <code>T</code> when you construct one: <code>LikePair&lt;String&gt; lp = new LikePair&lt;&gt;("A", "B");</code></p>
+  </div>
+  <div class="rule">
+    <p><strong>Java generics.</strong> Java is strongly typed and must know what type of thing every collection holds. <code>ArrayList&lt;String&gt; myArrayList = new ArrayList&lt;&gt;();</code> The type goes inside <code>&lt;&gt;</code>; the ArrayList code itself is written for any kind of Object.</p>
+  </div>
+
+  <h2>Several type parameters, arrays, and bounds</h2>
+  <div class="prose">
+    <ul>
+      <li><strong><code>UnlikePair&lt;A,B&gt;</code></strong>: the first item has type <code>A</code>, the second type <code>B</code>. That's how <code>HashMap</code> takes a key type and a value type.</li>
+      <li><strong><code>Tuple&lt;T&gt;</code></strong>: Java doesn't allow <code>new T[5]</code>. The workaround is <code>(T[]) new Object[5]</code>: make an array of Objects and cast it. (The reason is "type erasure", from Java adding generics after its first release.)</li>
+      <li><strong><code>LikeAnimalPair&lt;T extends Animal&gt;</code></strong>: <code>extends</code> requires <code>T</code> to be <code>Animal</code> or a subclass of it. Now <code>LikeAnimalPair&lt;Dog&gt;</code> holds two dogs and no cats.</li>
+    </ul>
+  </div>
+
+  <h2>Does it compile?</h2>
+  <div class="prose"><p>Each answer below was checked with <code>javac</code> (JDK 21) on the section's own classes.</p></div>
+  <div class="check" data-id="cse332-w1-s1-generics-new-t-array" data-grader="yesno" data-answer="no" data-miscon='{"yes":"new-t-array"}'>
+    <p>Quick check: inside <code>class Tuple&lt;T&gt;</code>, does <code>T[] a = new T[5];</code> compile? (yes / no)</p>
+    <div class="row"><input type="text" aria-label="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w1-s1-generics-animal-pair-mixed" data-grader="yesno" data-answer="yes" data-miscon='{"no":"bound-is-upper"}'>
+    <p>Quick check: does <code>LikeAnimalPair&lt;Animal&gt; p = new LikeAnimalPair&lt;&gt;(new Dog(), new Cat());</code> compile? (yes / no)</p>
+    <div class="row"><input type="text" aria-label="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w1-s1-generics-dog-pair-cat" data-grader="yesno" data-answer="no" data-miscon='{"yes":"t-is-fixed"}'>
+    <p>Quick check: does <code>LikeAnimalPair&lt;Dog&gt; p = new LikeAnimalPair&lt;&gt;(new Dog(), new Cat());</code> compile? (yes / no)</p>
+    <div class="row"><input type="text" aria-label="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The slide notes put it this way: "Within the class we can now use T as if it is a known type." Have students read <code>LikePair&lt;String&gt;</code> aloud as "a LikePair whose T is String".</li>
+      <li>The <code>LikeAnimalPair&lt;Animal&gt;</code> line on slide 21's notes compiles: with <code>T = Animal</code>, a Dog and a Cat are both Animals. A pair of <em>same</em>-kind animals needs <code>T = Dog</code> (or <code>Cat</code>).</li>
+      <li>The UnlikePair slide (18) deliberately leaves <code>T</code>s in the body for students to replace. That's Section problem 5.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S1: PROBLEMS -->
+<section class="page" id="section" data-title="Section problems">
+  <p class="where">Section 1 · problems 1–4 are the ADT slides (answers on slides 7–13) · problem 5 is slide 18 · problems 6–10 are the "Your turn!" worksheet (answers from the posted solutions)</p>
+  <h1>Section problems</h1>
+  <div class="prose">
+    <p>Answer on the page. Type answers are graded like Java would read them: spacing doesn't matter, and you may rename the type parameters (<code>&lt;T, U extends T&gt;</code> is as good as <code>&lt;A, B extends A&gt;</code>) as long as you're consistent within the problem.</p>
+  </div>
+
+  <article class="task" data-id="cse332-w1-s1-list-adt">
+    <h2>1. List ADT</h2>
+    <p class="prompt">An indexable collection of items held in a sequence. Identify the list operations, then data structures that could implement it.</p>
+    <div class="answer-spec" data-part="ops" data-grader="self" data-label="Operations"></div>
+    <div class="answer-spec" data-part="ds" data-grader="self" data-label="Data structures"></div>
+    <ol class="hints"><li>"Indexable" is the key word. What would you do with an index?</li><li>You've used two list data structures in CSE 12x/14x: one uses nodes, one uses an array.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Operations: Get, Add, Remove.</li>
+      <li class="answer">Data structures: Linked List, Array List.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-s1-stack-adt">
+    <h2>2. Stack ADT</h2>
+    <p class="prompt">A collection of items accessed in LIFO order. Identify the operations and data structures.</p>
+    <div class="answer-spec" data-part="ops" data-grader="self" data-label="Operations"></div>
+    <div class="answer-spec" data-part="ds" data-grader="self" data-label="Data structures"></div>
+    <ol class="hints"><li>Which end do you add to, and which end do you remove from?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Operations: Push, Pop, Peek.</li>
+      <li class="answer">Data structures: Linked list; Array List (resizable array).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-s1-queue-adt">
+    <h2>3. Queue ADT</h2>
+    <p class="prompt">A collection of items accessed in FIFO order. Identify the operations and data structures.</p>
+    <div class="answer-spec" data-part="ops" data-grader="self" data-label="Operations"></div>
+    <div class="answer-spec" data-part="ds" data-grader="self" data-label="Data structures"></div>
+    <ol class="hints"><li>Lecture 1 showed two data structures. Section adds one more that uses an array.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Operations: Enqueue, Dequeue, Peek.</li>
+      <li class="answer">Data structures: Linked List; Array List (resizable array); Circular Array.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-s1-set-adt">
+    <h2>4. Set ADT</h2>
+    <p class="prompt">An unordered collection of items without duplicates. Identify the operations and data structures.</p>
+    <div class="answer-spec" data-part="ops" data-grader="self" data-label="Operations"></div>
+    <div class="answer-spec" data-part="ds" data-grader="self" data-label="Data structures"></div>
+    <ol class="hints"><li>The main question you ask a set is "is this in here?"</li><li>Think beyond lists: trees and hashing both work.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Operations: Add, Remove, Contains.</li>
+      <li class="answer">Data structures: Linked List, Array List, Binary Tree, Hash Set.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul>
+        <li>The slide notes for problems 1–4: ask for operations first, then data structures (good and bad examples), then discuss at a high level how each operation would work on that structure.</li>
+        <li>For Set, ask why a linked list is a "bad example": <code>contains</code> has to walk the whole list. Lecture 2 makes that precise.</li>
+      </ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w1-s1-unlikepair" data-java-params='["A","B"]'>
+    <h2>5. Finish UnlikePair&lt;A,B&gt;</h2>
+    <p class="prompt">Slide 18 declares <code>public class UnlikePair&lt;A,B&gt;</code> with <code>private A first; private B second;</code> but leaves <code>T</code> in the rest of the body. "Replace the Ts." What type goes in each spot?</p>
+    <div class="answer-spec" data-part="ctor-first" data-grader="java" data-accept='["A"]' data-miscon='{"T":"leftover-t","B":"swapped"}' data-label="constructor parameter first"></div>
+    <div class="answer-spec" data-part="getsecond" data-grader="java" data-accept='["B"]' data-miscon='{"T":"leftover-t","A":"swapped"}' data-label="return type of getSecond()"></div>
+    <div class="answer-spec" data-part="setfirst" data-grader="java" data-accept='["A"]' data-miscon='{"T":"leftover-t","B":"swapped"}' data-label="parameter of setFirst(…)"></div>
+    <ol class="hints"><li>Each spot should match the type of the field it reads or writes.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The constructor assigns <code>this.first = first</code>, so its <code>first</code> parameter has the field's type, <code>A</code>.</li>
+      <li><code>getSecond()</code> returns <code>second</code>, which is a <code>B</code>. <code>setFirst</code> stores into <code>first</code>, so its parameter is an <code>A</code>.</li>
+      <li class="answer">A, B, A. (The slide gives no official answer; this completion was compiled with <code>javac</code>.)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-s1-typesubtypepair" data-java-params='["A","B"]'>
+    <h2>6. TypeSubtypePair</h2>
+    <p class="prompt">The first item is of some type; the second item is of a subtype of the first. Fill in the class header's type parameters and the types of <code>first</code> and <code>second</code> (they're the same in every blank that refers to that item).</p>
+    <pre class="code">public class TypeSubtypePair &lt; ________ &gt;{
+    private ____ first;
+    private ____ second;
+    ...</pre>
+    <div class="answer-spec" data-part="header" data-grader="java" data-header data-accept='["A, B extends A"]' data-miscon='{"A, B":"missing-bound","A extends B, B":"bound-reversed","A, A extends B":"bound-reversed"}' data-label="&lt; header &gt;"></div>
+    <div class="answer-spec" data-part="first" data-grader="java" data-accept='["A"]' data-label="type of first"></div>
+    <div class="answer-spec" data-part="second" data-grader="java" data-accept='["B"]' data-label="type of second"></div>
+    <ol class="hints"><li>You need two type parameters. One has to be restricted.</li><li>Section showed <code>T extends Animal</code>. Here the "Animal" is the other type parameter.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Two types, <code>A</code> for the first item and <code>B</code> for the second.</li>
+      <li>"B is a subtype of A" is the bound <code>B extends A</code>.</li>
+      <li class="answer"><code>public class TypeSubtypePair &lt;A, B extends A&gt;</code> with <code>private A first; private B second;</code></li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-s1-intotherpair" data-java-params='["T"]'>
+    <h2>7. IntOtherPair</h2>
+    <p class="prompt">The first item is an integer; the second item is some other type.</p>
+    <pre class="code">public class IntOtherPair&lt; ________ &gt;{
+    private ________ first;
+    private ________ second;
+    ...</pre>
+    <div class="answer-spec" data-part="header" data-grader="java" data-header data-accept='["T"]' data-miscon='{"Integer, T":"int-as-param","int, T":"int-as-param","A, B":"int-as-param"}' data-label="&lt; header &gt;"></div>
+    <div class="answer-spec" data-part="first" data-grader="java" data-accept='["int","Integer"]' data-miscon='{"T":"int-is-fixed"}' data-label="type of first"></div>
+    <div class="answer-spec" data-part="second" data-grader="java" data-accept='["T"]' data-label="type of second"></div>
+    <ol class="hints"><li>Only one of the two types varies. Which one?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The first item is always an integer, so it doesn't need a type parameter: its type is just <code>int</code>.</li>
+      <li class="answer"><code>public class IntOtherPair&lt;T&gt;</code> with <code>private int first; private T second;</code> (<code>Integer</code> also works for <code>first</code>.)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-s1-itempairpair" data-java-params='["A","B"]'>
+    <h2>8. ItemPairPair</h2>
+    <p class="prompt">The first item is of some type; the second item is a <code>LikePair</code> of things whose type is a subclass of the first item's type.</p>
+    <div class="answer-spec" data-part="header" data-grader="java" data-header data-accept='["A, B extends A"]' data-miscon='{"A, B":"missing-bound","A":"one-param-pair"}' data-label="&lt; header &gt;"></div>
+    <div class="answer-spec" data-part="first" data-grader="java" data-accept='["A"]' data-label="type of first"></div>
+    <div class="answer-spec" data-part="second" data-grader="java" data-accept='["LikePair<B>"]' data-miscon='{"B":"not-pair","LikePair":"raw-likepair","LikePair<A>":"pair-of-supertype"}' data-label="type of second"></div>
+    <ol class="hints"><li>Start from TypeSubtypePair. What changes about the second item?</li><li><code>LikePair</code> takes one type argument: the type of both things inside it.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Same header as TypeSubtypePair: <code>&lt;A, B extends A&gt;</code>.</li>
+      <li>The second item is a pair of <code>B</code>s, so its type is <code>LikePair&lt;B&gt;</code>.</li>
+      <li class="answer"><code>public class ItemPairPair&lt;A, B extends A&gt;</code> with <code>private A first; private LikePair&lt;B&gt; second;</code></li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-s1-itemarraypair" data-java-params='["A","B"]'>
+    <h2>9. ItemArrayPair</h2>
+    <p class="prompt">The first item is of some type; the second item is an array of objects of another type.</p>
+    <div class="answer-spec" data-part="header" data-grader="java" data-header data-accept='["A, B"]' data-label="&lt; header &gt;"></div>
+    <div class="answer-spec" data-part="first" data-grader="java" data-accept='["A"]' data-label="type of first"></div>
+    <div class="answer-spec" data-part="second" data-grader="java" data-accept='["B[]"]' data-miscon='{"B":"not-array","A[]":"same-type-array","Object[]":"object-array"}' data-label="type of second"></div>
+    <ol class="hints"><li>"Another type" means two independent type parameters, no bound.</li><li>How do you write "array of B" in Java?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Two unrelated types: <code>&lt;A, B&gt;</code>.</li>
+      <li class="answer"><code>public class ItemArrayPair&lt;A,B&gt;</code> with <code>private A first; private B[] second;</code></li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Contrast with <code>Tuple</code>: here the array is passed in, so the class never writes <code>new B[…]</code> and needs no cast.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w1-s1-comparablepair" data-java-params='["A","B"]'>
+    <h2>10. ComparablePair (challenge)</h2>
+    <p class="prompt">A pair of items such that both implement the <code>Comparable</code> interface. A comparable pair must itself be comparable!</p>
+    <pre class="code">public class ComparablePair&lt; ________ &gt; implements Comparable &lt; ________ &gt;{
+    ...
+    public int compareTo(___________ other){
+        int compare1st = this.first.compareTo(other.first);
+        return compare1st==0 ? compare1st : this.second.compareTo(other.second);
+    }</pre>
+    <div class="answer-spec" data-part="header" data-grader="java" data-header data-accept='["A extends Comparable<A>, B extends Comparable<B>"]' data-miscon='{"A, B":"missing-bound","A extends Comparable, B extends Comparable":"raw-comparable"}' data-label="&lt; header &gt;"></div>
+    <div class="answer-spec" data-part="implements" data-grader="java" data-accept='["ComparablePair<A,B>","Comparable<ComparablePair<A,B>>"]' data-miscon='{"ComparablePair":"raw-pair","A":"compare-element","A, B":"compare-element"}' data-label="implements Comparable&lt; … &gt;"></div>
+    <div class="answer-spec" data-part="compareto-param" data-grader="java" data-accept='["ComparablePair<A,B>"]' data-miscon='{"ComparablePair":"raw-pair","Object":"object-param"}' data-label="compareTo parameter type"></div>
+    <div class="answer-spec" data-part="worksheet-line" data-grader="yesno" data-answer="no" data-label="Is the worksheet's return line right?"></div>
+    <ol class="hints">
+      <li>Each element type must be comparable <em>to itself</em>: "A extends Comparable of what?"</li>
+      <li>What is a ComparablePair compared to? Another ComparablePair, with the same type arguments.</li>
+      <li>For the last box, try <code>(1,"z")</code> vs <code>(2,"a")</code>: the first items differ. Which comparison should decide?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Both types inherit from <code>Comparable</code>, and the thing each can compare to is itself: <code>A extends Comparable&lt;A&gt;</code>, <code>B extends Comparable&lt;B&gt;</code>.</li>
+      <li>The class implements <code>Comparable</code> too, and says what it compares to: another instance of itself, <code>Comparable&lt;ComparablePair&lt;A,B&gt;&gt;</code>. So <code>compareTo</code> takes a <code>ComparablePair&lt;A,B&gt;</code>.</li>
+      <li>The posted solution returns <code>compare1st != 0 ? compare1st : this.second.compareTo(other.second)</code>: use the first items unless they tie. The worksheet's <code>==</code> does the reverse. Run in Java, it says <code>(1,"z")</code> comes <em>after</em> <code>(2,"a")</code>.</li>
+      <li class="answer"><code>public class ComparablePair&lt;A extends Comparable&lt;A&gt;, B extends Comparable&lt;B&gt;&gt; implements Comparable&lt;ComparablePair&lt;A,B&gt;&gt;</code>, <code>compareTo(ComparablePair&lt;A,B&gt; other)</code>. And no: the line needs <code>!=</code>.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul>
+        <li>The posted solution calls this one "a doozy" and reads the header aloud: ComparablePair is parameterized by A and B; both inherit from Comparable, and each compares to itself; the class is Comparable to another instance of itself.</li>
+        <li>The slide notes: pair up, work in order, and with three minutes left get a show of hands and go over the first problem many people didn't finish.</li>
+      </ul>
+    </details>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: ANALYSIS -->
+<section class="page" id="analysis" data-title="Why count operations?">
+  <p class="where">Lecture 2 · Fri Oct 2 · slides 3–14 · Weiss 2.1–2.2</p>
+  <h1>Why count operations?</h1>
+  <div class="prose">
+    <p>We care about two things in an algorithm. <strong>Correctness</strong>: does it do what's intended? <strong>Performance</strong>: speed (time complexity) and memory (space complexity). Analysis lets us make good design decisions and find the bottlenecks.</p>
+    <p>"Uh, why NOT just run the program and time it??" Timing varies too much to be reliable or portable: hardware, OS, Java version, other programs, the implementation, and the choice of input. Testing can miss the worst-case input, and a stopwatch doesn't explain what happens when \(n\) doubles. Often we want to evaluate an <em>algorithm</em> before anyone codes it.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Resource analysis.</strong> The end result is a function that maps the algorithm's <em>input size</em> to a <em>count of resources used</em>. Input: number of characters in a string, items in a list, pixels in an image. Output: e.g. the number of additions, the number of <code>&gt;</code>/<code>&lt;</code> comparisons, the maximum bytes of memory in use. Know the "units" of both.</p>
+  </div>
+
+  <h2>Which input? Four scenarios</h2>
+  <div class="rule">
+    <p><strong>Worst case:</strong> max number of steps on the "most challenging" input. <strong>Best case:</strong> min number of steps on the "easiest" input. <strong>Average/expected:</strong> average steps on random inputs (depends on the distribution). <strong>Amortized:</strong> max total steps on \(M\) "most challenging" consecutive inputs, divided by \(M\).</p>
+    <p>Usually: worst case. If the worst-case running time is \(f(n)\), then among all inputs of size \(n\) the worst one does \(f(n)\) operations.</p>
+  </div>
+
+  <div class="panel" id="scen">
+    <h4>Worst, best, average for <code>contains</code> on the slide-23 list</h4>
+    <p class="note">Slide 23's linear search compares <code>a.get(i) == k</code> until it finds <code>k</code>. Click a target to count its comparisons. The list has 10 items.</p>
+    <div class="cells" id="scen-cells"></div>
+    <div class="controls"><button class="chip" id="scen-missing" aria-pressed="false">Target not in the list</button></div>
+    <p class="out" id="scen-out" role="status"></p>
+    <div class="table-wrap"><table class="plain num" id="scen-table"></table></div>
+  </div>
+
+  <h2>The analysis process</h2>
+  <div class="prose">
+    <p>From CSE 123/143: count "primitive operations" (+, −, compare, <code>arr[i]</code>, <code>arr.length</code>…), write the count with \(n\), then put it in a bucket by ignoring constants and non-dominant terms, inside an \(O(\ )\). For example \(4n^2+8n-10\) ends up as \(O(n^2)\), \(\tfrac12 n+80\) as \(O(n)\), \(n(n+1)\) as \(O(n^2)\).</p>
+    <p>In CSE 332:</p>
+    <ol>
+      <li>Pick a scenario (usually worst).</li>
+      <li>Count the chosen operation(s). Choose them for <em>necessity</em> (any solution must do them), <em>frequency</em> (the most frequent, up to a constant factor) and <em>magnitude</em> (the expensive ones).</li>
+      <li>Write the count as an expression in \(n\).</li>
+      <li>Put an asymptotic bound on it: \(O\), \(\Omega\) or \(\Theta\).</li>
+    </ol>
+  </div>
+  <div class="rule">
+    <p><strong>Worst case: general guide.</strong> Add the time of consecutive statements. Loops: sum the time of each iteration; if each takes the same time, time per iteration × number of iterations. Conditionals: time to check the condition plus the time of the slowest branch. Function calls: time of the body. Recursion: solve a recurrence (week 3).</p>
+  </div>
+
+  <div class="check" data-id="cse332-w1-l2-analysis-scenario-amortized" data-grader="mc">
+    <p>Quick check: "Over any 1,000 adds in a row, the total work divided by 1,000 is at most 3." Which scenario is that?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w1-l2-analysis-scenario-amortized"> Worst case<span class="why" hidden>Worst case is about the single most expensive call. This statement averages over a sequence.</span></label>
+      <label><input type="radio" name="cse332-w1-l2-analysis-scenario-amortized"> Average case<span class="why" hidden>Average case averages over <em>random inputs</em>. Here the inputs are the most challenging ones, and the average is over consecutive calls.</span></label>
+      <label data-correct><input type="radio" name="cse332-w1-l2-analysis-scenario-amortized"> Amortized<span class="why" hidden>Yes: the max total over consecutive operations, divided by how many there were.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide 4 ("pick an algorithm with the best running time") is blank in the posted deck. It was an in-class activity.</li>
+      <li>The topic summary's example of why this matters: Nathan timed selection sort vs. permutation sort. At length 14, permutation sort took about 26 minutes; selection sort took 6.6 ms.</li>
+      <li>"Units" is the quiet trap: is \(n\) the number of items, or the number of bits? Ask for both units every time.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: COUNTING -->
+<section class="page" id="counting" data-title="Counting worst-case operations">
+  <p class="where">Lecture 2 · slides 15–18 · Weiss 2.3–2.4</p>
+  <h1>Counting worst-case operations</h1>
+  <div class="prose">
+    <p><strong>Example 1</strong> from the slides. Input size: the number of items in the list. Operations counted: arithmetic (+ − * /, including <code>++</code>). Step through it and watch the tally on each line.</p>
+  </div>
+
+  <div class="panel" id="mf">
+    <div class="controls">
+      <label>\(n\) = <input type="number" id="mf-n" value="3" min="0" max="1000" aria-label="list size n"></label>
+      <button class="btn primary" id="mf-step">Step</button>
+      <button class="btn" id="mf-run">Run to end</button>
+      <button class="btn quiet" id="mf-reset">Reset</button>
+    </div>
+    <div class="split">
+      <div class="code-wrap"><ol class="code-lines" id="mf-code"></ol></div>
+      <div>
+        <p class="counter">arithmetic ops so far <b id="mf-count">0</b></p>
+        <p class="out" id="mf-vars"></p>
+        <p class="out note" id="mf-note" role="status"></p>
+        <div id="mf-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rule">
+    <p><strong>Slide 16's answer.</strong> \(3 + 2n + 1 + 2n = 4n+4\), which is \(O(n)\).</p>
+    <p>3 for the first three lines; \(2n\) for the first loop (<code>b++</code> and <code>i++</code>, \(n\) times each); 1 for <code>b % 2</code>; then the <em>slowest</em> branch, the else loop, another \(2n\).</p>
+  </div>
+  <div class="prose">
+    <p>Try an even \(n\) in the stepper. <code>b</code> ends up as \(120 + n\), so for even \(n\) it's even and the code takes the cheap <code>if</code> branch: \(2n+5\) operations. The general guide charges the slowest branch without tracing <code>b</code>, so \(4n+4\) is an upper bound. It's exact for odd \(n\) and an overestimate for even \(n \ge 2\). Both are \(O(n)\), which is what the analysis is for.</p>
+    <p>One edge case: for \(n = 0\) the else loop does nothing, so the <code>if</code> branch (1 op) is the slower one and the count is 5, not \(4\cdot 0+4\). The slide's formula is for lists with at least one item.</p>
+  </div>
+
+  <h2>Example 2: <code>beAnnoying</code></h2>
+  <pre class="code">beAnnoying(List n){
+    List m = [];
+    for (i=0; i &lt; n.size(); i++){      <span class="cm">// n times</span>
+        m.add(n[i]);
+        for (j=0; j&lt; n.size(); j++){   <span class="cm">// n times</span>
+            print ("Hi, I'm annoying"); <span class="cm">// 1</span>
+        }
+    }
+}</pre>
+  <div class="panel" id="ba">
+    <div class="controls">
+      <label>\(n\) = <input type="number" id="ba-n" value="4" min="0" max="3000" aria-label="list size n"></label>
+      <button class="btn primary" id="ba-run">Run the loops</button>
+    </div>
+    <div class="cells" id="ba-grid" aria-hidden="true"></div>
+    <p class="out" id="ba-out" role="status"></p>
+  </div>
+  <div class="prose"><p>Units: number of items. Operations: adding or printing. Printing: \(O(n^2)\). The inner loop runs all \(n\) times for <em>each</em> of the \(n\) outer iterations, so the counts multiply.</p></div>
+
+  <div class="check" data-id="cse332-w1-l2-counting-prints-n10" data-grader="exact" data-answer="100" data-miscon='{"20":"added-loops","10":"inner-only"}'>
+    <p>Quick check: for a list of 10 items, how many times does <code>beAnnoying</code> print?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w1-l2-counting-myfunction-bucket" data-grader="bigo" data-answer="n">
+    <p>Quick check: Example 1's worst-case count is \(4n+4\). What's its bucket? (e.g. <code>O(n^2)</code>)</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The answer slides for both examples (16 and 18) are hidden slides in the posted .pptx. The PDF leaves them out, so students using the PDF won't see them.</li>
+      <li>The stepper counts exactly what slide 16 annotates. The loop tests <code>i &lt; n.size()</code> are comparisons, not arithmetic, so they aren't counted. Ask: "If we counted comparisons too, would the bucket change?" (No: about \(n\) more, still linear.)</li>
+      <li>The stepper stops after 4,000 steps on large \(n\). It then says the run was cut off and doesn't show a total, because a partial count isn't the answer.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: AMORTIZED -->
+<section class="page" id="amortized" data-title="Amortized analysis">
+  <p class="where">Lecture 2 · slides 19–22</p>
+  <h1>Amortized analysis</h1>
+  <pre class="code">public void add(int value){
+    if(data.length == size)
+        resize();
+    data[size] = value;
+    size++;
+}
+private void resize(){
+    int[] oldData = data;
+    data = new int[data.length*2];
+    for(int i = 0; i &lt; oldData.length; i++)
+        data[i] = oldData[i];
+}</pre>
+  <div class="prose">
+    <p><strong>Worst case of one add.</strong> Input size: the size of "this". Operations: indexing. One add that triggers <code>resize()</code> copies every element, so a single add is \(O(n)\).</p>
+    <p><strong>Amortized.</strong> But every time we resize, we earn <code>data.length</code> more adds before the next resize. Slide 21 counts 1 for each value written and 1 for each element copied. Let \(c\) be the initial length of <code>data</code>.</p>
+  </div>
+  <div class="rule">
+    <p>The first \(c\) adds take \(c + c = 2c\). The next \(2c\) adds take \(2c+2c = 4c\). The next \(4c\) adds take \(4c+4c=8c\). Overall:</p>
+    <p>\[\frac{\text{total time}}{\#\text{ of adds}} = \frac{2c+4c+8c}{c+2c+4c} = \frac{14c}{7c} = 2.\]</p>
+  </div>
+
+  <div class="panel" id="al">
+    <div class="controls">
+      <label>initial length \(c\) = <input type="number" id="al-c" value="4" min="1" max="8" aria-label="initial capacity c"></label>
+      <button class="btn primary" id="al-add">add</button>
+      <button class="btn" id="al-add10">add ×10</button>
+      <button class="btn quiet" id="al-reset">Reset</button>
+    </div>
+    <div class="cells" id="al-cells"></div>
+    <p class="out" id="al-out" role="status"></p>
+    <div class="chart-box"><svg class="chart" id="al-bars" viewBox="0 0 640 140" role="img" aria-label="Cost of each add"></svg></div>
+    <p class="note">Bars: the cost of each add (1 write, plus copies when it resizes). A bar's height is the copies it paid for.</p>
+  </div>
+
+  <h2>Parking-lot analogy</h2>
+  <div class="prose">
+    <p>Parking costs $10 per day. If you're caught without paying, you get a warning. After 3 warnings you pay a $25 fine and the warnings reset. Should you actually pay?</p>
+    <p>Paying every day averages $10 per day. Not paying costs $0 + $0 + $25 every three days. Averaging an occasional big cost over many cheap days is exactly an amortized analysis.</p>
+  </div>
+  <div class="check" data-id="cse332-w1-l2-amortized-parking-average" data-grader="decimal" data-answer="25/3" data-tol="0.005" data-miscon='{"25":"no-divide","8.3":"rounding"}'>
+    <p>Quick check: what's the average cost per day if you never pay, in dollars? (round to the cent)</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w1-l2-amortized-total-c4" data-grader="exact" data-answer="56" data-miscon='{"28":"forgot-copies","84":"copies-every-add"}'>
+    <p>Quick check: start with \(c = 4\) and do 28 adds. Counting like slide 21 (1 per write, 1 per element copied), what's the total?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide 21's speaker note: amortized is a "running average".</li>
+      <li>The ratio is exactly 2 after \(3c, 7c, 15c, \dots\) adds, and exactly 1 after the first \(c\) (no resize yet). Right after a resize it jumps, but it stays under 3. Here's why: if the last resize happened when the length was \(L\), then \(L\) is less than the number of adds \(m\), and the copies total \(L + L/2 + \dots \le 2L - c < 2m\). So the total is under \(m + 2m = 3m\).</li>
+      <li>The widget shows the exact ratio for <em>this</em> sequence of adds only. The bound for every \(m\) comes from the argument above, not from the widget.</li>
+      <li>Resizing a queue's array is part of Exercise 0. This page uses the ArrayList from the slides.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: SEARCH -->
+<section class="page" id="search" data-title="Binary search">
+  <p class="where">Lecture 2 · slides 23–27</p>
+  <h1>Binary search</h1>
+  <div class="split">
+    <pre class="code">public static boolean contains(
+        List&lt;Integer&gt; a, int k){
+    for(int i=0; i&lt; a.size(); i++){
+        if (a.get(i) == k)
+            return true;
+    }
+    return false;
+}</pre>
+    <pre class="code">public static boolean binary_contains(
+        List&lt;Integer&gt; a, int k){
+    int start = 0;
+    int end = a.size();
+    while(start &lt; end){
+        int mid = start + (end-start)/2;
+        if(a.get(mid) == k)
+            return true;
+        else if(a.get(mid) &lt; k)
+            start = mid+1;
+        else
+            end = mid;
+    }
+    return false;
+}</pre>
+  </div>
+
+  <div class="panel" id="bs">
+    <div class="controls">
+      <label>Search for \(k\) = <input type="number" id="bs-k" value="13" aria-label="target k"></label>
+      <button class="btn primary" id="bs-step">Step</button>
+      <button class="btn" id="bs-run">Run</button>
+      <button class="btn quiet" id="bs-reset">Reset</button>
+    </div>
+    <div class="cells" id="bs-cells"></div>
+    <p class="out" id="bs-out" role="status"></p>
+    <div class="log" id="bs-log"></div>
+  </div>
+
+  <h2>Why is this \(\log_2 n\)?</h2>
+  <div class="prose">
+    <p>At the start, <code>end - start</code> \(= n\). After one iteration it is about \(\frac n2\): both <code>mid - start</code> and <code>end - mid</code> are half the gap. Each iteration cuts the gap in half, so after \(x\) iterations it is \(\frac{n}{2^x}\). We stop when the gap is 1. Solve \(\frac{n}{2^x} = 1\) for \(x\): \(x = \log_2 n\).</p>
+  </div>
+
+  <div class="panel" id="bsw">
+    <h4>Worst case, counted exactly</h4>
+    <p class="note">For each \(n\), the page runs <code>binary_contains</code> on a sorted list of \(n\) items for <em>every</em> possible target (each item and each gap between them) and keeps the most loop iterations. That's exhaustive for these \(n\) only.</p>
+    <div class="table-wrap"><table class="plain num" id="bsw-table"></table></div>
+  </div>
+  <div class="prose">
+    <p>The exact worst case is \(\lfloor \log_2 n\rfloor + 1\) iterations. The slide's \(\log_2 n\) is the same bucket; the +1 is the last iteration, which runs with a gap of 1. Linear search's worst case is \(n\) comparisons. Slide 27's graphs show the gap between \(\log n\) and \(n\) as \(n\) grows.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w1-l2-search-iterations-13" data-grader="exact" data-answer="2" data-miscon='{"3":"linear-count"}'>
+    <p>Quick check: on the slide-23 list (5 8 13 42 75 79 88 90 95 99), how many loop iterations does <code>binary_contains</code> take to find 13?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide 24 asks for a faster algorithm before showing binary search. Get the room to say "the list is sorted" first.</li>
+      <li><code>start + (end-start)/2</code> rather than <code>(start+end)/2</code>: the same value, but it can't overflow an <code>int</code> when <code>start + end</code> would.</li>
+      <li>The quick check's 13 sits at index 2, so linear search also needs 3 comparisons. Try 79: binary search finds it on the first iteration and linear search needs 6.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: ASYMPTOTIC -->
+<section class="page" id="asymptotic" data-title="Comparing running times">
+  <p class="where">Lecture 2 · slides 28–31 · topic summary "Asymptotics"</p>
+  <h1>Comparing running times</h1>
+  <div class="prose">
+    <p>Three algorithms have the same input/output behavior. Algorithm A's worst-case running time is \(10n+900\), B's is \(100n-50\), and C's is \(\frac{n^2}{100}\). Which is best?</p>
+  </div>
+
+  <div class="panel" id="gr">
+    <div class="controls" role="group" aria-label="Range of n">
+      <span>Show \(n\) up to</span>
+      <button class="chip" data-range="50" aria-pressed="true">50</button>
+      <button class="chip" data-range="2000" aria-pressed="false">2,000</button>
+      <button class="chip" data-range="20000" aria-pressed="false">20,000</button>
+    </div>
+    <div class="legend" id="gr-legend"></div>
+    <div class="chart-box" id="gr-box"><svg class="chart" id="gr-svg" viewBox="0 0 680 320" role="img" aria-label="Running times of A, B and C"></svg></div>
+    <div class="controls">
+      <label>Exact values at \(n\) = <input type="number" id="gr-n" value="100" min="0" max="1000000000" aria-label="n for exact values"></label>
+      <button class="chip" id="gr-table-toggle" aria-pressed="false">Table view</button>
+    </div>
+    <p class="out" id="gr-exact" role="status"></p>
+    <div class="table-wrap" id="gr-table" hidden></div>
+    <p class="trunc">The plot and table show finitely many \(n\). They're evidence, not proof. A Big-O claim is about <em>all</em> large \(n\), and only the definition below settles it.</p>
+  </div>
+
+  <h2>Asymptotic notation</h2>
+  <div class="rule">
+    <p><strong>\(O(g(n))\)</strong>: the set of functions with asymptotic behavior less than or equal to \(g(n)\). Upper-bounded by a constant times \(g\) for large enough \(n\):</p>
+    <p>\[f \in O(g(n)) \equiv \exists c>0.\ \exists n_0>0.\ \forall n\ge n_0.\ f(n) \le c\cdot g(n)\]</p>
+    <p><strong>\(\Omega(g(n))\)</strong>: the set of functions with asymptotic behavior greater than or equal to \(g(n)\). Lower-bounded by a constant times \(g\) for large enough \(n\):</p>
+    <p>\[f \in \Omega(g(n)) \equiv \exists c>0.\ \exists n_0>0.\ \forall n\ge n_0.\ f(n) \ge c\cdot g(n)\]</p>
+    <p><strong>\(\Theta(g(n))\)</strong>: "tightly" within a constant of \(g\) for large \(n\): \(\Omega(g(n)) \cap O(g(n))\). Like \(x = y \iff x\le y \wedge x \ge y\).</p>
+  </div>
+
+  <h2>Find \(c\) and \(n_0\)</h2>
+  <div class="panel" id="cn">
+    <div class="controls">
+      <label>Claim <select id="cn-claim" aria-label="Claim to prove"></select></label>
+    </div>
+    <div class="controls">
+      <label>\(c\) = <input type="text" id="cn-c" value="11" style="width:6rem" aria-label="c"></label>
+      <label>\(n_0\) = <input type="text" id="cn-n0" value="1" style="width:8rem" aria-label="n0"></label>
+      <button class="btn primary" id="cn-check">Test this pair</button>
+    </div>
+    <p class="out" id="cn-out" role="status"></p>
+    <div class="chart-box"><svg class="chart" id="cn-svg" viewBox="0 0 680 240" role="img" aria-label="f(n) and c times g(n)"></svg></div>
+    <p class="note">How the check works: it decides the inequality for <em>every</em> integer \(n \ge n_0\) with exact fractions. It bounds where \(c\cdot g(n) - f(n)\) can change sign (Cauchy's root bound), then tests the few integers where it could be smallest. The plot only illustrates; the verdict doesn't come from it.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w1-l2-asymptotic-c-bucket" data-grader="bigo" data-answer="n^2">
+    <p>Quick check: put C's running time \(\frac{n^2}{100}\) in a bucket.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w1-l2-asymptotic-o-means-worst" data-grader="mc">
+    <p>Quick check: true or false? "\(O\) means worst case and \(\Omega\) means best case."</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w1-l2-asymptotic-o-means-worst"> True<span class="why" hidden>\(O\) and \(\Omega\) compare two <em>functions</em>. Which case you analyze (worst, best…) is a separate choice made before you get the function.</span></label>
+      <label data-correct><input type="radio" name="cse332-w1-l2-asymptotic-o-means-worst"> False<span class="why" hidden>Right. "The best-case running time is \(O(n)\)" makes perfect sense: you did a best-case analysis and the resulting function is upper-bounded by \(n\).</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide 28 leaves the answer to the room. Exact crossovers, checked by script: B is below A only up to \(n=10\) (at 10, \(950 &lt; 1000\)), and A is below B from \(n = 11\) on. C is below A up to \(n=1083\) and above it from \(n=1084\). So "best" depends on \(n\), which is exactly why we compare asymptotically: A and B are both \(\Theta(n)\), and C is \(\Theta(n^2)\).</li>
+      <li>The topic summary's three methods for choosing \(c, n_0\): squeeze, by parts, and guess-and-check/induction. The claims in the dropdown are the summary's own examples. Its proofs use \(c=88, n_0=1\); \(c=14, n_0=1\); and \(c=1, n_0=8\). Have students find smaller pairs that also work: the checker accepts any valid pair.</li>
+      <li>The summary's warning: you don't need to justify <em>how</em> you chose \(c\) and \(n_0\), only that they work for every \(n\ge n_0\).</li>
+      <li>Next lecture (Algorithm Analysis 2, Mon Oct 5) continues with \(O, \Omega, \Theta\). Slide 13 says "more on this next class".</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2 PROBLEMS -->
+<section class="page" id="l2-problems" data-title="Lecture 2 exercises">
+  <p class="where">Lecture 2 · exercises 1–8 are the lecture's examples (slides 15–28) · 9–11 are the proofs in the "Asymptotics" topic summary · given answers come from the slides and the summary, and the rest were computed by running the code</p>
+  <h1>Lecture 2 exercises</h1>
+  <div class="prose"><p>Formula boxes take expressions in \(n\) (like <code>4n+4</code> or <code>n*n</code>) and are checked exactly at several values of \(n\). Big-O boxes take a class like <code>O(n)</code>, <code>n^2</code> or <code>log n</code>.</p></div>
+
+  <article class="task" data-id="cse332-w1-l2-myfunction">
+    <h2>1. Example 1: <code>myFunction</code></h2>
+    <p class="prompt">Use the general guide (each conditional costs its check plus its slowest branch) to count arithmetic operations (+ − * / and <code>++</code>) for a list of \(n \ge 1\) items. (Code on the <a href="#counting">counting page</a>.)</p>
+    <div class="answer-spec" data-part="count" data-grader="formula" data-answer="4n+4" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"2n+5":"if-branch","4n+5":"extra-op","4n":"forgot-constant"}' data-label="worst-case count"></div>
+    <div class="answer-spec" data-part="bucket" data-grader="bigo" data-answer="n" data-label="bucket"></div>
+    <ol class="hints">
+      <li>Go line by line. Which lines run once, and which run \(n\) times?</li>
+      <li>The conditional costs the check plus the <em>slower</em> branch. Which branch is slower?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The first three lines do one arithmetic op each: 3.</li>
+      <li>The first loop does <code>b++</code> and <code>i++</code> per iteration, \(n\) times: \(2n\).</li>
+      <li><code>b % 2</code> is 1. The slower branch is the else loop: another \(2n\).</li>
+      <li class="answer">\(3 + 2n + 1 + 2n = 4n+4\), which is \(O(n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l2-beannoying">
+    <h2>2. Example 2: <code>beAnnoying</code></h2>
+    <p class="prompt">Count the prints for a list of \(n\) items.</p>
+    <div class="answer-spec" data-part="prints" data-grader="formula" data-answer="n^2" data-points='{"n":["0","1","2","3","7","10","100"]}' data-miscon='{"2n":"added-loops","n":"inner-only","n^2+n":"counted-adds"}' data-label="prints, as a formula"></div>
+    <div class="answer-spec" data-part="prints-million" data-grader="exact" data-answer="1000000000000" data-miscon='{"2000000":"added-loops","1000000":"inner-only"}' data-label="prints for n = 1,000,000"></div>
+    <div class="answer-spec" data-part="bucket" data-grader="bigo" data-answer="n^2" data-label="bucket"></div>
+    <ol class="hints"><li>How many times does the inner loop body run for one outer iteration? How many outer iterations are there?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The inner loop prints \(n\) times for each outer iteration, and there are \(n\) outer iterations.</li>
+      <li>\(n \cdot n = n^2\). For \(n = 10^6\), that's \(10^{12} = 1{,}000{,}000{,}000{,}000\) prints.</li>
+      <li class="answer">\(n^2\) prints, \(O(n^2)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l2-arraylist-worst">
+    <h2>3. ArrayList add: worst case</h2>
+    <p class="prompt">Input size: the size of "this". Operations counted: indexing. Count the way slide 21 does: 1 per value written into <code>data</code>, 1 per element copied by <code>resize()</code>.</p>
+    <div class="answer-spec" data-part="full-8" data-grader="exact" data-answer="9" data-miscon='{"1":"amortized-vs-worst","8":"forgot-write","16":"copied-new-length"}' data-label="cost of add when data.length = size = 8"></div>
+    <div class="answer-spec" data-part="bucket" data-grader="bigo" data-answer="n" data-label="worst case of one add"></div>
+    <ol class="hints"><li>When <code>data.length == size</code>, <code>resize()</code> runs first. How many elements does its loop copy?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>resize()</code> copies all 8 old elements into the new length-16 array: 8.</li>
+      <li>Then <code>data[size] = value</code>: 1 more.</li>
+      <li class="answer">9. The worst case of one add is linear in the size: \(O(n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l2-arraylist-amortized">
+    <h2>4. ArrayList add: amortized</h2>
+    <p class="prompt">The initial length of <code>data</code> is \(c\). Do \(7c\) adds, counting like slide 21.</p>
+    <div class="answer-spec" data-part="total" data-grader="formula" data-answer="14c" data-points='{"c":["1","2","3","4","8","10"]}' data-miscon='{"7c":"forgot-copies","8c":"only-last-block"}' data-label="total cost, in terms of c"></div>
+    <div class="answer-spec" data-part="ratio" data-grader="exact" data-answer="2" data-miscon='{"1":"forgot-copies"}' data-label="total ÷ number of adds"></div>
+    <ol class="hints"><li>Split the \(7c\) adds into blocks of \(c\), \(2c\) and \(4c\). Each block ends by filling the array.</li><li>Each block's adds each cost 1 write, plus that block's resize copies as many elements as the block has adds.</li></ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>First \(c\) adds: \(c\) writes + \(c\) copies (the resize when the \((c+1)\)th add arrives, charged to this block) \(= 2c\).</li>
+        <li>Next \(2c\): \(2c + 2c = 4c\). Next \(4c\): \(4c + 4c = 8c\).</li>
+        <li class="answer">Total \(14c\) over \(7c\) adds: \(\frac{14c}{7c} = 2\) per add.</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="arraylist-14c">Check by running add()</button><span class="brute"></span></div>
+    </div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Run the slide's <code>add</code> for exactly \(7c\) adds and the resizes land at adds \(c+1\), \(2c+1\) and \(4c+1\). They copy \(c\), \(2c\) and \(4c\) elements, so the real total is exactly \(7c\) writes + \(7c\) copies = \(14c\), matching the slide. The brute-force button runs it for \(c = 1\) to \(8\).</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l2-parking">
+    <h2>5. The parking lot</h2>
+    <p class="prompt">Parking is $10/day. Unpaid days earn warnings; the 3rd warning costs a $25 fine and resets the warnings.</p>
+    <div class="answer-spec" data-part="average" data-grader="decimal" data-answer="25/3" data-tol="0.005" data-miscon='{"25":"no-divide","8.3":"rounding","12.5":"two-days"}' data-label="never-pay average per day ($)"></div>
+    <div class="answer-spec" data-part="cheaper" data-grader="yesno" data-answer="yes" data-label="Is never paying cheaper on average?"></div>
+    <ol class="hints"><li>The pattern repeats every three days. What does one cycle cost?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>One cycle is $0 + $0 + $25 over 3 days.</li>
+      <li class="answer">\(\$25/3 \approx \$8.33\) per day, which is less than $10, so yes. (The slide's point is the arithmetic, not the advice.)</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l2-binary-iterations">
+    <h2>6. Binary search iterations</h2>
+    <p class="prompt">Use the code from slide 25.</p>
+    <div class="answer-spec" data-part="halvings-1024" data-grader="exact" data-answer="10" data-miscon='{"512":"halved-once","1024":"linear-count"}' data-label="solve n/2^x = 1 for n = 1024"></div>
+    <div class="answer-spec" data-part="worst-1000" data-grader="exact" data-answer="10" data-miscon='{"9":"stopped-early","1000":"linear-count","500":"halved-once"}' data-label="worst-case loop iterations, n = 1000"></div>
+    <div class="answer-spec" data-part="linear-1000" data-grader="exact" data-answer="1000" data-label="worst-case comparisons of contains, n = 1000"></div>
+    <ol class="hints"><li>\(2^{10} = 1024\).</li><li>The loop still runs once when <code>end - start</code> is 1. Count the gaps 1000, 500, 250, … down to 1.</li></ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>\(1024 / 2^x = 1\) gives \(x = 10\).</li>
+        <li>For \(n = 1000\), the larger half shrinks 1000 → 500 → 250 → 125 → 62 → 31 → 15 → 7 → 3 → 1. That's 10 gaps, one iteration each, so the worst case is 10 iterations (\(\lfloor\log_2 1000\rfloor + 1\)).</li>
+        <li class="answer">10; 10; and linear search's worst case (target missing or last) is 1000 comparisons.</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="binary-1000">Check by brute force</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l2-compare-abc">
+    <h2>7. Comparing A, B and C</h2>
+    <p class="prompt">A: \(10n+900\). B: \(100n-50\). C: \(\frac{n^2}{100}\).</p>
+    <div class="answer-spec" data-part="a-below-b" data-grader="exact" data-answer="11" data-miscon='{"10":"strict-vs-equal"}' data-label="smallest n ≥ 1 with A(n) &lt; B(n)"></div>
+    <div class="answer-spec" data-part="c-above-a" data-grader="exact" data-answer="1084" data-miscon='{"1083":"strict-vs-equal","1000":"dropped-constant"}' data-label="smallest n ≥ 1 with C(n) &gt; A(n)"></div>
+    <div class="answer-spec" data-part="slowest-eventually" data-grader="choice" data-choices='["a","b","c"]' data-answer="c" data-miscon='{"b":"biggest-coefficient"}' data-label="largest for all large n (a, b or c)"></div>
+    <ol class="hints">
+      <li>Solve each inequality for \(n\), then take the smallest integer that satisfies it.</li>
+      <li>\(\frac{n^2}{100} &gt; 10n + 900 \iff n^2 - 1000n - 90000 &gt; 0\). Find the positive root.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>\(10n + 900 &lt; 100n - 50 \iff 950 &lt; 90n \iff n &gt; 10.5\), so \(n = 11\).</li>
+        <li>\(n^2 - 1000n - 90000 = 0\) has positive root \(500 + \sqrt{340000} \approx 1083.1\), so \(n = 1084\). Check: \(C(1083) = 11{,}728.89 &lt; 11{,}730 = A(1083)\), and \(C(1084) = 11{,}750.56 &gt; 11{,}740\).</li>
+        <li class="answer">11; 1084; C (it's \(\Theta(n^2)\), and A and B are \(\Theta(n)\)).</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="crossovers">Check by brute force</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l2-bigo-prove-a-linear">
+    <h2>8. Prove A is \(O(n)\)</h2>
+    <p class="prompt">Find \(c &gt; 0\) and \(n_0 &gt; 0\) with \(10n + 900 \le c\cdot n\) for all \(n \ge n_0\). Write the one-line argument in your work.</p>
+    <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["900","10"],"g":["0","1"],"rel":"O"}' data-label="\(c\)"></div>
+    <div class="answer-spec" data-part="n0" data-grader="bound" data-role="n0" data-label="\(n_0\)"></div>
+    <ol class="hints"><li>Squeeze: for \(n \ge 1\), \(900 \le 900n\).</li><li>Or keep \(c\) small and let \(n_0\) do the work: with \(c = 11\), when is \(900 \le n\)?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>For \(n \ge 1\): \(10n + 900 \le 10n + 900n = 910n\). So \(c = 910\), \(n_0 = 1\) works.</li>
+      <li>Another choice: \(c = 11\). Then \(10n + 900 \le 11n \iff n \ge 900\), so \(n_0 = 900\).</li>
+      <li class="answer">Any valid pair proves it, e.g. \(c=910, n_0=1\) or \(c=11, n_0=900\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l2-bigo-prove-summary-cubic">
+    <h2>9. \(4n^2 + 8n + 10 \in O\!\left(\tfrac14 n^3\right)\)</h2>
+    <p class="prompt">From the Asymptotics topic summary. Find \(c\) and \(n_0\).</p>
+    <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["10","8","4"],"g":["0","0","0","1/4"],"rel":"O"}' data-label="\(c\)"></div>
+    <div class="answer-spec" data-part="n0" data-grader="bound" data-role="n0" data-label="\(n_0\)"></div>
+    <ol class="hints"><li>For \(n\ge1\), replace \(8n\) with \(8n^2\) and \(10\) with \(10n^2\). Neither makes the left side smaller.</li><li>Then compare \(22n^2\) with \(c\cdot\frac14 n^3\).</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>For \(n \ge 1\): \(4n^2+8n+10 \le 22n^2 \le 22n^3\).</li>
+      <li>\(22n^3 = 88 \cdot \tfrac14 n^3\).</li>
+      <li class="answer">\(c = 88\), \(n_0 = 1\) (the summary's choice; other pairs work too).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l2-bigo-prove-summary-quadratic">
+    <h2>10. \(4n^2 - 8n + 10 \in O(2n^2)\)</h2>
+    <p class="prompt">From the topic summary. Find \(c\) and \(n_0\).</p>
+    <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["10","-8","4"],"g":["0","0","2"],"rel":"O"}' data-label="\(c\)"></div>
+    <div class="answer-spec" data-part="n0" data-grader="bound" data-role="n0" data-label="\(n_0\)"></div>
+    <ol class="hints"><li>Dropping \(-8n\) only makes \(f\) bigger, so it's enough to bound \(4n^2+10\).</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(4n^2-8n+10 \le 4n^2+10 \le 14n^2\) for \(n\ge1\).</li>
+      <li>\(14n^2 \le c\cdot 2n^2\) with \(c = 14\) (even \(c=7\) works).</li>
+      <li class="answer">\(c = 14\), \(n_0 = 1\). The summary notes \(c = 5\) works with the same argument.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w1-l2-omega-prove-summary-quadratic">
+    <h2>11. \(4n^2 - 8n + 10 \in \Omega(2n^2)\)</h2>
+    <p class="prompt">From the topic summary. Find \(c\) and \(n_0\) with \(f(n) \ge c\cdot g(n)\) for all \(n\ge n_0\).</p>
+    <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["10","-8","4"],"g":["0","0","2"],"rel":"Omega"}' data-label="\(c\)"></div>
+    <div class="answer-spec" data-part="n0" data-grader="bound" data-role="n0" data-label="\(n_0\)"></div>
+    <ol class="hints"><li>Dropping the \(+10\) only makes \(f\) smaller.</li><li>For large enough \(n\), \(-8n \ge -n^2\). How large?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(4n^2-8n+10 \ge 4n^2-8n\). For \(n \ge 8\), \(8n \le n^2\), so this is \(\ge 3n^2 \ge 2n^2\).</li>
+      <li class="answer">\(c = 1\), \(n_0 = 8\) (the summary's choice; it notes \(n_0 = 3\) also works).</li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CYU L2 -->
+<section class="page" id="cyu-l2" data-title="Check your understanding (Lecture 2)">
+  <p class="where">Lecture 2 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose"><p>Ten questions on Lecture 2 only. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="l2" role="status"></div>
+  <ol class="cyu-list" data-quiz="l2">
+    <li class="cyu" data-id="cse332-w1-l2-cyu-why-not-time" data-kind="mc" data-topic="analysis">
+      <p class="q">Your implementation runs faster than a classmate's on your laptop. What can you conclude about the algorithms?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w1-l2-cyu-why-not-time"> Yours is the better algorithm<span class="why" hidden>Hardware, OS, Java version, other programs and implementation details all affect the time. The slide says exactly this: we cannot conclude your algorithm is better.</span></label>
+        <label data-correct><input type="radio" name="cse332-w1-l2-cyu-why-not-time"> Nothing about the algorithms themselves<span class="why" hidden>Correct. Observations couple the algorithm with its implementation and machine.</span></label>
+        <label><input type="radio" name="cse332-w1-l2-cyu-why-not-time"> Yours is better for all large inputs<span class="why" hidden>One timing on one input says nothing about how either grows as \(n\) doubles.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-worst-case-def" data-kind="mc" data-topic="analysis">
+      <p class="q">"The worst-case running time is \(f(n)\)." What is \(f(5)\)?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w1-l2-cyu-worst-case-def"> The most operations done on any input of size 5<span class="why" hidden>Correct: the maximum count among all inputs of size \(n\).</span></label>
+        <label><input type="radio" name="cse332-w1-l2-cyu-worst-case-def"> The operations done on the slowest machine<span class="why" hidden>Running time counts operations, which don't depend on the machine.</span></label>
+        <label><input type="radio" name="cse332-w1-l2-cyu-worst-case-def"> The average over inputs of size 5<span class="why" hidden>That's average-case complexity.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-myfunction-n5" data-kind="num" data-answer="24" data-topic="counting" data-miscon='{"15":"if-branch","20":"forgot-constant"}'>
+      <p class="q">Using slide 16's worst-case count for <code>myFunction</code>, how many arithmetic operations for a list of 5 items?</p>
+      <p class="why" hidden>\(4n + 4 = 24\). (For \(n=5\) the code really takes the else branch, so the stepper also counts 24.)</p>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-beannoying-n7" data-kind="num" data-answer="49" data-topic="counting" data-miscon='{"14":"added-loops","7":"inner-only","56":"counted-adds"}'>
+      <p class="q">How many times does <code>beAnnoying</code> print for a list of 7 items?</p>
+      <p class="why" hidden>The inner loop prints 7 times for each of 7 outer iterations: \(7\cdot7 = 49\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-bucket-triangle" data-kind="bigo" data-answer="n^2" data-topic="counting">
+      <p class="q">Put \(\frac{n(n+1)}{2}\) in a bucket.</p>
+      <p class="why" hidden>\(\frac{n(n+1)}{2} = \frac12 n^2 + \frac12 n\). Drop constants and non-dominant terms: \(O(n^2)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-amortized-def" data-kind="mc" data-topic="amortized">
+      <p class="q">Amortized complexity is…</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w1-l2-cyu-amortized-def"> the average over random inputs<span class="why" hidden>That's average/expected complexity, which depends on a distribution.</span></label>
+        <label data-correct><input type="radio" name="cse332-w1-l2-cyu-amortized-def"> the max total over \(M\) consecutive worst-case operations, divided by \(M\)<span class="why" hidden>Correct, word for word from slide 10.</span></label>
+        <label><input type="radio" name="cse332-w1-l2-cyu-amortized-def"> the cost of the cheapest operation<span class="why" hidden>That's closer to best case, and for a single operation.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-arraylist-c2" data-kind="num" data-answer="28" data-topic="amortized" data-miscon='{"14":"forgot-copies"}'>
+      <p class="q">An ArrayList starts with <code>data.length = 2</code>. Counting like slide 21 (1 per write, 1 per element copied), what's the total for 14 adds?</p>
+      <p class="why" hidden>\(14 = 7c\) with \(c=2\). The resizes copy 2, 4 and 8 elements (14 copies) on top of 14 writes: \(14c = 28\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-binary-88" data-kind="num" data-answer="4" data-topic="search" data-miscon='{"7":"linear-count"}'>
+      <p class="q">How many loop iterations does <code>binary_contains</code> take to find 88 in 5 8 13 42 75 79 88 90 95 99?</p>
+      <p class="why" hidden>mid = 5 (79 &lt; 88), then [6,10) mid = 8 (95 &gt; 88), then [6,8) mid = 7 (90 &gt; 88), then [6,7) mid = 6: found. 4 iterations.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-theta-meaning" data-kind="mc" data-topic="asymptotic">
+      <p class="q">\(f \in \Theta(g)\) means…</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w1-l2-cyu-theta-meaning"> \(f(n) = g(n)\) for large \(n\)<span class="why" hidden>Too strong. \(\Theta\) allows a constant factor: \(5n^3 \in \Theta(2n^3)\).</span></label>
+        <label data-correct><input type="radio" name="cse332-w1-l2-cyu-theta-meaning"> \(f \in O(g)\) and \(f \in \Omega(g)\)<span class="why" hidden>Correct: \(\Theta(g) = \Omega(g)\cap O(g)\).</span></label>
+        <label><input type="radio" name="cse332-w1-l2-cyu-theta-meaning"> \(f\) is the average case<span class="why" hidden>\(\Theta\) compares functions; it says nothing about which case was analyzed.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-a-below-b" data-kind="num" data-answer="11" data-topic="asymptotic" data-miscon='{"10":"strict-vs-equal"}'>
+      <p class="q">For which smallest \(n \ge 1\) is \(10n + 900 &lt; 100n - 50\)?</p>
+      <p class="why" hidden>\(950 &lt; 90n \iff n &gt; 10.\overline{5}\), so 11. At \(n=10\): \(1000\) vs \(950\).</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="l2" role="status"></div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Question 5 matches the slide-12 examples (\(n(n+1)\) ends up as \(O(n^2)\)). Questions 9 and 10 bridge into Monday's lecture on asymptotics.</li>
+      <li>Every numeric answer was checked by running the slide code (see <code>tests/</code>).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ READINGS -->
+<section class="page" id="readings" data-title="Readings">
+  <h1>Readings</h1>
+  <div class="prose"><p>The textbook is optional, and the calendar lists the most relevant sections for each lecture. The topic summaries are a second presentation of the same material by Nathan Brunelle, posted on the course site.</p></div>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Lecture 1 (Wed Sept 30)</th><td>Weiss 3.1–3.7: abstract data types, lists, stacks and queues. <br><a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/adt_stacks_queues.html" target="_blank" rel="noopener">Summary: ADTs, Stacks, and Queues</a>, with step-through slides of the linked and circular array queues</td></tr>
+    <tr><th>Section 1 (Thu Oct 1)</th><td>No reading listed. <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section01.pdf" target="_blank" rel="noopener">Section slides (pdf)</a></td></tr>
+    <tr><th>Lecture 2 (Fri Oct 2)</th><td>Weiss 2.1–2.4: algorithm analysis. Math review: Weiss 1.1–1.6. <br><a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/runningtime.html" target="_blank" rel="noopener">Summary: Running time</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/asymptotics.html" target="_blank" rel="noopener">Summary: Asymptotics</a> (worked \(c, n_0\) proofs; exercises 9–11 here)</td></tr>
+    <tr><th>Any time</th><td><a href="https://courses.cs.washington.edu/courses/cse332/26au/files/math_identities_quick_reference.pdf" target="_blank" rel="noopener">Math identities quick reference</a>: summations and log rules</td></tr>
+  </table>
+  </div>
+  <h2>What to read for</h2>
+  <div class="prose">
+    <ul>
+      <li><strong>Running time summary:</strong> the definition \(f:\mathbb N\to\mathbb N\) (worst-case operations on inputs of size \(n\)), and why to choose operations by necessity, frequency and magnitude.</li>
+      <li><strong>Asymptotics summary:</strong> sections 2.2 (intuition) and 3.1 (squeeze method). Its "Common misconceptions" table matches the quick check on the comparing page.</li>
+      <li><strong>Math review:</strong> \(\sum_{i=1}^{n} i = \frac{n(n+1)}{2}\), \(\sum_{i=0}^{n-1} 2^i = 2^n - 1\), and logs base 2. Lecture 2's doubling argument uses the last two.</li>
+    </ul>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CHEATSHEET -->
+<section class="page" id="cheatsheet" data-title="Cheat sheet">
+  <h1>Week 1 cheat sheet</h1>
+  <p class="where">Print with <kbd>Ctrl</kbd>+<kbd>P</kbd>; only this page prints.</p>
+  <div class="cheat">
+    <section>
+      <h3>Terminology</h3>
+      <p><strong>ADT</strong>: mathematical description of a thing + its operations (the user's view). <strong>Data structure</strong>: data organization + algorithms implementing an ADT (the implementer's view). <strong>Implementation</strong>: that in a language. <strong>Algorithm</strong>: language-independent step-by-step process.</p>
+    </section>
+    <section>
+      <h3>Queue (FIFO) &amp; stack (LIFO)</h3>
+      <p>Queue: enqueue, dequeue (oldest), isEmpty (+ peek). Stack: push, pop (newest), peek, isEmpty.</p>
+      <p>Linked queue: <code>front</code> = oldest node, <code>back</code> = newest; set <code>back = null</code> when the last node leaves.</p>
+      <p>Circular array: <code>back</code> = first open slot; advance with <code>(i + 1) % queue.length</code>; <code>isEmpty</code> uses <code>size</code> because <code>front == back</code> when empty <em>and</em> when full.</p>
+    </section>
+    <section>
+      <h3>Generics</h3>
+      <p><code>class LikePair&lt;T&gt;</code> · <code>class UnlikePair&lt;A,B&gt;</code> · bound: <code>&lt;T extends Animal&gt;</code> · no <code>new T[n]</code>; use <code>(T[]) new Object[n]</code>.</p>
+      <p><code>&lt;A extends Comparable&lt;A&gt;&gt;</code>: A compares to itself.</p>
+    </section>
+    <section>
+      <h3>Worst-case counting guide</h3>
+      <ul>
+        <li>Consecutive statements: add.</li>
+        <li>Loops: sum the iterations (time per iteration × iterations).</li>
+        <li>Conditionals: the check + the slowest branch.</li>
+        <li>Calls: the body's time. Recursion: a recurrence.</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Scenarios</h3>
+      <p>Worst: max over inputs of size \(n\). Best: min. Average: over random inputs. Amortized: max total over \(M\) consecutive ops ÷ \(M\).</p>
+      <p>ArrayList add: \(O(n)\) worst case, constant amortized (\(14c/7c = 2\)).</p>
+    </section>
+    <section>
+      <h3>Asymptotic notation</h3>
+      <p>\(f\in O(g) \iff \exists c&gt;0, n_0&gt;0.\ \forall n\ge n_0.\ f(n)\le c\, g(n)\)</p>
+      <p>\(f\in \Omega(g) \iff \exists c&gt;0, n_0&gt;0.\ \forall n\ge n_0.\ f(n)\ge c\, g(n)\)</p>
+      <p>\(\Theta(g) = O(g)\cap\Omega(g)\). These compare <em>functions</em>, not cases.</p>
+    </section>
+    <section>
+      <h3>Week 1 numbers</h3>
+      <div class="table-wrap"><table class="plain">
+        <tr><td><code>myFunction</code> worst case</td><td>\(4n+4\), \(O(n)\)</td></tr>
+        <tr><td><code>beAnnoying</code> prints</td><td>\(n^2\), \(O(n^2)\)</td></tr>
+        <tr><td>Binary search, worst case</td><td>\(\lfloor\log_2 n\rfloor+1\) iterations</td></tr>
+        <tr><td>Linear search, worst case</td><td>\(n\) comparisons</td></tr>
+        <tr><td>A, B, C crossovers</td><td>A &lt; B from \(n=11\); C &gt; A from \(n=1084\)</td></tr>
+      </table></div>
+    </section>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+</main>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="vendor/katex/katex.min.js"></script>
+<script src="vendor/katex/contrib/auto-render.min.js"></script>
+<script src="js/grader.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/store.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

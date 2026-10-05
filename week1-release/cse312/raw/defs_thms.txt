@@ -1,0 +1,937 @@
+                Probability & Statistics with Applications to Computing
+                              Key Definitions and Theorems
+
+1     Combinatorial Theory
+1.1    So You Think You Can Count?
+The Sum Rule: If an experiment can either end up being one of N outcomes, or one of M outcomes (where there is no
+overlap), then the total number of possible outcomes is: N + M .
+The Product Rule: If an experiment has N1 outcomes for the first stage, N2 outcomes for the second stage,Qm . . . , and Nm
+outcomes for the mth stage, then the total number of outcomes of the experiment is N1 × N2 · · · · · Nm = i=1 Ni .
+Permutation: The number of orderings of N distinct objects is N ! = N · (N − 1) · (N − 2) · . . . 3 · 2 · 1.
+Complementary Counting: Let U be a (finite) universal set, and S a subset of interest. Then, | S |=| U | − | U \ S |.
+1.2    More Counting
+k-Permutations: If we want to pick (order matters) only k out of n distinct objects, the number of ways to do so is:
+                                                                                            n!
+                                   P (n, k) = n · (n − 1) · (n − 2) · ... · (n − k + 1) = (n−k)!
+
+k-Combinations/Binomial Coefficients: If we want to choose (order doesn’t matter) only k out of n distinct objects,
+the number of ways to do so is:
+                                                        
+                                                        n    P (n, k)       n!
+                                           C(n, k) =       =          =
+                                                        k       k!      k!(n − k)!
+
+Multinomial Coefficients: If we have k distinct types of objects (n total), with n1 of the first type, n2 of the second, ...,
+and nk of the k-th, then the number of arrangements possible is
+                                                                
+                                                      n                   n!
+                                                                   =
+                                               n1 , n2 , ..., nk     n1 !n2 !...nk !
+
+Stars and Bars/Divider Method: The number of ways to distribute n indistinguishable balls into k distinguishable bins
+is                                                               
+                                      n + (k − 1)       n + (k − 1)
+                                                   =
+                                         k−1                 n
+
+1.3    No More Counting Please
+                                                                                           Pn      n k n−k
+                                                                                                    
+Binomial Theorem: Let x, y ∈ R and n ∈ N a positive integer. Then: (x + y)n =                k=0   k x y   .
+Principle of Inclusion-Exclusion (PIE):
+2 events: |A ∪ B| = |A| + |B| − |A ∩ B|
+3 events: |A ∪ B ∪ C| = |A| + |B| + |C| − |A ∩ B| − |A ∩ C| − |B ∩ C| + |A ∩ B ∩ C|
+k events: singles - doubles + triples - quads + ...
+Pigeonhole Principle: If there are n pigeons we want to put into k holes (where n > k), then at least one pigeonhole must
+contain at least 2 (or to be precise, dn/ke) pigeons.
+Combinatorial Proofs: To prove two quantities are equal, you can come up with a combinatorial situation, and show that
+both in fact count the same thing, and hence must be equal.
+2     Discrete Probability
+2.1    Discrete Probability
+Key Probability Definitions: The sample space is the set Ω of all possible outcomes of an experiment. An event is
+any subset E ⊆ Ω. Events E and F are mutually exclusive if E ∩ F = ∅.
+Axioms of Probability & Consequences:
+
+    1. (Axiom: Nonnegativity) For any event E, P (E) ≥ 0.
+Alex Tsun                                                                  Probability & Statistics with Applications to Computing 2
+  2. (Axiom: Normalization) P (Ω) = 1.
+
+  3. (Axiom: Countable Additivity) If E and F are mutually exclusive, then P(E ∪ F ) = P (E) + P (F ).
+                                       
+  1. (Corollary: Complementation) P E C = 1 − P (E)
+  2. (Corollary: Monotonicity) If E ⊆ F , then P (E) ≤ P (F )
+
+  3. (Corollary: Inclusion-Exclusion) P (E ∪ F ) = P (E) + P (F ) − P (E ∩ F )
+
+Equally Likely Outcomes: If Ω is a sample space such that each of the unique outcome elements in Ω are equally likely,
+then for any event E ⊆ Ω: P(E) = |E|/|Ω|.
+2.2     Conditional Probability
+                                               P (A ∩ B)
+Conditional Probability: P (A | B) =
+                                                 P (B)
+                                  P (B | A) P (A)
+Bayes Theorem: P (A | B) =
+                                      P (B)
+Partition: Non-empty events E1 , . . . , En partition the sample space Ω if they are both:
+                                            Sn
+  • (Exhaustive) E1 ∪ E2 ∪ · · · ∪ En = i=1 Ei = Ω (they cover the entire sample space).
+   • (Pairwise Mutually Exclusive) For all i 6= j, Ei ∩ Ej = ∅ ( none of them overlap)
+
+Note that for any event E, E and E C always form a partition of Ω.
+Law of Total Probability (LTP): If events E1 , . . . , En partition Ω, then for any event F :
+                                                     n
+                                                     X                     n
+                                                                           X
+                                          P (F ) =         P (F ∩ Ei) =          P (F | Ei ) P (Ei )
+                                                     i=1                   i=1
+
+
+      Bayes Theorem with LTP: Let events E1 , . . . , En partition the sample space Ω, and let F be another event. Then:
+
+                                                                P (F | E1 ) P (E1 )
+                                                 P (E1 | F ) = Pn
+                                                                i=1 P (F | Ei ) P (Ei )
+
+
+2.3     Independence
+Chain Rule: Let A1 , . . . , An be events with nonzero probabilities. Then:
+
+                         P (A1 , . . . , An ) = P (A1 ) P (A2 | A1 ) P (A3 | A1 A2 ) · · · P (An | A1 , . . . , An−1 )
+
+Independence: A and B are independent if any of the following equivalent statements hold:
+
+  1. P (A | B) = P (A)
+  2. P (B | A) = P (B)
+  3. P (A, B) = P (A) P (B)
+
+Mutual Independence: We say n events A1 , A2 , . . . , An are (mutually) independent if, for any subset I ⊆ [n] =
+{1, 2, . . . , n}, we have                              !
+                                                \            Y
+                                          P           Ai =     P (Ai )
+                                                             i∈I          i∈I
+
+This equation is actually representing 2 equations since there are 2n subsets of [n].
+                                           n
+
+Conditional Independence: A and B are conditionally independent given an event C if any of the following
+equivalent statements hold:
+
+  1. P (A | B, C) = P (A | C)
+Alex Tsun                                                             Probability & Statistics with Applications to Computing 3
+
+
+    2. P (B | A, C) = P (B | C)
+    3. P (A, B | C) = P (A | C) P (B | C)
+
+3     Discrete Random Variables
+3.1     Discrete Random Variables Basics
+Random Variable (RV): A random variable (RV) X is a numeric function of the outcome X : Ω → R. The set of possible
+values X can take on is its range/support, denoted ΩX .
+If ΩX is finite or countable infinite (typically integers or a subset), X is a discrete RV. Else if ΩX is uncountably large (the
+size of real numbers), X is a continuous RV.
+Probability Mass Function (PMF): For a discrete RV X, assigns probabilities to values in its range. That is pX : ΩX →
+[0, 1] where: pX (k) = P (X = k).
+                                                           P
+Expectation: The expectation of a discrete RV X is: E [X] = k∈ΩX k · pX (k).
+3.2     More on Expectation
+Linearity of Expectation (LoE): For any random variables X, Y (possibly dependent):
+
+                                            E [aX + bY + c] = aE [X] + bE [Y ] + c
+                                                                                                           P
+Law of the Unconscious Statistician (LOTUS): For a discrete RV X and function g, E [g(X)] =                  b∈ΩX g(b) · pX (b).
+
+3.3     Variance
+Linearity of Expectation with Indicators: If asked only about the expectation of a RV X which is some sort of “count”
+(and not its PMF), then you may be able to write X as the sum of possibly dependent indicator RVs X1 , . . . , Xn , and apply
+LoE, where for an indicator RV Xi , E [Xi ] = 1 · P (Xi = 1) + 0 · P (Xi = 0) = P (Xi = 1).
+                                                       2
+Variance: Var (X) = E (X − E [X])2 = E X 2 − E [X] .
+                                     p
+Standard Deviation (SD): σX = Var (X).
+Property of Variance: Var (aX + b) = a2 Var (X).
+3.4     Zoo of Discrete Random Variables Part I
+Independence: Random variables X and Y are independent, denoted X ⊥ Y , if for all x ∈ ΩX and all y ∈ ΩY :
+P (X = x ∩ Y = y) = P (X = x) · P (Y = y).
+Independent and Identically Distributed (iid): We say X1 , . . . , Xn are said to be independent and identically
+distributed (iid) if all the Xi ’s are independent of each other, and have the same distribution (PMF for discrete RVs, or
+CDF for continuous RVs).
+Variance Adds for Independent RVs: If X ⊥ Y , then Var (X + Y ) = Var (X) + Var (Y ).
+Bernoulli Process: A Bernoulli process with parameter p is a sequence of independent coin flips X1 , X2 , X3 , ... where
+P (head) = p. If flip i is heads, then we encode Xi = 1; otherwise, Xi = 0.
+Bernoulli/Indicator Random Variable: X ∼ Bernoulli(p) (Ber(p) for short) iff X has PMF:
+                                                             
+                                                                   p,     k=1
+                                                  pX (k) =
+                                                                 1 − p,   k=0
+
+E [X] = p and Var (X) = p(1 − p). An example of a Bernoulli/indicator RV is one flip of a coin with P (head) = p. By a
+clever trick, we can write
+                                                            1−k
+                                         pX (k) = pk (1 − p)    , k = 0, 1
+
+Binomial Random Variable: X ∼ Binomial(n, p) (Bin(n, p) for short) iff X has PMF
+                                     
+                                     n k          n−k
+                           pX (k) =     p (1 − p)      , k ∈ ΩX = {0, 1, . . . , n}
+                                     k
+
+E [X] = np and Var (X) = np(1 − p). X is the sum of n iid Ber(p) random variables. An example of a Binomial RV is the
+number of heads in n independent flips of a coin with P (head) = p. Note that Bin(1, p) ≡ Ber(p). As n → ∞ and p →
+Alex Tsun                                                                   Probability & Statistics with Applications to Computing 4
+
+
+0, with np = λ, then Bin (n, p) → Poi(λ). If X1 , . . . , Xn are independent Binomial RV’s, where Xi ∼ Bin(Ni , p), then
+X = X1 + . . . + Xn ∼ Bin(N1 + . . . + Nn , p).
+3.5    Zoo of Discrete Random Variables Part II
+Uniform Random Variable (Discrete): X ∼ Uniform(a, b) (Unif(a, b) for short), for integers a ≤ b, iff X has PMF:
+
+                                                           1
+                                         pX (k) =              , k ∈ ΩX = {a, a + 1, . . . , b}
+                                                         b−a+1
+                             (b−a)(b−a+2)
+E [X] = a+b2 and Var (X) =        12      . This represents each integer in [a, b] to be equally likely. For example, a single roll
+of a fair die is Unif(1, 6).
+Geometric Random Variable: X ∼ Geometric(p) (Geo(p) for short) iff X has PMF:
+                                                                k−1
+                                             pX (k) = (1 − p)         p, k ∈ ΩX = {1, 2, 3, . . .}
+
+E [X] = p1 and Var (X) = 1−pp2 . An example of a Geometric RV is the number of independent coin flips up to and including
+the first head, where P (head) = p.
+Negative Binomial Random Variable: X ∼ NegativeBinomial(r, p) (NegBin(r, p) for short) iff X has PMF:
+                                                   
+                                               k−1 r            k−r
+                                 pX (k) =             p (1 − p)     , k ∈ ΩX = {r, r + 1, r + 2, . . .}
+                                                r−1
+
+E [X] = pr and Var (X) = r(1−p)
+                           p2 . X is the sum of r iid Geo(p) random variables. An example of a Negative Binomial RV is
+the number of independent coin flips up to and including the r-th head, where P (head) = p. If X1 , . . . , Xn are independent
+Negative Binomial RV’s, where Xi ∼ NegBin(ri , p), then X = X1 + . . . + Xn ∼ NegBin(r1 + . . . + rn , p).
+3.6    Zoo of Discrete Random Variables Part III
+Poisson Random Variable: X ∼ Poisson(λ) (Poi(λ) for short) iff X has PMF:
+
+                                                                λk
+                                                pX (k) = e−λ       , k ∈ ΩX = {0, 1, 2, . . .}
+                                                                k!
+E [X] = λ and Var (X) = λ. An example of a Poisson RV is the number of people born during a particular minute,
+where λ is the average birth rate per minute. If X1 , . . . , Xn are independent Poisson RV’s, where Xi ∼ Poi(λi ), then
+X = X1 + . . . + Xn ∼ Poi(λ1 + . . . + λn ).
+Hypergeometric Random Variable: X ∼ HyperGeometric(N, K, n) (HypGeo(N, K, n) for short) iff X has PMF:
+                                         K
+                                              N −K 
+                                         k     n−k
+                             pX (k) =         N
+                                                       , k ∈ ΩX = {max{0, n + K − N }, . . . , min {K, n}}
+                                              n
+
+                              K(N −K)(N −n)
+E [X] = n KN and Var (X) = n    N 2 (N −1)  . This represents the number of successes drawn, when n items are drawn from
+a bag with N items (K of which are successes, and N   − K failures) without replacement. If we did this with replacement,
+then this scenario would be represented as Bin n, KN .
+
+4     Continuous Random Variables
+4.1    Continuous Random Variables Basics
+Probability Density Function (PDF): The probability density function (PDF) of a continuous RV X is the function
+fX : R → R, such that the following properties hold:
+
+    • fX (z) ≥ 0 for all z ∈ R
+      R∞
+    • −∞ fX (t) dt = 1
+                        Rb
+    • P (a ≤ X ≤ b) =    a
+                             fX (w) dw
+
+Cumulative Distribution Function (CDF): The cumulative distribution function (CDF) of ANY random variable
+(discrete or continuous) is defined to be the function FX : R → R with FX (t) = P (X ≤ t). If X is a continuous RV, we have:
+Alex Tsun                                                               Probability & Statistics with Applications to Computing 5
+
+                            Rt
+   • FX (t) = P (X ≤ t) =   −∞
+                                 fX (w) dw for all t ∈ R
+      d
+   • du FX (u) = fX (u)
+
+Univariate: Discrete to Continuous:
+                         Discrete                                 Continuous
+ PMF/PDF                 pX (x) = P (X = x)                       fX (x) 6= PR(X = x) = 0
+                                    P                                          x
+ CDF                     FX (x) = t≤x pX (t)                      FX (x) = −∞ fX (t) dt
+                         P                                        R∞
+ Normalization              x pX (x) = 1                           −∞ X
+                                                                       f (x) dx = 1
+                                     P                                         R∞
+ Expectation/LOTUS       E [g(X)] = x g(x)pX (x)                  E [g(X)] = −∞ g(x)fX (x) dx
+4.2    Zoo of Continuous RVs
+Uniform Random Variable (Continuous): X ∼ Uniform(a, b) (Unif(a, b) for short) iff X has PDF:
+
+                                                               1
+                                                          
+                                                              b−a    if x ∈ ΩX = [a, b]
+                                            fX (x) =
+                                                              0      otherwise
+                                  2
+                             (b−a)
+E [X] = a+b
+          2 and Var (X) =      12 . This represents each real number from [a, b] to be equally likely. Do NOT confuse this
+with its discrete counterpart!
+Exponential Random Variable: X ∼ Exponential(λ) (Exp(λ) for short) iff X has PDF:
+
+                                                          λe−λx
+                                                      
+                                                                      if x ∈ ΩX = [0, ∞)
+                                           fX (x) =
+                                                          0           otherwise
+
+E [X] = λ1 and Var (X) = λ12 . FX (x) = 1 − e−λx for x ≥ 0. The exponential RV is the continuous analog of the geometric
+RV: it represents the waiting time to the next event, where λ > 0 is the average number of events per unit time. Note that
+the exponential measures how much time passes until the next event (any real number, continuous), whereas the Poisson
+measures how many events occur in a unit of time (nonnegative integer, discrete). The exponential RV is also memoryless:
+
+                                      for any s, t ≥ 0, P (X > s + t | X > s) = P (X > t)
+
+Gamma Random Variable: X ∼ Gamma(r, λ) (Gam(r, λ) for short) iff X has PDF:
+
+                                                      λr r−1 −λx
+                                          fX (x) =        x e    , x ∈ ΩX = [0, ∞)
+                                                     Γ(r)
+
+E [X] = λr and Var (X) = λr2 . X is the sum of r iid Exp(λ) random variables. In the above PDF, for positive integers r,
+Γ(r) = (r − 1)! (a normalizing constant). An example of a Gamma RV is the waiting time until the r-th event in the Poisson
+process. If X1 , . . . , Xn are independent Gamma RV’s, where Xi ∼ Gam(ri , λ), then X = X1 +. . .+Xn ∼ Gam(r1 +. . .+rn , λ).
+It also serves as a conjugate prior for λ in the Poisson and Exponential distributions.
+4.3    The Normal/Gaussian Random Variable
+Normal (Gaussian, “bell curve”) Random Variable: X ∼ N (µ, σ 2 ) iff X has PDF:
+
+                                                        1    1 (x−µ)
+                                                                    2
+
+                                           fX (x) =    √ e − 2 σ 2 , x ∈ ΩX = R
+                                                      σ 2π
+E [X] = µ and Var (X) = σ 2 . The “standard normal” random variable is typically denoted Z and has mean 0 and variance 1:
+if X ∼ N (µ, σ 2 ), then Z = X−µ
+                              σ  ∼ N (0, 1). The CDF has no closed form, but we denote the CDF of the standard normal as
+Φ (z) = FZ (z) = P (Z ≤ z). Note from symmetry of the probability density function about z = 0 that: Φ (−z) = 1 − Φ(z).
+Closure of the Normal Under Scale and Shift: If X ∼ N (µ, σ 2 ), then aX + b ∼ N (aµ + b, a2 σ 2 ). In particular, we
+can always scale/shift to get the standard Normal: X−µ
+                                                    σ  ∼ N (0, 1).
+                                                      2
+Closure of the Normal Under Addition: If X ∼ N (µX , σX ) and Y ∼ N (µY , σY2 ) are independent, then
+
+                                       aX + bY + c ∼ N (aµX + bµY + c, a2 σX
+                                                                           2
+                                                                             + b2 σY2 )
+Alex Tsun                                                                           Probability & Statistics with Applications to Computing 6
+
+4.4     Transforming Continuous RVs
+Steps to compute PDF of Y = g(X) from X (via CDF): Suppose X is a continuous RV.
+
+    1. Write down the range ΩX , PDF fX , and CDF FX .
+
+    2. Compute the range ΩY = {g(x) : x ∈ ΩX }.
+    3. Start computing the CDF of Y on ΩY , FY (y) = P (g(X) ≤ y), in terms of FX .
+    4. Differentiate the CDF FY (y) to get the PDF fY (y) on ΩY . fY is 0 outside ΩY .
+
+Explicit Formula to compute PDF of Y = g(X) from X (Univariate Case): Suppose X is a continuous RV. If Y =
+g(X) and g : ΩX → ΩY is strictly monotone and invertible with inverse X = g −1 (Y ) = h(Y ), then
+
+                                                  fX (h(y)) · |h0 (y)| if y ∈ ΩY
+                                                
+                                       fY (y) =
+                                                  0                    otherwise
+
+
+Explicit Formula to compute PDF of Y = g(X) from X (Multivariate Case):                      Let X = (X1 , ..., Xn ), Y =
+(Y1 , ..., Yn ) be continuous random vectors (each component is a continuous rv) with the same dimension n (so ΩX , ΩY ⊆ Rn ),
+and Y = g(X) where g : ΩX → ΩY is invertible and differentiable, with differentiable inverse X = g −1 (y) = h(y). Then,
+                                                                                                  
+                                                                                           ∂h(y)
+                                                      fY (y) = fX (h(y)) det
+                                                                                            ∂y
+                   
+            ∂h(y)
+where        ∂y         ∈ Rn×n is the Jacobian matrix of partial derivatives of h, with
+                                                                      
+                                                               ∂h(y)                ∂(h(y))i
+                                                                                =
+                                                                ∂y         ij         ∂yj
+
+5     Multiple Random Variables
+5.1     Joint Discrete Distributions
+Cartesian Product of Sets: The Cartesian product of sets A and B is denoted: A × B = {(a, b) : a ∈ A, b ∈ B}.
+Joint PMFs: Let X, Y be discrete random variables. The joint PMF of X and Y is:
+
+                                                        pX,Y (a, b) = P (X = a, Y = b)
+
+The joint range is the set of pairs (c, d) that have nonzero probability:
+
+                                                ΩX,Y = {(c, d) : pX,Y (c, d) > 0} ⊆ ΩX × ΩY
+
+Note that the probabilities in the table must sum to 1:
+                                                     X
+                                                                        pX,Y (s, t) = 1
+                                                           (s,t)∈ΩX,Y
+
+
+Further, note that if g : R2 → R is a function, then LOTUS extends to the multidimensional case:
+                                                         X X
+                                          E [g(X, Y )] =        g(x, y)pX,Y (x, y)
+                                                                 x∈ΩX y∈ΩY
+
+                                                                                                                    P
+Marginal PMFs: Let X, Y be discrete random variables. The marginal PMF of X is: pX (a) =                              b∈ΩY pX,Y (a, b).
+
+Independence (DRVs): Discrete RVs X, Y are independent, written X ⊥ Y , if for all x ∈ ΩX and y ∈ ΩY : pX,Y (x, y) =
+pX (x)pY (y).
+Variance Adds for Independent RVs: If X ⊥ Y , then: Var (X + Y ) = Var (X) + Var (Y ).
+Alex Tsun                                                            Probability & Statistics with Applications to Computing 7
+
+5.2    Joint Continuous Distributions
+Joint PDFs: Let X, Y be continuous random variables. The joint PDF of X and Y is:
+
+                                                         fX,Y (a, b) ≥ 0
+
+The joint range is the set of pairs (c, d) that have nonzero density:
+
+                                         ΩX,Y = {(c, d) : fX,Y (c, d) > 0} ⊆ ΩX × ΩY
+
+Note that the double integral over all values must be 1:
+                                               Z ∞Z ∞
+                                                             fX,Y (u, v)dudv = 1
+                                                  −∞   −∞
+
+Further, note that if g : R2 → R is a function, then LOTUS extends to the multidimensional case:
+                                                        Z ∞Z ∞
+                                         E [g(X, Y )] =        g(s, t)fX,Y (s, t)dsdt
+                                                         −∞    −∞
+
+The joint PDF must satisfy the following (similar to univariate PDFs):
+                                                                     Z bZ d
+                                      P (a ≤ X < b, c ≤ Y ≤ d) =               fX,Y (x, y)dydx
+                                                                       a   c
+
+                                                                                                         R∞
+Marginal PDFs: Let X, Y be continuous random variables. The marginal PDF of X is: fX (x) =               −∞
+                                                                                                              fX,Y (x, y)dy.
+Independence of Continuous Random Variables: Continuous RVs X, Y are independent, written X ⊥ Y , if for all
+x ∈ ΩX and y ∈ ΩY , fX,Y (x, y) = fX (x)fY (y).
+5.3    Conditional Distributions
+Conditional PMFs and PDFs: If X, Y are discrete, the conditional PMF of X given Y is:
+
+                                                                    pX,Y (a, b)   pY |X (b | a)pX (a)
+                              pX|Y (a | b) = P (X = a | Y = b) =                =
+                                                                      pY (b)             pY (b)
+
+Similarly for continuous RVs, but with f ’s instead of p’s (PDFs instead of PMFs).
+Conditional Expectation: If X is discrete (and Y is either discrete or continuous), then we define the conditional expec-
+tation of g(X) given (the event that) Y = y as:
+                                                            X
+                                         E [g(X) | Y = y] =    g(x)pX|Y (x | y)
+                                                                x∈ΩX
+
+
+If X is continuous (and Y is either discrete or continuous), then
+                                                             Z ∞
+                                          E [g(X) | Y = y] =      g(x)fX|Y (x | y)dx
+                                                                −∞
+
+
+Notice that these sums and integrals are over x (not y), since E [g(X) | Y = y] is a function of y.
+Law of Total Expectation (LTE): Let X, Y be jointly distributed random variables.
+If Y is discrete (and X is either discrete or continuous), then:
+                                                        X
+                                             E [g(X)] =      E [g(X) | Y = y] pY (y)
+                                                       y∈ΩY
+
+
+If Y is continuous (and X is either discrete or continuous), then
+                                                      Z ∞
+                                          E [g(X)] =      E [g(X) | Y = y] fY (y)dy
+                                                        −∞
+
+
+Basically, for E [g(X)], we take a weighted average of E [g(X) | Y = y] over all possible values of y.
+Alex Tsun                                                             Probability & Statistics with Applications to Computing 8
+
+
+Multivariate: Discrete to Continuous:
+                    Discrete                                        Continuous
+ Joint Dist         pX,Y (x, y) = P (X = x, Y = y)                  fX,Y (x, y) 6= PR(X =   x, Y = y)
+                                    P                                                 x Ry
+ Joint CDF          FX,Y (x, y) = t≤x,s≤y pX,Y (t, s)               FX,Y (x, y) = −∞ −∞ fX,Y (t, s) dsdt
+                    P                                               R∞ R∞
+ Normalization         x,y pX,YP(x, y) = 1                           −∞ −∞R X,Y
+                                                                               f     (x, y) dxdy = 1
+                                                                                ∞
+ Marginal Dist      pX (x) = y pX,Y (x, y)                          fX (x) = −∞ fX,Y (x, y)dy
+                                    P                                               RR
+ Expectation        E [g(X, Y )] = x,y g(x, y)pX,Y (x, y)           E [g(X, Y )] =      g(x, y)fX,Y (x, y)dxdy
+                                      p   (x,y)                                   f   (x,y)
+ Conditional Dist       pX|Y (x|y) = X,Y pP
+                                          Y (y)
+                                                                    fX|Y (x|y) = X,Y fRY (y)
+                                                                                        ∞
+ Conditional Exp        E [X|Y = y] = x xpX|Y (x|y)                 E [X|Y = y] = −∞ xfX|Y (x|y)dx
+ Independence           ∀x, y, pX,Y (x, y) = pX (x)pY (y)           ∀x, y, fX,Y (x, y) = fX (x)fY (y)
+5.4    Covariance and Correlation
+Covariance: The covariance of X and Y is:
+
+                               Cov (X, Y ) = E [(X − E [X])(Y − E [Y ])] = E [XY ] − E [X] E [Y ]
+
+Covariance satisfies the following properties:
+
+  1. If X ⊥ Y , then Cov (X, Y ) = 0 (but not necessarily vice versa).
+
+  2. Cov (X, X) = Var (X). (Just plug in Y = X).
+  3. Cov (X, Y ) = Cov (Y, X). (Multiplication is commutative).
+  4. Cov (X + c, Y ) = Cov (X, Y ). (Shifting doesn’t and shouldn’t affect the covariance).
+
+  5. Cov (aX + bY, Z) = a · Cov (X) Z + b · Cov (Y, Z). This can be easily remembered like the distributive property of scalars
+     (aX + bY )Z = a(XZ) + b(Y Z).
+  6. Var (X + Y ) = Var (X) + Var (Y ) + 2Cov (X, Y ), and hence if X ⊥ Y , then Var (X + Y ) = Var (X) + Var (Y ).
+         P                   
+            n         Pm         Pn Pm
+  7. Cov    i=1 X i ,  j=1 Yi   = i=1 j=1 Cov (Xi , Yj ). That is covariance works like FOIL (first, outer, inner, last) for
+      multiplication of sums ((a + b + c)(d + e) = ad + ae + bd + be + cd + ce).
+
+(Pearson) Correlation: The (Pearson) correlation of X and Y is: ρ(X, Y ) = √ Cov(X,Y
+                                                                                 √ )                             .
+                                                                                              Var(X)   Var(Y )
+It is always true that −1 ≤ ρ(X, Y ) ≤ 1. That is, correlation is just a normalized version of covariance. Most notably,
+ρ(X, Y ) = ±1 if and only if Y = aX + b for some constants a, b ∈ R, and then the sign of ρ is the same as that of a.
+Variance of Sums of RVs: Let X1 , . . . , Xn be any RVs (independent or not). Then,
+                                           n
+                                               !     n
+                                          X         X                X
+                               Var           Xi =      Var (Xi ) + 2   Cov (Xi , Xj )
+                                             i=1            i=1             i<j
+
+
+5.5    Convolution
+Law of Total Probability for Random Variables:
+Discrete version: If X, Y are discrete:
+                                                 X               X
+                                        pX (x) =   pX,Y (x, y) =   pX|Y (x | y)pY (y)
+                                                       y               y
+
+Continuous version: If X, Y are continuous:
+                                           Z ∞                 Z ∞
+                                  fX (x) =     fX,Y (x, y)dy =     fX|Y (x | y)fY (y)dy
+                                                  −∞                   −∞
+
+
+Convolution: Let X, Y be independent RVs, and Z = X + Y .
+Discrete version: If X, Y are discrete:           X
+                                         pZ (z) =    pX (x)pY (z − x)
+                                                             x∈ΩX
+Alex Tsun                                                           Probability & Statistics with Applications to Computing 9
+
+
+Continuous version: If X, Y are continuous:
+                                                         Z
+                                              fZ (z) =          fX (x)fY (z − x)dx
+                                                         x∈ΩX
+
+
+5.6    Moment Generating Functions
+                                                                                             
+Moments: Let X be    a random
+                               variable and c ∈ R a scalar. Then: The k-th moment of X is E X k and the k-th moment
+of X (about c) is: E (X − c)k .
+Moment Generating Functions (MGFs): The moment generating function (MGF) of X is a function of a dummy
+                                                     
+variable t (use LOTUS to compute this): MX (t) = E etX .
+Properties and Uniqueness of Moment Generating Functions: For a function f : R → R, we will denote f (n) (x) to
+be the n-th derivative of f (x). Let X, Y be independent random variables, and a, b ∈ R be scalars. Then MGFs satisfy the
+following properties:
+       0                 00
+                                                         (n)
+  1. MX  (0) = E [X], MX    (0) = E X 2 , and in general MX = E [X n ]. This is why we call MX a moment generating
+     function, as we can use it to generate the moments of X.
+
+  2. MaX+b (t) = etb MX (at).
+  3. If X ⊥ Y , then MX+Y (t) = MX (t)MY (t).
+  4. (Uniqueness) The following are equivalent:
+      (a) X and Y have the same distribution.
+      (b) fX (z) = fY (z) for all z ∈ R.
+       (c) FX (z) = FY (z) for all z ∈ R.
+      (d) There is an ε > 0 such that MX (t) = MY (t) for all t ∈ (−ε, ε).
+      That is MX uniquely identifies a distribution, just like PDFs/PMFs or CDFs do.
+
+5.7    Limit Theorems
+The Sample Mean + Properties: Let X1 , X2 , . . . , Xn be a sequence of iid RVs with mean µ and variance σ 2 . The
+                        Pn
+sample mean is: X̄n = n1 i=1 Xi . Further, E X̄n = µ and Var X̄n = σ 2 /n
+                                                               
+
+The Law of Large Numbers (LLN): Let X1 , . . . , Xn be iid RVs with the same mean µ. As n → ∞, the sample mean
+X n converges to the true mean µ.
+The Central Limit Theorem (CLT): Let X1 , . . . Xn be a sequence of iid RVs with mean µ and (finite) variance σ 2 .
+Then as n → ∞,
+                                                           σ2
+                                                             
+                                             X̄n → N µ,
+                                                           n
+The mean or variance are not a surprise; the importance of the CLT is, regardless of the distribution of Xi ’s, the sample
+mean approaches a Normal distribution as n → ∞.
+The Continuity Correction: When approximating an integer-valued (discrete) random variable X with a continuous one
+Y (such as in the CLT), if asked to find a P (a ≤ X ≤ b) for integers a ≤ b, you should use P (a − 0.5 ≤ Y ≤ b + 0.5) so that
+the width of the interval being integrated is the same as the number of terms summed over (b − a + 1).
+5.8    The Multinomial Distribution
+Random Vectors (RVTRs): Let X1 , ..., Xn be random variables. We say X = (X1 , . . . , Xn )T is a random vector.
+Expectation is defined pointwise: E [X] = (E [X1 ] , . . . , E [Xn ])T .
+Covariance Matrices: The covariance matrix of a random vector X ∈ Rn with E [X] = µ is the matrix Σ = Var (X) =
+Alex Tsun                                                                       Probability & Statistics with Applications to Computing 10
+
+
+Cov (X) whose entries Σij = Cov (Xi , Xj ). The formula for this is:
+
+                           Σ = Var (X) = Cov (X) = E (X − µ)(X − µ)T = E XXT − µµT
+                                                                                   
+                                                                                   
+                                    Var (X1 )     Cov (X1 , X2 ) ... Cov (X1 , Xn )
+                                 Cov (X2 , X1 )    Var (X2 )     ... Cov (X2 , Xn )
+                             =
+                                                                                   
+                                         ..             ..        . .       ..      
+                                         .              .            .      .      
+                                 Cov (Xn , X1 ) Cov (Xn , X2 ) ...      Var (Xn )
+
+Notice that the covariance matrix is symmetric (Σij = Σji ), and has variances on the diagonal.
+The PMultinomial Distribution: Suppose there are r outcomes, with probabilities p = (p1 , p2 , ..., pr ) respectively, such
+       r
+that i=1 pi = 1. Suppose we have n independent trials, and let Y = (Y1 , Y2 , ..., Yr ) be the rvtr of counts of each outcome.
+Then, we say Y ∼ Multr (n, p):
+The joint PMF of Y is:
+                                                                          Yr                              r
+                                                                    n                                       X
+                             pY1 ,...,Yr (k1 , ...kr ) =                       pki ,   k1 , ...kr ≥ 0 and         ki = n
+                                                               k1 , ..., kr i=1 i                           i=1
+
+Notice that each Yi is marginally Bin(n, pi ). Hence, E [Yi ] = npi and Var (Yi ) = npi (1 − pi ).
+Then, we can specify the entire mean vector E [Y] and covariance matrix:
+                                              
+                                         np1
+                         E [Y] = np =  ...        Var (Yi ) = npi (1 − pi )    Cov (Yi , Yj ) = −npi pj
+                                              
+
+                                               npr
+
+The Multivariate Hypergeometric (MVHG) Distribution: Suppose there are r different colors of balls in a bag,
+                                                                         Pr
+having K = (K1 , ..., Kr ) balls of each color, 1 ≤ i ≤ r. Let N = i=1 Ki be the total number of balls in the bag, and suppose
+we draw n without replacement. Let Y = (Y1 , ..., Yr ) be the rvtr such that Yi is the number of balls of color i we drew. We
+write that Y ∼ MVHGr (N, K, n) The joint PMF of Y is:
+                                                     Qr    Ki
+                                                                                                   r
+                                                      i=1 ki
+                                                                                                    X
+                         pY1 ,...,Yr (k1 , ...kr ) =    N
+                                                               , 0 ≤ ki ≤ Ki for all 1 ≤ i ≤ r and   kr = n
+                                                           n                                                      i=1
+
+Notice that each Yi is marginally HypGeo(N, Ki , n), so E [Yi ] = n K
+                                                                    N and
+                                                                      i
+
+              Ki N − Ki N − n
+Var (Yi ) = n    ·       ·        . The mean vector E [Y] and covariance matrix are:
+              N      N     N −1
+                             K1 
+                             nN
+                       K  .                         Ki N − Ki N − n                           Ki Kj N − n
+              E [Y] = n =  ..         Var (Yi ) = n   ·           ·       Cov (Yi , Yj ) = −n      ·
+                       N       Kr
+                                                      N      N        N − 1                     N N N −1
+                             nN
+
+5.9    The Multivariate Normal Distribution
+Properties of Expectation and Variance Hold for RVTRs: Let X be an n-dimensional RVTR, A ∈ Rn×n be a con-
+stant matrix, b ∈ Rn be a constant vector. Then: E [AX + b] = AE [X] + b and Var (AX + b) = AVar (X) AT .
+The Multivariate Normal Distribution: A random vector X = (X1 , ..., Xn ) has a multivariate Normal distribution
+with mean vector µ ∈ Rn and (symmetric and positive-definite) covariance matrix Σ ∈ Rn×n , written X ∼ Nn (µ, Σ), if it
+has the following joint PDF:
+                                                                           
+                                          1             1       T −1
+                           fX (x) =                exp − (x − µ) Σ (x − µ) ,        x ∈ Rn
+                                    (2π)n/2 |Σ|1/2      2
+Additionally, let us recall that for any RVs X and Y : X ⊥ Y → Cov (X, Y ) = 0. If X = (X1 , . . . , Xn ) is Multivariate Normal,
+the converse also holds: Cov (Xi , Xj ) = 0 → Xi ⊥ Xj .
+5.10     Order Statistics
+Order Statistics: Suppose Y1 , ..., Yn are iid continuous random variables with common PDF fY and common CDF FY .
+We sort the Yi ’s such that Ymin ≡ Y(1) < Y(2) < ... < Y(n) ≡ Ymax .
+Alex Tsun                                                         Probability & Statistics with Applications to Computing 11
+
+
+Notice that we can’t have equality because with continuous random variables, the probability that any two are equal is 0.
+Notice that each Y(i) is a random variable as well! We call Y(i) the ith order statistic, i.e. the ith smallest in a sample of
+size n. The density function of each Y(i) is
+                                                        
+                                                 n
+                            fY(i) (y) =                    · [FY (y)]i−1 · [1 − FY (y)]n−i · fY (y), y ∈ ΩY
+                                          i − 1, 1, n − i
+
+
+6     Concentration Inequalities
+6.1    Markov and Chebyshev Inequalities
+                                                                                        E [X]
+Markov’s Inequality: Let X ≥ 0 be a non-negative RV, and let k > 0. Then: P (X ≥ k) ≤         .
+                                                                                          k
+Chebyshev’s Inequality: Let X be any RV with expected value µ = E[X] and finite variance Var (X). Then, for any real
+                                      Var (X)
+number α > 0. Then, P (|X − µ| ≥ α) ≤         .
+                                        α2
+6.2    The Chernoff Bound
+Chernoff Bound for Binomial: Let X ∼ Bin(n, p) and let µ = E[X]. For any 0 < δ < 1:
+                                              2 
+                                                                                                    δ2 µ
+                                                                                                            
+                                                δ µ
+                       P (X ≥ (1 + δ)µ) ≤ exp −                and         P (X ≤ (1 − δ)µ) ≤ exp −
+                                                 3                                                   2
+
+6.3    Even More Inequalities
+                                                                                  Sn             Pn
+The Union Bound: Let E1 , E2 , ..., En be a collection of events. Then: P (         i=1 Ei ) ≤    i=1 P (Ei ).
+A similar statement also holds if the number of events is countably infinite.
+Convex Sets: A set S ⊆ Rn is a convex set if for any x1 , . . . , xm ∈ S
+                                  (m                                  m
+                                                                               )
+                                    X                                X
+                                       pi xi : p1 , ..., pm ≥ 0 and      pi = 1 ⊆ S
+                                          i=1                              i=1
+
+
+Convex Functions: Let SP       ⊆ Rn be a convex set. A function g : S → R is a convex function if for any x1 , ..., xm ∈ S,
+                                m
+and p1 , ..., pm ≥ 0 such that i=1 pi = 1,                   !
+                                                    Xm          Xm
+                                                g      p i xi ≤     pi g(xi )
+                                                      i=1            i=1
+
+
+Jensen’s Inequality: Let X be any RV, and g : R → R be convex. Then, g(E [X]) ≤ E [g(X)].
+Hoeffding’s Inequality: Let X1 , ...Xn be independent random variables, where each Xi is bounded: ai ≤ Xi ≤ bi and let
+X n be their sample mean. Then,
+
+                                                                       2n2 t2
+                                                                                    
+                                                     
+                                  P |X n − E X n | ≥ t ≤ 2 exp Pn                  2
+                                                                    i−1 (bi − ai )
+
+In the case X1 , ..., Xn are iid (so a ≤ Xi ≤ b for all i) with mean µ, then
+
+                                                                  2n2 t2                2nt2
+                                                                                            
+                                                   
+                                    P |X n − µ| ≥ t ≤ 2 exp                 = 2 exp
+                                                                n(b − a)2             (b − a)2
+
+
+
+7     Statistical Estimation
+7.1    Maximum Likelihood Estimation
+Realization / Sample: A realization/sample x of a random variable X is the value that is actually observed (will always
+be in ΩX ).
+Alex Tsun                                                                 Probability & Statistics with Applications to Computing 12
+
+
+Likelihood: Let x = (x1 , ..., xn ) be iid realizations from PMF pX (t | θ) (if X is discrete), or from density fX (t | θ) (if X is
+continuous), where θ is a parameter (or vector of parameters). We define the likelihood of x given θ to be the “probability”
+of observing x if the true parameter is θ. The log-likelihood is just the log of the likelihood, which is typically easier to
+optimize.
+If X is discrete,
+                                             Yn                                 Xn
+                                 L(x | θ) =      pX (xi | θ)    ln L(x | θ) =      ln pX (xi | θ)
+                                              i=1                                         i=1
+
+If X is continuous,
+                                              n
+                                              Y                                           n
+                                                                                          X
+                                 L(x | θ) =         fX (xi | θ)           ln L(x | θ) =         ln fX (xi | θ)
+                                              i=1                                         i=1
+
+
+Maximum Likelihood Estimator (MLE): Let x = (x1 , ..., xn ) be iid realizations from probability mass function pX (t | θ)
+(if X is discrete), or from density fX (t | θ) (if X is continuous), where θ is a parameter (or vector of parameters). We define
+the maximum likelihood estimator (MLE) θ̂M LE of θ to be the parameter which maximizes the likelihood/log-likelihood:
+
+                                         θ̂M LE = arg max L(x | θ) = arg max ln L(x | θ)
+                                                             θ                     θ
+
+
+7.2    MLE Examples
+7.3    Method of Moments Estimation
+Sample Moments: Let X be a random variable, and c ∈ R a scalar. Let x1 , . . . , xn be iid realizations (samples) from X.
+                                  Pn
+The k th sample moment of X is: n1 i=1 xki .
+                                             Pn
+The k th sample moment of X (about c) is: n1 i=1 (xi − c)k .
+Method of Moments Estimation: Let x = (x1 , . . . , xn ) be iid realizations (samples) from PMF pX (t; θ) (if X is discrete),
+or from density fX (t; θ) (if X continuous), where θ is a parameter (or vector of parameters).
+
+We then define the Method of Moments (MoM) estimator θ̂M oM of θ = (θ1 , . . . , θk ) to be a solution (if it ex-
+ists) to the k simultaneous equations where, for j = 1, . . . , k, we set the j th true and sample moments equal:
+                                               Pn                                     Pn
+                                    E [X] = n1 i=1 xi                    E X k = n1 i=1 xki
+                                                                            
+                                                                 ···
+
+7.4    The Beta and Dirichlet Distributions
+Beta Random Variable: X ∼ Beta(α, β), if and only if X has the following PDF:
+
+                                                  (
+                                                        1      α−1
+                                                      B(α,β) x     (1 − x)β−1 ,    x ∈ ΩX = [0, 1]
+                                      fX (x) =
+                                                      0,                           otherwise
+
+X is typically the belief distribution about some unknown probability of success, where we pretend we’ve seen α − 1 successes
+and β − 1 failures. Hence the mode (most likely value of the probability/point with highest density) arg max fX (x), is
+                                                                                                                 x∈[0,1]
+
+                                                                         α−1
+                                                           mode[X] = (α−1)+(β−1)
+
+Also note that there is an annoying “off-by-1” issue: (α − 1 heads and β − 1 tails), so when choosing these parameters, be
+careful! It also serves as a conjugate prior for p in the Bernoulli and Geometric distributions.
+Dirichlet RV: X ∼ Dir(α1 , α2 , . . . , αr ), if and only if X has the following density function:
+
+                                             (          Qr                                  Pr
+                                                  1             ai −1
+                                                 B(α)      i=1 xi     ,   xi ∈ (0, 1) and        i=1 xi = 1
+                                  fX (x) =
+                                               0,                         otherwise
+This is a generalization of the Beta random variable from 2 outcomes to r. The random vector X is typically the belief
+distribution about some unknown probabilities of the different outcomes, where we pretend we saw a1 − 1 outcomes of type
+1, a2 − 1 outcomes of type 2, . . . , and ar − 1 outcomes of type r . Hence, the mode of the distribution is the vector,
+arg        max P     fX (x), is
+   x∈[0,1]d and   xi =1
+Alex Tsun                                                                    Probability & Statistics with Applications to Computing 13
+
+                                                                                                               
+                                        mode[X] =         Pr α1 −1            −1
+                                                                       , Pr α2(a                     −1
+                                                                                      , . . . , Pr αr(a
+                                                           i=1 (ai −1)    i=1   i −1)            i=1    i −1)
+
+
+
+
+7.5     Maximum A Posteriori Estimation
+Maximum A Posteriori (MAP) Estimation: Let x = (x1 , . . . , xn ) be iid realizations from PMF pX (t ; Θ = θ) (if X
+discrete), or from density fX (t ; Θ = θ) (if X continuous), where Θ is the random variable representing the parameter (or
+vector of parameters). We define the Maximum A Posteriori (MAP) estimator θ̂M AP of Θ to be the parameter which
+maximizes the posterior distribution of Θ given the data (the mode).
+
+                                          θ̂M AP = argmax πΘ (θ | x) = argmax L(x | θ)πΘ (θ)
+                                                            θ                          θ
+
+
+7.6     Properties of Estimators I
+                                                                                           h i
+Bias: Let θ̂ be an estimator for θ. The bias of θ̂ as an estimator for θ is Bias(θ̂, θ) = E θ̂ − θ. If Bias(θ̂, θ) = 0, or
+               h i
+equivalently E θ̂ = θ, then we say θ̂ is an unbiased estimator of θ̂.
+                                                                                                            h         i
+Mean Squared Error (MSE): The mean squared error (MSE) of an estimator θ̂ of θ is MSE(θ̂, θ) = E (θ̂ − θ)2 .
+                                             h i                                                
+If θ̂ is an unbiased estimator of θ (i.e. E θ̂ = θ), then you can see that MSE(θ̂, θ) = Var θ̂ . In fact, in general
+                  
+MSE(θ̂, θ) = Var θ̂ + Bias(θ̂, θ)2 .
+7.7     Properties of Estimators II
+Consistency: An estimator θ̂n (depending on n iid samples) of θ is said to be consistent if it converges (in probability) to
+                                             
+θ. That is, for any ε > 0, lim P |θ̂n − θ| > ε = 0.
+                             n→∞
+
+Fisher Information: Let x = (x1 , ..., xn ) be iid realizations from PMF pX (t | θ) (if X is discrete), or from density function
+fX (t | θ) (if X is continuous), where θ is a parameter (or vector of parameters). The Fisher Information of a parameter θ
+is defined to be                                  "               2 #       2            
+                                                     ∂ ln L(x | θ)            ∂ ln L(x | θ)
+                                     I(θ) = n · E                       = −E
+                                                          ∂θ                      ∂θ2
+
+Cramer-Rao Lower Bound (CRLB): Let x = (x1 , ..., xn ) be iid realizations from PMF pX (t | θ) (if X is discrete), or
+from density function fX (t | θ) (if X is continuous), where θ is a parameter (or vector of parameters). If θ̂ is an unbiased
+estimator for θ, then
+                                                                       1
+                                                 MSE(θ̂, θ) = Var θ̂ ≥
+                                                                        I(θ)
+                                                                                 1
+That is, for any unbiased estimator θ̂ for θ, the variance (=MSE) is at least I(θ) . If we achieve this lower bound, meaning
+                                  1
+our variance is exactly equal to I(θ) , then we have the best variance possible for our estimate. Hence, it is the minimum
+variance unbiased estimator (MVUE) for θ.
+                                                                                                      I(θ)−1
+Efficiency: Let θ̂ be an unbiased estimator of θ. The efficiency of θ̂ is e(θ̂, θ) =                       ≤ 1.
+                                                                                                      Var θ̂
+An estimator is said to be efficient if it achieves the CRLB - meaning e(θ̂, θ) = 1.
+7.8     Properties of Estimators III
+                                                                                                                                  Pn
+Statistic: A statistic is any function T : Rn → R of samples x = (x1 , . . . , xn ). For example, T (x1 , . . . , xn ) = i=1 xi (the
+sum), T (x1 , . . . , xn ) = max{x1 , . . . , xn } (the max/largest value), T (x1 , . . . , xn ) = x1 (just take the first sample)
+Sufficiency: A statistic T = T (X1 , . . . , Xn ) is a sufficient statistic if the conditional distribution of X1 , . . . , Xn given
+T = t and θ does not depend on θ.
+
+                              P (X1 = x1 , . . . , Xn = xn | T = t, θ) = P (X1 = x1 , . . . , Xn = xn | T = t)
+
+Neyman-Fisher Factorization Criterion (NFFC):                                Let x1 , . . . , xn be iid random samples with likelihood
+L(x1 , . . . , xn |θ). A statistic T = T (x1 , . . . , xn ) is sufficient if and only if there exist non-negative functions g and h such that:
+Alex Tsun                                                                 Probability & Statistics with Applications to Computing 14
+
+
+                                    L(x1 , . . . , xn | θ) = g(x1 , . . . , xn ) · h(T (x1 , . . . , xn ), θ)
+
+
+8     Statistical Inference
+8.1     Confidence Intervals
+Confidence Interval: Suppose you have iid samples x1 ,...,xn from some distribution with unknown parameter θ, and you
+have some estimator θ̂ for θ.
+                                                                                                 h              i
+A 100(1 − α)% confidence interval for θ is an interval (typically but not always) centered at θ̂, θ̂ − ∆, θ̂ + ∆ , such that
+the probability (over the randomness in the samples x1 ,...,xn ) θ lies in the interval is 1 − α:
+                                                   h                 i
+                                              P θ ∈ θ̂ − ∆, θ̂ + ∆ = 1 − α
+          Pn
+If θ̂ = n1 i=1 xi is the sample mean, then θ̂ is approximately normal by the CLT, and a 100(1 − α)% confidence interval is
+given by the formula:                                                           
+                                                             σ               σ
+                                                 θ̂ − z1−α/2 √ , θ̂ + z1−α/2 √
+                                                              n                n
+where z1−α/2 = Φ−1 1 − α2 and σ is the true standard deviation of a single sample (which may need to be estimated).
+                            
+
+8.2     Credible Intervals
+Credible Intervals: Suppose you have iid samples x = (x1 , ..., xn ) from some distribution with unknown parameter Θ.
+You are in the Bayesian setting, so you have chosen a prior distribution for the RV Θ.
+
+A 100(1 − α)% credible interval for Θ is an interval [a, b] such that the probability (over the randomness in Θ) that Θ lies
+in the interval is 1 − α:
+                                                  P (Θ ∈ [a, b]) = 1 − α
+
+If we’ve chosen the appropriate conjugate prior for the sampling distribution (like Beta for Bernoulli), the posterior is easy
+to compute. Say the CDF of the posterior is FY . Then, a 100(1 − α)% credible interval is given by
+                                                 h     α            α i
+                                                  FY−1     , FY−1 1 −
+                                                         2             2
+
+8.3     Introduction to Hypothesis Testing
+Hypothesis Testing Procedure:
+
+    1. Make a claim (like ”Airplane food is good”, ”Pineapples belong on pizza”, etc...)
+
+    2. Set up a null hypothesis H0 and alternative hypothesis HA .
+       (a) Alternative hypothesis can be one-sided or two-sided.
+       (b) The null hypothesis is usually a ”baseline”, ”no effect”, or ”benefit of the doubt”.
+        (c) The alternative is what you want to ”prove”, and is opposite the null.
+
+    3. Choose a significance level α (usually α = 0.05 or 0.01).
+    4. Collect data.
+    5. Compute a p-value, p = P (observing data at least as extreme as ours | H0 is true).
+
+    6. State your conclusion. Include an interpretation in the context of the problem.
+       (a) If p < α, ”reject” the null hypothesis H0 in favor of the alternative HA .
+       (b) Otherwise, ”fail to reject” the null hypothesis H0 .
+

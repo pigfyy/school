@@ -1,0 +1,83 @@
+/* CSE 312 week 1 (template) · course.css: this course's widgets only.
+   Loaded after base.css; uses only base tokens (--a1/--a2/--a3, --ink*, --paper*, --surface, --line*, --night*,
+   --right/--wrong/--note, --sans/--mono, --r/--r-lg). The signature piece is the slot strip of the product rule. */
+
+/* ---------------------------------------------------------------- slot strip */
+.slots { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.5rem 0.6rem; margin: 1rem 0 1.25rem; }
+.slot { display: flex; flex-direction: column; align-items: center; min-width: 3.4rem; }
+.slot b {
+  display: block; min-width: 3.4rem; padding: 0.35rem 0.6rem 0.25rem;
+  font-family: var(--mono); font-size: var(--step-2); font-weight: 600; text-align: center;
+  background: var(--a1-tint); border-bottom: 4px solid var(--a1); border-radius: var(--r) var(--r) 0 0;
+}
+.slot span { font-size: 0.8rem; color: var(--ink-soft); margin-top: 0.3rem; text-align: center; line-height: 1.2; max-width: 7rem; }
+.op { font-family: var(--mono); font-size: var(--step-2); color: var(--ink-soft); padding-bottom: 1.6rem; }
+.total b { background: var(--ink); color: var(--paper); border-bottom-color: var(--a3); }
+
+/* ---------------------------------------------------------------- hero: letter slots */
+.hero .question { font-size: var(--step-2); line-height: 1.2; font-weight: 700; max-width: 26ch; margin: 0 0 1.25rem; }
+.letter-slots .slot input {
+  width: 3.4rem; height: 3.6rem; font-family: var(--mono); font-size: var(--step-3); font-weight: 600;
+  text-align: center; text-transform: uppercase; padding: 0;
+  border: 1.5px solid var(--line-strong); border-bottom: 4px solid var(--a1); border-radius: var(--r) var(--r) 0 0;
+  background: var(--surface); color: var(--ink);
+}
+.letter-slots .slot input.bad { border-color: var(--wrong); background: var(--wrong-tint); }
+.alphabet { display: flex; flex-wrap: wrap; gap: 0.2rem; margin: 0.5rem 0 0.75rem; max-width: 46rem; }
+.alphabet span { width: 1.65rem; text-align: center; font-family: var(--mono); font-size: 0.85rem; border-radius: 3px; background: var(--surface); border: 1px solid var(--line); }
+.alphabet span.used { background: transparent; color: var(--ink-faint); text-decoration: line-through; border-style: dashed; }
+
+/* ---------------------------------------------------------------- widget output lines */
+output, .out { display: block; font-size: var(--step-0); }
+.brute { font-size: 0.95rem; color: var(--ink-soft); }
+.brute.ok { color: var(--right); font-weight: 600; }
+.work-preview { white-space: pre-wrap; background: var(--paper); border-radius: var(--r); padding: 0.5rem 0.65rem; margin-top: 0.4rem; font-size: 0.95rem; }
+.work-preview:empty { display: none; }
+.check .hint-text { font-size: 0.85rem; color: var(--ink-soft); margin: 0.4rem 0 0; }
+
+/* ---------------------------------------------------------------- subs */
+.choice-col { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin-bottom: 0.5rem; }
+.choice-col > span:first-child { min-width: 5.5rem; font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft); }
+.sub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.35rem; margin-top: 0.75rem; }
+.sub-grid div { font-size: 0.82rem; padding: 0.3rem 0.45rem; border: 1px solid var(--line); border-radius: var(--r); line-height: 1.25; background: var(--surface); }
+.sub-grid div.on { background: var(--a1); color: #fff; border-color: var(--a1); }
+.sub-grid div.near { background: var(--a1-tint); }
+
+/* ---------------------------------------------------------------- power set */
+.bits { display: flex; gap: 0.35rem; margin: 0.5rem 0; flex-wrap: wrap; }
+.bits button {
+  font: inherit; width: 3.2rem; padding: 0.3rem 0; cursor: pointer; background: var(--surface);
+  border: 1.5px solid var(--line-strong); border-radius: var(--r);
+  display: flex; flex-direction: column; align-items: center; line-height: 1.15;
+}
+.bits button small { font-family: var(--mono); color: var(--ink-soft); font-size: 0.72rem; }
+.bits button b { font-family: var(--mono); font-size: var(--step-1); }
+.bits button[aria-pressed="true"] { border-color: var(--a1); background: var(--a1-tint); }
+.subset-list { columns: 4 9rem; column-gap: 1rem; font-size: 0.9rem; margin-top: 0.75rem; }
+.subset-list div { padding: 0.1rem 0.3rem; border-radius: 3px; break-inside: avoid; }
+.subset-list div.on { background: var(--ink); color: var(--paper); }
+.subset-list code { background: none; padding: 0; color: var(--a1); font-weight: 600; margin-right: 0.4rem; }
+.subset-list div.on code { color: var(--a1-on-dark); }
+
+/* ---------------------------------------------------------------- permutation tree */
+.tree-wrap { overflow-x: auto; }
+.tree { width: 100%; min-width: 40rem; height: auto; }
+.tree text { font-family: var(--mono); font-size: 14px; fill: var(--ink); }
+.tree .edge { stroke: var(--line-strong); stroke-width: 1.5; }
+.tree .leaf-ok { fill: var(--a1); font-weight: 600; }
+.tree .leaf-rep { fill: var(--a2); }
+.legend { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.92rem; }
+.legend .sw { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px; }
+
+/* ---------------------------------------------------------------- books (section task widget) */
+.people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; }
+.person { border: 1px solid var(--line); border-radius: var(--r); padding: 0.6rem 0.7rem; background: var(--surface); }
+.person h4 { margin: 0 0 0.35rem; }
+.person label { display: flex; gap: 0.4rem; align-items: center; font-size: 0.95rem; }
+.status { margin-top: 0.75rem; padding: 0.5rem 0.75rem; border-radius: var(--r); font-weight: 600; }
+.status.ok { background: var(--right-tint); color: var(--right); }
+.status.bad { background: var(--wrong-tint); color: var(--wrong); }
+
+@media (max-width: 860px) {
+  .people { grid-template-columns: 1fr; }
+}

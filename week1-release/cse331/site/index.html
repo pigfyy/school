@@ -1,0 +1,2029 @@
+<!doctype html>
+<!--
+  CSE 331 (Autumn 2026) · Week 1 teaching site (Wed Sept 30 to Fri Oct 2), built with the course-teaching-site skill.
+  Sources (raw copies and URLs in ../raw/sources.json): Lecture 1 notes and slides ("Welcome! Whole program
+  assertions", Sept 30), Lecture 2 notes and slides ("Procedural abstraction and specification", Oct 2), the
+  calendar, syllabus, resources, Reading 1 and the readings page. No section met in this range; Section 1
+  (Tue Oct 6) and its solution were still "not yet available" when this was built.
+
+  Where each component lives:
+    Sidebar rail .................... <nav class="rail">
+    Week overview + hero widget ..... #home (hero: run Sum and judge the first "user manual" sentence)
+    Lecture 1 modules ............... #l1-runs, #l1-spec, #l1-assert, #l1-reason, #l1-edge, #l1-know
+    Lecture 2 modules ............... #l2-pieces, #l2-javadoc, #l2-across, #l2-meets, #l2-strength, #l2-client
+    Interactive widgets ............. .term[data-input] transcripts, Sum stepper (#stepper), spec clause explorer,
+                                      #l2 two-programs runner, middle() caller, abstraction barrier, indexOf call lab,
+                                      strength grid, count stepper
+    Check your understanding ........ #l1-quiz, #l2-quiz (li.cyu[data-id])
+    Answerable problems ............. #l1-exercises, #l2-exercises (article.task[data-id] > .answer-spec[data-part])
+    Reading / cheat sheet ........... #reading, #cheatsheet
+  Every stateful element has a stable semantic data-id (see ../INTEGRATION.md). Answer keys live in js/keys.js.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE 331 week 1</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+
+<nav class="rail" aria-label="Week 1 modules">
+  <div class="rail-top">
+    <a class="brand" href="#home"><span class="brand-cmd">cse331 <b>week 1</b></span><small>Assertions and specifications</small></a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="rail-body">Contents</button>
+  </div>
+  <div class="rail-body" id="rail-body">
+    <div>
+      <h2>Lecture 1 · Wed Sept 30</h2>
+      <ol class="modules">
+        <li><a href="#l1-runs">Every run</a></li>
+        <li><a href="#l1-spec">The specification</a></li>
+        <li><a href="#l1-assert">Assertions</a></li>
+        <li><a href="#l1-reason">Reasoning between assertions</a></li>
+        <li><a href="#l1-edge">The edge of the program</a></li>
+        <li><a href="#l1-know">How do you come to know</a></li>
+        <li><a href="#l1-quiz">Check your understanding</a></li>
+        <li><a href="#l1-exercises">Lecture 1 exercises</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 2 · Fri Oct 2</h2>
+      <ol class="modules">
+        <li><a href="#l2-pieces">Sum, in pieces</a></li>
+        <li><a href="#l2-javadoc">Writing it in Java</a></li>
+        <li><a href="#l2-across">Reasoning across a call</a></li>
+        <li><a href="#l2-meets">Meeting a specification</a></li>
+        <li><a href="#l2-strength">Stronger and weaker</a></li>
+        <li><a href="#l2-client">Writing a client</a></li>
+        <li><a href="#l2-quiz">Check your understanding</a></li>
+        <li><a href="#l2-exercises">Lecture 2 problems</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Section</h2>
+      <ul class="later-list">
+        <li><span>Section 1 (Tue, Oct 6) isn't posted yet.</span><em>No section met Sept 30 to Oct 2</em></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Reference</h2>
+      <ul class="plain-links">
+        <li><a href="#home">Week overview</a></li>
+        <li><a href="#reading">Reading 1</a></li>
+        <li><a href="#cheatsheet">Cheat sheet</a></li>
+      </ul>
+    </div>
+    <p class="rail-foot"><kbd>←</kbd> <kbd>→</kbd> modules · <kbd>N</kbd> next step · <kbd>H</kbd> next hint</p>
+  </div>
+</nav>
+
+<main id="main">
+
+<section class="page" id="home" data-title="Week overview" data-unit="week">
+  <div class="hero">
+    <p class="eyebrow">Week 1 · Wed Sept 30 – Fri Oct 2</p>
+    <p class="motto">Your job is to deliver code that you <em>know</em> works.</p>
+    <h1>What does this program do?</h1>
+    <p class="question">Most people say: <q id="hero-claim">It reads a list of numbers from the user and prints them and their sum.</q></p>
+    <p class="where">Run the lecture's <code>Sum</code> program on anything you like and see whether that sentence survives. The run uses a simulator of Java's <code>Scanner</code> that was checked against real Java.</p>
+
+    <div class="sim" id="hero">
+      <div class="sim-in">
+        <label for="hero-input">What the user types</label>
+        <textarea id="hero-input" rows="2" spellcheck="false" autocomplete="off">3 4 5</textarea>
+        <div class="controls">
+          <button class="btn primary" id="hero-run">Run</button>
+          <span class="where">Try:</span>
+          <button class="chip" data-try="3 4 5">3 4 5</button>
+          <button class="chip" data-try="1 2 three 4">1 2 three 4</button>
+          <button class="chip" data-try="">nothing</button>
+          <button class="chip" data-try="2147483647 1">2147483647 1</button>
+        </div>
+      </div>
+      <div class="term" id="hero-term" aria-live="polite"></div>
+      <p class="verdict" id="hero-verdict" role="status"></p>
+      <p class="tally" id="hero-tally"></p>
+    </div>
+  </div>
+
+  <div class="prose">
+    <p>That sentence is true on the run you probably pictured. Lecture 1 asks for more: a description that is true on <strong>every</strong> run, a way to talk about what is true <strong>inside</strong> the program, and an honest answer to "how do you know?"</p>
+  </div>
+
+  <h2>This week</h2>
+  <div class="week">
+    <a href="#l1-runs"><strong>Wed, Sept 30</strong><span>Lecture 1: Welcome! Whole program assertions</span><span>6 modules, a 10-question quiz, the 7 exercises from the notes</span></a>
+    <div class="day"><strong>Thu, Oct 1</strong><span>No lecture or section</span><span>Office hours only. CSE 331 sections meet on Tuesdays; the first is Tue, Oct 6.</span></div>
+    <a href="#l2-pieces"><strong>Fri, Oct 2</strong><span>Lecture 2: Procedural abstraction and specification</span><span>6 modules, an 11-question quiz, 9 problems (the 6 exercises from the notes and 3 lecture activities). Homework 0 and Reading 1 due 11:59 pm.</span></a>
+  </div>
+
+  <div class="rule note">
+    <p><strong>What this site covers.</strong> Both lectures in Sept 30 to Oct 2 (notes, slides and end-of-notes exercises) and Reading 1. There was no section this week. The Section 1 handout (Tue, Oct 6, "Assertions and Specifications") and its solution still read "This content is not yet available" on the course site (checked Fri, Oct 2), so this site has no section problems. Homework 0 and Homework 1 appear only as due dates: <strong>no AI is allowed on either</strong>, and nothing here works their problems.</p>
+  </div>
+
+  <h2>How to use this site</h2>
+  <div class="prose">
+    <ul>
+      <li>Two lectures, each in the order of its notes. Each module has a short explanation, something to try, and a quick check you can pose to the room.</li>
+      <li><strong>Teaching notes</strong> (gold, open by default; click the heading to collapse) hold talking points, questions to ask and common mistakes.</li>
+      <li>Every program transcript on the site comes from the same simulator, so you can edit inputs and press <strong>Run</strong> anywhere you see a terminal.</li>
+      <li><strong>Exercises and problems</strong> are answerable on the page. Type answers, write your work, and ask for hints. Your work saves automatically. Solutions stay hidden until you press <strong>Show solution</strong>, then reveal one step at a time.</li>
+      <li>Each lecture ends with <strong>Check your understanding</strong>, a wrap-up quiz (10 questions for Lecture 1, 11 for Lecture 2).</li>
+    </ul>
+  </div>
+
+  <h2>Course essentials</h2>
+  <div class="table-scroll"><table class="plain">
+    <tr><th>Instructors</th><td>Zach Tatlock and James Wilcox, plus 10 TAs</td></tr>
+    <tr><th>Lectures</th><td>MWF in SAV 260: Lecture A 12:30–1:20, Lecture B 1:30–2:20. Recorded on Panopto via Canvas. Most lectures have a short paper activity, graded on completion. Hand it in at the door.</td></tr>
+    <tr><th>Sections</th><td>Tuesdays, TA-led, not recorded; printed material is posted on the course site. The first one is Tuesday, Oct 6 ("Assertions and Specifications").</td></tr>
+    <tr><th>Help</th><td>Ed is the one channel for announcements and questions (private posts reach staff only). Office hours run every weekday; see the home page for times.</td></tr>
+    <tr><th>Due this week</th><td>Homework 0 (survey + programming on paper) and Reading 1 (one reflection): Friday, Oct 2, 11:59 pm. Homework 1 (procedural abstraction; per the Lecture 2 slides, Tasks 1, 2 and 4 use Lecture 2's ideas): Friday, Oct 9, 11:59 pm. The late day is unlocked by making progress and submitting by Friday.</td></tr>
+    <tr><th>Grading</th><td>Coursework C: 60% homework and project, 20% reading reflections, 20% in-class activities (5 lowest dropped). Exams E: midterm 40% and final 60%, or the final alone if higher. Course grade = min(E, C / 0.9), with C / 0.9 capped at 100%.</td></tr>
+    <tr><th>AI</th><td>Allowed for learning and ungraded work. On graded work, only for light editing of reading reflections and for programming tasks whose handout says so. <strong>No AI on Homework 0 or Homework 1.</strong></td></tr>
+    <tr><th>Exams</th><td>Midterm in lecture Friday, Nov 13. Final Tuesday, Dec 15, 12:30–2:20 (A in BAG 131, B in BAG 154). One handwritten letter-size sheet of notes.</td></tr>
+    <tr><th>Collaboration</th><td>Discuss problems with others, then leave with no written records, wait 20 minutes, and write your solution alone.</td></tr>
+    <tr><th>Links</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/" target="_blank" rel="noopener">Course home</a> · <a href="https://courses.cs.washington.edu/courses/cse331/26au/info/" target="_blank" rel="noopener">Syllabus</a> · <a href="https://courses.cs.washington.edu/courses/cse331/26au/calendar/calendar.html" target="_blank" rel="noopener">Calendar</a> · <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture01-assertions/notes.html" target="_blank" rel="noopener">Lecture 1 notes</a> · <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture01-assertions/slides.html" target="_blank" rel="noopener">slides</a> · <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture02-specifications/notes.html" target="_blank" rel="noopener">Lecture 2 notes</a> · <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture02-specifications/slides.html" target="_blank" rel="noopener">slides</a> · <a href="https://courses.cs.washington.edu/courses/cse331/26au/homework/hw0.html" target="_blank" rel="noopener">HW0</a> · <a href="https://courses.cs.washington.edu/courses/cse331/26au/homework/hw1.html" target="_blank" rel="noopener">HW1</a></td></tr>
+  </table></div>
+
+  <details class="notes" open>
+    <summary>Teaching notes: opening the course</summary>
+    <ul>
+      <li>The slides contrast a bad course summary ("learn more Java, and some JavaScript") with a better one: say what code must do (specifications), structure and design programs, know code is correct (testing and proof), and build event-driven programs like user interfaces.</li>
+      <li>Open with the motto and its four questions from the slides. <em>Your job</em>: can a tool do it for you? <em>Deliver</em>: to whom? <em>Know</em>: how? <em>Works</em>: meaning what? The lecture answers all four by the end.</li>
+      <li>Before showing any run, have everyone write one sentence on the half sheet: "What does this program do?" Then use the hero above to run the four lecture inputs in order: <code>3 4 5</code>, <code>1 2 three 4</code>, nothing, <code>2147483647 1</code>.</li>
+      <li>Ending input in a real terminal: Control-D on macOS and Linux, Control-Z then Enter on Windows. Students who run <code>Sum</code> themselves will get stuck there otherwise.</li>
+    </ul>
+  </details>
+</section>
+
+<section class="page" id="l1-runs" data-unit="l1" data-title="Every run">
+  <p class="where">Lecture 1 · Wed Sept 30 · notes: "What does this program do?", "Every run"</p>
+  <h1>Every run</h1>
+
+  <div class="prose">
+    <p>Here is the whole program. Lines 13 and 19 are comments that mark two places we come back to later.</p>
+  </div>
+  <pre class="code" data-src="sum"></pre>
+
+  <div class="rule">
+    <p><strong>Run.</strong> A run of a program is a single execution of it, from the first line of <code>main</code> to the exit, on one particular input.</p>
+    <p><strong>Counterexample.</strong> A single run on which a claim about every run is false. It shows that the claim does not hold.</p>
+  </div>
+  <div class="prose">
+    <p>A program that reads input has as many runs as there are things a user might type, so infinitely many. "It reads a list of numbers and prints them and their sum" is a claim about <em>every</em> run. One run can only confirm it for that run. One run where it is false refutes it.</p>
+  </div>
+
+  <h2>The lecture's four runs</h2>
+  <div class="run-grid">
+    <figure class="run-card">
+      <div class="term" data-input="3 4 5"></div>
+      <figcaption><span class="tag ok">True of this run</span> The run everyone pictures.</figcaption>
+    </figure>
+    <figure class="run-card">
+      <div class="term" data-input="1 2 three 4"></div>
+      <figcaption><span class="tag warn">Silent</span> Four things typed, two read. The sentence never mentioned this, and a user who got a sum of 3 would feel misled.</figcaption>
+    </figure>
+    <figure class="run-card">
+      <div class="term" data-input=""></div>
+      <figcaption><span class="tag ok">True, if…</span> …we grant that an empty list has a sum of 0.</figcaption>
+    </figure>
+    <figure class="run-card">
+      <div class="term" data-input="2147483647 1"></div>
+      <figcaption><span class="tag bad">Counterexample</span> The true sum is 2147483648. A Java <code>int</code> holds only −2<sup>31</sup> to 2<sup>31</sup>−1, and passing the top wraps around to the bottom.</figcaption>
+    </figure>
+  </div>
+
+  <h2>Hunt for counterexamples</h2>
+  <div class="panel" id="hunt">
+    <p>The sentence promises the sum of the numbers the user typed. Type inputs until you find a run where that promise breaks in a way the lecture didn't show.</p>
+    <div class="sim-in">
+      <label for="hunt-input">What the user types</label>
+      <textarea id="hunt-input" rows="2" spellcheck="false" autocomplete="off">-2147483648 -1</textarea>
+      <div class="controls"><button class="btn primary" id="hunt-run">Run</button></div>
+    </div>
+    <div class="term" id="hunt-term" aria-live="polite"></div>
+    <p class="verdict" id="hunt-verdict" role="status"></p>
+    <div class="found" id="hunt-found"></div>
+  </div>
+
+  <div class="check" data-id="cse331-w1-l1-qc-count-counterexamples" data-kind="quickcheck" data-type="int">
+    <p>Quick check: how many of these runs are counterexamples to the first sentence? <code>3 4 5</code> · nothing · <code>2147483647 1</code> · <code>1 2 3</code></p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Ask for the user manual, not a line-by-line reading: "what does a person who runs it see?" The answer should work for a friend who needs to run the program and will never read it.</li>
+      <li>On <code>1 2 three 4</code> the slide asks "wrong about this run, or silent?" Let the room argue. The sentence never says what happens to a word, so it is at least silent. A user who expected a sum of 7 was misled.</li>
+      <li>The habit to name: the first user manual is true of the runs we pictured and silent or wrong about the others. Those other runs are where programs fail once other people use them.</li>
+      <li>Good extra counterexamples for the hunt: <code>-2147483648 -1</code> (wraps to the top), <code>2147483647 2147483647</code> (prints −2), and <code>2.5 3</code> (reads nothing).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l1-spec" data-unit="l1" data-title="The specification">
+  <p class="where">Lecture 1 · Wed Sept 30 · notes: "The specification"</p>
+  <h1>The specification</h1>
+
+  <div class="prose">
+    <p>We could change the program: read <code>long</code> values, stop with a message at the first word, refuse sums that overflow. Each change would need a different sentence. So for now we keep the program and repair the sentence by adding what it left out.</p>
+  </div>
+
+  <h2>The repaired sentence</h2>
+  <p class="where">Click any part to see the run that makes it necessary.</p>
+  <div class="panel" id="spec-explorer">
+    <p class="spec-text" id="spec-text">
+      <button class="clause" data-clause="asks">The program asks for numbers.</button>
+      It <button class="clause" data-clause="whole">reads whole numbers</button>
+      <button class="clause" data-clause="range">between −2<sup>31</sup> and 2<sup>31</sup> − 1</button>
+      from the user, <button class="clause" data-clause="order">in order</button>,
+      <button class="clause" data-clause="stop">until the input ends or the next thing typed is not such a number; anything from that point on is ignored.</button>
+      <button class="clause" data-clause="prints">It prints the numbers it read, then their sum,</button>
+      <button class="clause" data-clause="wrap">wrapped around into that same range if the true sum falls outside it.</button>
+    </p>
+    <div class="clause-detail" id="clause-detail" aria-live="polite">
+      <p class="where">Pick a clause above.</p>
+    </div>
+  </div>
+  <div class="prose">
+    <p>It is longer and uglier than the first sentence, but it is true on every run. The range clauses are unpleasant, and that is information: they tell you this program is probably not the one you want, and they point at what to change.</p>
+  </div>
+
+  <div class="rule">
+    <p><strong>Specification.</strong> A specification says what a piece of code <em>must</em> do <em>on every run</em>, <em>as seen from outside it</em>. It says nothing about how the code does it.</p>
+    <p>For a whole program, outside means the user, and the specification is a precise version of the user manual.</p>
+  </div>
+  <div class="prose">
+    <ul>
+      <li><strong>On every run</strong> is what the first sentence got wrong. One run where a specification is false refutes it. When there are infinitely many runs, no number of runs where it happens to be true can establish it.</li>
+      <li><strong>As seen from outside</strong> is why the specification never mentions <code>list</code>, <code>sum</code>, <code>hasNextInt</code> or line 15. A user manual is for someone who will never see the code.</li>
+      <li><strong>Must</strong>: a specification states what the code is required to do, and the code meets it or fails it. Here we described an existing program. More often the specification comes first and the program has to live up to it.</li>
+    </ul>
+  </div>
+
+  <div class="check" data-id="cse331-w1-l1-qc-spec-predicts-sum" data-kind="quickcheck" data-type="int" data-sum-input="5 3 three 2147483647 1">
+    <p>Quick check: the user types <code>5 3 three 2147483647 1</code>. Using only the specification, what sum does <code>Sum</code> print?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Check the repaired sentence against all four runs out loud. A user who read it first would be surprised by none of them.</li>
+      <li>Ask why the range clause on the <em>input</em> is needed when no lecture run overflowed on input. Answer: typing <code>2147483648</code> alone reads nothing, because that number does not fit in an <code>int</code>.</li>
+      <li>The footnote in the notes: "every run" means every run on a computer with what it needs. Give <code>Sum</code> more numbers than memory holds and it dies with an <code>OutOfMemoryError</code>. Specifications leave such runs out, like a power failure.</li>
+      <li>Homework 1 asks students to work in both directions: describe a program, and make a program meet a specification.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l1-assert" data-unit="l1" data-title="Assertions">
+  <p class="where">Lecture 1 · Wed Sept 30 · notes: "What is true at a point", "Sum with assertions"</p>
+  <h1>Assertions</h1>
+
+  <div class="prose">
+    <p>The specification speaks from outside. To know the program meets it, we look inside, at the state of its variables at points during the run. Step to point (1): the input loop has just finished and nothing has been printed since the prompt. What do we know about <code>list</code>?</p>
+  </div>
+
+  <h2>Step through Sum</h2>
+  <div class="panel stepper" id="stepper">
+    <div class="controls">
+      <label for="st-input">Input</label>
+      <input type="text" id="st-input" value="3 4 5" spellcheck="false" autocomplete="off">
+      <button class="chip" data-st="3 4 5">3 4 5</button>
+      <button class="chip" data-st="1 2 three 4">1 2 three 4</button>
+      <button class="chip" data-st="">nothing</button>
+      <button class="chip" data-st="2147483647 1">2147483647 1</button>
+    </div>
+    <div class="controls">
+      <button class="btn" id="st-back">Back</button>
+      <button class="btn primary" id="st-step">Step</button>
+      <button class="btn" id="st-p1">Run to (1)</button>
+      <button class="btn" id="st-p2">Run to (2)</button>
+      <button class="btn quiet" id="st-reset">Restart</button>
+      <span class="where" id="st-count"></span>
+    </div>
+    <div class="st-grid">
+      <pre class="code" id="st-code" data-src="sum"></pre>
+      <div class="st-state">
+        <h4>Input still waiting</h4>
+        <div class="tokens" id="st-tokens"></div>
+        <h4>Variables</h4>
+        <table class="vars" id="st-vars"></table>
+        <h4>Printed so far</h4>
+        <div class="term small" id="st-out"></div>
+        <div class="st-assert" id="st-assert" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rule">
+    <p><strong>Assertion.</strong> An assertion is a true or false claim about the program's state (the values of variables and memory) at a particular point in the program.</p>
+    <p>An assertion <strong>holds</strong> if the claim is true at that point on every run. One run where it is false, and it does not hold.</p>
+  </div>
+
+  <div class="prose">
+    <p>We write an assertion in double braces at the point it describes. Three things it is <em>not</em>:</p>
+    <ul>
+      <li>Not Java. The braces never execute. Java's own <code>assert</code> statement checks a condition on the one run that reaches it.</li>
+      <li>Not a print statement, which shows only what particular runs do.</li>
+      <li>Not a test, which checks only the runs you chose to try.</li>
+    </ul>
+    <p>Like a specification, an assertion claims something about all the runs at once. The stepper above checks the claim on one run. Knowing it holds takes an argument about the code, which comes next.</p>
+  </div>
+
+  <h2>Sum with assertions</h2>
+  <div class="prose">
+    <p>At (2), the obvious claim is about <code>sum</code>. Line 20 also depends on a second claim that often goes unstated: <code>list</code> still holds what it held at (1). It holds because the summing loop only reads <code>list</code>. A program that changed <code>list</code> while summing it could print two lines that disagree.</p>
+  </div>
+  <pre class="code" data-src="sum-asserted" data-start="10"></pre>
+
+  <div class="check" data-id="cse331-w1-l1-qc-list-size-at-point1" data-kind="quickcheck" data-type="int" data-sum-input="4 -4 x 9">
+    <p>Quick check: on input <code>4 -4 x 9</code>, what is <code>list.size()</code> at point (1)?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The half sheet's question 2: "one claim at each point, true on every run." Collect a few answers at (2) before showing the second claim about <code>list</code>. Almost nobody writes it.</li>
+      <li>Ask: "Have you ever written <code>// list is sorted here</code>?" That comment is an assertion. Students already write them; the course makes them precise.</li>
+      <li>The stepper's green check means "true on this run" only. Ask what it would take to turn that into "holds". (An argument about every run.)</li>
+      <li>On <code>2147483647 1</code>, step to (2) and point at the wrap: the claim about <code>sum</code> needs the same "wrapped into the int range" qualification as the specification.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l1-reason" data-unit="l1" data-title="Reasoning between assertions">
+  <p class="where">Lecture 1 · Wed Sept 30 · notes: "Sum with assertions" (end), "Reasoning between assertions"</p>
+  <h1>Reasoning between assertions</h1>
+
+  <h2>Outside and inside</h2>
+  <div class="prose">
+    <p>The specification makes two promises after the prompt. The assertions say why the code keeps them. Click a printed line.</p>
+  </div>
+  <div class="panel" id="inout">
+    <div class="term" id="inout-term"></div>
+    <div class="inout-detail" id="inout-detail" aria-live="polite"><p class="where">Click "Got …" or "The sum of your list was: …" above.</p></div>
+  </div>
+  <div class="grid-2">
+    <div class="rule"><p><strong>Specification</strong> · what the user will see. Outside the program, on every run.</p></div>
+    <div class="rule gold"><p><strong>Assertions</strong> · why the code delivers it. Inside the program, at one point, on every run. The user never sees them.</p></div>
+  </div>
+
+  <h2>The rule</h2>
+  <div class="prose">
+    <p>Both arguments about <code>Sum</code> had the same shape: a claim before some code, the code, and a claim after it. This is the pattern of nearly every argument about programs this quarter.</p>
+  </div>
+  <div class="triple">
+    <div class="t-p"><span>Before</span><code>{{ P }}</code></div>
+    <div class="t-c"><span>The code</span><code>some code</code></div>
+    <div class="t-q"><span>After</span><code>{{ Q }}</code></div>
+  </div>
+  <div class="rule">
+    <p><strong>Reasoning between assertions.</strong> Suppose P holds at its point. Suppose also that running the code from <em>any</em> state in which P is true ends in a state in which Q is true. Then Q holds at its point.</p>
+  </div>
+  <div class="prose">
+    <p>The rule is powerful because of what it leaves out. To establish Q we needed only P and the few lines between them, nothing about how the program got to P. Whatever happened earlier is summarized by P. That is why a large program can be understood a few lines at a time.</p>
+    <p>Our two arguments were in prose ("the loop added each element once"). That is fine for a loop this obvious. Making it precise for any loop is the work of the reasoning lectures later in the course.</p>
+  </div>
+
+  <h2>The two arguments in Sum</h2>
+  <div class="panel">
+    <div class="chain">
+      <div class="link"><span class="lbl">P</span><code>{{ nothing yet: list is empty, the user may type anything }}</code></div>
+      <div class="link code-link"><span class="lbl">code</span><code>lines 10–12: the input loop</code></div>
+      <div class="link"><span class="lbl">Q = P′</span><code>{{ (1): list holds, in order, every number typed before the end or a non-int }}</code></div>
+      <div class="link code-link"><span class="lbl">code</span><code>lines 14–18: print, sum = 0, the summing loop</code></div>
+      <div class="link"><span class="lbl">Q′</span><code>{{ (2): sum is the wrapped sum of list }} {{ list unchanged }}</code></div>
+    </div>
+    <p class="where">The second argument starts from (1). It needs nothing about the input loop, because (1) summarizes it.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w1-l1-qc-list-survives-loop" data-kind="quickcheck" data-type="yesno">
+    <p>Quick check: the summing loop on lines 16–18 reads <code>list</code> but never writes it. Does the claim at (1) about <code>list</code> still hold at (2)? (yes or no)</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Say the mapping in one breath: line 14 keeps the first promise because of the assertion at (1); line 20 keeps the second because of both assertions at (2).</li>
+      <li>The {{ P }} code {{ Q }} shape is Hoare's (1969), building on Floyd (1967). Students will meet it formally as Floyd-Hoare logic in week 3.</li>
+      <li>Ask: "What would we have to re-check at (2) if someone changed the input loop?" Only the claim at (1). That is the point of "summarized by P".</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l1-edge" data-unit="l1" data-title="The edge of the program">
+  <p class="where">Lecture 1 · Wed Sept 30 · notes: "The edge of the program"</p>
+  <h1>The edge of the program</h1>
+
+  <div class="prose">
+    <p>Everything a program knows about the world arrives through its input. At that edge there is no one to make promises. The person at the keyboard may type a word, nothing at all, or a whole pasted file. They did not read the code and owe it nothing. So a whole-program specification must not begin "assuming the user types numbers". It has to say what happens on every input.</p>
+    <p><code>Sum</code>'s answer to a word is to stop reading and print what it has. Complaining about the word, or skipping it and going on, would be reasonable too. Having no answer at all is not.</p>
+  </div>
+
+  <h2>One method call apart</h2>
+  <div class="panel" id="edge-panel">
+    <div class="controls" role="group" aria-label="Line 10">
+      <span>Line 10:</span>
+      <button class="chip" data-guard="orig" aria-pressed="true">while (in.hasNextInt())</button>
+      <button class="chip" data-guard="hasnext" aria-pressed="false">while (in.hasNext())</button>
+    </div>
+    <pre class="code" id="edge-code" data-src="sum" data-from="9" data-to="12"></pre>
+    <div class="sim-in">
+      <label for="edge-input">What the user types</label>
+      <textarea id="edge-input" rows="1" spellcheck="false" autocomplete="off">3 4 hello</textarea>
+      <div class="controls"><button class="btn primary" id="edge-run">Run</button></div>
+    </div>
+    <div class="term" id="edge-term" aria-live="polite"></div>
+    <p class="verdict" id="edge-verdict" role="status"></p>
+  </div>
+
+  <div class="prose">
+    <p><code>hasNext</code> only checks that more input is waiting. <code>hasNextInt</code> checks that the next thing is an <code>int</code>. With <code>hasNext</code>, <code>nextInt</code> runs on <code>hello</code> and throws.</p>
+    <p>A stack trace is a message from the language to the programmer: the exception, the method that threw it, and the line of our code that led there. To someone who can read the code it is the start of a repair. To the person who typed <code>hello</code> it says nothing they understand, nothing about what to do next, and it ends the run without the output they came for.</p>
+  </div>
+
+  <div class="rule warn">
+    <p><strong>Our standard, all quarter.</strong> Every input a user can produce gets a response the specification describes. A stack trace is never that response. It is a message meant for someone else.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w1-l1-qc-hasnext-exception" data-kind="quickcheck" data-type="text">
+    <p>Quick check: with <code>hasNext</code> on line 10, which exception does typing <code>3 4 hello</code> throw?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Have students try <code>2.5</code> and <code>2147483648</code> in the <code>hasNext</code> version. Both crash too: anything that is not an <code>int</code> reaches <code>nextInt</code>.</li>
+      <li>The stack trace reached the user because the author never decided what should happen on a word. The fix starts with the specification, not the code.</li>
+      <li>The line numbers inside <code>Scanner.java</code> depend on the JDK. The ones shown come from the lecture notes (the course uses JDK 25). The last line, <code>Sum.main(Sum.java:11)</code>, is the one that points into our code.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l1-know" data-unit="l1" data-title="How do you come to know">
+  <p class="where">Lecture 1 · Wed Sept 30 · notes: "How do you come to know"</p>
+  <h1>How do you come to know</h1>
+
+  <div class="prose">
+    <p>The lecture ended with two kinds of claim about every run: a specification from outside and assertions from inside. It has not said how anyone comes to know such a claim holds. That question is what the rest of the course is about. We have already used all three ways.</p>
+  </div>
+
+  <div class="ways">
+    <div class="way"><h3>Run it</h3><p>Run the program and watch, as we did with <code>3 4 5</code>.</p><p class="cap">Tells you about that run, and nothing about any other.</p></div>
+    <div class="way"><h3>Test it</h3><p>Choose runs on purpose, ordinary ones and the ones a user manual might forget, and check each against the claim: a word, nothing, the top of the <code>int</code> range.</p><p class="cap">Can refute a claim about every run. Can never confirm it.</p></div>
+    <div class="way"><h3>Reason about it</h3><p>Argue from the code that the claim is true on every run at once, as we did at (1) and (2).</p><p class="cap">Can confirm a claim about every run, if the argument is right. A test that refutes the claim refutes the argument too.</p></div>
+  </div>
+
+  <h2>Which way of knowing?</h2>
+  <div class="panel" id="sorter">
+    <p class="where">Classify each activity. The first three are from the lecture; the rest were written for this site.</p>
+    <ol class="sort-list" id="sort-list">
+      <li data-way="run">We typed <code>3 4 5</code>, pressed Control-D, and watched it print 12.</li>
+      <li data-way="test">We typed a word, then nothing, then a number at the top of the <code>int</code> range, to see if the first sentence held.</li>
+      <li data-way="reason">We said the input loop takes numbers one at a time, in order, so at (1) <code>list</code> holds exactly the numbers typed.</li>
+      <li data-way="test">Before shipping, a teammate writes down ten inputs including empty input and a single number, and checks each output against the specification.</li>
+      <li data-way="reason">You argue that the summing loop never writes to <code>list</code>, so the claim at (1) still holds at (2).</li>
+      <li data-way="run">You try the program once on the example from the assignment and it prints what you expected.</li>
+    </ol>
+    <p class="out" id="sort-out" role="status"></p>
+  </div>
+
+  <h2>The motto, word by word</h2>
+  <div class="panel" id="motto">
+    <p class="motto big">
+      <button class="word" data-word="job">Your job</button> is to
+      <button class="word" data-word="deliver">deliver</button> code that you
+      <button class="word" data-word="know">know</button>
+      <button class="word" data-word="works">works</button>.
+    </p>
+    <div class="word-detail" id="word-detail" aria-live="polite"><p class="where">Click a word.</p></div>
+  </div>
+
+  <div class="check" data-id="cse331-w1-l1-qc-which-way-confirms" data-kind="quickcheck" data-type="text">
+    <p>Quick check: which of the three ways can confirm a claim about every run? (one word)</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Kernighan and Pike quote Dijkstra: testing can show the presence of bugs but never their absence. This lecture made the same point about runs.</li>
+      <li>Reading 1 is three articles that disagree about what "know" means: Willison (run it and write a test), Fishman (the shuttle team's process) and Hoare (reliability without proof). This lecture gives the vocabulary to read them; Monday's lecture discusses them.</li>
+      <li>"Your job" connects to the AI policy: neither the compiler, a teammate, nor a tool that wrote some of the code takes the claim off your hands.</li>
+      <li>Friday's lecture splits <code>Sum</code> into methods, where these assertions become promises between them: <a href="#l2-pieces">Lecture 2</a>.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l1-quiz" data-unit="l1" data-title="Check your understanding: Lecture 1">
+  <p class="where">Lecture 1 · Wed Sept 30 · wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose">
+    <p>Ten questions on Lecture 1. Answer without looking back, then use the review links for anything you missed. Your score counts first tries only.</p>
+  </div>
+
+  <div class="cyu-score" data-role="score" role="status"></div>
+
+  <ol class="cyu-list">
+    <li class="cyu" data-kind="quiz" data-id="cse331-w1-l1-quiz-how-many-runs" data-format="mc" data-type="choice" data-topic="l1-runs">
+      <p class="q">A program reads whatever the user types on one line. How many runs does it have?</p>
+      <div class="opts">
+        <label data-option="one" data-misconception="program-is-run"><input type="radio" name="cyu1"> One<span class="why" hidden>The program text is one, but a run is one execution on one input. Different inputs give different runs.</span></label>
+        <label data-option="tested" data-misconception="tested-is-all"><input type="radio" name="cyu1"> As many as the inputs you have tested<span class="why" hidden>Your tests are a few of its runs. The runs you didn't try still exist.</span></label>
+        <label data-option="infinite"><input type="radio" name="cyu1"> As many as there are things a user might type: in general, infinitely many<span class="why" hidden>Correct. Each possible input gives a run, so a claim about every run covers infinitely many.</span></label>
+        <label data-option="two" data-misconception="two-classes"><input type="radio" name="cyu1"> Two: valid input and invalid input<span class="why" hidden>That splits runs into two groups, but each group has many runs, and they can behave differently (compare <code>3 4 5</code> with <code>2147483647 1</code>).</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-id="cse331-w1-l1-quiz-thousand-runs" data-format="mc" data-type="choice" data-topic="l1-runs">
+      <p class="q">You run a program on 1,000 inputs and a claim about every run is true on all of them. What do you now know?</p>
+      <div class="opts">
+        <label data-option="holds" data-misconception="many-runs-prove"><input type="radio" name="cyu2"> The claim holds<span class="why" hidden>Runs can confirm a claim only for those runs. Run 1,001 could be a counterexample.</span></label>
+        <label data-option="those-runs"><input type="radio" name="cyu2"> The claim is true on those 1,000 runs<span class="why" hidden>Correct. That is all the runs tell you, and it isn't nothing.</span></label>
+        <label data-option="false" data-misconception="no-counterexample-seen"><input type="radio" name="cyu2"> The claim is false<span class="why" hidden>Nothing refuted it. Only a run where it is false does that.</span></label>
+        <label data-option="nothing" data-misconception="runs-tell-nothing"><input type="radio" name="cyu2"> Nothing at all<span class="why" hidden>You know it is true on those runs. You don't know it is true on the others.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-id="cse331-w1-l1-quiz-sum-after-word" data-format="num" data-type="int" data-sum-input="10 20 x 30" data-topic="l1-spec">
+      <p class="q">A user types <code>10 20 x 30</code>. What sum does <code>Sum</code> print?</p>
+      <p class="why" hidden>The input loop stops at <code>x</code>, and everything from that point on is ignored, including the 30. So <code>Sum</code> prints <code>Got [10, 20]</code> and a sum of 30.</p>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-id="cse331-w1-l1-quiz-which-is-spec" data-format="mc" data-type="choice" data-topic="l1-spec">
+      <p class="q">Which of these is a specification of <code>Sum</code> (whether or not it meets it)?</p>
+      <div class="opts">
+        <label data-option="loop-count" data-misconception="inside-is-spec"><input type="radio" name="cyu4"> The loop on line 16 runs <code>list.size()</code> times.<span class="why" hidden>That describes the inside of the program. A user can't see line 16.</span></label>
+        <label data-option="prompt-first"><input type="radio" name="cyu4"> It prints "Enter some numbers." before it reads anything.<span class="why" hidden>Correct. It is about what a user sees, on every run, and says nothing about how. (Sum meets it.)</span></label>
+        <label data-option="sum-assertion" data-misconception="assertion-is-spec"><input type="radio" name="cyu4"> At (2), <code>sum</code> is the wrapped sum of <code>list</code>.<span class="why" hidden>That's an assertion: a claim about variables at one point inside the program.</span></label>
+        <label data-option="arraylist" data-misconception="how-is-spec"><input type="radio" name="cyu4"> It keeps the numbers in an <code>ArrayList</code>.<span class="why" hidden>That says how the code works, not what a user sees.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-id="cse331-w1-l1-quiz-sum-wraps-down" data-format="num" data-type="int" data-sum-input="-2147483648 -1" data-topic="l1-spec">
+      <p class="q">A user types <code>-2147483648 -1</code>. What sum does <code>Sum</code> print? (Type the exact number.)</p>
+      <p class="why" hidden>The true sum, −2147483649, is just below the bottom of the <code>int</code> range, so it wraps around to the top: 2147483647.</p>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-id="cse331-w1-l1-quiz-which-is-assertion" data-format="mc" data-type="choice" data-topic="l1-assert">
+      <p class="q">Which of these is an assertion at point (1)?</p>
+      <div class="opts">
+        <label data-option="size-bound"><input type="radio" name="cyu6"> <code>{{ list.size() is at most the number of things the user typed }}</code><span class="why" hidden>Correct. It is a true-or-false claim about the program's state at (1). It also holds, since the loop adds at most one number per thing typed.</span></label>
+        <label data-option="user-sees" data-misconception="spec-is-assertion"><input type="radio" name="cyu6"> The user sees <code>Got [...]</code> next.<span class="why" hidden>That's about what the user sees: specification territory, not program state.</span></label>
+        <label data-option="java-assert" data-misconception="java-assert-is-assertion"><input type="radio" name="cyu6"> <code>assert list != null;</code><span class="why" hidden>That's a Java statement. It checks a condition on the one run that reaches it.</span></label>
+        <label data-option="println" data-misconception="print-is-assertion"><input type="radio" name="cyu6"> <code>System.out.println(list);</code><span class="why" hidden>A print shows you what one run does. It doesn't claim anything about every run.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-id="cse331-w1-l1-quiz-nonempty-holds" data-format="mc" data-type="choice" data-topic="l1-assert">
+      <p class="q">Does <code>{{ list is not empty }}</code> hold at point (1)?</p>
+      <div class="opts">
+        <label data-option="loop-adds" data-misconception="loop-always-adds"><input type="radio" name="cyu7"> Yes, because the input loop adds to <code>list</code><span class="why" hidden>It adds only if there is an <code>int</code> to read. On some runs there isn't one.</span></label>
+        <label data-option="empty-run"><input type="radio" name="cyu7"> No: the run where the user types nothing is a counterexample<span class="why" hidden>Correct. On that run <code>list</code> is empty at (1), and one run where the claim is false is enough.</span></label>
+        <label data-option="one-run" data-misconception="one-run-holds"><input type="radio" name="cyu7"> Yes, because it is true on the run <code>3 4 5</code><span class="why" hidden>One run where it is true doesn't make it hold. It has to be true on every run.</span></label>
+        <label data-option="cant-tell" data-misconception="need-every-input"><input type="radio" name="cyu7"> We can't tell without trying every input<span class="why" hidden>We can tell: a single counterexample settles that it does not hold.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-id="cse331-w1-l1-quiz-rule-needs" data-format="mc" data-type="choice" data-topic="l1-reason">
+      <p class="q">To show that <code>{{ Q }}</code> holds after some code using the rule from lecture, what do you need?</p>
+      <div class="opts">
+        <label data-option="everything-before" data-misconception="need-history"><input type="radio" name="cyu8"> Everything the program did before reaching P<span class="why" hidden>That's exactly what the rule lets you skip. P summarizes it.</span></label>
+        <label data-option="p-and-code"><input type="radio" name="cyu8"> That P holds, and that the code takes any state where P is true to one where Q is true<span class="why" hidden>Correct. Only P and the few lines between P and Q.</span></label>
+        <label data-option="every-test" data-misconception="test-everything"><input type="radio" name="cyu8"> A passing test for every input<span class="why" hidden>That's impossible with infinitely many inputs, and it's not what the rule asks for.</span></label>
+        <label data-option="last-time" data-misconception="last-run-enough"><input type="radio" name="cyu8"> That Q held the last time the code ran<span class="why" hidden>One earlier run says nothing about every run.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-id="cse331-w1-l1-quiz-edge-standard" data-format="mc" data-type="choice" data-topic="l1-edge">
+      <p class="q">A user types a word where a number was expected. Which response does the course's standard rule out?</p>
+      <div class="opts">
+        <label data-option="stop-print" data-misconception="spec-response-ok"><input type="radio" name="cyu9"> Stop reading and print what was read so far<span class="why" hidden>That's what <code>Sum</code> does, and its specification describes it. Allowed.</span></label>
+        <label data-option="tell-user" data-misconception="message-ok"><input type="radio" name="cyu9"> Tell the user the word isn't a number<span class="why" hidden>A message to the user that the specification describes is fine.</span></label>
+        <label data-option="skip-word" data-misconception="skip-ok"><input type="radio" name="cyu9"> Skip the word and keep reading<span class="why" hidden>Also reasonable, as long as the specification says so.</span></label>
+        <label data-option="stack-trace"><input type="radio" name="cyu9"> End the run with a stack trace<span class="why" hidden>Correct. A stack trace is a message for the programmer, and it is never the response a specification should describe.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-id="cse331-w1-l1-quiz-testing-can" data-format="mc" data-type="choice" data-topic="l1-know">
+      <p class="q">Testing can ____ a claim about every run.</p>
+      <div class="opts">
+        <label data-option="refute-only"><input type="radio" name="cyu10"> refute, but never confirm<span class="why" hidden>Correct. One failing test is a counterexample. Passing tests cover only the runs you chose.</span></label>
+        <label data-option="confirm-only" data-misconception="testing-confirms"><input type="radio" name="cyu10"> confirm, but never refute<span class="why" hidden>Think about what one failing test shows, and what any number of passing tests can't.</span></label>
+        <label data-option="both" data-misconception="testing-both"><input type="radio" name="cyu10"> both confirm and refute<span class="why" hidden>Can a test ever cover every run? And what does a single failing test show?</span></label>
+        <label data-option="neither" data-misconception="testing-neither"><input type="radio" name="cyu10"> neither confirm nor refute<span class="why" hidden>What does one failing test show about a claim that every run must satisfy?</span></label>
+      </div>
+    </li>
+  </ol>
+
+  <div class="cyu-score" data-role="summary" role="status"></div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Use it as an exit ticket in the last minutes of lecture, or as a warm-up at the start of Section 1. Have students commit to an answer before anyone presses Check.</li>
+      <li>Questions 4 and 6 are the conceptual pair: outside (specification) versus inside (assertion). Ask a student to explain why each wrong option is wrong.</li>
+      <li>Questions 3 and 5 were checked against the real program.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l1-exercises" data-unit="l1" data-title="Lecture 1 exercises">
+  <p class="where">Lecture 1 · Wed Sept 30 · the seven exercises at the end of the lecture notes, with the course's answers as solutions</p>
+  <h1>Lecture 1 exercises</h1>
+  <div class="prose">
+    <p>Answer each exercise on the page and use the work box for your reasoning. Everything saves as you type. Hints and solutions stay hidden until you ask for them. Inside some solutions, <strong>Run it</strong> shows the actual run.</p>
+  </div>
+
+  <article class="task" data-id="cse331-w1-l1-predict-two-runs">
+    <h2>Exercise 1a: predict two runs</h2>
+    <p class="prompt">Predict what <code>Sum</code> prints for each input, then check.</p>
+    <div class="prompt-inputs"><div><span class="where">Input 1 (two lines)</span><pre class="typed">3 4
+5</pre></div><div><span class="where">Input 2</span><pre class="typed">2.5 3</pre></div></div>
+    <div class="answer-spec" data-part="two-lines-got" data-type="text" data-label="Input 1: the Got line" data-placeholder="Got [...]"></div>
+    <div class="answer-spec" data-part="two-lines-sum" data-type="int" data-label="Input 1: the sum" data-placeholder="a number"></div>
+    <div class="answer-spec" data-part="decimal-got" data-type="text" data-label="Input 2: the Got line" data-placeholder="Got [...]"></div>
+    <div class="answer-spec" data-part="decimal-sum" data-type="int" data-label="Input 2: the sum" data-placeholder="a number"></div>
+    <ol class="hints">
+      <li>For input 1: does <code>hasNextInt</code> care where one line ends and the next begins?</li>
+      <li>For input 2: is <code>2.5</code> a whole number? What does the loop do when the next thing is not an <code>int</code>?</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li><code>Sum</code> keeps reading across lines until the input ends, so input 1 gives <code>Got [3, 4, 5]</code> and a sum of 12. A sentence saying <code>Sum</code> "reads a line of numbers" is wrong about this run.</li>
+        <li><code>2.5</code> is not a whole number, so the loop stops before it ever reaches the <code>3</code>.</li>
+        <li class="answer">Input 1: <code>Got [3, 4, 5]</code>, sum 12. Input 2: <code>Got []</code>, sum 0.</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-run="orig" data-input="3 4&#10;5">Run it: input 1</button><button class="btn" data-run="orig" data-input="2.5 3">Run it: input 2</button></div>
+      <div class="run-out"></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l1-repair-sentence">
+    <h2>Exercise 1b: repair your sentence</h2>
+    <p class="prompt">Go back to the sentence you wrote before reading past the program. Test it against every run in this lecture. Where is it wrong, and where is it silent? Repair it until it is true of every run you have seen. Then compare it with the course's.</p>
+    <div class="answer-spec" data-part="sentence" data-type="self" data-label="Your repaired sentence" data-placeholder="The program …"></div>
+    <ol class="hints">
+      <li>A repaired sentence has to answer three questions. Which things are read?</li>
+      <li>What stops the reading, and what becomes of the rest of the input? What exactly do the two lines after the prompt hold?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>However you word it, a repaired sentence has to say three things: which things are read; what stops the reading and what becomes of the rest of the input; and what the two lines after the prompt hold, the wrapped sum included.</li>
+      <li class="answer">The course's version: "The program asks for numbers. It reads whole numbers between −2<sup>31</sup> and 2<sup>31</sup> − 1 from the user, in order, until the input ends or the next thing typed is not such a number; anything from that point on is ignored. It prints the numbers it read, then their sum, wrapped around into that same range if the true sum falls outside it." Yours may say it better.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l1-which-are-specs">
+    <h2>Exercise 2: which are specifications?</h2>
+    <p class="prompt">Four statements about <code>Sum</code>:</p>
+    <ol class="abcd">
+      <li>It prints the numbers it read, and then their sum.</li>
+      <li>It prints the numbers it read, and then a whole number.</li>
+      <li>It prints every whole number the user typed.</li>
+      <li>It keeps the numbers in a list and adds them up in a loop.</li>
+    </ol>
+    <p class="prompt">Which are specifications, and which of those does <code>Sum</code> meet? For each specification <code>Sum</code> does not meet, give a run that shows it (in your work).</p>
+    <div class="answer-spec" data-part="specs" data-type="letters" data-label="Specifications" data-placeholder="letters, e.g. AD, or none"></div>
+    <div class="answer-spec" data-part="sum-meets" data-type="letters" data-label="Specs Sum meets" data-placeholder="letters"></div>
+    <ol class="hints">
+      <li>A specification talks about what a user sees, on every run, and not how the code does it.</li>
+      <li>For each specification, look for one run from this lecture on which it is false.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>A fails on the overflow run <code>2147483647 1</code>, where the true sum is positive and the number printed is not. A is true on every other run in this lecture, which makes it easy to believe.</li>
+        <li>B is true on every run: line 14 always prints the numbers read, and line 20 always prints an <code>int</code>.</li>
+        <li>C fails on <code>1 2 three 4</code>, which never prints the 4. It also fails on <code>2147483648</code> alone, which never prints 2147483648.</li>
+        <li>D is true of the code but is not a specification: it says how <code>Sum</code> works, not what a user sees. Useful to a reader of the code, no use to someone who never will be.</li>
+        <li class="answer">A, B and C are specifications. <code>Sum</code> meets only B.</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-run="orig" data-input="2147483647 1">Run it: 2147483647 1</button><button class="btn" data-run="orig" data-input="1 2 three 4">Run it: 1 2 three 4</button><button class="btn" data-run="orig" data-input="2147483648">Run it: 2147483648</button></div>
+      <div class="run-out"></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l1-saying-more-less">
+    <h2>Exercise 3: saying more, saying less</h2>
+    <p class="prompt">Compare statement B from exercise 2 with the course's specification for <code>Sum</code>. Which tells a user more, and does that make the other one useless? Then ask the same two questions of these two assertions, both of which hold at point (2):</p>
+    <pre class="code" data-inline="{{ sum is the sum of the elements of list, wrapped into
+   the int range if the true sum falls outside it }}
+{{ if list is empty, then sum is 0 }}"></pre>
+    <div class="answer-spec" data-part="spec-vs-b" data-type="self" data-label="Spec vs. B"></div>
+    <div class="answer-spec" data-part="two-assertions" data-type="self" data-label="The two assertions"></div>
+    <ol class="hints">
+      <li>Does every program that meets the specification also meet B? Does every program that meets B meet the specification?</li>
+      <li>Think of a broken program that still meets B. Then ask what the second assertion says about a list with something in it.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The specification tells a user more. Any program meeting it also meets B, since the sum it prints is a whole number. Not the reverse: a program that prints the numbers it read and then 0, every time, meets B but not the specification.</li>
+      <li>That doesn't make B useless. Everything B says is true and a user can count on it. B just says too little to tell a working program from a broken one.</li>
+      <li>Saying more is not always better. The specification rules out a program that reads <code>long</code> values, or one that reports an overflow instead of wrapping, and you might prefer either. A specification written first could leave room for both by saying less about sums outside the <code>int</code> range.</li>
+      <li>The assertions compare the same way. Whenever the first is true, so is the second, since the sum of no elements is 0. But the second says nothing about a non-empty list.</li>
+      <li class="answer">The specification and the first assertion each say more. The weaker ones aren't useless: B is true and dependable, and the second assertion explains why the empty run prints 0. But neither is enough on its own: B can't tell a working program from a broken one, and the second assertion can't support line 20 on any non-empty run.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul>
+        <li>Lecture 2 names this comparison: the specification is <a href="#l2-strength">stronger</a> than B. Homework 1 asks students to make such comparisons themselves; don't preview its specs here.</li>
+      </ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l1-sum-starts-at-one">
+    <h2>Exercise 4: <code>int sum = 1;</code></h2>
+    <p class="prompt">Change line 15 of <code>Sum</code> from <code>int sum = 0;</code> to <code>int sum = 1;</code>. Which of the three assertions in "Sum with assertions" still hold? Does the changed program still meet the specification? If not, put the smallest run that shows it in your work.</p>
+    <div class="answer-spec" data-part="point1-list" data-type="yesno" data-label="(1) about list still holds?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="point2-sum" data-type="yesno" data-label="(2) about sum still holds?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="point2-list" data-type="yesno" data-label="(2) about list still holds?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="meets-spec" data-type="yesno" data-label="Still meets the spec?" data-placeholder="yes or no"></div>
+    <ol class="hints">
+      <li>Where is line 15 relative to each assertion? An assertion before the change can't be affected by it.</li>
+      <li>For the specification, look for the run with the fewest numbers in it.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>The assertion at (1) still holds: the change comes after that point.</li>
+        <li>The assertion at (2) about <code>list</code> still holds: the summing loop still never writes to <code>list</code>.</li>
+        <li>The assertion at (2) about <code>sum</code> does not hold: on every run, <code>sum</code> ends up one more than it says, wrapped if need be.</li>
+        <li>The changed program does not meet the specification. The smallest counterexample is the empty run, which prints <code>Got []</code> and a sum of 1.</li>
+        <li class="answer">Yes, no, yes; and no, it fails the specification. It still meets statement B from exercise 2, which can't tell this broken program from the working one.</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-run="one" data-input="">Run it: changed program, empty input</button></div>
+      <div class="run-out"></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l1-rule-println-and-init">
+    <h2>Exercise 5: use the rule</h2>
+    <p class="prompt">Use the rule from "Reasoning between assertions" on the two lines between point (1) and the summing loop. What holds after line 14, and why? What holds after line 15, and why?</p>
+    <pre class="code" data-inline="// (1)
+{{ list holds, in order, every number the user typed before
+   the input ended or something that was not an int appeared }}
+System.out.println(&quot;Got &quot; + list);
+{{ ? }}
+int sum = 0;
+{{ ? }}"></pre>
+    <div class="answer-spec" data-part="after-println" data-type="self" data-label="After line 14"></div>
+    <div class="answer-spec" data-part="after-sum-init" data-type="self" data-label="After line 15"></div>
+    <ol class="hints">
+      <li>Which variables does line 14 change? A claim about variables stays true across a line that changes none of them.</li>
+      <li>Line 15 changes exactly one variable. What new claim does that give you, and does the old one survive?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>After line 14, the claim at (1) still holds word for word. Line 14 prints <code>list</code> but changes no variable. What did change is what the user has seen: line 14 kept the specification's first promise. No assertion about variables records that.</li>
+      <li>After line 15, the claim at (1) still holds, since line 15 doesn't touch <code>list</code>. Beside it there is a new claim, <code>{{ sum is 0 }}</code>.</li>
+      <li class="answer">After 14: the claim at (1), unchanged. After 15: the claim at (1) and <code>{{ sum is 0 }}</code>. Together they are the claim before the summing loop, and the argument for (2) rested on both when it said the loop started from zero.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l1-long-version">
+    <h2>Exercise 6: read <code>long</code> values</h2>
+    <p class="prompt">Here is <code>Sum</code> changed to read <code>long</code> values (highlighted lines changed). A <code>long</code> holds −2<sup>63</sup> to 2<sup>63</sup> − 1, that is, −9223372036854775808 to 9223372036854775807. Predict which runs from this lecture now go differently, then write the specification of the changed program in your work.</p>
+    <pre class="code" data-src="sum-long" data-hl="9,10,11,15"></pre>
+    <div class="answer-spec" data-part="overflow-sum" data-type="int" data-label="Sum printed for 2147483647 1" data-placeholder="exact number"></div>
+    <div class="answer-spec" data-part="too-big-got" data-type="text" data-label="Got line for 2147483648 alone" data-placeholder="Got [...]"></div>
+    <div class="answer-spec" data-part="long-spec" data-type="self" data-label="Specification of the long version"></div>
+    <ol class="hints">
+      <li>Only runs that touched the edge of the <code>int</code> range can change. Which runs were those?</li>
+      <li>For the specification, start from the course's specification of <code>Sum</code>. Which numbers change, and does the range clause go away?</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>On <code>2147483647 1</code> the program now prints the true sum, 2147483648.</li>
+        <li>Typing <code>2147483648</code> alone is now read as a number, so it is printed in the list and again as the sum. The word, the empty input, <code>3 4 5</code> and both inputs from exercise 1 go as before.</li>
+        <li>Specification: "The program asks for numbers. It reads whole numbers between −2<sup>63</sup> and 2<sup>63</sup> − 1 from the user, in order, until the input ends or the next thing typed is not such a number; anything from that point on is ignored. It prints the numbers it read, then their sum, wrapped around into that same range if the true sum falls outside it."</li>
+        <li class="answer">The range clause did not go away; it only moved. <code>9223372036854775807 1</code> prints −9223372036854775808, and <code>9223372036854775808</code> alone reads nothing. A bigger type moves the limit further out, but the specification still has to say where it is.</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-run="long" data-input="2147483647 1">Run it: 2147483647 1</button><button class="btn" data-run="long" data-input="2147483648">Run it: 2147483648</button><button class="btn" data-run="long" data-input="9223372036854775807 1">Run it: 9223372036854775807 1</button></div>
+      <div class="run-out"></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l1-specs-worth-meeting">
+    <h2>Exercise 7: specifications worth meeting</h2>
+    <p class="prompt">Two statements, each offered as a specification for the <code>hasNext</code> version of <code>Sum</code> from "The edge of the program". For each, what does it promise a user who types a word, and does the <code>hasNext</code> version meet it? Which of the two, if either, does this course accept?</p>
+    <ol class="abcd" start="5">
+      <li>The user must type only whole numbers between −2<sup>31</sup> and 2<sup>31</sup> − 1. The program asks for them, reads them until the input ends, then prints them and their sum, wrapped around into that range if need be.</li>
+      <li>The program asks for numbers and reads whole numbers between −2<sup>31</sup> and 2<sup>31</sup> − 1 until the input ends, then prints them and their sum, wrapped around into that range if need be. If anything else is typed before the input ends, it stops there with a stack trace.</li>
+    </ol>
+    <div class="answer-spec" data-part="meets-e" data-type="yesno" data-label="hasNext version meets E?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="meets-f" data-type="yesno" data-label="hasNext version meets F?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="course-accepts" data-type="text" data-label="Course accepts: E, F, both or neither?" data-placeholder="E, F, both or neither"></div>
+    <ol class="hints">
+      <li>E's promises all depend on the user obeying E's rule. What is the program allowed to do when the user doesn't?</li>
+      <li>Meeting a specification is half the job. Check each statement against the standard from "The edge of the program".</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>E promises a user who types a word nothing at all. On such a run the program may do anything and still meet E. The <code>hasNext</code> version meets E, stack trace and all.</li>
+        <li>F promises a stack trace, and the <code>hasNext</code> version keeps that promise: on a word, a decimal, or a whole number outside the range, the run ends with a stack trace right after the prompt. Every other run goes as F says.</li>
+        <li class="answer">Both are met, and the course accepts neither. E leaves inputs a user can produce with no response described. F describes a response meant for a programmer. Meeting a specification is half the job; the other half is having one worth meeting.</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-run="hasnext" data-input="3 4 hello">Run it: 3 4 hello</button><button class="btn" data-run="hasnext" data-input="1 2.5">Run it: 1 2.5</button><button class="btn" data-run="hasnext" data-input="2147483648">Run it: 2147483648</button></div>
+      <div class="run-out"></div>
+    </div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul>
+        <li>Homework 1 holds programs to the same standard. Point students there without working any Homework 1 task in section.</li>
+        <li>Ask the room to rewrite F so the course would accept it. Any version that describes a user-facing response to a word works, for example the original <code>Sum</code>'s "anything from that point on is ignored".</li>
+      </ul>
+    </details>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: SUM IN PIECES -->
+<section class="page" id="l2-pieces" data-title="Sum, in pieces" data-unit="l2">
+  <p class="where">Lecture 2 · Fri Oct 2 · notes: "Sum, in pieces", "A specification for a method"</p>
+  <h1>Sum, in pieces</h1>
+
+  <div class="prose">
+    <p>Last lecture's <code>Sum</code> did all its work in <code>main</code>. Larger programs are built from methods, each with one job. Here is <code>Sum</code> rebuilt that way: one method reads the numbers, and another adds them up.</p>
+  </div>
+  <pre class="code" data-src="sum-pieces"></pre>
+
+  <div class="prose">
+    <p>Only one step has moved: the program now builds the <code>Scanner</code> after it prints the prompt. A <code>Scanner</code> reads nothing until the program asks it for a number, so on every input this program prints exactly what last lecture's <code>Sum</code> printed. It meets the same specification.</p>
+  </div>
+
+  <h2>Same output, every input</h2>
+  <div class="panel" id="pieces-panel">
+    <div class="sim-in">
+      <label for="pieces-input">What the user types</label>
+      <textarea id="pieces-input" rows="2" spellcheck="false" autocomplete="off">1 2 three 4</textarea>
+      <div class="controls">
+        <button class="btn primary" id="pieces-run">Run both</button>
+        <span class="where">Try:</span>
+        <button class="chip" data-try="3 4 5">3 4 5</button>
+        <button class="chip" data-try="">nothing</button>
+        <button class="chip" data-try="2147483647 1">2147483647 1</button>
+        <button class="chip" data-try="2.5 3">2.5 3</button>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div><h4>Lecture 1: all in <code>main</code></h4><div class="term small" id="pieces-old"></div></div>
+      <div><h4>Lecture 2: in pieces</h4><div class="term small" id="pieces-new"></div></div>
+    </div>
+    <p class="verdict" id="pieces-verdict" role="status"></p>
+    <p class="where">Both terminals come from the same Scanner model. Before trusting that, we compiled both Java programs and ran them as real processes on the same inputs: their output matched every time, as the lecture says.</p>
+  </div>
+
+  <h2>Does <code>main</code> work?</h2>
+  <div class="prose">
+    <p>Read <code>main</code> on its own, lines 6 to 11. To argue that the program meets its specification we need to know what <code>readList</code> returns and what <code>sumList</code> returns for that list, and <code>main</code> doesn't say. We could read both methods, as we read the loops last lecture. That stops working once a program has a thousand methods. Worse, <code>main</code> might work only because of how <code>sumList</code> happens to be written, and then a rewrite of <code>sumList</code> could break <code>main</code> without touching it. So instead we write down each method's promises.</p>
+  </div>
+
+  <h2>A specification for a method</h2>
+  <div class="prose">
+    <p>A method's runs are its calls. So a method's specification says what every call must do, as seen from the code that makes the call. Code that calls a method is a <strong>client</strong> of the method: <code>main</code> is a client of <code>sumList</code>.</p>
+  </div>
+  <div class="grid-2">
+    <div class="rule"><p><strong>A program's user</strong> owes it nothing. They may type anything at all, so the user manual has to cover every input.</p></div>
+    <div class="rule gold"><p><strong>A method's client</strong> can be held to a promise. It is code, written by a programmer who can read the specification. So a method's specification has two parts: what it asks of its client, and what it promises in return.</p></div>
+  </div>
+  <div class="rule">
+    <p><strong>Method specification.</strong> A method specification has a <em>precondition</em>, an assertion at the point where the method is called, and a <em>postcondition</em>, an assertion at the point where it returns or throws. The client must make the precondition true. The implementer must make the postcondition true and may assume the precondition.</p>
+    <p>A method <strong>meets</strong> its specification if every call that begins with the precondition true ends with the postcondition true.</p>
+  </div>
+  <div class="prose">
+    <p>On a call that breaks the precondition, the specification promises nothing: the method may return any value, throw any exception, or never return, and it still meets its specification. A whole program can't ask that of its user, since no one can hold a user to a promise. That's why last lecture's exercise 7 rejected a specification that began "the user must type only whole numbers". Put a client in place of the user, and the same sentence is an ordinary precondition.</p>
+    <p>Homework 1 says an implementation <em>satisfies</em> its specification where these notes say <em>meets</em>. The two words mean the same thing.</p>
+  </div>
+
+  <h2>Assertions become promises</h2>
+  <div class="chain panel">
+    <div class="link"><span class="lbl">(1)</span><code>{{ list holds, in order, every number the user typed before the input ended or something that was not an int appeared }}</code></div>
+    <div class="link code-link"><span class="lbl">becomes</span><code>what readList promises about the list it returns</code></div>
+    <div class="link"><span class="lbl">(2)</span><code>{{ sum is the sum of the elements of list, wrapped into the int range if the true sum falls outside it }}</code></div>
+    <div class="link code-link"><span class="lbl">becomes</span><code>what sumList promises about the number it returns</code></div>
+    <p class="where">Preconditions are short: <code>readList</code> asks nothing of its client, and <code>sumList</code> asks only for a list that is not <code>null</code>.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w1-l2-qc-who-makes-precondition" data-kind="quickcheck" data-type="text">
+    <p>Quick check: who must make a method's precondition true, the client or the implementer? (one word)</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Open with the slide's question: "Does <code>main</code> work?" Let the room notice that answering means opening <code>readList</code> and <code>sumList</code>. Then ask what happens when there are a thousand methods.</li>
+      <li>The moved <code>Scanner</code> is worth ten seconds: why doesn't printing the prompt first change the output? (A <code>Scanner</code> reads nothing until asked for a number.)</li>
+      <li>Client versus user is the key contrast of the lecture. Ask: "Why could last lecture's specification not start with 'the user must type numbers', when <code>sumList</code>'s can say 'must be non-null'?" That is exercise 6, so don't answer it fully yet.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: JAVADOC -->
+<section class="page" id="l2-javadoc" data-title="Writing it in Java" data-unit="l2">
+  <p class="where">Lecture 2 · Fri Oct 2 · notes: "Writing it in Java"</p>
+  <h1>Writing it in Java</h1>
+
+  <div class="prose">
+    <p>A method's specification goes just above the method, in a comment that begins with <code>/**</code>. The <code>javadoc</code> tool turns such comments into web pages; the pages for <code>ArrayList</code> and <code>Scanner</code> were made that way. The comment opens with a sentence saying what the method does. Then each part of the specification begins with a <em>tag</em>, a word starting with <code>@</code>.</p>
+  </div>
+
+  <div class="table-scroll"><table class="plain tags">
+    <tr><th>Tag</th><th>Says</th><th>Part of the</th></tr>
+    <tr><td><code>@param</code></td><td>what a parameter is for (a short precondition on that one parameter, like <em>must be non-null</em>, can go here too)</td><td>precondition</td></tr>
+    <tr><td><code>@requires</code></td><td>a precondition too long for one <code>@param</code>, or one that relates several parameters</td><td>precondition</td></tr>
+    <tr><td><code>@return</code></td><td>what the method returns</td><td>postcondition</td></tr>
+    <tr><td><code>@throws</code></td><td>which exception it throws, and when (a promise to throw it in that case)</td><td>postcondition</td></tr>
+    <tr><td><code>@modifies</code></td><td>the parameters the method may change; every other parameter is left alone</td><td>postcondition</td></tr>
+    <tr><td><code>@effects</code></td><td>how the parameters in <code>@modifies</code> change</td><td>postcondition</td></tr>
+  </table></div>
+  <p class="where"><code>@param</code>, <code>@return</code> and <code>@throws</code> are standard Javadoc. <code>@requires</code>, <code>@modifies</code> and <code>@effects</code> are this course's, from Liskov and Guttag. Homework 1 uses all six.</p>
+
+  <h2>Read a specification, then call it</h2>
+  <p class="where">The slide's example. Click a line of the comment, then try calls below.</p>
+  <div class="panel" id="middle-panel">
+    <pre class="code" data-src="middle" id="middle-code"></pre>
+    <div class="clause-detail" id="middle-detail" aria-live="polite"><p class="where">Click a tag line in the comment.</p></div>
+    <div class="controls">
+      <label for="middle-input">list =</label>
+      <input type="text" id="middle-input" value="[4, 8, 15, 16, 23]" spellcheck="false" autocomplete="off">
+      <button class="btn primary" id="middle-run">Call middle(list)</button>
+      <button class="chip" data-try="[4, 8, 15, 16, 23]">5 elements</button>
+      <button class="chip" data-try="[1, 2, 3, 4]">4 elements</button>
+      <button class="chip" data-try="[]">empty</button>
+    </div>
+    <div id="middle-out" class="verdict-box" role="status"></div>
+  </div>
+
+  <h2>Two specifications</h2>
+  <div class="prose"><p>The specifications of <code>readList</code> and <code>sumList</code> need only two tags:</p></div>
+  <pre class="code" data-src="javadoc-two"></pre>
+  <div class="prose">
+    <p><code>readList</code>'s specification talks about the user, and <code>sumList</code>'s talks only about its parameter. A client doesn't need to know about <code>Scanner</code>, loops or indices, so neither mentions them. <code>sumList</code> also makes a promise by what it leaves out: it has no <code>@modifies</code>, so it promises not to change <code>list</code>. That is the second claim last lecture needed at (2): the list the user was shown is the list that got summed.</p>
+  </div>
+
+  <h2>When a method changes something</h2>
+  <pre class="code" data-src="readinto"></pre>
+  <div class="prose">
+    <p><code>readInto</code> returns nothing, so everything it promises is in <code>@effects</code>, which describes the new <code>list</code> in terms of the old. A client that needs its list untouched learns from <code>@modifies</code> not to pass that list to <code>readInto</code>. Neither design is wrong. <code>readList</code> and <code>readInto</code> make different promises, and their specifications say exactly how.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w1-l2-qc-modifies-tag" data-kind="quickcheck" data-type="text">
+    <p>Quick check: which tag lists the parameters a method may change?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>On the <code>middle</code> panel, call it on a 4-element list. It returns something, and no exception. Ask: "Is that a bug?" No: the call broke <code>@requires</code>, so the specification promised nothing, and the method still meets it.</li>
+      <li>Ask what <code>sumList</code> promises by having <em>no</em> <code>@modifies</code>. Students rarely read an absent tag as a promise.</li>
+      <li>Homework 1 uses all six tags. Don't work any Homework 1 specification in class; the examples here are enough.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: ACROSS A CALL -->
+<section class="page" id="l2-across" data-title="Reasoning across a call" data-unit="l2">
+  <p class="where">Lecture 2 · Fri Oct 2 · notes: "Reasoning across a call"</p>
+  <h1>Reasoning across a call</h1>
+
+  <div class="prose">
+    <p>The specifications of <code>readList</code> and <code>sumList</code> let us argue that <code>main</code> is correct without opening either method. Here are lines 7 to 10 of <code>main</code>, with a claim written in after line 8:</p>
+  </div>
+  <pre class="code" data-src="across" data-start="7"></pre>
+
+  <div class="triple">
+    <div class="t-p"><span>P</span><code>precondition</code></div>
+    <div class="t-c"><span>The code</span><code>a call</code></div>
+    <div class="t-q"><span>Q</span><code>postcondition</code></div>
+  </div>
+  <div class="prose">
+    <p>This is last lecture's P, code, Q rule with a call as the code. The specification promises that running the call from any state where P is true ends in a state where Q is true.</p>
+  </div>
+
+  <h2>The argument for <code>main</code>, one step at a time</h2>
+  <div class="panel">
+    <div class="steps"><ol>
+      <li><code>readList</code> has no precondition for <code>main</code> to make true. Its postcondition says what is in the returned list, and line 8 stores that list in <code>list</code>. So the claim after line 8 holds. It is last lecture's assertion at (1), but this time it came from a specification instead of a loop.</li>
+      <li>Line 9 prints <code>list</code>: the numbers read. That keeps the whole program's first promise.</li>
+      <li>On line 10, <code>readList</code> promised a list, so <code>list</code> is not <code>null</code>, as <code>sumList</code>'s precondition requires. The call returns the wrapped sum of the elements of <code>list</code>.</li>
+      <li><code>sumList</code> promises not to change <code>list</code>, so its elements are still the numbers line 9 printed.</li>
+      <li class="answer">So line 10 prints their sum, wrapped as <code>Sum</code>'s specification says. Each step relied on nothing but the promises of <code>readList</code> and <code>sumList</code>.</li>
+    </ol></div>
+  </div>
+
+  <div class="rule">
+    <p><strong>Procedural abstraction.</strong> Procedural abstraction is using a method through its specification alone. The method's clients rely on nothing the specification does not promise, and its implementer may change anything the specification does not promise.</p>
+  </div>
+  <div class="prose">
+    <p>The specification is the line between a method's clients and its implementer, often called an <strong>abstraction barrier</strong>. On one side, <code>main</code> relies on the promises and nothing else. On the other, the implementer of <code>sumList</code> is free to add up the list from the end instead of the start.</p>
+  </div>
+
+  <h2>Cross the barrier</h2>
+  <div class="panel" id="barrier">
+    <div class="controls" role="group" aria-label="sumList implementation">
+      <span>Implementation of <code>sumList</code>:</span>
+      <button class="chip" data-dir="forward" aria-pressed="true">from the start (the lecture's)</button>
+      <button class="chip" data-dir="backward" aria-pressed="false">from the end</button>
+    </div>
+    <pre class="code" id="barrier-code" data-src="sumlist-forward"></pre>
+    <div class="controls">
+      <label for="barrier-input">The user types</label>
+      <input type="text" id="barrier-input" value="2147483647 5 -10" spellcheck="false" autocomplete="off">
+      <button class="btn primary" id="barrier-run">Run main</button>
+    </div>
+    <div class="term small" id="barrier-term"></div>
+    <p class="verdict" id="barrier-verdict" role="status"></p>
+  </div>
+
+  <div class="check" data-id="cse331-w1-l2-qc-main-lines-to-change" data-kind="quickcheck" data-type="int">
+    <p>Quick check: the implementer of <code>sumList</code> switches to adding from the end. It keeps the same promises. How many lines of <code>main</code> must change?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Reveal the argument one step at a time (<kbd>N</kbd>) and ask, at each step, "which promise did we just use?"</li>
+      <li>On the barrier panel, try <code>2147483647 5 -10</code>: the running total wraps in one order and not in the other, yet the printed sum is the same. <code>int</code> addition wraps the same way in any order, and we checked both versions against real Java on 300 lists, extreme values included. The point for the lecture isn't the arithmetic, though: <code>main</code> needs neither a change nor a new argument, because the promises are the same.</li>
+      <li>The slide marks "Specification or source code?" as half-sheet question 2. The question's text isn't in the posted slides or notes, so this site doesn't reproduce it.</li>
+      <li>A large program is argued correct the same way, one method at a time, each against the specifications of the methods it calls.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: MEETING A SPEC -->
+<section class="page" id="l2-meets" data-title="Meeting a specification" data-unit="l2">
+  <p class="where">Lecture 2 · Fri Oct 2 · notes: "Meeting a specification"</p>
+  <h1>Meeting a specification</h1>
+
+  <div class="prose">
+    <p>We can often give a method more than one reasonable specification, and choosing it is part of designing the method. Here is a method that searches part of an array, with its specification cut off where the choices begin:</p>
+  </div>
+  <pre class="code" data-src="indexof-head"></pre>
+
+  <h2>Five specifications</h2>
+  <div class="table-scroll"><table class="plain specs-table">
+    <tr><th>Spec</th><th>Requires</th><th>Returns</th><th>If there is no match</th></tr>
+    <tr><td><strong>A</strong></td><td>a match</td><td>a match</td><td>no promise</td></tr>
+    <tr><td><strong>B</strong></td><td></td><td>the smallest match</td><td>-1</td></tr>
+    <tr><td><strong>C</strong></td><td></td><td>the largest match</td><td>-1</td></tr>
+    <tr><td><strong>D</strong></td><td></td><td>some match</td><td>-1</td></tr>
+    <tr><td><strong>E</strong></td><td></td><td>the smallest match</td><td><code>NoSuchElementException</code></td></tr>
+  </table></div>
+  <p class="where">A <em>match</em> is an index <code>i</code> with <code>lo &lt;= i &lt; hi</code> and <code>a[i] == x</code>. All five also require <code>0 &lt;= lo &lt;= hi &lt;= a.length</code>.</p>
+  <details class="full-specs"><summary>The five specifications, as written in the notes</summary><pre class="code" data-src="indexof-specs"></pre></details>
+
+  <h2>Four implementations</h2>
+  <pre class="code" data-src="indexof-impls"></pre>
+
+  <h2>Call lab</h2>
+  <p class="where">Make a call. All four implementations run on it (the lecture's code, modelled with Java's semantics and checked against real Java on every call in the lecture's test domain). Each specification then says whether that outcome keeps its promise.</p>
+  <div class="panel" id="lab">
+    <div class="controls lab-inputs">
+      <label>a = <input type="text" id="lab-a" value="{5, 1, 5, 2, 5}" spellcheck="false" autocomplete="off" aria-label="array a"></label>
+      <label>lo = <input type="number" id="lab-lo" value="0" aria-label="lo"></label>
+      <label>hi = <input type="number" id="lab-hi" value="5" aria-label="hi"></label>
+      <label>x = <input type="number" id="lab-x" value="5" aria-label="x"></label>
+      <button class="btn primary" id="lab-run">Call indexOf</button>
+    </div>
+    <div class="controls">
+      <span class="where">Try:</span>
+      <button class="chip" data-call="{5, 1, 5, 2, 5}|0|5|5">x three times</button>
+      <button class="chip" data-call="{5, 1, 5, 2, 5}|0|5|9">x absent</button>
+      <button class="chip" data-call="{0, 1, 2}|0|1|2">x only past hi</button>
+      <button class="chip" data-call="{0, 1}|1|0|1">lo &gt; hi</button>
+    </div>
+    <div id="lab-out" class="lab-out" aria-live="polite"></div>
+  </div>
+
+  <div class="prose">
+    <p>Which implementations meet which specifications? Work it out first: it's <a href="#l2-exercises">Lecture 2 problem 1</a>, the lecture's in-class question. One call can show an implementation <em>fails</em> a specification. To show it <em>meets</em> one takes an argument about every call, which is what the lecture's answers give.</p>
+  </div>
+  <details class="spoiler">
+    <summary>The lecture's answers (open after you've tried)</summary>
+    <ul>
+      <li><strong>Implementation 1</strong> stops at the first match, the smallest matching index, and returns -1 when there is none. So it meets B, and D too (the smallest match is in particular some match). A's precondition promises a match, so the -1 never comes up: it meets A. It fails C on any array with x twice in the range, and E whenever x is absent.</li>
+      <li><strong>Implementation 2</strong> is implementation 1 with an exception in place of the -1. It meets E and A, and fails B, C and D whenever x is absent.</li>
+      <li><strong>Implementation 3</strong> never looks at <code>hi</code>. When A's precondition holds, it stops at the first match, so it meets A. When x is absent it keeps going past <code>hi</code>, and if <code>hi</code> is <code>a.length</code> it runs off the end with an <code>ArrayIndexOutOfBoundsException</code>. It meets A and nothing else.</li>
+      <li><strong>Implementation 4</strong> searches from the end and stops at the last match. It meets C, D and A. It fails B on any array with x twice in the range, and E whenever x is absent.</li>
+      <li>The lecture ran each implementation on every array of up to four elements drawn from 0, 1 and 2, with every range and every x from 0 to 3, and each failed exactly the specifications above. This site reran that check against real Java: same table.</li>
+    </ul>
+  </details>
+
+  <div class="check" data-id="cse331-w1-l2-qc-impls-meeting-d" data-kind="quickcheck" data-type="int">
+    <p>Quick check: how many of the four implementations meet specification D?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>This is half-sheet question 1. Give pairs three minutes on the 4 × 5 table before using the call lab.</li>
+      <li>Use the call lab to settle arguments, not to replace them. A red cell is a counterexample, and it settles "fails". A row of green cells on a few calls proves nothing: that's last lecture's point about runs, now about calls.</li>
+      <li>The "no promise" cells are the subtle ones. Try "x only past hi" with implementation 3: it returns 2, outside the range. That breaks B, C, D and E, but A promises nothing about that call.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: STRONGER AND WEAKER -->
+<section class="page" id="l2-strength" data-title="Stronger and weaker" data-unit="l2">
+  <p class="where">Lecture 2 · Fri Oct 2 · notes: "Stronger and weaker", "Which is better?"</p>
+  <h1>Stronger and weaker</h1>
+
+  <h2>Read it by specification</h2>
+  <div class="prose"><p>Count the implementations that meet each specification:</p></div>
+  <div class="slots metcount">
+    <div class="slot"><b>4</b><span>meet A</span></div>
+    <div class="slot"><b>1</b><span>meet B</span></div>
+    <div class="slot"><b>1</b><span>meet C</span></div>
+    <div class="slot"><b>2</b><span>meet D</span></div>
+    <div class="slot"><b>1</b><span>meet E</span></div>
+  </div>
+  <div class="prose"><p>A specification that promises more is met by fewer implementations. That gives a way to compare two specifications directly.</p></div>
+
+  <div class="rule">
+    <p><strong>Stronger and weaker.</strong> An assertion P is <em>stronger</em> than an assertion Q if Q is true whenever P is. A specification S1 is stronger than a specification S2 if every implementation that meets S1 also meets S2.</p>
+    <p>In either case the second is <em>weaker</em> than the first, and two that are neither stronger nor weaker than each other are <em>incomparable</em>.</p>
+  </div>
+  <div class="prose">
+    <p>Last lecture's exercise 3 made this comparison without the name. Every program that meets our specification for <code>Sum</code> also meets statement B ("it prints the numbers it read, and then a whole number"), and not the reverse. So our specification is the stronger one.</p>
+  </div>
+
+  <div class="rule">
+    <p><strong>The rule.</strong> S1 is stronger than S2 when S1's precondition is weaker than or the same as S2's, and, on every call where S2's precondition is true, S1's postcondition is stronger than or the same as S2's.</p>
+  </div>
+
+  <h2>All five compared</h2>
+  <p class="where">Row against column. Predict a cell, then click it to see the reasoning and the implementations that show it.</p>
+  <div class="panel" id="strength-grid-panel">
+    <div class="table-scroll"><table class="strength-grid" id="strength-grid"></table></div>
+    <div class="clause-detail" id="strength-detail" aria-live="polite"><p class="where">Click a cell.</p></div>
+    <div class="controls"><button class="btn" id="strength-all">Reveal the whole table</button><button class="btn quiet" id="strength-hide">Hide again</button></div>
+  </div>
+
+  <h2>Which is better?</h2>
+  <div class="prose">
+    <p>A stronger specification promises more, so the strongest can seem best. But every promise binds the implementer. B obliges <code>indexOf</code> to find the first match; D lets it search from whichever end suits the arrays it will see. A weaker specification leaves the implementer more choices, and every choice it allows is a case the client must handle.</p>
+  </div>
+  <div class="rule gold"><p><strong>A good specification</strong> rules out exactly the implementations its clients cannot use.</p></div>
+
+  <h2>Changing a specification</h2>
+  <div class="table-scroll"><table class="plain">
+    <tr><th>Change</th><th>Cannot break</th><th>Can break</th></tr>
+    <tr><td>Strengthening</td><td>a client</td><td>the implementation</td></tr>
+    <tr><td>Weakening</td><td>the implementation</td><td>a client</td></tr>
+  </table></div>
+  <div class="prose">
+    <p>Strengthening keeps every promise a client relied on. Weakening makes no promise the old specification didn't. If a method's only clients are your own code, you can fix both sides at once. A method in a library with a thousand clients is different: no one can check all of them, so its specification can only grow stronger.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w1-l2-qc-b-or-d-stronger" data-kind="quickcheck" data-type="text">
+    <p>Quick check: B and D have the same precondition. Which is stronger: B, D, or neither?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The common mistake is reading "stronger" as "asks more". A precondition that asks more of the client makes the specification <em>weaker</em>: that's why D is stronger than A.</li>
+      <li>Have the room predict the A row before revealing it. Every cell is W, by the rule: A asks the most and promises no more.</li>
+      <li>Homework 1's Task 2 asks for comparisons like these among five specifications of a different method. Don't preview it.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: CLIENT -->
+<section class="page" id="l2-client" data-title="Writing a client" data-unit="l2">
+  <p class="where">Lecture 2 · Fri Oct 2 · notes: "Writing a client", "Knowing a program in pieces"</p>
+  <h1>Writing a client</h1>
+
+  <div class="rule">
+    <p><strong>Correct client.</strong> A client is correct if it works with every implementation that meets the specifications it relies on. Working with the implementation it happens to run with is not enough.</p>
+  </div>
+  <div class="prose"><p>Here is a client of <code>indexOf</code> that counts how many times a value occurs in an array:</p></div>
+  <pre class="code" data-src="count" id="count-code"></pre>
+
+  <h2>Step through <code>count</code></h2>
+  <div class="panel" id="count-panel">
+    <div class="controls">
+      <label>a = <input type="text" id="count-a" value="{5, 1, 5, 2, 5}" spellcheck="false" autocomplete="off" aria-label="array a"></label>
+      <label>x = <input type="number" id="count-x" value="5" aria-label="x"></label>
+    </div>
+    <div class="controls" role="group" aria-label="indexOf implementation">
+      <span><code>indexOf</code> is</span>
+      <button class="chip" data-impl="1" aria-pressed="true">implementation 1</button>
+      <button class="chip" data-impl="2" aria-pressed="false">2</button>
+      <button class="chip" data-impl="3" aria-pressed="false">3</button>
+      <button class="chip" data-impl="4" aria-pressed="false">4</button>
+    </div>
+    <div class="controls">
+      <button class="btn" id="count-back">Back</button>
+      <button class="btn primary" id="count-step">Next call</button>
+      <button class="btn" id="count-end">Run to the end</button>
+      <span class="where" id="count-pos"></span>
+    </div>
+    <ol class="calls" id="count-calls"></ol>
+    <div id="count-verdict" class="verdict-box" role="status"></div>
+  </div>
+
+  <div class="prose">
+    <p>Each search in <code>count</code> starts just past the last match found. Under B, <em>smallest</em> guarantees no search skips a match, so <code>count</code> is correct against B. D allows a search to return any match; when it returns one other than the first in its range, the matches before it are never counted. So against D, <code>count</code> is wrong, though it may pass every test you give it. Implementations 1 and 4 both meet D, and on <code>[5, 1, 5, 2, 5]</code> they make <code>count</code> return 3 and 1.</p>
+  </div>
+
+  <h2>Does x occur?</h2>
+  <pre class="code" data-inline="indexOf(a, 0, a.length, x) != -1"></pre>
+  <div class="prose">
+    <p>B, C and D all promise -1 exactly when x is absent, so this client is correct against any of them. When x is absent the call breaks A's precondition, and under E the same call throws where the client expects -1. So it is correct against neither A nor E.</p>
+  </div>
+
+  <h2>Knowing a program in pieces</h2>
+  <div class="prose">
+    <p>For a program too big to hold in your head, specifications let us answer "how do you know it works?" one method at a time. We come to know that each method meets its own specification, with the specifications of the methods it calls standing in for their code, and that each client works with every implementation those specifications allow. And when someone rewrites a method to keep the same promises, its clients can stay exactly as they are. Those two payoffs are what procedural abstraction is for.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w1-l2-qc-count-impl4" data-kind="quickcheck" data-type="int">
+    <p>Quick check: with implementation 4 as <code>indexOf</code>, what does <code>count(new int[]{3, 0, 3, 3}, 3)</code> return?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Step <code>count</code> with implementation 1, then switch to 4 on the same array. Both implementations meet D. Ask: "Which one is wrong?" Neither. <code>count</code> is the wrong one: it relied on a promise D doesn't make.</li>
+      <li>Try implementations 2 and 3 too. They don't meet D, so <code>count</code> owes them nothing; the stepper shows the exception that ends the run.</li>
+      <li>Homework 1's Task 4 asks for exactly this discipline: code that is correct with any correct implementation of the methods it calls.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: QUIZ -->
+<section class="page" id="l2-quiz" data-title="Check your understanding: Lecture 2" data-unit="l2">
+  <p class="where">Lecture 2 · Fri Oct 2 · wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose">
+    <p>Eleven questions on Lecture 2 only. Answer without looking back, then use the review links for anything you missed. Your score counts first tries only.</p>
+  </div>
+  <div class="cyu-score" data-role="score" role="status"></div>
+
+  <ol class="cyu-list">
+    <li class="cyu" data-kind="quiz" data-format="mc" data-type="choice" data-id="cse331-w1-l2-quiz-who-keeps-precondition" data-topic="l2-pieces">
+      <p class="q">A method's specification requires a non-null list. Whose job is it to make sure the list isn't <code>null</code>?</p>
+      <div class="opts">
+        <label data-option="implementer" data-misconception="implementer-owns-pre"><input type="radio" name="l2q1"> The method's implementer, by checking for <code>null</code> first<span class="why" hidden>The implementer may <em>assume</em> the precondition. Checking is allowed, but it isn't what the specification asks of them.</span></label>
+        <label data-option="client"><input type="radio" name="l2q1"> The client, the code that makes the call<span class="why" hidden>Correct. The precondition is the client's promise. The implementer may assume it.</span></label>
+        <label data-option="user" data-misconception="user-is-client"><input type="radio" name="l2q1"> The user at the keyboard<span class="why" hidden>The user owes the program nothing. A method's other side is code, written by someone who can read the specification.</span></label>
+        <label data-option="java" data-misconception="compiler-checks"><input type="radio" name="l2q1"> Java, which checks preconditions when the method is called<span class="why" hidden>Java checks types, not preconditions. A comment like <code>@param list ... must be non-null</code> is never executed.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-format="mc" data-type="choice" data-id="cse331-w1-l2-quiz-broken-precondition" data-topic="l2-pieces">
+      <p class="q">A client calls a method in a way that breaks its precondition, and the method throws an exception. Does the method still meet its specification?</p>
+      <div class="opts">
+        <label data-option="no-throw" data-misconception="must-fail-gracefully"><input type="radio" name="l2q2"> No: a method that meets its specification never throws an unlisted exception<span class="why" hidden>That's true only on calls that keep the precondition. This call didn't.</span></label>
+        <label data-option="anything"><input type="radio" name="l2q2"> Yes: on such a call the specification promises nothing<span class="why" hidden>Correct. Any value, any exception, or never returning: the method still meets its specification.</span></label>
+        <label data-option="only-if-throws" data-misconception="throws-required"><input type="radio" name="l2q2"> Only if the specification has a <code>@throws</code> for that exception<span class="why" hidden><code>@throws</code> is a promise about calls that keep the precondition. It says nothing about calls that break it.</span></label>
+        <label data-option="depends-test" data-misconception="tests-decide"><input type="radio" name="l2q2"> It depends on whether the tests catch it<span class="why" hidden>Meeting a specification is about every call, not about which ones a test tried.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-format="mc" data-type="choice" data-id="cse331-w1-l2-quiz-no-modifies" data-topic="l2-javadoc">
+      <p class="q"><code>sumList</code>'s specification has no <code>@modifies</code> tag. What does that tell a client?</p>
+      <div class="opts">
+        <label data-option="nothing" data-misconception="absent-tag-silent"><input type="radio" name="l2q3"> Nothing; the specification is silent about changes<span class="why" hidden>An absent tag is a promise too. Re-read what <code>@modifies</code> means for the parameters it doesn't list.</span></label>
+        <label data-option="list-unchanged"><input type="radio" name="l2q3"> <code>sumList</code> promises not to change <code>list</code><span class="why" hidden>Correct. <code>@modifies</code> lists the parameters the method may change; every other parameter is left alone.</span></label>
+        <label data-option="may-change" data-misconception="absent-means-free"><input type="radio" name="l2q3"> <code>sumList</code> may change <code>list</code> any way it likes<span class="why" hidden>That's backwards: only the parameters listed in <code>@modifies</code> may change.</span></label>
+        <label data-option="effects-missing" data-misconception="effects-required"><input type="radio" name="l2q3"> The specification is incomplete without <code>@effects</code><span class="why" hidden><code>@effects</code> describes changes to parameters in <code>@modifies</code>. With nothing modified there's nothing to describe.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-format="mc" data-type="choice" data-id="cse331-w1-l2-quiz-which-tag-precondition" data-topic="l2-javadoc">
+      <p class="q">You need to say that <code>lo &lt;= hi</code>, a condition relating two parameters. Which tag does the course use?</p>
+      <div class="opts">
+        <label data-option="param" data-misconception="param-for-relations"><input type="radio" name="l2q4"> <code>@param</code><span class="why" hidden><code>@param</code> fits a short condition on one parameter. This one relates two.</span></label>
+        <label data-option="requires"><input type="radio" name="l2q4"> <code>@requires</code><span class="why" hidden>Correct. <code>@requires</code> holds preconditions too long for one <code>@param</code> or that relate several parameters.</span></label>
+        <label data-option="throws" data-misconception="throws-is-pre"><input type="radio" name="l2q4"> <code>@throws</code><span class="why" hidden><code>@throws</code> is part of the postcondition: a promise to throw. It doesn't ask anything of the client.</span></label>
+        <label data-option="effects" data-misconception="effects-is-pre"><input type="radio" name="l2q4"> <code>@effects</code><span class="why" hidden><code>@effects</code> is part of the postcondition: how parameters change.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-format="num" data-type="int" data-id="cse331-w1-l2-quiz-ignores-hi-returns" data-topic="l2-meets">
+      <p class="q">Implementation 3 is called as <code>indexOf(new int[]{4, 7, 7}, 0, 1, 7)</code>. What does it return?</p>
+      <p class="why" hidden>Implementation 3 never looks at <code>hi</code>. It starts at <code>i = 0</code>, skips the 4, and stops at the 7 at index 1, which is outside the range <code>[0, 1)</code>. The call keeps every specification's range precondition, x isn't in the range, so B, C, D and E are all broken by this one call; A's precondition fails, so A promises nothing.</p>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-format="mc" data-type="choice" data-id="cse331-w1-l2-quiz-meets-b-also" data-topic="l2-strength">
+      <p class="q">An implementation meets B. Which other specification must it also meet, whatever its code?</p>
+      <div class="opts">
+        <label data-option="c" data-misconception="same-pre-means-same"><input type="radio" name="l2q6"> C<span class="why" hidden>On an array with x twice, B's smallest match and C's largest match differ. B and C are incomparable.</span></label>
+        <label data-option="d"><input type="radio" name="l2q6"> D<span class="why" hidden>Correct. The smallest match is in particular some match, and both promise -1 when there is none. B is stronger than D.</span></label>
+        <label data-option="e" data-misconception="throw-equals-minus-one"><input type="radio" name="l2q6"> E<span class="why" hidden>Where x is absent, B promises -1 and E an exception. No implementation does both.</span></label>
+        <label data-option="none" data-misconception="no-implication"><input type="radio" name="l2q6"> None; each specification must be checked separately<span class="why" hidden>That's what "stronger" saves you. Look for a specification B promises more than.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-format="mc" data-type="choice" data-id="cse331-w1-l2-quiz-stronger-means" data-topic="l2-strength">
+      <p class="q">"S1 is stronger than S2" means:</p>
+      <div class="opts">
+        <label data-option="more-impls" data-misconception="stronger-more-impls"><input type="radio" name="l2q7"> More implementations meet S1 than S2<span class="why" hidden>Backwards from the count we saw: a specification that promises more is met by fewer implementations.</span></label>
+        <label data-option="every-impl"><input type="radio" name="l2q7"> Every implementation that meets S1 also meets S2<span class="why" hidden>Correct. That's the definition.</span></label>
+        <label data-option="longer" data-misconception="longer-is-stronger"><input type="radio" name="l2q7"> S1 has more tags or longer clauses<span class="why" hidden>Length isn't strength. Compare what each promises and what each asks of the client.</span></label>
+        <label data-option="asks-more" data-misconception="pre-direction"><input type="radio" name="l2q7"> S1's precondition asks more of the client<span class="why" hidden>A precondition that asks more makes a specification weaker, not stronger.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-format="mc" data-type="choice" data-id="cse331-w1-l2-quiz-strengthening-breaks" data-topic="l2-strength">
+      <p class="q">A method's specification is made stronger. What can that break?</p>
+      <div class="opts">
+        <label data-option="client" data-misconception="strengthen-breaks-client"><input type="radio" name="l2q8"> A client<span class="why" hidden>The stronger specification keeps every promise the old one made, so a client loses nothing it relied on.</span></label>
+        <label data-option="implementation"><input type="radio" name="l2q8"> The implementation<span class="why" hidden>Correct. The existing code may not keep the new promises.</span></label>
+        <label data-option="both" data-misconception="any-change-breaks-all"><input type="radio" name="l2q8"> Both<span class="why" hidden>One side is safe. Which side relied only on the old promises?</span></label>
+        <label data-option="neither" data-misconception="stronger-always-safe"><input type="radio" name="l2q8"> Neither<span class="why" hidden>New promises have to be kept by someone.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-format="num" data-type="int" data-id="cse331-w1-l2-quiz-count-last-match" data-topic="l2-client">
+      <p class="q">With implementation 4 as <code>indexOf</code>, what does <code>count(new int[]{2, 2, 2}, 2)</code> return?</p>
+      <p class="why" hidden>The first search covers the whole array and implementation 4 returns the last match, index 2. The next search starts at 3, an empty range, so it returns -1. <code>count</code> returns 1, though the array holds three 2s.</p>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-format="mc" data-type="choice" data-id="cse331-w1-l2-quiz-client-correct" data-topic="l2-client">
+      <p class="q">When is a client of <code>indexOf</code> correct against specification D?</p>
+      <div class="opts">
+        <label data-option="tests-pass" data-misconception="tests-decide"><input type="radio" name="l2q10"> When its tests pass with the implementation it runs with<span class="why" hidden><code>count</code> passes every test with implementation 1, and is still wrong against D.</span></label>
+        <label data-option="every-impl"><input type="radio" name="l2q10"> When it works with every implementation that meets D<span class="why" hidden>Correct. Working with the implementation it happens to run with is not enough.</span></label>
+        <label data-option="first-impl" data-misconception="one-impl-enough"><input type="radio" name="l2q10"> When it works with at least one implementation that meets D<span class="why" hidden>The implementation can be swapped for any other that meets D. The client has to survive that.</span></label>
+        <label data-option="keeps-pre" data-misconception="pre-is-enough"><input type="radio" name="l2q10"> Whenever its calls keep D's precondition<span class="why" hidden>Keeping the precondition is necessary, but the client must also rely only on what D's postcondition promises.</span></label>
+      </div>
+    </li>
+
+    <li class="cyu" data-kind="quiz" data-format="num" data-type="int" data-id="cse331-w1-l2-quiz-abs-min-value" data-topic="l2-exercises">
+      <p class="q">In Java, what is <code>Math.abs(Integer.MIN_VALUE)</code>? (Type the exact number.)</p>
+      <p class="why" hidden>2<sup>31</sup> doesn't fit in an <code>int</code>, so the absolute value wraps around to <code>Integer.MIN_VALUE</code> itself, -2147483648. That one value is why implementation 3 of <code>sign</code> fails S3.</p>
+    </li>
+  </ol>
+
+  <div class="cyu-score" data-role="summary" role="status"></div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Questions 2 and 7 target the two most common misreadings: that a broken precondition is the method's fault, and that "stronger" means "asks more".</li>
+      <li>Questions 5, 9 and 11 were checked against real Java.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: PROBLEMS -->
+<section class="page" id="l2-exercises" data-title="Lecture 2 problems" data-unit="l2">
+  <p class="where">Lecture 2 · Fri Oct 2 · problems</p>
+  <h1>Lecture 2 problems</h1>
+  <div class="prose">
+    <p>Problem 1 is the lecture's in-class question (half sheet, question 1) and problem 3 is the slide "All five compared"; their solutions are the lecture's answers. Problem 2 was written for this site: it is graded by running the lecture's code on the call you type, so many answers are right. Problems 4 to 9 are the six exercises at the end of the Lecture 2 notes, with the course's answers as solutions.</p>
+    <p>Answer each problem on the page and use the work box for your reasoning. Everything saves as you type. Hints and solutions stay hidden until you ask for them.</p>
+  </div>
+
+  <article class="task" data-id="cse331-w1-l2-meets-matrix">
+    <h2>Problem 1: which meet which?</h2>
+    <p class="prompt">For each of the four implementations of <code>indexOf</code> from <a href="#l2-meets">Meeting a specification</a>, which of the specifications A to E does it meet? Type the letters.</p>
+    <div class="answer-spec" data-part="first-or-minus-one" data-type="letters" data-label="Implementation 1 meets" data-placeholder="letters, e.g. AC, or none"></div>
+    <div class="answer-spec" data-part="first-or-throw" data-type="letters" data-label="Implementation 2 meets" data-placeholder="letters"></div>
+    <div class="answer-spec" data-part="ignores-hi" data-type="letters" data-label="Implementation 3 meets" data-placeholder="letters"></div>
+    <div class="answer-spec" data-part="last-or-minus-one" data-type="letters" data-label="Implementation 4 meets" data-placeholder="letters"></div>
+    <ol class="hints">
+      <li>Describe each implementation in a few words first: what does it return when x is in the range, and when it isn't?</li>
+      <li>Check A last. A only covers calls where x occurs in the range, so ask what each implementation does on those calls alone.</li>
+      <li>To rule a specification out, one call is enough: try an array with x twice in the range, and an x that isn't there.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>Implementation 1: the first match, or -1. It meets B, and D (the smallest match is some match), and A (A's precondition promises a match, so the -1 never comes up). It fails C when x is in the range twice, and E when x is absent.</li>
+        <li>Implementation 2: the first match, or an exception. It meets E and A, and fails B, C and D whenever x is absent.</li>
+        <li>Implementation 3 never looks at <code>hi</code>. When A's precondition holds it stops at the first match, so it meets A. When x is absent it runs past <code>hi</code>, possibly off the end of the array. It meets A only.</li>
+        <li>Implementation 4: the last match, or -1. It meets C, D and A, and fails B (x twice) and E (x absent).</li>
+        <li class="answer">1: A, B, D · 2: A, E · 3: A · 4: A, C, D</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="meets">Check by brute force</button><span class="brute"></span></div>
+    </div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>The brute-force button reruns the lecture's own check in the browser (every array of up to four elements from 0, 1, 2; every range; x from 0 to 3). The same calls were run on real Java when this site was built.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l2-break-it">
+    <h2>Problem 2: find the call that breaks it</h2>
+    <p class="prompt">A specification fails as soon as one call keeps its precondition and gets an outcome it doesn't allow. For each pair, type such a call as the array, then <code>lo</code>, <code>hi</code> and <code>x</code>, for example <code>{5, 1, 5}, 0, 3, 5</code>. The checker runs the lecture's implementation on your call. The last part asks for an array and x that make the client <code>count</code> give the wrong count.</p>
+    <div class="answer-spec" data-part="first-match-vs-c" data-type="witness" data-label="Implementation 1 breaks C" data-placeholder="{…}, lo, hi, x"></div>
+    <div class="answer-spec" data-part="last-match-vs-b" data-type="witness" data-label="Implementation 4 breaks B" data-placeholder="{…}, lo, hi, x"></div>
+    <div class="answer-spec" data-part="minus-one-vs-e" data-type="witness" data-label="Implementation 1 breaks E" data-placeholder="{…}, lo, hi, x"></div>
+    <div class="answer-spec" data-part="ignores-hi-vs-d" data-type="witness" data-label="Implementation 3 breaks D" data-placeholder="{…}, lo, hi, x"></div>
+    <div class="answer-spec" data-part="count-wrong-impl4" data-type="witness" data-label="count with impl. 4 miscounts" data-placeholder="{…}, x"></div>
+    <ol class="hints">
+      <li>Read what each specification promises that the implementation doesn't deliver: which match, or what happens when there is none?</li>
+      <li>Keep <code>0 &lt;= lo &lt;= hi &lt;= a.length</code>, or the specification promises nothing about your call. Small arrays are enough.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Implementation 1 returns the first match; C wants the last. Any range with x in it twice works, e.g. <code>{1, 1}, 0, 2, 1</code>: it returns 0 and C promises 1.</li>
+      <li>Implementation 4 returns the last match; B wants the first. The same call works: it returns 1 and B promises 0.</li>
+      <li>Implementation 1 returns -1 when x is absent; E promises an exception. E.g. <code>{0}, 0, 1, 7</code>.</li>
+      <li>Implementation 3 runs past <code>hi</code> when x isn't in the range. E.g. <code>{0, 1, 2}, 0, 1, 2</code> returns 2, outside the range, where D promises -1; or <code>{0}, 0, 1, 7</code> throws <code>ArrayIndexOutOfBoundsException</code>.</li>
+      <li class="answer">Any call of each kind is right. For <code>count</code>: any array with x at least twice, e.g. <code>{5, 1, 5, 2, 5}, 5</code> returns 1 with implementation 4, where there are three 5s.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l2-compare-five">
+    <h2>Problem 3: compare the five</h2>
+    <p class="prompt">Using the rule from <a href="#l2-strength">Stronger and weaker</a>, compare each pair of <code>indexOf</code> specifications. Answer <em>stronger</em>, <em>weaker</em> or <em>incomparable</em> for the first against the second.</p>
+    <div class="answer-spec" data-part="b-vs-c" data-type="strength" data-label="B compared with C" data-placeholder="stronger, weaker or incomparable"></div>
+    <div class="answer-spec" data-part="b-vs-d" data-type="strength" data-label="B compared with D" data-placeholder="stronger, weaker or incomparable"></div>
+    <div class="answer-spec" data-part="d-vs-a" data-type="strength" data-label="D compared with A" data-placeholder="stronger, weaker or incomparable"></div>
+    <div class="answer-spec" data-part="e-vs-b" data-type="strength" data-label="E compared with B" data-placeholder="stronger, weaker or incomparable"></div>
+    <div class="answer-spec" data-part="a-vs-e" data-type="strength" data-label="A compared with E" data-placeholder="stronger, weaker or incomparable"></div>
+    <ol class="hints">
+      <li>When two specifications share a precondition, compare only their postconditions. Which pairs here share one?</li>
+      <li>For a pair that doesn't, use both halves of the rule: whose precondition asks less, and on calls where the other's precondition holds, whose postcondition promises more?</li>
+      <li>"Incomparable" needs an implementation that meets each one and not the other. Problem 1's implementations are a good place to look.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>B vs C: same precondition. On an array with x twice, the smallest and largest matches differ. Implementation 1 meets B and not C; implementation 4 meets C and not B. Incomparable.</li>
+      <li>B vs D: same precondition, and the smallest match is in particular some match. B is stronger.</li>
+      <li>D vs A: where x occurs they promise the same, a match. Where x doesn't, the call breaks A's precondition and A promises nothing. D's precondition asks less, so D is stronger.</li>
+      <li>E vs B: where x is absent, B promises -1 and E an exception. No implementation does both: incomparable.</li>
+      <li class="answer">B/C incomparable · B stronger than D · D stronger than A · E/B incomparable · A weaker than E</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l2-maxlist-spec">
+    <h2>Problem 4 (exercise 1): specify <code>maxList</code></h2>
+    <p class="prompt">Here is a method that finds the largest element of a list. Write its specification with the tags from <a href="#l2-javadoc">Writing it in Java</a>, and decide what the specification should say about an empty list, and why.</p>
+    <pre class="code" data-src="maxlist"></pre>
+    <div class="answer-spec" data-part="spec" data-type="self" data-label="Your specification" data-placeholder="/** … @param … */"></div>
+    <div class="answer-spec" data-part="empty-list" data-type="text" data-label="What the code does on an empty list" data-placeholder="e.g. returns …, or throws …"></div>
+    <div class="answer-spec" data-part="empty-decision" data-type="self" data-label="What your spec says about it, and why"></div>
+    <div class="answer-spec" data-part="throws-version" data-type="strength" data-label="A @throws NoSuchElementException version, compared with a @requires-nonempty one" data-placeholder="stronger, weaker or incomparable"></div>
+    <ol class="hints">
+      <li>Start with the sentence saying what the method does. Then: does it need anything from its client, and does it change <code>list</code>?</li>
+      <li>For the empty list, trace the first line of the method. Then decide: is that call the client's mistake, or something the method promises to handle?</li>
+      <li>For the comparison, use the rule: which version asks less of the client, and what does each promise on a nonempty list?</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>One specification:<pre class="code" data-src="maxlist-spec"></pre>The method only reads <code>list</code>, so no <code>@modifies</code> is needed.</li>
+        <li>On an empty list, <code>list.get(0)</code> throws an <code>IndexOutOfBoundsException</code>. The specification above requires a nonempty list, so it promises nothing about that call: it is the client's mistake.</li>
+        <li>A specification could instead say what happens, replacing the <code>@requires</code> with <code>@throws NoSuchElementException if list is empty</code>. That asks less of the client and promises the same on every nonempty list, so it is stronger. It spares the client a check, and <code>maxList</code> has to make that check itself.</li>
+        <li class="answer">The code throws <code>IndexOutOfBoundsException</code> on an empty list. Either requiring a nonempty list or promising a <code>@throws</code> is a reasonable specification; the <code>@throws</code> version is the stronger one. Liskov and Guttag favor it for a method used beyond its immediate context, when the check is this cheap.</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-run-max="[]">Run it: maxList on an empty list</button><button class="btn" data-run-max="[3, 9, 2]">Run it: [3, 9, 2]</button></div>
+      <div class="run-out"></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l2-sign-meets">
+    <h2>Problem 5 (exercise 2): which meet which, for <code>sign</code></h2>
+    <p class="prompt">Three specifications for <code>static int sign(int x)</code>, and three implementations. Which implementations meet which specifications? Type the specification names (like <code>S1, S3</code>) or <code>none</code>.</p>
+    <pre class="code" data-src="sign-specs"></pre>
+    <pre class="code" data-src="sign-impls"></pre>
+    <div class="answer-spec" data-part="signum" data-type="set" data-label="Implementation 1 meets" data-placeholder="e.g. S1, S2, or none"></div>
+    <div class="answer-spec" data-part="identity" data-type="set" data-label="Implementation 2 meets" data-placeholder="e.g. S2, or none"></div>
+    <div class="answer-spec" data-part="divide-by-abs" data-type="set" data-label="Implementation 3 meets" data-placeholder="e.g. S3, or none"></div>
+    <div class="answer-spec" data-part="min-value-witness" data-type="witness" data-label="An x where implementation 3 breaks S3" data-placeholder="one int value of x"></div>
+    <ol class="hints">
+      <li>For each implementation, work out what it returns for a positive x, a negative x, and 0. Then hold each result against each specification.</li>
+      <li>S3 promises nothing about 0. For implementation 3, look for a nonzero x where Java's <code>int</code> arithmetic doesn't behave like ordinary arithmetic.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>Implementation 1 meets all three. <code>Integer.signum</code> returns 1, -1 or 0 by the sign of <code>x</code>, exactly what S1 promises. S2 and S3 promise less.</li>
+        <li>Implementation 2 meets S2 only. It returns <code>x</code> itself, a number of the right sign, but returns 1 or -1 only when <code>x</code> is 1 or -1.</li>
+        <li>Implementation 3 meets none. On 0 it divides by zero and throws <code>ArithmeticException</code>, which S1 and S2 don't allow. S3 promises nothing about 0, and most other <code>x</code> give 1 or -1. The trouble is the most negative <code>int</code>: 2<sup>31</sup> doesn't fit in an <code>int</code>, so <code>Math.abs(Integer.MIN_VALUE)</code> is <code>Integer.MIN_VALUE</code> itself, and the quotient is 1 where S3 asks for -1.</li>
+        <li class="answer">1: S1, S2, S3 · 2: S2 · 3: none. Implementation 3 breaks S3 at x = -2147483648.</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-run-sign="-2147483648">Run it: implementation 3 on Integer.MIN_VALUE</button><button class="btn" data-run-sign="0">Run it: implementation 3 on 0</button></div>
+      <div class="run-out"></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l2-sign-compare">
+    <h2>Problem 6 (exercise 3): compare the <code>sign</code> specifications</h2>
+    <p class="prompt">Which is stronger than which, and which pairs are incomparable? Answer for the first against the second.</p>
+    <div class="answer-spec" data-part="s1-vs-s2" data-type="strength" data-label="S1 compared with S2" data-placeholder="stronger, weaker or incomparable"></div>
+    <div class="answer-spec" data-part="s1-vs-s3" data-type="strength" data-label="S1 compared with S3" data-placeholder="stronger, weaker or incomparable"></div>
+    <div class="answer-spec" data-part="s2-vs-s3" data-type="strength" data-label="S2 compared with S3" data-placeholder="stronger, weaker or incomparable"></div>
+    <ol class="hints">
+      <li>S1 and S2 share a precondition (none). S3 has one. Use the right half of the rule for each pair.</li>
+      <li>For incomparable, find an implementation that meets one and not the other, in each direction. It may be one you invent.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>S1 is stronger than S2: same precondition, and 1, -1 and 0 are in particular positive, negative and zero.</li>
+      <li>S1 is stronger than S3: S1's precondition (none) is weaker than S3's (<code>x != 0</code>), and where S3's holds the two promise the same.</li>
+      <li>S2 and S3 are incomparable. Implementation 2 meets S2 and not S3. An implementation returning 1 or -1 by sign, and 42 for 0, meets S3 (which promises nothing about 0) and fails S2.</li>
+      <li class="answer">S1 stronger than S2 · S1 stronger than S3 · S2 and S3 incomparable</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l2-sign-clients">
+    <h2>Problem 7 (exercise 4): two clients of <code>sign</code></h2>
+    <p class="prompt">Against which of S1, S2 and S3 is each client correct?</p>
+    <pre class="code" data-src="sign-clients"></pre>
+    <div class="answer-spec" data-part="same-sign" data-type="set" data-label="sameSign is correct against" data-placeholder="e.g. S1, S2, or none"></div>
+    <div class="answer-spec" data-part="is-positive" data-type="set" data-label="isPositive is correct against" data-placeholder="e.g. S1, S2, or none"></div>
+    <ol class="hints">
+      <li>A client is correct against a specification if it works with every implementation that meets it. For each one, imagine the least helpful implementation the specification allows.</li>
+      <li>Neither client has a precondition, so each must work when called with 0. What call to <code>sign</code> does that make?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>sameSign</code> against S2: <code>sign(3)</code> may be 3 and <code>sign(5)</code> may be 5, so <code>sameSign(3, 5)</code> may return false. Against S3: <code>sameSign(0, 0)</code> must return true, yet it calls <code>sign(0)</code>, breaking S3's precondition.</li>
+      <li><code>isPositive</code>: S1 and S2 both promise a positive number exactly when <code>x</code> is positive. Against S3, <code>isPositive(0)</code> must return false, and it too calls <code>sign(0)</code>.</li>
+      <li class="answer"><code>sameSign</code>: S1 only · <code>isPositive</code>: S1 and S2</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l2-change-spec">
+    <h2>Problem 8 (exercise 5): change the specification of <code>indexOf</code></h2>
+    <p class="prompt">Suppose the specification of <code>indexOf</code> changes. For each change, which of the four implementations, and which of the two clients from <a href="#l2-client">Writing a client</a> (<code>count</code>, and the "does x occur?" client, called <code>occurs</code> here), does it break? An implementation or client that was already wrong under the old specification isn't "broken" by the change. Type numbers or names, or <code>none</code>.</p>
+    <div class="answer-spec" data-part="d-to-b-impls" data-type="set" data-label="D → B breaks implementations" data-placeholder="e.g. 1, 3, or none"></div>
+    <div class="answer-spec" data-part="d-to-b-clients" data-type="set" data-label="D → B breaks clients" data-placeholder="count, occurs, or none"></div>
+    <div class="answer-spec" data-part="b-to-d-impls" data-type="set" data-label="B → D breaks implementations" data-placeholder="e.g. 2, or none"></div>
+    <div class="answer-spec" data-part="b-to-d-clients" data-type="set" data-label="B → D breaks clients" data-placeholder="count, occurs, or none"></div>
+    <ol class="hints">
+      <li>Is D → B a strengthening or a weakening? Then use the table from <a href="#l2-strength">Changing a specification</a>: which side can it break?</li>
+      <li>On the side that can break, check each implementation or client that worked before the change. Which promise did it rely on, or fail to keep?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>D → B is a strengthening, so it breaks no client. <code>count</code>, wrong under D, becomes correct.</li>
+      <li>It does break implementation 4, which met D and doesn't meet B.</li>
+      <li>B → D is a weakening, so it breaks no implementation: implementation 1, the only one that met B, meets D.</li>
+      <li>It breaks <code>count</code>, which relied on <em>smallest</em>. D still promises -1 exactly when x is absent, so <code>occurs</code> stays correct.</li>
+      <li class="answer">D → B: breaks implementation 4, no client · B → D: breaks no implementation, breaks <code>count</code></li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w1-l2-precondition-vs-user">
+    <h2>Problem 9 (exercise 6): why may a method ask?</h2>
+    <p class="prompt">Last lecture's exercise 7 rejected a specification for a whole program that began "the user must type only whole numbers". Why may the specification of <code>sumList</code> require a non-null list, when the specification of <code>Sum</code> may not require anything of its user?</p>
+    <div class="answer-spec" data-part="explanation" data-type="self" data-label="Your answer"></div>
+    <ol class="hints">
+      <li>A precondition is a promise. Who makes it, and can they be held to it?</li>
+      <li>Compare who stands on the other side of each specification: what can each of them read, and what do they owe the program?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>A precondition is a promise, and a promise can be asked only of someone who can be held to it.</li>
+      <li>The client of <code>sumList</code> is code, written by a programmer who can read the specification and is responsible for keeping it. <code>readList</code> promises a list, so <code>main</code> keeps that precondition.</li>
+      <li class="answer">The user of <code>Sum</code> is a person at a keyboard who never read its specification and owes the program nothing. So the edge of the program, where input arrives, has to handle every input. Preconditions belong inside the program, between methods whose authors can read each other's specifications.</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+
+<section class="page" id="reading" data-title="Reading 1" data-unit="reading">
+  <p class="where">Reading 1 · assigned for this week · due Friday, Oct 2, 11:59 pm on Gradescope · discussed in lecture Monday, Oct 5</p>
+  <h1>Reading 1: what does "know" mean?</h1>
+  <div class="prose">
+    <p>The motto says you deliver code you <em>know</em> works. Does knowing require a proof? Does testing count? The assignment is to choose <strong>one</strong> of three articles, read it, and write a reflection. This page only summarizes the choices so you can pick; the reflection is graded and is yours to write.</p>
+  </div>
+  <div class="table-scroll"><table class="plain">
+    <tr><th>Willison 2025</th><td><em>Your job is to deliver code you have proven to work.</em> "Proven" here means evidence you can show someone: run it yourself and watch, then write an automated test that fails if the change is undone. Neither step is optional, even when an agent wrote the code. About 5 minutes.</td></tr>
+    <tr><th>Fishman 1996</th><td><em>They Write the Right Stuff.</em> The 260 people who wrote the space shuttle's software, and the process behind its near-zero error rate. About 20 minutes.</td></tr>
+    <tr><th>Hoare 1996</th><td><em>How Did Software Get So Reliable Without Proof?</em> From one of the inventors of the logic this course uses later. An academic paper; the last section is addressed to researchers. About an hour.</td></tr>
+  </table></div>
+  <p>Optional extras on the course page: Cook (how complex systems fail), Leveson and Turner (Therac-25; content note: patient injuries and deaths), Thompson (trusting trust). Links, cached copies and submission details: <a href="https://courses.cs.washington.edu/courses/cse331/26au/readings/reading1.html" target="_blank" rel="noopener">Reading 1 on the course site</a>.</p>
+  <h2>What the reflection asks</h2>
+  <div class="prose"><p>From the readings page: (1) what the reading argues, reconstructed in your own words, about 5 sentences; (2) your reaction, connected to your own experience as a programmer, about 5 sentences; (3) one or more things you want to discuss in class. On Monday, small groups discuss for 15 to 20 minutes and hand in one sheet per group.</p></div>
+  <div class="rule note"><p><strong>AI on the reflection.</strong> Light editing only (grammar, spelling, trimming), and you must say so when you submit.</p></div>
+
+  <details class="notes" open>
+    <summary>Teaching notes: connecting the reading to Lecture 1</summary>
+    <ul>
+      <li>Lecture 2 adds a fourth lens: Hoare's question is how big programs get reliable. Procedural abstraction (knowing a program one method at a time) is part of the answer the course gives.</li>
+      <li>Ask which of the lecture's three ways of knowing (run, test, reason) each author leans on most, and what each would say a passing test tells you.</li>
+      <li>Willison's title is nearly the motto, with "proven" in place of "know". Ask the room whether his "proof" is what the lecture calls reasoning.</li>
+      <li>Don't discuss anyone's reflection before the deadline. Monday's lecture is where the discussion happens.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="cheatsheet" data-title="Cheat sheet" data-unit="reference">
+  <h1>Week 1 cheat sheet</h1>
+  <p class="where">Print with <kbd>Ctrl</kbd>+<kbd>P</kbd>; only this page prints.</p>
+  <div class="cheat">
+    <section>
+      <h3>Motto</h3>
+      <p>Your job is to deliver code that you know works.</p>
+      <p><strong>Works</strong>: meets its specification on every run, not only the runs you tried.</p>
+    </section>
+    <section>
+      <h3>Runs</h3>
+      <p><strong>Run</strong>: one execution, first line of <code>main</code> to exit, on one input.</p>
+      <p><strong>Counterexample</strong>: one run where a claim about every run is false. It refutes the claim.</p>
+    </section>
+    <section>
+      <h3>Specification</h3>
+      <p>What code <em>must</em> do on <em>every run</em>, as seen from <em>outside</em>. Nothing about how.</p>
+      <p>Whole program: outside = the user; spec = precise user manual.</p>
+    </section>
+    <section>
+      <h3>Assertion</h3>
+      <p>A true/false claim about program state at one point, written <code>{{ … }}</code>.</p>
+      <p><strong>Holds</strong> = true at that point on every run. Not Java's <code>assert</code>, not a print, not a test.</p>
+    </section>
+    <section>
+      <h3>Reasoning between assertions</h3>
+      <p><code>{{ P }} code {{ Q }}</code>: if P holds and the code takes any P-state to a Q-state, then Q holds. Needs only P and the code between.</p>
+    </section>
+    <section>
+      <h3>How you come to know</h3>
+      <div class="table-scroll"><table class="plain">
+        <tr><th></th><th>confirm all runs?</th><th>refute?</th></tr>
+        <tr><td>Run</td><td>no (that run only)</td><td>that run only</td></tr>
+        <tr><td>Test</td><td>never</td><td>yes</td></tr>
+        <tr><td>Reason</td><td>yes, if the argument is right</td><td>n/a</td></tr>
+      </table></div>
+    </section>
+    <section>
+      <h3>Java facts used</h3>
+      <p><code>Math.abs(Integer.MIN_VALUE)</code> is <code>Integer.MIN_VALUE</code> (−2147483648).</p>
+      <p><code>int</code>: −2147483648 to 2147483647 (−2<sup>31</sup> to 2<sup>31</sup>−1). <code>long</code>: −2<sup>63</sup> to 2<sup>63</sup>−1. Overflow wraps around.</p>
+      <p><code>hasNextInt()</code>: is the next token an <code>int</code>? <code>hasNext()</code>: is there any token? <code>nextInt()</code> on a non-int throws <code>InputMismatchException</code>.</p>
+    </section>
+    <section>
+      <h3>The standard</h3>
+      <p>Every input a user can produce gets a response the specification describes. A stack trace is never that response.</p>
+    </section>
+    <section>
+      <h3>Method specification</h3>
+      <p><strong>Client</strong>: code that calls a method. <strong>Precondition</strong>: the client makes it true. <strong>Postcondition</strong>: the implementer makes it true, and may assume the precondition.</p>
+      <p><strong>Meets</strong>: every call that begins with the precondition true ends with the postcondition true. A call that breaks the precondition gets no promise.</p>
+    </section>
+    <section>
+      <h3>Javadoc tags</h3>
+      <div class="table-scroll"><table class="plain">
+        <tr><td><code>@param</code>, <code>@requires</code></td><td>precondition</td></tr>
+        <tr><td><code>@return</code>, <code>@throws</code></td><td>postcondition (result, exception)</td></tr>
+        <tr><td><code>@modifies</code>, <code>@effects</code></td><td>postcondition (which parameters change, how). No <code>@modifies</code> = changes nothing.</td></tr>
+      </table></div>
+    </section>
+    <section>
+      <h3>Procedural abstraction</h3>
+      <p>Use a method through its specification alone. Clients rely on nothing it doesn't promise; the implementer may change anything it doesn't promise. The specification is the <strong>abstraction barrier</strong>.</p>
+      <p>Across a call: <code>{{ pre }} call {{ post }}</code>, last lecture's P, code, Q rule.</p>
+    </section>
+    <section>
+      <h3>Stronger and weaker</h3>
+      <p>S1 stronger than S2: every implementation meeting S1 meets S2. Rule: S1's precondition weaker or same, and where S2's precondition holds, S1's postcondition stronger or same.</p>
+      <p>Strengthening can break the implementation, never a client. Weakening can break a client, never the implementation.</p>
+      <p><strong>Correct client</strong>: works with every implementation that meets the specifications it relies on.</p>
+    </section>
+    <section>
+      <h3>Lecture exercise answers</h3>
+      <div class="table-scroll"><table class="plain">
+        <tr><td>1a</td><td><code>Got [3, 4, 5]</code>, 12 · <code>Got []</code>, 0</td></tr>
+        <tr><td>2</td><td>Specs: A, B, C · Sum meets: B</td></tr>
+        <tr><td>4</td><td>(1) holds · (2) sum fails · (2) list holds · spec fails (empty run prints 1)</td></tr>
+        <tr><td>6</td><td>2147483648 · <code>Got [2147483648]</code></td></tr>
+        <tr><td>7</td><td>Meets E and F · course accepts neither</td></tr>
+      </table></div>
+    </section>
+    <section>
+      <h3>Lecture 2 answers</h3>
+      <div class="table-scroll"><table class="plain">
+        <tr><td>indexOf</td><td>1: A B D · 2: A E · 3: A · 4: A C D</td></tr>
+        <tr><td>2 (sign)</td><td>1: S1 S2 S3 · 2: S2 · 3: none (MIN_VALUE)</td></tr>
+        <tr><td>3</td><td>S1 &gt; S2 · S1 &gt; S3 · S2, S3 incomparable</td></tr>
+        <tr><td>4</td><td>sameSign: S1 · isPositive: S1, S2</td></tr>
+        <tr><td>5</td><td>D→B breaks impl. 4 · B→D breaks count</td></tr>
+      </table></div>
+    </section>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+</main>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<!-- Program text shown on the site. Line numbers match the lecture notes. -->
+<script type="text/plain" id="src-sum">import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Sum {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        System.out.println("Enter some numbers.");
+        List<Integer> list = new ArrayList<>();
+        while (in.hasNextInt()) {
+            list.add(in.nextInt());
+        }
+        // (1)
+        System.out.println("Got " + list);
+        int sum = 0;
+        for (int i = 0; i < list.size(); i++) {
+            sum += list.get(i);
+        }
+        // (2)
+        System.out.println("The sum of your list was: " + sum);
+    }
+}</script>
+<script type="text/plain" id="src-sum-long">import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Sum {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        System.out.println("Enter some numbers.");
+        List<Long> list = new ArrayList<>();
+        while (in.hasNextLong()) {
+            list.add(in.nextLong());
+        }
+        // (1)
+        System.out.println("Got " + list);
+        long sum = 0;
+        for (int i = 0; i < list.size(); i++) {
+            sum += list.get(i);
+        }
+        // (2)
+        System.out.println("The sum of your list was: " + sum);
+    }
+}</script>
+<!-- Lines starting with § are assertions: shown unnumbered, as in the notes. -->
+<script type="text/plain" id="src-sum-asserted">        while (in.hasNextInt()) {
+            list.add(in.nextInt());
+        }
+        // (1)
+§        {{ list holds, in order, every number the user typed before
+§           the input ended or something that was not an int appeared }}
+        System.out.println("Got " + list);
+        int sum = 0;
+        for (int i = 0; i < list.size(); i++) {
+            sum += list.get(i);
+        }
+        // (2)
+§        {{ sum is the sum of the elements of list, wrapped into the
+§           int range if the true sum falls outside it }}
+§        {{ list still holds, in order, every number the user typed
+§           before the input ended or something that was not an int
+§           appeared }}
+        System.out.println("The sum of your list was: " + sum);</script>
+<!-- Lecture 2 listings. Line numbers match the Lecture 2 notes. -->
+<script type="text/plain" id="src-sum-pieces">import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Sum {
+    public static void main(String[] args) {
+        System.out.println("Enter some numbers.");
+        List<Integer> list = readList();
+        System.out.println("Got " + list);
+        System.out.println("The sum of your list was: " + sumList(list));
+    }
+
+    static List<Integer> readList() {
+        Scanner in = new Scanner(System.in);
+        List<Integer> list = new ArrayList<>();
+        while (in.hasNextInt()) {
+            list.add(in.nextInt());
+        }
+        return list;
+    }
+
+    static int sumList(List<Integer> list) {
+        int sum = 0;
+        for (int i = 0; i < list.size(); i++) {
+            sum += list.get(i);
+        }
+        return sum;
+    }
+}</script>
+<script type="text/plain" id="src-middle">/**
+ * Returns the element in the middle of a list.
+ *
+ * @param list the list to look in; must be non-null
+ * @requires list has an odd number of elements
+ * @return the element with as many elements before it as after it
+ */
+static int middle(List<Integer> list) {
+    return list.get(list.size() / 2);
+}</script>
+<script type="text/plain" id="src-javadoc-two">/**
+ * Reads whole numbers typed by the user.
+ *
+ * @return a list holding, in order, every number the user typed
+ *     before the input ended or something that was not an int appeared
+ */
+static List<Integer> readList()
+
+/**
+ * Adds up a list of numbers.
+ *
+ * @param list the numbers to add; must be non-null
+ * @return the sum of the elements of list, wrapped into the int range
+ *     if the true sum falls outside it
+ */
+static int sumList(List<Integer> list)</script>
+<script type="text/plain" id="src-readinto">/**
+ * Reads whole numbers typed by the user into a list.
+ *
+ * @param list the list to add to; must be non-null
+ * @modifies list
+ * @effects adds to the end of list, in order, every number the user
+ *     typed before the input ended or something that was not an int
+ *     appeared
+ */
+static void readInto(List<Integer> list)</script>
+<script type="text/plain" id="src-across">System.out.println("Enter some numbers.");
+List<Integer> list = readList();
+§{{ list holds, in order, every number the user typed before
+§   the input ended or something that was not an int appeared }}
+System.out.println("Got " + list);
+System.out.println("The sum of your list was: " + sumList(list));</script>
+<script type="text/plain" id="src-sumlist-forward">static int sumList(List<Integer> list) {
+    int sum = 0;
+    for (int i = 0; i < list.size(); i++) {
+        sum += list.get(i);
+    }
+    return sum;
+}</script>
+<script type="text/plain" id="src-sumlist-backward">static int sumList(List<Integer> list) {
+    int sum = 0;
+    for (int i = list.size() - 1; i >= 0; i--) {
+        sum += list.get(i);
+    }
+    return sum;
+}</script>
+<script type="text/plain" id="src-indexof-head">/**
+ * Searches for a value in part of an array.
+ *
+ * @param a the array to search; must be non-null
+ * @param lo the index where the range to search begins
+ * @param hi the index just past where the range to search ends
+ * @param x the value to search for
+ * ... and one of the specifications below ...
+ */
+static int indexOf(int[] a, int lo, int hi, int x)</script>
+<script type="text/plain" id="src-indexof-specs">Spec A
+  @requires 0 <= lo <= hi <= a.length, and a[i] == x for some i
+            with lo <= i < hi
+  @return   an index i with lo <= i < hi and a[i] == x
+
+Spec B
+  @requires 0 <= lo <= hi <= a.length
+  @return   the smallest index i with lo <= i < hi and a[i] == x,
+            or -1 if there is none
+
+Spec C
+  @requires 0 <= lo <= hi <= a.length
+  @return   the largest index i with lo <= i < hi and a[i] == x,
+            or -1 if there is none
+
+Spec D
+  @requires 0 <= lo <= hi <= a.length
+  @return   some index i with lo <= i < hi and a[i] == x,
+            or -1 if there is none
+
+Spec E
+  @requires 0 <= lo <= hi <= a.length
+  @return   the smallest index i with lo <= i < hi and a[i] == x
+  @throws   NoSuchElementException if there is none</script>
+<script type="text/plain" id="src-indexof-impls">// Implementation 1
+for (int i = lo; i < hi; i++) {
+    if (a[i] == x) {
+        return i;
+    }
+}
+return -1;
+
+// Implementation 2
+for (int i = lo; i < hi; i++) {
+    if (a[i] == x) {
+        return i;
+    }
+}
+throw new NoSuchElementException();
+
+// Implementation 3
+int i = lo;
+while (a[i] != x) {
+    i++;
+}
+return i;
+
+// Implementation 4
+for (int i = hi - 1; i >= lo; i--) {
+    if (a[i] == x) {
+        return i;
+    }
+}
+return -1;</script>
+<script type="text/plain" id="src-count">static int count(int[] a, int x) {
+    int c = 0;
+    int i = indexOf(a, 0, a.length, x);
+    while (i != -1) {
+        c++;
+        i = indexOf(a, i + 1, a.length, x);
+    }
+    return c;
+}</script>
+<script type="text/plain" id="src-maxlist">static int maxList(List<Integer> list) {
+    int max = list.get(0);
+    for (int i = 1; i < list.size(); i++) {
+        if (list.get(i) > max) {
+            max = list.get(i);
+        }
+    }
+    return max;
+}</script>
+<script type="text/plain" id="src-maxlist-spec">/**
+ * Returns the largest element of a list.
+ *
+ * @param list the list to search; must be non-null
+ * @requires list is not empty
+ * @return the largest element of list
+ */</script>
+<script type="text/plain" id="src-sign-specs">Spec S1
+  @return   1 if x > 0, -1 if x < 0, and 0 if x == 0
+
+Spec S2
+  @return   a positive number if x > 0, a negative number if x < 0,
+            and 0 if x == 0
+
+Spec S3
+  @requires x != 0
+  @return   1 if x > 0 and -1 if x < 0</script>
+<script type="text/plain" id="src-sign-impls">// Implementation 1
+return Integer.signum(x);
+
+// Implementation 2
+return x;
+
+// Implementation 3
+return x / Math.abs(x);</script>
+<script type="text/plain" id="src-sign-clients">/**
+ * Tells whether two numbers have the same sign.
+ *
+ * @return true if x and y are both positive, both negative, or
+ *     both zero, and false otherwise
+ */
+static boolean sameSign(int x, int y) {
+    return sign(x) == sign(y);
+}
+
+/**
+ * Tells whether a number is positive.
+ *
+ * @return true if x > 0, and false otherwise
+ */
+static boolean isPositive(int x) {
+    return sign(x) > 0;
+}</script>
+
+<!-- A host may define window.COURSE_SITE_STORAGE here, before js/app.js. See ../INTEGRATION.md. -->
+<script src="js/sum-sim.js"></script>
+<script src="js/spec-sim.js"></script>
+<script src="js/grader.js"></script>
+<script src="js/keys.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

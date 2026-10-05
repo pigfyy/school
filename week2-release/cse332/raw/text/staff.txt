@@ -1,0 +1,108 @@
+ 
+ CSE332 - Course Staff 
+ CSE 332 – Course Staff 
+ Home [index.html] 
+ Syllabus [syllabus.html] 
+ Calendar [calendar.html] 
+ Tasks [tasks.html] 
+ Exams [exams.html] 
+ Summaries [summaries.html] 
+ Office Hours [oh.html] 
+ Staff 
+ Table of Contents 
+ 1 Instructor [#instructor]
+ 1.1 Ruth Anderson
+ (she/her) [#ruth-anderson-sheher] 
+ 2 TAs [#tas]
+ 2.1 Aadi Anand
+ (he/him) [#aadi-anand-hehim] 
+ 2.2 Jacklyn Cui
+ (she/her) [#jacklyn-cui-sheher] 
+ 2.3 Albert Du
+ (he/him) [#albert-du-hehim] 
+ 2.4 Iris Guo
+ (she/her) [#iris-guo-sheher] 
+ 2.5 Lucy He (she/her) [#lucy-he-sheher] 
+ 2.6 Aaron Honjaya
+ (he/him) [#aaron-honjaya-hehim] 
+ 2.7 Andrew Leffingwell
+ (he/him) [#andrew-leffingwell-hehim] 
+ 2.8 Cindy Ni
+ (she/her) [#cindy-ni-sheher] 
+ 2.9 Gracia Wang
+ (she/her) [#gracia-wang-sheher] 
+ This page is from a previous offering of the course. It has been left up for archival purposes. -->
+ This page is under construction. Any content you see now is subject to change until the first day of class. Expect some links to be broken until that time. -->
+ Looking for someone to talk to about CSE332? Try the Study Center in CSE room 006! There's a table there just for working on and discussing CSE332! -->
+ 1 Instructor 
+ 1.1 Ruth Anderson
+ (she/her) 
+ Hi I’m Ruth! I was born and grew up in North Carolina. I have a
+ BS in Mathematical Sciences with a concentration in CS from the
+ University of North Carolina. I came to UW for my PhD. I worked in
+ Programming Languages, Compilers, and Parallel Computing before
+ doing my PhD in Educational Technology & Pen Computing. I
+ taught at the University of Virginia for 5 years before coming
+ back to UW and have been here ever since. I’ve worked a bit in
+ applying Computing to problems in the Developing World but mostly
+ these days my research is in Computer Science Education. I enjoy
+ Running, Hiking, Backbacking, and generally getting outside. This
+ quarter I am also co-leading General TA Training. Ask me about the
+ CS Education seminar CSE590E. 
+ 2 TAs 
+ 2.1 Aadi Anand (he/him) 
+ Hello! This is my second quarter TAing 332, and my last quarter
+ as a master’s student in computer science. In my free time, I play
+ a lot of chess and poker. Feel free to reach out anytime! 
+ 2.2 Jacklyn Cui
+ (she/her) 
+ I’m Jacklyn! It was great to serve as a eighth-time TA for one
+ of my favorite (and personally considered the most important)
+ courses at the Allen School! Apart from doing Accessibility and
+ HCI-related research, I also enjoy traveling and outdoor
+ activities! Feel free to ping me if you have good recs on where to
+ travel! 
+ 2.3 Albert Du (he/him) 
+ Hi friends! I’m Albert, a third year CS student and fourth time
+ 332 TA (I think I’m getting old). In my free time, I like looking
+ at old maps. Feel free to reach out or drop by my office hours to
+ chat! 
+ 2.4 Iris Guo (she/her) 
+ Hi, I’m Iris! This is my third year at UW and first time TAing
+ CSE332. Outside of class I like to play video games, read
+ scifi/fantasy books, bleach paint clothes, and listen to hyperpop
+ music. Feel free to reach out :) 
+ 2.5 Lucy He (she/her) 
+ Hi all! I’m Lucy, a third year studying CS. This will be my
+ first time TAing 332, so please feel free to stop by office hours
+ to chat about the class or anything else! In my free time I love
+ to play pickleball, hike, and read. Excited for an amazing quarter
+ 🚀 
+ 2.6 Aaron Honjaya
+ (he/him) 
+ Hi! I’m Aaron. I’m a BS/MS student in computer science and this
+ will be my 5th quarter TAing 332. Outside of TAing I do research
+ in biomedical computer vision AI. In my free time I like to watch
+ TV shows and anime, read, play video games, and bake. Feel free to
+ drop by my office hours to chat about anything. Look forward to
+ this quarter with you all! 
+ 2.7 Andrew Leffingwell
+ (he/him) 
+ Hello! This is my third year at UW and I am very excited to TA
+ CSE 332. Outside of coursework, I enjoy running, backpacking, and
+ exploring Seattle. I also really enjoy playing board games and
+ watching sports. Feel free to reach out! 
+ 2.8 Cindy Ni (she/her) 
+ Hi, I’m Cindy! I’m a fourth-year CS major and I’m super excited
+ to return to 332 as a TA. Hope we have a great time this
+ quarter! 
+ 2.9 Gracia Wang
+ (she/her) 
+ Hi friends! I’m Gracia, majoring in CS and AMATH:DS. This is my
+ second time being a TA but first time for CSE 332. In my free
+ time, I enjoy watching movies/anime/TV series, and trying out new
+ boba shops (please come share if you have recommendations!).
+ Looking forward to meeting you all! 
+ Copyright © 2026 Paul G. Allen School of Computer Science & Engineering, University of Washington. Site design by Nathan Brunelle.
+ Released under the CC-BY-NC-SA 4.0 [http://creativecommons.org/licenses/by-nc-sa/4.0/] license .
+ Last updated 2026-09-30 16:57 

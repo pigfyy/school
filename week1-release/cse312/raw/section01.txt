@@ -1,0 +1,94 @@
+CSE 312: Foundations of Computing II                                                       Autumn 2026
+
+Quiz Section 1
+
+Review
+
+1) Sum rule. If you can choose from EITHER one of n options, OR one of m options with NO overlap
+   with the previous n, then the number of possible outcomes of the experiment is.             .
+
+
+2) Product rule. In a sequential process with m steps, if there are n1 choices for the 1st step, n2
+   choices for the 2nd step (given the first choice), ..., and nm choices for the mth step (given the
+   previous choices), then the total number of outcomes is                                .
+
+3) Permutations. The number of ways to re-order n elements is                    .
+
+4) k-permutations. The number of ways to choose a sequence of k distinct elements from a set of n
+   elements is      .
+
+5) Set difference. Is it always true that |AzB| “ |A| ´ |B|?
+
+Task 1 – Sets
+
+a) For each one of the following sets, give its cardinality, i.e., indicate how many elements it contains:
+
+      - A“H                      - B “ tHu                 - C “ ttHuu               - D “ tH, tHuu
+
+b) Let S “ ta, b, cu and T “ tc, du. Compute:
+
+      - SYT                - SXT                - SzT                - 2SzT               - SˆT
+
+Task 2 – Basic Counting
+
+a) Credit-card numbers are made of 15 decimal digits, and a 16th checksum digit (which is uniquely
+   determined by the first 15 digits). How many credit-card numbers are there?
+
+b) How many positive divisors does 1440 “ 25 32 5 have?
+
+c) How many ways are there to arrange the CSE 312 staff on a line (11 TAs, 2 professors) for a group
+   picture?
+
+d) How many ways are there to arrange the CSE 312 staff on a line so that Anup is at one of the ends
+   or exactly in the middle?
+
+
+
+
+                                                    1
+Task 3 – Weird Card Game
+
+In how many ways can a pack of fifty-two cards (in four suits of thirteen cards each) be dealt to thirteen
+players, four to each, so that every player has one card from each of the suits?
+
+Task 4 – Seating
+
+How many ways are there to seat 10 people, consisting of 5 couples, in a row of 10 seats if . . .
+
+a) . . . all couples are to get adjacent seats?
+
+b) . . . anyone can sit anywhere, except that one couple insists on not sitting in adjacent seats?
+
+Task 5 – HBCDEFGA
+
+How many ways are there to permute the 8 letters A, B, C, D, E, F, G, H so that A is not at the
+beginning and H is not at the end?
+
+Task 6 – Lizards and Snakes!
+
+Loudon has three pet lizards, Rango, a gecko named Gordon, and a goanna named Joanna, as well as
+two small pet snakes, Kaa and Basilisk, but only 4 terrariums to put them in. In how many different
+ways can he put his 7 pets in these 4 terrariums so that no terrarium has both a snake and a lizard?
+
+Task 7 – Birthday Cake
+
+A chef is preparing desserts for the week, starting on a Sunday. On each day, only one of five desserts
+(apple pie, cherry pie, strawberry pie, pineapple pie, and cake) may be served. On Thursday there is
+a birthday, so cake must be served that day. On no two consecutive days can the chef serve the same
+dessert. How many dessert menus are there for the week?
+
+Task 8 – Photographs
+
+Suppose that 8 people, including you and a friend, line up for a picture. In how many ways can the
+photographer organize the line if she wants to have fewer than 2 people between you and your friend?
+
+Task 9 – Extended Family Portrait
+
+A group of n families, each with m members, are to be lined up for a photograph. In how many ways
+can the nm people be arranged if members of a family must stay together?
+
+
+
+
+                                                    2
+
