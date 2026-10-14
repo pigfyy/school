@@ -35,9 +35,10 @@ of `site/core/grader.js`. Answer keys go either in the markup (`data-type`, `dat
 
 ## 3. Look
 
-- Use `core/base.css` as-is. A week's own widget styles go in `week.css`, using only base tokens: accents
-  `--a1`/`--a2`/`--a3` (with `-tint`, `-on-dark`), ink, paper, surface, line, night, `--right`/`--wrong`/`--note`,
-  IBM Plex Sans and Mono. Charts color series a1, a2, a3, then `--ink-soft`. See `house-style/reference/*.png`.
+- Use `core/base.css` as-is: CSE 332 week 2's original purple design (see `house-style/README.md` and
+  `house-style/reference/*.png`). A week's own widget styles go in `week.css`, using only base tokens: `--accent`,
+  `--s1`/`--s2`/`--s3` for chart series, `--amber`, `--today`, `--right`/`--wrong`, ink, paper, surface, line, night,
+  and the fonts `--display` (Fraunces), `--font` (Public Sans), `--mono` (JetBrains Mono).
 - **Dates are honest.** Write `<span class="today-chip" data-date="YYYY-MM-DD">Mon Oct 5</span>`; the engine adds
   "Today" on that day only. Upcoming sessions are dashed `.later` items.
 - **Widgets are not templated.** Shape each module around its idea: a terminal for a command-line program, a tree

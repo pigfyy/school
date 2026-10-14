@@ -14,7 +14,7 @@ site/                       the website, served as-is (no build step; also works
     app.js                  engine: routing, rail, switcher, quick checks, quiz, problems, hints, solutions, saving
     grader.js               every answer type (exact math, Big-O, output, yes/no, …); see the header for types
     store.js                saved answers: localStorage + PUT/GET /api/state/<course>/<week>
-    base.css fonts/ katex/  house style, IBM Plex, KaTeX
+    base.css fonts/ katex/  house style (CSE 332 week 2 purple), Fraunces/Public Sans/JetBrains Mono, KaTeX
   <course>/<week>/          one folder per week, e.g. cse332/w03/
     index.html              the content
     week.css                this week's widget styles (base.css tokens only)

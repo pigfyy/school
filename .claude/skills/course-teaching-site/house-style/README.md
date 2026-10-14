@@ -1,16 +1,25 @@
 # House style
 
-The look every week shares. The stylesheet itself is `site/core/base.css` (with `site/core/fonts.css` and the
-IBM Plex fonts); weeks load it from there and never copy it. The screenshots in `reference/` show the target.
+Every week uses one look: CSE 332 week 2's original design. The stylesheet is `site/core/base.css` (with
+`site/core/fonts.css`); weeks load it and never copy it. `reference/*.png` shows the target.
 
 ## Fixed parts
 
-- **Palette:** paper `--paper`, cards `--surface`, ink `--ink`, dark rail `--night`. The only accent hues are `--a1` (teal), `--a2` (rust) and `--a3` (violet), each with a `-tint` and an `-on-dark` variant, plus the semantic colors `--right`, `--wrong` and `--note`. Charts and widgets use the accents for series in order a1, a2, a3, with `--ink-soft` for a fourth.
-- **Type:** IBM Plex Sans for prose and IBM Plex Mono for anything machine-like, eyebrow labels (`.where`, `.eyebrow`, `.panel-label`), counters and tags. No other font families. KaTeX keeps its own math font.
-- **Rail:** dark, with a mono brand line (`$ cse332 week 2`) and a subtitle, then the course/week switcher (built by `core/app.js` from `site/courses.js`), the lecture group with its numbered `ol.modules`, the dashed "Later this week" list, Reference links and key hints. On a phone it becomes a sticky top bar with a **Contents** button.
-- **Labels:** `.where` / `.eyebrow` with a `.today-chip[data-date]`. Upcoming content uses dashed `.tag-later` / `.day.later`. Week cards use `.week` with `.day.now` / `.day.later`.
+- **Page:** warm paper (`--paper`) with a faint 28px grid. Cards and boxes on `--surface`, ink `--ink`.
+- **Rail:** deep indigo (`--night`) with the same grid. Brand: a small caps kicker (`CSE 332 · week 2`) over the week's
+  title in Fraunces, then the course/week switcher, lecture groups with a mint date badge, numbered modules,
+  "Later this week", Reference. The current page is a pale lavender pill. On a phone it's a top bar with **Menu**.
+- **Type:** Fraunces for titles (h1, h2, problem titles, week cards); Public Sans for reading; JetBrains Mono for code.
+  `h1 em` is purple italic.
+- **Color:** purple `--accent` for links, buttons, rule edges and the current page. Amber for teaching notes, hints
+  and quick checks. Mint `--today` for "today". `--right` / `--wrong` for grading. Chart series `--s1` blue,
+  `--s2` orange, `--s3` aqua (also available as `--a1`/`--a2`/`--a3`). CSE 331's terminals keep their own
+  `--out`/`--err`/`--st` (standard output, standard error, exit status), only inside those widgets.
+- **Labels:** `.kicker` at the top of a page, `.where` above a module title, `.today-chip[data-date]` for dates.
+  Week cards: `.week` with `.day.today` / `.day.later` and a `.when` line.
 - **Components:** `.rule`, `.panel`, `.check`, `details.notes`, `article.task`, `.cyu`, `.cheat`, `.pager`, `.toast`.
 
 ## What stays free
 
-Each lecture's widgets and the layout inside a module are designed for that content, in the week's `week.css`, from the base tokens, so they still read as one family.
+Each lecture's widgets and the layout inside a module are designed for that content, in the week's `week.css`,
+using these tokens, so they still read as one family.

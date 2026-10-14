@@ -186,7 +186,7 @@ function setupDates() {
     const when = n.dataset.date === today ? "today" : n.dataset.date < today ? "past" : "later";
     n.dataset.when = when;
     if (n.classList.contains("tag-today")) n.textContent = when === "today" ? "Today" : when === "past" ? "Past" : "Upcoming";
-    else if (when === "today") n.textContent = `Today · ${n.textContent}`;
+    else if (when === "today") n.textContent = n.hasAttribute("data-plain") ? `Today, ${n.textContent}` : `Today · ${n.textContent}`;
 
   });
 }
