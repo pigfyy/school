@@ -797,9 +797,9 @@
   <article class="task" data-id="cse331-w2-l3-read-the-program">
     <h2>4. Read the program</h2>
     <p class="prompt">The slide "A different Sum" asks three questions about the 99-line program (it's on the <a href="#l3-sum">Sum, from the command line</a> page). Answer each in a sentence or two, then compare with what the lecture found.</p>
-    <div class="answer-spec" data-part="does" data-type="self" data-label="What does Sum do?" data-placeholder="It reads …"></div>
-    <div class="answer-spec" data-part="good" data-type="self" data-label="What is good about it?" data-placeholder="It …"></div>
-    <div class="answer-spec" data-part="not-good" data-type="self" data-label="What is not?" data-placeholder="It …"></div>
+    <div class="answer-spec" data-part="does" data-type="self" data-long data-label="What does Sum do?" data-placeholder="It reads …"></div>
+    <div class="answer-spec" data-part="good" data-type="self" data-long data-label="What is good about it?" data-placeholder="It …"></div>
+    <div class="answer-spec" data-part="not-good" data-type="self" data-long data-label="What is not?" data-placeholder="It …"></div>
     <ol class="hints">
       <li>For "what it does", read the manual on lines 5–19, then the argument loop: there are three places its numbers can come from? (Two, really: a file or standard input.)</li>
       <li>For good and not good, run it on the runs that broke Lecture 1's sentence, on empty input with and without <code>-a</code>, and with <code>--help</code>.</li>
@@ -815,7 +815,7 @@
   <article class="task" data-id="cse331-w2-l3-repair-manual">
     <h2>5. Exercise 1: repair the user manual</h2>
     <p class="prompt">Repair <code>Sum</code>'s user manual until it is true of every run of <code>Sum</code> in the notes, error messages and exit status included. Then answer the four questions your manual has to settle.</p>
-    <div class="answer-spec" data-part="manual" data-type="self" data-label="Your additions to the manual" data-placeholder="Each integer must be …"></div>
+    <div class="answer-spec" data-part="manual" data-type="self" data-long data-label="Your additions to the manual" data-placeholder="Each integer must be …"></div>
     <div class="answer-spec" data-part="error-status" data-type="int" data-label="Exit status on a mistake" data-placeholder="a number"></div>
     <div class="answer-spec" data-part="message-stream" data-type="stream" data-label="Where the message goes" data-placeholder="standard output or standard error"></div>
     <div class="answer-spec" data-part="smallest-int" data-type="int" data-label="The smallest integer Sum accepts" data-placeholder="a number"></div>
@@ -848,7 +848,7 @@
     <p class="prompt">Find an input whose error message misleads the user. First predict two runs from the course's answer; then give your own input and say what's misleading about its message.</p>
     <div class="answer-spec" data-part="dashes-missing" data-type="output" data-label="java Sum precision=4 nums.txt prints" data-placeholder="exactly as printed"></div>
     <div class="answer-spec" data-part="precision-too-big" data-type="output" data-label="java Sum -a --precision=2147483648 prints" data-placeholder="exactly as printed"></div>
-    <div class="answer-spec" data-part="your-input" data-type="self" data-label="Your input, and why its message misleads" data-placeholder="java Sum …"></div>
+    <div class="answer-spec" data-part="your-input" data-type="self" data-long data-label="Your input, and why its message misleads" data-placeholder="java Sum …"></div>
     <ol class="hints">
       <li>Walk each command line through the argument loop on lines 28–51, one argument at a time. What does <code>Sum</code> take <code>precision=4</code> to be?</li>
       <li>For the second, what does <code>Integer.parseInt</code> do with a number one past the largest <code>int</code>?</li>
@@ -875,7 +875,7 @@
       <li>lines 61–66: a word that is not an <code>int</code></li>
       <li>lines 73–75: nothing to average</li>
     </ol>
-    <div class="answer-spec" data-part="spec" data-type="self" data-label="Your method and its specification" data-placeholder="static String answer(…)"></div>
+    <div class="answer-spec" data-part="spec" data-type="self" data-long data-label="Your method and its specification" data-placeholder="static String answer(…)"></div>
     <div class="answer-spec" data-part="relies-on" data-type="letters" data-allowed="ABCDEFG" data-label="Checks the precondition relies on" data-placeholder="letters, e.g. AB"></div>
     <div class="answer-spec" data-part="missing-check" data-type="yesno" data-label="Does writing the precondition reveal a check Sum lacks?" data-placeholder="yes or no"></div>
     <ol class="hints">
@@ -901,7 +901,7 @@
     <div class="answer-spec" data-part="m1-vs-m2" data-type="strength" data-label="M1 is ___ than M2" data-placeholder="stronger, weaker or incomparable"></div>
     <div class="answer-spec" data-part="status-script" data-type="choice" data-options="both:M1 and M2|m1:M1 only|m2:M2 only|neither:Neither" data-label="A script checks only whether Sum succeeded. It is correct against"></div>
     <div class="answer-spec" data-part="message-script" data-type="choice" data-options="both:M1 and M2|m1:M1 only|m2:M2 only|neither:Neither" data-label="A script reports the bad word by reading what follows Sum: not an integer:. It is correct against"></div>
-    <div class="answer-spec" data-part="publish" data-type="self" data-label="Which manual would you publish, and why?" data-placeholder="I'd publish …"></div>
+    <div class="answer-spec" data-part="publish" data-type="self" data-long data-label="Which manual would you publish, and why?" data-placeholder="I'd publish …"></div>
     <ol class="hints">
       <li>The user owes <code>Sum</code> nothing, so both manuals have the same precondition: none. Compare only what they promise.</li>
       <li>Is exit status 1 a nonzero status? Can you build a version of <code>Sum</code> that meets M2 and not M1?</li>
@@ -922,7 +922,7 @@
     <div class="answer-spec" data-part="help-stream" data-type="stream" data-label="--help prints the manual on" data-placeholder="standard output or standard error"></div>
     <div class="answer-spec" data-part="help-status" data-type="int" data-label="--help exits with status" data-placeholder="a number"></div>
     <div class="answer-spec" data-part="usage-status" data-type="int" data-label="A mistake in the arguments exits with status" data-placeholder="a number"></div>
-    <div class="answer-spec" data-part="changes" data-type="self" data-label="Your code and the manual's new lines" data-placeholder="} else if (arg.equals(&quot;--help&quot;)) { …"></div>
+    <div class="answer-spec" data-part="changes" data-type="self" data-long data-label="Your code and the manual's new lines" data-placeholder="} else if (arg.equals(&quot;--help&quot;)) { …"></div>
     <ol class="hints">
       <li>When the user asks for the manual and gets it, did the run succeed? Is the manual a result or a message?</li>
       <li>A script might want to tell "I ran Sum wrong" apart from "I gave Sum bad data". The input mistakes already use status 1. What does GNU <code>ls</code> exit with on an unknown option?</li>

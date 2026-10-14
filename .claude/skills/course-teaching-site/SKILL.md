@@ -31,7 +31,7 @@ Start from the same course's latest week (`site/<course>/<previous week>/index.h
 
 The markup the engine understands is listed at the top of `site/core/app.js`; answer types are listed at the top
 of `site/core/grader.js`. Answer keys go either in the markup (`data-type`, `data-answer`, `data-miscon`) or in a
-`keys.js` that sets `window.WEEK.keys`. Feedback text for misconception tags goes in `window.WEEK.messages`.
+`keys.js` that sets `window.WEEK.keys`. Self-check parts are one-line boxes; add `data-long` for a written answer. Feedback text for misconception tags goes in `window.WEEK.messages`.
 
 ## 3. Look
 

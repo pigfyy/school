@@ -411,43 +411,19 @@ ol.hints li[hidden], ol.hints[hidden] { display: none; }
   .steps li[hidden] { display: list-item !important; }
 }
 
-/* ---------------------------------------------------------------- course + week switcher (top of the rail) */
-.switcher { display: grid; gap: 0.55rem; margin-top: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--night-3); }
-.sw-home { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--night-soft); text-decoration: none; }
-.sw-home::before { content: "← "; }
-.sw-home:hover { color: var(--night-ink); }
-.sw-courses { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--night-2); border: 1px solid var(--night-3); border-radius: var(--r); padding: 2px; }
-.sw-course { text-align: center; font-family: var(--mono); font-size: 0.88rem; padding: 0.3rem 0.5rem; border-radius: 4px; text-decoration: none; color: var(--night-soft); }
-.sw-course:hover { color: var(--night-ink); }
-.sw-course[aria-current="page"] { background: var(--night-3); color: #fff; box-shadow: inset 0 -2px 0 var(--out-term); }
-.sw-weeks { display: grid; grid-template-columns: repeat(auto-fill, minmax(2rem, 1fr)); gap: 3px; }
-.sw-week { text-align: center; font-family: var(--mono); font-size: 0.8rem; padding: 0.22rem 0; border-radius: 4px; text-decoration: none; color: var(--night-ink); background: var(--night-2); border: 1px solid var(--night-3); }
-.sw-week:hover { border-color: var(--night-soft); }
-.sw-week[aria-current="page"] { background: var(--out-term); color: var(--night); border-color: var(--out-term); font-weight: 600; }
-.sw-week.later { color: var(--night-3); background: transparent; border-style: dashed; cursor: default; }
-@media (max-width: 860px) {
-  .switcher { margin-top: 0.7rem; padding-bottom: 0.7rem; }
-  .rail:not(.open) .sw-weeks, .rail:not(.open) .sw-home { display: none; }
-}
+/* ---------------------------------------------------------------- course + week switcher (first block of the rail body)
+   Same idiom as the rest of the rail: mono caps heading, plain links with the teal inset bar for "here",
+   dashed for weeks that aren't posted yet. */
+.switch-courses, .switch-weeks { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.2rem; }
+.switch-courses { margin-bottom: 0.55rem; }
+.switch-courses a { padding: 0.3rem 0.6rem; border-radius: var(--r); text-decoration: none; font-family: var(--mono); font-size: 0.92rem; }
+.switch-weeks a, .switch-weeks span { display: block; min-width: 1.85rem; text-align: center; padding: 0.22rem 0.3rem; border-radius: var(--r); text-decoration: none; font-family: var(--mono); font-size: 0.85rem; }
+.switch-courses a:hover, .switch-weeks a:hover { background: var(--night-2); }
+.switch-courses a[aria-current="page"], .switch-weeks a[aria-current="page"] { background: var(--night-3); color: #fff; box-shadow: inset 3px 0 0 var(--out-term); }
+.switch-weeks span { color: var(--night-3); cursor: default; }
+.switcher h2 a { text-decoration: none; }
+.switcher h2 a:hover { color: var(--night-ink); }
 
-/* ---------------------------------------------------------------- landing page */
-.landing { max-width: 64rem; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
-.landing .brand-cmd { color: var(--ink-soft); }
-.landing .brand-cmd b { color: var(--ink); }
-.course-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin: 2rem 0; }
-.course-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 1.3rem 1.4rem; }
-.course-card h2 { margin: 0 0 0.2rem; }
-.course-card .now { display: block; margin: 1rem 0; padding: 0.9rem 1rem; border: 2px solid var(--ink); border-radius: var(--r); text-decoration: none; color: var(--ink); }
-.course-card .now:hover { background: var(--paper-2); }
-.course-card .now strong { display: block; font-size: var(--step-1); }
-.course-card .weeks { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.35rem; }
-.course-card .weeks a, .course-card .weeks span { text-align: center; font-family: var(--mono); font-size: 0.85rem; padding: 0.35rem 0; border-radius: var(--r); border: 1px solid var(--line); text-decoration: none; color: var(--ink); background: var(--paper); }
-.course-card .weeks a:hover { border-color: var(--ink); }
-.course-card .weeks span { color: var(--ink-faint); border-style: dashed; background: transparent; }
-@media (max-width: 760px) { .course-cards { grid-template-columns: 1fr; } }
-
-/* date chips that aren't today (core/app.js setupDates) read as plain dates */
-.today-chip[data-when="past"], .today-chip[data-when="later"] { background: transparent; color: inherit; padding: 0; }
-.rail h2 .today[data-when="past"], .rail h2 .today[data-when="later"] { background: transparent; color: var(--night-soft); padding: 0; }
-.tag-today[data-when="past"] { background: transparent; color: var(--ink-soft) !important; border: 1px solid var(--line-strong); }
-.tag-today[data-when="later"] { background: transparent; color: var(--ink) !important; border: 1px dashed var(--line-strong); }
+/* ---------------------------------------------------------------- landing page (hero + .week cards, as on a week overview) */
+.landing > * { max-width: 62rem; }
+.landing h2 .muted { font-weight: 400; }

@@ -8,30 +8,43 @@
 <link rel="stylesheet" href="core/base.css">
 </head>
 <body>
-<main class="landing">
-  <p class="eyebrow" id="term"></p>
-  <h1><span class="brand-cmd">cse <b>study</b></span></h1>
-  <p class="lede">One site for every course week: lecture modules, quick checks, quizzes and problems. Answers are saved to your account.</p>
-  <div class="course-cards" id="cards"></div>
+<div class="shell">
+<nav class="rail" aria-label="Courses">
+  <div class="rail-top">
+    <a class="brand" href="./"><span class="brand-cmd">cse <b>study</b></span><small id="term"></small></a>
+  </div>
+  <div class="rail-body" id="rail-body"></div>
+</nav>
+<main id="main" class="landing">
+  <div class="hero">
+    <p class="eyebrow" id="today"></p>
+    <h1>This week</h1>
+    <p class="lede">Lecture modules, quick checks, quizzes and problems for each course week. Answers are saved to your account.</p>
+  </div>
+  <div id="courses"></div>
 </main>
+</div>
 <script src="courses.js"></script>
 <script>
   "use strict";
+  // Built from courses.js with the week overview's own pieces: rail groups, h2 per course, .week cards.
   const { term, courses } = window.COURSES;
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const num = (w) => w.id.replace(/^w0?/, "");
   document.getElementById("term").textContent = term;
-  const cards = document.getElementById("cards");
+  document.getElementById("today").textContent = new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  const rail = document.getElementById("rail-body"), main = document.getElementById("courses");
   for (const c of courses) {
     const posted = c.weeks.filter((w) => w.posted);
     const latest = posted[posted.length - 1];
-    const card = document.createElement("section");
-    card.className = "course-card";
-    const label = (w) => w.id.replace(/^w0?/, "");
-    card.innerHTML = `<p class="eyebrow">${c.name}</p><h2>${c.title}</h2>`
-      + (latest ? `<a class="now" href="${c.id}/${latest.id}/"><span class="eyebrow">Latest · week ${label(latest)} · ${latest.dates || ""}</span><strong>${latest.title || ""}</strong></a>` : "<p>No weeks posted yet.</p>")
-      + `<div class="weeks">${c.weeks.map((w) => (w.posted ? `<a href="${c.id}/${w.id}/" title="${w.title || ""}">W${label(w)}</a>` : `<span title="not posted yet">W${label(w)}</span>`)).join("")}</div>`
-      + `<p class="muted" style="margin:1rem 0 0;font-size:0.9rem"><a href="${c.home}" target="_blank" rel="noopener">Course website</a></p>`;
-    cards.append(card);
+    rail.insertAdjacentHTML("beforeend", `<div><h2>${esc(c.name)}</h2><ul class="plain-links">${posted.slice().reverse()
+      .map((w) => `<li><a href="${c.id}/${w.id}/">Week ${num(w)}: ${esc(w.title)}</a></li>`).join("")}</ul></div>`);
+    main.insertAdjacentHTML("beforeend", `<h2>${esc(c.name)} <span class="muted">· ${esc(c.title)}</span></h2>
+      <div class="week">${c.weeks.slice(Math.max(0, c.weeks.indexOf(latest) - 2), Math.max(0, c.weeks.indexOf(latest) - 2) + 4).map((w) => w.posted
+        ? `<a href="${c.id}/${w.id}/" class="day${w === latest ? " now" : ""}"><strong>Week ${num(w)}</strong>${w === latest ? '<span class="tag-today">Latest</span>' : ""}<span>${esc(w.title)}</span><span>${esc(w.dates)}</span></a>`
+        : `<div class="day later"><strong>Week ${num(w)}</strong><span class="tag-later">Not posted yet</span><span>${esc(w.dates)}</span></div>`).join("")}</div>`);
   }
+  rail.insertAdjacentHTML("beforeend", `<div><h2>Course websites</h2><ul class="plain-links">${courses.map((c) => `<li><a href="${c.home}" target="_blank" rel="noopener">${esc(c.name)}</a></li>`).join("")}</ul></div>`);
 </script>
 </body>
 </html>

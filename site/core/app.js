@@ -147,38 +147,38 @@ function setupMenu() {
   });
 }
 
-/* =========================================================== course + week switcher (built from site/courses.js) */
+/* =========================================================== course + week switcher (built from site/courses.js)
+   The first block of the rail body: the courses, then this course's weeks. */
 function buildSwitcher() {
   const cat = window.COURSES;
-  const top = $(".rail-top");
-  if (!cat || !top) return;
+  const body = $(".rail-body");
+  if (!cat || !body) return;
   const course = cat.courses.find((c) => c.id === COURSE);
-  const box = el("div", { class: "switcher" });
-  const tabs = el("div", { class: "sw-courses", role: "group", "aria-label": "Course" });
+  const courses = el("ul", { class: "switch-courses", "aria-label": "Course" });
   for (const c of cat.courses) {
-    // Same week in the other course if it exists, else its latest posted week.
+    // Same week in the other course if it's posted, else that course's latest week.
     const posted = c.weeks.filter((w) => w.posted);
     const target = posted.find((w) => w.id === WEEK_ID) || posted[posted.length - 1];
-    const a = el("a", { class: "sw-course", href: target ? `${ROOT}${c.id}/${target.id}/` : `${ROOT}`, text: c.short || c.id });
+    const a = el("a", { href: target ? `${ROOT}${c.id}/${target.id}/` : ROOT, text: c.id });
     if (c.id === COURSE) a.setAttribute("aria-current", "page");
-    tabs.append(a);
+    courses.append(el("li", {}, a));
   }
-  const weeks = el("div", { class: "sw-weeks", role: "group", "aria-label": `${course ? course.short : COURSE} weeks` });
+  const weeks = el("ul", { class: "switch-weeks", "aria-label": "Weeks" });
   for (const w of course ? course.weeks : []) {
-    const label = w.id.replace(/^w0?/, "");
+    const n = w.id.replace(/^w0?/, "");
     const node = w.posted
-      ? el("a", { class: "sw-week", href: `${ROOT}${COURSE}/${w.id}/`, title: w.title ? `Week ${label}: ${w.title}` : `Week ${label}`, text: label })
-      : el("span", { class: "sw-week later", title: `Week ${label}: not posted yet`, text: label });
+      ? el("a", { href: `${ROOT}${COURSE}/${w.id}/`, title: `Week ${n}${w.title ? `: ${w.title}` : ""}`, text: n })
+      : el("span", { title: `Week ${n}: not posted yet`, text: n });
     if (w.id === WEEK_ID) node.setAttribute("aria-current", "page");
-    weeks.append(node);
+    weeks.append(el("li", {}, node));
   }
-  box.append(el("a", { class: "sw-home", href: ROOT, text: "All courses" }), tabs, weeks);
-  top.after(box);
+  body.prepend(el("div", { class: "switcher" }, el("h2", {}, el("a", { href: ROOT, text: "Courses" })), courses, el("h2", { text: "Week" }), weeks));
 }
 
 /* =========================================================== date labels
-   Write <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span>: it reads "Today · Mon Oct 5" on that day
-   and just the date otherwise, so an old week never claims to be today. .tag-today shows Today / Past / Upcoming. */
+   Write <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span> (or class "today" in the rail): it reads
+   "Today · Mon Oct 5" on that day and just the date otherwise, so an old week never claims to be today.
+   .tag-today shows Today / Past / Upcoming. */
 function setupDates() {
   const d = new Date();
   const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -187,7 +187,7 @@ function setupDates() {
     n.dataset.when = when;
     if (n.classList.contains("tag-today")) n.textContent = when === "today" ? "Today" : when === "past" ? "Past" : "Upcoming";
     else if (when === "today") n.textContent = `Today · ${n.textContent}`;
-    if (when !== "today") n.closest(".day")?.classList.remove("now");
+
   });
 }
 
@@ -471,18 +471,19 @@ function buildTask(task) {
     const domId = `${p.pid}-input`.replace(/\./g, "--");
     const d = p.spec.dataset;
     let input;
-    if (p.type === "self") input = el("textarea", { id: domId, rows: "3", spellcheck: "true", placeholder: d.placeholder || "your answer" });
+    // Short self-check answers are one line, like the other rows; data-long gives a written one a textarea.
+    if (p.type === "self" && p.spec.hasAttribute("data-long")) input = el("textarea", { id: domId, rows: "3", spellcheck: "true", placeholder: d.placeholder || "your answer" });
     else if (d.options) {
       input = el("select", { id: domId }, el("option", { value: "", text: "Choose…" }));
       for (const o of d.options.split("|")) { const [v, t] = o.split(":"); input.append(el("option", { value: v, text: t || v })); }
     } else input = el("input", { type: "text", id: domId, autocomplete: "off", spellcheck: "false", placeholder: d.placeholder || PLACEHOLDER[p.type] || (d.choices ? JSON.parse(d.choices).join(" or ") : ""), class: p.type === "java" ? "mono" : null });
     p.spec.classList.add("ans-row");
-    if (p.type === "self") p.spec.classList.add("self");
+    if (p.type === "self" && input.tagName === "TEXTAREA") p.spec.classList.add("self");
     if (p.type === "output") p.spec.classList.add("mono-answer");
     p.spec.dataset.itemId = p.pid;
     p.fb = el("p", { class: "part-fb", role: "status" });
     p.spec.append(el("label", { for: domId, text: d.label || (parts.length === 1 ? "Your answer" : `Part ${i + 1}`) }), input);
-    if (p.type === "self") p.spec.append(el("span", { class: "where", text: "check yourself against the solution" }));
+    if (p.type === "self") p.spec.append(el("span", { class: "where", text: "check against the solution" }));
     p.spec.append(p.fb);
     rows.append(p.spec);
     input.addEventListener(input.tagName === "SELECT" ? "change" : "input", () => {
@@ -502,7 +503,7 @@ function buildTask(task) {
   if (hasAuto) myWork.append(el("div", { class: "row" }, checkBtn));
   myWork.append(fb);
   const workId = `${id}--work`;
-  const work = el("textarea", { id: workId, rows: "4", placeholder: task.dataset.workPlaceholder || "Your work: how you got your answer." });
+  const work = el("textarea", { id: workId, rows: "4", placeholder: task.dataset.workPlaceholder || (window.katex ? "Explain how you got your answer. Math works too, e.g. \\( 10n+100 \\le 10n^2 \\)" : "Your reasoning: the lines you followed, the runs you predicted, what you'd change.") });
   const preview = el("div", { class: "work-preview", "aria-live": "polite", hidden: true });
   myWork.append(el("label", { class: "work-label", for: workId, text: "Your work" }), work, preview);
   let previewTimer;
@@ -693,7 +694,12 @@ function setupTasks() {
   $$(".page").forEach((page) => {
     const first = $(".task[data-id]", page);
     if (!first) return;
-    page.insertBefore(el("div", { class: "task-progress" }, el("p", { class: "progress-text", role: "status" })), first);
+    const clearAll = el("button", { class: "btn quiet", type: "button", text: "Clear all on this page" });
+    clearAll.addEventListener("click", () => {
+      if (!confirm("Clear every answer and all work on this page? Your past checks stay in your history.")) return;
+      $$(".task[data-id]", page).forEach((t) => { store.clear(t.dataset.id); ITEMS.get(t.dataset.id).restore(); });
+    });
+    page.insertBefore(el("div", { class: "task-progress" }, el("p", { class: "progress-text", role: "status" }), el("div", { class: "row" }, clearAll)), first);
   });
 }
 function refreshCounts() {
@@ -703,7 +709,7 @@ function refreshCounts() {
     const submitted = recs.filter((r) => liveAttempts(r).length).length;
     const correct = ids.filter((tid, k) => TASKS.has(tid) && statusOf(recs[k], TASKS.get(tid).hasAuto, TASKS.get(tid).hasSelf)[0] === "Correct").length;
     const seen = recs.filter((r) => r && r.solutionViewed).length;
-    $(".progress-text", bar).textContent = `${submitted} of ${ids.length} submitted · ${correct} correct now · ${seen} solution${seen === 1 ? "" : "s"} viewed`;
+    $(".progress-text", bar).textContent = `${submitted} of ${ids.length} answered · ${correct} correct now · ${seen} solution${seen === 1 ? "" : "s"} viewed`;
   });
 }
 
