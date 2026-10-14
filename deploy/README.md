@@ -5,7 +5,9 @@ Project: appgprj_6acfcb7a2b648191b06326661ccd9b96
 
 For the future Codex subagent told “deploy the latest site”:
 
-1. Read the Sites skill. Reuse the project above; never create another Site.
+1. Read the installed Sites skill. Call sites_get_site for the project above and
+   confirm the selected account is its owner and access remains owner-only.
+   Reuse this project; never create another Site or modify other Sites.
 2. Call sites_create_source_repository_write_credential for this project.
 3. Create that checkout directory if absent. Open/refresh source with the installed site-workflow.mjs helper, running
    from /home/pigfy/.t3/projects/school/deploy/.sites-checkout.
@@ -15,9 +17,8 @@ For the future Codex subagent told “deploy the latest site”:
 
    node /home/pigfy/.t3/projects/school/deploy/deploy.mjs
 
-   An optional argument selects another static directory. For placeholders:
-
-   node /home/pigfy/.t3/projects/school/deploy/deploy.mjs /home/pigfy/.t3/projects/school/deploy/placeholder
+   Omit the argument to deploy the latest site/. An optional argument selects
+   another existing static directory; the old placeholder directory was deleted.
 
 5. Run the same helper again, with hidden stdin JSON containing credential,
    source (the complete opening result), commands: [], and archivePath:
@@ -27,8 +28,16 @@ For the future Codex subagent told “deploy the latest site”:
    and archive. Poll sites_get_deployment_status if not terminal.
    Check live pages, sites_read_database_overview, and Worker error logs.
 
-Helper: /home/pigfy/.codex/plugins/cache/openai-curated-remote/sites/1.0.2-remix-a.1/scripts/site-workflow.mjs
-Launch it with a TTY; send credential JSON only after its hidden-input prompt.
+Helper: /home/pigfy/.codex/plugins/cache/openai-curated-remote/sites/1.0.0/scripts/site-workflow.mjs
+Run the helper from the checkout for both opening and packaging:
+
+   node /home/pigfy/.codex/plugins/cache/openai-curated-remote/sites/1.0.0/scripts/site-workflow.mjs --project-id appgprj_6acfcb7a2b648191b06326661ccd9b96
+
+Launch it with a TTY; send one newline-terminated credential JSON object only
+after “Ready for Site workflow JSON on stdin (input is hidden).” Wait for exit
+code 0 and retain the final JSON line (packaging also prints the archive path).
+If the installed plugin version changes, locate its scripts/site-workflow.mjs
+and matching skills/sites/SKILL.md first; do not assume an old path still exists.
 Never persist credentials or put them in command arguments.
 
 worker.mjs serves static files and GET/PUT /api/state/<course>/<week>.
@@ -54,3 +63,27 @@ pages served (no-slash path redirects); DB.state exists; no Worker exceptions;
 real signed-in PUT/GET test/w00 matched data and timestamp (200/200).
 Bypass tokens are identity-less: they can check pages, but API requests get 401.
 Local Worker checks also passed auth, JSON validation, body cap, and routing.
+
+Live verification after deployment (use the authenticated-browser skill and
+the owner's saved ChatGPT account, familyopenai10916@gmail.com):
+
+- Open the landing page and confirm CSE 331 and CSE 332 are listed.
+- Open /cse331/w01/, /cse331/w02/, /cse332/w01/, /cse332/w02/.
+  Wait for network idle; inspect console and page errors for each page,
+  confirm KaTeX elements render without .katex-error on the 332 pages,
+  and check document.fonts for loaded page and KaTeX fonts.
+- On /cse332/w02/, enter a unique test marker in an empty Your work field,
+  wait at least two seconds, reload, and confirm the marker remains. Also
+  GET /api/state/cse332/w02 in that signed-in browser and confirm HTTP 200
+  and the marker in returned data, so localStorage alone cannot mask failure.
+- Call sites_read_database_overview, then sites_read_database_table_rows
+  using its exact DB binding and state table names. Follow next_offset if
+  needed; report row count and columns, and only confirm marker presence.
+- Call sites_get_site_worker_logs with errors_only=true for this project.
+  Report any errors; never change site/ as part of deployment verification.
+
+Verified latest site/ on 2026-10-14: deployment
+appgdep_6acfdeafdd348191a5add57e6a5962f9 succeeded. Landing and all four
+week URLs loaded without console/page errors; 332 math and used fonts loaded.
+Owner-signed-in Your work persisted after reload and was present in API/DB.
+Worker error query returned two /favicon.ico 404s, with no Worker exceptions.
