@@ -1,14 +1,23 @@
-# Dependencies (reinstall with `npm install` in each tests/ folder)
+# Dependencies (npm install in tests/)
 node_modules/
 
-# Build and test output
+# Raw course files stay on disk; their text copies (materials/*/*/text/) and sources.json are committed
+materials/**/*.pdf
+materials/**/*.pptx
+materials/**/*.docx
+materials/**/*.zip
+materials/**/*.png
+materials/**/*.jpg
+
+# Build, test and scratch output
 *.class
-tests/java/**/out/
 *.log
-npm-debug.log*
-coverage/
+.scratch/
 test-results/
-playwright-report/
+
+# Deploy working copies (deploy/README.md)
+deploy/.sites-checkout/
+deploy/dist/
 
 # Local tool and editor state
 .claude/settings.local.json
@@ -16,8 +25,6 @@ playwright-report/
 .idea/
 *.swp
 *~
-
-# OS clutter
 .DS_Store
 Thumbs.db
 desktop.ini

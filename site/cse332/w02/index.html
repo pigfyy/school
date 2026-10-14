@@ -1,0 +1,1100 @@
+<!doctype html>
+<!--
+  CSE 332 (26au) · Week 2 teaching site (Mon Oct 5 – Fri Oct 9). Built from the course-teaching-site template.
+  Every stateful element carries a stable semantic data-id (problems: article.task, parts: .answer-spec[data-part],
+  quick checks: .check, quiz questions: li.cyu). Change the id when the question changes.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE 332 week 2</title>
+<link rel="stylesheet" href="../../core/fonts.css">
+<link rel="stylesheet" href="../../core/base.css">
+<link rel="stylesheet" href="../../core/katex/katex.min.css">
+<link rel="stylesheet" href="week.css">
+</head>
+<body data-course="cse332" data-week="w02">
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+
+<nav class="rail" aria-label="Week 2 modules">
+  <div class="rail-top">
+    <a class="brand" href="#home"><span class="brand-cmd">cse332 <b>week 2</b></span><small>Growth, compared</small></a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="rail-body">Contents</button>
+  </div>
+  <div class="rail-body" id="rail-body">
+    <div>
+      <h2>Lecture 3 <span class="today" data-date="2026-10-05">Mon Oct 5</span></h2>
+      <ol class="modules">
+        <li><a href="#search">Why binary search is log n</a></li>
+        <li><a href="#notation"><span>\(O\), \(\Omega\), \(\Theta\)</span></a></li>
+        <li><a href="#proofs">Proving a bound</a></li>
+        <li><a href="#drop">What you can drop</a></li>
+        <li><a href="#examples">True or false?</a></li>
+        <li><a href="#usage">Using the notation well</a></li>
+        <li><a href="#l3-problems">Lecture 3 exercises</a></li>
+        <li><a href="#cyu-l3">Check your understanding</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Later this week</h2>
+      <ul class="later-list">
+        <li><span>Wed Oct 7 · Priority Queues 1 (ADT)</span><em>materials not posted yet</em></li>
+        <li><span>Thu Oct 8 · Section 2: Algorithm Analysis and Heaps</span><em>materials not posted yet</em></li>
+        <li><span>Fri Oct 9 · Priority Queues 2 (Binary Heap)</span><em>materials not posted yet</em></li>
+        <li><span>Fri Oct 9 · EX0 Generics due</span><em><a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-0" target="_blank" rel="noopener">tasks page</a></em></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Reference</h2>
+      <ul class="plain-links">
+        <li><a href="#home">Week overview</a></li>
+        <li><a href="#upcoming">Later this week</a></li>
+        <li><a href="#readings">Readings</a></li>
+        <li><a href="#cheatsheet">Cheat sheet</a></li>
+      </ul>
+    </div>
+    <p class="rail-foot"><kbd>←</kbd> <kbd>→</kbd> modules · <kbd>N</kbd> next step · <kbd>H</kbd> next hint</p>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ================================================================ HOME -->
+<section class="page" id="home" data-title="Week overview">
+  <div class="hero">
+    <p class="eyebrow">Week 2 · Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
+    <h1>Who wins <em>eventually</em>?</h1>
+    <p class="lede question">Slide 32 claims \(n^{50} \in O(1.1^n)\). At \(n = 100\), \(n^{50}\) has 101 digits and \(1.1^{n}\) is about 13,781. So is the slide wrong?</p>
+    <div class="race-card" id="hero">
+      <div class="controls">
+        <label for="hero-n">\(n\) =</label>
+        <input type="range" id="hero-n" min="0" max="1000" value="400" aria-label="n (slider)">
+        <input type="number" id="hero-n-num" min="1" max="20000" value="100" aria-label="n">
+        <button class="chip" data-hero-jump="4401">n = 4,401</button>
+        <button class="chip" data-hero-jump="4402">n = 4,402</button>
+      </div>
+      <div class="duel">
+        <div class="duel-side s1"><span class="duel-label">\(n^{50}\)</span><b id="hero-f">…</b><span class="duel-sub" id="hero-f-sub"></span></div>
+        <div class="duel-vs" id="hero-vs">vs</div>
+        <div class="duel-side s2"><span class="duel-label">\(1.1^{n}\)</span><b id="hero-g">…</b><span class="duel-sub" id="hero-g-sub"></span></div>
+      </div>
+      <p class="out" id="hero-out" role="status"></p>
+      <div class="chart-box" id="hero-box"><svg class="chart" id="hero-svg" viewBox="0 0 760 260" role="img" aria-label="Number of digits of n^50 and 1.1^n as n grows"></svg></div>
+      <p class="note">Compared exactly with big integers: \(n^{50} \le 1.1^n \iff n^{50}\cdot 10^n \le 11^n\). The chart's height is the number of digits (\(\log_{10}\)), so both curves fit on one axis.</p>
+    </div>
+  </div>
+
+  <div class="prose">
+    <p>The slide is right. \(1.1^n\) loses for a long time, but from \(n = 4{,}402\) on it stays ahead forever. Big-O doesn't care about the first 4,401 inputs. It asks what happens for <em>all large enough</em> \(n\), and it makes "large enough" precise with two numbers, \(c\) and \(n_0\). That's Lecture 3.</p>
+  </div>
+
+  <h2>This week</h2>
+  <div class="week">
+    <a href="#search" class="day now"><strong>Mon, Oct 5</strong><span class="tag-today" data-date="2026-10-05">Today</span><span>Lecture 3: Algorithm Analysis 2</span><span>\(O\), \(\Omega\), \(\Theta\), proofs with \(c\) and \(n_0\), what to drop. Weiss 2.1–2.4; math review 1.1–1.6</span></a>
+    <a href="#upcoming" class="day later"><strong>Wed, Oct 7</strong><span class="tag-later">Upcoming</span><span>Priority Queues 1 (ADT)</span><span>Weiss 6.1–6.3. Slides not posted yet.</span></a>
+    <a href="#upcoming" class="day later"><strong>Thu, Oct 8</strong><span class="tag-later">Upcoming</span><span>Section 2: Algorithm Analysis and Heaps</span><span>Handout not posted yet.</span></a>
+    <a href="#upcoming" class="day later"><strong>Fri, Oct 9</strong><span class="tag-later">Upcoming</span><span>Priority Queues 2 (Binary Heap)</span><span>Weiss 6.4–6.5. Slides not posted yet.</span></a>
+  </div>
+
+  <h2>Due soon</h2>
+  <div class="table-wrap">
+  <table class="plain due">
+    <tr><th>Tonight, Mon Oct 5</th><td>Preliminary survey (on <a href="https://canvas.uw.edu/courses/1916767/quizzes/2447449" target="_blank" rel="noopener">Canvas</a>)</td></tr>
+    <tr><th>Fri Oct 9</th><td>EX0 Generics. <a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-0" target="_blank" rel="noopener">Tasks page</a> (two separate Gradescope submissions)</td></tr>
+    <tr><th>Mon Oct 12</th><td>EX1 Running Time (coming early next week, per slide 2)</td></tr>
+    <tr><th>First 4 weeks</th><td>"Meet the staff": visit any CSE 332 office hour, in person or on Zoom, and ask to be checked off</td></tr>
+  </table>
+  </div>
+
+  <h2>How to use this site</h2>
+  <div class="prose">
+    <ul>
+      <li>The Lecture 3 modules follow the slides in order. Each one has an explanation, something to try, and a quick check you can pose to the room.</li>
+      <li><strong>Teaching notes</strong> are the amber blocks. They're open by default and hold talking points, questions to ask and common mistakes.</li>
+      <li><strong>Exercises</strong> are answerable on the page. Type an answer, write your work, and ask for hints. Solutions stay hidden until you press <strong>Show solution</strong>, and then they show one step at a time. Your work is kept in this browser as you type.</li>
+      <li>Boxes accept arithmetic like <code>2^10+1</code>. Big-O boxes take a class like <code>n log n</code>, <code>O(n^2)</code> or <code>2^n</code>. True/false boxes take <code>true</code>, <code>false</code>, <code>yes</code> or <code>no</code>.</li>
+      <li>Everything after today is marked <span class="tag-later">Upcoming</span>. It's listed, not taught, because its materials aren't posted yet.</li>
+    </ul>
+  </div>
+
+  <h2>Course essentials</h2>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Instructor</th><td>Ruth Anderson, plus the TAs on the <a href="https://courses.cs.washington.edu/courses/cse332/26au/staff.html" target="_blank" rel="noopener">staff page</a></td></tr>
+    <tr><th>Lectures</th><td>MWF in CSE2 G20 (12:30–1:20) and CSE2 G10 (3:30–4:20)</td></tr>
+    <tr><th>Grading</th><td>13 exercises 42% (lowest dropped, except EX12) · participation 3% (surveys, meet the staff, in-class activities) · midterm 20% · final 35%</td></tr>
+    <tr><th>Late days</th><td>Six late-day tokens for exercises, each worth 24 hours</td></tr>
+    <tr><th>Links</th><td><a href="https://courses.cs.washington.edu/courses/cse332/26au/calendar.html" target="_blank" rel="noopener">Calendar</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/syllabus.html" target="_blank" rel="noopener">Syllabus</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries.html" target="_blank" rel="noopener">Topic summaries</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/math_identities_quick_reference.pdf" target="_blank" rel="noopener">Math identities</a> · <a href="https://edstem.org/us/courses/107515" target="_blank" rel="noopener">Ed</a></td></tr>
+  </table>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes: opening Lecture 3</summary>
+    <ul>
+      <li>Slides 3–5 review Friday: we analyze algorithms with a function from input size to resources used, and the scenarios are worst, best, average and amortized. Week 1's site covers those slides in detail. Spend two minutes on them, no more.</li>
+      <li>Open with the hero: ask the room which is bigger at \(n = 100\), then at \(n = 10{,}000\). Most will say \(n^{50}\) both times. The exact flip happens between 4,401 and 4,402. Between them, \(1.1^n\) is ahead only at \(n = 1\) (1 vs 1.1).</li>
+      <li>Announcements (slide 2): the Preliminary Survey is due tonight; EX0 is due Friday with two Gradescope submissions; EX1 (Running Time) comes early next week, due Mon Oct 12; and there's "Meet the staff" in the first four weeks.</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ================================================================ L3: BINARY SEARCH -->
+<section class="page" id="search" data-title="Why binary search is log n">
+  <p class="where">Lecture 3 · slides 3–11 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
+  <h1>Why binary search is \(\log_2 n\)</h1>
+  <div class="prose">
+    <p>Slide 6 searches a sorted list the slow way: look at every item. That's up to \(n\) comparisons. Slide 7 asks for something faster, and slide 8's answer uses the fact that the list is sorted.</p>
+  </div>
+  <div class="split">
+    <pre class="code"><span class="cm">// slide 6</span>
+public static boolean contains(
+        List&lt;Integer&gt; a, int k){
+    for(int i=0; i&lt; a.size(); i++){
+        if (a.get(i) == k)
+            return true;
+    }
+    return false;
+}</pre>
+    <pre class="code"><span class="cm">// slide 8</span>
+public static boolean binary_contains(
+        List&lt;Integer&gt; a, int k){
+    int start = 0;
+    int end = a.size();
+    while(start &lt; end){
+        int mid = start + (end-start)/2;
+        if(a.get(mid) == k)
+            return true;
+        else if(a.get(mid) &lt; k)
+            start = mid+1;
+        else
+            end = mid;
+    }
+    return false;
+}</pre>
+  </div>
+
+  <h2>Watch the gap halve</h2>
+  <div class="panel" id="gap">
+    <div class="controls">
+      <label>Search the slide's list for \(k\) = <input type="number" id="gap-k" value="88" aria-label="target k"></label>
+      <button class="btn primary" id="gap-step">Step</button>
+      <button class="btn" id="gap-run">Run</button>
+      <button class="btn quiet" id="gap-reset">Reset</button>
+    </div>
+    <div class="cells" id="gap-cells"></div>
+    <div class="gap-bars" id="gap-bars" aria-label="end − start at the top of each iteration"></div>
+    <p class="out" id="gap-out" role="status"></p>
+  </div>
+
+  <div class="rule">
+    <p><strong>The halving argument (slide 9).</strong> At the start, <code>end - start</code> \(= n\). Each iteration keeps at most half of the gap, because both <code>mid - start</code> and <code>end - mid</code> are about half. After \(x\) iterations the gap is \(\frac{n}{2^x}\). We stop when the gap is 1:</p>
+    <p>\[\frac{n}{2^x} = 1 \quad\Longrightarrow\quad x = \log_2 n.\]</p>
+  </div>
+
+  <div class="panel" id="worst">
+    <h4>Worst case for any \(n\)</h4>
+    <div class="controls">
+      <label>\(n\) = <input type="number" id="worst-n" value="1000" min="1" max="1000000000" aria-label="list size n"></label>
+    </div>
+    <p class="out" id="worst-out" role="status"></p>
+    <div class="gap-chain" id="worst-chain"></div>
+    <p class="note">The worst path always keeps the larger half, so the gap goes \(n \to \lfloor n/2\rfloor \to \cdots \to 1\), one iteration per gap. That's \(\lfloor\log_2 n\rfloor + 1\) iterations. For \(n \le 10^6\) the page also tries every target (each item and each space between items) and reports the true maximum. The Java run in <code>checks/cse332/w02/</code> agrees for every \(n\) tested.</p>
+  </div>
+
+  <h2>Aside: what's the base of the log?</h2>
+  <div class="rule">
+    <p><strong>Change of base (slide 10).</strong> \(\log n\) with no base means \(\log_2 n\). For any constant \(c\),</p>
+    <p>\[\log_c n = \frac{\log_2 n}{\log_2 c},\]</p>
+    <p>and \(\log_2 c\) is just a constant, so it hides inside the \(O(\,)\). \(O(\log_5 n)\) and \(O(\log_2 n)\) are the same set.</p>
+  </div>
+  <div class="panel" id="logb">
+    <div class="controls" role="group" aria-label="Base">
+      <span>Base \(c\):</span>
+      <button class="chip" data-base="2" aria-pressed="false">2</button>
+      <button class="chip" data-base="5" aria-pressed="true">5</button>
+      <button class="chip" data-base="8" aria-pressed="false">8</button>
+      <button class="chip" data-base="10" aria-pressed="false">10</button>
+    </div>
+    <div class="table-wrap"><table class="plain num" id="logb-table"></table></div>
+    <p class="note">The last column never changes: it's \(\log_2 c\), the constant the slide hides inside the \(O\).</p>
+  </div>
+
+  <h2>Running time graphed (slide 11)</h2>
+  <div class="prose">
+    <p>Slide 11 shows two measured graphs. On small inputs (100 to 2,600) the "binary" curve is above "linear". On larger inputs (1,000 to 49,000) "linear" climbs past it near 7,000 and keeps going. The slide gives no units or code for the measurements, so this site doesn't reproduce the numbers. The shape is the lesson: what wins on small inputs can lose on big ones, so we need a way to compare <em>long-term</em> behavior.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w2-l3-search-worst-million" data-grader="exact" data-answer="20" data-miscon='{"1000000":"linear-count","19":"stopped-early","500000":"halved-once"}'>
+    <p>Quick check: on a sorted list of 1,000,000 items, what's the most loop iterations <code>binary_contains</code> can take?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w2-l3-search-log8-same-bucket" data-grader="mc">
+    <p>Quick check: an algorithm takes \(\log_8 n\) steps. What is that in terms of \(\log_2 n\)?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w2-l3-search-log8-same-bucket"> \(8\log_2 n\), so it's a different bucket<span class="why" hidden>Change of base divides; it doesn't multiply. And a constant factor never changes the bucket anyway.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l3-search-log8-same-bucket"> \(\tfrac13\log_2 n\), so it's still \(O(\log n)\)<span class="why" hidden>Right: \(\log_8 n = \frac{\log_2 n}{\log_2 8} = \frac{\log_2 n}{3}\). That's a constant factor, so it's the same bucket.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-search-log8-same-bucket"> \((\log_2 n)^3\), so it grows faster<span class="why" hidden>That would be a power of the log. Change of base gives a constant factor, not a power.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Week 1's site stepped through this same code (Lecture 2 covered it). Today's new content is the <em>argument</em>: name the quantity that shrinks (the gap) and solve \(\frac{n}{2^x} = 1\).</li>
+      <li>The exact worst case is \(\lfloor \log_2 n\rfloor + 1\), not \(\log_2 n\). For \(n = 1024\) it's 11, because the loop still runs once when the gap is 1. Both are \(\Theta(\log n)\). Use this as a preview of "drop the constants".</li>
+      <li>Try \(k = 5\) in the widget: the gaps go 10, 5, 2, 1, so it takes 4 iterations even though 5 is the very first item. Linear search finds it in 1. Ask: "Is binary search always faster?" No, only in the worst case.</li>
+      <li>Slide 11 is a timing graph. Hold it for the end of the lecture (slide 37, timing vs. Big-O).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3: NOTATION -->
+<section class="page" id="notation" data-title="O, Ω, Θ">
+  <p class="where">Lecture 3 · slides 12–18 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
+  <h1>\(O\), \(\Omega\), \(\Theta\)</h1>
+  <div class="prose">
+    <p>Slide 12 asks which of A \(=10n+900\), B \(=100n-50\) and C \(=\frac{n^2}{100}\) is best. The answer changes with \(n\): C is the cheapest of the three up to \(n = 1{,}083\) and A is cheapest from 1,084 on, while B beats A only up to \(n = 10\). That's why we want a comparison with these properties (slide 13):</p>
+    <ul>
+      <li><strong>Long-term behavior.</strong> All algorithms are fast on small inputs, so compare on large ones.</li>
+      <li><strong>Ignore constant coefficients and non-dominant terms.</strong> Different people count different operations, and different machines run them at different speeds. Constant coefficients matter more than the non-dominant terms: \(2n^2 &gt; n^2 + n\).</li>
+    </ul>
+  </div>
+
+  <h2>The definitions (slide 15)</h2>
+  <div class="rule defn" id="defn">
+    <p><strong>\(O(g(n))\)</strong>: the <em>set of functions</em> with asymptotic behavior less than or equal to \(g(n)\). Upper-bounded by a constant times \(g\) for large enough \(n\).</p>
+    <p class="quant" aria-label="Definition of Big-O, click a part">
+      <button class="q-part" data-q="in">\(f \in O(g(n))\)</button> \(\equiv\)
+      <button class="q-part" data-q="c">\(\exists c &gt; 0.\)</button>
+      <button class="q-part" data-q="n0">\(\exists n_0 &gt; 0.\)</button>
+      <button class="q-part" data-q="all">\(\forall n \ge n_0.\)</button>
+      <button class="q-part" data-q="le">\(f(n) \le c\cdot g(n)\)</button>
+    </p>
+    <p class="q-explain" id="q-explain" role="status">Click any part of the definition.</p>
+    <p><strong>\(\Omega(g(n))\)</strong>: the set of functions with asymptotic behavior greater than or equal to \(g(n)\). Lower-bounded by a constant times \(g\) for large enough \(n\):</p>
+    <p>\[f \in \Omega(g(n)) \equiv \exists c&gt;0.\ \exists n_0&gt;0.\ \forall n\ge n_0.\ f(n) \ge c\cdot g(n)\]</p>
+    <p><strong>\(\Theta(g(n))\)</strong>: "tightly" within a constant of \(g\) for large \(n\). \(\Theta(g(n)) = \Omega(g(n)) \cap O(g(n))\).</p>
+  </div>
+  <div class="prose">
+    <p><strong>The idea of \(\Theta\) (slide 16)</strong> is the same as for numbers: \(x = y \iff x \le y \wedge x \ge y\). \(O\) is like \(\le\), \(\Omega\) is like \(\ge\), and \(\Theta\) is like \(=\) (up to constants, for large \(n\)).</p>
+  </div>
+
+  <h2>The picture (slide 14)</h2>
+  <div class="panel sandwich" id="sw1" data-claim="sq17-theta">
+    <div class="controls sw-claim"></div>
+    <div class="controls sw-consts"></div>
+    <div class="legend sw-legend"></div>
+    <div class="chart-box"><svg class="chart sw-svg" viewBox="0 0 760 280" role="img" aria-label="f(n) between c1 g(n) and c2 g(n)"></svg></div>
+    <p class="out sw-out" role="status"></p>
+    <p class="note">The smallest \(n_0\) shown is computed exactly: the page checks the inequality for every integer \(n \ge n_0\), not by looking at the plot.</p>
+  </div>
+
+  <h2>Big-O relates functions (slide 17)</h2>
+  <div class="rule">
+    <p><strong>\(O(n^2)\) is a set.</strong> \((3n^2 + 17) \in O(n^2)\), because \(3n^2+17\) and \(n^2\) have the same asymptotic behavior. We also write "\(3n^2+17\) is \(O(n^2)\)" and "\(3n^2+17 = O(n^2)\)". But we never write \(O(n^2) = 3n^2+17\). The "=" here means "is in" and only reads one way.</p>
+  </div>
+
+  <h2>Warning: \(O\), \(\Omega\), \(\Theta\) are not best, worst, average (slide 18)</h2>
+  <div class="rule warn">
+    <p><strong>Two separate questions.</strong> Best, worst and average answer <em>which function \(f\) am I analyzing?</em> \(O\), \(\Omega\) and \(\Theta\) answer <em>what do I know about \(f\): is it \(\le\), \(\ge\) or \(=\) something?</em> You can use \(\le\) on the worst case or the best case, and \(\ge\) on either too.</p>
+  </div>
+  <div class="panel" id="grid">
+    <p class="note">Click a cell for a true statement from this lecture or its speaker notes.</p>
+    <div class="table-wrap"><table class="plain grid6" id="grid-table"></table></div>
+    <p class="out" id="grid-out" role="status"></p>
+  </div>
+
+  <div class="check" data-id="cse332-w2-l3-notation-omega-best" data-grader="mc">
+    <p>Quick check: "Every sorting algorithm takes at least \(n\log n\) time in the worst case." Which pair describes this claim?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w2-l3-notation-omega-best"> \(O\), best case<span class="why" hidden>"At least" is a lower bound, so it's \(\Omega\). And the claim is about the worst case.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l3-notation-omega-best"> \(\Omega\), worst case<span class="why" hidden>Right. That's slide 18's speaker note: an \(\Omega\) statement in a worst-case context.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-notation-omega-best"> \(\Omega\), best case<span class="why" hidden>"At least" does make it \(\Omega\). But the claim is about the worst case. \(\Omega\) doesn't mean best case.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-notation-omega-best"> \(\Theta\), average case<span class="why" hidden>The claim gives only a lower bound, and it's about the worst case.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w2-l3-notation-sq17-upper-n0" data-grader="exact" data-answer="5" data-miscon='{"4":"strict-vs-equal","17":"forgot-c","1":"no-n0"}'>
+    <p>Quick check: with \(c = 4\), what is the smallest \(n_0\) such that \(3n^2 + 17 \le c\cdot n^2\) for every \(n \ge n_0\)?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The definition is a nest of quantifiers. Have students read it aloud: "there is some \(c\), and some starting point \(n_0\), so that from there on, \(f\) never goes above \(c\) times \(g\)." The clickable version above says what each piece is for.</li>
+      <li>Slide 18's speaker note explains why you'd use \(O\) or \(\Omega\) instead of \(\Theta\): "Sometimes you don't know if you've done the analysis perfectly." Lower-bound examples: "every algorithm for sorting takes at least \(n\log n\) time in the worst-case" (\(\Omega\), worst case) and "every algorithm for this problem needs to look at all the elements, so will take at least \(n\) time, even in the best case" (\(\Omega(n)\), best case).</li>
+      <li>The slide flags that the "\(O\) = worst case" misconception is common, including in generated text. Hammer it with the 2×3 grid: every cell can hold a true statement.</li>
+      <li>In the sandwich, \(3n^2 + 17\) is never below \(3n^2\), so \(c_1 = 3\) works from \(n_0 = 1\). For \(c_2 = 4\) you need \(n^2 \ge 17\), so \(n_0 = 5\). Try \(c_2 = 3\): no \(n_0\) works.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3: PROOFS -->
+<section class="page" id="proofs" data-title="Proving a bound">
+  <p class="where">Lecture 3 · slides 19–26 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
+  <h1>Proving a bound</h1>
+  <div class="rule">
+    <p><strong>Big-O is an \(\exists c, n_0\ \forall n\) statement (slides 19–20).</strong> It's an "exists" statement with a "for all" inside.</p>
+    <ul>
+      <li>To prove an <em>exists</em>: show the \(c\) and \(n_0\) that work. Give specific values.</li>
+      <li>To prove a <em>for all</em>: introduce an arbitrary \(n \ge n_0\) and show the inequality for it.</li>
+    </ul>
+  </div>
+
+  <h2>Example 1: \(10n + 100 \in O(n^2)\)</h2>
+  <div class="split">
+    <div class="prose">
+      <p><strong>Scratchwork (slide 22).</strong> We need \(10n + 100 \le c\cdot n^2\). The algebra looks easier with \(c = 10\). Now we need \(10n + 100 \le 10n^2\), which is the same as \(n + 10 \le n^2\).</p>
+      <p>To pick \(n_0\), ask when "add 10" has less impact than "multiply by \(n\)". If \(n \ge 10\), then \(n + 10 \le 2n\), \(2n \le 10n\) and \(10n \le n^2\). So \(n+10 \le n^2\). Use \(c = 10\), \(n_0 = 10\).</p>
+    </div>
+    <div class="proof">
+      <p class="proof-head">Proof (slide 23)</p>
+      <p>Let \(c = 10\) and \(n_0 = 10\). Show \(\forall n \ge 10\): \(10n + 100 \le 10n^2\).</p>
+      <p>\[\begin{aligned} &amp;10n+100 \le 10n^2\\ \equiv\ &amp; n + 10 \le n^2\\ \equiv\ &amp; 10 \le n^2 - n\\ \equiv\ &amp; 10 \le n(n-1)\end{aligned}\]</p>
+      <p>This is true because \(n(n-1)\) is strictly increasing and \(10(10-1) &gt; 10\).</p>
+    </div>
+  </div>
+
+  <h2>Example 2: \(13n^2 - 50n \in \Omega(n^2)\)</h2>
+  <div class="split">
+    <div class="prose">
+      <p><strong>Scratchwork (slide 25).</strong> We need \(13n^2 - 50n \ge c\cdot n^2\), or equivalently \(13n - 50 \ge c\cdot n\). Try \(c = 13\): now we need \(13n - 50 \ge 13n\), that is, \(-50 \ge 0\). That didn't work! It tells us the left side has to make up 50, so we definitely need \(c &lt; 13\).</p>
+      <p>Use \(c = 12\) instead: \(13n - 50 \ge 12n\) simplifies to \(n \ge 50\). So \(n_0 = 50\).</p>
+    </div>
+    <div class="proof">
+      <p class="proof-head">Proof (slide 26)</p>
+      <p>Let \(c = 12\) and \(n_0 = 50\). Show \(\forall n \ge 50\): \(13n^2 - 50n \ge 12n^2\).</p>
+      <p>\[\begin{aligned} &amp;13n^2 - 50n \ge 12n^2\\ \equiv\ &amp; n^2 - 50n \ge 0\\ \equiv\ &amp; n - 50 \ge 0 \quad(n \ne 0 \text{ since } n \ge 50)\\ \equiv\ &amp; n \ge 50\end{aligned}\]</p>
+      <p>Because we chose \(n_0 = 50\), the inequality holds for all \(n \ge n_0\).</p>
+    </div>
+  </div>
+
+  <h2>Try your own \(c\)</h2>
+  <div class="panel sandwich" id="sw2" data-claim="ex1">
+    <div class="controls sw-claim"></div>
+    <div class="controls sw-consts"></div>
+    <div class="legend sw-legend"></div>
+    <div class="chart-box"><svg class="chart sw-svg" viewBox="0 0 760 280" role="img" aria-label="f(n) and c times g(n)"></svg></div>
+    <p class="out sw-out" role="status"></p>
+    <p class="note">For each \(c\), the page finds the <em>smallest</em> \(n_0\) that works, exactly, or proves that none does. Any \(n_0\) at least that large also works, so the slides' \(n_0 = 10\) is fine even though 4 is the smallest for \(c = 10\).</p>
+  </div>
+
+  <div class="check" data-id="cse332-w2-l3-proofs-example1-smallest-n0" data-grader="exact" data-answer="4" data-miscon='{"10":"not-smallest","3":"strict-vs-equal"}'>
+    <p>Quick check: in Example 1 with \(c = 10\), what is the <em>smallest</em> \(n_0\) that works?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w2-l3-proofs-example2-c13" data-grader="yesno" data-answer="no" data-miscon='{"yes":"c13-works"}'>
+    <p>Quick check: in Example 2, is there <em>any</em> \(n_0\) that makes \(c = 13\) work? (yes or no)</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide 21 writes the technique as "\(\forall n &gt; n_0\)", and slides 23 and 26 write "\(\forall n \ge n_0\)". The definition on slide 15 uses \(\ge\). The site uses \(\ge\) everywhere and asks for the smallest \(n_0\) under \(\ge\).</li>
+      <li>Scratchwork goes forward from what you need. The proof then states \(c\) and \(n_0\) first and shows the inequality for every \(n \ge n_0\). Students often hand in only the scratchwork.</li>
+      <li>Slide 23's chain of \(\equiv\) steps divides by 10 and rearranges. Each step must be reversible, which is why slide 26 notes "allowed because \(n\ne0\)" when it divides by \(n\).</li>
+      <li>Have the room shrink \(n_0\): with \(c = 10\), Example 1 holds from \(n = 4\) (\(4\cdot3 = 12 \ge 10\), but \(3\cdot 2 = 6 &lt; 10\)). Raising \(c\) lowers \(n_0\): with \(c = 110\), \(n_0 = 1\).</li>
+      <li>Example 2 turned the other way: \(c = 1\) needs only \(n_0 = 5\), and \(c = 11\) needs \(n_0 = 25\). The smaller \(c\) is, the sooner it works.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3: DROP -->
+<section class="page" id="drop" data-title="What you can drop">
+  <p class="where">Lecture 3 · slides 27–29 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
+  <h1>What you can drop</h1>
+  <div class="rule">
+    <p><strong>Gaining intuition (slide 27).</strong> When doing asymptotic analysis of functions:</p>
+    <ul>
+      <li>If several expressions are added together, ignore all but the "biggest": if \(f(n)\) grows asymptotically faster than \(g(n)\), then \(f(n) + g(n) \in \Theta(f(n))\).</li>
+      <li>Ignore multiplicative constants: \(c\cdot f(n) \in \Theta(f(n))\) for any constant \(c\).</li>
+      <li>Ignore the bases of logarithms.</li>
+      <li><strong>Do not</strong> ignore constants that aren't multiplicative or additive (in exponents, bases of exponents), and don't ignore the logarithms themselves.</li>
+    </ul>
+  </div>
+  <div class="rule warn">
+    <p><strong>What you can't drop (slide 28).</strong> \(n^3\) is not \(O(n^2)\). \(3^n\) is not \(O(2^n)\). This all follows from the formal definition.</p>
+  </div>
+
+  <h2>Simplify an expression</h2>
+  <div class="panel" id="simp">
+    <div class="controls">
+      <label for="simp-in">\(f(n) =\)</label>
+      <input type="text" id="simp-in" class="mono wide" value="0.5nlogn + 2n + 7" aria-label="expression in n" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="controls" role="group" aria-label="Slide 27 examples">
+      <span class="note">Slide 27:</span>
+      <button class="chip" data-simp="4n + 5">4n + 5</button>
+      <button class="chip" data-simp="0.5nlogn + 2n + 7">0.5 n log n + 2n + 7</button>
+      <button class="chip" data-simp="n^3 + 2^n + 3n">n³ + 2ⁿ + 3n</button>
+      <button class="chip" data-simp="nlog(10n^2)">n log(10n²)</button>
+    </div>
+    <p class="out" id="simp-out" role="status"></p>
+    <ol class="ladder" id="simp-ladder" aria-label="Common categories, slowest growth first"></ol>
+    <p class="note">This classifier handles sums and products of constants, \(n^a\), \(b^n\), logs and square roots, and it uses exact fractions. It refuses expressions it can't classify for certain, like \(n^2 - n^2\).</p>
+  </div>
+
+  <h2>Common categories (slide 29)</h2>
+  <div class="table-wrap">
+  <table class="plain cats">
+    <tr><td>\(O(1)\)</td><td>constant</td></tr>
+    <tr><td>\(O(\log n)\)</td><td>logarithmic</td></tr>
+    <tr><td>\(O(n)\)</td><td>linear</td></tr>
+    <tr><td>\(O(n\log n)\)</td><td>log-linear</td></tr>
+    <tr><td>\(O(n^2)\)</td><td>quadratic</td></tr>
+    <tr><td>\(O(n^3)\)</td><td>cubic</td></tr>
+    <tr><td>\(O(n^k)\)</td><td>polynomial (where \(k\) is a constant \(&gt; 1\))</td></tr>
+    <tr><td>\(O(k^n)\)</td><td>exponential (where \(k\) is a constant \(&gt; 1\))</td></tr>
+  </table>
+  </div>
+
+  <div class="check" data-id="cse332-w2-l3-drop-n3-2n-bucket" data-grader="bigo" data-answer="2^n">
+    <p>Quick check: put \(n^3 + 2^n + 3n\) in its simplest bucket.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w2-l3-drop-exponent-base" data-grader="mc">
+    <p>Quick check: which one is <em>not</em> in \(\Theta(2^n)\)?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w2-l3-drop-exponent-base"> \(5\cdot 2^n\)<span class="why" hidden>A multiplicative constant: drop it. This is \(\Theta(2^n)\).</span></label>
+      <label><input type="radio" name="cse332-w2-l3-drop-exponent-base"> \(2^n + n^{10}\)<span class="why" hidden>\(2^n\) eventually dominates \(n^{10}\), so the sum is \(\Theta(2^n)\).</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l3-drop-exponent-base"> \(4^n\)<span class="why" hidden>Right. \(4^n = 2^n\cdot 2^n\). The base of an exponential is not a multiplicative constant, so you can't drop it (slide 28).</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide 27's four examples have no posted answers. By the slide's own rules: \(4n+5 \in \Theta(n)\). \(0.5n\log n + 2n + 7 \in \Theta(n\log n)\). \(n^3 + 2^n + 3n \in \Theta(2^n)\). \(n\log(10n^2) = n(\log 10 + 2\log n) \in \Theta(n\log n)\). The last one uses log rules from the math identities sheet.</li>
+      <li>Why coefficients go (slide 28): "we don't have units anyway". \(3n^2\) versus \(5n^2\) means nothing when we can't count operations very accurately.</li>
+      <li>Ask: "Is \(2^{n+1} \in \Theta(2^n)\)?" Yes, because \(2^{n+1} = 2\cdot 2^n\). Now ask about \(2^{2n}\). No, because \(2^{2n} = 4^n\). An additive constant in the exponent becomes a multiplier. A multiplicative constant in the exponent changes the base.</li>
+      <li>The table on slide 29 gives "polynomial" as \(k &gt; 1\), so \(O(n^2)\) and \(O(n^3)\) are special cases of it.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3: EXAMPLES -->
+<section class="page" id="examples" data-title="True or false?">
+  <p class="where">Lecture 3 · slides 30–32 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
+  <h1>True or false?</h1>
+  <div class="prose">
+    <p>Slide 31 asks for five verdicts, and slide 32 answers them with "semi-intuitive" justifications. Use the classifier to compare any two functions. It reports all three relations at once, so you can see that \(O\) and \(\Omega\) can both be true (that's \(\Theta\)) or exactly one can be.</p>
+  </div>
+
+  <div class="panel" id="rel">
+    <div class="controls" role="group" aria-label="Slide 31 claims">
+      <span class="note">Slide 31:</span>
+      <button class="chip" data-rel='["4+3n","n"]'>4 + 3n vs n</button>
+      <button class="chip" data-rel='["n+2log n","log n"]'>n + 2 log n vs log n</button>
+      <button class="chip" data-rel='["log n+2","1"]'>log n + 2 vs 1</button>
+      <button class="chip" data-rel='["n^50","1.1^n"]'>n⁵⁰ vs 1.1ⁿ</button>
+      <button class="chip" data-rel='["3^n","2^n"]'>3ⁿ vs 2ⁿ</button>
+    </div>
+    <div class="controls">
+      <label>\(f(n) =\) <input type="text" id="rel-f" class="mono" value="n^50" aria-label="f(n)" autocomplete="off" spellcheck="false"></label>
+      <label>\(g(n) =\) <input type="text" id="rel-g" class="mono" value="1.1^n" aria-label="g(n)" autocomplete="off" spellcheck="false"></label>
+    </div>
+    <div class="verdicts" id="rel-out" role="status"></div>
+  </div>
+
+  <h2>"Eventually" made exact</h2>
+  <div class="panel" id="race">
+    <div class="controls" role="group" aria-label="Race">
+      <button class="chip" data-race="n50" aria-pressed="true">\(n^{50}\) vs \(1.1^n\)</button>
+      <button class="chip" data-race="threeTwo" aria-pressed="false">\(3^n\) vs \(1000\cdot 2^n\)</button>
+    </div>
+    <div class="legend" id="race-legend"></div>
+    <div class="chart-box" id="race-box"><svg class="chart" id="race-svg" viewBox="0 0 760 280" role="img" aria-label="log10 of both functions"></svg></div>
+    <p class="out" id="race-out" role="status"></p>
+    <div class="controls">
+      <button class="chip" id="race-table-toggle" aria-pressed="false">Table view</button>
+    </div>
+    <div class="table-wrap" id="race-table" hidden></div>
+  </div>
+
+  <div class="check" data-id="cse332-w2-l3-examples-log-plus-two" data-grader="yesno" data-answer="no" data-miscon='{"yes":"log-is-constant"}'>
+    <p>Quick check: true or false? \(\log n + 2 \in O(1)\).</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide 32's verdicts: True, False, False, True, False. Make students commit before you click.</li>
+      <li>\(3^n \notin \Theta(2^n)\), because \(3^n \le c\,2^n \iff (\log_2 3)\,n \le \log_2 c + n\), and multiplying by \(\log_2 3\) eventually beats adding \(\log_2 c\). The slide's threshold is \(n &gt; \frac{\log_2 c}{\log_2 3 - 1}\). For \(c = 1000\) that's \(n &gt; 17.04\). The race above confirms it exactly: \(3^n &gt; 1000\cdot 2^n\) first at \(n = 18\), and from then on forever.</li>
+      <li><strong>A slip on slide 32.</strong> For \(n + 2\log n \notin O(\log n)\), the slide says "eventually \(n &gt; c\log n\) (specifically, when \(\frac{2^n}{n} &gt; c\))". As printed that condition is too weak: \(n &gt; c\log_2 n \iff 2^n &gt; n^c\). With \(c = 10\), \(\frac{2^n}{n} &gt; 10\) already at \(n = 6\), but \(6 &gt; 10\log_2 6 \approx 25.8\) is false. The first \(n\) with \(n &gt; 10\log_2 n\) is 59 (checked with exact integers in Java). The verdict (False) is right; only the parenthetical is off. Worth mentioning only if someone asks.</li>
+      <li>\(\log n + 2 \notin O(1)\): for any \(c\), \(\log n &gt; c\) once \(n &gt; 2^c\). The "+2" is irrelevant.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3: USAGE -->
+<section class="page" id="usage" data-title="Using the notation well">
+  <p class="where">Lecture 3 · slides 33–37 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
+  <h1>Using the notation well</h1>
+
+  <h2>Say \(\Theta\) when you mean it (slide 33)</h2>
+  <div class="rule">
+    <p><strong>A common error is to say \(O(f(n))\) when you mean \(\Theta(f(n))\).</strong> If \(f(n) = n\), then "\(f(n) \in O(n)\)" is true but only gives the upper bound. \(f(n) = n\) is also \(O(n^5)\). So "this algorithm is exactly \(O(n)\)" is incomplete. Say it is \(\Theta(n)\). That also tells the reader it is <em>not</em>, for example, \(O(\log n)\).</p>
+  </div>
+
+  <h2>What we are analyzing (slides 34–35)</h2>
+  <div class="prose">
+    <p>The most common thing is an \(O\) or \(\Theta\) <em>bound</em> on the <em>worst-case</em> running <em>time</em> of an <em>algorithm</em>. Each of those words is a choice. Slide 34's true statements about binary search:</p>
+  </div>
+  <div class="statements">
+    <div class="stmt"><span class="badge">Common</span> \(\Theta(\log n)\) running time in the worst case.</div>
+    <div class="stmt"><span class="badge quiet">Less common</span>\(\Theta(1)\) in the best case (the item is in the middle).</div>
+    <div class="stmt"><span class="badge quiet">Less common</span>\(\Omega(\log\log n)\) in the worst case. True, but weak: it only says the algorithm is not really, really, really fast.</div>
+    <div class="stmt"><span class="badge quiet">Good to know</span>The find-in-sorted-array <em>problem</em> is \(\Omega(\log n)\) in the worst case. No algorithm can do better (without parallelism).</div>
+  </div>
+  <div class="prose">
+    <p>A <em>problem</em> can't be "\(O(f(n))\)" in a useful sense, since you can always find a slower algorithm. When people say it, they mean there exists an algorithm that fast.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Summary (slide 35).</strong> Analysis can be about the problem or the algorithm (usually the algorithm); time or space (usually time; or power, or dollars…); the best, worst or average case (usually worst); and an upper, lower or tight bound (usually upper or tight).</p>
+  </div>
+
+  <h2>Big-O caveats (slide 36)</h2>
+  <div class="prose">
+    <p>Big-O is about large \(n\) and is independent of any computer or coding trick. You can still be misled about trade-offs. The slide's example: \(n^{1/10}\) grows faster than \(\log n\) asymptotically, but the crossover is around \(5\cdot10^{17}\).</p>
+  </div>
+  <div class="panel" id="tenth">
+    <div class="controls">
+      <label for="tenth-k">\(n = 2^k\), \(k\) =</label>
+      <input type="range" id="tenth-k" min="1" max="80" value="40" aria-label="k">
+      <output id="tenth-k-out">40</output>
+    </div>
+    <div class="duel compact">
+      <div class="duel-side s1"><span class="duel-label">\(n^{1/10} = 2^{k/10}\)</span><b id="tenth-f">…</b></div>
+      <div class="duel-vs" id="tenth-vs">vs</div>
+      <div class="duel-side s2"><span class="duel-label">\(\log_2 n = k\)</span><b id="tenth-g">…</b></div>
+    </div>
+    <div class="chart-box" id="tenth-box"><svg class="chart" id="tenth-svg" viewBox="0 0 760 240" role="img" aria-label="n^(1/10) and log2 n for n = 2^k"></svg></div>
+    <p class="out" id="tenth-out" role="status"></p>
+    <p class="note">The winner is decided exactly: \(2^{k/10} \gt k \iff 2^k \gt k^{10}\), compared with big integers.</p>
+  </div>
+  <div class="prose">
+    <p>Comparing \(O(\,)\) for small \(n\) can mislead too. Quicksort is \(O(n\log n)\) (expected) and insertion sort is \(O(n^2)\) (expected), yet insertion sort is faster for small \(n\). Sorting comes later in the course.</p>
+  </div>
+
+  <h2>Timing vs. Big-O (slide 37)</h2>
+  <div class="rule">
+    <p><strong>Use the right tool.</strong> To evaluate an <em>algorithm</em>, use asymptotic analysis: examine the algorithm itself, mathematically, as a function of \(n\), and prove things about it. To evaluate an <em>implementation</em> (hardware or software), timing can be useful. In the real world we do want to know whether implementation A runs faster than B on data set C (for example, when benchmarking graphics cards).</p>
+  </div>
+
+  <div class="check" data-id="cse332-w2-l3-usage-say-theta" data-grader="mc">
+    <p>Quick check: you've shown an algorithm does exactly \(3n + 4\) operations in the worst case. Which statement says the most?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w2-l3-usage-say-theta"> Its worst case is \(O(n^5)\)<span class="why" hidden>True, but it's a very loose upper bound.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-usage-say-theta"> Its worst case is \(O(n)\)<span class="why" hidden>True, but it's only an upper bound. It doesn't rule out the algorithm being \(O(\log n)\).</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l3-usage-say-theta"> Its worst case is \(\Theta(n)\)<span class="why" hidden>Right. It's both an upper and a lower bound, so it says the worst case is not \(O(\log n)\).</span></label>
+      <label><input type="radio" name="cse332-w2-l3-usage-say-theta"> Its worst case is \(\Omega(1)\)<span class="why" hidden>True of every algorithm that does anything, so it says almost nothing.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide 36's numbers, checked: at \(n = 2^{58}\), \(\log_2 n = 58\) and \(n^{1/10} = 2^{5.8} \approx 55.7\), so \(n^{1/10}\) is still smaller. At \(n = 2^{59}\), \(n^{1/10} \approx 59.7 &gt; 59\). The real-valued crossover is near \(n \approx 4.9\cdot 10^{17}\), which matches "around \(5\cdot 10^{17}\)". Below \(2^{58}\), the \(n^{1/10}\) algorithm is the cheaper one.</li>
+      <li>There's a second crossover at tiny \(n\): at \(n = 2\) (\(k = 1\)), \(n^{1/10} \approx 1.07 &gt; 1 = \log_2 2\). It only matters as a reminder that "eventually" means "from some point on, forever".</li>
+      <li>Slide 34's last bullet is subtle. Upper bounds belong to algorithms: a problem "is \(O(f)\)" only in the sense that some algorithm achieves it. Lower bounds on problems are strong statements about every algorithm.</li>
+      <li>Link back to slide 11: the timing graph and EX0's benchmarking part are about implementations. The proofs are about algorithms.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L3 PROBLEMS -->
+<section class="page" id="l3-problems" data-title="Lecture 3 exercises">
+  <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span> · built from the slides' own examples (slides 9–10, 17, 21–27, 31–32, 34, 36). Where the slides give answers, the solutions use them. Every other number was computed with exact integer arithmetic in Java (see <code>checks/cse332/w02/</code>).</p>
+  <h1>Lecture 3 exercises</h1>
+  <div class="prose"><p>Number boxes take arithmetic like <code>2^10 + 1</code>. Big-O boxes take a class like <code>n log n</code> or <code>2^n</code>. True/false boxes take <code>true</code>/<code>false</code> or <code>yes</code>/<code>no</code>. For a \(c\)/\(n_0\) pair, any pair that works is accepted, and the checker decides it exactly for every \(n \ge n_0\).</p></div>
+
+  <article class="task" data-id="cse332-w2-l3-gap-halving">
+    <h2>1. Halving the gap</h2>
+    <p class="prompt">Use the slide-9 argument and the slide-8 code.</p>
+    <div class="answer-spec" data-part="solve-4096" data-grader="exact" data-answer="12" data-miscon='{"2048":"halved-once","4096":"linear-count"}' data-label="solve \(\frac{n}{2^x} = 1\) for \(n = 4096\)"></div>
+    <div class="answer-spec" data-part="worst-2-to-20" data-grader="exact" data-answer="21" data-miscon='{"20":"stopped-early","1048576":"linear-count"}' data-label="worst-case loop iterations, \(n = 2^{20}\)"></div>
+    <div class="answer-spec" data-part="worst-million" data-grader="exact" data-answer="20" data-miscon='{"21":"rounded-up","19":"stopped-early","1000000":"linear-count"}' data-label="worst-case loop iterations, \(n = 1{,}000{,}000\)"></div>
+    <ol class="hints">
+      <li>\(\frac{n}{2^x} = 1\) means \(2^x = n\). For the loop counts, write down the gaps: \(n, \lfloor n/2\rfloor, \dots, 1\). Each gap is one iteration.</li>
+      <li>\(2^{20} = 1{,}048{,}576\). Is \(1{,}000{,}000\) above or below that?</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>\(2^{12} = 4096\), so \(x = 12\).</li>
+        <li>For \(n = 2^{20}\), the gaps are \(2^{20}, 2^{19}, \dots, 2^0 = 1\). That's 21 gaps, so 21 iterations. The loop still runs when the gap is 1.</li>
+        <li>For \(n = 10^6\): \(2^{19} = 524{,}288 \le 10^6 &lt; 2^{20}\), so \(\lfloor\log_2 10^6\rfloor = 19\) and the worst case is \(19 + 1 = 20\).</li>
+        <li class="answer">12; 21; 20. All are \(\lfloor\log_2 n\rfloor + 1\), which is \(\Theta(\log n)\).</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="worst-cases">Check by brute force</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l3-log-base">
+    <h2>2. The base of the log</h2>
+    <p class="prompt">Slide 10: \(\log_c n = \frac{\log_2 n}{\log_2 c}\).</p>
+    <div class="answer-spec" data-part="log8-divisor" data-grader="exact" data-answer="3" data-miscon='{"8":"base-not-log"}' data-label="\(\log_8 n = \frac{\log_2 n}{?}\)"></div>
+    <div class="answer-spec" data-part="log8-at-2-to-30" data-grader="exact" data-answer="10" data-miscon='{"30":"base-ignored","90":"base-multiplied"}' data-label="\(\log_8 n\) at \(n = 2^{30}\)"></div>
+    <div class="answer-spec" data-part="log5-in-o-log2" data-grader="yesno" data-answer="yes" data-label="Is \(\log_5 n \in O(\log_2 n)\)?"></div>
+    <div class="answer-spec" data-part="log2-in-o-log5" data-grader="yesno" data-answer="yes" data-label="Is \(\log_2 n \in O(\log_5 n)\)?"></div>
+    <ol class="hints">
+      <li>\(\log_2 8\) is a small whole number.</li>
+      <li>For the last two, the ratio of the two functions is a constant both ways round. What does that give you for \(c\)?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(\log_2 8 = 3\), so \(\log_8 n = \frac{\log_2 n}{3}\).</li>
+      <li>At \(n = 2^{30}\): \(\frac{30}{3} = 10\). Check: \(8^{10} = 2^{30}\).</li>
+      <li>\(\log_5 n = \frac{1}{\log_2 5}\log_2 n \le 1\cdot\log_2 n\), so \(c = 1\) works. And \(\log_2 n = (\log_2 5)\cdot\log_5 n\), so \(c = \log_2 5 \approx 2.32\) works the other way.</li>
+      <li class="answer">3; 10; yes; yes. So \(\Theta(\log_5 n) = \Theta(\log_2 n)\): ignore the base.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l3-example1-bigo">
+    <h2>3. Example 1: \(10n + 100 \in O(n^2)\)</h2>
+    <p class="prompt">Find \(c &gt; 0\) and \(n_0 &gt; 0\) with \(10n + 100 \le c\cdot n^2\) for all \(n \ge n_0\). Then find the smallest \(n_0\) that works with the slide's \(c = 10\).</p>
+    <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["100","10"],"g":["0","0","1"],"rel":"O"}' data-label="your \(c\)"></div>
+    <div class="answer-spec" data-part="n0" data-grader="bound" data-role="n0" data-label="your \(n_0\)"></div>
+    <div class="answer-spec" data-part="smallest-n0-c10" data-grader="exact" data-answer="4" data-miscon='{"10":"not-smallest","3":"strict-vs-equal"}' data-label="smallest \(n_0\) for \(c = 10\)"></div>
+    <ol class="hints">
+      <li>Slide 22 picks \(c = 10\) so that dividing by 10 gives \(n + 10 \le n^2\).</li>
+      <li>\(n + 10 \le n^2 \iff 10 \le n(n-1)\). Try \(n = 3\) and \(n = 4\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>With \(c = 10\): \(10n + 100 \le 10n^2 \iff 10 \le n(n-1)\).</li>
+      <li>\(n(n-1)\) is increasing for \(n \ge 1\), and \(3\cdot2 = 6 &lt; 10 \le 4\cdot3 = 12\). So the smallest \(n_0\) is 4. The slides use \(n_0 = 10\), which also works.</li>
+      <li>Another pair: for \(n \ge 1\), \(10n + 100 \le 10n^2 + 100n^2 = 110n^2\), so \(c = 110, n_0 = 1\).</li>
+      <li class="answer">Any valid pair, e.g. \(c = 10, n_0 = 10\) (slide 23) or \(c = 110, n_0 = 1\). The smallest \(n_0\) for \(c = 10\) is 4.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l3-example2-omega">
+    <h2>4. Example 2: \(13n^2 - 50n \in \Omega(n^2)\)</h2>
+    <p class="prompt">Find \(c &gt; 0\) and \(n_0 &gt; 0\) with \(13n^2 - 50n \ge c\cdot n^2\) for all \(n \ge n_0\).</p>
+    <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["0","-50","13"],"g":["0","0","1"],"rel":"Omega"}' data-label="your \(c\)"></div>
+    <div class="answer-spec" data-part="n0" data-grader="bound" data-role="n0" data-label="your \(n_0\)"></div>
+    <div class="answer-spec" data-part="smallest-n0-c12" data-grader="exact" data-answer="50" data-miscon='{"49":"strict-vs-equal","51":"strict-vs-equal"}' data-label="smallest \(n_0\) for \(c = 12\)"></div>
+    <div class="answer-spec" data-part="c13-possible" data-grader="yesno" data-answer="no" data-miscon='{"yes":"c13-works"}' data-label="Can \(c = 13\) work with some \(n_0\)?"></div>
+    <ol class="hints">
+      <li>Divide both sides by \(n\) (fine for \(n \ge 1\)): you need \(13n - 50 \ge c\cdot n\).</li>
+      <li>With \(c = 13\) the \(n\)s cancel. What's left?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Equivalent: \(13n - 50 \ge cn\), i.e. \((13 - c)\,n \ge 50\).</li>
+      <li>\(c = 13\): \(0 \ge 50\) is false for every \(n\), so no \(n_0\) works.</li>
+      <li>\(c = 12\): \(n \ge 50\), so the smallest \(n_0\) is exactly 50. That's slide 26's choice.</li>
+      <li class="answer">Any \(c &lt; 13\) with \(n_0 \ge \frac{50}{13 - c}\), e.g. \(c = 12, n_0 = 50\). Smallest \(n_0\) for \(c = 12\): 50. \(c = 13\): impossible.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul>
+        <li>This is the "that didn't work!" moment on slide 25. The failed attempt is useful: it shows that \(c\) must be below 13 and by how much the left side falls short.</li>
+        <li>The general rule \(n_0 \ge \frac{50}{13-c}\) makes the trade-off visible: \(c = 1\) needs \(n_0 = 5\), \(c = 11\) needs 25, \(c = 12\) needs 50, and \(c = 12.5\) needs 100.</li>
+      </ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l3-sq17-theta">
+    <h2>5. Slide 17: \(3n^2 + 17 \in \Theta(n^2)\)</h2>
+    <p class="prompt">\(\Theta\) needs both bounds. Give a pair for \(O\) and a pair for \(\Omega\).</p>
+    <div class="answer-spec" data-part="upper-c" data-grader="bound" data-role="c" data-pair="upper" data-bound='{"f":["17","0","3"],"g":["0","0","1"],"rel":"O"}' data-label="\(O\): your \(c\)"></div>
+    <div class="answer-spec" data-part="upper-n0" data-grader="bound" data-role="n0" data-pair="upper" data-label="\(O\): your \(n_0\)"></div>
+    <div class="answer-spec" data-part="lower-c" data-grader="bound" data-role="c" data-pair="lower" data-bound='{"f":["17","0","3"],"g":["0","0","1"],"rel":"Omega"}' data-label="\(\Omega\): your \(c\)"></div>
+    <div class="answer-spec" data-part="lower-n0" data-grader="bound" data-role="n0" data-pair="lower" data-label="\(\Omega\): your \(n_0\)"></div>
+    <ol class="hints">
+      <li>The lower bound is the easy one: \(3n^2 + 17\) is never below \(3n^2\).</li>
+      <li>For the upper bound, \(17 \le 17n^2\) when \(n \ge 1\). Or keep \(c\) small and ask when \(17 \le n^2\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(\Omega\): \(3n^2 + 17 \ge 3n^2\) for every \(n\), so \(c = 3, n_0 = 1\).</li>
+      <li>\(O\): for \(n \ge 1\), \(3n^2 + 17 \le 3n^2 + 17n^2 = 20n^2\), so \(c = 20, n_0 = 1\). Or \(c = 4\): \(3n^2 + 17 \le 4n^2 \iff n^2 \ge 17\), so \(n_0 = 5\).</li>
+      <li class="answer">For example, \(O\) with \(c = 20, n_0 = 1\) (or \(c = 4, n_0 = 5\)), and \(\Omega\) with \(c = 3, n_0 = 1\). So \(3n^2+17 \in \Theta(n^2)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l3-intuition-buckets">
+    <h2>6. Slide 27's examples</h2>
+    <p class="prompt">Give the simplest \(\Theta\) bucket for each.</p>
+    <div class="answer-spec" data-part="four-n-plus-five" data-grader="bigo" data-answer="n" data-label="\(4n + 5\)"></div>
+    <div class="answer-spec" data-part="half-nlogn" data-grader="bigo" data-answer="n log n" data-label="\(0.5n\log n + 2n + 7\)"></div>
+    <div class="answer-spec" data-part="cube-plus-exp" data-grader="bigo" data-answer="2^n" data-label="\(n^3 + 2^n + 3n\)"></div>
+    <div class="answer-spec" data-part="nlog-10n2" data-grader="bigo" data-answer="n log n" data-label="\(n\log(10n^2)\)"></div>
+    <ol class="hints">
+      <li>For each sum, find the term that grows fastest and drop its coefficient.</li>
+      <li>For the last one, use \(\log(ab) = \log a + \log b\) and \(\log(n^k) = k\log n\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(4n + 5\): drop the 5 and the 4. That gives \(n\).</li>
+      <li>\(0.5n\log n + 2n + 7\): \(n\log n\) dominates \(n\). That gives \(n\log n\).</li>
+      <li>\(n^3 + 2^n + 3n\): the exponential dominates every polynomial. That gives \(2^n\).</li>
+      <li>\(n\log(10n^2) = n(\log 10 + 2\log n) = (\log 10)\,n + 2n\log n\). That gives \(n\log n\).</li>
+      <li class="answer">\(\Theta(n)\); \(\Theta(n\log n)\); \(\Theta(2^n)\); \(\Theta(n\log n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l3-more-examples">
+    <h2>7. Slide 31: true or false?</h2>
+    <p class="prompt">Decide each claim.</p>
+    <div class="answer-spec" data-part="four-plus-3n" data-grader="yesno" data-answer="yes" data-label="\(4 + 3n \in O(n)\)"></div>
+    <div class="answer-spec" data-part="n-plus-2logn" data-grader="yesno" data-answer="no" data-miscon='{"yes":"bigger-in-smaller"}' data-label="\(n + 2\log n \in O(\log n)\)"></div>
+    <div class="answer-spec" data-part="logn-plus-2" data-grader="yesno" data-answer="no" data-miscon='{"yes":"log-is-constant"}' data-label="\(\log n + 2 \in O(1)\)"></div>
+    <div class="answer-spec" data-part="n50-vs-1-1n" data-grader="yesno" data-answer="yes" data-miscon='{"no":"poly-vs-exp"}' data-label="\(n^{50} \in O(1.1^n)\)"></div>
+    <div class="answer-spec" data-part="3n-theta-2n" data-grader="yesno" data-answer="no" data-miscon='{"yes":"exp-base-dropped"}' data-label="\(3^n \in \Theta(2^n)\)"></div>
+    <ol class="hints">
+      <li>For each one, ask which side grows faster in the long run. \(O\) means "\(\le\) eventually, up to a constant".</li>
+      <li>Any exponential \(b^n\) with \(b &gt; 1\) eventually beats any polynomial. And \(3^n / 2^n = 1.5^n\) isn't bounded.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>True: for large inputs, \(4 + 3n &lt; n + 3n = 4n\).</li>
+      <li>False: for any constant \(c\), eventually \(n &gt; c\log n\).</li>
+      <li>False: for any constant \(c\), eventually \(\log n &gt; c\) (specifically when \(n &gt; 2^c\)).</li>
+      <li>True: for large \(n\), \(50\log_{1.1} n \le n\).</li>
+      <li>False: \(3^n \le c\,2^n \iff (\log_2 3)\,n \le \log_2 c + n\), and eventually multiplying by \(\log_2 3\) has more impact than adding \(\log_2 c\).</li>
+      <li class="answer">True, False, False, True, False (slide 32).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l3-eventually-exact">
+    <h2>8. How long is "eventually"?</h2>
+    <p class="prompt">Slide 32's justifications say "eventually". Find the exact thresholds. (Use \(\log = \log_2\).)</p>
+    <div class="answer-spec" data-part="n50-last-fail" data-grader="exact" data-answer="4401" data-miscon='{"4402":"first-hold-not-last-fail","525":"peak-not-crossing"}' data-label="largest \(n\) with \(n^{50} &gt; 1.1^n\)"></div>
+    <div class="answer-spec" data-part="three-two-c1000" data-grader="exact" data-answer="18" data-miscon='{"17":"strict-vs-equal"}' data-label="smallest \(n\) with \(3^n &gt; 1000\cdot 2^n\)"></div>
+    <div class="answer-spec" data-part="logn-plus-2-c12" data-grader="exact" data-answer="1025" data-miscon='{"1024":"strict-vs-equal","4097":"used-2-to-c","4096":"used-2-to-c"}' data-label="smallest \(n\) with \(\log n + 2 &gt; 12\)"></div>
+    <div class="answer-spec" data-part="n-plus-2logn-c10" data-grader="exact" data-answer="44" data-miscon='{"59":"wrong-c","43":"strict-vs-equal"}' data-label="smallest \(n \ge 2\) with \(n + 2\log n &gt; 10\log n\)"></div>
+    <ol class="hints">
+      <li>Turn each into a comparison of whole numbers: \(n^{50} \le 1.1^n \iff n^{50}\cdot10^n \le 11^n\). \(\log n + 2 &gt; 12 \iff n &gt; 2^{10}\).</li>
+      <li>\(n + 2\log n &gt; 10\log n \iff n &gt; 8\log n \iff 2^n &gt; n^8\). Slide 32's \(n &gt; \frac{\log_2 c}{\log_2 3 - 1}\) handles the \(3^n\) one.</li>
+      <li>These are small enough to check by computer. Use exact integers, not floating point. Then make sure the inequality stays true after the threshold.</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>\(n^{50}\cdot 10^n\) vs \(11^n\): the ratio \(n^{50}/1.1^n\) peaks at \(n = 525\), then falls forever. It drops to 1 or below between 4,401 and 4,402. So 4,401 is the last \(n\) where \(n^{50}\) is bigger.</li>
+        <li>\(3^n &gt; 1000\cdot2^n \iff 1.5^n &gt; 1000 \iff n &gt; \frac{\log_2 1000}{\log_2 3 - 1} \approx 17.04\). So \(n = 18\).</li>
+        <li>\(\log n + 2 &gt; 12 \iff \log n &gt; 10 \iff n &gt; 1024\). So \(n = 1025\).</li>
+        <li>\(2^n &gt; n^8\): at \(n = 43\), \(2^{43} \approx 8.80\cdot10^{12} &lt; 43^8 \approx 1.17\cdot10^{13}\). At \(n = 44\), \(2^{44} \approx 1.76\cdot10^{13} &gt; 44^8 \approx 1.40\cdot10^{13}\). After that \(2^n\) doubles while \(n^8\) grows by less than a factor of 1.2.</li>
+        <li class="answer">4,401; 18; 1,025; 44.</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="eventually">Check by brute force</button><span class="brute"></span></div>
+    </div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul>
+        <li>The point: "eventually" can be far away (4,401) or close (18). The definition doesn't care, as long as it's some fixed \(n_0\).</li>
+        <li>Slide 32's parenthetical for this claim says "specifically, when \(\frac{2^n}{n} &gt; c\)". That isn't the right condition: with \(c = 8\) it would give \(n = 6\), but \(6 &gt; 8\log_2 6 \approx 20.7\) is false. The exact condition is \(2^n &gt; n^c\).</li>
+      </ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l3-tenth-vs-log">
+    <h2>9. Slide 36: \(n^{1/10}\) vs. \(\log n\)</h2>
+    <p class="prompt">Work with \(n = 2^k\), so \(\log_2 n = k\) and \(n^{1/10} = 2^{k/10}\).</p>
+    <div class="answer-spec" data-part="tenth-at-2-to-40" data-grader="exact" data-answer="16" data-label="\(n^{1/10}\) at \(n = 2^{40}\)"></div>
+    <div class="answer-spec" data-part="bigger-at-2-to-40" data-grader="choice" data-choices='["tenth","log"]' data-answer="log" data-miscon='{"tenth":"asymptotic-not-now"}' data-label="larger at \(n = 2^{40}\) (tenth or log)"></div>
+    <div class="answer-spec" data-part="crossover-k" data-grader="exact" data-answer="59" data-miscon='{"58":"strict-vs-equal","60":"strict-vs-equal"}' data-label="smallest \(k \ge 2\) with \(n^{1/10} &gt; \log_2 n\) from \(n = 2^k\) on"></div>
+    <ol class="hints">
+      <li>\(2^{40/10} = 2^4\).</li>
+      <li>\(2^{k/10} &gt; k \iff 2^k &gt; k^{10}\). Slide 36 says the crossover is around \(5\cdot10^{17}\), and \(2^{58} \approx 2.9\cdot10^{17}\).</li>
+    </ol>
+    <div class="solution">
+      <div class="steps"><ol>
+        <li>\(n^{1/10} = 2^{4} = 16\) and \(\log_2 n = 40\). So \(\log n\) is larger at \(n = 2^{40}\), about a trillion.</li>
+        <li>\(k = 58\): \(2^{58} \approx 2.88\cdot10^{17} &lt; 58^{10} \approx 4.31\cdot10^{17}\), so \(\log n\) is still larger. \(k = 59\): \(2^{59} \approx 5.76\cdot10^{17} &gt; 59^{10} \approx 5.11\cdot10^{17}\). From then on \(2^k\) doubles each step and \(k^{10}\) grows by less than a factor of 2.</li>
+        <li class="answer">16; log; 59. That's \(n = 2^{59} \approx 5.8\cdot10^{17}\), matching slide 36's "around \(5\cdot10^{17}\)".</li>
+      </ol></div>
+      <div class="step-bar"><button class="btn" data-brute="tenth">Check by brute force</button><span class="brute"></span></div>
+    </div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l3-true-statements">
+    <h2>10. Which statements are true?</h2>
+    <p class="prompt">From slides 18, 33 and 34. Answer true or false.</p>
+    <div class="answer-spec" data-part="omega-means-best" data-grader="yesno" data-answer="no" data-miscon='{"yes":"omega-best"}' data-label="&quot;\(\Omega\) means best case.&quot;"></div>
+    <div class="answer-spec" data-part="binary-best-theta1" data-grader="yesno" data-answer="yes" data-label="Binary search is \(\Theta(1)\) in the best case."></div>
+    <div class="answer-spec" data-part="binary-worst-omega-loglog" data-grader="yesno" data-answer="yes" data-label="Binary search is \(\Omega(\log\log n)\) in the worst case."></div>
+    <div class="answer-spec" data-part="n-in-o-n5" data-grader="yesno" data-answer="yes" data-label="\(f(n) = n\) is \(O(n^5)\)."></div>
+    <div class="answer-spec" data-part="n-theta-means-not-olog" data-grader="yesno" data-answer="yes" data-label="If the worst case is \(\Theta(n)\), it is not \(O(\log n)\)."></div>
+    <ol class="hints">
+      <li>Remember slide 18: "which case" and "which bound" are separate choices.</li>
+      <li>An upper bound can be loose and still true. A lower bound can be weak and still true.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>False. \(\Omega\) is a lower bound on some function. That function can be the worst case, the best case or anything else.</li>
+      <li>True: if the item is in the middle, the first iteration finds it.</li>
+      <li>True, but weak: \(\log n\) is at least \(\log\log n\) for large \(n\).</li>
+      <li>True: \(n \le n^5\) for \(n \ge 1\). It's just not tight.</li>
+      <li class="answer">False, True, True, True, True. The last one is why slide 33 says to prefer \(\Theta\): \(\Theta(n)\) rules out \(O(\log n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l3-write-proof">
+    <h2>11. Write a full proof</h2>
+    <p class="prompt">Slide 32 justifies \(4 + 3n \in O(n)\) only "semi-intuitively". Write a proof in the style of slide 23: state \(c\) and \(n_0\), then show the inequality for every \(n \ge n_0\). Compare with the solution when you're done.</p>
+    <div class="answer-spec" data-part="proof" data-grader="self" data-label="your \(c\), \(n_0\) and key step"></div>
+    <ol class="hints">
+      <li>Slide 32 hints at \(c = 4\): "\(4 + 3n &lt; n + 3n\)". When is \(4 \le n\)?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Let \(c = 4\) and \(n_0 = 4\). Let \(n \ge 4\) be arbitrary.</li>
+      <li>Since \(n \ge 4\), \(4 + 3n \le n + 3n = 4n = c\cdot n\).</li>
+      <li class="answer">So \(\forall n \ge 4\): \(4 + 3n \le 4n\), which proves \(4 + 3n \in O(n)\). (\(c = 7, n_0 = 1\) works too: \(4 \le 4n\) for \(n \ge 1\).)</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Check that the proof names <em>specific</em> values and then argues for an <em>arbitrary</em> \(n \ge n_0\). Those are the two moves from slide 20. "For large \(n\) it works" is not a proof.</li></ul>
+    </details>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CYU L3 -->
+<section class="page" id="cyu-l3" data-title="Check your understanding">
+  <p class="where">Lecture 3 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose"><p>Ten questions on Lecture 3 only. Answer without looking back, then use the review links for anything you missed. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="l3" role="status"></div>
+  <ol class="cyu-list" data-quiz="l3">
+    <li class="cyu" data-id="cse332-w2-l3-cyu-definition-order" data-kind="mc" data-topic="notation">
+      <p class="q">In the definition of \(f \in O(g)\), which comes first?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-definition-order"> Choose \(c\) and \(n_0\); then the inequality must hold for every \(n \ge n_0\)<span class="why" hidden>Correct. \(\exists c\,\exists n_0\,\forall n\): one pair of constants has to work for all large \(n\).</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-definition-order"> For each \(n\), choose a \(c\) that works for that \(n\)<span class="why" hidden>That would be \(\forall n\,\exists c\), which every positive function satisfies (take \(c = f(n)/g(n)\)). The order of the quantifiers is the whole point.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-definition-order"> Check the inequality at \(n = n_0\) only<span class="why" hidden>It must hold for every \(n \ge n_0\), not just at one point.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w2-l3-cyu-bucket-cubic" data-kind="bigo" data-answer="n^3" data-topic="drop">
+      <p class="q">Put \(5n^3 + n^2\log n + 100\) in its simplest bucket.</p>
+      <p class="why" hidden>\(n^3\) grows faster than \(n^2\log n\) (\(\log n\) grows slower than \(n\)). Drop the 5 and the lower terms: \(\Theta(n^3)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w2-l3-cyu-binary-4096" data-kind="num" data-answer="13" data-topic="search" data-miscon='{"12":"stopped-early","4096":"linear-count"}'>
+      <p class="q">On a sorted list of 4,096 items, what's the worst-case number of loop iterations of <code>binary_contains</code>?</p>
+      <p class="why" hidden>The gaps are \(2^{12}, 2^{11}, \dots, 1\): 13 of them. \(\lfloor\log_2 4096\rfloor + 1 = 13\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w2-l3-cyu-log-base-bucket" data-kind="mc" data-topic="search">
+      <p class="q">Algorithm X takes \(\log_{10} n\) steps and Algorithm Y takes \(\log_2 n\) steps. Which is true?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w2-l3-cyu-log-base-bucket"> X is in a smaller \(O\) class than Y<span class="why" hidden>X is faster by a constant factor (\(\log_2 10 \approx 3.32\)), but constants don't change the class.</span></label>
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-log-base-bucket"> Both are \(\Theta(\log n)\)<span class="why" hidden>Correct: \(\log_{10} n = \frac{\log_2 n}{\log_2 10}\). That's a constant factor.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-log-base-bucket"> Y is \(\Theta(n)\) because base 2 means halving<span class="why" hidden>Halving each step is exactly what gives \(\log_2 n\) steps. It's logarithmic, not linear.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w2-l3-cyu-omega-not-best" data-kind="mc" data-topic="notation">
+      <p class="q">"Linear search is \(\Omega(n)\) in the worst case." What does this say?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w2-l3-cyu-omega-not-best"> Nothing: \(\Omega\) only applies to the best case<span class="why" hidden>That's the misconception slide 18 warns about. \(\Omega\) is a lower bound on whatever function you analyze.</span></label>
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-omega-not-best"> The worst-case count grows at least as fast as \(n\)<span class="why" hidden>Correct: "worst case" picks the function, and \(\Omega\) says it's eventually at least \(c\cdot n\).</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-omega-not-best"> Every input takes at least \(n\) steps<span class="why" hidden>No. The best case finds the item first, in 1 comparison. The claim is only about the worst-case function.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w2-l3-cyu-example2-c11" data-kind="num" data-answer="25" data-topic="proofs" data-miscon='{"50":"used-c12","24":"strict-vs-equal"}'>
+      <p class="q">For \(13n^2 - 50n \ge c\cdot n^2\) with \(c = 11\), what's the smallest \(n_0\) that works?</p>
+      <p class="why" hidden>\((13 - 11)\,n \ge 50 \iff n \ge 25\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w2-l3-cyu-not-in-o-n2" data-kind="mc" data-topic="drop">
+      <p class="q">Which function is <em>not</em> in \(O(n^2)\)?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(1000n^2\)<span class="why" hidden>A constant factor: take \(c = 1000\).</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(n^{1.5}\)<span class="why" hidden>\(n^{1.5} \le n^2\) for \(n \ge 1\). \(O\) is an upper bound, so smaller functions are in it.</span></label>
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(n^2\log n\)<span class="why" hidden>Correct. \(\frac{n^2\log n}{n^2} = \log n\) grows without bound, so no constant \(c\) works.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> 50<span class="why" hidden>A constant is in \(O(n^2)\): \(50 \le 50n^2\) for \(n \ge 1\).</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w2-l3-cyu-exponent-constant" data-kind="mc" data-topic="drop">
+      <p class="q">Which one is \(\Theta(2^n)\)?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(2^{n+1}\)<span class="why" hidden>Correct: \(2^{n+1} = 2\cdot 2^n\), which is a multiplicative constant.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(2^{2n}\)<span class="why" hidden>\(2^{2n} = 4^n\). The constant in the exponent multiplies \(n\), so the base changes.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(n\cdot 2^n\)<span class="why" hidden>The ratio to \(2^n\) is \(n\), which isn't bounded.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(3^n\)<span class="why" hidden>Slide 32: \(3^n \notin \Theta(2^n)\).</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w2-l3-cyu-sq17-n0" data-kind="num" data-answer="5" data-topic="notation" data-miscon='{"4":"strict-vs-equal","17":"forgot-c"}'>
+      <p class="q">With \(c = 4\), what's the smallest \(n_0\) for \(3n^2 + 17 \le c\cdot n^2\)?</p>
+      <p class="why" hidden>\(3n^2 + 17 \le 4n^2 \iff n^2 \ge 17\). \(4^2 = 16 &lt; 17 \le 25 = 5^2\), so 5.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w2-l3-cyu-timing-vs-bigo" data-kind="mc" data-topic="usage">
+      <p class="q">You want to know whether your HashMap code is faster than a classmate's on the class data set. What should you use?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Asymptotic analysis only<span class="why" hidden>Asymptotic analysis evaluates algorithms. Two implementations of the same algorithm can have the same \(\Theta\) and still differ in speed.</span></label>
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Timing<span class="why" hidden>Correct (slide 37): to evaluate an implementation on a specific data set, timing is useful.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Neither tells you anything<span class="why" hidden>Timing does answer this exact question: implementation A vs B on data set C.</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="l3" role="status"></div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Use it as an exit ticket. Questions 1 and 5 are the conceptual ones (quantifier order; \(\Omega\) vs. best case). Ask someone to explain a wrong option.</li>
+      <li>Every numeric answer here was checked in Java with exact integers (see <code>checks/cse332/w02/</code>).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ UPCOMING -->
+<section class="page" id="upcoming" data-title="Later this week">
+  <p class="where"><span class="tag-later">Upcoming</span> · Wed Oct 7 – Fri Oct 9</p>
+  <h1>Later this week</h1>
+  <div class="rule honest">
+    <p><strong>Not posted yet.</strong> On Mon Oct 5 (checked at 12:27 and again at 13:23 PDT) the course calendar had no slide or handout links for these sessions, and the guessed file names (<code>files/section/Section02.pdf</code> and lec04/lec05 slide names) returned "not found". So this site doesn't teach priority queues or heaps yet, and it doesn't make up section problems. The lectures and section will be added once their materials are posted.</p>
+  </div>
+  <div class="upcoming">
+    <div class="up-card">
+      <span class="tag-later">Upcoming · Wed Oct 7</span>
+      <h3>Priority Queues 1 (ADT)</h3>
+      <p>Reading: Weiss 6.1–6.3.</p>
+      <p class="status-line">Slides: not posted yet</p>
+    </div>
+    <div class="up-card">
+      <span class="tag-later">Upcoming · Thu Oct 8</span>
+      <h3>Section 2: Algorithm Analysis and Heaps</h3>
+      <p>No reading listed.</p>
+      <p class="status-line">Slides and worksheet: not posted yet</p>
+    </div>
+    <div class="up-card">
+      <span class="tag-later">Upcoming · Fri Oct 9</span>
+      <h3>Priority Queues 2 (Binary Heap)</h3>
+      <p>Reading: Weiss 6.4–6.5.</p>
+      <p class="status-line">Slides: not posted yet</p>
+    </div>
+    <div class="up-card due">
+      <span class="tag-later">Due · Fri Oct 9</span>
+      <h3>EX0 Generics</h3>
+      <p><a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-0" target="_blank" rel="noopener">Instructions on the tasks page</a>. Two separate Gradescope submissions.</p>
+    </div>
+  </div>
+  <div class="prose">
+    <p>For Section 2, the "algorithm analysis" half will use today's material. The <a href="#l3-problems">Lecture 3 exercises</a> and the <a href="#cheatsheet">cheat sheet</a> are good preparation. The course's own <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries.html" target="_blank" rel="noopener">topic summaries page</a> lists a Heaps summary. It's linked here, not taught.</p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul><li>When the PQ slides and the Section 2 handout appear, add them as their own modules with their own ids (<code>cse332-w2-l4-…</code>, <code>cse332-w2-s2-…</code>, <code>cse332-w2-l5-…</code>). Nothing on this page holds learner state.</li></ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ READINGS -->
+<section class="page" id="readings" data-title="Readings">
+  <h1>Readings</h1>
+  <div class="prose"><p>The textbook is optional. The calendar lists the most relevant sections for each lecture. The topic summaries are a second presentation of the same material, posted on the course site.</p></div>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Lecture 3 · Mon Oct 5</th><td>Weiss 2.1–2.4 (algorithm analysis). Math review: Weiss 1.1–1.6. <br><a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec03-Analysis2.pdf" target="_blank" rel="noopener">Slides (pdf)</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec03-Analysis2.pptx" target="_blank" rel="noopener">slides (pptx)</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/math_identities_quick_reference.pdf" target="_blank" rel="noopener">Math identities</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/asymptotics.html" target="_blank" rel="noopener">Summary: Asymptotics</a></td></tr>
+    <tr><th>Wed Oct 7 <span class="tag-later">Upcoming</span></th><td>Weiss 6.1–6.3</td></tr>
+    <tr><th>Fri Oct 9 <span class="tag-later">Upcoming</span></th><td>Weiss 6.4–6.5</td></tr>
+  </table>
+  </div>
+  <h2>What to read for</h2>
+  <div class="prose">
+    <ul>
+      <li><strong>Asymptotics summary:</strong> its section 2.1 states the same three definitions as slide 15, with \(n_0 \in \mathbb N\). Section 3 has more worked \(c, n_0\) proofs (squeeze, by parts, guess and check), and its "Common misconceptions" table matches slide 18.</li>
+      <li><strong>Math identities:</strong> the log rules (\(\log_b a = \frac{\log_d a}{\log_d b}\), \(\log_b(n^k) = k\log_b n\)) do the work in slide 10 and in \(n\log(10n^2)\). The summations come back for loops and recurrences.</li>
+      <li>Weiss isn't online, so this site doesn't summarize it.</li>
+    </ul>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CHEATSHEET -->
+<section class="page" id="cheatsheet" data-title="Cheat sheet">
+  <h1>Week 2 cheat sheet</h1>
+  <p class="where">Print with <kbd>Ctrl</kbd>+<kbd>P</kbd>; only this page prints.</p>
+  <div class="cheat">
+    <section>
+      <h3>Definitions</h3>
+      <p>\(f\in O(g) \iff \exists c&gt;0\ \exists n_0&gt;0\ \forall n\ge n_0:\ f(n)\le c\, g(n)\)</p>
+      <p>\(f\in \Omega(g) \iff \exists c&gt;0\ \exists n_0&gt;0\ \forall n\ge n_0:\ f(n)\ge c\, g(n)\)</p>
+      <p>\(\Theta(g) = O(g)\cap\Omega(g)\). Read them as \(\le\), \(\ge\), \(=\) for large \(n\), up to constants.</p>
+      <p>Write \(3n^2+17 \in O(n^2)\) or \(= O(n^2)\), but never \(O(n^2) = 3n^2+17\).</p>
+    </section>
+    <section>
+      <h3>Proving a bound</h3>
+      <ol>
+        <li>Scratchwork: start from \(f(n) \le c\,g(n)\), pick a convenient \(c\), and solve for \(n\).</li>
+        <li>Proof: "Let \(c = \_\), \(n_0 = \_\). Let \(n \ge n_0\)." Then a chain of reversible steps.</li>
+        <li>If \(c\) fails for every \(n\) (like \(-50 \ge 0\)), change \(c\).</li>
+      </ol>
+      <p>Ex. 1: \(c=10, n_0=10\) (the smallest \(n_0\) is 4). Ex. 2: \(c=12, n_0=50\).</p>
+    </section>
+    <section>
+      <h3>Drop / keep</h3>
+      <p><strong>Drop:</strong> lower-order terms, multiplicative constants, log bases.</p>
+      <p><strong>Keep:</strong> exponents (\(n^3 \notin O(n^2)\)), bases of exponentials (\(3^n \notin O(2^n)\)), the logs themselves.</p>
+      <p>\(2^{n+1} = 2\cdot2^n \in \Theta(2^n)\), but \(2^{2n} = 4^n \notin \Theta(2^n)\).</p>
+    </section>
+    <section>
+      <h3>Growth ladder (slowest first)</h3>
+      <p>\(1 \;&lt;\; \log n \;&lt;\; n^{1/10} \;&lt;\; n \;&lt;\; n\log n \;&lt;\; n^2 \;&lt;\; n^3 \;&lt;\; n^{50} \;&lt;\; 1.1^n \;&lt;\; 2^n \;&lt;\; 3^n\)</p>
+      <p class="note">Each is \(O\) of the next but not \(\Omega\) of it.</p>
+    </section>
+    <section>
+      <h3>Not best/worst/average</h3>
+      <p>Case (best, worst, average, amortized) picks <em>which function</em>. \(O/\Omega/\Theta\) say <em>what you know</em> about it. Any pairing is allowed. Prefer \(\Theta\) when you know it.</p>
+    </section>
+    <section>
+      <h3>Logs (math identities sheet)</h3>
+      <table class="plain">
+        <tr><td>\(\log_b a = \dfrac{\log_d a}{\log_d b}\)</td><td>\(b^{\log_b n} = n\)</td></tr>
+        <tr><td>\(\log_b(nm) = \log_b n + \log_b m\)</td><td>\(\log_b(n^k) = k\log_b n\)</td></tr>
+        <tr><td>\(\log_b(n/m) = \log_b n - \log_b m\)</td><td>\(a^{\log_b c} = c^{\log_b a}\)</td></tr>
+        <tr><td>\(\log_b b = 1\), \(\log_b 1 = 0\)</td><td>\(\log n\) means \(\log_2 n\)</td></tr>
+      </table>
+    </section>
+    <section>
+      <h3>Sums (math identities sheet)</h3>
+      <table class="plain">
+        <tr><td>\(\sum_{i=1}^{n} i = \frac{n(n+1)}{2}\)</td><td>\(\sum_{i=1}^{n} i^2 = \frac{n(n+1)(2n+1)}{6}\)</td></tr>
+        <tr><td>\(\sum_{i=0}^{n-1} x^i = \frac{1-x^n}{1-x}\)</td><td>\(\sum_{i=0}^{n-1} \frac{1}{2^i} = 2 - \frac{1}{2^{n-1}}\)</td></tr>
+        <tr><td>\(\sum_{i=0}^{\infty} x^i = \frac{1}{1-x}\), \(|x|&lt;1\)</td><td>\(\sum_{i=1}^{n} i^3 = \left(\frac{n(n+1)}{2}\right)^2\)</td></tr>
+      </table>
+    </section>
+    <section>
+      <h3>Week 2 numbers</h3>
+      <div class="table-wrap"><table class="plain">
+        <tr><td>Binary search, worst case</td><td>\(\lfloor\log_2 n\rfloor+1\) iterations (\(10^6 \to 20\))</td></tr>
+        <tr><td>\(n^{50}\) vs \(1.1^n\)</td><td>\(1.1^n\) ahead for good from \(n = 4{,}402\)</td></tr>
+        <tr><td>\(3^n\) vs \(1000\cdot2^n\)</td><td>\(3^n\) ahead from \(n = 18\)</td></tr>
+        <tr><td>\(n^{1/10}\) vs \(\log_2 n\)</td><td>\(n^{1/10}\) ahead from \(n = 2^{59} \approx 5.8\cdot 10^{17}\)</td></tr>
+        <tr><td>\(3n^2+17 \le 4n^2\)</td><td>from \(n = 5\)</td></tr>
+      </table></div>
+    </section>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+</main>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="../../core/katex/katex.min.js"></script>
+<script src="../../core/katex/contrib/auto-render.min.js"></script>
+<script src="../../courses.js"></script>
+<script src="../../core/grader.js"></script>
+<script src="../../core/store.js"></script>
+<script src="sim.js"></script>
+<script src="week.js"></script>
+<script src="../../core/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE study</title>
+<link rel="stylesheet" href="core/fonts.css">
+<link rel="stylesheet" href="core/base.css">
+</head>
+<body>
+<main class="landing">
+  <p class="eyebrow" id="term"></p>
+  <h1><span class="brand-cmd">cse <b>study</b></span></h1>
+  <p class="lede">One site for every course week: lecture modules, quick checks, quizzes and problems. Answers are saved to your account.</p>
+  <div class="course-cards" id="cards"></div>
+</main>
+<script src="courses.js"></script>
+<script>
+  "use strict";
+  const { term, courses } = window.COURSES;
+  document.getElementById("term").textContent = term;
+  const cards = document.getElementById("cards");
+  for (const c of courses) {
+    const posted = c.weeks.filter((w) => w.posted);
+    const latest = posted[posted.length - 1];
+    const card = document.createElement("section");
+    card.className = "course-card";
+    const label = (w) => w.id.replace(/^w0?/, "");
+    card.innerHTML = `<p class="eyebrow">${c.name}</p><h2>${c.title}</h2>`
+      + (latest ? `<a class="now" href="${c.id}/${latest.id}/"><span class="eyebrow">Latest · week ${label(latest)} · ${latest.dates || ""}</span><strong>${latest.title || ""}</strong></a>` : "<p>No weeks posted yet.</p>")
+      + `<div class="weeks">${c.weeks.map((w) => (w.posted ? `<a href="${c.id}/${w.id}/" title="${w.title || ""}">W${label(w)}</a>` : `<span title="not posted yet">W${label(w)}</span>`)).join("")}</div>`
+      + `<p class="muted" style="margin:1rem 0 0;font-size:0.9rem"><a href="${c.home}" target="_blank" rel="noopener">Course website</a></p>`;
+    cards.append(card);
+  }
+</script>
+</body>
+</html>
