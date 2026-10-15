@@ -3,6 +3,8 @@
   CSE 332 (26au) · Week 2 teaching site (Mon Oct 5 – Fri Oct 9). Built from the course-teaching-site template.
   Every stateful element carries a stable semantic data-id (problems: article.task, parts: .answer-spec[data-part],
   quick checks: .check, quiz questions: li.cyu). Change the id when the question changes.
+  Added later in the week: Priority Queues 1 and 2 slides (lec04, lec05) and the Section 2 slides (Runtime), raw copies in
+  materials/cse332/w02/. Exercise 0 (graded) is not used.
 -->
 <html lang="en">
 <head>
@@ -20,7 +22,7 @@
 
 <nav class="rail" aria-label="Week 2 modules">
   <div class="rail-top">
-    <a class="brand" href="#home"><span class="brand-kicker">CSE 332 · week 2</span>Growth, compared<small>Algorithm Analysis 2 · priority queues next</small></a>
+    <a class="brand" href="#home"><span class="brand-kicker">CSE 332 · week 2</span>Growth, compared<small>Algorithm Analysis 2 · priority queues and heaps</small></a>
     <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="rail-body">Menu</button>
   </div>
   <div class="rail-body" id="rail-body">
@@ -38,19 +40,29 @@
       </ol>
     </div>
     <div>
-      <h2>Later this week</h2>
-      <ul class="later-list">
-        <li><span>Wed Oct 7 · Priority Queues 1 (ADT)</span><em>materials not posted yet</em></li>
-        <li><span>Thu Oct 8 · Section 2: Algorithm Analysis and Heaps</span><em>materials not posted yet</em></li>
-        <li><span>Fri Oct 9 · Priority Queues 2 (Binary Heap)</span><em>materials not posted yet</em></li>
-        <li><span>Fri Oct 9 · EX0 Generics due</span><em><a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-0" target="_blank" rel="noopener">tasks page</a></em></li>
-      </ul>
+      <h2>Lecture 4: Priority Queues 1 <span class="today" data-date="2026-10-07">Wed Oct 7</span></h2>
+      <ol class="modules">
+        <li><a href="#l4-pq">The priority queue ADT</a></li>
+        <li><a href="#l4-heap">Why a heap</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Section 2: Runtime <span class="today" data-date="2026-10-08">Thu Oct 8</span></h2>
+      <ol class="modules">
+        <li><a href="#s2-runtime">Big-O proofs and numUnique</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 5: Priority Queues 2 <span class="today" data-date="2026-10-09">Fri Oct 9</span></h2>
+      <ol class="modules">
+        <li><a href="#l5-ops">Insert and extract</a></li>
+        <li><a href="#l5-build">Array heaps and buildHeap</a></li>
+      </ol>
     </div>
     <div>
       <h2>Reference</h2>
       <ul class="plain-links">
         <li><a href="#home">Week overview</a></li>
-        <li><a href="#upcoming">Later this week</a></li>
         <li><a href="#readings">Readings</a></li>
         <li><a href="#cheatsheet">Cheat sheet</a></li>
       </ul>
@@ -93,9 +105,9 @@
   <h2>This week</h2>
   <div class="week">
     <a href="#search" class="day now"><strong>Mon, Oct 5</strong><span class="tag-today" data-date="2026-10-05">Today</span><span>Lecture 3: Algorithm Analysis 2</span><span>\(O\), \(\Omega\), \(\Theta\), proofs with \(c\) and \(n_0\), what to drop. Weiss 2.1–2.4; math review 1.1–1.6</span></a>
-    <a href="#upcoming" class="day later"><strong>Wed, Oct 7</strong><span class="tag-later">Upcoming</span><span>Priority Queues 1 (ADT)</span><span>Weiss 6.1–6.3. Slides not posted yet.</span></a>
-    <a href="#upcoming" class="day later"><strong>Thu, Oct 8</strong><span class="tag-later">Upcoming</span><span>Section 2: Algorithm Analysis and Heaps</span><span>Handout not posted yet.</span></a>
-    <a href="#upcoming" class="day later"><strong>Fri, Oct 9</strong><span class="tag-later">Upcoming</span><span>Priority Queues 2 (Binary Heap)</span><span>Weiss 6.4–6.5. Slides not posted yet.</span></a>
+    <a href="#l4-pq" class="day"><strong>Wed, Oct 7</strong><span class="tag-today" data-date="2026-10-07">Today</span><span>Lecture 4: Priority Queues 1</span><span>The ADT, how to implement it, and why a binary heap gives \(\Theta(\log n)\). Weiss 6.1–6.3.</span></a>
+    <a href="#s2-runtime" class="day"><strong>Thu, Oct 8</strong><span class="tag-today" data-date="2026-10-08">Today</span><span>Section 2: Runtime</span><span>Big-O, \(\Omega\), \(\Theta\) proofs with \(c\) and \(n_0\), and a running-time analysis.</span></a>
+    <a href="#l5-ops" class="day"><strong>Fri, Oct 9</strong><span class="tag-today" data-date="2026-10-09">Today</span><span>Lecture 5: Priority Queues 2</span><span>Percolate up and down, the array representation, buildHeap. Weiss 6.4–6.5.</span></a>
   </div>
 
   <h2>Due soon</h2>
@@ -115,7 +127,7 @@
       <li><strong>Teaching notes</strong> are the amber blocks. They're open by default and hold talking points, questions to ask and common mistakes.</li>
       <li><strong>Exercises</strong> are answerable on the page. Type an answer, write your work, and ask for hints. Solutions stay hidden until you press <strong>Show solution</strong>, and then they show one step at a time. Your work is kept in this browser as you type.</li>
       <li>Boxes accept arithmetic like <code>2^10+1</code>. Big-O boxes take a class like <code>n log n</code>, <code>O(n^2)</code> or <code>2^n</code>. True/false boxes take <code>true</code>, <code>false</code>, <code>yes</code> or <code>no</code>.</li>
-      <li>Everything after today is marked <span class="tag-later">Upcoming</span>. It's listed, not taught, because its materials aren't posted yet.</li>
+      <li>The Wednesday, Thursday and Friday pages (priority queues, Section 2, heaps) come after Lecture 3 in the rail. They use the course's own slides and section worksheet, with short quick checks. Graded Exercise 0 is not reproduced.</li>
     </ul>
   </div>
 
@@ -953,44 +965,295 @@ public static boolean binary_contains(
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ UPCOMING -->
-<section class="page" id="upcoming" data-title="Later this week">
-  <p class="where"><span class="tag-later">Upcoming</span> · Wed Oct 7 – Fri Oct 9</p>
-  <h1>Later this week</h1>
-  <div class="rule honest">
-    <p><strong>Not posted yet.</strong> On Mon Oct 5 (checked at 12:27 and again at 13:23 PDT) the course calendar had no slide or handout links for these sessions, and the guessed file names (<code>files/section/Section02.pdf</code> and lec04/lec05 slide names) returned "not found". So this site doesn't teach priority queues or heaps yet, and it doesn't make up section problems. The lectures and section will be added once their materials are posted.</p>
+<!-- ================================================================ L4: PRIORITY QUEUES 1 -->
+<section class="page" id="l4-pq" data-title="The priority queue ADT">
+  <p class="where">Lecture 4 · Priority Queues 1 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span> · Weiss 6.1–6.3</p>
+  <h1>The priority queue ADT</h1>
+  <div class="prose">
+    <p>A pharmacy follows first come, first served: a queue. An emergency room serves by need: a <em>priority</em> queue. A priority queue holds items with priorities and gives quick access to the top-priority one.</p>
   </div>
-  <div class="upcoming">
-    <div class="up-card">
-      <span class="tag-later">Upcoming · Wed Oct 7</span>
-      <h3>Priority Queues 1 (ADT)</h3>
-      <p>Reading: Weiss 6.1–6.3.</p>
-      <p class="status-line">Slides: not posted yet</p>
-    </div>
-    <div class="up-card">
-      <span class="tag-later">Upcoming · Thu Oct 8</span>
-      <h3>Section 2: Algorithm Analysis and Heaps</h3>
-      <p>No reading listed.</p>
-      <p class="status-line">Slides and worksheet: not posted yet</p>
-    </div>
-    <div class="up-card">
-      <span class="tag-later">Upcoming · Fri Oct 9</span>
-      <h3>Priority Queues 2 (Binary Heap)</h3>
-      <p>Reading: Weiss 6.4–6.5.</p>
-      <p class="status-line">Slides: not posted yet</p>
-    </div>
-    <div class="up-card due">
-      <span class="tag-later">Due · Fri Oct 9</span>
-      <h3>EX0 Generics</h3>
-      <p><a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-0" target="_blank" rel="noopener">Instructions on the tasks page</a>. Two separate Gradescope submissions.</p>
-    </div>
+  <div class="rule">
+    <p><strong>ADT: Priority Queue.</strong> A collection of items and their priorities. Usually a smaller priority value is more important.</p>
+    <p><code>insert(item, priority)</code> adds an item. <code>extract</code> removes and returns the top-priority item (usually the smallest value). <code>isEmpty</code> says whether any items remain.</p>
   </div>
   <div class="prose">
-    <p>For Section 2, the "algorithm analysis" half will use today's material. The <a href="#l3-problems">Lecture 3 exercises</a> and the <a href="#cheatsheet">cheat sheet</a> are good preparation. The course's own <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries.html" target="_blank" rel="noopener">topic summaries page</a> lists a Heaps summary. It's linked here, not taught.</p>
+    <p>Priorities must be comparable (<code>&lt;</code> or <code>compareTo</code>). In lecture the item is often just an <code>int</code> that is also its own priority. Applications: triage, operating-system jobs ("critical" before "interactive"), network packets, data compression, and sorting (insert everything, then extract repeatedly).</p>
   </div>
+
+  <h2>Trace it</h2>
+  <div>
+    <pre class="code"><code>insert(5,5)  insert(6,6)  insert(3,3)
+print(extract)
+insert(1,1)
+print(extract)
+print(extract)
+insert(8,8)
+print(extract)
+print(extract)</code></pre>
+    <div class="prose"><p>Slide 9's second example prints <code>3, 1, 5, 6, 8</code>. Note the second line: <code>1</code> was inserted after the first extract, so it beats the <code>5</code> still waiting. Slide 8's first example (insert 5, 6, 1, 3, 8, then five extracts) prints <code>1, 3, 5, 6, 8</code>, which is sorting.</p></div>
+  </div>
+
+  <div class="check" data-id="cse332-w2-l4-qc-example2-third" data-grader="exact" data-answer="5">
+    <p>Quick check: in the trace above, what is the third value printed?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2>Candidate implementations (worst case)</h2>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Data structure</th><th>insert</th><th>extract</th></tr>
+    <tr><td>Unsorted array</td><td>\(\Theta(1)\)</td><td>\(\Theta(n)\)</td></tr>
+    <tr><td>Unsorted linked list</td><td>\(\Theta(1)\)</td><td>\(\Theta(n)\)</td></tr>
+    <tr><td>Sorted array</td><td>\(\Theta(n)\)</td><td>\(\Theta(1)\)</td></tr>
+    <tr><td>Sorted linked list</td><td>\(\Theta(n)\)</td><td>\(\Theta(1)\)</td></tr>
+    <tr><td>Binary search tree</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
+    <tr><td>Binary heap</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(\log n)\)</td></tr>
+  </table>
+  </div>
+  <p class="note">The slide assumes the maximum size is known in advance; otherwise an amortized analysis gives the same answers.</p>
+
+  <div class="check" data-id="cse332-w2-l4-qc-sorted-array-insert" data-grader="bigo" data-answer="n">
+    <p>Quick check: worst-case time of <code>insert</code> into a sorted array (the rest must shift over). Give a class.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
   <details class="notes" open>
     <summary>Teaching notes</summary>
-    <ul><li>When the PQ slides and the Section 2 handout appear, add them as their own modules with their own ids (<code>cse332-w2-l4-…</code>, <code>cse332-w2-s2-…</code>, <code>cse332-w2-l5-…</code>). Nothing on this page holds learner state.</li></ul>
+    <ul>
+      <li>Ask the room to fill in the table before showing it. Each simple structure makes one operation cheap and the other expensive; the heap's idea is to keep <em>some</em> order, not full order, so both are \(\Theta(\log n)\).</li>
+      <li>The BST is \(\Theta(n)\) in the worst case because it can become a chain.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l4-heap" data-title="Why a heap">
+  <p class="where">Lecture 4 · Priority Queues 1 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
+  <h1>Why a heap gives \(\log n\)</h1>
+  <div class="rule">
+    <p><strong>Complete binary tree.</strong> Every node has at most 2 children, every level is full except possibly the bottom one, and the bottom level fills left to right.</p>
+    <p><strong>Min-heap property.</strong> Every node's priority is \(\le\) its children's. (Max-heap: \(\ge\).) The minimum is at the root.</p>
+  </div>
+  <div class="prose">
+    <p><strong>Height.</strong> A binary tree of height \(h\) (edges on the longest path) has at most \(2^{h+1}-1\) nodes. With \(n\) nodes, the smallest height satisfies \(n \le 2^{h+1}-1\), so \(h = \lceil\log_2(n+1)\rceil - 1\), which is \(\Theta(\log n)\). A complete tree is as short as possible, and each insert or extract makes one trip between root and leaf, so each is \(\Theta(\log n)\) in the worst case.</p>
+  </div>
+
+  <h2>Are these binary min-heaps? (Lecture 5, slides 8-9)</h2>
+  <div class="prose">
+    <p>The slide shows four small trees and answers each. Two are valid. One is not: a node has a child smaller than itself. One is not: <strong>wrong shape</strong>, because the bottom level isn't filled left to right. A tree with a larger value in another branch (a 10 beside a 5) is still fine: <em>5 is smaller than 10, but 10 isn't its ancestor, so that's not a violation.</em></p>
+  </div>
+
+  <div class="check" data-id="cse332-w2-l4-qc-heap-leaf-ancestor" data-grader="yesno" data-answer="no">
+    <p>Quick check: in a min-heap, must every node on one level be smaller than every node on the level below it?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The heap property only relates a node to its own children (and so to its ancestors). It is not a sorted order, which is why a heap is cheaper to maintain than a sorted array.</li>
+      <li>Ask: where is the minimum? how do I insert? how do I extract? how do I do it in Java? The next page answers the first three; the array representation answers the last.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S2: RUNTIME -->
+<section class="page" id="s2-runtime" data-title="Section 2: big-O proofs and numUnique">
+  <p class="where">Section 2 · Runtime · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
+  <h1>Section 2: Runtime</h1>
+  <div class="prose">
+    <p>Section 2 reviews the definitions and practises proofs with \(c\) and \(n_0\), then analyses a program. The worked answers below follow the section slides.</p>
+  </div>
+  <div class="rule">
+    <p>\(f(n)\in O(g(n))\): there are positive constants \(c, n_0\) with \(f(n)\le c\cdot g(n)\) for all \(n\ge n_0\). \(\Omega\) is the same with \(\ge\). \(\Theta\) means both. Big-O is an upper bound, not necessarily tight; \(c\) ignores the scale of the curve and \(n_0\) ignores small \(n\).</p>
+  </div>
+
+  <h2>Worksheet question 0: suppose \(f(n)\in O(n)\)</h2>
+  <table class="plain small">
+    <tr><th>Statement</th><th>Always true, always false, or sometimes?</th></tr>
+    <tr><td>\(f\in O(n^2)\)</td><td>always true</td></tr>
+    <tr><td>\(f\in O(4^n)\)</td><td>always true</td></tr>
+    <tr><td>\(f\in O(\log n)\)</td><td>sometimes true</td></tr>
+    <tr><td>\(f\in O(n\log n)\)</td><td>always true</td></tr>
+    <tr><td>\(f\in O(1)\)</td><td>sometimes true</td></tr>
+    <tr><td>\(f\in \Omega(n)\)</td><td>sometimes true</td></tr>
+    <tr><td>\(f\in \Omega(\log n)\)</td><td>sometimes true</td></tr>
+    <tr><td>\(f\in \Omega(n^2)\)</td><td>always false</td></tr>
+  </table>
+  <p class="note">"Sometimes" because \(f=1\) and \(f=n\) are both in \(O(n)\) and behave differently.</p>
+
+  <h2>Question 1: prove \(f\in O(g)\)</h2>
+  <p class="prose">A proof just declares \(c\) and \(n_0\) and shows the inequality holds; finding them is scratch work.</p>
+  <div class="table-wrap">
+  <table class="plain small">
+    <tr><th></th><th>\(f(n)\)</th><th>\(g(n)\)</th><th>\(c\), \(n_0\)</th><th>Why</th></tr>
+    <tr><td>a</td><td>\(7n\)</td><td>\(n/10\)</td><td>70, 1</td><td>\(7n = 70\cdot n/10\)</td></tr>
+    <tr><td>b</td><td>1000</td><td>\(3n^2\)</td><td>1, 20</td><td>\(3\cdot 20^2 = 1200 &gt; 1000\), and it only grows</td></tr>
+    <tr><td>c</td><td>\(2^n\)</td><td>\(3^{2n}\)</td><td>1, 2</td><td>\(3^{2n} = 9^n \ge 2^n\)</td></tr>
+    <tr><td>d</td><td>\(7n^2+3n\)</td><td>\(n^4\)</td><td>10, 1</td><td>\(7n^2\le 7n^4\) and \(3n\le 3n^4\) for \(n\ge1\) (by parts)</td></tr>
+    <tr><td>e</td><td>\(n+2n\log n\)</td><td>\(n\log n\)</td><td>3, 2</td><td>\(n\le n\log n\) once \(\log n\ge 1\) (squeeze)</td></tr>
+  </table>
+  </div>
+
+  <h2>Question 2: \(\Theta\) proofs</h2>
+  <div class="prose">
+    <p>Prove both \(O\) and \(\Omega\). For \(7n\in\Theta(n/10)\), \(c=70, n_0=1\) works for both. For \(n^3+10n\in\Theta(3n^3)\): \(O\) with \(c=1, n_0=4\) (since \(10\le n^2\) gives \(n^3+10n\le 2n^3\le 3n^3\)); \(\Omega\) with \(c=\tfrac13, n_0=1\) (since \(n^3+10n\ge n^3\)).</p>
+  </div>
+
+  <div class="check" data-id="cse332-w2-s2-qc-q1b-n0" data-grader="exact" data-answer="19" data-miscon='{"20":"not-smallest","18":"strict-vs-equal"}'>
+    <p>Quick check: for 1b with \(c=1\), what is the smallest \(n_0\) for which \(1000\le 3n^2\) for all \(n\ge n_0\)? (The slide uses 20.)</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2>Question 3: running time of <code>numUnique</code></h2>
+  <pre class="code"><code>int numUnique(String[] values) {
+    boolean[] visited = new boolean[values.length];
+    for (int i = 0; i &lt; values.length; i++) {
+        visited[i] = false;
+    }
+    int out = 0;
+    for (int i = 0; i &lt; values.length; i++) {
+        if (!visited[i]) {
+            out += 1;
+            for (int j = i; j &lt; values.length; j++) {
+                if (values[i].equals(values[j])) {
+                    visited[j] = true;
+                }
+            }
+        }
+    }
+    return out;
+}</code></pre>
+  <div class="prose">
+    <p><strong>Worst case \(f(n)\)</strong>: every value is unique, so every outer iteration runs the inner loop over the rest of the array: \(n + (n-1)+\dots+1 = \frac{n(n+1)}{2}\) iterations, plus \(n\) for the first loop. So \(f(n) = n + \frac{n(n+1)}{2}\in\Theta(n^2)\).</p>
+    <p><strong>Best case \(g(n)\)</strong>: every value is the same. The inner loop runs only for the first \(i\), and then everything is visited. So \(g(n) = n + n\in\Theta(n)\).</p>
+  </div>
+
+  <div class="check" data-id="cse332-w2-s2-qc-numunique-worst" data-grader="bigo" data-answer="n^2">
+    <p>Quick check: worst-case running time of <code>numUnique</code>, as a Θ class.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w2-s2-qc-numunique-best" data-grader="bigo" data-answer="n">
+    <p>Quick check: best-case running time of <code>numUnique</code> (all values equal), as a Θ class.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The two techniques named on the slides: "by parts" (bound each term separately, then add) and the "squeeze" (put a third function between \(f\) and \(g\)).</li>
+      <li>Keep scratch work out of the proof: state \(c\) and \(n_0\), then show why the inequality holds.</li>
+      <li>The section ends by pointing to the course's Heaps summary, a video review, and office hours.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L5: HEAP OPERATIONS -->
+<section class="page" id="l5-ops" data-title="Insert and extract">
+  <p class="where">Lecture 5 · Priority Queues 2 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span> · Weiss 6.4–6.5</p>
+  <h1>Insert and extract</h1>
+  <div class="rule">
+    <p><strong>insert.</strong> Put the item in the next open spot (to keep the tree complete), then <em>percolate up</em>: while its priority is less than its parent's, swap with the parent.</p>
+    <p><strong>extract.</strong> Save the root. Move the bottom-right item to the root. Then <em>percolate down</em>: while it is larger than a child, swap it with its smaller child. Return the saved root.</p>
+  </div>
+  <div class="prose">
+    <p>Both percolate along one root–leaf path, so each is \(\Theta(\log n)\) in the worst case.</p>
+  </div>
+
+  <h2>The slide example</h2>
+  <div class="prose">
+    <p>Heap (level order): <code>1, 3, 2, 4, 7, 5, 6, 5, 9</code>. <strong>insert 1.5</strong>: it lands as the 10th item under 7, swaps with 7, then with 3, and stops under the root 1: <code>1, 1.5, 2, 4, 3, 5, 6, 5, 9, 7</code>. <strong>extract</strong>: return 1; move the last item (7) to the root; swap with 1.5, then with 3: <code>1.5, 3, 2, 4, 7, 5, 6, 5, 9</code>.</p>
+  </div>
+
+  <h2>A second example: 16, 32, 4, 57, 80, 43, 2</h2>
+  <div class="prose">
+    <p>Insert them in that order into an empty min-heap. The level-order contents are <code>2, 32, 4, 57, 80, 43, 16</code> (2 percolates all the way to the root). Then <code>extract</code> returns 2, and the last item, 16, moves to the root and percolates down: <code>4, 32, 16, 57, 80, 43</code>.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w2-l5-qc-extract-new-root" data-grader="exact" data-answer="4">
+    <p>Quick check: in that example, which value is at the root after the <code>extract</code>?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w2-l5-qc-percolate-time" data-grader="bigo" data-answer="log n">
+    <p>Quick check: worst-case running time of percolate up or down in a heap of \(n\) items.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Have students draw the tree and move the item themselves before showing the slide animation.</li>
+      <li>The "other operations" slide: <em>decrease key</em> on a min-heap is followed by percolate up; <em>increase key</em> by percolate down (swap the two for a max-heap). <em>Remove</em> takes the item at a given index out of the PQ.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l5-build" data-title="Array heaps and buildHeap">
+  <p class="where">Lecture 5 · Priority Queues 2 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
+  <h1>Array heaps and buildHeap</h1>
+  <div class="prose">
+    <p>Every complete binary tree with the same number of nodes has the same positions and edges, so a heap lives in an array, level by level. In lecture's pseudocode, <strong>count from 1</strong> (index 0 unused). The course's exercises count from 0, so check which convention a problem uses.</p>
+  </div>
+  <div class="rule">
+    <p>Root: index 1. Parent of \(i\): \(\lfloor i/2\rfloor\). Left child: \(2i\). Right child: \(2i+1\). Leaves: \(\lfloor n/2\rfloor+1\) to \(n\).</p>
+  </div>
+  <pre class="code"><code>insert(item) {
+    if (size == arr.length - 1) resize();
+    size++;  arr[size] = item;  percolateUp(size);
+}
+extract() {
+    theMin = arr[1];  arr[1] = arr[size];  size--;
+    percolateDown(1);  return theMin;
+}</code></pre>
+  <div class="prose">
+    <p><code>percolateUp(i)</code> repeats while <code>i &gt; 1 &amp;&amp; arr[i] &lt; arr[i/2]</code>: swap with the parent and move up. <code>percolateDown(i)</code> repeats while the node has a left child (<code>left &lt;= size</code>): pick the smaller child (the left one if there's no right child), swap if it's smaller than the current value, otherwise stop.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w2-l5-qc-right-child-of-4" data-grader="exact" data-answer="9">
+    <p>Quick check: using the 1-indexed formulas, what is the index of the right child of node 4?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w2-l5-qc-first-leaf" data-grader="exact" data-answer="5">
+    <p>Quick check: in a heap with \(n = 9\) items, at which index do the leaves begin?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2>Floyd's buildHeap</h2>
+  <div class="prose">
+    <p>To heapify \(n\) items, either insert them one at a time (percolate up) or fix the whole array at once. <strong>Floyd's method</strong> works toward the root, one position at a time, calling percolate down:</p>
+  </div>
+  <pre class="code"><code>buildHeap() {
+    for (int i = size; i &gt; 0; i--) percolateDown(i);
+}</code></pre>
+  <div class="prose">
+    <p><strong>Running time.</strong> A node percolates down at most the height of its subtree: 0 for a leaf, 1 on the second-to-last level, 2 on the third-to-last, and so on. At most \(n/2\) nodes have height 0, \(n/4\) have height 1, \(n/8\) have height 2, ..., 1 has height \(\log_2 n\). The total is \(0\cdot\frac n2 + 1\cdot\frac n4 + 2\cdot\frac n8 + \dots = n\sum_{i=0}^{\log_2 n}\frac{i}{2^{i+1}} \le n\sum_{i=0}^{\infty}\frac{i}{2^{i+1}} = 2n\), so buildHeap is \(\Theta(n)\).</p>
+  </div>
+
+  <div class="check" data-id="cse332-w2-l5-qc-buildheap-time" data-grader="bigo" data-answer="n">
+    <p>Quick check: worst-case running time of Floyd's <code>buildHeap</code> on \(n\) items.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Most students expect \(\Theta(n\log n)\) because each of \(n\) calls is \(O(\log n)\). The sharper count works because most nodes are near the bottom and percolate only a step or two.</li>
+      <li>The slides point to the course's Heaps summary page for a second presentation.</li>
+    </ul>
   </details>
   <nav class="pager"></nav>
 </section>
@@ -1002,8 +1265,9 @@ public static boolean binary_contains(
   <div class="table-wrap">
   <table class="plain">
     <tr><th>Lecture 3 · Mon Oct 5</th><td>Weiss 2.1–2.4 (algorithm analysis). Math review: Weiss 1.1–1.6. <br><a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec03-Analysis2.pdf" target="_blank" rel="noopener">Slides (pdf)</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec03-Analysis2.pptx" target="_blank" rel="noopener">slides (pptx)</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/math_identities_quick_reference.pdf" target="_blank" rel="noopener">Math identities</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/asymptotics.html" target="_blank" rel="noopener">Summary: Asymptotics</a></td></tr>
-    <tr><th>Wed Oct 7 <span class="tag-later">Upcoming</span></th><td>Weiss 6.1–6.3</td></tr>
-    <tr><th>Fri Oct 9 <span class="tag-later">Upcoming</span></th><td>Weiss 6.4–6.5</td></tr>
+    <tr><th>Wed Oct 7 · Priority Queues 1</th><td>Weiss 6.1–6.3. <br><a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec04-PQs-1.pdf" target="_blank" rel="noopener">Slides (pdf)</a></td></tr>
+    <tr><th>Thu Oct 8 · Section 2</th><td><a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/heaps.html" target="_blank" rel="noopener">Summary: Heaps</a> (linked from the section's last slide)</td></tr>
+    <tr><th>Fri Oct 9 · Priority Queues 2</th><td>Weiss 6.4–6.5. <br><a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec05-PQs-2.pdf" target="_blank" rel="noopener">Slides (pdf)</a></td></tr>
   </table>
   </div>
   <h2>What to read for</h2>
@@ -1069,6 +1333,11 @@ public static boolean binary_contains(
         <tr><td>\(\sum_{i=0}^{n-1} x^i = \frac{1-x^n}{1-x}\)</td><td>\(\sum_{i=0}^{n-1} \frac{1}{2^i} = 2 - \frac{1}{2^{n-1}}\)</td></tr>
         <tr><td>\(\sum_{i=0}^{\infty} x^i = \frac{1}{1-x}\), \(|x|&lt;1\)</td><td>\(\sum_{i=1}^{n} i^3 = \left(\frac{n(n+1)}{2}\right)^2\)</td></tr>
       </table>
+    </section>
+    <section>
+      <h3>Priority queues and heaps</h3>
+      <p>PQ ADT: <code>insert(item, priority)</code>, <code>extract</code> (smallest priority first), <code>isEmpty</code>. Min-heap: complete binary tree, every node \(\le\) its children. Insert and extract are \(\Theta(\log n)\): percolate up / down one root–leaf path.</p>
+      <p>1-indexed array: parent \(\lfloor i/2\rfloor\), children \(2i\), \(2i+1\), leaves \(\lfloor n/2\rfloor+1..n\). Floyd's buildHeap: percolate down from \(i=n\) to 1, \(\Theta(n)\).</p>
     </section>
     <section>
       <h3>Week 2 numbers</h3>

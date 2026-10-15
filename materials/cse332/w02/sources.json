@@ -103,40 +103,7 @@
       "sha256": "382bcc857b08f60fdeadaeb59b60fea312d9dae672d57b6372922c7344678c6e"
     }
   ],
-  "notPosted": {
-    "checkedAt": [
-      "2026-10-05T12:27:40-07:00",
-      "2026-10-05T13:23:27-07:00"
-    ],
-    "note": "The calendar shows Priority Queues 1 (Wed Oct 7), Section 2 (Thu Oct 8) and Priority Queues 2 (Fri Oct 9) with readings only, no slide links. Guessed URLs returned HTTP 404 at both checks.",
-    "probes": [
-      {
-        "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section02.pdf",
-        "status": 404
-      },
-      {
-        "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section02.pptx",
-        "status": 404
-      },
-      {
-        "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec04-PriorityQueues1.pdf",
-        "status": 404
-      },
-      {
-        "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec04-PQ1.pdf",
-        "status": 404
-      },
-      {
-        "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec05-PriorityQueues2.pdf",
-        "status": 404
-      },
-      {
-        "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec05-PQ2.pdf",
-        "status": 404
-      }
-    ],
-    "ignored": "files/slides/ also lists lecture4_analysis2_pqs.*, lecture5_pqs.* etc. dated 2026-09-29. They are not linked from the 26au calendar and don't follow the 26au file naming (cse332-26au-lecNN-*), so they were not used."
-  },
+  "notPosted": null,
   "notFetched": [
     {
       "url": "https://canvas.uw.edu/courses/1916767/quizzes/2447449",
@@ -155,5 +122,57 @@
       "why": "Textbook not available; listed, not summarized"
     }
   ],
-  "fetchTimeSource": "fetchedAt = the file's modification time right after curl wrote it"
+  "fetchTimeSource": "fetchedAt = the file's modification time right after curl wrote it",
+  "refreshedAt": "2026-10-14T17:59:50-07:00",
+  "postMondayMaterials": [
+    {
+      "file": "cse332-26au-lec04-PQs-1.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec04-PQs-1.pdf",
+      "what": "Priority Queues lecture 1 slides (PDF)",
+      "fetchedAt": "2026-10-14T17:59:50-07:00",
+      "bytes": 339653,
+      "sha256": "fd1b863db2e3406494af2c1835102e2da7b454a529b3d192e45a3f695ff10bcb"
+    },
+    {
+      "file": "cse332-26au-lec04-PQs-1.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec04-PQs-1.pptx",
+      "what": "Priority Queues lecture 1 slides with speaker notes (PPTX)",
+      "fetchedAt": "2026-10-14T17:59:50-07:00",
+      "bytes": 672206,
+      "sha256": "71b9224ea1a97e588515ae6b4b2e8acad15f170a34f68c4477e848cfbc07ec1e"
+    },
+    {
+      "file": "cse332-26au-lec05-PQs-2.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec05-PQs-2.pdf",
+      "what": "Priority Queues lecture 2 slides (PDF)",
+      "fetchedAt": "2026-10-14T17:59:50-07:00",
+      "bytes": 404309,
+      "sha256": "37b8e9690b64da60ec871c7a24dcd06e7a10e119312644472bc6b144868e71e8"
+    },
+    {
+      "file": "cse332-26au-lec05-PQs-2.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec05-PQs-2.pptx",
+      "what": "Priority Queues lecture 2 slides with speaker notes (PPTX)",
+      "fetchedAt": "2026-10-14T17:59:50-07:00",
+      "bytes": 739909,
+      "sha256": "c274cd96d9ef4325e4016729d5d4f00f0c253dbad39b0d84a364b12ebc59cbb6"
+    },
+    {
+      "file": "Section02.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section02.pdf",
+      "what": "Section 2 handout",
+      "fetchedAt": "2026-10-14T17:59:50-07:00",
+      "bytes": 702715,
+      "sha256": "b600fc572610de33f8e6ca747def3b2eeaa0d58bc1d35963b12e1fc72aab21b7"
+    },
+    {
+      "file": "Section02.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section02.pptx",
+      "what": "Section 2 slides",
+      "fetchedAt": "2026-10-14T17:59:50-07:00",
+      "bytes": 6259703,
+      "sha256": "1f9608743e95a372af6a59e4a32a032e4dd168a8a59443b7978e0c4172573f0a"
+    }
+  ],
+  "note": "The Monday 2026-10-05 availability probes were superseded by these official files, posted Oct 7\u201311. Only the requested PQ lectures and Section 2 are included for this update."
 }

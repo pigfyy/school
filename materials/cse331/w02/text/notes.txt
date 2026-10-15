@@ -1,0 +1,476 @@
+CSE 331: Testing
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          What "works" means
+Three ways to gain knowledge
+From a run to a test
+Four steps to writing a test
+Writing a test in code
+Which inputs?
+Where the expected answer comes from
+What tests tell us
+Exercises
+Further reading
+
+        CSE 331: Testing
+
+lecture
+
+Course motto: Your job is to deliver code that you know works.
+
+What "works" means
+
+So far, we have given an exact meaning to one word of the motto:
+works. Lecture 1 said that a whole program works if it meets its
+specification on every run. We then broke that down in Lecture 2 to a
+single method: a method meets its specification if every call that
+begins with the precondition true ends with the postcondition true.
+Another word for "works" is "correct".
+
+Definition: correct
+
+Code is correct if it meets its specification.
+
+Notice that the definition depends on having a specification! So
+whenever someone says that code is correct, they are referring to a
+specification, even if they do not say which one. When you hear
+someone claim code is correct, you should ask: correct against what
+specification?
+
+Three ways to gain knowledge
+
+The motto asks for more than correct code. It asks you to know
+that the code is correct. There are three techniques that we use
+together to gain this knowledge:
+
+Testing: run the code on inputs chosen on purpose, and check
+  each run against the specification.
+
+Tools: let another program check yours. A type checker, such
+  as the one in Java's compiler, looks at every run without running
+  any, but it checks only that each value has the right type.
+
+Reasoning: argue from the code itself that it meets its
+  specification on every run.
+
+We will study each of these in more detail. This lecture covers
+testing.
+
+From a run to a test
+
+Lecture 1 said that testing means choosing runs on purpose and
+checking each run against the claim. On Monday we added a
+distinction. In manual testing, you run the program and watch
+what it does. In automated testing, another program runs it and
+checks the result. This lecture says what a test is, how to write
+one, and how to choose the runs to test.
+
+Lecture 2 said which of four implementations of indexOf satisfy
+which of five specifications. Those answers were also checked by a
+large set of tests, reported in one sentence of Lecture 2's notes:
+
+We ran each implementation on every array of up to four elements
+drawn from 0, 1, and 2, with every range and every x from 0 to 3.
+
+That sentence describes 6,196 calls to each implementation. For each
+call, a program checked what the implementation did against each
+specification. Each call was a test. Its inputs were chosen on
+purpose: every small array, not just the few a person would think of.
+
+Definition: test
+
+A test runs code on a chosen input, and checks the
+actual behavior, what the code did, against the
+expected behavior, what the specification says it must do
+on that input. The test passes if the two match, and
+fails if they do not.
+
+A test that passes confirms a claim about its own run: on that one
+input, the code did the right thing. A test that fails is a
+counterexample, in Lecture 1's word. It is one run on which the
+code does the wrong thing, and so it refutes the claim that the
+code works on every run.
+
+Four steps to writing a test
+
+Writing a test takes four steps:
+
+Choose an input.
+
+Use the specification to figure out the expected behavior
+   on that input.
+
+Run the code on the input, and observe the actual behavior.
+
+Compare the actual behavior with the expected behavior. The test
+   passes if they match, and fails if they do not.
+
+Let's take the steps with indexOf from Lecture 2, under
+specification D, the one that promises some matching index. Here is
+the method with that specification and Lecture 2's implementation 1:
+
+/**
+ * Searches for a value in part of an array.
+ *
+ * @param a the array to search; must be non-null
+ * @param lo the index where the range to search begins
+ * @param hi the index just past where the range to search ends
+ * @param x the value to search for
+ * @requires 0 <= lo <= hi <= a.length
+ * @return some index i with lo <= i < hi and a[i] == x,
+ *     or -1 if there is none
+ */
+static int indexOf(int[] a, int lo, int hi, int x) {
+    for (int i = lo; i < hi; i++) {
+        if (a[i] == x) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+For step 1, choose the array {3, 0, 7}, the whole range from
+0 to 3, and x = 7. For step 2, notice that the only index in
+the range that holds 7 is 2. D promises some such index, so on
+this input it promises exactly 2. For step 3, run
+implementation 1, which returns 2. For step 4, 2 is what we
+expected, so the test passes.
+
+Expected behavior first
+
+It is essential to determine the expected behavior before
+running the code and observing the actual behavior. The
+expected behavior comes from the specification, never from
+what the code did when you ran it.
+
+Here is why the order matters. Suppose you ran the code first,
+saw 2, and then wrote 2 down as the expected answer. Your test would
+pass, but it would check only that the code returns what it returned
+before. That is worth something, since the test fails if a later
+change alters the answer. It does not check that 2 is right. Only an
+expected answer worked out from the specification does that. Several
+of you asked, about Reading 1, whether tests mean anything when the
+tool that wrote the code also wrote the tests. Here is part of the
+answer: a test means as much as its expected answers, and an
+expected answer tells you whether the code is right only if it comes
+from the specification.
+
+Writing a test in code
+
+Taking the four steps by hand is manual testing. A manual test checks
+the code as it was when you ran it. Change the code, and you have to
+take every step again. An automated test is code that takes steps 3
+and 4 for you, so every test can run again after every change, in
+seconds. Steps 1 and 2 are still yours, since the input you chose and
+the answer you expect are written into the test.
+
+In Java, automated tests are usually written with JUnit, a library
+for writing and running them. Here is the start of a file of tests
+for indexOf, with the test above and a test where x is absent:
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class IndexOfTest {
+    @Test
+    void findsTheOnlyMatch() {
+        int[] a = {3, 0, 7};
+        assertEquals(2, IndexOf.indexOf(a, 0, 3, 7));
+    }
+
+    @Test
+    void returnsMinusOneWhenAbsent() {
+        int[] a = {3, 0, 7};
+        assertEquals(-1, IndexOf.indexOf(a, 0, 3, 42));
+    }
+
+@Test marks a method as a test, so JUnit knows to run it. Each test
+method takes the four steps. Its first line is the input you chose.
+Its call to indexOf runs the code. assertEquals(expected, actual)
+compares the two values, and if they differ, it stops the test and
+reports a failure. The expected value comes first, and it is the one
+you worked out from the specification. indexOf lives in a class
+called IndexOf, so the tests call it as IndexOf.indexOf.
+
+To run the tests, compile them together with IndexOf and JUnit,
+then ask JUnit to run every test in the class. With JUnit's jar file
+saved as junit.jar, the commands are:
+
+javac -cp junit.jar IndexOf.java IndexOfTest.java
+java -jar junit.jar execute --class-path . --select-class IndexOfTest
+
+JUnit lists each test it ran, with a check mark beside each test
+that passed, and then counts the tests that passed and failed. The
+file has four tests, and against implementation 1 all four pass. The
+other two come up below.
+
+A test of indexOf on its own is a unit test: it checks one
+piece of a program, usually a single method, apart from the rest. An
+integration test checks pieces working together, such as
+Lecture 2's count with the indexOf it calls. An
+end-to-end test runs the whole program, as a user would. Each run
+of Sum in Lecture 3, a command with its input and what Sum
+printed, can be an end-to-end test: run the same command, and compare
+what it prints, its error output, and its exit status. The staff keep
+a script that does that for every run in Lecture 3's notes. This
+lecture is about unit tests.
+
+Which inputs?
+
+Steps 2 to 4 are much the same for every test. Step 1 is where
+testing gets hard: which inputs should you choose? indexOf takes an
+array and three numbers, so it has far more inputs than anyone could
+run. Four tips narrow the choice.1
+
+Test only the inputs the specification allows. D asks for an
+array that is not null, in its @param, and for
+0 <= lo <= hi <= a.length, in its @requires. On a call that
+breaks either, such as one with hi past the end of the array, D
+promises nothing, so there is no expected answer to check against. A
+whole program is different. As Lecture 3 said, the user owes the
+program nothing, so Sum's user manual has to cover every input, and
+every input is fair game for a test of Sum.
+
+Test each method separately. A method's tests check that method
+alone. So when one method calls another, the caller's tests can
+assume that the method called satisfies its specification.
+Lecture 2 reasoned the same way about a program in pieces: the
+specifications of the methods a method calls stand in for their
+code. A unit test of count runs indexOf too. It need not check
+that indexOf returns -1 on an empty range, since that check
+belongs in the tests of indexOf.
+
+Test exhaustively when possible. To test exhaustively is to
+test every input the specification allows. That is practical only
+when the inputs are few, say ten or fewer. A method whose only
+argument is a boolean, for one, has two inputs, and two tests
+settle it. Lecture 2's check took this idea further. It tested every
+input in the small slice of indexOf's inputs that the sentence from
+Lecture 2 quoted above describes. Those are not all of indexOf's
+inputs, so the check could miss a mistake that shows only on longer
+arrays. Even so, it found every specification that each
+implementation fails.
+
+Cover each case and each boundary. When there are too many
+inputs to test them all, choose an input for each case the
+specification describes, and inputs at the boundaries between
+cases. D describes these cases:
+
+x occurs once in the range;
+
+x occurs more than once in the range, where D allows
+  more than one answer;
+
+x does not occur in the range;
+
+the range is empty, with lo == hi.
+
+The boundaries are where x sits at the first index of the range,
+lo, or at its last, hi - 1, and where x sits just outside the
+range, at lo - 1 or at hi, where it must not be found. Mistakes
+cluster at boundaries. An implementation whose loop ran while
+i <= hi, one step too far, would look at index hi, outside the
+range. Every test that finds x inside the range would pass it. A test
+with x at hi would not: on {3, 0, 7}, with the range from 0 to 2
+and x = 7, that implementation returns 2, where D promises -1.
+
+These tips say which inputs to try. They do not say how many tests
+are enough, and the inputs they pick come from the specification,
+never from the code. Friday's lecture takes up both.
+
+Where the expected answer comes from
+
+Step 2 was easy for {3, 0, 7}, since D promised exactly one answer.
+Now take an input from the second case on our list, where x occurs
+more than once: the array {5, 1, 5, 2, 5}, the whole range, and
+x = 5. What should the test expect?
+
+D allows any of 0, 2, and 4. Lecture 2 showed that implementations 1
+and 4 both satisfy D, but they answer differently here.
+Implementation 1 searches from the front and returns 0.
+Implementation 4 searches from the back and returns 4. Here are the
+last two tests in the file, both for this input:
+
+@Test
+void findsTheFirstMatch() {
+    int[] a = {5, 1, 5, 2, 5};
+    assertEquals(0, IndexOf.indexOf(a, 0, 5, 5));
+}
+
+@Test
+void findsSomeMatch() {
+    int[] a = {5, 1, 5, 2, 5};
+    int i = IndexOf.indexOf(a, 0, 5, 5);
+    assertTrue(0 <= i && i < 5 && a[i] == 5);
+}
+
+findsTheFirstMatch expects 0. Against implementation 1, it passes.
+Against implementation 4, it fails, and JUnit reports
+expected: <0> but was: <4>. Yet implementation 4 satisfies D. The
+test failed a correct implementation because it checked more than D
+promises: D never promised the first match.
+
+findsSomeMatch checks only what D promises. assertTrue fails the
+test if its condition is false, and the condition here is D's
+promise: the answer is in the range, and the array holds 5 there.
+This test passes against both implementations.
+
+Definition: specification-based test
+
+A specification-based test checks only behavior that the
+specification promises, so it passes on every correct
+implementation. An implementation-based test also checks
+behavior the specification does not promise, so it can fail on
+a correct implementation if that implementation happens to make
+different choices.
+
+An implementation-based test has its uses. While writing
+implementation 1, you might want to check that it really does stop at
+the first match. But such a test is a claim about one implementation,
+not about the method. When someone replaces implementation 1 with
+implementation 4, the test fails, though every client that relies
+only on D still works.
+
+Lecture 2 asked of a client whether it works with every
+implementation its specifications allow. A test is a client too. A
+specification-based test calls indexOf knowing only what D
+promises, so it works with every implementation D allows. The same
+reasoning explains a puzzle from Lecture 2. Its count is wrong
+against D. Yet with implementation 1 underneath, count gives the
+right answer on every input, since implementation 1 never skips a
+match. So no test of count can find the mistake until it runs with
+an implementation like 4.
+
+What tests tell us
+
+A test confirms a claim about its own run, and a well-chosen set of
+tests confirms claims about many runs. Still, no set of tests
+confirms a claim about every run, since an input you did not choose
+may go wrong. Lecture 1 put it this way: testing can refute a claim
+about every run and never confirm it. Tests are still among the best
+reasons we have, and the course motto asks for reasons: to know
+that code works is to have reasons, from tests and from arguments.
+Friday asks how many tests are enough, and how to use the code
+itself to choose them.
+
+Exercises
+
+Each answer is folded under its question. Write yours first.
+
+1. Choose inputs for testing indexOf against specification D,
+following the four tips. For each input, give the expected answer,
+or say what every correct answer must satisfy.
+
+Answer
+
+One set. Each row is one input, its expected answer, and the
+  case or boundary it covers:
+
+a                lo  hi  x    expected     covers
+{3, 0, 7}        0   3   7    2            x once, at hi - 1
+{3, 0, 7}        0   3   42   -1           x absent
+{5, 1, 5, 2, 5}  0   5   5    0, 2, or 4   x more than once
+{3, 0, 7}        1   1   0    -1           empty range
+{}               0   0   3    -1           empty array
+{7, 0, 3}        0   3   7    0            x at lo
+{7, 0, 3}        1   3   7    -1           x at lo - 1
+{3, 0, 7}        0   2   7    -1           x at hi
+
+The empty range. On {3, 0, 7} with lo and hi both
+  1, the array holds 0 at index 1, but the range holds nothing,
+  so the answer is -1.
+
+What is not on the list. No input breaks the
+  precondition, so no test has a null array, lo past hi, or
+  hi past the end of the array.
+
+Checking it. Implementations 1 and 4 both give the answers
+  above. On the third input, implementation 1 gives 0 and
+  implementation 4 gives 4.
+
+2. Specifications B and C promise the smallest and the largest
+matching index. Which of the four tests in IndexOfTest are
+specification-based under B? Under C? Under D?
+
+Answer
+
+findsTheOnlyMatch and returnsMinusOneWhenAbsent
+  are specification-based under all three. When x occurs
+  once, B, C, and D all promise its index, and when x is
+  absent, all three promise -1.
+
+findsTheFirstMatch is specification-based under B, which
+  promises the smallest index, 0. Under C it is worse than
+  implementation-based: C promises 4, so the test fails on every
+  implementation that satisfies C. Under D it is
+  implementation-based, as above.
+
+findsSomeMatch is specification-based under all three, since
+  the index B or C promises is in the range and holds 5, which is all
+  the test checks. Under B and C, though, it checks less than the
+  specification promises. An implementation of B that returned 2 here
+  would be wrong, and this test would pass it.
+
+3. A test calls indexOf(a, 0, 4, 7) on a = {3, 0, 7} and
+expects -1. What is wrong with it?
+
+Answer
+
+It breaks the precondition. hi is 4, past the end of a
+  three-element array, so D promises nothing about this call. No
+  answer is right or wrong, and the test checks nothing about D.
+
+What the implementations do. Implementation 1 finds 7 at
+  index 2 and returns 2, so the test fails against it.
+  Implementation 4 starts at index 3 and throws
+  ArrayIndexOutOfBoundsException. Both satisfy D.
+
+Further reading
+
+The course's testing tips. James Wilcox and Kevin Zatloukal,
+  "Testing" (2025). One page: the first three tips above,
+  and those for Friday.
+
+Testing in practice. Brian Kernighan and Rob Pike,
+  The Practice of Programming (1999), chapter 6. Section 6.1 is on
+  testing boundaries as you write code, 6.2 on testing
+  systematically, and 6.3 on automating tests.
+
+JUnit. The JUnit User Guide explains how to
+  write and run tests, and the assertions beyond
+  assertEquals and assertTrue.
+
+James Wilcox and Kevin Zatloukal set out the first three
+tips, and the tips for Friday, in "Testing" (2025), a
+one-page note for this course. ↩
+
+    UW Site Use Agreement

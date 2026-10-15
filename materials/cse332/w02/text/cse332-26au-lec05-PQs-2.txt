@@ -1,0 +1,1165 @@
+--- slide 1 ---
+CSE 332 Autumn 2026Lecture 5: Priority Queues, pt 2
+Ruth Anderson
+http://www.cs.uw.edu/332
+
+
+1
+
+--- slide 2 ---
+Announcements
+Exercise 0
+Due Friday  TONIGHT! 10/09/2026
+There are 2 separate Gradescope submissions
+“Meet the staff” activity - Sometime during the first 4 weeks of class.
+Participate in Section, earn a late day (see Ed Board post)
+Exercise 1 Running Time: 
+Due Mon Oct 12
+Entirely in Gradescope. Save your answers outside of Gradescope and confirm that you have answered/uploaded everything that is needed!
+Exercise 2 Heaps: coming later today, due Fri Oct 16
+2
+
+--- slide 3 ---
+ADT: Priority Queue
+What is it?
+A collection of items and their “priorities”
+Allows quick access/removal to the “top priority” thing
+Usually a smaller priority value means the item is “more important”
+What Operations do we need?
+insert(item, priority)
+Add a new item to the PQ with indicated priority
+extract
+Remove and return the “top priority” item from the queue
+Usually the item with the smallest priority value
+IsEmpty
+Indicate whether or not there are items still on the queue
+Note: the “priority” value can be any type/class so long as it’s comparable (i.e. you can use “<“ or “compareTo” with it)
+3
+
+--- slide 4 ---
+Trees for Heaps
+Binary Trees:
+The branching factor is 2
+Every node has ≤ 2 children
+Complete Tree:
+All “layers” are full, except the bottom
+Bottom layer filled left-to-right
+ 
+1
+3
+2
+4
+7
+5
+6
+5
+9
+4
+
+--- slide 5 ---
+Heap – Priority Queue Data Structure
+Idea: We need to keep some ordering, but it doesn’t need to be entirely sorted
+Θ(log𝑛) worst case for extract and insert
+
+ 
+1
+3
+2
+4
+7
+5
+6
+5
+9
+1
+2
+3
+4
+6
+5
+7
+8
+9
+5
+
+--- slide 6 ---
+Achieving log𝑛 Running Time
+ 
+What is the maximum number of total nodes in a binary tree of height h?
+2h+1−1
+Θ2h
+If I have 𝑛 nodes in a binary tree, what is its minimum height?
+Find the smallest h such that: 𝑛≤2h+1−1
+Solve for h: ⌈log𝑛+1−1⌉=h
+Height is Θlog𝑛
+
+Heap Idea:
+If 𝑛 values are inserted into a complete tree, the height will be roughly log𝑛
+Ensure each insert and extract requires just one “trip” from root to leaf
+ 
+6
+
+--- slide 7 ---
+(Min) Heap Data Structure
+1
+3
+2
+4
+7
+5
+6
+5
+9
+1
+2
+3
+4
+6
+5
+7
+8
+9
+Keep items in a complete binary tree
+Maintain the “(Min) Heap Property” of the tree
+Every node’s priority is ≤ its children’s priority
+Max Heap Property: every node’s priority is ≥ its children
+Where is the min?
+How do I insert?
+How do I extract?
+How to do it in Java?
+ 
+7
+
+--- slide 8 ---
+Are These Binary Min-Heaps?
+3
+4
+5
+5
+4
+6
+3
+4
+10
+5
+6
+5
+7
+6
+8
+9
+8
+
+--- slide 9 ---
+Are These Binary Min-Heaps? (Answers)
+3
+4
+5
+Valid heap!
+5
+4
+6
+No! 5 has a child that is smaller.
+3
+4
+10
+5
+6
+Valid heap! 5 is smaller than 10, but 10 isn’t an ancestor so not a violation.
+5
+7
+6
+8
+9
+No! Wrong shape!
+9
+
+--- slide 10 ---
+Heap Insert Example
+1.5
+1
+3
+2
+4
+7
+5
+6
+5
+9
+insert(item, priority){
+    put item in the “next open” spot (keep tree complete)
+    while (priority < parent’s priority){
+        swap item with parent
+    }
+}
+10
+
+--- slide 11 ---
+Heap Insert (New Node)
+1
+3
+2
+4
+7
+5
+6
+5
+9
+1.5
+insert(item, priority){
+    put item in the “next open” spot (keep tree complete)
+    while (priority < parent’s priority){
+        swap item with parent
+    }
+}
+11
+
+--- slide 12 ---
+Heap Insert (Percolate 1)
+1
+3
+2
+4
+1.5
+5
+6
+5
+9
+7
+insert(item, priority){
+    put item in the “next open” spot (keep tree complete)
+    while (priority < parent’s priority){
+        swap item with parent
+    }
+}
+
+Percolate Up
+12
+
+--- slide 13 ---
+Heap Insert (Percolate 2)
+1
+1.5
+2
+4
+3
+5
+6
+5
+9
+7
+insert(item, priority){
+    put item in the “next open” spot (keep tree complete)
+    while (priority < parent’s priority){
+        swap item with parent
+    }
+}
+
+Percolate Up
+13
+
+--- slide 14 ---
+Heap Insert (Done)
+1
+1.5
+2
+4
+3
+5
+6
+5
+9
+7
+insert(item, priority){
+    put item in the “next open” spot (keep tree complete)
+    while (priority < parent’s priority){
+        swap item with parent
+    }
+}
+14
+
+--- slide 15 ---
+Heap extract Example
+1
+1.5
+2
+4
+3
+5
+6
+5
+9
+7
+extract(){
+    min = root
+    curr = bottom-right item
+    move curr to the root
+    while(curr > curr.left || curr > curr.right){
+        swap curr with its smallest child
+    }
+    return min
+}
+ 
+15
+
+--- slide 16 ---
+Heap extract (Move Node)
+7
+1.5
+2
+4
+3
+5
+6
+5
+9
+7
+extract(){
+    min = root
+    curr = bottom-right item
+    move curr to the root
+    while(curr > curr.left || curr > curr.right){
+        swap curr with its smallest child
+    }
+    return min
+}
+ 
+16
+
+--- slide 17 ---
+Heap extract (Percolate 1)
+1.5
+7
+2
+4
+3
+5
+6
+5
+9
+extract(){
+    min = root
+    curr = bottom-right item
+    move curr to the root
+    while(curr > curr.left || curr > curr.right){
+        swap curr with its smallest child
+    }
+    return min
+}
+ 
+
+Percolate Down
+17
+
+--- slide 18 ---
+Heap extract (Percolate 2)
+1.5
+3
+2
+4
+7
+5
+6
+5
+9
+extract(){
+    min = root
+    curr = bottom-right item
+    move curr to the root
+    while(curr > curr.left || curr > curr.right){
+        swap curr with its smallest child
+    }
+    return min
+}
+ 
+
+Percolate Down
+18
+
+--- slide 19 ---
+Heap extract (Done)
+1.5
+3
+2
+4
+7
+5
+6
+5
+9
+extract(){
+    min = root
+    curr = bottom-right item
+    move curr to the root
+    while(curr > curr.left || curr > curr.right){
+        swap curr with its smallest child
+    }
+    return min
+}
+ 
+19
+
+--- slide 20 ---
+Percolate Up and Down (for a Min Heap)
+Goal: restore the “Heap Property”
+Percolate Up:
+Take a node that may be smaller than a parent, repeatedly swap with a parent until it is larger than its parent
+Percolate Down:
+Take a node that may be larger than one of its children, repeatedly swap with smallest child until both children are larger
+Worst case running time of each:
+Θlog𝑛
+
+ 
+20
+
+--- slide 21 ---
+Representing a Heap (Questions)
+Important: On our Exercises start counting from 0
+Every complete binary tree with the same number of nodes uses the same positions and edges
+Use an array to represent the heap
+Index of root: 
+Parent of node 𝑖:
+Left child of node 𝑖:
+Right child of node 𝑖:
+Location of the leaves: 
+ 
+1
+3
+2
+4
+7
+5
+6
+5
+9
+1
+2
+3
+4
+6
+5
+7
+8
+9
+
+1
+3
+2
+4
+7
+5
+6
+5
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+21
+
+--- slide 22 ---
+Representing a Heap (Answers)
+Important: On our Exercises start counting from 0
+Every complete binary tree with the same number of nodes uses the same positions and edges
+Use an array to represent the heap
+Index of root: 1
+Parent of node 𝑖: 𝑖2
+Left child of node 𝑖: 2𝑖
+Right child of node 𝑖: 2𝑖+1
+Location of the leaves: 𝑛2+1 to 𝑛
+ 
+1
+3
+2
+4
+7
+5
+6
+5
+9
+1
+2
+3
+4
+6
+5
+7
+8
+9
+
+1
+3
+2
+4
+7
+5
+6
+5
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+22
+
+--- slide 23 ---
+Insert Pseudocode
+For simplicity, assume value is the same as priority
+1
+3
+2
+4
+7
+5
+6
+5
+9
+1
+2
+3
+4
+6
+5
+7
+8
+9
+
+1
+3
+2
+4
+7
+5
+6
+5
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+insert(item){
+    if(size == arr.length – 1){resize();}
+    size++;
+    arr[size] = item;
+    percolateUp(size)
+} 
+
+23
+
+--- slide 24 ---
+Percolate Up
+percolateUp(int i){
+    int parent = i/2;  \\ index of parent
+    Item val = arr[i];  \\ value at current location
+    while(i > 1 && arr[i] < arr[parent]){  \\ until location is root or heap property holds
+        arr[i] = arr[parent];  \\ move parent value to this location
+        arr[parent] = val; \\ put current value into parent’s location 
+        i = parent;  \\ make current location the parent
+        parent = i/2;  \\ update new parent
+    }
+}
+24
+
+--- slide 25 ---
+extract Pseudocode
+extract(){
+    theMin = arr[1];
+    arr[1] = arr[size];
+    size--;
+    percolateDown(1);
+    return theMin;
+} 
+
+25
+
+--- slide 26 ---
+Percolate Down
+percolateDown(int i){
+    int left = i*2;  \\ index of left child
+    int right = i*2+1;  \\ index of right child
+    Item val = arr[i];  \\ value at location
+    while(left <= size){  \\ until location is leaf
+        int toSwap = right;
+        if(right > size || arr[left] < arr[right]){  \\ if there is no right child or if left child is smaller
+            toSwap = left;  \\ swap with left
+        } \\ now toSwap has the smaller of left/right, or left if right does not exist
+        if (arr[toSwap] < val){  \\ if the smaller child is less than the current value
+            arr[i] = arr[toSwap];
+            arr[toSwap] = val; \\ swap parent with smaller child
+            i = toSwap; \\ update current node to be smaller child
+            left = i*2;
+            right = i*2+1;
+        }
+        else{ return;} \\ if we don’t swap, then heap property holds
+    }
+}
+26
+
+--- slide 27 ---
+Example
+Important: On our Exercises start counting from 0
+
+
+
+
+
+
+
+
+0
+1
+2
+3
+4
+5
+6
+7
+insert: 16, 32, 4, 57, 80, 43, 2
+extract
+27
+
+--- slide 28 ---
+Example: After insertions (Answers)
+Important: On our Exercises start counting from 0
+insert: 16, 32, 4, 57, 80, 43, 2
+extract
+
+2
+32
+4
+57
+80
+43
+16
+0
+1
+2
+3
+4
+5
+6
+7
+16
+80
+57
+4
+32
+2
+43
+28
+
+--- slide 29 ---
+Example:  After extract (Answers)
+Important: On our Exercises start counting from 0
+insert: 16, 32, 4, 57, 80, 43, 2
+extract
+
+4
+32
+16
+57
+80
+43
+
+0
+1
+2
+3
+4
+5
+6
+7
+80
+57
+16
+32
+4
+43
+29
+
+--- slide 30 ---
+Other Operations
+Update Key
+Increase Key
+Given the index of an item in the PQ, make its priority value larger
+Min Heap: Then percolate down
+Max Heap: Then percolate up
+Decrease Key
+Given the index of an item in the PQ, make its priority value smaller
+Min Heap: Then percolate up
+Max Heap: Then percolate down
+Remove
+Given the item at the given index from the PQ
+30
+
+--- slide 31 ---
+Building a Heap From “Scratch”
+Suppose we had 𝑛 items and wanted to “heapify” them
+ 
+
+5
+6
+10
+3
+15
+8
+7
+14
+2
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+1
+10
+5
+6
+10
+3
+15
+8
+7
+14
+2
+1
+2
+3
+4
+6
+5
+7
+8
+9
+1
+10
+Violate Heap Property!
+Two ways for “fix” the heap:
+Percolate Up
+Percolate Down
+31
+
+--- slide 32 ---
+Floyd’s buildHeap method
+Working towards the root, one row at a time, percolate down
+
+buildHeap(){
+    for(int i = size; i>0; i--){
+        percolateDown(i);
+    }
+}
+32
+
+--- slide 33 ---
+Floyd’s buildHeap method (Percolate 15) 
+
+5
+6
+10
+3
+15
+8
+7
+14
+2
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+1
+10
+Suppose we had 𝑛 items and wanted to “heapify” them
+ 
+5
+6
+10
+3
+15
+8
+7
+14
+2
+1
+2
+3
+4
+6
+5
+7
+8
+9
+1
+10
+buildHeap(){
+    for(int i = size; i>0; i--){
+        percolateDown(i);
+    }
+}
+Violates Heap Property!
+Nodes bigger than a child
+33
+
+--- slide 34 ---
+Floyd’s buildHeap method (Percolate 3) 
+Suppose we had 𝑛 items and wanted to “heapify” them
+ 
+5
+6
+10
+3
+1
+8
+7
+14
+2
+1
+2
+3
+4
+6
+5
+7
+8
+9
+15
+10
+
+5
+6
+10
+3
+1
+8
+7
+14
+2
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+15
+10
+buildHeap(){
+    for(int i = size; i>0; i--){
+        percolateDown(i);
+    }
+}
+Violates Heap Property!
+Nodes bigger than a child
+34
+
+--- slide 35 ---
+Floyd’s buildHeap method (Percolate 10) 
+Suppose we had 𝑛 items and wanted to “heapify” them
+ 
+5
+6
+10
+2
+1
+8
+7
+14
+3
+1
+2
+3
+4
+6
+5
+7
+8
+9
+15
+10
+
+5
+6
+10
+2
+1
+8
+7
+14
+3
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+15
+10
+Violates Heap Property!
+buildHeap(){
+    for(int i = size; i>0; i--){
+        percolateDown(i);
+    }
+}
+35
+
+--- slide 36 ---
+Floyd’s buildHeap method (Percolate 6) 
+Suppose we had 𝑛 items and wanted to “heapify” them
+ 
+5
+6
+7
+2
+1
+8
+10
+14
+3
+1
+2
+3
+4
+6
+5
+7
+8
+9
+15
+10
+Violates Heap Property!
+
+5
+6
+7
+2
+1
+8
+10
+14
+3
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+15
+10
+buildHeap(){
+    for(int i = size; i>0; i--){
+        percolateDown(i);
+    }
+}
+36
+
+--- slide 37 ---
+Floyd’s buildHeap method (Percolate 5) 
+Suppose we had 𝑛 items and wanted to “heapify” them
+ 
+5
+1
+7
+2
+6
+8
+10
+14
+3
+1
+2
+3
+4
+6
+5
+7
+8
+9
+15
+10
+Violates Heap Property!
+
+5
+1
+7
+2
+6
+8
+10
+14
+3
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+15
+10
+buildHeap(){
+    for(int i = size; i>0; i--){
+        percolateDown(i);
+    }
+}
+37
+
+--- slide 38 ---
+Floyd’s buildHeap method (Done)
+Suppose we had 𝑛 items and wanted to “heapify” them
+ 
+1
+2
+7
+3
+6
+8
+10
+14
+5
+1
+2
+3
+4
+6
+5
+7
+8
+9
+15
+10
+Satisfies Heap Property!
+
+1
+2
+7
+3
+6
+8
+10
+14
+5
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+15
+10
+buildHeap(){
+    for(int i = size; i>0; i--){
+        percolateDown(i);
+    }
+}
+38
+
+--- slide 39 ---
+How long did this take?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Worst case running time of buildHeap:
+No node can percolate down more than the height of its subtree
+When i is a leaf:
+When i is second-from-last level:
+When i is third-from-last level:
+Overall Running time:
+buildHeap(){
+    for(int i = size; i>0; i--){
+        percolateDown(i);
+    }
+}
+39
+
+--- slide 40 ---
+How long did this take? (Answers)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Worst case running time of buildHeap:
+No node can percolate down more than the height of its subtree
+When 𝑖 is a leaf: 0
+When 𝑖 is second-from-last level: 1
+When 𝑖 is third-from-last level: 2
+Overall Running time:
+Sum of [Max levels moved down * Max Nodes at that level]
+0⋅𝑛2+1⋅𝑛4+2⋅𝑛8+…log2𝑛⋅1
+𝑖=0log2𝑛𝑖⋅𝑛2𝑖+1=𝑛𝑖=0log2𝑛𝑖2𝑖+1≤𝑛𝑖=0∞𝑖2𝑖+1=2𝑛
+Θ(𝑛)
+ 
+buildHeap(){
+    for(int i = size; i>0; i--){
+        percolateDown(i);
+    }
+}
+40

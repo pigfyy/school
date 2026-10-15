@@ -72,7 +72,64 @@ const taskOf = (idx) => { const before = html.slice(0, idx); const m = [...befor
 const S = (n) => String(n);
 const worst = (n) => J1("binaryWorst", (r) => r.n === n).worst;
 
+/* Wed-Fri additions (Priority Queues 1 and 2, Section 2): the lecture's pseudocode, run for real. */
+const pq = (() => {
+  // 1-indexed min-heap exactly as lecture 5's pseudocode (percolateUp / percolateDown); returns swap counts
+  const up = (h, i) => { let swaps = 0; while (i > 1 && h[i] < h[i >> 1]) { [h[i], h[i >> 1]] = [h[i >> 1], h[i]]; i >>= 1; swaps++; } return swaps; };
+  const down = (h, i, size) => {
+    let swaps = 0;
+    while (i * 2 <= size) {
+      let c = i * 2; if (c + 1 <= size && h[c + 1] < h[c]) c++;
+      if (h[c] < h[i]) { [h[c], h[i]] = [h[i], h[c]]; i = c; swaps++; } else break;
+    }
+    return swaps;
+  };
+  const h = [null]; for (const v of [16, 32, 4, 57, 80, 43, 2]) { h.push(v); up(h, h.length - 1); }
+  const afterInserts = h.slice(1).join(",");
+  const min = h[1]; h[1] = h.pop(); down(h, 1, h.length - 1);
+  const afterExtract = h.slice(1).join(",");
+  // slide example: insert 1.5, then extract
+  const s = [null, 1, 3, 2, 4, 7, 5, 6, 5, 9]; s.push(1.5); up(s, 10);
+  const slideInsert = s.slice(1).join(","); s[1] = s.pop(); down(s, 1, s.length - 1);
+  const slideExtract = s.slice(1).join(",");
+  // slide 9: the second PQ trace
+  const q = [null], out = []; const ins = (v) => { q.push(v); up(q, q.length - 1); }; const ext = () => { const m = q[1]; q[1] = q.pop(); if (q.length > 1) down(q, 1, q.length - 1); out.push(m); };
+  ins(5); ins(6); ins(3); ext(); ins(1); ext(); ext(); ins(8); ext(); ext();
+  // worst-case percolate depth and buildHeap work, over many sizes (worst case: reverse-sorted input)
+  let maxUp = 0; const depths = [];
+  for (let n = 1; n <= 2048; n++) { const a = [null]; for (let v = n; v >= 1; v--) { a.push(v); } const hh = [null]; let m = 0; for (let v = 1; v <= n; v++) { hh.push(n - v + 1); m = Math.max(m, up(hh, hh.length - 1)); } depths.push([n, m]); maxUp = Math.max(maxUp, m); }
+  const buildSwaps = (n) => { const a = [null]; for (let v = n; v >= 1; v--) a.push(v); let total = 0; for (let i = n; i > 0; i--) total += down(a, i, n); return total; };
+  const buildOK = [1, 2, 3, 7, 15, 100, 1000, 4095, 4096].every((n) => buildSwaps(n) <= 2 * n);
+  const ratioOK = buildSwaps(1 << 14) / (1 << 14) < 1 && buildSwaps(1 << 16) / (1 << 16) < 1;
+  return { afterInserts, min, afterExtract, slideInsert, slideExtract, trace: out.join(","), depthOK: depths.every(([n, m]) => m === Math.floor(Math.log2(n))), buildOK, ratioOK };
+})();
+const numUnique = (vals) => { // section 2 question 3, counting the loop iterations
+  const visited = vals.map(() => false); let steps = vals.length, out = 0;
+  for (let i = 0; i < vals.length; i++) if (!visited[i]) { out++; for (let j = i; j < vals.length; j++) { steps++; if (vals[i] === vals[j]) visited[j] = true; } }
+  return { out, steps };
+};
+const nuWorst = [1, 2, 5, 10, 50, 200].every((n) => numUnique(Array.from({ length: n }, (_, i) => `v${i}`)).steps === n + (n * (n + 1)) / 2);
+const nuBest = [1, 2, 5, 10, 50, 200].every((n) => numUnique(Array(n).fill("a")).steps === 2 * n);
+ok(pq.afterInserts === "2,32,4,57,80,43,16" && pq.min === 2 && pq.afterExtract === "4,32,16,57,80,43", `lecture 5 example 16,32,4,57,80,43,2 (${pq.afterInserts} / ${pq.afterExtract})`);
+ok(pq.slideInsert === "1,1.5,2,4,3,5,6,5,9,7" && pq.slideExtract === "1.5,3,2,4,7,5,6,5,9", `slide insert 1.5 / extract (${pq.slideInsert} / ${pq.slideExtract})`);
+ok(pq.trace === "3,1,5,6,8", `slide 9 PQ trace prints ${pq.trace}`);
+ok(pq.depthOK, "worst-case percolate up is floor(log2 n) swaps for n up to 2048");
+ok(pq.buildOK && pq.ratioOK, "Floyd buildHeap does at most 2n swaps");
+ok(nuWorst && nuBest, "numUnique: n + n(n+1)/2 steps when all distinct, 2n when all equal");
+// heap property is only between a node and its children: a heap with a level-1 value (5) above a level-2 value (3)
+{ const h = [null, 1, 5, 2, 6, 7, 3, 4]; const valid = h.every((v, i) => i < 2 || h[i >> 1] <= v); ok(valid && h[2] > h[6], "valid min-heap with a larger value on a higher level"); }
+ok(Math.floor(9 / 2) + 1 === 5 && 2 * 4 + 1 === 9, "n = 9 leaves start at 5; right child of 4 is 9");
+ok(Math.ceil(Math.log2(1000 + 1)) - 1 === 9, "height of a complete tree on 1000 nodes is 9");
+const smallestN0 = (() => { let n = 1; while (!(1000 <= 3 * n * n)) n++; return n; })();
+
 const TRUTH = {
+  // Wed-Fri additions
+  "cse332-w2-l4-qc-example2-third": pq.trace.split(",")[2],
+  "cse332-w2-l4-qc-heap-leaf-ancestor": "no",
+  "cse332-w2-s2-qc-q1b-n0": S(smallestN0),
+  "cse332-w2-l5-qc-extract-new-root": pq.afterExtract.split(",")[0],
+  "cse332-w2-l5-qc-right-child-of-4": S(2 * 4 + 1),
+  "cse332-w2-l5-qc-first-leaf": S(Math.floor(9 / 2) + 1),
   // binary search
   "cse332-w2-l3-search-worst-million": S(worst(1000000)),
   "cse332-w2-l3-gap-halving.solve-4096": S(Math.log2(4096)),
@@ -116,6 +173,12 @@ const TRUTH = {
   "cse332-w2-l3-true-statements.n-theta-means-not-olog": !G.relate("n", "log n").o ? "yes" : "no",
 };
 const BIGO_TRUTH = { // buckets, checked against the class engine with a second spelling
+  // Wed-Fri additions: verified above by running the code (counts / swap bounds), spelled a second way here
+  "cse332-w2-l4-qc-sorted-array-insert": "3n + 2",
+  "cse332-w2-s2-qc-numunique-worst": "n + n(n+1)/2",
+  "cse332-w2-s2-qc-numunique-best": "2n",
+  "cse332-w2-l5-qc-percolate-time": "2 log n + 1",
+  "cse332-w2-l5-qc-buildheap-time": "2n",
   "cse332-w2-l3-drop-n3-2n-bucket": "n^3 + 2^n + 3n",
   "cse332-w2-l3-intuition-buckets.four-n-plus-five": "4n + 5",
   "cse332-w2-l3-intuition-buckets.half-nlogn": "0.5nlogn + 2n + 7",

@@ -57,24 +57,24 @@
       "file": "section/section01.html",
       "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section01.html",
       "fetchedAt": "2026-10-05T12:27:36-07:00",
-      "bytes": 7058,
-      "sha256": "ce169b3f05ccc0a282aaed8bb20cf33e181a2e452e91e75671251b8a2fdf402e",
+      "bytes": 15653,
+      "sha256": "66d10b259b2712c10c2a7f2f0ac03be43b6cb3e3c28162e7b611cb7533448807",
       "note": "Placeholder: title 'CSE 331: Not Yet Available' (checked twice on 2026-10-05). Not used for content."
     },
     {
       "file": "section/section01-solution.html",
       "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section01-solution.html",
       "fetchedAt": "2026-10-05T12:27:36-07:00",
-      "bytes": 7058,
-      "sha256": "ce169b3f05ccc0a282aaed8bb20cf33e181a2e452e91e75671251b8a2fdf402e",
+      "bytes": 17909,
+      "sha256": "db24228b844088ef5686cc4e6e4f176b79ff006c54df4b1260b4d16f60c20959",
       "note": "Placeholder: 'Not Yet Available' (checked twice on 2026-10-05). Not used."
     },
     {
       "file": "testing/notes.html",
       "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/testing/notes.html",
       "fetchedAt": "2026-10-05T12:27:36-07:00",
-      "bytes": 7058,
-      "sha256": "ce169b3f05ccc0a282aaed8bb20cf33e181a2e452e91e75671251b8a2fdf402e",
+      "bytes": 37754,
+      "sha256": "d226560cd4e4ef1840cfec6c644394b648678e12fa0359f23015698eb3b396db",
       "note": "Placeholder: 'Not Yet Available' (checked twice on 2026-10-05). lectures/testing/ contains only this file; lectures/lecture04/ is 404."
     },
     {
@@ -123,6 +123,93 @@
       "bytes": 29981,
       "sha256": "970bf59625552247dd0ffe2494e6fb09d7a1e6776b63a0321c0be5e689fe5721",
       "note": "Syllabus: lecture times, sections, late policy (logistics only)."
+    }
+  ],
+  "refreshedAt": "2026-10-14T17:59:50-07:00",
+  "postMondayMaterials": [
+    {
+      "file": "section/section01.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section01.html",
+      "what": "CSE 331 Section 1 handout, Specifications",
+      "fetchedAt": "2026-10-14T17:59:50-07:00",
+      "bytes": 15653,
+      "sha256": "66d10b259b2712c10c2a7f2f0ac03be43b6cb3e3c28162e7b611cb7533448807"
+    },
+    {
+      "file": "section/section01-solution.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section01-solution.html",
+      "what": "Official Section 1 solutions",
+      "fetchedAt": "2026-10-14T17:59:50-07:00",
+      "bytes": 17909,
+      "sha256": "db24228b844088ef5686cc4e6e4f176b79ff006c54df4b1260b4d16f60c20959"
+    },
+    {
+      "file": "testing/index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture04-testing/",
+      "what": "Testing lecture landing page",
+      "fetchedAt": "2026-10-14T17:59:50-07:00",
+      "bytes": 9353,
+      "sha256": "4f35cb7f6230e0d10a043778dc1e6b0796c9783149617fb0729ef0851144df01"
+    },
+    {
+      "file": "testing/notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture04-testing/notes.html",
+      "what": "Testing lecture notes",
+      "fetchedAt": "2026-10-14T17:59:50-07:00",
+      "bytes": 37754,
+      "sha256": "d226560cd4e4ef1840cfec6c644394b648678e12fa0359f23015698eb3b396db"
+    },
+    {
+      "file": "testing/slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture04-testing/slides.html",
+      "what": "Testing lecture slides",
+      "fetchedAt": "2026-10-14T17:59:50-07:00",
+      "bytes": 43821,
+      "sha256": "a77bb36af5c354cd71e1451377c362890261ec9b7e58af634bc1b49e61c3f379"
+    },
+    {
+      "file": "testing/slides.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture04-testing/slides.pdf",
+      "what": "Testing lecture slides PDF",
+      "fetchedAt": "2026-10-14T17:59:50-07:00",
+      "bytes": 263536,
+      "sha256": "7e78efa16eb397428ccb7e79186ea27ebc4f92614ba7ed5feb713af78b6216bc"
+    },
+    {
+      "file": "coverage/index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture05-coverage/",
+      "what": "CSE 331 Coverage lecture html",
+      "posted": "2026-10-09",
+      "fetchedAt": "2026-10-14T18:00:12-07:00",
+      "bytes": 10604,
+      "sha256": "92884adafb6823b4de94e70b283e19e686a5d5177e075323823c208e090f05da"
+    },
+    {
+      "file": "coverage/notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture05-coverage/notes.html",
+      "what": "CSE 331 Coverage lecture html",
+      "posted": "2026-10-09",
+      "fetchedAt": "2026-10-14T18:00:12-07:00",
+      "bytes": 80529,
+      "sha256": "e1670239f1eaf38bc3f9bbe544907a56801f3fc6b7e8e6bfec5d6a6824aecfb7"
+    },
+    {
+      "file": "coverage/slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture05-coverage/slides.html",
+      "what": "CSE 331 Coverage lecture html",
+      "posted": "2026-10-09",
+      "fetchedAt": "2026-10-14T18:00:12-07:00",
+      "bytes": 69418,
+      "sha256": "d6f1f9836351a2acb440ec6267b8e842ec2cd570100222243e3f9a57c5f3ebce"
+    },
+    {
+      "file": "coverage/slides.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture05-coverage/slides.pdf",
+      "what": "CSE 331 Coverage lecture pdf",
+      "posted": "2026-10-09",
+      "fetchedAt": "2026-10-14T18:00:12-07:00",
+      "bytes": 591724,
+      "sha256": "5272da9b9a49a31e9b51ebe44f836612c3ca90d77c9ea8ed403d4f696af960b7"
     }
   ]
 }

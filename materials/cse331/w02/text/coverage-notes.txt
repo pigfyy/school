@@ -1,0 +1,1005 @@
+CSE 331: Coverage
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          Tests from the specification alone
+How many tests are enough?
+Statement coverage
+Branch coverage
+Loop coverage
+Recursion
+When to stop
+Coverage is not correctness
+The floor
+Test code is code
+Testable by design
+What tests tell us
+Exercises
+Further reading
+
+        CSE 331: Coverage
+
+lecture
+
+Course motto: Your job is to deliver code that you know works.
+
+Tests from the specification alone
+
+Lecture 4 chose every test's input from the specification. Here is
+a specification, and eleven inputs chosen that way:
+
+/**
+ * Decides whether a number is prime.
+ *
+ * @param n the number to decide
+ * @requires 0 < n
+ * @return true if n is prime, and false if it is not
+ */
+static boolean isPrime(int n)
+
+Test 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, and 12. Each has an expected
+answer anyone can work out. The specification describes two cases,
+prime and not prime, and the inputs cover each several times over,
+so this looks like a thorough set. Now read the
+implementation:1
+
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28/** Whether each number below 100 is prime. */
+static final boolean[] SMALL = smallPrimes();
+
+/**
+ * Decides whether a number is prime.
+ *
+ * @param n the number to decide
+ * @requires 0 < n
+ * @return true if n is prime, and false if it is not
+ */
+static boolean isPrime(int n) {
+    if (n < 100) {
+        return SMALL[n];
+    }
+    for (int k = 2; k * k < n; k++) {
+        if (n % k == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+SMALL, declared on line 9, is a table of the answers for every
+number below 100, filled once by a method lower in the file. Every
+one of our eleven inputs is below 100, so every one of our tests
+is the lookup on line 20. The loop never ran. It has a mistake:
+line 22 stops one step early, k * k < n where it should be
+k * k <= n, so a square of a prime passes as prime. Our eleven
+tests pass. The method is wrong. The file's main prints
+isPrime of the number on the command line, and bc is a
+calculator:
+
+$ javac IsPrime.java
+$ java IsPrime 121
+true
+
+$ echo '11 * 11' | bc
+121
+
+Nothing in the specification says to look past 100. The code does.
+
+So the specification is not the only thing to read when choosing
+tests. Today we read the code too. Reading it answers what
+Lecture 4 left open: how many tests are enough, and which ones.
+
+How many tests are enough?
+
+Our eleven tests of isPrime looked like plenty. They were not,
+because they all did the same thing. Each input was below 100, so
+each test ran the if on line 19, took the lookup on line 20, and
+returned. The loop on line 22 never ran. Fifty tests on numbers
+below 100 would be no better. Each would take the same path, and
+the loop would still never run. So the number of tests is not what
+matters. What matters is which parts of the method the tests run.
+
+Testing every input would be different. Lecture 4's first tip was
+to test only the inputs the specification allows. Those are the
+allowed inputs: for isPrime, every n with 0 < n. If the
+tests ran isPrime on every allowed input and all passed, the
+method would be correct, because the specification is a claim
+about every run and we would have checked every run. Lecture 4's
+third tip says to do this when possible. When is it possible? A
+Java int has \(2^{32}\) values. The specification requires
+0 < n, which leaves \(2^{31} - 1\) allowed inputs. A computer can
+run that many. The problem is step 2 of Lecture 4's four steps:
+the expected answer for each test comes from the specification.
+Nobody works out two billion answers by hand. A second program
+could, but then we would have to know that the second program is
+right. And two int arguments make \(2^{64}\) inputs, which would
+take one computer centuries.
+
+Lecture 2's check
+came close to testing every input. It ran four implementations of
+indexOf against five specifications, on every small array: up to
+four elements, each 0, 1, or 2, with every range and every x from
+0 to 3. That is 6,196 calls to each implementation. Within that
+bound, nothing was left out. Outside it, an array can be any
+length and hold any int, and the check tested none of those.
+Exhaustive testing in practice means exhaustive within a bound.
+
+One test is never enough. Suppose isPrime always returned
+true. A test on 7 expects true, and it passes. A single test
+cannot catch a method that always returns the same answer,
+because that answer may be the one the test expects. A second
+test on 8 expects false, and it fails. So every method needs at
+least two tests.2
+
+Between two tests and all of them, the number says nothing more.
+What we ask of a set of tests is which parts of the method it has
+run. The specification cannot answer that, since it does not
+mention the parts. The code can. Lecture 4 chose inputs by reading
+the specification. Today we choose them by reading the code, and
+we measure a set of tests by how much of the code it has run. The
+word for that is coverage. Testers call choosing tests from
+the code clear-box testing, or white-box testing, and
+choosing them from the specification alone black-box testing.
+A method's tests need both. The next three sections give three
+measures of coverage, each catching what the one before it misses.
+
+Statement coverage
+
+Our eleven tests of isPrime ran lines 19 and 20, and no test
+ran the loop on lines 22 to 27. The simplest measure of a set of
+tests asks for exactly what the eleven lacked: that every
+statement in the method ran during some test.
+
+Definition: statement coverage
+
+A set of tests has statement coverage of a method if every
+statement that some allowed input reaches is run by some test.
+
+The box says some allowed input rather than any input because
+of Lecture 4's first tip. A statement that only a disallowed
+input reaches, such as a check that the precondition holds, is
+not a gap in coverage, since no test may call the method that way.
+
+By this measure the eleven tests were not enough. The test to add
+is one whose input reaches the loop, any n of 100 or more. The
+run on 121 above was such a test, and it showed the mistake. The
+measure does not pick 121, though. It asks only that every
+statement run, and three tests do that: 2 runs the lookup, 100
+runs the return false inside the loop, and 101 runs the
+return true after it. Those three are better tests than the
+eleven, since every line of the method has now run. All three
+pass. The mistake is still there.
+
+Now a smaller method, and one test of it:
+
+/**
+ * Picks the smaller of two numbers.
+ *
+ * @param a one number
+ * @param b the other number
+ * @return the smaller of a and b
+ */
+static int min(int a, int b) {
+    int r = a;
+    if (a <= b) {
+        r = a;
+    }
+    return r;
+}
+
+@Test
+void firstIsSmaller() {
+    assertEquals(1, Min.min(1, 2));
+}
+
+Run the test in your head. r becomes 1, the condition is true,
+r becomes 1 again, and the method returns 1. Every statement
+ran, so this one test has statement coverage, and it passes. Is
+the method right? Try min(2, 1). The condition is false, the if
+does nothing, and the method returns 2, the larger number. A
+second test finds the mistake:
+
+@Test
+void secondIsSmaller() {
+    assertEquals(1, Min.min(2, 1));
+}
+
+│     ├─ firstIsSmaller() ✔
+│     └─ secondIsSmaller() ✘ expected: <1> but was: <2>
+
+The first test never ran the if with its condition false.
+Statement coverage never asked for that: the code after an if
+with no else runs either way, so every statement can run while
+the condition is never false. The next measure asks for the false
+case.
+
+Branch coverage
+
+Every if has two branches, the one taken when its condition is
+true and the one taken when it is false. An if with no else
+still has a false branch. That branch is empty.
+
+Definition: branch coverage
+
+A set of tests has branch coverage of a method if every
+branch that some allowed input takes is run by some test.
+
+Branch coverage asks for the test that found the mistake in
+min, the second one. Our two tests have it: the first runs the
+true branch and the second the false one. Now a method with two
+ifs, and two tests of it:
+
+/**
+ * Gives the quadrant of a point that is on neither axis.
+ *
+ *          y
+ *      2   |   1
+ *  --------+-------- x
+ *      3   |   4
+ *
+ * @param x the point's x coordinate
+ * @param y the point's y coordinate
+ * @requires x != 0 and y != 0
+ * @return 1 if x > 0 and y > 0,
+ *         2 if x < 0 and y > 0,
+ *         3 if x < 0 and y < 0, and
+ *         4 if x > 0 and y < 0
+ */
+static int quadrant(int x, int y) {
+    int q = 1;
+    if (x < 0) {
+        q = 2;
+    }
+    if (y < 0) {
+        q = q + 1;
+    }
+    return q;
+}
+
+@Test
+void upperRight() {
+    assertEquals(1, Quadrant.quadrant(1, 1));
+}
+
+@Test
+void lowerLeft() {
+    assertEquals(3, Quadrant.quadrant(-1, -1));
+}
+
+On (1, 1) both conditions are false, and on (-1, -1) both are
+true. So the two tests run both branches of both ifs: they have
+branch coverage, and both pass. Is the method right? Try (1, -1).
+The first condition is false, the second is true, and q becomes
+2 where the specification promises 4. A third test, on that
+input, finds the mistake:
+
+@Test
+void lowerRight() {
+    assertEquals(4, Quadrant.quadrant(1, -1));
+}
+
+│     ├─ upperRight() ✔
+│     ├─ lowerLeft() ✔
+│     └─ lowerRight() ✘ expected: <4> but was: <2>
+
+The two passing tests ran every branch, but never this combination
+of branches. A path through the method is one such
+combination, and quadrant has four of them. Asking for every
+path would have found the mistake. We do not ask for it, because
+paths multiply: a method with ten ifs in a row has \(2^{10}\)
+paths, over a thousand, and a loop adds a path for every number
+of times its body can run. The next section adds one more
+measure, for loops, which branches do not measure.
+
+Loop coverage
+
+Here is Lecture 4's indexOf again, with specification D and
+implementation 1, and its four tests, from the file
+IndexOfTest:
+
+/**
+ * Searches for a value in part of an array.
+ *
+ * @param a the array to search; must be non-null
+ * @param lo the index where the range to search begins
+ * @param hi the index just past where the range to search ends
+ * @param x the value to search for
+ * @requires 0 <= lo <= hi <= a.length
+ * @return some index i with lo <= i < hi and a[i] == x,
+ *     or -1 if there is none
+ */
+static int indexOf(int[] a, int lo, int hi, int x) {
+    for (int i = lo; i < hi; i++) {
+        if (a[i] == x) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+@Test
+void findsTheOnlyMatch() {
+    int[] a = {3, 0, 7};
+    assertEquals(2, IndexOf.indexOf(a, 0, 3, 7));
+}
+
+@Test
+void returnsMinusOneWhenAbsent() {
+    int[] a = {3, 0, 7};
+    assertEquals(-1, IndexOf.indexOf(a, 0, 3, 42));
+}
+
+@Test
+void findsTheFirstMatch() {
+    int[] a = {5, 1, 5, 2, 5};
+    assertEquals(0, IndexOf.indexOf(a, 0, 5, 5));
+}
+
+@Test
+void findsSomeMatch() {
+    int[] a = {5, 1, 5, 2, 5};
+    int i = IndexOf.indexOf(a, 0, 5, 5);
+    assertTrue(0 <= i && i < 5 && a[i] == 5);
+}
+
+Measure the four tests. findsTheOnlyMatch returns from inside
+the loop. returnsMinusOneWhenAbsent returns after it. Between
+the two, every statement runs, and the if takes both branches.
+So the four tests have statement coverage and branch coverage.
+Neither measure asks how many times the loop's body ran.
+
+Count how many times the body runs in each test, by running each
+test in your head:
+
+findsTheOnlyMatch: lo is 0 and hi is 3, so i takes
+  0, 1, and 2. The body runs three times, and the third run
+  returns 2.
+
+returnsMinusOneWhenAbsent: the same range, with no 42 in
+  it. The body runs three times, and the method returns -1 after
+  the loop.
+
+findsTheFirstMatch and findsSomeMatch: one input between
+  them, with 5 at index 0. The body runs once, and that run
+  returns 0.
+
+No test runs the body zero times. The input that does is an empty
+range, with lo == hi. On {3, 0, 7} with lo and hi both 1,
+i starts at 1, the condition i < hi is false at once, and the
+method returns -1 without running the body. Lecture 4's
+exercise 1 listed that input. IndexOfTest left it out.
+
+The third measure asks for that test:
+
+Definition: loop coverage
+
+A set of tests has loop coverage of a method if, for every
+loop in it, some test runs the loop's body zero times, some
+test runs it once, and some test runs it more than once.
+
+Why those three counts? Zero times, because the code after a loop
+has to be right when the loop did nothing, a case that is easy to
+forget. Once, because the body has to be right on its own. More
+than once, because of what a loop carries from one run of its body
+to the next. Here is a method whose loop carries a value, and two
+tests of it:
+
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22/**
+ * Raises a number to a power.
+ *
+ * @param b the base
+ * @param n the exponent
+ * @requires 0 <= n, and b to the n fits in an int
+ * @return b to the n
+ */
+static int pow(int b, int n) {
+    int r = 1;
+    for (int i = 0; i < n; i++) {
+        r = b;
+    }
+    return r;
+}
+
+@Test
+void loopZeroTimes() {
+    assertEquals(1, Pow.pow(2, 0));
+}
+
+@Test
+void loopOnce() {
+    assertEquals(2, Pow.pow(2, 1));
+}
+
+Run both in your head:
+
+loopZeroTimes: n is 0, so the loop does nothing, and the
+  method returns 1, which is right.
+
+loopOnce: n is 1, so the body runs once, r becomes b,
+  and the method returns b, right again.
+
+Between the two, every statement ran, and the loop's condition
+was both true and false. So the two tests have statement coverage
+and branch coverage, and both pass. Is the method right? Try
+pow(2, 3).
+
+Line 19 should read r = r * b;. It reads r = b;, the kind of
+slip a hurried edit leaves behind. The first run of the body
+leaves r holding b, which is right. The second run should
+multiply that by b, and instead sets r to b again. So on
+pow(2, 3) the method returns 2 where the specification
+promises 8. A third test finds the mistake:
+
+@Test
+void loopManyTimes() {
+    assertEquals(8, Pow.pow(2, 3));
+}
+
+│     ├─ loopOnce() ✔
+│     ├─ loopZeroTimes() ✔
+│     └─ loopManyTimes() ✘ expected: <8> but was: <2>
+
+JUnit lists the tests in its own order, not the file's. A value
+written in one run of the body and read in the next is checked
+only by a test that runs the body at least twice. That is what
+"more than once" is for.
+
+Recursion
+
+A method that calls itself carries values the same way, through
+the arguments of each call and the result each call returns, so
+the same rule applies, counting calls instead of runs of a loop
+body. For every recursive method, some test makes zero recursive
+calls, some test makes one, and some test makes more than
+one.2 Here is pow again, by recursion, and two tests of
+it, on the same inputs:
+
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38/**
+ * Raises a number to a power, by recursion.
+ *
+ * @param b the base
+ * @param n the exponent
+ * @requires 0 <= n, and b to the n fits in an int
+ * @return b to the n
+ */
+static int powRec(int b, int n) {
+    if (n == 0) {
+        return 1;
+    }
+    powRec(b, n - 1);
+    return b;
+}
+
+@Test
+void zeroCalls() {
+    assertEquals(1, Pow.powRec(2, 0));
+}
+
+@Test
+void oneCall() {
+    assertEquals(2, Pow.powRec(2, 1));
+}
+
+Run both in your head:
+
+zeroCalls: n is 0, so the method returns 1 without calling
+  itself, which is right.
+
+oneCall: n is 1, so the method calls itself once, with 0.
+  That call returns 1, and the method returns b, right again.
+
+Again the two tests have statement coverage and branch coverage,
+and both pass. Is the method right? Try powRec(2, 3).
+
+Lines 36 and 37 should be one line, return b * powRec(b, n - 1);.
+They make the call and throw away what it returns, so whenever n
+is at least 1 the method returns b. On powRec(2, 3) the method
+calls itself three times and returns 2 where the specification
+promises 8. A third test finds the mistake:
+
+@Test
+void manyCalls() {
+    assertEquals(8, Pow.powRec(2, 3));
+}
+
+│     ├─ oneCall() ✔
+│     ├─ zeroCalls() ✔
+│     └─ manyCalls() ✘ expected: <8> but was: <2>
+
+With one recursive call, the call returns 1, and b times 1 is
+b, so throwing the result away changes nothing. The result can
+differ from 1 only when that call calls the method again, so only
+a test that makes at least two calls finds the mistake.
+
+When to stop
+
+A method's tests are enough when there are at least two of them
+and, between them, they have run all that an allowed input can
+reach:2
+
+every statement;
+
+both branches of every if;
+
+every loop's body zero times, once, and more than once;
+
+every method that calls itself, with zero, one, and more than
+  one recursive call.
+
+Until the list is complete, it says which test to write next: one
+that runs an item on the list that no test has run yet. When the
+list is complete, you may stop. That is how many tests are
+enough, and which ones.
+
+Three things about the list:
+
+Only allowed inputs count. Lecture 4's first tip says that
+  tests never call a method on an input its specification
+  forbids. So a statement or branch that only such an input
+  reaches is not on the list. The usual case is a check that the
+  precondition holds. No test runs it, and the list does not ask
+  for it.
+
+The measures nest. The tests that give a method loop
+  coverage usually give it branch coverage too, and the tests
+  that give it branch coverage give it statement coverage. So in
+  practice you plan for loops and branches, and statements come
+  free.
+
+The measures are in wide use. Tools that measure coverage
+  report statement and branch coverage on whole programs. Loop
+  coverage you count yourself, as we did for IndexOfTest.
+  Homework in this course holds a method's tests to the whole list.
+
+The list says when you may stop writing tests. It does not say
+the method is correct. The next section shows tests that complete
+the list and still miss a mistake.
+
+Coverage is not correctness
+
+The list asked for the tests that found the mistakes in min,
+pow, and powRec. That is what the list is for. It is not a
+promise that tests which complete it find every mistake.
+quadrant already showed that: its two tests completed the list
+and passed, and only a third test, which the list did not ask
+for, found the mistake. isPrime shows it again. Add two inputs
+to our eleven: 100 and 10,007, which is prime. Here is what the
+method returns on each, and how many times the loop's body runs:
+
+isPrime(100): returns false, loop runs 1
+isPrime(10007): returns true, loop runs 99
+
+On 100 the loop's body runs once, finds the divisor 2, and
+returns false. On 10,007 it runs 99 times and returns true. No
+allowed input runs it zero times. Every n that reaches the loop
+is at least 100, and 2 times 2 is less than that, so the body
+runs at least once. The zero case is unreachable, like a
+statement no allowed input reaches, and the list does not ask
+for it. With these two inputs the set has loop coverage, branch
+coverage, and statement coverage, and every test passes. The
+mistake is still there. It shows only on a square of a prime at
+least 11, where the loop stops one step short of the one divisor
+that matters.
+
+What would have found it is a boundary, in Lecture 4's sense, but
+read off the code rather than the specification. The condition
+k * k < n divides inputs into two kinds at the point where
+k * k == n, so a test should sit right on that line: a perfect
+square. The list does not ask for this test. A careful tester
+writes it anyway.3
+
+Every mistake so far was in code on the page: a line that reads
+wrong. A mistake can also be code that is missing. When a
+specification describes three cases and the method handles
+two, the third has no statement, branch, or loop to run, so the
+list asks for no test of it. Tests that complete the list pass,
+and the third case is never tried. Reading the code finds nothing
+that the code left out. The test for a missing case comes from
+reading the specification, case by case, as Lecture 4 did.
+Marick, in the further reading, calls a mistake of this kind a
+fault of omission.
+
+Some mistakes lie outside what the list names at all. The
+Therac-25, the radiation therapy machine in Reading 1's extra,
+gave six patients massive overdoses in the 1980s. One of its
+mistakes showed only when the operator edited the prescription
+within the eight seconds the machine took to set its magnets.
+The task that read the prescription had already finished, and
+the task that set the magnets never noticed the edit. The beam
+the patient received was far stronger than any prescription
+allowed.4 No statement, branch, or loop was wrong on its
+own. The mistake was in the timing of two tasks that ran at
+once, which the list never mentions. A test finds it only by
+typing fast enough, often enough, to land inside those eight
+seconds.
+
+So coverage tells you when you may stop writing tests. It does
+not tell you the code is correct. Lecture 1 said why: testing can
+refute a claim about every run and never confirm it. The one
+exception is testing every allowed input, which is rarely
+possible. A set of tests that completes the list and passes is a
+good reason to believe the code works. It is not knowledge.
+Lecture 4 named two other ways to know. A tool confirms one claim
+about every run, the claim it was built to check. Reasoning, which
+the lectures after Monday's take up, confirms a claim about every
+run when the argument is right.
+
+The floor
+
+The list says when you may stop. It does not say that you must.
+Above the list, how much more to test depends on what a mistake
+would cost. A mistake in a program that steers a car costs more
+than a mistake in a program that counts words, so the steering
+program's tests go further: every path through a method, and
+every boundary read off the code, the tests that quadrant and
+isPrime needed. How far to go is an engineering judgment, and
+you will make it on every program you write.
+
+Below the list there is no judgment to make. The list, together
+with the cases and boundaries Lecture 4 read off the
+specification, is the least testing that any code you deliver
+gets, whatever the code does and whatever the deadline. That
+least is the floor. The motto says whose job it is. Code tested
+less than the floor is not code you know works. Delivering it
+anyway is not a trade-off an engineer may make. It is a failure
+of due diligence.
+
+Two mistakes from 2014 show what skipping the floor costs. The
+code in Apple's iOS and OS X that checks a secure connection's
+signature carried the line goto fail; twice in a row, pasted
+once too often.5 The second copy sat under no if,
+whatever its indentation said, so every run jumped to the exit
+with the error code still reporting success, and the signature
+check below it never ran, on any input. Statement coverage would
+have shown that: no test ran the lines after the stray goto,
+and no test could have. The same year, Heartbleed, a mistake in
+OpenSSL, a library many web servers use to secure their
+connections, let anyone on the internet read up to 64 kilobytes
+of a server's memory per request, passwords and private keys
+included. The code that answered a heartbeat request trusted the
+length the request claimed for itself and never checked it
+against the bytes that came: a missing check, the kind of mistake
+the last section named.6 Lecture 4's fourth tip would
+have shown that: a request whose claimed length is larger than
+its payload is a boundary, and one test of it gets back bytes the
+request never sent.
+
+Test code is code
+
+Lecture 2 ran every implementation of indexOf on every small
+array, and reported the result in
+one sentence.
+That check was a program: a loop over every array, every range,
+and every x, calling indexOf and checking the answer against
+each specification. That loop could have been wrong. A loop that
+skipped the empty range, or an answer-checker that was itself
+mistaken, would have reported success and meant nothing. A test
+is code, and code can be wrong.
+
+So keep your tests simple. A test that is one call and one
+assertEquals, like the tests of min, quadrant, and pow,
+can be read and checked by eye. A test with a loop in it needs
+its own tests, and then those need reading. When you find
+yourself writing a clever test, write two plain ones instead.
+
+Testable by design
+
+Some methods are hard to unit test. The cure is in how you write
+the method, not the test. A method is hard to unit test when:
+
+it is large, or does several jobs at once, so that its inputs
+  must be chosen to steer every job together;
+
+it reads or writes something outside its arguments and its
+  return value, such as a file, the keyboard, or the screen, so a
+  test has to set that up and inspect it afterward.
+
+Lecture 2's Sum showed the cure. Lecture 1's Sum did
+everything in main: read the numbers, added them, and printed
+the result.
+Lecture 2
+split it into readList and sumList. sumList takes a list
+and returns a number, so a test of it is one call and one
+assertEquals, with no keyboard and no screen in the way.
+readList still reads the keyboard, so testing it takes more
+setup. But the arithmetic is no longer behind the keyboard: the
+split moved it into a method a test can call on its own.
+Lecture 2 made that split so that a program can be understood
+one method at a time. The same split makes it testable.
+
+What tests tell us
+
+A test confirms a claim about its own run. Coverage says how many
+such runs a method's tests must include, and which: enough to
+complete the list in When to stop. Those tests come from
+reading the code. The expected answers still come from the
+specification, as Lecture 4 insisted. A method with such tests,
+all passing, has been tested enough. That is still less than
+knowing that it is correct. Reading the code further, to the
+values each variable can take at each line, leads past testing to
+reasoning about every run at once. Monday's lecture turns to what
+a program should do when its input is wrong, and the lectures
+after it to that reasoning.
+
+Exercises
+
+Each answer is folded under its question. Write yours first.
+
+1. Lecture 2's count calls indexOf to count how many times
+x occurs in an array. Here it is with a specification. indexOf
+lives in the class IndexOf, so count calls it as
+IndexOf.indexOf, as Lecture 4's tests did:
+
+/**
+ * Counts how many times a value occurs in an array.
+ *
+ * @param a the array to search; must be non-null
+ * @param x the value to count
+ * @return the number of indices i with a[i] == x
+ */
+static int count(int[] a, int x) {
+    int c = 0;
+    int i = IndexOf.indexOf(a, 0, a.length, x);
+    while (i != -1) {
+        c++;
+        i = IndexOf.indexOf(a, i + 1, a.length, x);
+    }
+    return c;
+}
+
+The indexOf it calls is the one Loop coverage showed,
+specification D with Lecture 2's implementation 1:
+
+/**
+ * Searches for a value in part of an array.
+ *
+ * @param a the array to search; must be non-null
+ * @param lo the index where the range to search begins
+ * @param hi the index just past where the range to search ends
+ * @param x the value to search for
+ * @requires 0 <= lo <= hi <= a.length
+ * @return some index i with lo <= i < hi and a[i] == x,
+ *     or -1 if there is none
+ */
+static int indexOf(int[] a, int lo, int hi, int x) {
+    for (int i = lo; i < hi; i++) {
+        if (a[i] == x) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+Choose inputs for tests of count that complete the list in
+When to stop, and give each test's expected answer.
+
+Answer
+
+One set. Each row is one input, the answer the
+  specification promises, and how many times the loop's body
+  runs:
+
+a
+x
+expected
+loop runs
+
+{3, 0, 7}
+42
+0
+0
+
+{3, 0, 7}
+7
+1
+1
+
+{5, 1, 5, 2, 5}
+5
+3
+3
+
+{}
+3
+0
+0
+
+The rest follows. Four tests is at least two. The test
+  that runs the body once runs every statement: the two before
+  the loop, the two in its body, and the return after it. The
+  method has no if. Its only branch is the while condition,
+  true before each run of the body and false when the loop
+  ends. So branch coverage comes with loop coverage.
+
+Lecture 4's second tip at work. The tests assume indexOf
+  satisfies its specification; they do not check it. With
+  implementation 1 underneath, all four pass.
+
+And a reminder. Lecture 2 showed count is wrong against
+  specification D, since an implementation of D may return a
+  later match and skip earlier ones. These tests complete the
+  list and pass. Coverage is not correctness.
+
+2. On which allowed inputs does isPrime return the wrong
+answer? Why not on 100 or on 101?
+
+Answer
+
+Squares of primes from 11 up. On 121, the loop runs k from
+  2 to 10, since the condition stops k at k * k < 121. No k in
+  that range divides 121, so the method returns true. The same
+  holds for 169, 289, and every square of a prime at least 11.
+  Below 100 the table answers, and it was built with the right
+  condition.
+
+100 and 101. 100 is even, so k = 2 divides it on the loop's
+  first run, before the stopping condition matters. 101 is prime,
+  so returning true is right. The mistake bites only when n's
+  smallest divisor is its square root, that is, when n is the
+  square of a prime.
+
+3. Lecture 2's implementation 2 of indexOf is implementation
+1 with throw new NoSuchElementException() in place of
+return -1. Under specification A, whose precondition promises
+that x occurs in the range, which of its statements can tests
+reach?
+
+Answer
+
+Every statement but the throw. A's precondition promises a
+  match, so every allowed input returns from inside the loop. The
+  throw runs only on an input that breaks the precondition,
+  which Lecture 4's first tip keeps out of the tests.
+
+So statement coverage is complete without it. Statement
+  coverage asks for every statement some allowed input reaches,
+  and no allowed input reaches that one. Under B, C, or D, where
+  x may be absent, the same statement is reachable and a test must
+  run it.
+
+Further reading
+
+The course's testing tips. James Wilcox and Kevin Zatloukal,
+  "Testing" (2025). The second list is the list in
+  When to stop; the heuristics at the end are the practices
+  beyond it.
+
+Testing systematically. Brian Kernighan and Rob Pike,
+  The Practice of Programming (1999), section 6.2, whose last
+  rule is to measure test coverage, and section 6.1 on boundary
+  conditions, which this lecture read off the code.
+
+Coverage misused. Brian Marick, "How to Misuse Code
+  Coverage" (1997). A missed line is a clue that the tests
+  near it were designed weakly. Writing the one test that runs it
+  satisfies the tool and leaves the weakness. A suite written to
+  reach a coverage number is weak in the way coverage cannot
+  report: it misses the cases the code never handles. The first
+  seven pages carry the argument (cached: PDF).
+
+Tests the machine chooses. Koen Claessen and John Hughes,
+  "QuickCheck: A Lightweight Tool for Random Testing of Haskell
+  Programs" (ICFP, 2000). State what every answer must satisfy,
+  as findsSomeMatch did, and let the machine choose the inputs,
+  thousands of them. The practice is called property-based
+  testing.
+
+Testing the tests. Richard DeMillo, Richard Lipton, and
+  Fred Sayward, "Hints on Test Data Selection: Help for the
+  Practicing Programmer" (Computer, 1978). Change the program a
+  little, many times over, and ask whether the tests notice each
+  change. A change no test notices marks a weak spot in the tests,
+  as a missed line does for coverage. The practice is called
+  mutation testing.
+
+The isPrime example is Kevin Zatloukal's, and min
+and quadrant are James Wilcox's, from past offerings of this
+course. ↩
+
+James Wilcox and Kevin Zatloukal, "Testing"
+(2025), the one-page note Lecture 4 cited. Its first three
+items were Lecture 4's tips; its second list is the list in
+When to stop. ↩↩↩
+
+The "Testing" note lists this and other
+practices it recommends but does not require: a boundary test
+on each side of every comparison, two values for every
+argument, a test for each side of an || or &&. ↩
+
+Nancy Leveson and Clark Turner, "An Investigation of
+the Therac-25 Accidents" (Computer, 1993), the extra on
+Reading 1's page, which
+carries a content note: the paper describes the patients'
+injuries and deaths. The eight seconds and the two tasks are
+in its account of the software error found after the Tyler
+accidents. ↩
+
+Adam Langley, "Apple's SSL/TLS bug"
+(2014), shows the lines from Apple's published source and
+traces what the second goto skips. Apple's note on
+the fix, iOS 7.0.6, says only that "Secure Transport failed
+to validate the authenticity of the connection"
+(CVE-2014-1266). ↩
+
+The OpenSSL Security Advisory of
+April 7, 2014 (CVE-2014-0160): "A missing bounds check in the
+handling of the TLS heartbeat extension can be used to reveal
+up to 64k of memory to a connected client or server." The
+mistake had shipped in OpenSSL 1.0.1 in March 2012. Neel
+Mehta of Google and a team at Codenomicon found it, and
+Codenomicon's page, heartbleed.com, named it. ↩
+
+    UW Site Use Agreement

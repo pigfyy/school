@@ -1,0 +1,85 @@
+CSE 331: Coverage
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          CSE 331: Coverage
+
+        CSE 331: Coverage
+
+Lecture 4 chose every test's input from the specification. This
+lecture opens on a method with eleven tests chosen that way. All
+pass, and the method is wrong, since no input among them reaches
+the loop that holds the mistake. The specification, then, is not
+the only thing to read when choosing tests. Reading the code
+answers what Lecture 4 left open: how many tests are enough, and
+which ones. Testing every input is out of reach in general. One
+test, on the other hand, is never enough, since a method that
+returns the same value on every input passes any single test
+expecting that value. So every method needs at least two tests.
+
+Beyond the count, what matters is which parts of the method the
+tests have run. The word for that is coverage. Choosing tests
+from the code is clear-box testing, and choosing them from
+the specification alone is black-box testing. A method's
+tests need both. A set of tests has statement coverage of a
+method if every statement that some allowed input reaches is run
+by some test. It has branch coverage if every branch that
+some allowed input takes is run by some test. It has
+loop coverage if, for every loop, some test runs the body
+zero times, some test once, and some test more than once. A
+recursive method is tested the same way, counting its recursive
+calls.
+
+A method's tests are enough when there are at least two and,
+between them, they have statement, branch, and loop coverage.
+Until then, those measures say which test to write next. Homework
+in this course holds a method's tests to all of them. Tests can
+have all of them and pass while the method is still wrong, since
+a mistake may hide in a combination of branches, at a boundary
+read off the code, or in code that was never written. Above the
+list, how far to test depends on what a mistake would cost. Below
+it there is no decision: the list, with Lecture 4's cases and
+boundaries, is the least testing any code you deliver gets, the
+floor, and two mistakes from 2014, Apple's goto fail and
+OpenSSL's Heartbleed, show what skipping it costs. The Therac-25's
+mistake, in the timing of two tasks, lay outside what the list
+names at all. Testing can refute a claim about every run and
+never confirm it. Tests are code too, so keep each one simple.
+And write methods that are easy to test: one job each, with
+nothing read or written outside the arguments and the return
+value. In the next lecture, we will discuss what a program should
+do when its input is wrong.
+
+Notes
+
+Slides
+
+Slides (PDF)
+
+    UW Site Use Agreement

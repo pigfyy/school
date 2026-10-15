@@ -8,14 +8,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>CSE 331: Not Yet Available</title>
+    <title>CSE 331: Section 1 — Specifications</title>
 
     <link rel="icon" href="/courses/cse331/26au/site/img/favicon-32.png" type="image/png" sizes="32x32">
 
     <link rel="stylesheet" href="/courses/cse331/26au/site/css/fonts.css">
 
     
-    
+<link rel="stylesheet" href="/courses/cse331/26au/site/css/worksheet.css">
+
 
     <script>
       var basePath = "/courses/cse331/26au";
@@ -165,12 +166,241 @@
                `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
           <nav id="toc" aria-label="Table of Contents" data-spy="affix" data-toggle="toc">
             <h2 class="hidden-md hidden-lg" id="contents-label" data-toc-skip>Contents</h2>
-          <ul class="nav"><li><a href="#cse-331-not-yet-available">CSE 331: Not Yet Available</a></li></ul></nav>
+          <ul class="nav"><li><a href="#task-1">Task 1</a></li><li><a href="#task-2">Task 2</a></li></ul></nav>
         </div>
         <main class="col-md-9" id="main-content">
-        <h1 id="cse-331-not-yet-available">CSE 331: Not Yet Available</h1>
+        <h1>CSE 331: Section 1 — Specifications</h1>
         
-<p>This content is not yet available. Please check back later.</p>
+<h2 id="task-1">Task 1</h2>
+<p>Recall this example from lecture:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/**</span>
+<span class="cm"> * Searches for an element in a range of indices.</span>
+<span class="cm"> * @param a the array to search, must be non-null</span>
+<span class="cm"> * @param lo the (inclusive) low end of the range to search</span>
+<span class="cm"> * @param hi the (exclusive) high end of the range to search</span>
+<span class="cm"> * @param x the value to search for</span>
+<span class="cm"> * ... more tags given below ...</span>
+<span class="cm"> */</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">indexOf</span><span class="p">(</span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">lo</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">hi</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+</code></pre></div>
+<p>and these possible ways to complete this spec:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Spec A</span>
+<span class="c1">// @requires 0 &lt;= lo &lt;= hi &lt;= a.length and x occurs in a[lo..hi]</span>
+<span class="c1">// @return an index i such that lo &lt;= i &lt; hi and a[i] == x</span>
+
+<span class="c1">// Spec B</span>
+<span class="c1">// @requires 0 &lt;= lo &lt;= hi &lt;= a.length</span>
+<span class="c1">// @return the *smallest* index i with lo &lt;= i &lt; hi and a[i] == x,</span>
+<span class="c1">//          or -1 if no such index exists</span>
+
+<span class="c1">// Spec C</span>
+<span class="c1">// @requires 0 &lt;= lo &lt;= hi &lt;= a.length</span>
+<span class="c1">// @return the *largest* index i with lo &lt;= i &lt; hi and a[i] == x,</span>
+<span class="c1">//          or -1 if no such index exists</span>
+
+
+<span class="c1">// Spec D</span>
+<span class="c1">// @requires 0 &lt;= lo &lt;= hi &lt;= a.length</span>
+<span class="c1">// @return *some* index i with lo &lt;= i &lt; hi and a[i] == x,</span>
+<span class="c1">//          or -1 if no such index exists</span>
+
+<span class="c1">// Spec E</span>
+<span class="c1">// @requires 0 &lt;= lo &lt;= hi &lt;= a.length</span>
+<span class="c1">// @return the smallest index i with lo &lt;= i &lt; hi and a[i] == x</span>
+<span class="c1">// @throws NoSuchElementException if no such index exists</span>
+</code></pre></div>
+<p>Compare these 5 specs for strength by filling in the following table. Write an
+"S" if the spec on left (the row) is stronger than the spec on top (the column),
+a "W" if the left spec is weaker, and "---" if the specs are incomparable.</p>
+<div class="spec-table">
+<table>
+<thead>
+<tr>
+<th><span class="sr-only">Spec</span></th>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+<th>D</th>
+<th>E</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A</strong></td>
+<td>X</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td></td>
+<td>X</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>C</strong></td>
+<td></td>
+<td></td>
+<td>X</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>D</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td>X</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>E</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>X</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="task-2">Task 2</h2>
+<p>Here we look at a few different specifications for a method with this signature:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/**</span>
+<span class="cm"> * Removes x from the prefix a[0..n] (but see below for details)</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param a the non-null array to remove from</span>
+<span class="cm"> * @param n the length of the prefix</span>
+<span class="cm"> * @param x the value to remove</span>
+<span class="cm"> * @requires 0 &lt;= n &lt;= a.length</span>
+<span class="cm"> * @modifies a</span>
+<span class="cm"> */</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">removeValue</span><span class="p">(</span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+</code></pre></div>
+<p>We use the notation <code>a[i..j]</code> to refer to the elements of an array <code>a</code> from
+index <code>i</code> (inclusive) to <code>j</code> (exclusive). So <code>a[0..n]</code> is the elements of <code>a</code> at
+indices <code>0</code>, <code>1</code>, ..., <code>n-1</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Spec A</span>
+<span class="c1">// @effects if x does not occur in a[0..n], leaves a unchanged;</span>
+<span class="c1">//   otherwise, if the first occurrence of x in a[0..n] is at index i,</span>
+<span class="c1">//   then the new values in a[0..n-1] will be the old values of a[0..i]</span>
+<span class="c1">//   followed by the old values of a[i+1..n], and the new value of a[n-1]</span>
+<span class="c1">//   is unspecified. </span>
+<span class="c1">// @return n - 1 if x was removed, else n</span>
+
+<span class="c1">// Spec B</span>
+<span class="c1">// @effects if x does not occur in a[0..n], leaves a unchanged;</span>
+<span class="c1">//   otherwise, the new values in a[0..n-1] are a possibly reordered version</span>
+<span class="c1">//   of the old values of a[0..n] with one fewer occurrence of x,</span>
+<span class="c1">//   and the new value of a[n-1] is unspecified</span>
+<span class="c1">// @return n - 1 if x was removed, else n</span>
+
+<span class="c1">// Spec C</span>
+<span class="c1">// @effects if x does not occur in a[0..n], leaves a unchanged;</span>
+<span class="c1">//   otherwise, if x occurs k &gt; 0 times in a[0..n], then remove all k</span>
+<span class="c1">//   occurrences of x, leaving remaining elements in the same relative</span>
+<span class="c1">//   order as before; the new value of elements in a[n-k..n] is unspecified</span>
+<span class="c1">// @return n - k</span>
+
+<span class="c1">// Spec D</span>
+<span class="c1">// @requires a[0..n] contains no duplicates</span>
+<span class="c1">// @effects if x does not occur in a[0..n], leaves a unchanged;</span>
+<span class="c1">//   otherwise, if x occurs in a[0..n] at index i, then the new values</span>
+<span class="c1">//   in a[0..n-1] will be the old values of a[0..i] followed by the</span>
+<span class="c1">//   old values of a[i+1..n], and the new value of a[n-1] is unspecified.</span>
+<span class="c1">// @return n - 1 if x was removed, else n</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>// Impl 1
+int w = 0;
+for (int r = 0; r &lt; n; r++) {
+    if (a[r] != x) {
+        a[w] = a[r];
+        w++;
+    }
+}
+return w;
+
+// Impl 2
+for (int i = 0; i &lt; n; i++) {
+    if (a[i] == x) {
+        for (int k = i; k &lt; n - 1; k++) {
+            a[k] = a[k + 1];
+        }
+        return n - 1;
+    }
+}
+return n;
+
+// Impl 3
+for (int i = n - 1; i &gt;= 0; i--) {
+    if (a[i] == x) {
+        for (int k = i; k &lt; n - 1; k++) {
+            a[k] = a[k + 1];
+        }
+        return n - 1;
+    }
+}
+return n;
+
+// Impl 4
+for (int i = 0; i &lt; n; i++) {
+    if (a[i] == x) {
+        a[i] = a[n - 1];
+        return n - 1;
+    }
+}
+return n;
+</code></pre></div>
+<p>Fill in the following table explaining which implementations satisfy which
+specifications. In each cell, write "yes" or "no" to say whether the
+implementation satisfies the spec.</p>
+<div class="spec-table">
+<table>
+<thead>
+<tr>
+<th><span class="sr-only">Impl</span></th>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+<th>D</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
 
         </main> <!-- col -->
       </div> <!-- row -->

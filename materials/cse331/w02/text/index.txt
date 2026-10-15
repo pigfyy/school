@@ -1,0 +1,65 @@
+CSE 331: Testing
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          CSE 331: Testing
+
+        CSE 331: Testing
+
+Code is correct if it meets its specification. There are three
+ways to gain knowledge that code is correct: testing, tools (such as
+type checkers), and reasoning. This lecture covers testing.
+
+A test runs code on a chosen input and checks the actual behavior
+against the expected behavior. Writing a test takes four steps:
+choose an input, use the spec to figure out the expected behavior,
+run the code, and compare. It is essential to determine the expected
+behavior before running the code and observing the actual behavior.
+A test of one method on its own is a unit test.
+
+Choosing the input is the hardest step. Four tips for choosing
+inputs: test only inputs allowed by the specification, test each
+method separately, test exhaustively when possible, and cover each
+case and each boundary.
+
+A specification-based test checks only behavior that the
+specification promises, so it passes on every correct implementation.
+An implementation-based test also checks behavior the
+specification does not promise, so it can fail on a correct
+implementation if that implementation happens to make different
+choices. No set of tests confirms a claim about every run. In the
+next lecture, we will discuss how many tests are enough.
+
+Notes
+
+Slides
+
+Slides (PDF)
+
+    UW Site Use Agreement

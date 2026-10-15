@@ -1,0 +1,783 @@
+--- slide 1 ---
+CSE 332 Autumn 2026Lecture 4: Priority Queues, pt 1
+Ruth Anderson
+http://www.cs.uw.edu/332
+
+
+1
+
+--- slide 2 ---
+Announcements
+Exercise 0
+Due Friday 10/09/2026
+There are 2 separate Gradescope submissions
+“Meet the staff” activity - Sometime during the first 4 weeks of class.
+Participate in Section, earn a late day (see Ed Board post)
+Exercise 1 Running Time: 
+Due Mon Oct 12
+Entirely in Gradescope. Save your answers outside of Gradescope and confirm that you have answered/uploaded everything that is needed!
+Exercise 2 Heaps: coming end of week, due Fri Oct 16
+2
+
+--- slide 3 ---
+Review: ADT: Queue
+What is it?
+A “First In First Out” (FIFO) collection of items
+What Operations do we need?
+Enqueue
+Add a new item to the queue
+Dequeue
+Remove the “oldest” item from the queue
+Is_empty
+Indicate whether or not there are items still on the queue
+3
+
+--- slide 4 ---
+Scenario
+What is the difference between waiting for service at a pharmacy versus an ER?
+
+Pharmacies usually follow the ruleFirst Come, First Served
+
+Emergency Rooms assign priorities based on each individual's need
+
+
+4
+style.visibilitystyle.visibility
+
+--- slide 5 ---
+Scenario (answer)
+What is the difference between waiting for service at a pharmacy versus an ER?
+
+Pharmacies usually follow the ruleFirst Come, First Served
+
+Emergency Rooms assign priorities based on each individual's need
+
+
+Queue
+PriorityQueue
+5
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 6 ---
+ADT: Priority Queue
+What is it?
+A collection of items and their “priorities”
+Allows quick access/removal to the “top priority” thing
+Usually a smaller priority value means the item is “more important”
+What Operations do we need?
+insert(item, priority)
+Add a new item to the PQ with indicated priority
+extract
+Remove and return the “top priority” item from the queue
+Usually the item with the smallest priority value
+IsEmpty
+Indicate whether or not there are items still on the queue
+Note: the “priority” value can be any type/class so long as it’s comparable (i.e. you can use “<“ or “compareTo” with it)
+6
+
+--- slide 7 ---
+A priority queue holds compare-able data
+Unlike stacks and queues need to compare items
+Given x and y, is x less than, equal to, or greater than y
+What this means can depend on your data
+Much of course will require comparable data: e.g. sorting
+Integers are comparable, so will use them in examples
+But the priority queue ADT is much more general
+Typically two fields, the priority and the data
+For simplicity in lecture, we’ll often suppose items are just ints and the int is also the priority
+
+7
+
+--- slide 8 ---
+Priority Queue Example 1
+PriorityQueue PQ = new PriorityQueue();
+PQ.insert(5,5)
+PQ.insert(6,6)
+PQ.insert(1,1)
+PQ.insert(3,3)
+PQ.insert(8,8)
+Print(PQ.extract)
+Print(PQ.extract)
+Print(PQ.extract)
+Print(PQ.extract)
+Print(PQ.extract)
+
+Prints:
+1
+3
+5
+6
+8
+8
+style.visibility
+
+--- slide 9 ---
+Priority Queue Example 2
+PriorityQueue PQ = new PriorityQueue();
+PQ.insert(5,5)
+PQ.insert(6,6)
+PQ.insert(3,3)
+Print(PQ.extract)
+PQ.insert(1,1)
+Print(PQ.extract)
+Print(PQ.extract)
+PQ.insert(8,8)
+Print(PQ.extract)
+Print(PQ.extract)
+
+Prints:
+3
+1
+5
+6
+8
+9
+style.visibility
+
+--- slide 10 ---
+Applications?
+
+10
+
+--- slide 11 ---
+Some Example Applications
+Treat hospital patients in order of severity (or triage)
+Run multiple programs in the operating system
+“critical” before “interactive” before “compute-intensive”
+Maybe let users set priority level
+Forward network packets in order of urgency
+Select most frequent symbols for data compression (see CSE123?)
+Will see an example when we study graphs in a few weeks
+Sort: insert all, then repeatedly extract
+11
+
+--- slide 12 ---
+Thinking through implementations
+{5C22544A-7EE6-4342-B048-85BDC9FD1C3A}Data Structure
+Worst case time to insert
+Worst case time to extract
+Unsorted Array
+
+
+Unsorted Linked List
+
+
+Sorted Array
+
+
+Sorted Linked List
+
+
+Binary Search Tree
+
+
+For simplicity,  Assume we know the maximum size of the PQ in advance (otherwise we’d do an amortized analysis, but get the same answers…)
+12
+
+--- slide 13 ---
+Thinking through implementations (solutions)
+{5C22544A-7EE6-4342-B048-85BDC9FD1C3A}Data Structure
+Worst case time to insert
+Worst case time to extract
+Unsorted Array
+Θ(1)
+Θ(𝑛)
+Unsorted Linked List
+Θ(1)
+Θ(𝑛)
+Sorted Array
+Θ𝑛
+Θ(1)
+Sorted Linked List
+Θ𝑛
+Θ1
+Binary Search Tree
+Θ𝑛
+Θ𝑛
+Binary Heap
+Θlog𝑛
+Θlog𝑛
+{5C22544A-7EE6-4342-B048-85BDC9FD1C3A}Data Structure
+Worst case time to insert
+Worst case time to extract
+Unsorted Array
+
+
+Unsorted Linked List
+
+
+Sorted Array
+
+
+Sorted Linked List
+
+
+Binary Search Tree
+
+
+Binary Heap
+
+
+For simplicity,  Assume we know the maximum size of the PQ in advance (otherwise we’d do an amortized analysis, but get the same answers…)
+13
+
+--- slide 14 ---
+Trees for Heaps
+Binary Trees:
+The branching factor is 2
+Every node has ≤ 2 children
+Complete Tree:
+All “layers” are full, except the bottom
+Bottom layer filled left-to-right
+ 
+1
+3
+2
+4
+7
+5
+6
+5
+9
+14
+
+--- slide 15 ---
+Heap – Priority Queue Data Structure
+Idea: We need to keep some ordering, but it doesn’t need to be entirely sorted
+Θ(log𝑛) worst case for extract and insert
+
+ 
+1
+3
+2
+4
+7
+5
+6
+5
+9
+1
+2
+3
+4
+6
+5
+7
+8
+9
+15
+
+--- slide 16 ---
+How log𝑛 Height?
+ 
+height – number of edges in path from node to deepest descendent
+16
+1
+3
+2
+4
+7
+5
+6
+5
+9
+
+--- slide 17 ---
+Achieving log𝑛 Running Time
+ 
+What is the maximum number of total nodes in a binary tree of height h?
+2h+1−1
+Θ2h
+If I have 𝑛 nodes in a binary tree, what is its minimum height?
+Find the smallest h such that: 𝑛≤2h+1−1
+Solve for h: ⌈log𝑛+1−1⌉=h
+Height is Θlog𝑛
+
+Heap Idea:
+If 𝑛 values are inserted into a complete tree, the height will be roughly log𝑛
+Ensure each insert and extract requires just one “trip” from root to leaf
+ 
+17
+
+--- slide 18 ---
+(Min) Heap Data Structure
+1
+3
+2
+4
+7
+5
+6
+5
+9
+1
+2
+3
+4
+6
+5
+7
+8
+9
+Keep items in a complete binary tree
+Maintain the “(Min) Heap Property” of the tree
+Every node’s priority is ≤ its children’s priority
+Max Heap Property: every node’s priority is ≥ its children
+Where is the min?
+How do I insert?
+How do I extract?
+How to do it in Java?
+ 
+18
+
+--- slide 19 ---
+Heap Insert Example
+1.5
+1
+3
+2
+4
+7
+5
+6
+5
+9
+insert(item, priority){
+    put item in the “next open” spot (keep tree complete)
+    while (priority < parent’s priority){
+        swap item with parent
+    }
+}
+19
+
+--- slide 20 ---
+Heap Insert (New Node)
+1
+3
+2
+4
+7
+5
+6
+5
+9
+1.5
+insert(item, priority){
+    put item in the “next open” spot (keep tree complete)
+    while (priority < parent’s priority){
+        swap item with parent
+    }
+}
+20
+
+--- slide 21 ---
+Heap Insert (1st Percolate)
+1
+3
+2
+4
+1.5
+5
+6
+5
+9
+7
+insert(item, priority){
+    put item in the “next open” spot (keep tree complete)
+    while (priority < parent’s priority){
+        swap item with parent
+    }
+}
+
+Percolate Up
+21
+
+--- slide 22 ---
+Heap Insert (2nd Percolate)
+1
+1.5
+2
+4
+3
+5
+6
+5
+9
+7
+insert(item, priority){
+    put item in the “next open” spot (keep tree complete)
+    while (priority < parent’s priority){
+        swap item with parent
+    }
+}
+
+Percolate Up
+22
+
+--- slide 23 ---
+Heap Insert (Done)
+1
+1.5
+2
+4
+3
+5
+6
+5
+9
+7
+insert(item, priority){
+    put item in the “next open” spot (keep tree complete)
+    while (priority < parent’s priority){
+        swap item with parent
+    }
+}
+23
+
+--- slide 24 ---
+Heap extract Example
+1
+1.5
+2
+4
+3
+5
+6
+5
+9
+7
+extract(){
+    min = root
+    curr = bottom-right item
+    move curr to the root
+    while(curr > curr.left || curr > curr.right){
+        swap curr with its smallest child
+    }
+    return min
+}
+ 
+24
+
+--- slide 25 ---
+Heap extract (Move Node)
+7
+1.5
+2
+4
+3
+5
+6
+5
+9
+7
+extract(){
+    min = root
+    curr = bottom-right item
+    move curr to the root
+    while(curr > curr.left || curr > curr.right){
+        swap curr with its smallest child
+    }
+    return min
+}
+ 
+25
+
+--- slide 26 ---
+Heap extract (1st Percolate)
+1.5
+7
+2
+4
+3
+5
+6
+5
+9
+extract(){
+    min = root
+    curr = bottom-right item
+    move curr to the root
+    while(curr > curr.left || curr > curr.right){
+        swap curr with its smallest child
+    }
+    return min
+}
+ 
+
+Percolate Down
+26
+
+--- slide 27 ---
+Heap extract (2nd Percolate)
+1.5
+3
+2
+4
+7
+5
+6
+5
+9
+extract(){
+    min = root
+    curr = bottom-right item
+    move curr to the root
+    while(curr > curr.left || curr > curr.right){
+        swap curr with its smallest child
+    }
+    return min
+}
+ 
+
+Percolate Down
+27
+
+--- slide 28 ---
+Heap extract (Done)
+1.5
+3
+2
+4
+7
+5
+6
+5
+9
+extract(){
+    min = root
+    curr = bottom-right item
+    move curr to the root
+    while(curr > curr.left || curr > curr.right){
+        swap curr with its smallest child
+    }
+    return min
+}
+ 
+28
+
+--- slide 29 ---
+Percolate Up and Down (for a Min Heap)
+Goal: restore the “Heap Property”
+Percolate Up:
+Take a node that may be smaller than a parent, repeatedly swap with a parent until it is larger than its parent
+Percolate Down:
+Take a node that may be larger than one of its children, repeatedly swap with smallest child until both children are larger
+Worst case running time of each:
+Θlog𝑛
+
+ 
+29
+
+--- slide 30 ---
+Representing a Heap (Questions)
+Every complete binary tree with the same number of nodes uses the same positions and edges
+Use an array to represent the heap
+Index of root: 
+Parent of node 𝑖:
+Left child of node 𝑖:
+Right child of node 𝑖:
+Location of the leaves: 
+ 
+1
+3
+2
+4
+7
+5
+6
+5
+9
+1
+2
+3
+4
+6
+5
+7
+8
+9
+
+1
+3
+2
+4
+7
+5
+6
+5
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+30
+
+--- slide 31 ---
+Representing a Heap (Answers)
+Every complete binary tree with the same number of nodes uses the same positions and edges
+Use an array to represent the heap
+Index of root: 1
+Parent of node 𝑖: 𝑖2
+Left child of node 𝑖: 2𝑖
+Right child of node 𝑖: 2𝑖+1
+Location of the leaves: 𝑛2+1 to 𝑛
+ 
+1
+3
+2
+4
+7
+5
+6
+5
+9
+1
+2
+3
+4
+6
+5
+7
+8
+9
+
+1
+3
+2
+4
+7
+5
+6
+5
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+31
+
+--- slide 32 ---
+Insert Pseudocode
+For simplicity, assume value is the same as priority
+1
+3
+2
+4
+7
+5
+6
+5
+9
+1
+2
+3
+4
+6
+5
+7
+8
+9
+
+1
+3
+2
+4
+7
+5
+6
+5
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+insert(item){
+    if(size == arr.length – 1){resize();}
+    size++;
+    arr[size] = item;
+    percolateUp(size)
+} 
+
+32
+
+--- slide 33 ---
+Percolate Up
+percolateUp(int i){
+    int parent = i/2;  \\ index of parent
+    Item val = arr[i];  \\ value at current location
+    while(i > 1 && arr[i] < arr[parent]){  \\ until location is root or heap property holds
+        arr[i] = arr[parent];  \\ move parent value to this location
+        arr[parent] = val; \\ put current value into parent’s location 
+        i = parent;  \\ make current location the parent
+        parent = i/2;  \\ update new parent
+    }
+}
+33
+
+--- slide 34 ---
+extract Pseudocode
+extract(){
+    theMin = arr[1];
+    arr[1] = arr[size];
+    size--;
+    percolateDown(1);
+    return theMin;
+} 
+
+34
+
+--- slide 35 ---
+Percolate Down
+percolateDown(int i){
+    int left = i*2;  \\ index of left child
+    int right = i*2+1;  \\ index of right child
+    Item val = arr[i];  \\ value at location
+    while(left <= size){  \\ until location is leaf
+        int toSwap = right;
+        if(right > size || arr[left] < arr[right]){  \\ if there is no right child or if left child is smaller
+            toSwap = left;  \\ swap with left
+        } \\ now toSwap has the smaller of left/right, or left if right does not exist
+        if (arr[toSwap] < val){  \\ if the smaller child is less than the current value
+            arr[i] = arr[toSwap];
+            arr[toSwap] = val; \\ swap parent with smaller child
+            i = toSwap; \\ update current node to be smaller child
+            left = i*2;
+            right = i*2+1;
+        }
+        else{ return;} \\ if we don’t swap, then heap property holds
+    }
+}
+35
+
+--- slide 36 ---
+Other Operations
+Update Key
+Increase Key
+Given the index of an item in the PQ, make its priority value larger
+Min Heap: Then percolate down
+Max Heap: Then percolate up
+Decrease Key
+Given the index of an item in the PQ, make its priority value smaller
+Min Heap: Then percolate up
+Max Heap: Then percolate down
+Remove
+Given the item at the given index from the PQ
+36

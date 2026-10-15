@@ -1,0 +1,365 @@
+--- slide 1 ---
+Section 2
+Runtime
+
+--- slide 2 ---
+Big-Oh Review
+Definition:
+If 𝑓:ℕ→ℝ and 𝑔:ℕ→ℝ are two functions, then we say 𝑓𝑛∈𝑂(𝑔𝑛) provided there exists positive constants 𝑐 and 𝑛0 such that 𝑓𝑛≤𝑐⋅𝑔𝑛 for all values of 𝑛≥𝑛0.
+ 
+Main ideas:
+In Big-O, we focus on the growth of the runtime as the input size n goes to infinity.
+Big-O represents an upper bound on the algorithm runtime. Not necessarily tight!
+
+Why is 𝒄 important?
+Ensures that we focus on the shape of the runtime curve’s growth.
+ 
+Why is 𝒏𝟎 important?
+Ensures that we focus on the input size 𝑛 as it goes to infinity by allow us to ignore small values.
+
+--- slide 3 ---
+Big-Omega and Big-Theta
+Definition of Ω:
+
+If 𝑓:ℕ→ℝ and 𝑔:ℕ→ℝ are two functions, then we say 𝑓𝑛∈Ω(𝑔𝑛) provided there exists positive constants 𝑐 and 𝑛0 such that 𝑓𝑛≥𝑐⋅𝑔𝑛 for all values of 𝑛≥𝑛0.
+We also focus on the growth of the runtime as the input size n goes to infinity.
+𝛺 represents a lower bound on the algorithm runtime. Not necessarily tight either.
+
+Definition of Θ:
+
+If 𝑓:ℕ→ℝ and 𝑔:ℕ→ℝ are two functions, then we say 𝑓𝑛∈𝜃(𝑔𝑛) provided that both 𝑓𝑛∈O(𝑔𝑛) and 𝑓𝑛∈Ω(𝑔𝑛). 
+Θ represents a tight/exact bound on the algorithm runtime.
+
+--- slide 4 ---
+Practice Worksheet Question 0
+Suppose that 𝑓𝑛∈𝑂𝑛. Indicate if each statement is guaranteed to be always true, guaranteed to be always false, or is sometimes true (and thus also sometimes false).
+
+𝑓𝑛∈𝑂𝑛2
+𝑓𝑛∈𝑂4𝑛
+𝑓𝑛∈𝑂𝑙𝑜𝑔𝑛
+𝑓𝑛∈𝑂𝑛𝑙𝑜𝑔𝑛
+𝑓𝑛∈𝑂1
+𝑓𝑛∈Ω𝑛
+𝑓𝑛∈Ω𝑙𝑜𝑔𝑛
+𝑓(𝑛)∈Ω(𝑛2)
+
+--- slide 5 ---
+Solutions Worksheet Question 0
+Suppose that 𝑓𝑛∈𝑂𝑛. Indicate if each statement is guaranteed to be always true, guaranteed to be always false, or is sometimes true (and thus also sometimes false).
+
+𝑓𝑛∈𝑂𝑛2
+𝑓𝑛∈𝑂4𝑛
+𝑓𝑛∈𝑂𝑙𝑜𝑔𝑛
+𝑓𝑛∈𝑂𝑛𝑙𝑜𝑔𝑛
+𝑓𝑛∈𝑂1
+𝑓𝑛∈Ω𝑛
+𝑓𝑛∈Ω𝑙𝑜𝑔𝑛
+𝑓(𝑛)∈Ω(𝑛2)
+
+ 
+Always True
+Always True
+Sometimes True
+Always True
+Sometimes True
+Sometimes True
+Sometimes True
+Always False
+
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 6 ---
+Worksheet Question 1
+Prove that 𝑓𝑛∈𝑂(𝑔𝑛)
+
+f(n) = 7n, g(n) = n/10
+f(n) = 1000, g(n) = 3n3
+f(n) = 2n, g(n) = 32n
+f(n) = 7n2 + 3n, g(n) = n4
+f(n) = n + 2nlog(n), g(n) = nlog(n)
+
+--- slide 7 ---
+How to Approach these Problems
+When trying to prove something like 𝑓𝑛∈𝑂(𝑔𝑛)
+or 𝑓𝑛∈Ω(𝑔𝑛)you need to find a 𝑐 and 𝑛0 . 
+The proof, or final solution, for the problem should simply declare the values of c and n0 and should plug them in/explain why they make the inequality true.  
+The proof should not explain how to solve for c and n0- that would be your own work. 
+
+ 
+Show: 10𝑛+100∈𝑂𝑛2.
+Technique: find values 𝑐>0 and 𝑛0>0 such that ∀𝑛≥𝑛0 we have that 10𝑛+100≤𝑐∗𝑛2.
+Proof: Let 𝑐=10 and 𝑛0=6. Show that ∀𝑛≥6, 10𝑛+100≤10𝑛2.
+≡𝑛+10≤𝑛2
+≡10≤𝑛2−𝑛
+≡10≤𝑛(𝑛−1)
+This final expression is true because 𝑛(𝑛−1) is strictly increasing and 66−1>10
+
+--- slide 8 ---
+1a) Prove 𝑓𝑛=7𝑛, 𝑔𝑛=𝑛10    (Scratch Work)
+ 
+We need to find positive constants c and n_0 so that for all 𝑛≥𝑛0 we have that 7𝑛≤𝑐𝑛10
+ 
+7𝑛≤𝑐𝑛10
+70𝑛≤𝑐𝑛
+70≤𝑐
+ 
+This is only ok because we said 𝑛≥𝑛0>0
+ 
+Meaning that this inequality holds for all values 𝑛>0 so long as 𝑐≥70, so we can select 𝑐=70 and 𝑛0=1.
+
+--- slide 9 ---
+1a) Prove 𝑓𝑛=7𝑛, 𝑔𝑛=𝑛10    (Final Solution)
+ 
+Let 𝑐=70 and 𝑛0=1, let 𝑛≥𝑛0 be an arbitrary integer.
+We start with the left-hand-side of the inequality. Observe that
+ 
+7𝑛=70⋅𝑛10=𝑐⋅𝑛10
+ 
+Thus 7𝑛≤𝑐⋅𝑛10 for all 𝑛≥𝑛0.
+We thus have 7𝑛∈𝑂𝑛10, by definition.
+
+--- slide 10 ---
+1b) Prove 𝑓𝑛=1000, 𝑔𝑛=3𝑛2  (Scratch Work)
+ 
+We need to find positive constants 𝑐 and 𝑛0 so that for all 𝑛≥𝑛0 we have that 1000≤𝑐⋅3𝑛2.
+ 
+Here we can select 𝑐=1 and then make sure 𝑛0 is large enough so 1000≤3𝑛2 
+ 
+If we select 𝑛0=20 then 3𝑛2=1200
+Definition of 𝑂 holds for 𝑐=1 and 𝑛0=20.
+
+--- slide 11 ---
+1b) Prove 𝑓𝑛=1000, 𝑔𝑛=3𝑛2  (Final Solution)
+ 
+Let 𝑐=1 and 𝑛0=20. Let let 𝑛≥𝑛0 be an arbitrary integer.
+We start with the right-hand-side of the inequality. 
+
+Observe that 𝑐3𝑛2=3𝑛2 (as c=1).
+
+Further, note that the smallest 𝑛 could be is 20, where we have that 3𝑛2=3⋅202=1200.
+
+When 𝑛>20, we have 3𝑛2>3⋅202≥1200>1000.
+
+Thus, we have 1000≤𝑐⋅3𝑛2, and so 1000∈𝑂3𝑛2.
+
+--- slide 12 ---
+1c) 𝑓𝑛=2𝑛, 𝑔𝑛=32𝑛   (Scratch Work)
+ 
+We need to find positive constants 𝑐 and 𝑛0 so that for all 𝑛≥𝑛0 we have that 2𝑛≤𝑐⋅32𝑛.
+2𝑛≤𝑐⋅32𝑛
+2𝑛≤𝑐⋅9𝑛
+
+If we select 𝑛0=2 and 𝑐=1 then:
+2𝑛≤1⋅9𝑛
+
+Certainly holds true ∀𝑛≥2.
+
+--- slide 13 ---
+1c) Prove 𝑓𝑛=2𝑛, 𝑔𝑛=32𝑛  (Final Solution)
+ 
+Let 𝑐=1 and 𝑛0=2. 
+
+We wish to show ∀𝑛≥𝑛0, we have 2𝑛≤𝑐⋅32𝑛.
+
+Since 𝑐=1, our task is to show 2𝑛≤1⋅32𝑛.
+
+Note that 32𝑛=9𝑛. Since 2<9, we certainly have 2𝑛≤9𝑛 for all 𝑛≥𝑛0. Thus we have 2𝑛≤9𝑛= 32𝑛= 𝑐⋅32𝑛 for all 𝑛≥𝑛0, as required.
+
+Therefore, 2𝑛∈𝑂32𝑛.
+
+--- slide 14 ---
+1d) 𝑓𝑛=7𝑛2+3𝑛,𝑔𝑛=𝑛4  (Scratch Work)
+ 
+We need to find positive constants 𝑐 and 𝑛0 so that for all 𝑛≥𝑛0 we have that 7𝑛2+3𝑛≤𝑐𝑛4
+
+7𝑛2+3𝑛≤𝑐𝑛4                                         7𝑛2+3𝑛≤7𝑛2+3𝑛2≤𝑐𝑛4          As long as 𝑛≥110𝑛2≤𝑐⋅𝑛4                                          
+
+Because 10𝑛2≤𝑐⋅𝑛4 for 𝑐=10 and every 𝑛≥1, we can satisfy 𝑓(𝑛)∈𝑂(𝑔(𝑛)) for 𝑐=10 and 𝑛0=1
+
+--- slide 15 ---
+1d) Prove 𝑓𝑛=7𝑛2+3𝑛,𝑔𝑛=𝑛4 (Final Solution)
+ 
+Let 𝑐=10 and 𝑛0=1, and consider an arbitrary        𝑛≥𝑛0. 
+
+We have 7𝑛2≤7𝑛4 (since 𝑛≥1 ) and 3𝑛≤3𝑛4 (since 𝑛≥1 ). 
+
+Adding these inequalities we have 7𝑛2+3𝑛≤10𝑛4, as required.
+ 
+This approach is “by parts” as we show the runtime for each term separately. Read more on course webpage.
+
+style.visibility
+
+--- slide 16 ---
+1 e) 𝑓(𝑛)=𝑛+2𝑛log2𝑛,𝑔(𝑛)=𝑛log2𝑛 (Scratch Work)
+ 
+We need to find positive constants 𝑐 and 𝑛0 so that for all 𝑛≥𝑛0 we have that 𝑛+2𝑛log2𝑛≤𝑐⋅𝑛log2𝑛:
+
+𝑛+2𝑛log2𝑛≤𝑐⋅𝑛log2𝑛                                            𝑛+2𝑛log2𝑛≤3𝑛log2𝑛≤𝑐⋅𝑛log2𝑛     As long as 𝑛≥2
+
+Because 3𝑛log2𝑛≤𝑐⋅𝑛log2𝑛 for 𝑐=3 and every 𝑛≥1,
+and 𝑛+2𝑛log2𝑛≤3𝑛log2𝑛 for every 𝑛≥2,
+we can satisfy 𝑓(𝑛)∈𝑂(𝑔(𝑛)) for 𝑐=3 and 𝑛0=2
+
+--- slide 17 ---
+1e) Prove 𝑓(𝑛)=𝑛+2𝑛log2𝑛,𝑔(𝑛)=𝑛log2𝑛
+ 
+Let 𝑐=3 and 𝑛0=2. For an arbitrary 𝑛≥𝑛0, we have:
+
+𝑛≤𝑛log𝑛          (since 𝑛≥2,log𝑛≥1)2𝑛log𝑛≤2𝑛log𝑛                                                                
+
+Adding these inequalities, we have 𝑛+2𝑛log𝑛≤𝑐⋅𝑛log𝑛, as required. So we have f(n)∈O(g(n)).
+ 
+This approach is the “squeeze method” as we squeeze another function between f and g. More on course webpage.
+Final Solution
+
+style.visibility
+
+--- slide 18 ---
+Worksheet problem 2. Big-Theta Proofs
+For each of the following, prove that 𝑓𝑛∈Θ𝑔 :
+
+𝑓𝑛=7n,    𝑔(𝑛)=𝑛10
+𝑓𝑛=𝑛3+10𝑛,    𝑔(𝑛)=3𝑛3
+
+--- slide 19 ---
+High Level Approach
+When trying to prove a function f(n)∈Θ(g), you should show that f(n)∈𝑂(𝑔) and 𝑓(𝑛)∈Ω(𝑔).
+The proof, or final solution, for the problem consists of both a big-O and big-Omega proof
+Each sub-proof should simply declare values of c and n0 and plug them in/explain why they make the inequality true.
+The proof should not explain how to solve for c and n0 - that would be your own scratch work.
+
+--- slide 20 ---
+Problem Solving Techniques
+Example: Show that 2𝑛2+5∈Θ4𝑛2.
+
+Technique: Demonstrate that 2𝑛2+5∈𝑂4𝑛2 and 2𝑛2+5∈Ω4𝑛2
+
+Proof:
+First we will show that 2𝑛2+5 belongs to 𝑂4𝑛2:
+Let 𝑐=1 and 𝑛0=3.  We show that ∀𝑛>𝑛0 we have that 2𝑛2+5≤𝑐⋅4𝑛2.
+Start with the left-hand side of the inequality. 2𝑛2+5≤3𝑛2 because 𝑛2>5 whenever 𝑛≥3. Since 3𝑛2≤4𝑛2 we can conclude 2𝑛2+5∈𝑂4𝑛2.
+
+ Next we will show that 2𝑛2+5 belongs to Ω4𝑛2:
+Let 𝑐=12 and 𝑛0=1. We have that 2𝑛2+5≥𝑐⋅4𝑛2. We start with the left-hand side of the inequality. Observe that 2𝑛2+5≥12⋅4𝑛2 for all positive values of 𝑛, therefore 2𝑛2+5∈Ω4𝑛2
+
+ Since, 2𝑛2+5∈𝑂4𝑛2 and 2𝑛2+5∈Ω4𝑛2, it must be that 2𝑛2+5 ∈Θ4𝑛2.
+
+--- slide 21 ---
+𝑓(𝑛)∈𝑂(𝑔(𝑛)) shown in problem 1(a).
+Now we show 𝑓(𝑛)∈Ω(𝑔(𝑛))
+We need to find positive constants 𝑐 and 𝑛0 so that for all 𝑛≥𝑛0 we have that 7𝑛≥𝑐𝑛10
+7𝑛≥𝑐𝑛1070𝑛≥𝑐𝑛70≥𝑐
+
+
+Meaning that this inequality holds for all values of 𝑛>0 so long as 𝑐≤70, so we can select 𝑐=70 and 𝑛0=1.
+
+ 
+2a) 𝑓𝑛=7𝑛,   𝑔𝑛=𝑛10    (Scratch Work)
+
+--- slide 22 ---
+2a) Prove 𝑓𝑛=7𝑛,   𝑔𝑛=𝑛10  (Final Solution)
+ 
+Again, we let 𝑐=70 and 𝑛0=1, let 𝑛≥𝑛0 be an arbitrary integer. We start with the left-hand-side of the inequality. Observe that
+7𝑛=70⋅𝑛10=𝑐⋅𝑛10
+Thus 7n ≥𝑐⋅𝑛10 for all 𝑛≥𝑛0. 
+We thus have 7𝑛∈Ω𝑛10,by definition. Since we have both 𝑂 and Ω bounds, we conclude 7𝑛∈Θ𝑛10.
+
+--- slide 23 ---
+2 b) 𝑓𝑛=𝑛3+10𝑛,𝑔𝑛=3𝑛3.    (Scratch)
+ 
+To show Big-Oh:
+We need to find positive constants 𝑐 and 𝑛0 so that for all 𝑛≥𝑛0 we have that 𝑛3+10𝑛≤𝑐⋅3𝑛3.
+𝑛2+10≤2𝑛2 when 𝑛≥4.
+Therefore 𝑛3+10𝑛≤2𝑛3 since 𝑛 is positive.
+And 2𝑛3≤𝑐⋅3𝑛3 for 𝑐≥23.
+By transitivity: 𝑛3+10𝑛≤𝑐⋅3𝑛3 for 𝑛≥4,𝑐≥23.
+We can select 𝑐=1 and 𝑛0=4.
+
+--- slide 24 ---
+2 b) 𝑓𝑛=𝑛3+10𝑛,𝑔𝑛=3𝑛3.   (Scratch)
+ 
+To show Big-Omega:
+We need to find positive constants 𝑐 and 𝑛0 so that for all 𝑛≥𝑛0 we have that 𝑛3+10𝑛≥𝑐⋅3𝑛3.
+Let’s select 𝑐=13.
+𝑛3+10𝑛≥𝑛3 for all choices of 𝑛.
+Definition of Ω holds for 𝑐=13 and 𝑛0=1.
+
+--- slide 25 ---
+2b) Prove 𝑓𝑛=𝑛3+10𝑛,𝑔𝑛=3𝑛3 (Final Pt. 1)
+ 
+First we will show 𝑛3+10𝑛 belongs to 𝑂3𝑛3.
+Let 𝑐=1 and 𝑛0=4 and let 𝑛≥𝑛0 be an arbitrary integer.
+Observe 10≤𝑛2 for 𝑛≥4. Multiply both sides by 𝑛.
+
+10𝑛≤𝑛3
+Add 𝑛3 to both sides.
+
+𝑛3+10𝑛≤2𝑛3
+
+Thus, we have: 𝑛3+10𝑛≤2𝑛3≤1⋅3𝑛3. So 𝑛3+10𝑛∈𝑂3𝑛3
+
+--- slide 26 ---
+2b) Prove 𝑓𝑛=𝑛3+10𝑛,𝑔𝑛=3𝑛3 (Final Pt. 2)
+ 
+Next, we show 𝑛3+10𝑛∈Ω3𝑛3.
+Consider 𝑐=13 and 𝑛0=1.
+For an arbitrary 𝑛≥𝑛0, we have:
+
+𝑛3+10𝑛≥13⋅3𝑛3+10𝑛≥133𝑛3=𝑐3𝑛3
+
+We thus have 𝑛3+10𝑛∈Ω3𝑛3.
+
+ 
+Since we have matching 𝑂 and Ω bounds, we conclude 𝑛3+10𝑛∈Θ3𝑛3
+ 
+style.visibility
+
+--- slide 27 ---
+Worksheet problems: Q3
+Get the Θ(⋅) bound of each function below.
+𝑓(𝑛)= worst case running time
+𝑔(𝑛)= best case running time
+
+We will construct equations for each function and then simplify them to get a closed form.
+ 
+1  int numUnique(String[] values) {2      boolean[] visited = new boolean[values.length]3      for (int i = 0; i < values.length; i++) {4          visited[i] = false5      }6      int out = 07      for (int i = 0; i < values.length; i++) {8          if (!visited[i]) {9              out += 110             for (int j = i; j < values.length; j++) {11                 if (values[i].equals(values[j])) {12                     visited[j] = true13                 }14             }15         }16     }17     return out;18 }
+
+--- slide 28 ---
+3a) 𝑓(𝑛)= worst case running time
+ 
+First function (lines 3-5) always runs once. 
+
+
+Worst case for lines 7-16 is if every value in array is unique.
+This means for every iteration of the outer loop, the inner loop will iterate through the rest of the array.
+Total number of iterations is 𝑛+(𝑛−1)+(𝑛−2)+…+ 1.
+There is a formula for this sum: n(n+1)/2 	f(n)=n+n(n+1)/2=>n2. 
+This is quadratic running time
+
+Now, we do something similar to Q2 proofs to prove that n+n(n+1)/2∈Θn2.
+ 
+1  int numUnique(String[] values) {2      boolean[] visited = new boolean[values.length]3      for (int i = 0; i < values.length; i++) {4          visited[i] = false5      }6      int out = 07      for (int i = 0; i < values.length; i++) {8          if (!visited[i]) {9              out += 110             for (int j = i; j < values.length; j++) {11                 if (values[i].equals(values[j])) {12                     visited[j] = true13                 }14             }15         }16     }17     return out;18 }
+
+--- slide 29 ---
+3b) 𝑔(𝑛)= best case running time
+ 
+First function (lines 3-5) always runs once. 
+
+Best case for lines 7-16 is if every value in array is the same.
+This means the inner loop will only run once: for the first iteration of the outer loop.
+Then, it will not run because every index will be visited after the first time.
+𝑔(𝑛)=𝑛+𝑛=>𝑛
+ 
+1  int numUnique(String[] values) {2      boolean[] visited = new boolean[values.length]3      for (int i = 0; i < values.length; i++) {4          visited[i] = false5      }6      int out = 07      for (int i = 0; i < values.length; i++) {8          if (!visited[i]) {9              out += 110             for (int j = i; j < values.length; j++) {11                 if (values[i].equals(values[j])) {12                     visited[j] = true13                 }14             }15         }16     }17     return out;18 }
+
+--- slide 30 ---
+Heaps!
+Review material on Heaps can be found on the course website under Home Page  Summaries
+Review of the ADT and its uses
+Associated methods
+Building Heaps efficiently
+Please come to office hours and ask questions on the Ed Board
+Additionally, find this video review for more contents on Heaps from the course Panopto
+
+--- slide 31 ---
+Thanks!

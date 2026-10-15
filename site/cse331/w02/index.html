@@ -3,8 +3,8 @@
   CSE 331 (Autumn 2026) · Week 2 teaching site (Mon Oct 5 to Fri Oct 9), built with the course-teaching-site skill.
   Sources (raw copies, URLs, fetch times and hashes in materials/cse331/w02/sources.json): Lecture 3 notes, slides (HTML and PDF)
   and index ("Reading 1 discussion; Batch processing", Mon Oct 5), Reading 1 and the readings page, the calendar,
-  Homework 1 (due date only). Section 1 (Tue Oct 6) and the Testing lecture notes were "Not Yet Available" on Oct 5;
-  they appear only as upcoming, with no invented content.
+  Homework 1 (due date only). Added later in the week: Section 1 handout and solution (Tue Oct 6), the Testing lecture
+  (lecture 4: notes, slides) and the Coverage lecture (lecture 5: notes, slides); raw copies in materials/cse331/w02/.
 
   Where each component lives:
     Sidebar rail .................... <nav class="rail">
@@ -50,11 +50,30 @@
       </ol>
     </div>
     <div>
-      <h2>Later this week</h2>
+      <h2>Section 1 <span class="today" data-date="2026-10-06">Tue Oct 6</span></h2>
+      <ol class="modules">
+        <li><a href="#s1-strength">Task 1: comparing specs</a></li>
+        <li><a href="#s1-remove">Task 2: removeValue</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 4: Testing <span class="today" data-date="2026-10-07">Wed Oct 7</span></h2>
+      <ol class="modules">
+        <li><a href="#l4-test">What a test is</a></li>
+        <li><a href="#l4-inputs">Choosing inputs</a></li>
+        <li><a href="#l4-spec-based">Specification-based tests</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 5: Coverage <span class="today" data-date="2026-10-09">Fri Oct 9</span></h2>
+      <ol class="modules">
+        <li><a href="#l5-coverage">Statement, branch, loop</a></li>
+        <li><a href="#l5-enough">When to stop</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Due</h2>
       <ul class="later-list">
-        <li><span>Tue Oct 6 · Section 1: Assertions and Specifications</span><em>materials not posted yet</em></li>
-        <li><span>Wed Oct 7 · Lecture: Testing 1</span><em>materials not posted yet</em></li>
-        <li><span>Fri Oct 9 · Lecture: Testing 2</span><em>materials not posted yet</em></li>
         <li><span>Fri Oct 9, 11:59 pm · Homework 1 due</span><em><a href="https://courses.cs.washington.edu/courses/cse331/26au/homework/hw1.html" target="_blank" rel="noopener">assignment page</a></em></li>
       </ul>
     </div>
@@ -89,9 +108,13 @@
   <h2>This week</h2>
   <div class="week">
     <a class="day now" href="#l3-discuss"><strong>Mon, Oct 5</strong><span class="tag-today" data-date="2026-10-05">Today</span><span>Lecture 3: Reading 1 discussion; batch processing</span><span>6 modules, an 11-question check, 9 problems</span></a>
-    <div class="day later"><strong>Tue, Oct 6</strong><span class="tag-later">Upcoming</span><span>Section 1: Assertions and Specifications</span><span>Materials not posted yet. The handout and its solution still said "Not Yet Available" on Oct 5.</span></div>
-    <div class="day later"><strong>Wed, Oct 7</strong><span class="tag-later">Upcoming</span><span>Lecture: Testing 1</span><span>Materials not posted yet.</span></div>
-    <div class="day later"><strong>Fri, Oct 9</strong><span class="tag-later">Upcoming</span><span>Lecture: Testing 2</span><span>Materials not posted yet. <b>Homework 1 due 11:59 pm.</b></span></div>
+    <a class="day" href="#s1-strength"><strong>Tue, Oct 6</strong><span class="tag-today" data-date="2026-10-06">Today</span><span>Section 1: Specifications</span><span>Comparing five specs for strength; four implementations of <code>removeValue</code> against four specs.</span></a>
+    <a class="day" href="#l4-test"><strong>Wed, Oct 7</strong><span class="tag-today" data-date="2026-10-07">Today</span><span>Lecture 4: Testing</span><span>What a test is, four steps, choosing inputs, specification-based tests.</span></a>
+    <a class="day" href="#l5-coverage"><strong>Fri, Oct 9</strong><span class="tag-today" data-date="2026-10-09">Today</span><span>Lecture 5: Coverage</span><span>How many tests are enough: statement, branch and loop coverage. <b>Homework 1 due 11:59 pm.</b></span></a>
+  </div>
+
+  <div class="prose">
+    <p>Later in the week the course added <a href="#s1-strength">Section 1</a> (Tue), <a href="#l4-test">Lecture 4: Testing</a> (Wed) and <a href="#l5-coverage">Lecture 5: Coverage</a> (Fri). They follow Lecture 3 in the rail. Practice there is the section's own tasks and the lectures' own exercises, with short quick checks; Homework 1 is not reproduced.</p>
   </div>
 
   <h2>How to use this site</h2>
@@ -107,7 +130,7 @@
   <h2>Course essentials</h2>
   <table class="plain">
     <tr><th>Lectures</th><td>MWF in SAV 260: lecture A 12:30–1:20, lecture B 1:30–2:20. Recorded on Panopto (linked from Canvas). Most lectures have an in-class activity with a short written response, graded on completion.</td></tr>
-    <tr><th>Sections</th><td>Tuesdays, TA-led, not recorded; the printed material is posted on the course site. Section 1 is Tue Oct 6.</td></tr>
+    <tr><th>Sections</th><td>Tuesdays, TA-led, not recorded; the printed material is posted on the course site. Section 1 was Tue Oct 6.</td></tr>
     <tr><th>Due this week</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/homework/hw1.html" target="_blank" rel="noopener">Homework 1: Procedural Abstraction</a>, Fri Oct 9 at 11:59 pm.</td></tr>
     <tr><th>Next reading</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/readings/reading2.html" target="_blank" rel="noopener">Reading 2</a>, due Fri Oct 16; discussed Mon Oct 19.</td></tr>
     <tr><th>Late days</th><td>Submit by Friday to unlock one late day for that assignment, then resubmit through Saturday 11:59 pm. Nothing submitted by Friday means no late day.</td></tr>
@@ -120,7 +143,7 @@
       <li>Two halves. First 15–20 minutes: the Reading 1 discussion in groups of 3 or 4, ending with a half sheet handed in at the door. Then the slides return briefly to Lecture 2's "Stronger and weaker", and the rest is the new <code>Sum</code>.</li>
       <li>The notes ask students to read Lecture 2's last sections (Stronger and weaker through Knowing a program in pieces) in Lecture 2's notes; Lecture 3's notes don't repeat them. The module here is a short recap for the room.</li>
       <li>Hand out the program sheet (the 99-line <code>Sum</code>) before "A different Sum" and give the room a minute with the three questions: what does it do, what is good about it, what is not.</li>
-      <li>Coming up on the last slide: Tuesday's section on assertions and specifications, testing on Wednesday and Friday, and Homework 1 (Task 3 is a user manual for Histogram; Task 4 is checks at the edge in Gradebook's <code>main</code>).</li>
+      <li>Coming up on the last slide: Tuesday's section on specifications, testing on Wednesday and coverage on Friday, and Homework 1 (Task 3 is a user manual for Histogram; Task 4 is checks at the edge in Gradebook's <code>main</code>).</li>
     </ul>
   </details>
 </section>
@@ -946,6 +969,321 @@
   <nav class="pager"></nav>
 </section>
 
+<!-- ================================================================ SECTION 1 -->
+<section class="page" id="s1-strength" data-title="Section 1: comparing specs" data-unit="s1">
+  <p class="where">Section 1 · <span class="today-chip" data-date="2026-10-06">Tue Oct 6</span> · Task 1</p>
+  <h1>Section 1: comparing specs</h1>
+  <div class="prose">
+    <p>Section 1 has two tasks. Both reuse Lecture 2's ideas: a specification is stronger than another if every implementation that meets it also meets the other. The tables and answers on this page and the next are the section's own handout and solution, lightly condensed.</p>
+  </div>
+
+  <h2>Task 1: five specs for <code>indexOf</code></h2>
+  <div class="prose"><p>All five share the signature <code>indexOf(int[] a, int lo, int hi, int x)</code> and differ in the tags:</p></div>
+  <table class="plain">
+    <tr><th>A</th><td><code>@requires 0 &lt;= lo &lt;= hi &lt;= a.length and x occurs in a[lo..hi]</code>; <code>@return</code> an index <code>i</code> with <code>lo &lt;= i &lt; hi</code> and <code>a[i] == x</code></td></tr>
+    <tr><th>B</th><td><code>@requires 0 &lt;= lo &lt;= hi &lt;= a.length</code>; <code>@return</code> the <em>smallest</em> such index, or −1 if none</td></tr>
+    <tr><th>C</th><td>same precondition as B; <code>@return</code> the <em>largest</em> such index, or −1 if none</td></tr>
+    <tr><th>D</th><td>same precondition as B; <code>@return</code> <em>some</em> such index, or −1 if none</td></tr>
+    <tr><th>E</th><td>same precondition as B; <code>@return</code> the smallest such index; <code>@throws NoSuchElementException</code> if none</td></tr>
+  </table>
+  <p class="prose">The section's table (row spec compared with column spec; S = row is stronger, W = weaker, — = incomparable):</p>
+  <table class="plain small">
+    <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>
+    <tr><th>A</th><td>X</td><td>W</td><td>W</td><td>W</td><td>W</td></tr>
+    <tr><th>B</th><td>S</td><td>X</td><td>—</td><td>S</td><td>—</td></tr>
+    <tr><th>C</th><td>S</td><td>—</td><td>X</td><td>S</td><td>—</td></tr>
+    <tr><th>D</th><td>S</td><td>W</td><td>W</td><td>X</td><td>—</td></tr>
+    <tr><th>E</th><td>S</td><td>—</td><td>—</td><td>—</td><td>X</td></tr>
+  </table>
+  <div class="rule">
+    <p>A is weaker than everything else. B is stronger than D but incomparable with C and E. C is stronger than D but incomparable with E. D and E are also incomparable.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w2-s1-qc-b-vs-c" data-kind="quickcheck" data-type="strength" data-answer="incomparable">
+    <p>Quick check: B promises the smallest matching index and C the largest, with the same precondition. B is ___ than C.</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="stronger, weaker or incomparable"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse331-w2-s1-qc-a-vs-d" data-kind="quickcheck" data-type="strength" data-answer="weaker">
+    <p>Quick check: A requires that <code>x</code> occurs in the range; D does not. A is ___ than D.</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="stronger, weaker or incomparable"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Use the rule from Lecture 3: S1 is stronger when its precondition is weaker or the same and, where S2's precondition holds, its postcondition is stronger or the same. A's precondition is the strongest, so A is weakest. B, C and D share a precondition, so only the postconditions matter: "smallest" and "largest" each imply "some", but not each other.</li>
+      <li>E differs by throwing instead of returning −1, so neither it nor B implies the other.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="s1-remove" data-title="Section 1: removeValue" data-unit="s1">
+  <p class="where">Section 1 · <span class="today-chip" data-date="2026-10-06">Tue Oct 6</span> · Task 2</p>
+  <h1>Section 1: <code>removeValue</code></h1>
+  <div class="prose">
+    <p><code>public static int removeValue(int[] a, int n, int x)</code> removes <code>x</code> from the prefix <code>a[0..n]</code> (indices 0 to n−1). It has <code>@requires 0 &lt;= n &lt;= a.length</code> and <code>@modifies a</code>, and returns the new length. Four specs:</p>
+  </div>
+  <table class="plain">
+    <tr><th>A</th><td>Removes the <em>first</em> occurrence and keeps the rest in order (the last slot is unspecified); returns <code>n − 1</code> if <code>x</code> was removed, else <code>n</code>.</td></tr>
+    <tr><th>B</th><td>Removes one occurrence; the remaining elements may be <em>reordered</em>; returns <code>n − 1</code> or <code>n</code>.</td></tr>
+    <tr><th>C</th><td>Removes <em>all</em> <code>k</code> occurrences, keeping the rest in order; returns <code>n − k</code>.</td></tr>
+    <tr><th>D</th><td>Like A, but <code>@requires</code> that <code>a[0..n]</code> has no duplicates.</td></tr>
+  </table>
+  <p class="prose">Four implementations: <b>1</b> copies every element that is not <code>x</code> forward (removes all occurrences); <b>2</b> shifts left over the <em>first</em> occurrence; <b>3</b> searches from the back and shifts left over the <em>last</em> occurrence; <b>4</b> overwrites the first occurrence with <code>a[n-1]</code>.</p>
+
+  <table class="plain small">
+    <tr><th>Impl</th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+    <tr><th>1</th><td>no</td><td>no</td><td>yes</td><td>yes</td></tr>
+    <tr><th>2</th><td>yes</td><td>yes</td><td>no</td><td>yes</td></tr>
+    <tr><th>3</th><td>no</td><td>yes</td><td>no</td><td>yes</td></tr>
+    <tr><th>4</th><td>no</td><td>yes</td><td>no</td><td>no</td></tr>
+  </table>
+  <div class="rule">
+    <p><b>1</b> removes every occurrence, so it fails A and B (one removal only) and meets C; D allows no duplicates, so removing all is the same as removing one. <b>2</b> does exactly what A says; B allows but doesn't require reordering; it fails C; D's only occurrence is also the first. <b>3</b> removes the last occurrence, so it fails A, but B doesn't care which one goes; fails C; meets D because there is only one occurrence. <b>4</b> moves <code>a[n-1]</code> into the removed slot, so it breaks the order A and D require, but B allows it; fails C.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w2-s1-qc-impl4-spec-b" data-kind="quickcheck" data-type="yesno" data-answer="yes">
+    <p>Quick check: does Impl 4 (overwrite the first occurrence with <code>a[n-1]</code>) satisfy Spec B?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse331-w2-s1-qc-impl3-spec-a" data-kind="quickcheck" data-type="yesno" data-answer="no">
+    <p>Quick check: does Impl 3 (removes the <em>last</em> occurrence) satisfy Spec A?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Common slip: calling Impl 1 wrong for D. D's precondition rules out duplicates, so on every allowed input Impl 1 does exactly what A says.</li>
+      <li>Each spec's strength is visible from this table: C is met only by Impl 1, B by 2, 3 and 4, A by 2 only. B is the weakest of the three.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ LECTURE 4: TESTING -->
+<section class="page" id="l4-test" data-title="What a test is" data-unit="l4">
+  <p class="where">Lecture 4 · Testing · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
+  <h1>What a test is</h1>
+  <div class="prose">
+    <p>The motto asks for code you <em>know</em> works. <strong>Code is correct if it meets its specification</strong>, so "correct" always means correct against some spec. There are three ways to gain that knowledge: <strong>testing</strong> (run chosen inputs and check each run), <strong>tools</strong> (such as a type checker), and <strong>reasoning</strong>. This lecture is testing.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Test.</strong> A test runs code on a chosen input and checks the actual behavior against the expected behavior, which is what the spec says must happen on that input. It passes if they match and fails if not. A failing test is a counterexample: it refutes the claim that the code works on every run.</p>
+  </div>
+  <h2>Four steps</h2>
+  <ol class="prose">
+    <li>Choose an input.</li>
+    <li>Use the specification to find the expected behavior.</li>
+    <li>Run the code and observe the actual behavior.</li>
+    <li>Compare. Pass if they match.</li>
+  </ol>
+  <div class="prose">
+    <p>Example under spec D with Lecture 2's implementation 1: input <code>{3, 0, 7}</code>, range 0 to 3, <code>x = 7</code>. D promises some index holding 7, and only index 2 holds it, so the expected answer is 2. The code returns 2: pass.</p>
+    <p><strong>Expected behavior first.</strong> If you run the code, see 2 and write down 2, the test only checks that the code still returns what it returned before. That has some value (it fails if the answer later changes) but it does not check that 2 is right. A test means as much as its expected answers, and those must come from the spec.</p>
+    <p>An automated test is code that does steps 3 and 4. In Java, <code>@Test</code> marks a JUnit test method, and <code>assertEquals(expected, actual)</code> compares, with the expected value first. A <em>unit test</em> checks one method apart from the rest; an <em>integration test</em> checks pieces together; an <em>end-to-end test</em> runs the whole program.</p>
+  </div>
+  <pre class="code"><code>@Test
+void findsTheOnlyMatch() {
+    int[] a = {3, 0, 7};
+    assertEquals(2, IndexOf.indexOf(a, 0, 3, 7));
+}</code></pre>
+
+  <div class="check" data-id="cse331-w2-l4-qc-where-expected" data-kind="quickcheck" data-type="text" data-answer="specification|spec|the specification|the spec">
+    <p>Quick check: where must a test's expected answer come from: the specification, or the code's output?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="specification or code"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>This answers Reading 1's question about tests written by the same tool as the code: the test is only as good as its expected answers, and an expected answer helps only if it comes from the spec.</li>
+      <li>Lecture 2's check of the four <code>indexOf</code> implementations (6,196 calls each) was itself a set of tests: each call was a test with a chosen input.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l4-inputs" data-title="Choosing inputs" data-unit="l4">
+  <p class="where">Lecture 4 · Testing · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
+  <h1>Choosing inputs</h1>
+  <div class="prose"><p>Step 1 is the hard one: <code>indexOf</code> has far more inputs than anyone can run. Four tips:</p></div>
+  <ol class="prose">
+    <li><strong>Test only inputs the spec allows.</strong> If the precondition fails (say <code>hi</code> past the end of the array), the spec promises nothing, so there is no expected answer. A whole program is different: the user owes it nothing, so every input is fair game for <code>Sum</code>.</li>
+    <li><strong>Test each method separately.</strong> A caller's tests may assume the methods it calls meet their specs.</li>
+    <li><strong>Test exhaustively when possible</strong>, practical only when the inputs are few (say ten or fewer; a <code>boolean</code> argument has two).</li>
+    <li><strong>Cover each case and each boundary.</strong> For D the cases are: <code>x</code> occurs once; occurs more than once; does not occur; the range is empty (<code>lo == hi</code>). The boundaries: <code>x</code> at <code>lo</code>, at <code>hi - 1</code>, and just outside at <code>lo - 1</code> or <code>hi</code>.</li>
+  </ol>
+  <p class="prose">Exercise 1's set of inputs for D, each with its expected answer:</p>
+  <table class="plain small">
+    <tr><th>a</th><th>lo</th><th>hi</th><th>x</th><th>expected</th><th>covers</th></tr>
+    <tr><td><code>{3, 0, 7}</code></td><td>0</td><td>3</td><td>7</td><td>2</td><td>x once, at hi − 1</td></tr>
+    <tr><td><code>{3, 0, 7}</code></td><td>0</td><td>3</td><td>42</td><td>−1</td><td>x absent</td></tr>
+    <tr><td><code>{5, 1, 5, 2, 5}</code></td><td>0</td><td>5</td><td>5</td><td>0, 2 or 4</td><td>x more than once</td></tr>
+    <tr><td><code>{3, 0, 7}</code></td><td>1</td><td>1</td><td>0</td><td>−1</td><td>empty range</td></tr>
+    <tr><td><code>{}</code></td><td>0</td><td>0</td><td>3</td><td>−1</td><td>empty array</td></tr>
+    <tr><td><code>{7, 0, 3}</code></td><td>0</td><td>3</td><td>7</td><td>0</td><td>x at lo</td></tr>
+    <tr><td><code>{7, 0, 3}</code></td><td>1</td><td>3</td><td>7</td><td>−1</td><td>x at lo − 1</td></tr>
+    <tr><td><code>{3, 0, 7}</code></td><td>0</td><td>2</td><td>7</td><td>−1</td><td>x at hi</td></tr>
+  </table>
+  <div class="prose">
+    <p>Boundaries catch off-by-one mistakes. An implementation whose loop ran while <code>i &lt;= hi</code> would pass every test with <code>x</code> inside the range, but on <code>{3, 0, 7}</code> with range 0 to 2 and <code>x = 7</code> it returns 2 where D promises −1. Exercise 3: a test calling <code>indexOf(a, 0, 4, 7)</code> on a 3-element array breaks the precondition (<code>hi</code> is 4), so it checks nothing; implementation 1 returns 2 and implementation 4 throws <code>ArrayIndexOutOfBoundsException</code>, and both satisfy D.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w2-l4-qc-empty-range" data-kind="quickcheck" data-type="int" data-answer="-1">
+    <p>Quick check: <code>a = {3, 0, 7}</code>, <code>lo = hi = 1</code>, <code>x = 0</code>. The array holds 0 at index 1, but the range is empty. What must D's answer be?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The tips say which inputs to try, not how many; Friday's coverage lecture takes up the count, and tips come from the spec, never the code.</li>
+      <li>"Mistakes cluster at boundaries." Have the room name a mistake that only each boundary input would catch.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l4-spec-based" data-title="Specification-based tests" data-unit="l4">
+  <p class="where">Lecture 4 · Testing · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
+  <h1>Specification-based tests</h1>
+  <div class="prose">
+    <p>On <code>{5, 1, 5, 2, 5}</code>, range 0 to 5, <code>x = 5</code>, D allows 0, 2 or 4. Implementation 1 searches from the front and returns 0; implementation 4 returns 4. Two tests:</p>
+  </div>
+  <pre class="code"><code>@Test void findsTheFirstMatch() {
+    int[] a = {5, 1, 5, 2, 5};
+    assertEquals(0, IndexOf.indexOf(a, 0, 5, 5));
+}
+@Test void findsSomeMatch() {
+    int[] a = {5, 1, 5, 2, 5};
+    int i = IndexOf.indexOf(a, 0, 5, 5);
+    assertTrue(0 &lt;= i &amp;&amp; i &lt; 5 &amp;&amp; a[i] == 5);
+}</code></pre>
+  <div class="rule">
+    <p><strong>Specification-based test.</strong> Checks only behavior the spec promises, so it passes on every correct implementation. An <strong>implementation-based test</strong> also checks behavior the spec does not promise, so it can fail on a correct implementation. <code>findsTheFirstMatch</code> expects 0, fails implementation 4 (<code>expected: &lt;0&gt; but was: &lt;4&gt;</code>) even though 4 meets D.</p>
+  </div>
+  <div class="prose">
+    <p>A test is a client too. Exercise 2: under B (smallest), <code>findsTheFirstMatch</code> is specification-based; under C (largest) it fails every correct implementation; under D it is implementation-based. <code>findsSomeMatch</code> is specification-based under all three but checks less than B or C promise. No set of tests confirms a claim about every run: testing can refute, never confirm.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w2-l4-qc-first-match-d" data-kind="quickcheck" data-type="yesno" data-answer="no">
+    <p>Quick check: under spec D, is <code>findsTheFirstMatch</code> a specification-based test?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse331-w2-l4-qc-first-match-b" data-kind="quickcheck" data-type="yesno" data-answer="yes">
+    <p>Quick check: under spec B (the smallest index), is <code>findsTheFirstMatch</code> a specification-based test?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>This also explains a puzzle from Lecture 2: <code>count</code> is wrong against D, yet with implementation 1 underneath it is right on every input, so no test of <code>count</code> finds the mistake until it runs with an implementation like 4.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ LECTURE 5: COVERAGE -->
+<section class="page" id="l5-coverage" data-title="Statement, branch, loop" data-unit="l5">
+  <p class="where">Lecture 5 · Coverage · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
+  <h1>Statement, branch and loop coverage</h1>
+  <div class="prose">
+    <p>The lecture opens on <code>isPrime(n)</code> with eleven tests (2 through 12) chosen from the spec. All pass, and the method is wrong: every input is below 100, so every test is the table lookup and the loop never runs. Line 22 reads <code>k * k &lt; n</code> where it should be <code>k * k &lt;= n</code>, so the square of a prime (121) passes as prime. The number of tests is not what matters; <em>which parts of the method the tests run</em> is. That is <strong>coverage</strong>. Choosing tests from the code is clear-box testing; from the spec alone, black-box. A method's tests need both.</p>
+    <p><strong>One test is never enough</strong> (a method that always returns <code>true</code> passes a test expecting <code>true</code>), so every method needs at least two.</p>
+  </div>
+
+  <h2>Three measures</h2>
+  <div class="rule">
+    <p><strong>Statement coverage.</strong> Every statement that some allowed input reaches is run by some test.</p>
+    <p><strong>Branch coverage.</strong> Every branch that some allowed input takes is run by some test. An <code>if</code> with no <code>else</code> still has a (empty) false branch.</p>
+    <p><strong>Loop coverage.</strong> For every loop, some test runs the body zero times, some once, and some more than once.</p>
+  </div>
+  <table class="plain">
+    <tr><th><code>min</code></th><td>Body <code>r = a; if (a &lt;= b) r = a;</code> returns <code>a</code> always. <code>min(1, 2)</code> alone has statement coverage and passes; <code>min(2, 1)</code> (false branch) returns 2 and finds the mistake. Branch coverage asks for it.</td></tr>
+    <tr><th><code>quadrant</code></th><td>Two <code>if</code>s. Tests <code>(1, 1)</code> and <code>(−1, −1)</code> run every branch and pass, but <code>(1, −1)</code> returns 2 where 4 is promised. Branch coverage misses a combination; every path would find it, but paths multiply (ten <code>if</code>s give 2<sup>10</sup> paths).</td></tr>
+    <tr><th><code>pow</code></th><td>Loop body is <code>r = b</code> instead of <code>r = r * b</code>. <code>pow(2,0)</code> and <code>pow(2,1)</code> have statement and branch coverage and pass; <code>pow(2,3)</code> returns 2, not 8. A value carried from one run of the body to the next is only checked when the body runs at least twice.</td></tr>
+    <tr><th>recursion</th><td>Count calls like loop runs: zero, one, more than one. <code>powRec</code> discards the recursive result and returns <code>b</code>; only <code>powRec(2, 3)</code> (more than one call) returns 2 instead of 8.</td></tr>
+  </table>
+  <div class="prose">
+    <p>Lecture 4's <code>IndexOfTest</code> has statement and branch coverage but no test runs the loop body zero times: the input it lacks is an empty range such as <code>lo = hi = 1</code>.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w2-l5-qc-min-tests" data-kind="quickcheck" data-type="int" data-answer="2">
+    <p>Quick check: what is the fewest tests any method needs, whatever its code?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse331-w2-l5-qc-pow-three" data-kind="quickcheck" data-type="int" data-answer="2">
+    <p>Quick check: the faulty <code>pow</code> has body <code>r = b</code>. What does <code>pow(2, 3)</code> return? (The correct answer is 8.)</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Walk each example in the order the lecture does: show the passing tests with the coverage measure just introduced, then the test that finds the mistake. Each measure catches what the one before misses.</li>
+      <li>Sources: the lecture's own examples (<code>isPrime</code>, <code>min</code>, <code>quadrant</code>, <code>pow</code>, <code>powRec</code>, <code>indexOf</code>).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l5-enough" data-title="When to stop" data-unit="l5">
+  <p class="where">Lecture 5 · Coverage · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
+  <h1>When to stop, and what coverage doesn't tell you</h1>
+  <div class="rule">
+    <p><strong>Enough.</strong> A method's tests are enough when there are at least two and, between them, they run: every statement; both branches of every <code>if</code>; every loop's body zero, one and more than one times; and every recursive method with zero, one and more than one recursive call. Until the list is complete, it says which test to write next. Only allowed inputs count: a check that a precondition holds is not on the list, because no test may reach it.</p>
+  </div>
+  <div class="prose">
+    <ul>
+      <li>The measures nest: loop coverage usually gives branch coverage, and branch gives statement.</li>
+      <li><strong>Coverage is not correctness.</strong> Add 100 and 10,007 to the eleven <code>isPrime</code> tests: statement, branch and loop coverage hold and every test passes, yet 121 is still wrong. The test that finds it sits on a boundary read off the code: a perfect square, where <code>k * k == n</code>.</li>
+      <li>A mistake of <em>omission</em> (a case the spec describes that the code never handles) has no statement to run. Tests for it come from reading the spec case by case.</li>
+      <li>Some mistakes are outside the list: the Therac-25's came from the timing of two tasks.</li>
+      <li><strong>The floor.</strong> The list, plus Lecture 4's cases and boundaries, is the least testing that any code you deliver gets. Above it, how much more depends on the cost of a mistake. Apple's <code>goto fail</code> (statement coverage would have shown the unreachable lines) and Heartbleed (a boundary test would have found the unchecked length) are the lecture's examples of skipping it.</li>
+      <li><strong>Test code is code.</strong> Keep tests simple: one call and one <code>assertEquals</code>. Write methods that are easy to test: one job each, nothing read or written outside the arguments and return value (Lecture 2's <code>sumList</code> split).</li>
+    </ul>
+  </div>
+
+  <h2>Exercises</h2>
+  <div class="prose">
+    <p><strong>1.</strong> Tests of <code>count</code> that complete the list. Lecture 5's set: <code>{3, 0, 7}</code> with some <code>x</code> absent; one with <code>x = 7</code>; <code>{5, 1, 5, 2, 5}</code>; and <code>{}</code>. Four tests is at least two, the test that runs the body once runs every statement, and the only branch is the <code>while</code> condition, so branch coverage comes with loop coverage. The tests pass with implementation 1, but <code>count</code> is still wrong against D: coverage is not correctness.</p>
+    <p><strong>2.</strong> <code>isPrime</code> returns the wrong answer on squares of primes from 11 up (121, 169, 289, …): for 121 the loop's <code>k</code> stops at 10, and no <code>k</code> divides 121. Not on 100 (<code>k = 2</code> divides it on the first run) or 101 (prime, so <code>true</code> is right).</p>
+    <p><strong>3.</strong> Under spec A, whose precondition promises <code>x</code> occurs, implementation 2 (which throws instead of returning −1) has every statement reachable except the <code>throw</code>: only an input that breaks the precondition reaches it, so statement coverage is complete without it. Under B, C or D the throw is reachable and a test must run it.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w2-l5-qc-coverage-proof" data-kind="quickcheck" data-type="yesno" data-answer="no">
+    <p>Quick check: if a method's tests pass and have statement, branch and loop coverage, does that show the method is correct?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse331-w2-l5-qc-square-boundary" data-kind="quickcheck" data-type="int" data-answer="121">
+    <p>Quick check: what is the smallest <code>n</code> where the faulty <code>isPrime</code> (stopping at <code>k * k &lt; n</code>) wrongly returns <code>true</code>?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Homework 1 holds a method's tests to the whole list; this page shows what the list is for and why it is a floor. Next lecture (Mon Oct 12 on the lecture page) turns to what a program should do when its input is wrong.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
 <!-- ================================================================ READINGS -->
 <section class="page" id="readings" data-title="Readings">
   <p class="where">Reading 1 · due Fri Oct 2 · discussed today, Mon Oct 5</p>
@@ -1078,8 +1416,17 @@
       <p>Messages name their program (<code>Sum: …</code>). Rule of Repair: fail noisily and as soon as possible.</p>
     </section>
     <section>
+      <h3>Testing (Lecture 4)</h3>
+      <p>Code is correct if it meets its spec. Test = chosen input, expected behavior <em>from the spec</em>, run, compare. Tips: allowed inputs only; each method separately; exhaustive when few inputs; each case and each boundary.</p>
+      <p>Specification-based tests pass every correct implementation; implementation-based ones may fail a correct one. Testing refutes, never confirms.</p>
+    </section>
+    <section>
+      <h3>Coverage (Lecture 5)</h3>
+      <p>At least two tests, plus: every statement; both branches of every <code>if</code>; every loop body 0, 1 and more than 1 times; recursion 0, 1 and more than 1 calls. Only allowed inputs count. This is the floor, not proof of correctness.</p>
+    </section>
+    <section>
       <h3>This week</h3>
-      <p>Tue Oct 6 section · Wed and Fri testing · Homework 1 due Fri Oct 9, 11:59 pm · Reading 2 due Fri Oct 16.</p>
+      <p>Tue Oct 6 Section 1 · Wed Oct 7 Testing · Fri Oct 9 Coverage · Homework 1 due Fri Oct 9, 11:59 pm · Reading 2 due Fri Oct 16.</p>
     </section>
   </div>
   <nav class="pager"></nav>
