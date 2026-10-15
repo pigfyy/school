@@ -29,6 +29,9 @@ Start from the same course's latest week (`site/<course>/<previous week>/index.h
 - **Problems**: the section handout's or lecture's exercises, answerable on the page.
 - **Readings** (when assigned) and a **cheat sheet**.
 
+The problems and quiz are required for every lecture and section, including sessions added later to a week that
+already exists. A page with modules and quick checks only is not finished.
+
 The markup the engine understands is listed at the top of `site/core/app.js`; answer types are listed at the top
 of `site/core/grader.js`. Answer keys go either in the markup (`data-type`, `data-answer`, `data-miscon`) or in a
 `keys.js` that sets `window.WEEK.keys`. Self-check parts are one-line boxes; add `data-long` for a written answer. Feedback text for misconception tags goes in `window.WEEK.messages`.

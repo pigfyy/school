@@ -28,11 +28,19 @@ deploy/                     Worker + deploy steps. Codex runs these; read deploy
 
 ## Adding or updating a week
 
-1. `tools/ingest.sh <zip> <course> <week>` puts the files in `materials/<course>/<week>/` and text copies in `text/`.
-   Read `text/`. Open a PDF or slide image only when its text is garbled.
+One Claude thread does the whole build (it may use one subagent per course). Don't put a coordinator agent in front of
+it. Adding to a week that already exists is the same job: add the new sessions to its `index.html` in place.
+
+1. `tools/ingest.sh <zip or folder> <course> <week>` puts the files in `materials/<course>/<week>/` and text copies in
+   `text/`. If the materials are on the course website instead of in a zip, download them into a folder first and
+   run the script on it; record each URL in `materials/<course>/<week>/sources.json`. Read `text/`. Open a PDF or
+   slide image only when its text is garbled.
 2. Use the `course-teaching-site` skill for what the pages contain and how they look. Start from the course's
    previous week: copy its `index.html` as the shape and replace the content.
 3. Add the week to `site/courses.js` (`posted: true`).
+   Every lecture and section gets the full set from the skill, not a summary: modules with quick checks, a
+   "Check your understanding" quiz per lecture, and answerable problems with hints and solutions. A quicker or
+   narrower pass may trim widgets, never the problems and quiz.
 4. Check:
    - Every computed answer against ground truth in `checks/<course>/<week>/verify.mjs` (run the lecture's code,
      brute-force counts). Run it: `node checks/<course>/<week>/verify.mjs`.
