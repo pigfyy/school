@@ -268,6 +268,89 @@ for (const stdin of ["3 4 5", "1 2 three 4", "2147483647 1", "", "2147483648", "
   }
 }
 
+
+/* ---------------------------------------------------------------- 7. Wed-Fri practice keys (Section 1, Lectures 4 and 5)
+   Every answer key added for Section 1, Testing and Coverage is recomputed here by running ports of the course's own
+   code and specs (exhaustive over small arrays), then compared with the key in site/cse331/w02/index.html. */
+{
+  const html = readFileSync(join(here, "../../../site/cse331/w02/index.html"), "utf8");
+  const attr = (tag, name) => { const m = new RegExp(`${name}="([^"]*)"`).exec(tag); return m ? m[1] : undefined; };
+  const keyOf = (tid, part) => { const at = html.indexOf(`data-id="${tid}"`); const m = new RegExp(`<div class="answer-spec" data-part="${part}"[^>]*>`).exec(html.slice(at)); return m ? attr(m[0], "data-answer") : undefined; };
+  const quizKey = (qid) => { const at = html.indexOf(`data-id="${qid}"`); const tag = html.slice(at, html.indexOf(">", at)); return attr(tag, "data-answer"); };
+  const arrays = (len, vals) => { const out = []; const rec = (p) => { if (p.length === len) { out.push(p); return; } for (const v of vals) rec([...p, v]); }; rec([]); return out; };
+  const smallArrays = []; for (let len = 0; len <= 4; len++) smallArrays.push(...arrays(len, [0, 1, 2]));
+  const sorted = (v) => [...v].sort().join();
+
+  // removeValue: four implementations, four specs (Section 1, Task 2)
+  const IMPL = {
+    1: (a, n, x) => { let w = 0; for (let r = 0; r < n; r++) if (a[r] !== x) { a[w] = a[r]; w++; } return w; },
+    2: (a, n, x) => { for (let i = 0; i < n; i++) if (a[i] === x) { for (let k = i; k < n - 1; k++) a[k] = a[k + 1]; return n - 1; } return n; },
+    3: (a, n, x) => { for (let i = n - 1; i >= 0; i--) if (a[i] === x) { for (let k = i; k < n - 1; k++) a[k] = a[k + 1]; return n - 1; } return n; },
+    4: (a, n, x) => { for (let i = 0; i < n; i++) if (a[i] === x) { a[i] = a[n - 1]; return n - 1; } return n; },
+  };
+  const A = (old, n, x, nw, ret) => { const i = old.slice(0, n).indexOf(x); if (i < 0) return ret === n && nw.join() === old.join(); const e = [...old.slice(0, i), ...old.slice(i + 1, n)]; return ret === n - 1 && nw.slice(0, n - 1).join() === e.join() && nw.slice(n).join() === old.slice(n).join(); };
+  const RS = {
+    A: { pre: () => true, ok: A },
+    B: { pre: () => true, ok: (old, n, x, nw, ret) => { const i = old.slice(0, n).indexOf(x); if (i < 0) return ret === n && nw.join() === old.join(); const rest = [...old.slice(0, i), ...old.slice(i + 1, n)]; return ret === n - 1 && sorted(nw.slice(0, n - 1)) === sorted(rest) && nw.slice(n).join() === old.slice(n).join(); } },
+    C: { pre: () => true, ok: (old, n, x, nw, ret) => { const rest = old.slice(0, n).filter((v) => v !== x); return ret === rest.length && nw.slice(0, rest.length).join() === rest.join() && nw.slice(n).join() === old.slice(n).join(); } },
+    D: { pre: (old, n) => new Set(old.slice(0, n)).size === n, ok: A },
+  };
+  const meets = (impl, spec) => { for (const a of smallArrays) for (let n = 0; n <= a.length; n++) for (let x = 0; x <= 3; x++) { if (!RS[spec].pre(a, n, x)) continue; const nw = [...a]; const ret = IMPL[impl](nw, n, x); if (!RS[spec].ok(a, n, x, nw, ret)) return false; } return true; };
+  const setOf = (impl) => "ABCD".split("").filter((s) => meets(impl, s)).join("");
+  for (const i of [1, 2, 3, 4]) ok("practice", keyOf("cse331-w2-s1-which-specs", `impl${i}`) === setOf(i), `Section 1 which-specs impl ${i}: key ${keyOf("cse331-w2-s1-which-specs", `impl${i}`)} vs run ${setOf(i)}`);
+  { const tr = (i) => { const a = [4, 8, 4, 6]; const r = IMPL[i](a, 4, 4); return { r, a }; };
+    ok("practice", String(tr(1).r) === keyOf("cse331-w2-s1-run-impls", "impl1-return") && String(tr(1).a[0]) === keyOf("cse331-w2-s1-run-impls", "impl1-first") && String(tr(3).a[0]) === keyOf("cse331-w2-s1-run-impls", "impl3-first") && String(tr(4).a[0]) === keyOf("cse331-w2-s1-run-impls", "impl4-first"), "Section 1 run-impls traces"); }
+
+  // spec strength, by enumeration of every possible implementation behavior on small inputs
+  const outs = (len) => arrays(len, [0, 1, 2, 3]);
+  const allowedOf = (spec, inp) => { const r = []; for (let ret = 0; ret <= inp.n; ret++) for (const nw of outs(inp.a.length)) if (RS[spec].ok(inp.a, inp.n, inp.x, nw, ret)) r.push(nw.join() + "|" + ret); return new Set(r); };
+  const inputs = []; for (const a of arrays(3, [0, 1, 2]).concat(arrays(2, [0, 1, 2]), arrays(4, [0, 1])))
+    for (let n = 0; n <= a.length; n++) for (let x = 0; x <= 2; x++) inputs.push({ a, n, x });
+  const stronger = (s1, s2) => inputs.every((i) => !RS[s2].pre(i.a, i.n) || (RS[s1].pre(i.a, i.n) && [...allowedOf(s1, i)].every((o) => allowedOf(s2, i).has(o))));
+  const rel = (x, y) => (stronger(x, y) && stronger(y, x) ? "same" : stronger(x, y) ? "stronger" : stronger(y, x) ? "weaker" : "incomparable");
+  for (const [part, x, y] of [["a-b", "A", "B"], ["a-c", "A", "C"], ["c-d", "C", "D"], ["b-d", "B", "D"]])
+    ok("practice", keyOf("cse331-w2-s1-removevalue-strength", part) === rel(x, y), `removeValue ${x} vs ${y}: key ${keyOf("cse331-w2-s1-removevalue-strength", part)} vs enumerated ${rel(x, y)}`);
+
+  // indexOf: the lecture's tests and the `i <= hi` mistake
+  const matches = (a, lo, hi, x) => { const r = []; for (let i = lo; i < hi; i++) if (a[i] === x) r.push(i); return r; };
+  const buggy = (a, lo, hi, x) => { for (let i = lo; i <= hi; i++) { if (i >= a.length) return "throw"; if (a[i] === x) return i; } return -1; };
+  const rows = { A: [[3, 0, 7], 0, 3, 7], B: [[3, 0, 7], 0, 3, 42], C: [[5, 1, 5, 2, 5], 0, 5, 5], D: [[3, 0, 7], 1, 1, 0], E: [[], 0, 0, 3], F: [[7, 0, 3], 0, 3, 7], G: [[7, 0, 3], 1, 3, 7], H: [[3, 0, 7], 0, 2, 7] };
+  const failing = Object.entries(rows).filter(([, [a, lo, hi, x]]) => { const m = matches(a, lo, hi, x); const want = (r) => (m.length ? m.includes(r) : r === -1); return !want(buggy(a, lo, hi, x)); }).map(([k]) => k).join("");
+  ok("practice", keyOf("cse331-w2-l4-boundary-hunt", "failing-rows") === failing, `boundary hunt: key ${keyOf("cse331-w2-l4-boundary-hunt", "failing-rows")} vs run ${failing}`);
+  { // which of the four tests are specification-based under B, C, D: passes every outcome the spec allows
+    const specOk = { B: (m, r) => (m.length ? r === m[0] : r === -1), C: (m, r) => (m.length ? r === m[m.length - 1] : r === -1), D: (m, r) => (m.length ? m.includes(r) : r === -1) };
+    const tests = { A: [[3, 0, 7], 0, 3, 7, (r) => r === 2], B: [[3, 0, 7], 0, 3, 42, (r) => r === -1], C: [[5, 1, 5, 2, 5], 0, 5, 5, (r) => r === 0], D: [[5, 1, 5, 2, 5], 0, 5, 5, (r, a) => r >= 0 && r < 5 && a[r] === 5] };
+    for (const [sp, part] of [["B", "under-b"], ["C", "under-c"], ["D", "under-d"]]) {
+      const got = Object.entries(tests).filter(([, [a, lo, hi, x, t]]) => { const m = matches(a, lo, hi, x); const al = [-1, ...Array.from({ length: hi - lo }, (_, i) => lo + i)].filter((r) => specOk[sp](m, r)); return al.every((r) => t(r, a)); }).map(([k]) => k).join("");
+      ok("practice", keyOf("cse331-w2-l4-spec-based-which", part) === got, `spec-based under ${sp}: key ${keyOf("cse331-w2-l4-spec-based-which", part)} vs run ${got}`);
+    }
+    ok("practice", keyOf("cse331-w2-l4-spec-based-which", "c-expects") === String(matches([5, 1, 5, 2, 5], 0, 5, 5).pop()), "C's largest index is 4");
+  }
+  { const aa = [3, 0, 7]; const impl1 = (a, lo, hi, x) => { for (let i = lo; i < hi; i++) if (a[i] === x) return i; return -1; }; const impl4 = (a, lo, hi, x) => { for (let i = hi - 1; i >= lo; i--) { if (i >= a.length) return "throw"; if (a[i] === x) return i; } return -1; };
+    ok("practice", keyOf("cse331-w2-l4-break-precondition", "impl1") === String(impl1(aa, 0, 4, 7)) && impl4(aa, 0, 4, 7) === "throw" && keyOf("cse331-w2-l4-break-precondition", "impl4") === "yes" && keyOf("cse331-w2-l4-break-precondition", "promises") === "no", "precondition-breaking call: impl 1 returns 2, impl 4 throws, D promises nothing"); }
+
+  // Lecture 5: faulty methods, isPrime loop counts, count with two indexOf implementations
+  const minF = (a, b) => { let r = a; if (a <= b) r = a; return r; };
+  const quad = (x, y) => { let q = 1; if (x < 0) q = 2; if (y < 0) q = q + 1; return q; };
+  const powF = (b, n) => { let r = 1; for (let i = 0; i < n; i++) r = b; return r; };
+  const powRec = (b, n) => { if (n === 0) return 1; powRec(b, n - 1); return b; };
+  ok("practice", [minF(2, 1), quad(1, -1), powF(3, 2), powRec(2, 3)].map(String).join() === ["min", "quadrant", "pow", "powrec"].map((p) => keyOf("cse331-w2-l5-find-the-mistake", p)).join(), "Lecture 5 faulty methods");
+  const smallP = (n) => { if (n < 2) return false; for (let k = 2; k * k <= n; k++) if (n % k === 0) return false; return true; };
+  const badP = (n) => { let runs = 0; if (n < 100) return [smallP(n), 0]; for (let k = 2; k * k < n; k++) { runs++; if (n % k === 0) return [false, runs]; } return [true, runs]; };
+  const wrong = Object.entries({ A: 100, B: 121, C: 143, D: 169, E: 289 }).filter(([, n]) => badP(n)[0] !== smallP(n)).map(([k]) => k).join("");
+  ok("practice", keyOf("cse331-w2-l5-isprime", "wrong") === wrong && keyOf("cse331-w2-l5-isprime", "runs-10007") === String(badP(10007)[1]) && keyOf("cse331-w2-l5-isprime", "runs-100") === String(badP(100)[1]), `isPrime: wrong ${wrong}, runs ${badP(10007)[1]} / ${badP(100)[1]}`);
+  { let first = null; for (let n = 1; n < 1000 && first === null; n++) if (badP(n)[0] !== smallP(n)) first = n; ok("practice", quizKey("cse331-w2-q2-first-bad-prime") === String(first), `first wrong isPrime input ${first}`); }
+  { const front = (a, lo, hi, x) => { for (let i = lo; i < hi; i++) if (a[i] === x) return i; return -1; };
+    const back = (a, lo, hi, x) => { for (let i = hi - 1; i >= lo; i--) if (a[i] === x) return i; return -1; };
+    const count = (f, a, x) => { let body = 0, i = f(a, 0, a.length, x); while (i !== -1) { body++; i = f(a, i + 1, a.length, x); } return body; };
+    ok("practice", keyOf("cse331-w2-l5-count-impls", "front") === String(count(front, [5, 1, 5, 2, 5], 5)) && keyOf("cse331-w2-l5-count-impls", "front-body") === String(count(front, [5, 1, 5, 2, 5], 5)) && keyOf("cse331-w2-l5-count-impls", "back") === String(count(back, [5, 1, 5, 2, 5], 5)), `count: front ${count(front, [5, 1, 5, 2, 5], 5)}, back ${count(back, [5, 1, 5, 2, 5], 5)}`); }
+  { // sumUpTo: each test fixes n and so runs the body exactly n times; loop coverage needs counts 0, 1 and more than 1
+    const body = (n) => { let c = 0; for (let i = 1; i <= n; i++) c++; return c; };
+    ok("practice", keyOf("cse331-w2-l5-plan-tests", "fewest") === "3" && body(0) === 0 && body(1) === 1 && body(3) > 1, "sumUpTo needs three tests (0, 1, many body runs)"); }
+  ok("practice", quizKey("cse331-w2-q2-fewest-tests") === "2", "two tests are the least");
+  console.log(`practice keys: ${counts.practice} checks`);
+}
+
 rmSync(work, { recursive: true, force: true });
 console.log(`groups: ${Object.entries(counts).map(([k, v]) => `${k} ${v}`).join(", ")}`);
 console.log(`${checks - fails}/${checks} checks match real Java and bash`);

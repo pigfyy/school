@@ -44,12 +44,14 @@
       <ol class="modules">
         <li><a href="#l4-pq">The priority queue ADT</a></li>
         <li><a href="#l4-heap">Why a heap</a></li>
+        <li><a href="#l4-practice">Practice</a></li>
       </ol>
     </div>
     <div>
       <h2>Section 2: Runtime <span class="today" data-date="2026-10-08">Thu Oct 8</span></h2>
       <ol class="modules">
         <li><a href="#s2-runtime">Big-O proofs and numUnique</a></li>
+        <li><a href="#s2-practice">Practice</a></li>
       </ol>
     </div>
     <div>
@@ -57,6 +59,8 @@
       <ol class="modules">
         <li><a href="#l5-ops">Insert and extract</a></li>
         <li><a href="#l5-build">Array heaps and buildHeap</a></li>
+        <li><a href="#l5-practice">Practice</a></li>
+        <li><a href="#w2-quiz">Check your understanding</a></li>
       </ol>
     </div>
     <div>
@@ -127,7 +131,7 @@
       <li><strong>Teaching notes</strong> are the amber blocks. They're open by default and hold talking points, questions to ask and common mistakes.</li>
       <li><strong>Exercises</strong> are answerable on the page. Type an answer, write your work, and ask for hints. Solutions stay hidden until you press <strong>Show solution</strong>, and then they show one step at a time. Your work is kept in this browser as you type.</li>
       <li>Boxes accept arithmetic like <code>2^10+1</code>. Big-O boxes take a class like <code>n log n</code>, <code>O(n^2)</code> or <code>2^n</code>. True/false boxes take <code>true</code>, <code>false</code>, <code>yes</code> or <code>no</code>.</li>
-      <li>The Wednesday, Thursday and Friday pages (priority queues, Section 2, heaps) come after Lecture 3 in the rail. They use the course's own slides and section worksheet, with short quick checks. Graded Exercise 0 is not reproduced.</li>
+      <li>The Wednesday, Thursday and Friday pages (priority queues, Section 2, heaps) come after Lecture 3 in the rail. Each has a practice page of answerable problems built from the course's own slides and section worksheet, and the last has a nine-question check. Graded Exercise 0 is not reproduced.</li>
     </ul>
   </div>
 
@@ -1061,6 +1065,83 @@ print(extract)</code></pre>
   <nav class="pager"></nav>
 </section>
 
+<section class="page" id="l4-practice" data-title="Lecture 4: practice">
+  <p class="where">Lecture 4 · Priority Queues 1 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span> · practice</p>
+  <h1>Lecture 4: practice</h1>
+  <div class="prose"><p>Three problems built on the lecture's own examples: a trace like slide 9's, the implementation table of slide 13, and the height argument of slide 17. Every number was computed by running it.</p></div>
+
+  <article class="task" data-id="cse332-w2-l4-pq-trace">
+    <h2>1. Trace a priority queue</h2>
+    <p class="prompt">Start with an empty priority queue (smallest priority first) and run: <code>insert(9)</code>, <code>insert(4)</code>, <code>insert(7)</code>, <code>extract</code>, <code>insert(2)</code>, <code>extract</code>, <code>extract</code>, <code>insert(6)</code>, <code>extract</code>, <code>extract</code>. Each <code>extract</code> prints what it returns.</p>
+    <div class="answer-spec" data-part="first" data-grader="exact" data-answer="4" data-label="first value printed"></div>
+    <div class="answer-spec" data-part="second" data-grader="exact" data-answer="2" data-label="second value printed"></div>
+    <div class="answer-spec" data-part="third" data-grader="exact" data-answer="7" data-label="third value printed"></div>
+    <div class="answer-spec" data-part="fifth" data-grader="exact" data-answer="9" data-label="last value printed"></div>
+    <ol class="hints">
+      <li>Keep the items still waiting in a list. An <code>extract</code> removes the smallest one <em>now in the queue</em>, not the smallest ever inserted.</li>
+      <li>After the first <code>extract</code> the queue holds 9 and 7. The next insert is 2.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>After the three inserts the queue holds 9, 4, 7. <code>extract</code> prints 4.</li>
+      <li><code>insert(2)</code>, then <code>extract</code> prints 2 (it beats 7 and 9, even though it arrived later). The next <code>extract</code> prints 7.</li>
+      <li>Now only 9 is left. <code>insert(6)</code>, then <code>extract</code> prints 6, and the last <code>extract</code> prints 9.</li>
+      <li class="answer">4, 2, 7, 6, 9. A queue would print them in arrival order (9, 4, 7, …); a priority queue serves by priority.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>The same shape as slide 9's second example, with new numbers. The usual error is returning the oldest item, or the smallest ever inserted.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l4-pq-costs">
+    <h2>2. Pick the data structure</h2>
+    <p class="prompt">Worst-case running time of one operation, from the lecture's table (<code>n</code> items, maximum size known in advance). Give a Θ class.</p>
+    <div class="answer-spec" data-part="unsorted-extract" data-grader="bigo" data-answer="n" data-label="extract from an unsorted array"></div>
+    <div class="answer-spec" data-part="sorted-insert" data-grader="bigo" data-answer="n" data-label="insert into a sorted array"></div>
+    <div class="answer-spec" data-part="sorted-extract" data-grader="bigo" data-answer="1" data-label="extract from a sorted array (smallest first)"></div>
+    <div class="answer-spec" data-part="heap-insert" data-grader="bigo" data-answer="log n" data-label="insert into a binary heap"></div>
+    <ol class="hints">
+      <li>Which operation is cheap in a structure that keeps its items unsorted? Which in one that keeps them sorted?</li>
+      <li>A sorted array can keep its smallest item at the front, so what does <code>extract</code> do there?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Unsorted array: <code>insert</code> is just one write at the end, \(\Theta(1)\). <code>extract</code> has to scan for the smallest, \(\Theta(n)\).</li>
+      <li>Sorted array: <code>insert</code> must find the spot and shift the rest, \(\Theta(n)\). The smallest sits at an end, so <code>extract</code> is \(\Theta(1)\).</li>
+      <li>Binary heap: both operations follow one root-to-leaf path, \(\Theta(\log n)\).</li>
+      <li class="answer">\(\Theta(n)\); \(\Theta(n)\); \(\Theta(1)\); \(\Theta(\log n)\). Each simple structure makes one operation cheap and the other expensive; the heap makes both cheap enough.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Rows of slide 13 (Lecture 4): fill in the table yourself first. The BST is \(\Theta(n)\) for both because it can degenerate into a chain.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l4-height">
+    <h2>3. How tall can a heap be?</h2>
+    <p class="prompt">A binary tree of height \(h\) (the edges on the longest path) has at most \(2^{h+1}-1\) nodes. A complete binary tree with \(n\) nodes has the smallest height \(h\) with \(n \le 2^{h+1}-1\).</p>
+    <div class="answer-spec" data-part="max-h5" data-grader="exact" data-answer="63" data-label="most nodes in a binary tree of height 5"></div>
+    <div class="answer-spec" data-part="h-1000" data-grader="exact" data-answer="9" data-label="height of a complete tree with 1000 nodes"></div>
+    <div class="answer-spec" data-part="h-1024" data-grader="exact" data-answer="10" data-label="height of a complete tree with 1024 nodes"></div>
+    <div class="answer-spec" data-part="h-1023" data-grader="exact" data-answer="9" data-label="height of a complete tree with 1023 nodes"></div>
+    <ol class="hints">
+      <li>\(2^{5+1}-1\). For the heights, find the smallest \(h\) whose bound is at least \(n\).</li>
+      <li>\(2^{10} = 1024\) and \(2^{9} = 512\), so \(2^{10}-1 = 1023\) is the largest tree of height 9.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Height 5: \(2^{6}-1 = 63\) nodes at most.</li>
+      <li>For \(n = 1000\): \(2^{9}-1 = 511 &lt; 1000 \le 1023 = 2^{10}-1\), so \(h = 9\).</li>
+      <li>For \(n = 1023\) the tree is exactly full at height 9: \(2^{10}-1 = 1023\). For \(n = 1024\) one more node starts a new level, so the height is 10.</li>
+      <li class="answer">63; 9; 10; 9. In general \(h = \lceil\log_2(n+1)\rceil - 1\), which is \(\Theta(\log n)\). That is why a complete tree is a good shape for a priority queue.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>The lecture's reasoning (slide 17): max nodes \(2^{h+1}-1\), minimum height \(\lceil\log_2(n+1)\rceil - 1\). The step from 1023 to 1024 nodes is the one students miss.</li></ul>
+    </details>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
 <!-- ================================================================ S2: RUNTIME -->
 <section class="page" id="s2-runtime" data-title="Section 2: big-O proofs and numUnique">
   <p class="where">Section 2 · Runtime · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
@@ -1153,6 +1234,103 @@ print(extract)</code></pre>
       <li>The section ends by pointing to the course's Heaps summary, a video review, and office hours.</li>
     </ul>
   </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="s2-practice" data-title="Section 2: practice">
+  <p class="where">Section 2 · Runtime · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span> · practice</p>
+  <h1>Section 2: practice</h1>
+  <div class="prose"><p>Four problems from the section's worksheet: the true/false claims of question 0, the smallest \(n_0\) in the question 1 proofs, a Θ proof in the style of question 2, and the <code>numUnique</code> loops of question 3. Write your reasoning in the work box.</p></div>
+
+  <article class="task" data-id="cse332-w2-s2-q0-claims">
+    <h2>1. Suppose \(f(n) \in O(n)\)</h2>
+    <p class="prompt">Worksheet question 0. For each statement say <code>true</code> if it is guaranteed always true, <code>false</code> if always false, and <code>sometimes</code> if it can go either way.</p>
+    <div class="answer-spec" data-part="n-sq" data-grader="choice" data-answer="true" data-choices='["true","false","sometimes"]' data-label="\(f \in O(n^2)\)"></div>
+    <div class="answer-spec" data-part="log" data-grader="choice" data-answer="sometimes" data-choices='["true","false","sometimes"]' data-label="\(f \in O(\log n)\)"></div>
+    <div class="answer-spec" data-part="omega-n" data-grader="choice" data-answer="sometimes" data-choices='["true","false","sometimes"]' data-label="\(f \in \Omega(n)\)"></div>
+    <div class="answer-spec" data-part="omega-n2" data-grader="choice" data-answer="false" data-choices='["true","false","sometimes"]' data-label="\(f \in \Omega(n^2)\)"></div>
+    <ol class="hints">
+      <li>Test two functions that are both in \(O(n)\): \(f = 1\) and \(f = n\). Does the statement hold for both?</li>
+      <li>Big-O is an upper bound: anything below \(O(n)\) is below \(O(n^2)\) too.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(f \in O(n)\) means \(f \le c\,n\) eventually. Then \(f \le c\,n \le c\,n^2\), so \(f \in O(n^2)\) always.</li>
+      <li>\(f = 1\) is in \(O(\log n)\); \(f = n\) is not. So \(O(\log n)\) is sometimes true. Likewise \(f = n\) is in \(\Omega(n)\) and \(f = 1\) is not.</li>
+      <li>\(\Omega(n^2)\) would need \(f \ge c\,n^2\), and \(O(n)\) says \(f \le c'\,n\): both together are impossible for large \(n\), so always false.</li>
+      <li class="answer">true; sometimes; sometimes; false.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>The slide's full list has eight rows; four are asked here. "Sometimes" is the answer whenever a function can sit anywhere below the bound.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w2-s2-smallest-n0">
+    <h2>2. The smallest \(n_0\)</h2>
+    <p class="prompt">For each pair, give the smallest \(n_0\) so that \(f(n) \le c \cdot g(n)\) for every \(n \ge n_0\), with the constant \(c\) the section chose. (Check the first \(n\) where it holds <em>and keeps holding</em>.)</p>
+    <div class="answer-spec" data-part="q1b" data-grader="exact" data-answer="19" data-miscon='{"20":"not-smallest"}' data-label="1b: \(f=1000\), \(g=3n^2\), \(c=1\)"></div>
+    <div class="answer-spec" data-part="q1d" data-grader="exact" data-answer="1" data-label="1d: \(f=7n^2+3n\), \(g=n^4\), \(c=10\)"></div>
+    <div class="answer-spec" data-part="q2b" data-grader="exact" data-answer="3" data-label="2b: \(f=n^3+10n\), \(g=3n^3\), \(c=1\)"></div>
+    <div class="answer-spec" data-part="q1e" data-grader="exact" data-answer="2" data-label="1e: \(f=n+2n\log_2 n\), \(g=n\log_2 n\), \(c=3\)"></div>
+    <ol class="hints">
+      <li>Write the inequality and solve it for \(n\). Then check the value just below your answer: it must fail.</li>
+      <li>For 1b: \(1000 \le 3n^2\) means \(n^2 \ge 333.3\). \(18^2 = 324\) and \(19^2 = 361\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>1b: \(3\cdot 18^2 = 972 &lt; 1000\) fails; \(3\cdot 19^2 = 1083 \ge 1000\) holds. So \(n_0 = 19\). The slide takes 20, which also works but isn't the smallest.</li>
+      <li>1d: \(7n^2+3n \le 10n^4\) already holds at \(n=1\) (10 ≤ 10). So \(n_0 = 1\).</li>
+      <li>2b: \(n^3+10n \le 3n^3 \iff 10 \le 2n^2 \iff n \ge 3\) (\(n=2\): 28 &gt; 24 fails; \(n=3\): 57 ≤ 81 holds).</li>
+      <li>1e: \(n + 2n\log n \le 3n\log n \iff 1 \le \log n \iff n \ge 2\).</li>
+      <li class="answer">19; 1; 3; 2. The slides use safe values (20, 1, 4, 2) rather than the smallest, and a proof only needs one that works.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>The distinction the section keeps making: scratch work finds \(c\) and \(n_0\); the proof only declares them and shows they work.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w2-s2-write-theta">
+    <h2>3. Write a Θ proof</h2>
+    <p class="prompt">Prove \(2n^2 + 5 \in \Theta(4n^2)\) in the section's style: show \(O\) and \(\Omega\) separately, each declaring \(c\) and \(n_0\) and showing the inequality for every \(n \ge n_0\).</p>
+    <div class="answer-spec" data-part="proof" data-grader="self" data-long data-label="your \(O\) pair, your \(\Omega\) pair, and the key step of each"></div>
+    <ol class="hints">
+      <li>For \(O\): \(2n^2 + 5 \le c\cdot 4n^2\). When is \(5 \le n^2\)? For \(\Omega\): \(2n^2+5\) is never below \(2n^2\).</li>
+      <li>The section's own example uses \(c = 1, n_0 = 3\) for \(O\) and \(c = \tfrac12, n_0 = 1\) for \(\Omega\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(O\): let \(c = 1\) and \(n_0 = 3\). For \(n \ge 3\), \(n^2 \ge 9 &gt; 5\), so \(2n^2 + 5 \le 3n^2 \le 4n^2\).</li>
+      <li>\(\Omega\): let \(c = \tfrac12\) and \(n_0 = 1\). Then \(c\cdot 4n^2 = 2n^2 \le 2n^2 + 5\) for every \(n \ge 1\).</li>
+      <li>Both bounds hold, so \(2n^2 + 5 \in \Theta(4n^2)\).</li>
+      <li class="answer">\(O\) with \(c = 1, n_0 = 3\); \(\Omega\) with \(c = \tfrac12, n_0 = 1\). Any valid pairs earn credit: check that each names specific values and argues for an arbitrary \(n \ge n_0\).</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Many pairs work. The two moves from slide 20: name specific values, then argue for an <em>arbitrary</em> \(n \ge n_0\). Don't put the solving in the proof.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w2-s2-numunique-trace">
+    <h2>4. Count the loops in numUnique</h2>
+    <p class="prompt"><code>numUnique</code> (on the Section 2 page) marks every copy of the current value as visited. Run it on <code>["a","b","c","d","e","f"]</code> (all different) and on <code>["a","a","a","a","a","a"]</code> (all the same), and count the inner-loop iterations (lines 10–14 only).</p>
+    <div class="answer-spec" data-part="distinct-out" data-grader="exact" data-answer="6" data-label="result on the six different values"></div>
+    <div class="answer-spec" data-part="distinct-inner" data-grader="exact" data-answer="21" data-label="inner-loop iterations, six different values"></div>
+    <div class="answer-spec" data-part="same-out" data-grader="exact" data-answer="1" data-label="result on the six equal values"></div>
+    <div class="answer-spec" data-part="same-inner" data-grader="exact" data-answer="6" data-label="inner-loop iterations, six equal values"></div>
+    <ol class="hints">
+      <li>With all values different, the inner loop starts at index <code>i</code> and runs to the end for every <code>i</code>: how many iterations is that?</li>
+      <li>With all equal values, the first outer iteration visits everything. What do the later iterations do?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Six different values: the inner loop runs 6 + 5 + 4 + 3 + 2 + 1 = 21 times, and the method returns 6. For \(n\) values that is \(\frac{n(n+1)}{2}\).</li>
+      <li>Six equal values: the first outer iteration runs the inner loop 6 times and marks every index visited. Every later outer iteration finds <code>visited[i]</code> true and skips it, so the inner loop never runs again. It returns 1.</li>
+      <li class="answer">6 and 21; 1 and 6. So the worst case is \(n + \frac{n(n+1)}{2} \in \Theta(n^2)\) and the best case is \(n + n \in \Theta(n)\).</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Add the first loop (\(n\) iterations) to get the full counts: worst \(n + \frac{n(n+1)}{2}\), best \(2n\). Those are the section's \(f(n)\) and \(g(n)\).</li></ul>
+    </details>
+  </article>
+
   <nav class="pager"></nav>
 </section>
 
@@ -1253,6 +1431,188 @@ extract() {
     <ul>
       <li>Most students expect \(\Theta(n\log n)\) because each of \(n\) calls is \(O(\log n)\). The sharper count works because most nodes are near the bottom and percolate only a step or two.</li>
       <li>The slides point to the course's Heaps summary page for a second presentation.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l5-practice" data-title="Lecture 5: practice">
+  <p class="where">Lecture 5 · Priority Queues 2 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span> · practice</p>
+  <h1>Lecture 5: practice</h1>
+  <div class="prose"><p>Four problems from the lecture's own examples: the "Are these min-heaps?" slide, the insert 1.5 / extract example, the 16, 32, 4, 57, 80, 43, 2 example, and Floyd's buildHeap. Draw the tree as you go. Every answer was computed by running the lecture's pseudocode.</p></div>
+
+  <article class="task" data-id="cse332-w2-l5-heap-check">
+    <h2>1. Is it a min-heap?</h2>
+    <p class="prompt">Each array is a heap stored from index 0 (children of index <code>i</code> are <code>2i+1</code> and <code>2i+2</code>, the course exercises' convention). Say whether it is a valid binary min-heap. <b>A</b>: <code>2, 4, 3, 8, 5, 9, 7</code>. <b>B</b>: <code>1, 4, 2, 3, 5, 6, 7</code>. <b>C</b>: <code>3, 5, 4, 9, 6, 7, 8, 10</code>. <b>D</b>: <code>4, 6, 5, 7, 3, 8, 9</code>.</p>
+    <div class="answer-spec" data-part="a" data-grader="yesno" data-answer="yes" data-label="A"></div>
+    <div class="answer-spec" data-part="b" data-grader="yesno" data-answer="no" data-label="B"></div>
+    <div class="answer-spec" data-part="c" data-grader="yesno" data-answer="yes" data-label="C"></div>
+    <div class="answer-spec" data-part="d" data-grader="yesno" data-answer="no" data-label="D"></div>
+    <ol class="hints">
+      <li>Check each node against its own two children only. Index 1's children are indexes 3 and 4.</li>
+      <li>The shape is always right in an array. Only the ordering can fail.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>A: 2 ≤ 4, 3; 4 ≤ 8, 5; 3 ≤ 9, 7. Valid.</li>
+      <li>B: index 1 holds 4 but its child at index 3 is 3 and 3 &lt; 4. Not a heap.</li>
+      <li>C: 3 ≤ 5, 4; 5 ≤ 9, 6; 4 ≤ 7, 8; 9 ≤ 10 (index 3's child at index 7). Valid.</li>
+      <li>D: index 1 holds 6 and its child at index 4 is 3. Not a heap.</li>
+      <li class="answer">A yes; B no; C yes; D no. The heap property relates a node only to its own children.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Slide 9 of Lecture 5 asks the same on trees. A node's value compared with a node on another branch is never a violation.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l5-insert-extract">
+    <h2>2. Percolate by hand</h2>
+    <p class="prompt">The heap from the lecture's slide, in level order: <code>1, 3, 2, 4, 7, 5, 6, 5, 9</code>. (a) <code>insert(0)</code>. (b) A fresh copy of the original, then <code>extract</code>.</p>
+    <div class="answer-spec" data-part="insert-swaps" data-grader="exact" data-answer="3" data-label="(a) number of swaps percolating 0 up"></div>
+    <div class="answer-spec" data-part="insert-root" data-grader="exact" data-answer="0" data-label="(a) the new root"></div>
+    <div class="answer-spec" data-part="extract-returned" data-grader="exact" data-answer="1" data-label="(b) value returned by extract"></div>
+    <div class="answer-spec" data-part="extract-root" data-grader="exact" data-answer="2" data-label="(b) the new root afterwards"></div>
+    <ol class="hints">
+      <li>Insert goes in the next open spot, the 10th position, whose parent is the 7. Swap upward while the new value is smaller than its parent.</li>
+      <li>Extract moves the last item (9) to the root, then swaps it with its smaller child until neither child is smaller.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>(a) 0 lands under 7 (position 10): swap with 7, with 3, with 1. Three swaps and 0 is the root. The heap is <code>0, 1, 2, 4, 3, 5, 6, 5, 9, 7</code>.</li>
+      <li>(b) <code>extract</code> returns the root, 1. Move 9 to the root; its children are 3 and 2; swap with the smaller (2). Then 9's children are 5 and 6; swap with 5. The new root is 2: <code>2, 3, 5, 4, 7, 9, 6, 5</code>.</li>
+      <li class="answer">(a) 3 swaps, root 0; (b) returns 1, new root 2. Each is one trip along a root–leaf path, so \(\Theta(\log n)\).</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>The lecture's own example inserts 1.5 (2 swaps) and extracts 1; this one inserts a new minimum so students see a percolate all the way to the root.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l5-build-sequence">
+    <h2>3. Insert, then extract: 16, 32, 4, 57, 80, 43, 2</h2>
+    <p class="prompt">The lecture's example: insert these seven values in order into an empty min-heap, then <code>extract</code> once. Use the course exercises' 0-based array, children of <code>i</code> at <code>2i+1</code> and <code>2i+2</code>.</p>
+    <div class="answer-spec" data-part="swaps-2" data-grader="exact" data-answer="2" data-label="swaps when 2 is inserted"></div>
+    <div class="answer-spec" data-part="root-after-inserts" data-grader="exact" data-answer="2" data-label="root after all seven inserts"></div>
+    <div class="answer-spec" data-part="extracted" data-grader="exact" data-answer="2" data-label="value returned by the extract"></div>
+    <div class="answer-spec" data-part="root-after-extract" data-grader="exact" data-answer="4" data-label="root after the extract"></div>
+    <ol class="hints">
+      <li>Only 4 and 2 move upward at all. Track where each is inserted and what its parent is.</li>
+      <li>By the time 2 is inserted at index 6, 4 has already swapped with 16: its parent (index 2) holds 16, and the root holds 4.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>16 is the root; 32 goes under it (no swap); 4 goes under 16 and swaps with it (1 swap); 57, 80 and 43 land with no swaps. The array is <code>4, 32, 16, 57, 80, 43</code> at that point.</li>
+      <li>2 lands at index 6 under 16: swap with 16, swap with 4. Two swaps and 2 is the root: <code>2, 32, 4, 57, 80, 43, 16</code>.</li>
+      <li><code>extract</code> returns 2. The last item, 16, moves to the root and swaps with its smaller child 4. Result: <code>4, 32, 16, 57, 80, 43</code>.</li>
+      <li class="answer">2 swaps; root 2; extract returns 2; new root 4.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Lecture 5 slides 27–29. A common error is to stop 2's percolate after one swap: it must go all the way to the root.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w2-l5-buildheap">
+    <h2>4. Floyd's buildHeap</h2>
+    <p class="prompt">Run <code>buildHeap()</code> on the 9-item array <code>9, 8, 7, 6, 5, 4, 3, 2, 1</code> (1-indexed, as in the lecture's pseudocode). It percolates down from <code>i = size</code> to 1. Count the swaps, and compare with inserting the same values one at a time.</p>
+    <div class="answer-spec" data-part="first-leaf" data-grader="exact" data-answer="5" data-label="index of the first leaf (n = 9)"></div>
+    <div class="answer-spec" data-part="total-swaps" data-grader="exact" data-answer="7" data-label="total swaps made by buildHeap"></div>
+    <div class="answer-spec" data-part="final-root" data-grader="exact" data-answer="1" data-label="the root afterwards"></div>
+    <div class="answer-spec" data-part="insert-swaps" data-grader="exact" data-answer="16" data-label="swaps if you insert 9, 8, 7, …, 1 one at a time"></div>
+    <ol class="hints">
+      <li>The leaves are indexes \(\lfloor n/2\rfloor+1\) to \(n\): they don't move. Start at the last non-leaf, index 4.</li>
+      <li>Work from 4 down to 1: index 4 (value 6) has children 2 and 1 (indexes 8 and 9).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Indexes 9 down to 5 are leaves: no swaps. Index 4 (6) swaps with its smaller child: 1 swap. Index 3 (7) swaps once. Index 2 (8) swaps twice. Index 1 (9) swaps three times: 1 + 1 + 2 + 3 = 7.</li>
+      <li>The final array is <code>1, 2, 3, 6, 5, 4, 7, 8, 9</code>, with root 1.</li>
+      <li>Inserting 9, 8, …, 1 one at a time percolates each new smaller value up: 0, 1, 1, 2, 2, 2, 2, 3, 3 swaps, a total of 16.</li>
+      <li class="answer">First leaf 5; 7 swaps; root 1; 16 swaps by repeated insert. Both are correct, but buildHeap does far fewer: \(\Theta(n)\) total versus \(\Theta(n\log n)\) for repeated insertion.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Slides 31–40. On this reverse-sorted input the gap is already visible at \(n=9\); the analysis (sum \(\sum i/2^{i+1} \le 2\)) shows why it grows.</li></ul>
+    </details>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="w2-quiz" data-title="Check your understanding: priority queues and Section 2">
+  <p class="where">Priority Queues 1 and 2 and Section 2 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: priority queues and heaps</h1>
+  <div class="prose"><p>Nine questions on Priority Queues 1 and 2 and Section 2. Answer without looking back, then use the review links for anything you missed. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="w2" role="status"></div>
+  <ol class="cyu-list" data-quiz="w2">
+    <li class="cyu" data-id="cse332-w2-q2-pq-vs-queue" data-kind="mc" data-topic="l4-pq">
+      <p class="q">What does <code>extract</code> remove from a priority queue?</p>
+      <div class="opts">
+        <label><input type="radio" name="pq1"> The item inserted first<span class="why" hidden>That is a (FIFO) queue.</span></label>
+        <label data-correct><input type="radio" name="pq1"> The item with the highest priority (usually the smallest value)<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="pq1"> The item inserted last<span class="why" hidden>That is a stack.</span></label>
+        <label><input type="radio" name="pq1"> Any item, chosen at random<span class="why" hidden>It is deterministic: always the top priority.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w2-q2-heap-shape" data-kind="mc" data-topic="l4-heap">
+      <p class="q">A binary min-heap must be…</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="pq2"> a complete binary tree with every node ≤ its children<span class="why" hidden>Correct. Both parts: the shape keeps height \(\log n\), the order puts the minimum at the root.</span></label>
+        <label><input type="radio" name="pq2"> a sorted array<span class="why" hidden>A heap is only partly ordered; that is why it is cheaper to maintain.</span></label>
+        <label><input type="radio" name="pq2"> a binary search tree<span class="why" hidden>A BST orders left versus right; a heap orders parent versus children.</span></label>
+        <label><input type="radio" name="pq2"> a tree where every level is sorted left to right<span class="why" hidden>No such requirement.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w2-q2-heap-not-sorted" data-kind="mc" data-topic="l4-heap">
+      <p class="q">In a min-heap, is every node on one level smaller than every node on the next?</p>
+      <div class="opts">
+        <label><input type="radio" name="pq3"> Yes<span class="why" hidden>A node is only compared with its own parent and children. Another branch's nodes can be smaller or larger.</span></label>
+        <label data-correct><input type="radio" name="pq3"> No, only a parent is ≤ its children<span class="why" hidden>Correct. Slide 9: 5 is smaller than 10, but 10 isn't its ancestor, so that is not a violation.</span></label>
+        <label><input type="radio" name="pq3"> Yes, otherwise the minimum wouldn't be at the root<span class="why" hidden>The root is the minimum because every parent is ≤ its children, which gives it ≤ everything below.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w2-q2-percolate-down-pick" data-kind="mc" data-topic="l5-ops">
+      <p class="q">Percolating down, which child does the value swap with?</p>
+      <div class="opts">
+        <label><input type="radio" name="pq4"> The left child<span class="why" hidden>Only if the left child is the smaller one.</span></label>
+        <label><input type="radio" name="pq4"> The larger child<span class="why" hidden>That would leave the larger one above a smaller sibling.</span></label>
+        <label data-correct><input type="radio" name="pq4"> The smaller child<span class="why" hidden>Correct. Otherwise the sibling would be smaller than its new parent.</span></label>
+        <label><input type="radio" name="pq4"> Neither; it stays put<span class="why" hidden>Only if neither child is smaller than it.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w2-q2-right-child-0based" data-kind="num" data-answer="8" data-topic="l5-build">
+      <p class="q">With the course exercises' 0-based array, what is the index of the right child of the node at index 3?</p>
+      <p class="why" hidden>Children of index \(i\) are \(2i+1\) and \(2i+2\): 7 and 8. (1-indexed, as in the lecture pseudocode, they are \(2i\) and \(2i+1\).)</p>
+    </li>
+    <li class="cyu" data-id="cse332-w2-q2-parent-1based" data-kind="num" data-answer="5" data-topic="l5-build">
+      <p class="q">In the lecture's 1-indexed array, what is the index of the parent of node 11?</p>
+      <p class="why" hidden>The parent of \(i\) is \(\lfloor i/2\rfloor = \lfloor 11/2\rfloor = 5\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w2-q2-buildheap-time" data-kind="mc" data-topic="l5-build">
+      <p class="q">Floyd's buildHeap on \(n\) items takes…</p>
+      <div class="opts">
+        <label><input type="radio" name="pq7"> \(\Theta(n\log n)\), since there are \(n\) percolate-downs of \(O(\log n)\) each<span class="why" hidden>That is an upper bound but not tight: most nodes are near the bottom and percolate only a step.</span></label>
+        <label data-correct><input type="radio" name="pq7"> \(\Theta(n)\)<span class="why" hidden>Correct. \(0\cdot\frac n2 + 1\cdot\frac n4 + 2\cdot\frac n8 + \dots \le 2n\).</span></label>
+        <label><input type="radio" name="pq7"> \(\Theta(\log n)\)<span class="why" hidden>Every item has to be examined, so at least \(n\).</span></label>
+        <label><input type="radio" name="pq7"> \(\Theta(n^2)\)<span class="why" hidden>Far too many: each percolate-down is at most \(\log n\).</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w2-q2-section-sometimes" data-kind="mc" data-topic="s2-runtime">
+      <p class="q">If \(f(n)\in O(n)\), is \(f(n)\in O(\log n)\)?</p>
+      <div class="opts">
+        <label><input type="radio" name="pq8"> Always<span class="why" hidden>\(f = n\) is in \(O(n)\) and not in \(O(\log n)\).</span></label>
+        <label><input type="radio" name="pq8"> Never<span class="why" hidden>\(f = 1\) is in both.</span></label>
+        <label data-correct><input type="radio" name="pq8"> Sometimes<span class="why" hidden>Correct: \(f=1\) is in \(O(\log n)\), \(f=n\) is not.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w2-q2-numunique-same-bucket" data-kind="bigo" data-answer="n" data-topic="s2-runtime">
+      <p class="q">Best-case running time of <code>numUnique</code> (every value the same), as a Θ class.</p>
+      <p class="why" hidden>The first loop is \(n\) iterations; the first outer iteration runs the inner loop \(n\) times and marks everything, so no later iteration runs it. \(2n \in \Theta(n)\).</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="w2" role="status"></div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Use it as an exit ticket on Friday. Questions 3 and 7 are the conceptual core: the heap property is local, and buildHeap is linear.</li>
+      <li>The numeric answers were checked by running the lecture's pseudocode (<code>checks/cse332/w02/verify.mjs</code>).</li>
     </ul>
   </details>
   <nav class="pager"></nav>

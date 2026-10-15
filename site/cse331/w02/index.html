@@ -54,6 +54,7 @@
       <ol class="modules">
         <li><a href="#s1-strength">Task 1: comparing specs</a></li>
         <li><a href="#s1-remove">Task 2: removeValue</a></li>
+        <li><a href="#s1-practice">Practice</a></li>
       </ol>
     </div>
     <div>
@@ -62,6 +63,7 @@
         <li><a href="#l4-test">What a test is</a></li>
         <li><a href="#l4-inputs">Choosing inputs</a></li>
         <li><a href="#l4-spec-based">Specification-based tests</a></li>
+        <li><a href="#l4-practice">Practice</a></li>
       </ol>
     </div>
     <div>
@@ -69,6 +71,8 @@
       <ol class="modules">
         <li><a href="#l5-coverage">Statement, branch, loop</a></li>
         <li><a href="#l5-enough">When to stop</a></li>
+        <li><a href="#l5-practice">Practice</a></li>
+        <li><a href="#w2-quiz">Check your understanding</a></li>
       </ol>
     </div>
     <div>
@@ -114,7 +118,7 @@
   </div>
 
   <div class="prose">
-    <p>Later in the week the course added <a href="#s1-strength">Section 1</a> (Tue), <a href="#l4-test">Lecture 4: Testing</a> (Wed) and <a href="#l5-coverage">Lecture 5: Coverage</a> (Fri). They follow Lecture 3 in the rail. Practice there is the section's own tasks and the lectures' own exercises, with short quick checks; Homework 1 is not reproduced.</p>
+    <p>Later in the week the course added <a href="#s1-strength">Section 1</a> (Tue), <a href="#l4-test">Lecture 4: Testing</a> (Wed) and <a href="#l5-coverage">Lecture 5: Coverage</a> (Fri). They follow Lecture 3 in the rail. Each has a practice page of answerable problems built from the section's tasks and the lectures' own exercises, and the last has an eight-question check. Homework 1 is not reproduced.</p>
   </div>
 
   <h2>How to use this site</h2>
@@ -1066,6 +1070,89 @@
   <nav class="pager"></nav>
 </section>
 
+<section class="page" id="s1-practice" data-title="Section 1: practice" data-unit="s1">
+  <p class="where">Section 1 · <span class="today-chip" data-date="2026-10-06">Tue Oct 6</span> · practice</p>
+  <h1>Section 1: practice</h1>
+  <div class="prose">
+    <p>Three problems on Section 1's specs. Answer before looking back at the tables on the previous two pages. Problem 3 re-asks the section's own table; problems 1 and 2 build on it. Type your reasoning in the work box as you go.</p>
+  </div>
+
+  <article class="task" data-id="cse331-w2-s1-removevalue-strength">
+    <h2>1. Comparing the removeValue specs</h2>
+    <p class="prompt">Take specs A–D of Task 2 (the <code>removeValue</code> specs on the previous page). Say whether the first spec is <em>stronger</em>, <em>weaker</em> or <em>incomparable</em> to the second.</p>
+    <div class="answer-spec" data-part="a-b" data-type="strength" data-answer="stronger" data-label="A is ___ than B" data-placeholder="stronger, weaker or incomparable"></div>
+    <div class="answer-spec" data-part="a-c" data-type="strength" data-answer="incomparable" data-label="A is ___ than C" data-placeholder="stronger, weaker or incomparable"></div>
+    <div class="answer-spec" data-part="c-d" data-type="strength" data-answer="stronger" data-label="C is ___ than D" data-placeholder="stronger, weaker or incomparable"></div>
+    <div class="answer-spec" data-part="b-d" data-type="strength" data-answer="incomparable" data-label="B is ___ than D" data-placeholder="stronger, weaker or incomparable"></div>
+    <ol class="hints">
+      <li>Use the rule from Lecture 3: precondition weaker or the same, and where the other's precondition holds, postcondition stronger or the same. Which pairs share a precondition?</li>
+      <li>For <em>incomparable</em> you need two implementations: one that meets only the first spec and one that meets only the second. Try an array with a repeated value.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>A and B have the same precondition. A's result must be the old values with the <em>first</em> <code>x</code> removed, in order. B allows any reordering of the old values with one <code>x</code> removed, so everything A allows, B allows. A is stronger.</li>
+      <li>A and C: with a repeated <code>x</code>, A removes only the first copy and C removes all of them, so Impl 2 meets A and not C, and Impl 1 meets C and not A. Incomparable.</li>
+      <li>C and D: D requires no duplicates; C has no precondition. When D's precondition holds, <code>x</code> occurs at most once, and C's result (remove it, keep the order, return <code>n − k</code>) is exactly what D says. C has the weaker precondition and the same promise, so C is stronger.</li>
+      <li>B and D: D's precondition is stronger, so on inputs with duplicates D promises nothing and B does, so D is not stronger than B. And on inputs D allows, D demands the order be kept, which B does not, so B is not stronger than D. Incomparable.</li>
+      <li class="answer">A stronger than B; A and C incomparable; C stronger than D; B and D incomparable.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>The section's own table (Task 2) answers which implementations meet which spec. This problem turns that table into strength claims, which is how Lecture 3 uses the idea.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse331-w2-s1-run-impls">
+    <h2>2. Run the four implementations</h2>
+    <p class="prompt">Take <code>a = {4, 8, 4, 6}</code>, <code>n = 4</code>, <code>x = 4</code>. Trace each implementation of Task 2 on that input and give what it returns and what the array holds afterward.</p>
+    <div class="answer-spec" data-part="impl1-return" data-type="int" data-answer="2" data-label="Impl 1 returns" data-placeholder="a number"></div>
+    <div class="answer-spec" data-part="impl1-first" data-type="int" data-answer="8" data-label="Impl 1: a[0] afterward" data-placeholder="a number"></div>
+    <div class="answer-spec" data-part="impl3-first" data-type="int" data-answer="4" data-label="Impl 3: a[0] afterward" data-placeholder="a number"></div>
+    <div class="answer-spec" data-part="impl4-first" data-type="int" data-answer="6" data-label="Impl 4: a[0] afterward" data-placeholder="a number"></div>
+    <ol class="hints">
+      <li>Impl 1 copies every element that is not <code>x</code> to a write position <code>w</code> and returns <code>w</code>. Impl 3 searches from the back.</li>
+      <li>Impl 4 overwrites the first occurrence of <code>x</code> with <code>a[n-1]</code> and leaves the rest alone.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Impl 1 keeps 8 and 6, writing them to indices 0 and 1, and returns 2. The array is <code>{8, 6, 4, 6}</code>.</li>
+      <li>Impl 2 (not asked) removes the first 4 by shifting left: <code>{8, 4, 6, 6}</code>, returns 3.</li>
+      <li>Impl 3 finds the <em>last</em> 4 at index 2 and shifts left over it: <code>{4, 8, 6, 6}</code>, returns 3. So <code>a[0]</code> is still 4.</li>
+      <li>Impl 4 overwrites index 0 with <code>a[3] = 6</code>: <code>{6, 8, 4, 6}</code>, returns 3.</li>
+      <li class="answer">Impl 1 returns 2 and <code>a[0]</code> is 8; Impl 3 leaves <code>a[0]</code> at 4; Impl 4 puts 6 at <code>a[0]</code>. Three different arrays, so three different specs can tell them apart.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>The next problem is the same observation as a table: Impl 1's array has only 2 live slots, Impl 3's keeps a 4 at the front (the first one, not the last).</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse331-w2-s1-which-specs">
+    <h2>3. Which specs does each implementation meet?</h2>
+    <p class="prompt">For each implementation, list the specs from {A, B, C, D} it satisfies, using the section's reasoning: A needs the first occurrence removed and the order kept, B allows reordering, C removes every occurrence, D has a no-duplicates precondition. Type the letters only, like <code>AB</code>.</p>
+    <div class="answer-spec" data-part="impl1" data-type="letters" data-allowed="ABCD" data-answer="CD" data-label="Impl 1 satisfies" data-placeholder="letters, e.g. AB"></div>
+    <div class="answer-spec" data-part="impl2" data-type="letters" data-allowed="ABCD" data-answer="ABD" data-label="Impl 2 satisfies" data-placeholder="letters, e.g. AB"></div>
+    <div class="answer-spec" data-part="impl3" data-type="letters" data-allowed="ABCD" data-answer="BD" data-label="Impl 3 satisfies" data-placeholder="letters, e.g. AB"></div>
+    <div class="answer-spec" data-part="impl4" data-type="letters" data-allowed="ABCD" data-answer="B" data-label="Impl 4 satisfies" data-placeholder="letters, e.g. AB"></div>
+    <div class="answer-spec" data-part="why-d" data-type="self" data-long data-label="Impl 1 removes every occurrence. Why does it still satisfy D?" data-placeholder="Because …"></div>
+    <ol class="hints">
+      <li>Check the specs one at a time: does the implementation remove the right occurrence(s), keep the order, return the right number?</li>
+      <li>D's precondition says there are no duplicates. What does that do to the difference between the first, the last and every occurrence?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Impl 1 removes all occurrences, so it fails A and B (one removal only) and meets C. D rules out duplicates, so removing all is the same as removing the one.</li>
+      <li>Impl 2 removes the first occurrence by shifting: that is exactly A. B allows but does not require reordering, so it meets B. It fails C. D's only occurrence is also the first.</li>
+      <li>Impl 3 removes the last occurrence, so it fails A. B doesn't care which one goes, so it meets B. It fails C. Under D, the last occurrence is the only occurrence.</li>
+      <li>Impl 4 moves <code>a[n-1]</code> into the removed slot, which breaks the order A and D require. B allows reordering, so it meets B. It fails C.</li>
+      <li class="answer">Impl 1: CD. Impl 2: ABD. Impl 3: BD. Impl 4: B.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>This is Section 1's own table (Task 2), re-asked. The self-check box is the sentence the solution writes: D's precondition makes "all", "first" and "last" the same thing.</li></ul>
+    </details>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
 <!-- ================================================================ LECTURE 4: TESTING -->
 <section class="page" id="l4-test" data-title="What a test is" data-unit="l4">
   <p class="where">Lecture 4 · Testing · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
@@ -1194,6 +1281,80 @@ void findsTheOnlyMatch() {
   <nav class="pager"></nav>
 </section>
 
+<section class="page" id="l4-practice" data-title="Lecture 4: practice" data-unit="l4">
+  <p class="where">Lecture 4 · Testing · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span> · practice</p>
+  <h1>Lecture 4: practice</h1>
+  <div class="prose">
+    <p>Three problems built from the lecture's own <code>indexOf</code> examples and its Exercises 1–3. The first two have you do what the lecture says tests do: find a mistake, and decide what a test may check.</p>
+  </div>
+
+  <article class="task" data-id="cse331-w2-l4-boundary-hunt">
+    <h2>1. Which inputs find the off-by-one?</h2>
+    <p class="prompt">Implementation 1 of <code>indexOf</code> has a mistake: its loop runs <code>while (i &lt;= hi)</code>, one step too far. Spec D. Which of these inputs (Exercise 1's eight rows, here named A–H) make it return the wrong answer or throw? Type the letters.</p>
+    <div class="answer-spec" data-part="failing-rows" data-type="letters" data-allowed="ABCDEFGH" data-answer="BDEGH" data-label="Rows where the mistaken loop fails" data-placeholder="letters, e.g. AB"></div>
+    <ol class="hints">
+      <li>The extra step looks at index <code>hi</code>. When does that index hold <code>x</code> (wrong answer) or fall off the array (exception)?</li>
+      <li>A test whose <code>x</code> is found before reaching <code>hi</code> never gets to the extra step. Rows A, C and F find <code>x</code> early.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>A: finds 7 at index 2 first. C: finds 5 at index 0. F: finds 7 at index 0. All still correct.</li>
+      <li>B: 42 is absent, so the loop reaches <code>i = 3</code>, off the end of the array: <code>ArrayIndexOutOfBoundsException</code>.</li>
+      <li>D: the range is empty but the loop looks at <code>a[1] = 0</code> and returns 1 where D promises −1. E: <code>a[0]</code> on an empty array throws. G: <code>i = 3</code> is off the end. H: looks at <code>a[2] = 7</code> and returns 2 where D promises −1.</li>
+      <li class="answer">B, D, E, G and H. The five rows that sit on a boundary or a case edge are the ones that catch this mistake; the three "x inside the range" rows can't.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Exercise 1's set was chosen for this reason: every row covers a different case or boundary, and each mistake of this kind is caught by some row.</li><li>Row A, C and F are the "easy" tests a person writes first. They all pass the mistaken loop.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse331-w2-l4-spec-based-which">
+    <h2>2. Which tests are specification-based?</h2>
+    <p class="prompt">Four tests of <code>indexOf</code> on the arrays from the lecture. <b>A</b>: <code>findsTheOnlyMatch</code> (<code>{3, 0, 7}</code>, 0 to 3, x = 7, expects 2). <b>B</b>: <code>returnsMinusOneWhenAbsent</code> (x = 42, expects −1). <b>C</b>: <code>findsTheFirstMatch</code> (<code>{5, 1, 5, 2, 5}</code>, expects 0). <b>D</b>: <code>findsSomeMatch</code> (checks the answer is in range and holds 5). For each spec, which tests are specification-based, so they pass every correct implementation?</p>
+    <div class="answer-spec" data-part="under-b" data-type="letters" data-allowed="ABCD" data-answer="ABCD" data-label="Under spec B (the smallest index)" data-placeholder="letters, e.g. AB"></div>
+    <div class="answer-spec" data-part="under-c" data-type="letters" data-allowed="ABCD" data-answer="ABD" data-label="Under spec C (the largest index)" data-placeholder="letters, e.g. AB"></div>
+    <div class="answer-spec" data-part="under-d" data-type="letters" data-allowed="ABCD" data-answer="ABD" data-label="Under spec D (some index)" data-placeholder="letters, e.g. AB"></div>
+    <div class="answer-spec" data-part="c-expects" data-type="int" data-answer="4" data-label="Under spec C, test C should expect" data-placeholder="a number"></div>
+    <ol class="hints">
+      <li>A test is specification-based if it checks only what the spec promises. What does each spec promise on <code>{5, 1, 5, 2, 5}</code>, x = 5?</li>
+      <li>Spec B promises 0, spec C promises 4, and spec D allows 0, 2 or 4.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Tests A and B have one possible answer under all three specs (x occurs once, or not at all), so they are specification-based under all of them.</li>
+      <li>Test C expects 0. B promises 0, so it is specification-based under B. C promises 4, so test C fails every implementation of C. D allows 0, 2 or 4, so test C is implementation-based.</li>
+      <li>Test D checks only that the answer is in range and holds 5: true under B, C and D.</li>
+      <li class="answer">Under B: ABCD. Under C: ABD (test C should expect 4). Under D: ABD.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>This is Exercise 2 of the lecture. Note the side remark: test D is spec-based under all three but checks <em>less</em> than B or C promise, so it would pass an implementation of B that returned 2.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse331-w2-l4-break-precondition">
+    <h2>3. A test that breaks the precondition</h2>
+    <p class="prompt">A test calls <code>indexOf(a, 0, 4, 7)</code> on <code>a = {3, 0, 7}</code> and expects −1. Use spec D.</p>
+    <div class="answer-spec" data-part="promises" data-type="yesno" data-answer="no" data-label="Does D promise anything for this call?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="impl1" data-type="int" data-answer="2" data-label="Implementation 1 (searches from the front) returns" data-placeholder="a number"></div>
+    <div class="answer-spec" data-part="impl4" data-type="yesno" data-answer="yes" data-label="Does implementation 4 (searches from index hi − 1 down) throw ArrayIndexOutOfBoundsException?" data-placeholder="yes or no"></div>
+    <ol class="hints">
+      <li>Read D's <code>@requires</code>. What is <code>a.length</code> here, and what is <code>hi</code>?</li>
+      <li>Implementation 1 finds 7 before it reaches the end. Implementation 4 starts at index 3.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>hi = 4</code> is past <code>a.length = 3</code>, so the call breaks <code>0 &lt;= lo &lt;= hi &lt;= a.length</code>. D promises nothing, and no answer is right or wrong.</li>
+      <li>Implementation 1 finds 7 at index 2 and returns 2, so the test (expecting −1) fails. Implementation 4 starts at index 3 and throws. Both satisfy D.</li>
+      <li class="answer">D promises nothing; implementation 1 returns 2; implementation 4 throws. The test checks nothing about D, which is why tests only use inputs the spec allows.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>The point of Tip 1: tests cannot be wrong about a call the spec never covered. A whole program is different, because its user owes it nothing.</li></ul>
+    </details>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
 <!-- ================================================================ LECTURE 5: COVERAGE -->
 <section class="page" id="l5-coverage" data-title="Statement, branch, loop" data-unit="l5">
   <p class="where">Lecture 5 · Coverage · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
@@ -1279,6 +1440,185 @@ void findsTheOnlyMatch() {
     <summary>Teaching notes</summary>
     <ul>
       <li>Homework 1 holds a method's tests to the whole list; this page shows what the list is for and why it is a floor. Next lecture (Mon Oct 12 on the lecture page) turns to what a program should do when its input is wrong.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l5-practice" data-title="Lecture 5: practice" data-unit="l5">
+  <p class="where">Lecture 5 · Coverage · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span> · practice</p>
+  <h1>Lecture 5: practice</h1>
+  <div class="prose">
+    <p>Four problems from the lecture's own methods: <code>min</code>, <code>quadrant</code>, <code>pow</code>, <code>powRec</code>, <code>isPrime</code> and <code>count</code>. Run each in your head first, as the lecture does, then read the solution. Problem 4 is a planning exercise: there is no single right input, only inputs that complete the list.</p>
+  </div>
+
+  <article class="task" data-id="cse331-w2-l5-find-the-mistake">
+    <h2>1. Run the faulty methods</h2>
+    <p class="prompt">Each of these methods has the mistake the lecture found. Run it in your head and give what it returns.</p>
+    <div class="answer-spec" data-part="min" data-type="int" data-answer="2" data-label="<code>min(2, 1)</code> where <code>r = a; if (a &lt;= b) r = a;</code>" data-placeholder="a number"></div>
+    <div class="answer-spec" data-part="quadrant" data-type="int" data-answer="2" data-label="<code>quadrant(1, −1)</code> (the correct answer is 4)" data-placeholder="a number"></div>
+    <div class="answer-spec" data-part="pow" data-type="int" data-answer="3" data-label="<code>pow(3, 2)</code> with body <code>r = b</code> (the correct answer is 9)" data-placeholder="a number"></div>
+    <div class="answer-spec" data-part="powrec" data-type="int" data-answer="2" data-label="<code>powRec(2, 3)</code>, which discards the recursive result and returns <code>b</code>" data-placeholder="a number"></div>
+    <ol class="hints">
+      <li>Follow each line. <code>quadrant</code> starts with <code>q = 1</code>; the first <code>if</code> is about <code>x &lt; 0</code>; the second adds 1 if <code>y &lt; 0</code>.</li>
+      <li>For <code>pow</code>, how many times does the body run, and what does it do to <code>r</code> each time?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>min(2, 1)</code>: <code>r = 2</code>; <code>2 &lt;= 1</code> is false, so <code>r</code> stays 2. It returns the larger number. Only a test with the false branch finds it.</li>
+      <li><code>quadrant(1, -1)</code>: <code>x &lt; 0</code> is false, so <code>q = 1</code>; <code>y &lt; 0</code> is true, so <code>q = 1 + 1 = 2</code>. The spec says 4. The two tests <code>(1, 1)</code> and <code>(-1, -1)</code> run every branch and never try this combination.</li>
+      <li><code>pow(3, 2)</code>: the body runs twice; each time <code>r = b = 3</code>. It returns 3, not 9. A value carried between runs of the body is only tested when the body runs at least twice.</li>
+      <li><code>powRec(2, 3)</code> calls itself three times and returns <code>b = 2</code>, throwing away what each call returned.</li>
+      <li class="answer">2; 2; 3; 2. Each passes the tests that give statement and branch coverage; each needs the test the next measure asks for.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Use these as a ladder: min needs the false branch, quadrant needs the right combination of branches, pow and powRec need more than one run of the loop or recursion.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse331-w2-l5-isprime">
+    <h2>2. The mistake in isPrime</h2>
+    <p class="prompt">The lecture's <code>isPrime(n)</code> answers from a table for <code>n &lt; 100</code> and otherwise loops <code>for (k = 2; k * k &lt; n; k++)</code>, which should be <code>&lt;=</code>. Which of these inputs does it get wrong? <b>A</b>: 100. <b>B</b>: 121. <b>C</b>: 143. <b>D</b>: 169. <b>E</b>: 289. Then count how often the loop runs.</p>
+    <div class="answer-spec" data-part="wrong" data-type="letters" data-allowed="ABCDE" data-answer="BDE" data-label="Inputs it gets wrong" data-placeholder="letters, e.g. AB"></div>
+    <div class="answer-spec" data-part="runs-10007" data-type="int" data-answer="99" data-label="Times the loop body runs on 10007 (a prime)" data-placeholder="a number"></div>
+    <div class="answer-spec" data-part="runs-100" data-type="int" data-answer="1" data-label="Times the loop body runs on 100" data-placeholder="a number"></div>
+    <ol class="hints">
+      <li>The loop stops one step early: it never tries <code>k</code> with <code>k * k == n</code>. Which of these are squares? Of a prime?</li>
+      <li>143 is 11 · 13. The loop tries <code>k = 2, 3, …, 11</code>, because <code>11 * 11 = 121 &lt; 143</code>.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>100 is even: <code>k = 2</code> divides it at once, so the loop returns <code>false</code> after one run of its body. Correct.</li>
+      <li>121 = 11², 169 = 13², 289 = 17²: each is the square of a prime, and <code>k * k &lt; n</code> stops just before that <code>k</code>, so the method returns <code>true</code>. 143 is divisible by 11 and 11 · 11 &lt; 143, so it is caught.</li>
+      <li>10007 is prime. The loop runs while <code>k * k &lt; 10007</code>, so for <code>k = 2 … 100</code> (<code>100 · 100 = 10000 &lt; 10007</code>, but <code>101 · 101 = 10201</code> is not): 99 runs.</li>
+      <li class="answer">B, D, E; the loop runs 99 times on 10007 and once on 100. The tests that run it only on 100 and 10007 have all three kinds of coverage and still miss the mistake: the boundary here is a perfect square.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Verify with a table: the faulty method is wrong on 121, 169, 289, 361, … every square of a prime from 11 up. 100 and 101 are fine, as the lecture's Exercise 2 says.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse331-w2-l5-count-impls">
+    <h2>3. The loop in count, with two indexOf implementations</h2>
+    <p class="prompt">Lecture 5's Exercise 1 uses <code>count(a, x)</code>, which calls <code>indexOf</code> in a <code>while</code> loop and moves on to <code>i + 1</code>. Run <code>count({5, 1, 5, 2, 5}, 5)</code> with two implementations of spec D: Implementation 1 (searches from the front) and one that searches from the back.</p>
+    <div class="answer-spec" data-part="front" data-type="int" data-answer="3" data-label="count with the front-searching indexOf returns" data-placeholder="a number"></div>
+    <div class="answer-spec" data-part="front-body" data-type="int" data-answer="3" data-label="… and the while loop's body runs" data-placeholder="a number"></div>
+    <div class="answer-spec" data-part="back" data-type="int" data-answer="1" data-label="count with the back-searching indexOf returns" data-placeholder="a number"></div>
+    <ol class="hints">
+      <li>Front search: it finds index 0, then searches from index 1, then from the next. How many matches does that find?</li>
+      <li>Back search: the first answer is 4. Then <code>count</code> searches <code>indexOf(a, 5, 5, x)</code>. What is the range?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Front search finds 0, then 2, then 4, then −1: three matches, so the body runs 3 times and <code>count</code> returns 3.</li>
+      <li>Back search finds 4 first. The next search is <code>indexOf(a, 5, 5, x)</code>, an empty range, so it returns −1. The body runs once and <code>count</code> returns 1.</li>
+      <li>Both are allowed by D, but <code>count</code> is only right with the first.</li>
+      <li class="answer">3 (body runs 3 times); with the back search, 1. <code>count</code> is wrong against D: the tests that complete the list pass with the front search, and coverage is not correctness.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>This is the lecture's reminder in Exercise 1, run for real: <code>count</code> relies on indexOf returning the <em>first</em> match, which D never promised.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse331-w2-l5-plan-tests">
+    <h2>4. Plan tests that complete the list</h2>
+    <p class="prompt"><code>static int sumUpTo(int n)</code> has <code>@requires 0 &lt;= n</code> and returns 1 + 2 + … + n. It is <code>int s = 0; for (int i = 1; i &lt;= n; i++) { s += i; } return s;</code>. Plan the tests.</p>
+    <div class="answer-spec" data-part="fewest" data-type="int" data-answer="3" data-label="Fewest tests that give loop coverage" data-placeholder="a number"></div>
+    <div class="answer-spec" data-part="plan" data-type="self" data-long data-label="Choose the inputs, say why, and say which measures they give" data-placeholder="n = … because …"></div>
+    <ol class="hints">
+      <li>Loop coverage needs the body to run zero times, once and more than once. Can one test do two of those?</li>
+      <li>There is no <code>if</code>, so what do statement and branch coverage need beyond the loop?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Each test fixes <code>n</code>, so it runs the body exactly <code>n</code> times: one count per test. Zero, once and more than once are three different counts, so at least three tests.</li>
+      <li>For example <code>n = 0</code> (expected 0), <code>n = 1</code> (expected 1) and <code>n = 3</code> (expected 6). Each expected answer comes from the spec, not from running the code.</li>
+      <li>Every statement runs in the one-run test, and the only branch is the loop condition (true before each run of the body, false at the end), so statement and branch coverage come with loop coverage.</li>
+      <li class="answer">Three tests, for example <code>n = 0, 1, 3</code>. That is at least two and has statement, branch and loop coverage. It is the floor, not proof the method is right.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>The self-check box has no exact answer: look for three different loop counts and expected values worked out from the spec (6 for <code>n = 3</code>). A student who picks 3, 4, 5 has loop coverage on "more than once" only.</li></ul>
+    </details>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="w2-quiz" data-title="Check your understanding: Section 1, testing, coverage" data-unit="l5">
+  <p class="where">Section 1, Lecture 4 and Lecture 5 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: specs, testing, coverage</h1>
+  <div class="prose"><p>Eight questions on Section 1, Lecture 4 (Testing) and Lecture 5 (Coverage). Answer without looking back, then use the review links for anything you missed. Your score counts first tries.</p></div>
+  <div class="cyu-score" data-role="score" role="status"></div>
+  <ol class="cyu-list">
+    <li class="cyu" data-id="cse331-w2-q2-expected-source" data-kind="quiz" data-format="mc" data-type="choice" data-topic="l4-test">
+      <p class="q">Where must a test's expected answer come from?</p>
+      <div class="opts">
+        <label data-option="o0"><input type="radio" name="w2q1"> The code's output the first time you run it<span class="why" hidden>That only checks the code still does what it did. It doesn't check that it was right.</span></label>
+        <label data-option="o1" data-correct><input type="radio" name="w2q1"> The specification<span class="why" hidden>Correct. Lecture 4: work out the expected behavior from the spec before running the code.</span></label>
+        <label data-option="o2"><input type="radio" name="w2q1"> The comments next to the code<span class="why" hidden>Comments aren't the spec the claim is about, and they can be wrong too.</span></label>
+        <label data-option="o3"><input type="radio" name="w2q1"> Whatever makes the test pass<span class="why" hidden>A test that can't fail checks nothing.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse331-w2-q2-spec-based" data-kind="quiz" data-format="mc" data-type="choice" data-topic="l4-spec-based">
+      <p class="q">A test checks that <code>indexOf</code> returns the <em>first</em> match. Under spec D it is…</p>
+      <div class="opts">
+        <label data-option="o0"><input type="radio" name="w2q2"> specification-based, because every implementation returns something<span class="why" hidden>D never promised the first match, so the test checks more than D promises.</span></label>
+        <label data-option="o1" data-correct><input type="radio" name="w2q2"> implementation-based, and it can fail a correct implementation<span class="why" hidden>Correct. D allows any match, so an implementation that returns the last one is correct and fails the test.</span></label>
+        <label data-option="o2"><input type="radio" name="w2q2"> wrong, because it breaks D's precondition<span class="why" hidden>The input is allowed; the problem is what the test expects.</span></label>
+        <label data-option="o3"><input type="radio" name="w2q2"> fine under every spec<span class="why" hidden>Under C (the largest index) it fails every correct implementation.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse331-w2-q2-boundary" data-kind="quiz" data-format="mc" data-type="choice" data-topic="l4-inputs">
+      <p class="q">Which input would catch a loop that runs <code>while (i &lt;= hi)</code>?</p>
+      <div class="opts">
+        <label data-option="o0"><input type="radio" name="w2q3"> <code>x</code> at <code>lo</code><span class="why" hidden>The loop finds <code>x</code> at once and returns before the extra step.</span></label>
+        <label data-option="o1" data-correct><input type="radio" name="w2q3"> <code>x</code> exactly at <code>hi</code>, just outside the range<span class="why" hidden>Correct. The extra step looks at index <code>hi</code>, where the spec says <code>x</code> must not be found.</span></label>
+        <label data-option="o2"><input type="radio" name="w2q3"> <code>x</code> in the middle of the range<span class="why" hidden>It returns from inside the range before reaching <code>hi</code>.</span></label>
+        <label data-option="o3"><input type="radio" name="w2q3"> Any input at all<span class="why" hidden>Inputs that find <code>x</code> inside the range all pass.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse331-w2-q2-strength-rule" data-kind="quiz" data-format="mc" data-type="choice" data-topic="s1-strength">
+      <p class="q">S1 has a weaker precondition than S2 and the same postcondition. S1 is…</p>
+      <div class="opts">
+        <label data-option="o0" data-correct><input type="radio" name="w2q4"> stronger than S2<span class="why" hidden>Correct: it works on at least every input S2 does and promises the same.</span></label>
+        <label data-option="o1"><input type="radio" name="w2q4"> weaker than S2<span class="why" hidden>A weaker precondition on its own makes a spec stronger, not weaker.</span></label>
+        <label data-option="o2"><input type="radio" name="w2q4"> incomparable to S2<span class="why" hidden>Comparable: every implementation of S1 meets S2.</span></label>
+        <label data-option="o3"><input type="radio" name="w2q4"> the same as S2<span class="why" hidden>Different preconditions make different specs.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse331-w2-q2-loop-coverage" data-kind="quiz" data-format="mc" data-type="choice" data-topic="l5-coverage">
+      <p class="q">Loop coverage asks that some test runs the body…</p>
+      <div class="opts">
+        <label data-option="o0"><input type="radio" name="w2q5"> once<span class="why" hidden>That gives one count, and the code after the loop is never checked after zero runs.</span></label>
+        <label data-option="o1" data-correct><input type="radio" name="w2q5"> zero times, once, and more than once<span class="why" hidden>Correct. After zero runs, alone, and carrying a value from one run to the next.</span></label>
+        <label data-option="o2"><input type="radio" name="w2q5"> exactly as many times as the array is long<span class="why" hidden>That is one count.</span></label>
+        <label data-option="o3"><input type="radio" name="w2q5"> at least twice<span class="why" hidden>That skips the zero and one cases.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse331-w2-q2-coverage-limit" data-kind="quiz" data-format="mc" data-type="choice" data-topic="l5-enough">
+      <p class="q">A method's tests have statement, branch and loop coverage and pass. What does that show?</p>
+      <div class="opts">
+        <label data-option="o0"><input type="radio" name="w2q6"> The method is correct<span class="why" hidden>The lecture's <code>isPrime</code> and <code>quadrant</code> examples are both wrong with all of it.</span></label>
+        <label data-option="o1" data-correct><input type="radio" name="w2q6"> You may stop writing tests; it is the floor, not proof<span class="why" hidden>Correct. The list says when you may stop, not that the code is right.</span></label>
+        <label data-option="o2"><input type="radio" name="w2q6"> Nothing at all<span class="why" hidden>It is the least testing code you deliver gets.</span></label>
+        <label data-option="o3"><input type="radio" name="w2q6"> The spec is wrong<span class="why" hidden>Coverage says nothing about the spec.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w2-q2-first-bad-prime" data-format="num" data-type="int" data-answer="121" data-topic="l5-practice">
+      <p class="q">The faulty <code>isPrime</code> (loop <code>k * k &lt; n</code>) first gives a wrong answer at which input?</p>
+      <p class="why" hidden>121 = 11 · 11 is the smallest square of a prime that reaches the loop. Below 100 the table answers; 100 and 101 are fine.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w2-q2-fewest-tests" data-format="num" data-type="int" data-answer="2" data-topic="l5-coverage">
+      <p class="q">What is the fewest tests any method needs, whatever its code?</p>
+      <p class="why" hidden>One test is never enough: a method that always returns the same value passes a single test expecting it. So at least two.</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-role="summary" role="status"></div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Use it as an exit ticket on Friday. Questions 2 and 3 are the conceptual core of Lecture 4; question 6 is the lecture's main warning.</li>
+      <li>The numeric answers come from running the lecture's code (<code>checks/cse331/w02/verify.mjs</code>).</li>
     </ul>
   </details>
   <nav class="pager"></nav>

@@ -122,7 +122,64 @@ ok(Math.floor(9 / 2) + 1 === 5 && 2 * 4 + 1 === 9, "n = 9 leaves start at 5; rig
 ok(Math.ceil(Math.log2(1000 + 1)) - 1 === 9, "height of a complete tree on 1000 nodes is 9");
 const smallestN0 = (() => { let n = 1; while (!(1000 <= 3 * n * n)) n++; return n; })();
 
+/* Wed-Fri practice problems: every key is recomputed here by running the lecture's pseudocode / the section's code. */
+const NEWT = {}, NEWBIGO = {};
+{
+  const up = (h, i) => { let n = 0; while (i > 1 && h[i] < h[i >> 1]) { [h[i], h[i >> 1]] = [h[i >> 1], h[i]]; i >>= 1; n++; } return n; };
+  const down = (h, i, size) => { let n = 0; while (i * 2 <= size) { let c = i * 2; if (c + 1 <= size && h[c + 1] < h[c]) c++; if (h[c] < h[i]) { [h[c], h[i]] = [h[i], h[c]]; i = c; n++; } else break; } return n; };
+  const extractOf = (h) => { const min = h[1]; const last = h.pop(); let sw = 0; if (h.length > 1) { h[1] = last; sw = down(h, 1, h.length - 1); } return { min, sw }; };
+  // Lecture 4 problem 1: the trace
+  { const h = [null], out = []; const I = (v) => { h.push(v); up(h, h.length - 1); }; const E = () => out.push(extractOf(h).min);
+    I(9); I(4); I(7); E(); I(2); E(); E(); I(6); E(); E();
+    Object.assign(NEWT, { "cse332-w2-l4-pq-trace.first": S(out[0]), "cse332-w2-l4-pq-trace.second": S(out[1]), "cse332-w2-l4-pq-trace.third": S(out[2]), "cse332-w2-l4-pq-trace.fifth": S(out[4]) }); }
+  // Lecture 4 problem 2: operation costs, measured in elementary steps for growing n
+  { const sizes = [8, 64, 512, 4096];
+    const unsortedExtract = (n) => n;                                        // scan every slot for the minimum
+    const sortedInsert = (n) => { const a = Array.from({ length: n }, (_, i) => i + 1); let shifts = 0; let i = n; a.push(0); while (i > 0) { a[i] = a[i - 1]; shifts++; i--; } return shifts; }; // new minimum: shift everything
+    const sortedExtract = () => 1;                                           // take the front item
+    const heapInsert = (n) => { let worst = 0; const h = [null]; for (let v = n; v >= 1; v--) { h.push(v); worst = Math.max(worst, up(h, h.length - 1)); } return worst; };
+    ok(sizes.every((n) => sortedInsert(n) === n && unsortedExtract(n) === n && sortedExtract() === 1 && heapInsert(n) === Math.floor(Math.log2(n))), "PQ operation costs: n, n, 1, floor(log2 n) steps");
+    Object.assign(NEWBIGO, { "cse332-w2-l4-pq-costs.unsorted-extract": "n", "cse332-w2-l4-pq-costs.sorted-insert": "n + 1", "cse332-w2-l4-pq-costs.sorted-extract": "1", "cse332-w2-l4-pq-costs.heap-insert": "log n + 1" }); }
+  // Lecture 4 problem 3: height of a complete tree
+  { const maxNodes = (h) => 2 ** (h + 1) - 1; const height = (n) => { let h = 0; while (maxNodes(h) < n) h++; return h; };
+    Object.assign(NEWT, { "cse332-w2-l4-height.max-h5": S(maxNodes(5)), "cse332-w2-l4-height.h-1000": S(height(1000)), "cse332-w2-l4-height.h-1024": S(height(1024)), "cse332-w2-l4-height.h-1023": S(height(1023)) });
+    ok([1, 2, 3, 7, 8, 1000, 1023, 1024, 5000].every((n) => height(n) === Math.ceil(Math.log2(n + 1)) - 1), "height formula ceil(log2(n+1)) - 1"); }
+  // Section 2 problem 1: always / sometimes / never, by testing sample functions in O(n)
+  { const g = { one: () => 1, lin: (n) => n, half: (n) => n / 2 }; const bigO = (f, h, c = 8, from = 64) => { for (let n = from; n < from + 5000; n++) if (f(n) > c * h(n)) return false; return true; };
+    const omega = (f, h, c = 1 / 8, from = 64) => { for (let n = from; n < from + 5000; n++) if (f(n) < c * h(n)) return false; return true; };
+    const verdict = (test) => { const r = Object.values(g).map(test); return r.every(Boolean) ? "true" : r.some(Boolean) ? "sometimes" : "false"; };
+    const sq = (n) => n * n, lg = (n) => Math.log2(n), id = (n) => n;
+    Object.assign(NEWT, { "cse332-w2-s2-q0-claims.n-sq": verdict((f) => bigO(f, sq)), "cse332-w2-s2-q0-claims.log": verdict((f) => bigO(f, lg)), "cse332-w2-s2-q0-claims.omega-n": verdict((f) => omega(f, id)), "cse332-w2-s2-q0-claims.omega-n2": verdict((f) => omega(f, sq)) }); }
+  // Section 2 problem 2: the smallest n0 that holds and keeps holding (checked over a long window)
+  { const first = (f, gg, c) => { for (let n = 1; n < 10000; n++) { let good = true; for (let m = n; m < n + 2000; m++) if (f(m) > c * gg(m)) { good = false; break; } if (good) return n; } };
+    Object.assign(NEWT, { "cse332-w2-s2-smallest-n0.q1b": S(first(() => 1000, (n) => 3 * n * n, 1)), "cse332-w2-s2-smallest-n0.q1d": S(first((n) => 7 * n * n + 3 * n, (n) => n ** 4, 10)), "cse332-w2-s2-smallest-n0.q2b": S(first((n) => n ** 3 + 10 * n, (n) => 3 * n ** 3, 1)), "cse332-w2-s2-smallest-n0.q1e": S(first((n) => n + 2 * n * Math.log2(n), (n) => n * Math.log2(n), 3)) }); }
+  // Section 2 problem 4: numUnique
+  { const nu = (v) => { const vis = v.map(() => false); let inner = 0, out = 0; for (let i = 0; i < v.length; i++) if (!vis[i]) { out++; for (let j = i; j < v.length; j++) { inner++; if (v[i] === v[j]) vis[j] = true; } } return [out, inner]; };
+    const d = nu(["a", "b", "c", "d", "e", "f"]), e = nu(Array(6).fill("a"));
+    Object.assign(NEWT, { "cse332-w2-s2-numunique-trace.distinct-out": S(d[0]), "cse332-w2-s2-numunique-trace.distinct-inner": S(d[1]), "cse332-w2-s2-numunique-trace.same-out": S(e[0]), "cse332-w2-s2-numunique-trace.same-inner": S(e[1]) }); }
+  // Lecture 5 problem 1: heap checks (0-based arrays)
+  { const isHeap = (a) => a.every((v, i) => i === 0 || a[(i - 1) >> 1] <= v); const yn = (a) => (isHeap(a) ? "yes" : "no");
+    Object.assign(NEWT, { "cse332-w2-l5-heap-check.a": yn([2, 4, 3, 8, 5, 9, 7]), "cse332-w2-l5-heap-check.b": yn([1, 4, 2, 3, 5, 6, 7]), "cse332-w2-l5-heap-check.c": yn([3, 5, 4, 9, 6, 7, 8, 10]), "cse332-w2-l5-heap-check.d": yn([4, 6, 5, 7, 3, 8, 9]) }); }
+  // Lecture 5 problem 2: insert 0, and extract from the slide's heap
+  { const base = [null, 1, 3, 2, 4, 7, 5, 6, 5, 9]; const a = [...base]; a.push(0); const sw = up(a, 10);
+    const b = [...base]; const ex = extractOf(b);
+    ok(a.slice(1).join() === "0,1,2,4,3,5,6,5,9,7" && b.slice(1).join() === "2,3,5,4,7,9,6,5", `insert 0 / extract on the slide heap (${a.slice(1).join()} / ${b.slice(1).join()})`);
+    Object.assign(NEWT, { "cse332-w2-l5-insert-extract.insert-swaps": S(sw), "cse332-w2-l5-insert-extract.insert-root": S(a[1]), "cse332-w2-l5-insert-extract.extract-returned": S(ex.min), "cse332-w2-l5-insert-extract.extract-root": S(b[1]) }); }
+  // Lecture 5 problem 3: 16, 32, 4, 57, 80, 43, 2
+  { const h = [null]; const swaps = []; for (const v of [16, 32, 4, 57, 80, 43, 2]) { h.push(v); swaps.push(up(h, h.length - 1)); }
+    const root = h[1]; const ex = extractOf(h);
+    Object.assign(NEWT, { "cse332-w2-l5-build-sequence.swaps-2": S(swaps[6]), "cse332-w2-l5-build-sequence.root-after-inserts": S(root), "cse332-w2-l5-build-sequence.extracted": S(ex.min), "cse332-w2-l5-build-sequence.root-after-extract": S(h[1]) }); }
+  // Lecture 5 problem 4: Floyd's buildHeap on 9, 8, ..., 1 versus repeated insert
+  { const arr = [null, 9, 8, 7, 6, 5, 4, 3, 2, 1]; let total = 0; for (let i = 9; i > 0; i--) total += down(arr, i, 9);
+    const h = [null]; let ins = 0; for (const v of [9, 8, 7, 6, 5, 4, 3, 2, 1]) { h.push(v); ins += up(h, h.length - 1); }
+    Object.assign(NEWT, { "cse332-w2-l5-buildheap.first-leaf": S(Math.floor(9 / 2) + 1), "cse332-w2-l5-buildheap.total-swaps": S(total), "cse332-w2-l5-buildheap.final-root": S(arr[1]), "cse332-w2-l5-buildheap.insert-swaps": S(ins) }); }
+  // practice quiz numbers
+  Object.assign(NEWT, { "cse332-w2-q2-right-child-0based": S(2 * 3 + 2), "cse332-w2-q2-parent-1based": S(Math.floor(11 / 2)) });
+  Object.assign(NEWBIGO, { "cse332-w2-q2-numunique-same-bucket": "2n" });
+}
+
 const TRUTH = {
+  ...NEWT,
   // Wed-Fri additions
   "cse332-w2-l4-qc-example2-third": pq.trace.split(",")[2],
   "cse332-w2-l4-qc-heap-leaf-ancestor": "no",
@@ -173,6 +230,7 @@ const TRUTH = {
   "cse332-w2-l3-true-statements.n-theta-means-not-olog": !G.relate("n", "log n").o ? "yes" : "no",
 };
 const BIGO_TRUTH = { // buckets, checked against the class engine with a second spelling
+  ...NEWBIGO,
   // Wed-Fri additions: verified above by running the code (counts / swap bounds), spelled a second way here
   "cse332-w2-l4-qc-sorted-array-insert": "3n + 2",
   "cse332-w2-s2-qc-numunique-worst": "n + n(n+1)/2",
