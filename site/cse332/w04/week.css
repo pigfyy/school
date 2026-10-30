@@ -1,0 +1,45 @@
+/* CSE 332 week 4 widgets: AVL drawings (.treelab, .treeview, as in week 3), the string-hash calculator (.hashcalc)
+   and the hash table lab (.hashlab). Base tokens only. */
+.tl-svg { max-width: 760px; margin: 0 auto; }
+.tl-edge { stroke: var(--line-strong); stroke-width: 1.5; }
+.tl-edge.on { stroke: var(--s1); stroke-width: 2.5; }
+.tl-node circle { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; }
+.chart .tl-node text { font-family: var(--mono); font-size: 13px; font-weight: 600; fill: var(--ink); }
+.chart .tl-node text.tl-h { font-size: 10.5px; font-weight: 600; fill: var(--accent); }
+.chart .tl-empty { fill: var(--ink-soft); }
+.tl-node.path circle { fill: var(--s1-tint); stroke: var(--s1); }
+.tl-node.new circle { fill: var(--s3); stroke: var(--s3); }
+.tl-node.found circle { fill: var(--s1); stroke: var(--s1); }
+.chart .tl-node.new text:not(.tl-h), .chart .tl-node.found text:not(.tl-h) { fill: #fff; }
+.tl-node.problem circle { fill: var(--s2-tint); stroke: var(--s2); stroke-width: 3; }
+.tl-node.repl circle { fill: var(--amber-tint); stroke: var(--amber); stroke-width: 3; }
+.tl-key { width: 6rem; }
+.tl-orders { font-family: var(--mono); font-size: 0.82rem; overflow-wrap: anywhere; }
+.tl-queue { font-family: var(--mono); font-size: 0.85rem; color: var(--ink-soft); }
+
+.treeview { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 0.5rem 0.75rem; margin: 0.5rem 0 1rem; }
+.treeview figcaption { font-size: 0.9rem; color: var(--ink-soft); text-align: center; }
+.tree-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.75rem; }
+.tree-grid .treeview { margin: 0; }
+
+.hc-table td, .hc-table th { font-family: var(--mono); font-size: 0.88rem; }
+.hc-horner, .hc-out { font-family: var(--mono); font-size: 0.85rem; overflow-wrap: anywhere; }
+.hc-s { font-family: var(--mono); width: 12rem; }
+.hc-m, .hl-size { width: 5rem; }
+.hl-key { width: 6rem; }
+.hl-grid { display: grid; grid-template-columns: repeat(var(--cols, 10), minmax(0, 1fr)); gap: 3px; margin: 0.75rem 0 0.5rem; align-items: end; }
+.hl-cell { display: flex; flex-direction: column; align-items: stretch; position: relative; min-width: 0; }
+.hl-cell > b, .hl-chain b { display: block; text-align: center; font-family: var(--mono); font-weight: 600; font-size: 0.95rem; padding: 0.35rem 0; border: 2px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface); min-height: 2.1rem; overflow: hidden; }
+.hl-cell > b.empty { border-style: dashed; color: var(--ink-faint); }
+.hl-cell > b.tomb { color: var(--ink-soft); background: var(--paper-2); }
+.hl-chain { display: flex; flex-direction: column-reverse; gap: 2px; min-height: 2.1rem; justify-content: flex-start; border-bottom: 3px solid var(--line-strong); padding-bottom: 2px; }
+.hl-chain b { background: var(--s1-tint); border-color: var(--s1); font-size: 0.85rem; padding: 0.2rem 0; min-height: 0; }
+.hl-cell.path > b { border-color: var(--s1); background: var(--s1-tint); }
+.hl-cell.path .hl-chain { border-bottom-color: var(--s1); }
+.hl-cell.at > b { border-color: var(--s3); background: var(--s3); color: #fff; }
+.hl-chain b.hit, .hl-cell > b.hit { background: var(--s3); border-color: var(--s3); color: #fff; }
+.hl-idx { text-align: center; font-family: var(--mono); font-size: 0.75rem; color: var(--ink-soft); margin-top: 0.15rem; }
+.hl-step { position: absolute; top: -0.9rem; right: 2px; font-size: 0.68rem; font-weight: 700; color: var(--s1); font-family: var(--mono); }
+.hl-stat { font-size: 0.85rem; color: var(--ink-soft); }
+.hl-out { font-size: 0.95rem; }
+@media (max-width: 600px) { .hl-cell > b, .hl-chain b { font-size: 0.72rem; } }

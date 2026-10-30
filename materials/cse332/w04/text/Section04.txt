@@ -1,0 +1,1113 @@
+AVL Tree
+CSE 332 - Section 4
+Reminder
+
+
+
+
+  Meet the Staff due Oct 23!
+                please come to our office hours!!
+Announcements
+
+● Midterm is coming up!
+  ○ Monday, Nov 9th
+  ○ Review session:Friday, Nov 6th (during Lecture)
+  ○ Study for midterm: section problems, past midterms. Have
+     any questions? Go to OH or post on ed
+AVL Trees
+What are AVL Trees?
+                                                                      Are these AVL trees?
+
+According to lecture:
+An AVL Tree is a tree data structure with the following properties:
+Structural Property
+ ● Each node has ≤2 children.
+ ● Heights of the left and right subtrees of every node differ by at most 1 .
+
+Order Property
+ ● All keys in the left subtree < node’s key.
+ ● All keys in the right subtree > node’s key.
+
+Notice that this is just a Binary Search Tree (BST) with 1 additional property.
+Wait, why?
+                                                              Are these AVL trees?
+
+●   Guaranteed balance. AVL trees keep their height minimal after every insert/delete. This
+    allows operations to stay efficient.
+
+    Data Structure      Find                       Insert           Delete
+
+    AVL Tree            O(log n)                   O(log n)         O(log n)
+
+    Unbalanced BST      O(h), h = height           O(h)             O(h)
+
+    Linked List         O(n)                       O(n)             O(n)
+
+    Unsorted Array      O(n)                       O(n)             O(n)
+
+    Sorted Array        O(log n) [binary search]   O(n)             O(n)
+
+    Recall the ADT ensures no duplicate elements, so we must search before inserting
+Worksheet: Problem 0
+  Problem 0 (Questions)
+
+What are the constraints on the data types you can store in an AVL tree?
+
+
+
+When is an AVL tree preferred over another dictionary implementation, such as a HashMap?
+  Problem 0 (Answer 1)
+
+What are the constraints on the data types you can store in an AVL tree?
+ ● Keys must be of a comparable data type.
+ ● Values can be any data type.
+
+When is an AVL tree preferred over another dictionary implementation, such as a HashMap?
+  Problem 0 (Answer 2)
+
+What are the constraints on the data types you can store in an AVL tree?
+ ● Keys must be of a comparable data type.
+ ● Values can be any data type.
+
+When is an AVL tree preferred over another dictionary implementation, such as a HashMap?
+ ● In an AVL tree, keys can be iterated over in sorted order.
+ ● It’s easier to find next and previous key in AVL tree. (check ex4)
+AVL Tree Rotations
+   Microteach
+       AVL Tree Rotations
+
+     To fix an imbalance in an AVL tree after an insert:
+      1. Identify the lowest problem node p where the imbalance occurs.
+      2. Identify the insert location.
+      3. Execute the corresponding tree rotation(s).                                            a
+
+
+Case             Insert Location             Tree Rotation(s)
+                                                                                p
+ 1        Left subtree of Left child (W)    Single right rotation
+
+                                             Double left-right
+ 2        Right subtree of Left child (X)                               b               c
+                                                rotation
+                                             Double right-left
+ 3        Left subtree of Right child (Y)
+                                                rotation
+
+ 4       Right subtree of Right child (Z)   Single left rotation                                    V
+
+                                                                    W       X       Y       Z
+       Right Rotation
+p is the lowest problem node. Insert location was inw.
+References that change:
+ ● a.left = b
+                                                                             a
+ ● p.left = b.right
+                            a
+ ● b.right = p
+                                                         b
+               p
+
+                                                                 p
+       b               c
+
+                                                                         c
+                                                                                 V
+                                          V
+                   Y       Z
+
+   W       X                                         W       X
+                                                                     Y       Z
+     Problem 1 - Left Rotation
+
+  p is the lowest problem node. Insert location was inz.
+  References that change:
+   ● a.left = c                                                                     a
+   ● p.right = c.left
+   ● c.left = p
+
+                                                                    p
+
+
+                                                            b               c
+
+
+                                                                                        V
+                                                        W       X
+Tip for ex4: remember to update height field in nodes                   Y       Z
+                                Case              Insert Location                  Tree Rotation(s)
+                                                                                                                          p
+
+
+  Case 1
+                                 1          Left subtree of Left child (W)        Single right rotation
+
+                                                                                   Double left- right             b               c
+                                 2         Right subtree of Left child (X)
+                                                                                      rotation
+
+                                                                                   Double right- left
+                                 3         Left subtree of Right child (Y)
+                                                                                      rotation
+
+                                 4         Right subtree of Right child (Z)       Single left rotation        W       X       Y       Z
+Let’s insert 1.
+1. Identify the problem nodep    2. Identify the insert location                              3. Execute the tree rotation
+
+
+                  6                                       3                                                       3
+
+
+          3               8                2                            6                                 2                   6
+                                                         5
+      2       5                        1                                      8                     1                 5           8
+
+
+  1
+
+
+3.1. Identify bad edges          3.2. Remove bad edges                                        3.3. Replace edges
+                                Case         Insert Location          Tree Rotation(s)
+                                                                                                                   p
+
+
+  Case 4                         1
+
+                                 2
+                                             Left of Left (W)
+
+                                             Right of Left (X)
+                                                                     Single right rotation
+
+                                                                 Double left- right rotation
+                                                                                                           b               c
+
+
+                                 3           Left of Right (Y)   Double right- left rotation
+
+                                 4       Right of Right (Z)          Single left rotation              W       X       Y        Z
+Let’s insert 11.
+1. Identify the problem nodep   2. Identify the insert location                          3. Execute the tree rotation
+
+
+          6                                             8                                                  8
+
+
+  3                8                     6                       9                                 6                   9
+                                                        7
+              7        9             3                                 11                      3       7                   11
+
+
+                           11
+
+
+3.1. Identify bad edges         3.2. Remove bad edges                                    3.3. Replace edges
+                                  Case          Insert Location                 Tree Rotation(s)
+                                                                                                                                    p
+
+
+Case 2 (left)                      1
+
+                                   2
+                                                Left of Left (W)
+
+                                               Right of Left (X)
+                                                                              Single right rotation
+
+                                                                            Double left- right rotation
+                                                                                                                            b               c
+
+
+                                   3           Left of Right (Y)            Double right- left rotation
+
+                                   4           Right of Right (Z)              Single left rotation                     W       X       Y       Z
+  Let’s insert either 4 or 6.
+  1. Identify the problem nodep   2. Identify the insert location                                  3. Execute the first tree rotation
+                                                                                                          For Case 2, we do the first rotation on nodeb
+
+
+                7                                                       7                                                       7
+
+
+        3              8                                5                             8                             5                       8
+
+
+    1       5                              3                        6                                         3             6
+                                                        4
+        4       6                      1                                                                  1       4
+
+
+  3.1. Identify bad edges         3.2. Remove bad edges                                            3.3. Replace edges
+                                                                                                                                p
+                                             Case         Insert Location              Tree Rotation(s)
+
+
+Case 2 (right)                                   1
+
+                                                 2
+                                                          Left of Left (W)
+
+                                                         Right of Left (X)
+                                                                                    Single right rotation
+
+                                                                                  Double left- right rotation
+                                                                                                                        b               c
+
+
+                                                 3       Left of Right (Y)        Double right- left rotation
+
+                                                 4       Right of Right (Z)          Single left rotation           W       X       Y       Z
+  This is now similar to Case 1!
+  4. Execute the second tree rotation
+     We do the second rotation on node p
+
+
+                        7                                       5                                                       5
+
+
+              5                   8                  3                        7                                 3                   7
+                                                                6
+
+        3          6                         1           4                         8                      1         4       6           8
+
+
+    1       4
+
+
+  4.1. Identify bad edges                  4.2. Remove bad edges                                   4.3. Replace edges
+                              Case    Insert Location         Tree Rotation(s)
+                                                                                                    p
+
+
+  Case 3                       1
+
+                               2
+                                      Left of Left (W)
+
+                                     Right of Left (X)
+                                                            Single right rotation
+
+                                                          Double left- right rotation
+                                                                                            b               c
+
+
+                               3     Left of Right (Y)    Double right- left rotation
+
+                               4     Right of Right (Z)      Single left rotation       W       X       Y       Z
+Let’s insert either 6 or 8.
+
+
+
+          5
+
+
+  3               9
+
+
+              7       10
+                              Case    Insert Location         Tree Rotation(s)
+                                                                                                    p
+
+  Case 3 – Step 1              1      Left of Left (W)      Single right rotation
+                                                                                            b               c
+                               2     Right of Left (X)    Double left- right rotation
+
+                               3     Left of Right (Y)    Double right- left rotation
+
+                               4     Right of Right (Z)      Single left rotation       W       X       Y       Z
+Let’s insert either 6 or 8.
+
+
+
+          5
+
+
+  3               9
+
+
+              7       10
+
+
+          6       8
+                                Case     Insert Location         Tree Rotation(s)
+                                                                                                       p
+
+  Case 3 – Step 2                1       Left of Left (W)      Single right rotation
+                                                                                               b               c
+                                 2      Right of Left (X)    Double left- right rotation
+
+                                 3      Left of Right (Y)    Double right- left rotation
+
+                                 4      Right of Right (Z)      Single left rotation       W       X       Y       Z
+Let’s insert either 6 or 8.
+1. Identify the problem nodep   2. Identify the insert location
+
+
+          5
+
+
+  3               9
+
+
+              7       10
+
+
+          6       8
+                                Case     Insert Location         Tree Rotation(s)
+                                                                                                                   p
+
+  Case 3 – Step 3                1       Left of Left (W)      Single right rotation
+                                                                                                           b                c
+                                 2      Right of Left (X)    Double left- right rotation
+
+                                 3      Left of Right (Y)    Double right- left rotation
+
+                                 4      Right of Right (Z)      Single left rotation                   W       X       Y        Z
+Let’s insert either 6 or 8.
+1. Identify the problem nodep   2. Identify the insert location                     3. Execute the first tree rotation
+                                                                                           For Case 3, we do the first rotation on nodec
+
+
+          5
+
+
+  3               9
+
+
+              7       10
+
+
+          6       8
+
+
+3.1. Identify bad edges
+                                Case      Insert Location             Tree Rotation(s)
+                                                                                                                        p
+
+  Case 3 – Step 4                1        Left of Left (W)          Single right rotation
+                                                                                                                b                c
+                                 2       Right of Left (X)        Double left- right rotation
+
+                                 3       Left of Right (Y)        Double right- left rotation
+
+                                 4       Right of Right (Z)          Single left rotation                   W       X       Y        Z
+Let’s insert either 6 or 8.
+1. Identify the problem nodep   2. Identify the insert location                          3. Execute the first tree rotation
+                                                                                                For Case 3, we do the first rotation on nodec
+
+
+          5                                  5
+
+
+  3               9                  3                        7
+
+
+              7       10                       6                     9
+                                                              8
+          6       8                                                        10
+
+
+3.1. Identify bad edges         3.2. Remove bad edges
+                                Case      Insert Location             Tree Rotation(s)
+                                                                                                                        p
+
+  Case 3 – Step 5                1        Left of Left (W)          Single right rotation
+                                                                                                                b                c
+                                 2       Right of Left (X)        Double left- right rotation
+
+                                 3       Left of Right (Y)        Double right- left rotation
+
+                                 4       Right of Right (Z)          Single left rotation                   W       X       Y        Z
+Let’s insert either 6 or 8.
+1. Identify the problem nodep   2. Identify the insert location                          3. Execute the first tree rotation
+                                                                                                For Case 3, we do the first rotation on nodec
+
+
+          5                                  5
+
+
+  3               9                  3                        7
+
+
+              7       10                       6                     9
+                                                              8
+          6       8                                                        10
+
+
+3.1. Identify bad edges         3.2. Remove bad edges
+                                Case      Insert Location             Tree Rotation(s)
+                                                                                                                         p
+
+  Case 3 – Step 6                1        Left of Left (W)          Single right rotation
+                                                                                                                b                     c
+                                 2       Right of Left (X)        Double left- right rotation
+
+                                 3       Left of Right (Y)        Double right- left rotation
+
+                                 4       Right of Right (Z)          Single left rotation                   W       X            Y        Z
+Let’s insert either 6 or 8.
+1. Identify the problem nodep   2. Identify the insert location                          3. Execute the first tree rotation
+                                                                                                For Case 3, we do the first rotation on nodec
+
+
+          5                                  5                                                            5
+
+
+  3               9                  3                        7                                 3                    7
+
+
+              7       10                       6                     9                                          6            9
+                                                              8
+          6       8                                                        10                                        8               10
+
+
+3.1. Identify bad edges         3.2. Remove bad edges                                    3.3. Replace edges
+                                         Case    Insert Location         Tree Rotation(s)
+                                                                                                               p
+
+  Case 3 – Step 7                         1      Left of Left (W)      Single right rotation
+                                                                                                       b               c
+                                          2     Right of Left (X)    Double left- right rotation
+
+                                          3     Left of Right (Y)    Double right- left rotation
+
+                                          4     Right of Right (Z)      Single left rotation       W       X       Y       Z
+This is now similar to Case 4!
+4. Execute the second tree rotation
+   We do the second rotation on node p
+
+
+            5
+
+
+  3                   7
+
+
+                 6          9
+
+
+                      8         10
+
+
+4.1. Identify bad edges
+                                         Case         Insert Location              Tree Rotation(s)
+                                                                                                                        p
+
+  Case 3 – Step 8                         1           Left of Left (W)            Single right rotation
+                                                                                                                b               c
+                                          2           Right of Left (X)       Double left- right rotation
+
+                                          3           Left of Right (Y)       Double right- left rotation
+
+                                          4       Right of Right (Z)              Single left rotation      W       X       Y       Z
+This is now similar to Case 4!
+4. Execute the second tree rotation
+   We do the second rotation on node p
+
+
+            5                                                    7
+
+
+  3                   7                           5                           9
+                                                                 6
+
+                 6          9                 3                           8         10
+
+
+                      8         10
+
+
+4.1. Identify bad edges                  4.2. Remove bad edges
+                                         Case         Insert Location              Tree Rotation(s)
+                                                                                                                                p
+
+  Case 3 – Step 9                         1           Left of Left (W)            Single right rotation
+                                                                                                                        b               c
+                                          2           Right of Left (X)       Double left- right rotation
+
+                                          3           Left of Right (Y)       Double right- left rotation
+
+                                          4       Right of Right (Z)              Single left rotation              W       X       Y        Z
+This is now similar to Case 4!
+4. Execute the second tree rotation
+   We do the second rotation on node p
+
+
+            5                                                    7                                                      7
+
+
+  3                   7                           5                           9                                 5                   9
+                                                                 6
+
+                 6          9                 3                           8         10                      3       6       8           10
+
+
+                      8         10
+
+
+4.1. Identify bad edges                  4.2. Remove bad edges                                        4.3. Replace edges
+Problem 2 Walkthrough
+                                       Case    Insert Location         Tree Rotation(s)
+                                                                                                             p
+
+
+  Problem 2                             1
+
+                                        2
+                                               Left of Left (W)
+
+                                              Right of Left (X)
+                                                                     Single right rotation
+
+                                                                   Double left- right rotation
+                                                                                                     b               c
+
+
+                                        3     Left of Right (Y)    Double right- left rotation
+
+                                        4     Right of Right (Z)      Single left rotation       W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+                                       Case    Insert Location         Tree Rotation(s)
+                                                                                                             p
+
+
+  P2 – Step 1                           1      Left of Left (W)      Single right rotation
+                                                                                                     b               c
+                                        2     Right of Left (X)    Double left- right rotation
+
+                                        3     Left of Right (Y)    Double right- left rotation
+
+                                        4     Right of Right (Z)      Single left rotation       W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+No imbalances
+                                                 10
+                                       Case    Insert Location         Tree Rotation(s)
+                                                                                                             p
+
+
+  P2 – Step 3                           1      Left of Left (W)      Single right rotation
+                                                                                                     b               c
+                                        2     Right of Left (X)    Double left- right rotation
+
+                                        3     Left of Right (Y)    Double right- left rotation
+
+                                        4     Right of Right (Z)      Single left rotation       W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+No imbalances
+                                                 10
+
+
+                            4
+                                       Case    Insert Location         Tree Rotation(s)
+                                                                                                             p
+
+
+  P2 – Step 4                             1    Left of Left (W)      Single right rotation
+                                                                                                     b               c
+                                          2   Right of Left (X)    Double left- right rotation
+
+                                          3   Left of Right (Y)    Double right- left rotation
+
+                                          4   Right of Right (Z)      Single left rotation       W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 10
+  ● Case 2                                       10
+  ● Rotate left at 4
+                            4
+
+
+                                      5
+                                       Case    Insert Location         Tree Rotation(s)
+                                                                                                             p
+
+
+  P2 – Step 5                           1      Left of Left (W)      Single right rotation
+                                                                                                     b               c
+                                        2     Right of Left (X)    Double left- right rotation
+
+                                        3     Left of Right (Y)    Double right- left rotation
+
+                                        4     Right of Right (Z)      Single left rotation       W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 10
+  ● Case 2                                       10
+  ● Rotate left at 4
+                            5
+
+
+                       4
+                                       Case    Insert Location         Tree Rotation(s)
+                                                                                                             p
+
+
+  P2 – Step 6                           1      Left of Left (W)      Single right rotation
+                                                                                                     b               c
+                                        2     Right of Left (X)    Double left- right rotation
+
+                                        3     Left of Right (Y)    Double right- left rotation
+
+                                        4     Right of Right (Z)      Single left rotation       W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 10
+  ● Case 2                                        5
+  ● Rotate left at 4
+  ● Rotate right at 10      4                                                    10
+No more imbalances
+                                       Case    Insert Location             Tree Rotation(s)
+                                                                                                                 p
+
+
+  P2 – Step 7                           1      Left of Left (W)          Single right rotation
+                                                                                                         b               c
+                                        2     Right of Left (X)        Double left- right rotation
+
+                                        3     Left of Right (Y)        Double right- left rotation
+
+                                        4     Right of Right (Z)          Single left rotation       W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+No imbalances
+                                                  5
+
+
+                            4                                                        10
+
+
+                                                                   8
+                                       Case    Insert Location             Tree Rotation(s)
+                                                                                                                 p
+
+
+  P2 – Step 8                           1      Left of Left (W)          Single right rotation
+                                                                                                         b               c
+                                        2     Right of Left (X)        Double left- right rotation
+
+                                        3     Left of Right (Y)        Double right- left rotation
+
+                                        4     Right of Right (Z)          Single left rotation       W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 10
+  ● Case 2                                        5
+  ● Rotate left at 8
+                            4                                                        10
+
+
+                                                                   8
+
+
+
+
+                                                                            9
+                                       Case    Insert Location             Tree Rotation(s)
+                                                                                                                 p
+
+
+  P2 – Step 9                           1      Left of Left (W)          Single right rotation
+                                                                                                         b               c
+                                        2     Right of Left (X)        Double left- right rotation
+
+                                        3     Left of Right (Y)        Double right- left rotation
+
+                                        4     Right of Right (Z)          Single left rotation       W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 10
+  ● Case 2                                        5
+  ● Rotate left at 8
+  ● Rotate right at 10      4                                                        10
+
+
+                                                                   9
+
+
+
+
+                                                           8
+                                       Case    Insert Location             Tree Rotation(s)
+                                                                                                                      p
+
+  P2 – Step 10                          1      Left of Left (W)          Single right rotation
+                                                                                                              b               c
+                                        2     Right of Left (X)        Double left- right rotation
+
+                                        3     Left of Right (Y)        Double right- left rotation
+
+                                        4     Right of Right (Z)          Single left rotation            W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 10
+  ● Case 2                                        5
+  ● Rotate left at 8
+  ● Rotate right at 10      4                                                         9
+No more imbalances
+
+                                                                   8                                 10
+                                       Case    Insert Location             Tree Rotation(s)
+                                                                                                                      p
+
+  P2 – Step 11                          1      Left of Left (W)          Single right rotation
+                                                                                                              b               c
+                                        2     Right of Left (X)        Double left- right rotation
+
+                                        3     Left of Right (Y)        Double right- left rotation
+
+                                        4     Right of Right (Z)          Single left rotation            W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 5
+  ● Case 3                                        5
+  ● Rotate right at 9
+                            4                                                         9
+
+
+                                                                   8                                 10
+
+
+
+
+                                                           6
+                                       Case    Insert Location             Tree Rotation(s)
+                                                                                                                      p
+
+  P2 – Step 12                          1      Left of Left (W)          Single right rotation
+                                                                                                              b               c
+                                        2     Right of Left (X)        Double left- right rotation
+
+                                        3     Left of Right (Y)        Double right- left rotation
+
+                                        4     Right of Right (Z)          Single left rotation           W        X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 5
+  ● Case 3                                        5
+  ● Rotate right at 9
+  ● Rotate left at 5        4                                                         8
+
+
+                                                                   6                                 9
+
+
+
+
+                                                                                                             10
+                                       Case    Insert Location         Tree Rotation(s)
+                                                                                                                  p
+
+  P2 – Step 13                            1    Left of Left (W)      Single right rotation
+                                                                                                          b               c
+                                          2   Right of Left (X)    Double left- right rotation
+
+                                          3   Left of Right (Y)    Double right- left rotation
+
+                                          4   Right of Right (Z)      Single left rotation            W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 5
+  ● Case 3                                        8
+  ● Rotate right at 9
+  ● Rotate left at 5        5                                                     9
+No more imbalances
+
+                        4             6                                                          10
+                                       Case    Insert Location         Tree Rotation(s)
+                                                                                                                   p
+
+  P2 – Step 14                            1    Left of Left (W)      Single right rotation
+                                                                                                           b               c
+
+  (pt 1)                                  2
+
+                                          3
+                                              Right of Left (X)
+
+                                              Left of Right (Y)
+                                                                   Double left- right rotation
+
+                                                                   Double right- left rotation
+
+                                          4   Right of Right (Z)      Single left rotation            W        X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 9
+  ● Case 4                                        8
+  ● Rotate left at 9
+                            5                                                     9
+
+
+                       4              6                                                          10
+
+
+
+
+                                                                                                          11
+                                       Case    Insert Location             Tree Rotation(s)
+                                                                                                                      p
+
+  P2 – Step 14                            1    Left of Left (W)          Single right rotation
+                                                                                                              b               c
+
+  (pt 2)                                  2
+
+                                          3
+                                              Right of Left (X)
+
+                                              Left of Right (Y)
+                                                                       Double left- right rotation
+
+                                                                       Double right- left rotation
+
+                                          4   Right of Right (Z)          Single left rotation            W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 9
+  ● Case 4                                        8
+  ● Rotate left at 9
+No more imbalances          5                                                        10
+
+
+                       4              6                            9                                 11
+                                       Case    Insert Location             Tree Rotation(s)
+                                                                                                                      p
+
+  P2 – Step 15                            1    Left of Left (W)          Single right rotation
+                                                                                                              b               c
+                                          2   Right of Left (X)        Double left- right rotation
+
+                                          3   Left of Right (Y)        Double right- left rotation
+
+                                          4   Right of Right (Z)          Single left rotation            W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+No imbalances
+                                                  8
+
+
+                            5                                                        10
+
+
+                    4                 6                            9                                 11
+
+
+
+
+                3
+                                       Case    Insert Location             Tree Rotation(s)
+                                                                                                                      p
+
+  P2 – Step 16                            1    Left of Left (W)          Single right rotation
+                                                                                                              b               c
+                                          2   Right of Left (X)        Double left- right rotation
+
+                                          3   Left of Right (Y)        Double right- left rotation
+
+                                          4   Right of Right (Z)          Single left rotation            W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 4
+  ● Case 1                                        8
+  ● Rotate right at 4
+                            5                                                        10
+
+
+                        4             6                            9                                 11
+
+
+
+
+               3
+  2
+                                       Case    Insert Location             Tree Rotation(s)
+                                                                                                                      p
+
+  P2 – Step 17                            1    Left of Left (W)          Single right rotation
+                                                                                                              b               c
+                                          2   Right of Left (X)        Double left- right rotation
+
+                                          3   Left of Right (Y)        Double right- left rotation
+
+                                          4   Right of Right (Z)          Single left rotation            W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 4
+  ● Case 1                                        8
+  ● Rotate right at 4
+No more imbalances              5                                                    10
+
+
+                        3             6                            9                                 11
+
+
+
+
+               2            4
+                                       Case    Insert Location             Tree Rotation(s)
+                                                                                                                      p
+
+  P2 – Step 18                            1    Left of Left (W)          Single right rotation
+                                                                                                              b               c
+                                          2   Right of Left (X)        Double left- right rotation
+
+                                          3   Left of Right (Y)        Double right- left rotation
+
+                                          4   Right of Right (Z)          Single left rotation            W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 5
+  ● Case 1                                        8
+  ● Rotate right at 5
+                                5                                                    10
+
+
+                        3             6                            9                                 11
+
+
+
+
+               2            4
+  1
+                                       Case        Insert Location             Tree Rotation(s)
+                                                                                                                          p
+
+  P2 – Step 19                            1        Left of Left (W)          Single right rotation
+                                                                                                                  b               c
+                                          2       Right of Left (X)        Double left- right rotation
+
+                                          3       Left of Right (Y)        Double right- left rotation
+
+                                          4       Right of Right (Z)          Single left rotation            W       X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 5
+  ● Case 1                                            8
+  ● Rotate right at 5
+No more imbalances          3                                                            10
+
+
+                        2             5                                9                                 11
+
+
+
+
+               1                 4            6
+                                       Case        Insert Location             Tree Rotation(s)
+                                                                                                                           p
+
+  P2 – Step 20                            1        Left of Left (W)          Single right rotation
+                                                                                                                   b               c
+                                          2       Right of Left (X)        Double left- right rotation
+
+                                          3       Left of Right (Y)        Double right- left rotation
+
+                                          4       Right of Right (Z)          Single left rotation            W        X       Y       Z
+
+
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+No imbalances
+                                                      8
+
+
+                            3                                                            10
+
+
+                    2                 5                                9                                 11
+
+
+
+
+                1                4            6                                                                   14
+Problem 3
+ Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+Problem 3: Height = 0
+ Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+
+
+
+
+ Height = 0:
+Problem 3: Height = 1
+ Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+
+
+
+
+ Height = 1:
+Problem 3: Height = 2
+ Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+
+
+
+
+ Height = 2:
+Problem 3: Height = 3
+ Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+
+
+
+ Height = 3:
+Problem 3: Height = 4
+ Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+
+ Height = 4:
+Problem 3: General
+ More generally: What is the min number of nodes for a AVL tree with height h?
+
+                                                         r
+ height(r) = h
+ height(sub1) = h-1
+ height(sub2) = h-2
+                                                                     sub2
+
+                                        sub1
+
+
+
+
+ minNum(h) = 1 + minNum(h-1) + minNum(h-2)
+

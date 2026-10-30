@@ -1,0 +1,149 @@
+{
+  "course": "CSE 332 Autumn 2026 (26au)",
+  "week": "Week 4: 2026-10-19 to 2026-10-23 (America/Los_Angeles)",
+  "extractedText": "text/: pdftotext -layout for every PDF (<name>.txt), slide text plus speaker notes for every deck (<name>.pptx-with-notes.txt), docx text, tag-stripped HTML. All raw files sit at the top of this folder; PDFs, decks and docx are git-ignored, so their sha256 here is the record.",
+  "fetchTimeSource": "fetchedAt = local time right after curl wrote the file",
+  "sources": [
+    {
+      "file": "cse332-26au-lec09-AVL-2.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec09-AVL-2.pdf",
+      "what": "Lecture 9 AVL Trees 2 slides (pdf)",
+      "fetchedAt": "2026-10-29T22:24:40-07:00",
+      "bytes": 455876,
+      "sha256": "ebf2e03ba85b86795a5ee2770f08d0443b79ec5d3fbdabbb8a9c1090cb8242d6"
+    },
+    {
+      "file": "cse332-26au-lec09-AVL-2.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec09-AVL-2.pptx",
+      "what": "Lecture 9 AVL Trees 2 slides (pptx, with speaker notes)",
+      "fetchedAt": "2026-10-29T22:24:41-07:00",
+      "bytes": 676279,
+      "sha256": "e41f6de67f245aebd117a2cf2a363d4b76213d6ac63812b6cb615ddad9b21861"
+    },
+    {
+      "file": "cse332-26au-lec10-hashing-1.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec10-hashing-1.pdf",
+      "what": "Lecture 10 Hashing slides (pdf)",
+      "fetchedAt": "2026-10-29T22:24:41-07:00",
+      "bytes": 440936,
+      "sha256": "fa30c3cdb4d95cac232c2d9f1d4e550cb8e4972c056366b743b08a65db92e5a8"
+    },
+    {
+      "file": "cse332-26au-lec10-hashing-1.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec10-hashing-1.pptx",
+      "what": "Lecture 10 Hashing slides (pptx, with speaker notes)",
+      "fetchedAt": "2026-10-29T22:24:41-07:00",
+      "bytes": 929731,
+      "sha256": "af31381674acb509e2c5e165675be92882f748218654506fafa30771908c449f"
+    },
+    {
+      "file": "Section04.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section04.pdf",
+      "what": "Section 4 AVL Trees slides (pdf)",
+      "fetchedAt": "2026-10-29T22:24:41-07:00",
+      "bytes": 492488,
+      "sha256": "ba20337377f88bc50e6d28908db881692ab4f24bfaef494c0373df527ef92bfa"
+    },
+    {
+      "file": "Section04.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section04.pptx",
+      "what": "Section 4 AVL Trees slides (pptx)",
+      "fetchedAt": "2026-10-29T22:24:41-07:00",
+      "bytes": 1220850,
+      "sha256": "e6d1fa8004fa074331bf4cbab8a14540505ec5a6e76131ce1a18b4bbda1ad427"
+    },
+    {
+      "file": "Section04-worksheet.docx",
+      "url": "https://docs.google.com/document/d/1evX84yeqeAb__5t3lvtl0DhkRAVA1GcA/export?format=docx",
+      "what": "Section 4 worksheet (Google Doc linked from the calendar, exported as docx)",
+      "fetchedAt": "2026-10-29T22:24:42-07:00",
+      "bytes": 35518,
+      "sha256": "48a985d4f07f912b413bd19172b97a0378cedf5343f6137be5e37e1912513715"
+    },
+    {
+      "file": "Section04-solutions.docx",
+      "url": "https://docs.google.com/document/d/1T0mqYDv1H32V9A4ISk3HHi4zhc540bSo/export?format=docx",
+      "what": "Section 4 worksheet solutions (Google Doc linked from the calendar, exported as docx)",
+      "fetchedAt": "2026-10-29T22:24:42-07:00",
+      "bytes": 254487,
+      "sha256": "ebfa0d4182facefcba6c768ef78072e6e79e836d8866d8fdbc764fe493d6867d"
+    },
+    {
+      "file": "cse332-26au-lec11-hashing-2.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec11-hashing-2.pdf",
+      "what": "Lecture 11 Hashing 2 slides (pdf)",
+      "fetchedAt": "2026-10-29T22:24:42-07:00",
+      "bytes": 425154,
+      "sha256": "442b9c86a9ded490e5db178891a79a12579a3a82f560350a4352956f51cd0b90"
+    },
+    {
+      "file": "cse332-26au-lec11-hashing-2.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec11-hashing-2.pptx",
+      "what": "Lecture 11 Hashing 2 slides (pptx, with speaker notes)",
+      "fetchedAt": "2026-10-29T22:24:42-07:00",
+      "bytes": 904853,
+      "sha256": "1089f899addf2f1a162060359ba950160be99c05707179784a010648a071aec8"
+    },
+    {
+      "file": "summary_avl.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries/avl.html",
+      "what": "Topic summary: AVL Trees",
+      "fetchedAt": "2026-10-29T22:24:42-07:00",
+      "bytes": 64661,
+      "sha256": "cf2ad5584db2ac3593fbb1f3a68a5bc5b4b105db0b490802a4195cff000ed93b"
+    },
+    {
+      "file": "summary_hashing.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries/hashing.html",
+      "what": "Topic summary: Hash Functions and Hash Tables",
+      "fetchedAt": "2026-10-29T22:24:42-07:00",
+      "bytes": 58886,
+      "sha256": "93f65693e634a993f6091a1de94f772740b19fad50a5dafc0555c6f52e27e3c5"
+    },
+    {
+      "file": "calendar.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/calendar.html",
+      "what": "Course calendar (last updated 2026-10-29 18:38)",
+      "fetchedAt": "2026-10-29T22:24:42-07:00",
+      "bytes": 38470,
+      "sha256": "055dcd54709c49cf4c26560b0aaf84ff16a34e7a55801eb1f1cdcfb3c98af570"
+    },
+    {
+      "file": "tasks.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/tasks.html",
+      "what": "Tasks page (exercise objectives and due dates only; graded work not downloaded)",
+      "fetchedAt": "2026-10-29T22:24:43-07:00",
+      "bytes": 33696,
+      "sha256": "75cd4a2d6fc41fb4a992e07ab0a7e80563997be185b282c2b74899c68b0e0e65"
+    }
+  ],
+  "notPosted": [],
+  "notFetched": [
+    {
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-2",
+      "why": "EX2 Heaps (closed Mon Oct 19): graded work; date only"
+    },
+    {
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-3",
+      "why": "EX3 Recurrences (due Fri Oct 23): graded work in Gradescope; date only"
+    },
+    {
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/exercises/ex4.zip",
+      "why": "EX4 AVL Trees starter code (due Fri Oct 30): graded work, deliberately not downloaded"
+    },
+    {
+      "url": "Canvas: Week 3 survey (due Tue Oct 20)",
+      "why": "Graded participation survey; date only"
+    },
+    {
+      "url": "Weiss, Data Structures & Algorithm Analysis in Java, 4.4, 5.1-5.5",
+      "why": "Textbook not available; listed, not summarized"
+    }
+  ],
+  "notes": [
+    "Lecture 11's pptx has a hidden slide 12 (the load-factor answers, shown earlier in Lecture 10), so its pdf page numbers run one behind the pptx slide numbers after slide 11. The site cites pptx slide numbers.",
+    "Lecture 11 slide 29 (quadratic probing example) leaves the table blank; the site's table was computed by running the probes and checked in checks/cse332/w04/verify.mjs.",
+    "Section 4 problem 4 is not walked through in the section slides; the official solution's final tree is used."
+  ],
+  "pages": "site/cse332/w04/index.html: Lecture 9 (l9-insert, l9-minimal, l9-practice, l9-quiz), Lecture 10 (l10-idea, l10-hashfn, l10-chain, l10-practice, l10-quiz), Section 4 (s4-avl, s4-practice, s4-quiz), Lecture 11 (l11-linear, l11-quad, l11-rehash, l11-practice, l11-quiz), readings, cheatsheet"
+}

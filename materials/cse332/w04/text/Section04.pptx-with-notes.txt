@@ -1,0 +1,1854 @@
+--- slide 1 ---
+AVL Tree
+CSE 332 - Section 4
+
+--- slide 2 ---
+Reminder
+Meet the Staff due Oct 23!
+please come to our office hours!! 😄
+style.visibility
+
+--- slide 3 ---
+Announcements
+Midterm is coming up!
+Monday, Nov 9th
+Review session: Friday, Nov 6th (during Lecture)
+Study for midterm: section problems, past midterms. Have any questions? Go to OH or post on ed
+
+--- slide 4 ---
+AVL Trees
+
+--- slide 5 ---
+What are AVL Trees?
+According to lecture:
+An AVL Tree is a tree data structure with the following properties:
+Structural Property
+Each node has ≤ 2 children.
+Heights of the left and right subtrees of every node differ by at most 1.
+Order Property
+All keys in the left subtree < node’s key.
+All keys in the right subtree > node’s key.
+Notice that this is just a Binary Search Tree (BST) with 1 additional property.
+
+ Are these AVL trees?
+[notes]
+Maybe add labels to the nodes on the trees so that you can add alt text describing their structure.
+
+--- slide 6 ---
+Wait, why?
+Guaranteed balance. AVL trees keep their height minimal after every insert/delete. This allows operations to stay efficient.
+{A1681FDF-C7CB-4C2B-BE79-F69BE13273A6}Data Structure
+Find
+Insert
+Delete
+AVL Tree
+O(log n)
+O(log n)
+O(log n)
+Unbalanced BST
+O(h), h = height
+O(h)
+O(h)
+Linked List
+O(n)
+O(n)
+O(n)
+Unsorted Array
+O(n)
+O(n)
+O(n)
+Sorted Array
+O(log n)  [binary search]
+O(n)
+O(n)
+
+ Are these AVL trees?
+Recall the ADT ensures no duplicate elements, so we must search before inserting
+[notes]
+Tree and question mark can be marked as decorative.
+Add more general note reminding that insert/delete require first determining whether the key present
+Add the “using binary search” footnote just into the table
+
+--- slide 7 ---
+Worksheet: Problem 0
+
+--- slide 8 ---
+Problem 0 (Questions)
+What are the constraints on the data types you can store in an AVL tree?
+
+When is an AVL tree preferred over another dictionary implementation, such as a HashMap?
+
+--- slide 9 ---
+Problem 0 (Answer 1)
+What are the constraints on the data types you can store in an AVL tree?
+Keys must be of a comparable data type.
+Values can be any data type.
+
+When is an AVL tree preferred over another dictionary implementation, such as a HashMap?
+
+--- slide 10 ---
+Problem 0 (Answer 2)
+What are the constraints on the data types you can store in an AVL tree?
+Keys must be of a comparable data type.
+Values can be any data type.
+
+When is an AVL tree preferred over another dictionary implementation, such as a HashMap?
+In an AVL tree, keys can be iterated over in sorted order. 
+It’s easier to find next and previous key in AVL tree. (check ex4)
+
+--- slide 11 ---
+AVL Tree Rotations Microteach
+
+--- slide 12 ---
+AVL Tree Rotations
+To fix an imbalance in an AVL tree after an insert:
+Identify the lowest problem node p where the imbalance occurs.
+Identify the insert location.
+Execute the corresponding tree rotation(s).
+{A1681FDF-C7CB-4C2B-BE79-F69BE13273A6}Case
+Insert Location
+Tree Rotation(s)
+1
+Left subtree of Left child (W)
+Single right rotation
+2
+Right subtree of Left child (X)
+Double left-right rotation
+3
+Left subtree of Right child (Y)
+Double right-left rotation
+4
+Right subtree of Right child (Z)
+Single left rotation
+b
+c
+p
+W
+X
+Y
+Z
+a
+V
+[notes]
+See lecture slides for suggestions on how to make this accessible. I’d recommend making the whole tree one big group and adding alt text to that group.
+
+Or you could just copy the figure from the lecture slides and then update the table to represent the different variable naming.
+
+--- slide 13 ---
+Right Rotation
+p is the lowest problem node. Insert location was in w.
+References that change:
+a.left = b
+p.left = b.right
+b.right = p
+
+b
+c
+p
+W
+X
+Y
+Z
+a
+V
+b
+c
+p
+W
+X
+Y
+Z
+a
+V
+[notes]
+See lecture slides for suggestions on how to make this accessible. I’d recommend making each tree its own group and adding alt text to that group.
+
+--- slide 14 ---
+Problem 1 - Left Rotation
+p is the lowest problem node. Insert location was in z.
+References that change:
+a.left = c
+p.right = c.left
+c.left = p
+
+b
+c
+p
+W
+X
+Y
+Z
+a
+V
+Tip for ex4: remember to update height field in nodes
+
+--- slide 15 ---
+Case 1
+{A1681FDF-C7CB-4C2B-BE79-F69BE13273A6}Case
+Insert Location
+Tree Rotation(s)
+1
+Left subtree of Left child (W)
+Single right rotation
+2
+Right subtree of Left child (X)
+Double left-right rotation
+3
+Left subtree of Right child (Y)
+Double right-left rotation
+4
+Right subtree of Right child (Z)
+Single left rotation
+b
+c
+p
+W
+X
+Y
+Z
+Let’s insert 1.
+1.  Identify the problem node p
+3
+8
+6
+2
+5
+1
+6
+2
+1
+
+3.1.  Identify bad edges
+2.  Identify the insert location
+2
+6
+3
+1
+8
+5
+3.2.  Remove bad edges
+3.  Execute the tree rotation
+2
+6
+3
+1
+5
+8
+3.3.  Replace edges
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+[notes]
+Make each animated component a group, then add alt text to that group. Some alt text “templates”
+Initial tree: We begin with an AVL tree formatted as follows… [insert description here mimicking lecture slides]
+Node 1: next we insert the new node 1 into the tree, which becomes the left child of 2. We next check if the tree is balanced by comparing the heights of all subtrees of nodes on the path from the root to the new node. In this case we see that 6 is a problem node because…
+Circle arrow: Now that we’ve identified that 6 is the problem node we need to determine our rotation case by looking at the first two directions from 6 to the new node. In this we go left twices, so we need to do a right rotation
+Middle tree: mark all the nodes as decorative, the “bad edges” can be made a group with alt text describing why they’re “bad”. The replacement edges can have alt text describing which edges they are and why we chose them
+Right tree: make one big group describing the final tree
+
+--- slide 16 ---
+Case 4
+Let’s insert 11.
+b
+c
+p
+W
+X
+Y
+Z
+1.  Identify the problem node p
+2.  Identify the insert location
+3.  Execute the tree rotation
+3
+8
+6
+7
+9
+11
+6
+9
+11
+
+3.1.  Identify bad edges
+6
+9
+8
+3
+11
+7
+3.2.  Remove bad edges
+6
+9
+8
+3
+7
+11
+3.3.  Replace edges
+{A1681FDF-C7CB-4C2B-BE79-F69BE13273A6}Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 17 ---
+Case 2 (left)
+Let’s insert either 4 or 6.
+b
+c
+p
+W
+X
+Y
+Z
+1.  Identify the problem node p
+2.  Identify the insert location
+3.  Execute the first tree rotation
+For Case 2, we do the first rotation on node b
+
+3
+8
+7
+1
+5
+3.1.  Identify bad edges
+4
+6
+7
+4
+6
+5
+3.2.  Remove bad edges
+1
+8
+5
+3
+6
+4
+7
+3.3.  Replace edges
+3
+6
+1
+4
+8
+5
+7
+{A1681FDF-C7CB-4C2B-BE79-F69BE13273A6}Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 18 ---
+Case 2 (right)
+This is now similar to Case 1!
+b
+c
+p
+W
+X
+Y
+Z
+4.  Execute the second tree rotation
+We do the second rotation on node p
+4.1.  Identify bad edges
+3
+6
+1
+4
+8
+5
+7
+
+4.2.  Remove bad edges
+3
+5
+1
+6
+7
+8
+4
+4.3.  Replace edges
+3
+7
+5
+1
+4
+6
+8
+{A1681FDF-C7CB-4C2B-BE79-F69BE13273A6}Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 19 ---
+Case 3
+Let’s insert either 6 or 8.
+3
+9
+5
+7
+10
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+
+--- slide 20 ---
+Case 3 – Step 1
+Let’s insert either 6 or 8.
+3
+9
+5
+7
+10
+6
+8
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+
+--- slide 21 ---
+Case 3 – Step 2
+Let’s insert either 6 or 8.
+1.  Identify the problem node p
+2.  Identify the insert location
+3
+9
+5
+7
+10
+6
+8
+5
+7
+6
+8
+7
+6
+8
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+
+--- slide 22 ---
+Case 3 – Step 3
+Let’s insert either 6 or 8.
+1.  Identify the problem node p
+2.  Identify the insert location
+3.  Execute the first tree rotation
+For Case 3, we do the first rotation on node c
+3
+9
+5
+7
+10
+6
+8
+5
+7
+6
+8
+7
+6
+8
+
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+3.1.  Identify bad edges
+
+--- slide 23 ---
+Case 3 – Step 4
+Let’s insert either 6 or 8.
+1.  Identify the problem node p
+2.  Identify the insert location
+3.  Execute the first tree rotation
+For Case 3, we do the first rotation on node c
+3
+9
+5
+7
+10
+6
+8
+5
+7
+6
+8
+7
+6
+8
+
+3.1.  Identify bad edges
+3
+7
+5
+6
+9
+8
+10
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+3.2.  Remove bad edges
+
+--- slide 24 ---
+Case 3 – Step 5
+Let’s insert either 6 or 8.
+1.  Identify the problem node p
+2.  Identify the insert location
+3.  Execute the first tree rotation
+For Case 3, we do the first rotation on node c
+3
+9
+5
+7
+10
+6
+8
+5
+7
+6
+8
+7
+6
+8
+
+3.1.  Identify bad edges
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+3.2.  Remove bad edges
+3
+7
+5
+6
+9
+8
+10
+
+--- slide 25 ---
+Case 3 – Step 6
+Let’s insert either 6 or 8.
+1.  Identify the problem node p
+2.  Identify the insert location
+3.  Execute the first tree rotation
+For Case 3, we do the first rotation on node c
+3
+9
+5
+7
+10
+6
+8
+5
+7
+6
+8
+7
+6
+8
+
+3.1.  Identify bad edges
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+3.2.  Remove bad edges
+3
+7
+5
+6
+9
+8
+10
+3.3.  Replace edges
+3
+7
+5
+6
+9
+8
+10
+
+--- slide 26 ---
+Case 3 – Step 7
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+This is now similar to Case 4!
+4.  Execute the second tree rotation
+We do the second rotation on node p
+3
+7
+5
+6
+9
+8
+10
+
+4.1.  Identify bad edges
+
+--- slide 27 ---
+Case 3 – Step 8
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+This is now similar to Case 4!
+4.  Execute the second tree rotation
+We do the second rotation on node p
+3
+7
+5
+6
+9
+8
+10
+
+4.1.  Identify bad edges
+5
+7
+3
+6
+9
+8
+10
+4.2.  Remove bad edges
+
+--- slide 28 ---
+Case 3 – Step 9
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+This is now similar to Case 4!
+4.  Execute the second tree rotation
+We do the second rotation on node p
+4.1.  Identify bad edges
+3
+7
+5
+6
+9
+8
+10
+
+4.2.  Remove bad edges
+5
+7
+3
+6
+9
+8
+10
+4.3.  Replace edges
+5
+9
+7
+3
+6
+8
+10
+
+--- slide 29 ---
+Problem 2 Walkthrough
+
+--- slide 30 ---
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Problem 2
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+b
+c
+p
+W
+X
+Y
+Z
+
+--- slide 31 ---
+P2 – Step 1
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+b
+c
+p
+W
+X
+Y
+Z
+No imbalances
+10
+style.visibilitystyle.visibility
+[notes]
+We initially add the first node 10 as the only node in the tree
+
+--- slide 32 ---
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+P2 – Step 3
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+b
+c
+p
+W
+X
+Y
+Z
+No imbalances
+10
+4
+style.visibility
+[notes]
+We initially add the first node 10 as the only node in the tree
+
+--- slide 33 ---
+P2 – Step 4
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 10
+Case 2
+Rotate left at 4
+5
+4
+10
+10
+5
+
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+
+--- slide 34 ---
+P2 – Step 5
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 10
+Case 2
+Rotate left at 4
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+4
+5
+10
+10
+5
+
+--- slide 35 ---
+P2 – Step 6
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 10
+Case 2
+Rotate left at 4
+Rotate right at 10
+No more imbalances
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+4
+10
+5
+10
+5
+style.visibility
+
+--- slide 36 ---
+P2 – Step 7
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+4
+10
+5
+8
+No imbalances
+style.visibility
+
+--- slide 37 ---
+P2 – Step 8
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+Imbalance at 10
+Case 2
+Rotate left at 8
+4
+10
+5
+9
+8
+10
+9
+
+--- slide 38 ---
+P2 – Step 9
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+Imbalance at 10
+Case 2
+Rotate left at 8
+Rotate right at 10
+4
+10
+5
+8
+9
+10
+9
+
+style.visibility
+
+--- slide 39 ---
+P2 – Step 10
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+Imbalance at 10
+Case 2
+Rotate left at 8
+Rotate right at 10
+No more imbalances
+4
+9
+5
+8
+10
+10
+9
+style.visibilitystyle.visibility
+
+--- slide 40 ---
+P2 – Step 11
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 5
+Case 3
+Rotate right at 9
+4
+9
+5
+6
+8
+10
+5
+6
+
+8
+
+--- slide 41 ---
+P2 – Step 12
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 5
+Case 3
+Rotate right at 9
+Rotate left at 5
+4
+8
+5
+6
+9
+10
+5
+8
+
+6
+style.visibility
+
+--- slide 42 ---
+P2 – Step 13
+b
+c
+p
+W
+X
+Y
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 5
+Case 3
+Rotate right at 9
+Rotate left at 5
+No more imbalances
+4
+6
+5
+9
+8
+10
+5
+8
+6
+style.visibilitystyle.visibility
+
+--- slide 43 ---
+Imbalance at 9
+
+b
+
+c
+
+p
+
+W
+
+X
+
+Y
+
+Z
+Case 4
+
+4
+
+6
+
+5
+
+9
+
+8
+
+10
+
+11
+
+9
+
+11
+
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Rotate left at 9
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+P2 – Step 14 (pt 1)
+style.visibilitystyle.visibilitystyle.visibility
+
+--- slide 44 ---
+b
+
+c
+
+p
+
+W
+
+X
+
+Y
+
+Z
+No more imbalances
+
+4
+
+6
+
+5
+
+10
+
+8
+
+9
+
+11
+
+9
+
+11
+Imbalance at 9
+Case 4
+Rotate left at 9
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+P2 – Step 14 (pt 2)
+style.visibility
+
+--- slide 45 ---
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+
+3
+
+4
+
+6
+
+5
+
+10
+
+8
+
+9
+
+11
+
+No imbalances
+
+b
+
+c
+
+p
+
+W
+
+X
+
+Y
+
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+P2 – Step 15
+style.visibility
+
+--- slide 46 ---
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 4
+
+b
+
+c
+
+p
+
+W
+
+X
+
+Y
+
+Z
+Case 1
+Rotate right at 4
+
+5
+
+10
+
+8
+
+11
+
+3
+
+4
+
+6
+
+9
+
+4
+
+2
+
+2
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+P2 – Step 16
+style.visibilitystyle.visibilitystyle.visibility
+
+--- slide 47 ---
+b
+
+c
+
+p
+
+W
+
+X
+
+Y
+
+Z
+No more imbalances
+
+2
+
+4
+
+3
+
+6
+
+5
+
+10
+
+8
+
+9
+
+11
+
+4
+
+2
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 4
+Case 1
+Rotate right at 4
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+P2 – Step 17
+style.visibility
+
+--- slide 48 ---
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Imbalance at 5
+
+b
+
+c
+
+p
+
+W
+
+X
+
+Y
+
+Z
+Case 1
+Rotate right at 5
+
+2
+
+4
+
+3
+
+6
+
+5
+
+10
+
+8
+
+9
+
+11
+
+5
+
+1
+
+1
+
+2
+
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+P2 – Step 18
+style.visibilitystyle.visibilitystyle.visibility
+
+--- slide 49 ---
+No more imbalances
+Imbalance at 5
+Case 1
+Rotate right at 5
+
+1
+
+2
+
+5
+
+3
+
+10
+
+8
+
+4
+
+6
+
+9
+
+11
+
+5
+
+2
+
+1
+
+b
+
+c
+
+p
+
+W
+
+X
+
+Y
+
+Z
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+P2 – Step 19
+style.visibility
+
+--- slide 50 ---
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree
+
+1
+
+2
+
+5
+
+3
+
+10
+
+8
+
+4
+
+6
+
+9
+
+11
+
+14
+
+No imbalances
+
+b
+
+c
+
+p
+
+W
+
+X
+
+Y
+
+Z
+Case
+Insert Location
+Tree Rotation(s)
+1
+Left of Left (W)
+Single right rotation
+2
+Right of Left (X)
+Double left-right rotation
+3
+Left of Right (Y)
+Double right-left rotation
+4
+Right of Right (Z)
+Single left rotation
+P2 – Step 20
+style.visibility
+
+--- slide 51 ---
+Problem 3
+Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+
+--- slide 52 ---
+Problem 3: Height = 0
+Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+
+Height = 0:
+
+--- slide 53 ---
+Problem 3: Height = 1
+Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+
+Height = 1:
+
+--- slide 54 ---
+Problem 3: Height = 2
+Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+
+Height = 2:
+
+--- slide 55 ---
+Problem 3: Height = 3
+Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+
+Height = 3:
+
+--- slide 56 ---
+Problem 3: Height = 4
+Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+
+Height = 4:
+
+--- slide 57 ---
+Problem 3: General
+More generally: What is the min number of nodes for a AVL tree with height h?
+
+height(r) = h
+height(sub1) = h-1
+height(sub2) = h-2
+
+minNum(h) = 1 + minNum(h-1) + minNum(h-2)
+
+r
+
+sub1
+
+sub2
+

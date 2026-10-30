@@ -1,0 +1,467 @@
+ CSE 332 Autumn 2026
+Lecture 10: Hashing, pt. 1
+             Ruth Anderson
+       http://www.cs.uw.edu/332
+
+
+
+
+                                  1
+Announcements
+• “Meet the staff” activity – Come meet us in office hours!
+• Participate in Section, earn a late day (see Ed Board post)
+• Section Tomorrow: AVL Trees!
+• Conceptual Office Hours: 10-11am Thursday in CSE2 128. A space to
+  ask about course content and topics only as opposed to direct help
+  with exercises.
+• Exercise 3 Recurrences: Due Fri Oct 23
+• Exercise 4 AVL Trees: Due Friday Oct 30
+• Midterm: 5-6pm Monday November 9
+                                                                       2
+Dictionary (Map) ADT - Ordered
+• Contents:
+   • Sets of key+value pairs
+   • Keys must be comparable
+• Operations:
+   • insert(key, value)
+      • Adds the (key,value) pair into the dictionary
+      • If the key already has a value, overwrite the old value
+          • Consequence: Keys cannot be repeated
+   • find(key)
+      • Returns the value associated with the given key
+   • delete(key)
+      • Remove the key (and its associated value)
+
+                                                                  3
+Dictionary Data Structures
+  Data Structure         Time to insert   Time to find   Time to delete
+  Unsorted Array              Θ(1)            Θ(𝑛𝑛)             Θ(𝑛𝑛)
+  Unsorted Linked List        Θ(1)            Θ(𝑛𝑛)             Θ(𝑛𝑛)
+  Sorted Array                Θ 𝑛𝑛           Θ(log 𝑛𝑛)          Θ(𝑛𝑛)
+  Sorted Linked List          Θ 𝑛𝑛            Θ 𝑛𝑛              Θ 𝑛𝑛
+  Heap                      Θ(log 𝑛𝑛)         Θ 𝑛𝑛              Θ 𝑛𝑛
+  Binary Search Tree       Θ height         Θ height          Θ height
+  AVL Tree                  Θ(log 𝑛𝑛)        Θ(log 𝑛𝑛)        Θ(log 𝑛𝑛)
+
+
+
+
+                                                                          4
+     BSTs and AVL Trees
+• Binary Search Tree:
+   • A binary tree where for each node, all keys in its left subtree are smaller and all keys in its right subtree are
+     larger
+   • Find:
+       • If it matches, return the value.
+       • If the search key is less than the current node, look left. If it’s greater, look right.
+       • If we reach an empty spot, find was unsuccessful
+   • Insert:
+       • Do a find, if it was successful then update the value
+       • If it was unsuccessful, add a new node to the empty spot we found.
+   • Delete:
+       • If the deleted node is a leaf, just remove it
+       • If the deleted node had one child, replace it with that one child
+       • If the deleted node had 2 children, replace it with the largest key to the left
+• AVL Tree:
+   • A binary search tree where for each node, the height of its left subtree and the height of its right subtree
+     are off by at most 1.
+   • Find:
+       • Same as BST
+   • Insert:
+       • Do a BST insert, then rotate if tree is unbalanced (apply one LL, RR, LR, RL case)
+   • Delete: (Not covered this quarter)
+                                                                                                                           5
+       • Do a BST delete, then rotate if the tree is unbalanced (apply LL, RR, LR, RL cases as needed from leaf to root)
+Aside: Other Tree-based Dictionaries
+We will not cover these, but may be of interest:
+• Red-Black Trees
+   • Similar to AVL Trees in that we add shape rules to BSTs
+   • More “relaxed” shape than an AVL Tree
+          • Trees can be taller (though not asymptotically so)
+          • Needs to move nodes less frequently
+   • This is what Java’s TreeMap uses!
+• Tries
+   • Similar to a Huffman Tree
+   • Requires keys to be sequences (e.g. Strings)
+   • Combines shared prefixes among keys to save space
+   • Often used for text-based searches
+          • Web search, Genomes                                  6
+Next topic: Hash Tables
+  Data Structure            Time to insert   Time to find   Time to delete
+  Unsorted Array                 Θ(𝑛𝑛)           Θ(𝑛𝑛)             Θ(𝑛𝑛)
+  Unsorted Linked List           Θ(𝑛𝑛)           Θ(𝑛𝑛)             Θ(𝑛𝑛)
+  Sorted Array                   Θ 𝑛𝑛           Θ(log 𝑛𝑛)          Θ(𝑛𝑛)
+  Sorted Linked List             Θ 𝑛𝑛            Θ 𝑛𝑛              Θ 𝑛𝑛
+  Binary Search Tree          Θ height         Θ height          Θ height
+  AVL Tree                     Θ(log 𝑛𝑛)        Θ(log 𝑛𝑛)        Θ(log 𝑛𝑛)
+  Hash Table (Worst case)        Θ(𝑛𝑛)           Θ(𝑛𝑛)             Θ(𝑛𝑛)
+  Hash Table (Average)           Θ 1             Θ 1               Θ 1
+
+
+                                                                             7
+Dictionary (Map) ADT - Unordered
+• Contents:
+   • Sets of key+value pairs
+   • Keys must be comparable Keys have a hash function
+• Operations:
+   • insert(key, value)
+      • Adds the (key,value) pair into the dictionary
+      • If the key already has a value, overwrite the old value
+          • Consequence: Keys cannot be repeated
+   • find(key)
+      • Returns the value associated with the given key
+   • delete(key)
+      • Remove the key (and its associated value)
+
+                                                                  8
+Another Dictionary: “Really Big Array”
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+…
+
+
+
+                                         9
+“Really Big Array” Operations
+• Think of every key as a number
+• Give each key its own index in an array   Problems?
+
+insert(key, value){
+    arr[key] = value;
+}
+find(key){
+    return arr[key];
+}
+delete(key){
+    arr[key] = null;
+}
+
+                                                        10
+ Hash Tables
+ • Idea:
+     • Have a small array to store information
+     • Use a hash function to convert the key into an integer
+             • Hash function should “scatter” the keys, behave as if it randomly assigned keys to integers
+     • Mod integer by tablesize and Store key (& value) at given index
+     • Do something if two keys map to the same place (should be very rare)
+             • Collision resolution
+
+
+
+                                            Insert / find /
+                    ℎ(𝑘𝑘)    Some Integer      delete                      & value
+
+Key Object
+                                                                                                       11
+Caller-ID Example
+                                  0    1    2    3    4    5    6    7    8      9
+  • Key: Phone Number (as a string)
+  • Value: Person associated with that phone number
+  • Table size: 10
+
+  Sample Hash function:
+  • ℎ 𝑝𝑝𝑝𝑝𝑝𝑝𝑝𝑝𝑝 returns the phone number as an integer
+     • ℎ "2068675309" = 2068675309
+  • Store at index: (Result of hash function) % Table size
+     • The key “2068675309” is stored at index 9, because 2068675309 % 10 is 9
+
+                                                                                 12
+What Influences Running time?
+• How long hashing itself takes
+• Likelihood of collisions
+   • “quality” of our hash function
+   • Size of the array vs number of values in the array
+• What we do when we have a collision
+
+
+
+
+                                                          13
+What are the Keys?
+• Keys can be as simple as an integer or as complex as a Java object
+
+• If the key is a Java object:
+   • Which parts of the object will you use in your hash function?
+   • Equal objects must hash the same:
+       • If a.equals(b) or if c.compare(a,b) == 0, then we must require:
+               a.hashCode() == b.hashCode()
+   • If you ever override .equals()
+       • You need to override hashCode() also in a consistent way
+
+
+
+                                                                           14
+Properties of a “Good” Hash Function
+• Definition: A hash function maps objects to integers
+
+• Consistent
+    • Keys considered “equal” should hash to the same integer
+    • Deterministic: running the hash function on the same key twice should yield the same result
+• Uniform
+    • Should be able to use every index in a fixed-size array
+    • Should use every index at roughly equal rates
+• Effective
+    • It should be difficult to find two different (unequal) keys which hash to the same integer
+    • Given a key, it should be hard to find a different (unequal) key which hashes to the same integer
+    • “Avalanche effect”: making a small change to the key yields big changes in the integer it hashes to
+• Efficient
+    • Time to calculate the hash function should be very small
+
+                                                                                                        15
+A Bad Hash Function (and phone number trivia)
+• ℎ 𝑝𝑝𝑝𝑝𝑝𝑝𝑝𝑝𝑝 returns the first digit of the phone number as an integer
+   • Assume 10-digit format, with area code first
+   • No US phone numbers start with 1 or 0
+   • If we’re sampling from this class, 2 is by far the most likely
+• Consistent?
+• Uniform?
+• Effective?
+• Efficient?
+                                      0     1     2    3     4    5   6   7   8        9
+
+                                                                                  16
+A Bad Hash Function (Answers)
+• ℎ 𝑝𝑝𝑝𝑝𝑝𝑝𝑝𝑝𝑝 returns the first digit of the phone number as an integer
+   • Assume 10-digit format, with area code first
+
+• Consistent? Yes!
+• Uniform? No!
+   • No US phone numbers start with 1 or 0
+   • If we’re sampling from this class, 2 is by far the most likely
+• Effective? No!
+   • ℎ "2068675309" = 2
+   • ℎ "2068675305" = 2               0     1     2    3     4    5   6   7   8        9
+• Efficient? Yes!
+                                                                                  17
+Compare These Hash Functions (for strings)
+• Let 𝑠𝑠 = 𝑠𝑠0 𝑠𝑠1 𝑠𝑠2 … 𝑠𝑠𝑚𝑚−1 be a string of length 𝑚𝑚
+   • Let 𝑎𝑎(𝑠𝑠𝑖𝑖 ) be the ascii encoding of the character 𝑠𝑠𝑖𝑖
+• ℎ1 𝑠𝑠 = 𝑎𝑎 𝑠𝑠0
+
+• ℎ2 𝑠𝑠 = ∑𝑚𝑚−1
+           𝑖𝑖=0 𝑎𝑎 𝑠𝑠𝑖𝑖
+
+
+• ℎ3 𝑠𝑠 = ∑𝑚𝑚−1
+           𝑖𝑖=0 𝑎𝑎 𝑠𝑠𝑖𝑖 ⋅ 31𝑖𝑖
+
+
+
+• ℎ4 𝑠𝑠 = 2 ⋅ ∑𝑚𝑚−1
+               𝑖𝑖=0 𝑎𝑎 𝑠𝑠𝑖𝑖 ⋅ 31𝑖𝑖
+
+
+                                                                 18
+Properties of Those Example Hash Functions
+• Let 𝑠𝑠 = 𝑠𝑠0 𝑠𝑠1 𝑠𝑠2 … 𝑠𝑠𝑚𝑚−1 be a string of length 𝑚𝑚
+    • Let 𝑎𝑎(𝑠𝑠𝑖𝑖 ) be the ascii encoding of the character 𝑠𝑠𝑖𝑖
+• ℎ1 𝑠𝑠 = 𝑎𝑎 𝑠𝑠0
+    • Is: consistent, efficient
+• ℎ2 𝑠𝑠 = ∑𝑚𝑚−1
+           𝑖𝑖=0 𝑎𝑎 𝑠𝑠𝑖𝑖
+    • Is: consistent, efficient, and possibly uniform
+• ℎ3 𝑠𝑠 = ∑𝑚𝑚−1
+           𝑖𝑖=0 𝑎𝑎 𝑠𝑠𝑖𝑖 ⋅ 31𝑖𝑖
+
+    • Is: consistent, efficient, uniform, and effective
+• ℎ4 𝑠𝑠 = 2 ⋅ ∑𝑚𝑚−1
+               𝑖𝑖=0 𝑎𝑎 𝑠𝑠𝑖𝑖 ⋅ 31𝑖𝑖
+
+    • Is: consistent, efficient, effective
+                                                                  19
+Calculating hash functions quickly
+  ℎ3 𝑠𝑠 = ∑𝑚𝑚−1             𝑖𝑖
+           𝑖𝑖=0 𝑎𝑎 𝑠𝑠𝑖𝑖 ⋅ 31 =
+
+
+    = s0*310 + s1*311 + s2*312 + s3*313 + …
+
+ • But we need to calculate this quickly…..
+ • Avoid calculating 31𝑖𝑖 directly (don’t call Math.pow())
+
+ If m = 4, re-write as:
+
+ = s0 + 31(s1 + 31(s2 + 31 * s3))
+
+ for (i = m-1; i >= 0;i--) {
+        h = 31*h + s[i];
+   }
+
+                                                             20
+Ideal Insert procedure
+Supposing we have a “good” hash function:
+
+insert(key, value) {
+     h = key.hash();
+     arr[h % table.length] = (key, value);
+}
+
+Problem: It’s possible that two different keys map to the same index!
+This is called a “collision”
+
+                                                                        21
+Collision Resolution
+• A Collision occurs when we want to insert something into an already-
+  occupied position in the hash table
+• 2 main strategies:
+   • Separate Chaining
+      • Use a secondary data structure to contain the items
+          • E.g. each index in the hash table is itself a linked list
+   • Open Addressing
+      • Use a different spot in the table instead
+          • Linear Probing
+          • Quadratic Probing
+          • Double Hashing
+
+                                                 0      1       2       3   4   5   6   7   8        9
+                                                                                                22
+Separate Chaining Insert
+• To insert k, v:
+   • Compute the index using i = h(k) % table.length
+   • Add the key-value pair to the data structure at table[i]
+
+
+
+                                                                k,v
+
+
+
+                                              k,v               k,v
+
+
+
+
+                                    0    1    2     3   4       5     6   7   8        9
+                                                                                  23
+Separate Chaining Find
+• To find k:
+   • Compute the index using i = h(k) % table.length
+   • Call find with the key on the data structure at table[i]
+
+
+
+                                                                k,v
+
+
+
+                                              k,v               k,v
+
+
+
+
+                                    0     1    2    3    4      5     6   7   8        9
+                                                                                  24
+Separate Chaining Delete
+• To delete k:
+   • Compute the index using i = h(k) % table.length
+   • Call delete with the key on the data structure at table[i]
+
+
+
+                                                              k,v
+
+
+
+                                              k,v             k,v
+
+
+
+
+                                    0    1    2     3    4    5     6   7   8        9
+                                                                                25
+Formal Running Time Analysis
+• The load factor of a hash table represents the average number of
+  items per “bucket”
+               𝑛𝑛
+   • 𝜆𝜆 =
+          𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙
+
+• Assume we have a hash table that uses a linked-list for separate
+  chaining
+   • What is the expected number of comparisons needed in an unsuccessful find?
+
+   • What is the expected number of comparisons needed in a successful find?
+• How can we make the expected running time Θ(1)?
+
+                                                                               26
+Formal Running Time Analysis (Answers)
+• The load factor of a hash table represents the average number of items per
+  “bucket”
+                  𝑛𝑛
+   • 𝜆𝜆 =
+             𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙
+• Assume we have a hash table that uses a linked-list for separate chaining
+   • What is the expected number of comparisons needed in an unsuccessful find?
+       • 𝜆𝜆
+   • What is the expected number of comparisons needed in a successful find?
+            𝜆𝜆
+       •
+            2
+
+• How can we make the expected running time Θ(1)?
+   • Pick a constant value, resize the array whenever 𝜆𝜆 exceeds that constant
+       • We’ll talk about which constant we should pick later
+
+                                                                                  27
+Load Factor Example 1
+                                  𝑘𝑘, 𝑣𝑣
+
+
+                 𝑘𝑘, 𝑣𝑣           𝑘𝑘, 𝑣𝑣
+
+
+
+
+         0   1    2       3   4    5       6   7   8   9
+
+
+
+
+                                                           28
+                                                         𝑘𝑘, 𝑣𝑣
+
+Load Factor Example 2 𝑘𝑘, 𝑣𝑣                             𝑘𝑘, 𝑣𝑣
+
+
+                                    𝑘𝑘, 𝑣𝑣               𝑘𝑘, 𝑣𝑣
+
+
+                   𝑘𝑘, 𝑣𝑣           𝑘𝑘, 𝑣𝑣               𝑘𝑘, 𝑣𝑣
+
+
+
+
+           0   1    2       3   4    5       6   7   8     9
+
+
+
+
+                                                                  29
+                                                                            𝑘𝑘, 𝑣𝑣
+
+Load Factor Example 3 𝑘𝑘, 𝑣𝑣                              𝑘𝑘, 𝑣𝑣            𝑘𝑘, 𝑣𝑣
+
+
+                       𝑘𝑘, 𝑣𝑣                𝑘𝑘, 𝑣𝑣       𝑘𝑘, 𝑣𝑣            𝑘𝑘, 𝑣𝑣
+
+
+          𝑘𝑘, 𝑣𝑣       𝑘𝑘, 𝑣𝑣       𝑘𝑘, 𝑣𝑣   𝑘𝑘, 𝑣𝑣       𝑘𝑘, 𝑣𝑣   𝑘𝑘, 𝑣𝑣   𝑘𝑘, 𝑣𝑣
+
+
+
+
+           0       1    2       3     4       5       6    7        8         9
+
+
+
+
+                                                                                     30
+

@@ -1,0 +1,574 @@
+  CSE 332 Autumn 2026
+Lecture 9: AVL Trees, pt. 2
+             Ruth Anderson
+       http://www.cs.uw.edu/332
+
+
+
+
+                                  1
+Announcements
+• “Meet the staff” activity – Come meet us in office hours!
+• Participate in Section, earn a late day (see Ed Board post)
+• Exercise 2 Heaps: closes TONIGHT, Mon Oct 18
+• Week 3 Survey in canvas: Due TOMORROW, Tuesday Oct 20
+• Exercise 3 Recurrences: Due Fri Oct 23
+• Exercise 4 AVL Trees: Due Friday Oct 30
+• Midterm: 5-6pm Monday November 9
+
+
+                                                                2
+AVL Tree: A Balanced BST, a Dictionary
+• A Binary Search tree that maintains that the left and right subtrees of
+  every node have heights that differ by at most one.
+   • height of left subtree and height of right subtree differ by at most 1
+   • Not too weak (ensures trees are short)
+   • Not too strong (works for any number of nodes)
+
+• Idea of AVL Tree:
+   • When you insert/delete nodes, if tree is “out of balance” then modify the tree
+   • Modification = “rotation”
+
+
+                                                                                  3
+                                                                                Tree B
+Is it an AVL Tree? (Answers)                          Tree A
+                                                      Not Balanced!
+                                                                                              9
+
+                                                  9                                 3                   10
+   “Problem” Node
+   Its children’s heights                     3       10                                      6              16
+                                                                            1
+   differ by more than 1
+                                          1       6
+                                                                   0                5
+                                                                                                       Balanced!
+                                      0       5
+
+
+Tree C            9                                            Tree D           9
+
+          3                 10
+                                                                        3                10
+
+                 6               16
+                                                               1                6                 16
+
+
+          5                                                                                            Balanced!
+                      Not Balanced!                        0            5                7
+                                                                                                             4
+Inserting into an AVL Tree
+• Starts out the same way as BST:
+   • “Find” where the new node should go
+   • Put it in the correct place (it will be a leaf)
+• Next check the balance
+   • If the tree is still balanced, you’re done!
+   • Otherwise we need to do rotations
+
+
+
+
+                                                       5
+Insert Example (Insert -1)
+                                -1
+
+
+
+                       9
+
+                   3       11
+
+
+               1       6        16
+
+
+           0       2       7
+
+
+
+                                     6
+    Insert -1, BST Insert Step
+Not Balanced!
+Node 9 is the “problem node”                             Height=4
+Left and right children of node                             9
+9 are different by 2.                         Height=3              Height=1
+
+                                                   3                11
+Idea: “shorten” the left            Height=2             Height=1
+subtree, “lengthen” the right             1                 6             16
+                             Height=1            Height=0
+                                   0               2                 7
+                       Height=0
+
+                             -1     Height=-1
+
+
+
+
+                                                                               7
+Right Rotation Needed!                       Solution:
+                                             Take the subtree starting with the problem node,
+                                             “Rotate” that tree to the right
+
+
+
+                                    9
+                         Height=3       Height=1
+                              3         11
+
+
+                     1              6            16
+
+
+                 0            2          7
+
+
+            -1
+
+
+
+
+                                                                                   8
+     Insert -1, Right rotation process
+                                   Solution:
+                                   Take the subtree starting with the problem node,
+                                   “Rotate” that tree to the right
+
+                                                                                                  Result is Balanced!
+                           9                                                              3
+          Height = 3                Height = 1
+                       3       11                                           1                       9
+                                                   Right
+                                                  Rotation
+                           6           16                                                     6           11
+            1                                                       0                 2
+
+
+      0            2           7                             -1                                     7              16
+
+
+-1
+                                                                                                               9
+After the Right Rotation, Balanced!
+
+                                    3
+                     Height=2               Height=2
+
+                          1                   9
+
+
+                                        6          11
+                 0              2
+
+
+            -1                                7         16
+
+
+
+
+                                                             10
+Right Rotation - Definition
+• We just inserted 𝑐𝑐, node 𝑎𝑎 is the deepest “problem” node
+• Make the left child the new root
+• Make the old root the right child of the new
+• Make the new root’s right subtree the old root’s left subtree
+            ℎ+3                                          ℎ+2
+                         𝑎𝑎                                    𝑏𝑏
+     ℎ+2                      ℎ                   ℎ+1
+                                                               ℎ+1
+           𝑏𝑏                                                        𝑎𝑎
+                                        Right
+ℎ+1             ℎ                 𝑧𝑧   Rotation
+                                                        𝑥𝑥     ℎ          ℎ
+
+
+     𝑥𝑥             𝑦𝑦                            𝑐𝑐            𝑦𝑦            𝑧𝑧
+
+𝑐𝑐                                                                                 11
+Right Rotation - Implementation
+Node b = a.left
+a.left = b.right                       Running time: Θ(1)
+b.right = a
+return b
+
+            ℎ+3                                                    ℎ+2
+                         𝑎𝑎                                              𝑏𝑏
+     ℎ+2                      ℎ                             ℎ+1
+                                                                         ℎ+1
+           𝑏𝑏                                                                  𝑎𝑎
+                                                 Right
+ℎ+1             ℎ                 𝑧𝑧            Rotation
+                                                                  𝑥𝑥     ℎ          ℎ
+
+
+     𝑥𝑥             𝑦𝑦                                      𝑐𝑐            𝑦𝑦            𝑧𝑧
+
+𝑐𝑐                                                                                           12
+Insert Example (Insert 20)
+
+                                9
+       20
+                        3                11
+
+
+                    1       6       10        16
+
+
+                0       2                          18
+
+
+
+
+                                                        13
+    Insert 20: Not Balanced! Multiple Problem Nodes
+Here, nodes 11 and 16 are
+problem nodes.
+                                                        9
+                                        Height=2                 Height=3
+There may be multiple places                                     11
+                                             3
+where we can do a rotation to                          Height=0         Height=2
+rebalance the tree, but the                                              16
+                                    1              6        10
+deepest problem node always                                                          Height=1
+works!                                                           Height=-1
+                                0            2                                      18
+                                                                                           Height=0
+                                                                        Height=-1
+                                                                                          20
+
+
+
+
+                                                                                                      14
+Left Rotation Needed!
+                                          Solution:
+                                          Take the subtree starting with the problem node,
+                                9         “Rotate” that tree to the left
+
+                        3                11
+
+
+                   1        6       10        16
+                                                     Height=1
+                                     Height=-1
+               0        2                           18
+
+                                                           20
+
+
+
+
+                                                                                15
+    Inserting 20, Left rotation process
+                          Solution:
+                          Take the subtree starting with the problem node,                         Result is Balanced!
+                9                                                                    9
+                          “Rotate” that tree to the left
+
+        3                11                                                  3                11
+
+
+                              16                                        1        6       10             18
+    1       6       10
+                                     Height=1                                             Height=0            Height=0
+                     Height=-1                     Left
+0       2                           18           Rotation        0           2                     16        20
+
+
+                                          20
+
+
+
+
+                                                                                                             16
+After the Left Rotation, Balanced!
+
+                                9
+
+                        3                11
+
+
+                    1       6       10             18
+                                     Height=0           Height=0
+                0       2                     16        20
+
+
+
+
+                                                                   17
+Left Rotation - Definition
+• We just inserted 𝑐𝑐, node 𝑎𝑎 is the deepest “problem” node
+• Make the right child the new root
+• Make the old root the left child of the new
+• Make the new root’s left subtree the old root’s right subtree
+           ℎ+3                                            ℎ+2
+                 𝑎𝑎                                                    𝑏𝑏
+       ℎ                                           ℎ+1                      ℎ+1
+                 ℎ+2
+                       𝑏𝑏                                𝑎𝑎
+                                          Left
+       𝑥𝑥        ℎ          ℎ+1         Rotation   ℎ          ℎ               𝑧𝑧
+
+                  𝑦𝑦          𝑧𝑧                   𝑥𝑥             𝑦𝑦               𝑐𝑐
+
+                                   𝑐𝑐                                                   18
+Left Rotation (Implementation)
+Node b = a.right
+a.right = b.left
+b.left = a
+return b
+         ℎ+3                                            ℎ+2
+               𝑎𝑎                                                    𝑏𝑏
+     ℎ                                           ℎ+1                      ℎ+1
+               ℎ+2
+                     𝑏𝑏                                𝑎𝑎
+                                        Left
+     𝑥𝑥        ℎ          ℎ+1         Rotation   ℎ          ℎ               𝑧𝑧
+
+                𝑦𝑦          𝑧𝑧                   𝑥𝑥             𝑦𝑦               𝑐𝑐
+
+                                 𝑐𝑐                                                   19
+Insertion Story So Far… still some missing pieces
+• After insertion, update the heights of the node’s ancestors
+• Check for unbalance
+• If unbalanced then at the deepest unbalanced root:
+     • If the left subtree was deeper then rotate right     This is incomplete!
+                                                            There are some cases
+     • If the right subtree was deeper then rotate left     where this doesn’t work!
+
+        9                              9                     5
+
+                                                  Right                    Still
+ 5               Insert 7         5                                 9
+                                                 Rotation                  imbalanced!
+
+                                       7                     7
+                                                                              20
+Insertion Cases
+• After insertion, update the heights of the node’s ancestors
+• Check for unbalance
+• If unbalanced then at the deepest unbalanced root:
+   • Case LL: If we inserted in the left subtree of the left child then rotate right
+   • Case RR: If we inserted in the right subtree of the right child then rotate left
+   • Case LR: If we inserted into the right subtree of the left child then ???
+   • Case RL: If we inserted into the left subtree of the right child then ???
+
+                                                         Cases LR and RL require 2
+                                                         rotations! (a double rotation)
+                                                                                        21
+Case LR
+• From deepest problem node:
+     1. Rotate left at the left child
+     2. Then, Rotate right at the problem node
+
+
+
+
+                               9
+        9                                                 9
+                                    Rotate Left                                7
+             Insert 7     5            at 5                    Rotate
+ 5                                                    7
+                                                              Right at 9
+                               7                                           5        9
+                                                  5
+
+                                                                               22
+     Case LR - Definition
+     • We just inserted 𝑑𝑑, node 𝑎𝑎 is the deepest “problem” node
+     • Imbalance caused by inserting in the left child’s right subtree
+     1. Rotate left at the left child
+     2. Then, rotate right at the unbalanced node
+       ℎ+3                                                   ℎ+3
+                                                                                                        ℎ+2
+                𝑎𝑎                                                    𝑎𝑎                                      𝑐𝑐
+ℎ+2                                                   ℎ+2                  ℎ     Rotate       ℎ+1
+                          ℎ         Rotate
+
+      𝑏𝑏                           Left at 𝑏𝑏               𝑐𝑐                  Right at 𝑎𝑎
+                                                                                                   𝑏𝑏              ℎ + 1 𝑎𝑎
+                                                ℎ+1
+ℎ     ℎ+1
+                𝑐𝑐            𝑧𝑧                      𝑏𝑏                   𝑧𝑧                 ℎ                                ℎ
+                                                                 𝑦𝑦                                      𝑥𝑥         𝑦𝑦
+                                                ℎ
+𝑤𝑤                                                               𝑑𝑑                           𝑤𝑤         𝑑𝑑         𝑑𝑑         𝑧𝑧
+           𝑥𝑥        𝑦𝑦                                     𝑥𝑥
+           𝑑𝑑        𝑑𝑑                         𝑤𝑤          𝑑𝑑                                                            23
+                                                                                       Node b = a.left
+     Case LR Implementation                                                            Node c = b.right
+                                                                                       b.right = c.left
+                                                                                       a.left = c.right
+                                                                                       c.right = a
+                                                                                       c.left = b
+                                                                                       return c
+
+
+       ℎ+3                                                   ℎ+3
+                                                                                                        ℎ+2
+                𝑎𝑎                                                    𝑎𝑎                                      𝑐𝑐
+ℎ+2                                                   ℎ+2                  ℎ     Rotate       ℎ+1
+                          ℎ         Rotate
+
+      𝑏𝑏                           Left at 𝑏𝑏               𝑐𝑐                  Right at 𝑎𝑎
+                                                                                                   𝑏𝑏              ℎ + 1 𝑎𝑎
+                                                ℎ+1
+ℎ     ℎ+1
+                𝑐𝑐            𝑧𝑧                      𝑏𝑏                   𝑧𝑧                 ℎ                                ℎ
+                                                                 𝑦𝑦                                      𝑥𝑥         𝑦𝑦
+                                                ℎ
+𝑤𝑤                                                               𝑑𝑑                           𝑤𝑤         𝑑𝑑         𝑑𝑑         𝑧𝑧
+           𝑥𝑥        𝑦𝑦                                     𝑥𝑥
+           𝑑𝑑        𝑑𝑑                         𝑤𝑤          𝑑𝑑                                                            24
+     Case RL - Definition
+     • We just inserted 𝑑𝑑, node 𝑎𝑎 is the deepest “problem” node
+     • Imbalance caused by inserting in the right child’s left subtree
+     1. Rotate right at the right child
+     2. Then, rotate left at the unbalanced node
+                                                                                                    ℎ+2
+     ℎ+3    𝑎𝑎                               ℎ + 3 𝑎𝑎                                                     𝑐𝑐
+                            Rotate                                            Rotate      ℎ+1
+            ℎ+2                          ℎ
+ℎ                     𝑏𝑏   Right at 𝑏𝑏                  ℎ+2   𝑐𝑐             Left at 𝑎𝑎
+                                                                                               𝑎𝑎              ℎ + 1 𝑏𝑏
+      ℎ+1
+                           ℎ                                  ℎ + 1 𝑏𝑏
+            𝑐𝑐                           𝑤𝑤
+                                                                                          ℎ                                ℎ
+𝑤𝑤                                                      𝑥𝑥               ℎ                           𝑥𝑥         𝑦𝑦
+       𝑥𝑥        𝑦𝑦        𝑧𝑧                           𝑑𝑑      𝑦𝑦                        𝑤𝑤         𝑑𝑑         𝑑𝑑         𝑧𝑧
+       𝑑𝑑        𝑑𝑑                                             𝑑𝑑       𝑧𝑧                                           25
+                                                                                          Node b = a.right
+     Case RL Implementation                                                               Node c = b.left
+                                                                                          b.left = c.right
+                                                                                          a.right = c.left
+                                                                                          c.left = a
+                                                                                          c.right = b
+                                                                                          return c
+
+
+                                                                                                        ℎ+2
+     ℎ+3    𝑎𝑎                               ℎ + 3 𝑎𝑎                                                         𝑐𝑐
+                            Rotate                                            Rotate         ℎ+1
+            ℎ+2                          ℎ
+ℎ                     𝑏𝑏   Right at 𝑏𝑏                  ℎ+2   𝑐𝑐             Left at 𝑎𝑎
+                                                                                                   𝑎𝑎              ℎ + 1 𝑏𝑏
+      ℎ+1
+                           ℎ                                  ℎ + 1 𝑏𝑏
+            𝑐𝑐                           𝑤𝑤
+                                                                                              ℎ                                ℎ
+𝑤𝑤                                                      𝑥𝑥               ℎ                               𝑥𝑥         𝑦𝑦
+      𝑥𝑥         𝑦𝑦        𝑧𝑧                           𝑑𝑑      𝑦𝑦                            𝑤𝑤         𝑑𝑑         𝑑𝑑         𝑧𝑧
+      𝑑𝑑         𝑑𝑑                                             𝑑𝑑       𝑧𝑧                                               26
+Insert Summary
+• After a BST insertion, update the heights of the node’s ancestors
+• From leaf to root, check if each node is balanced
+• If a node is unbalanced then at the deepest unbalanced node:
+   • Case LL: If we inserted in the left subtree of the left child then: rotate right
+   • Case RR: If we inserted in the right subtree of the right child then: rotate left
+   • Case LR: If we inserted into the right subtree of the left child then: rotate left at
+     the left child and then rotate right at the root
+   • Case RL: If we inserted into the left subtree of the right child then: rotate right at
+     the right child and then rotate left at the root
+• Done after either reaching the root or applying one of the above cases
+                                                                                      27
+Insert 1, 2, 5, 3, 4 into an AVL tree
+
+
+
+
+                                        28
+Insert 1, 2, 5, 3, 4 into an AVL tree (Answers)
+                                                    2
+
+             Rotate                             1       4
+1           Left at 1
+                            2
+
+    2                   1       5                   3            5
+
+
+        5                   3
+                                        2
+                                4
+                                    1       5
+
+
+                                        4
+
+                                    3
+                                                            29
+     Insert Operation (for AVL)
+insert(key, value, root) {
+        root = insertHelper(key, value, root);
+}
+insertHelper(key, value, root) {
+        if (root == null)
+                 return new Node(key, value);
+        if (root.key < key)
+                 root.right = insertHelper(key, value, root.right);
+        else
+                 root.left = insertHelper(key, value, root.left);
+        if (isUnbalanced(root))
+                 root = rotate(root);
+        return root;
+}                                                                     30
+Bounding the Height
+• Suppose you have a tree of height ℎ, meeting the AVL condition:
+
+          AVL condition: For every node, the height of its left subtree and right
+          subtree differ by at most 1.
+
+• What is the minimum number of nodes in the tree?
+
+
+• If ℎ = 0, then 1 node
+• If ℎ = 1, then 2 nodes.
+
+• In general?
+
+
+                                                                                    31
+Let 𝑴𝑴(𝒉𝒉) be the minimum # of nodes in an AVL tree of height h, then:
+     h           Minimal AVL Tree                      𝑴𝑴(𝒉𝒉)
+
+
+
+
+                                                                         32
+Minimal AVL Trees
+
+
+
+
+                    33
+Why is this Θ(log 𝑛𝑛) time?
+• We get poor running times when ℎ𝑒𝑒𝑒𝑒𝑒𝑒𝑒𝑒𝑒 ≈ 𝑛𝑛
+• Let 𝑀𝑀(ℎ) be the minimum count of nodes in an AVL tree of height ℎ
+• An AVL tree of height ℎ must have one subtree of height ℎ − 1
+• This means the other subtree has height at least ℎ − 2
+• 𝑀𝑀 ℎ = 𝑀𝑀 ℎ − 1 + 𝑀𝑀 ℎ − 2 + 1
+
+
+
+
+                                                                       34
+Comparing to Fibonacci Sequence
+• 𝑀𝑀 ℎ = 𝑀𝑀 ℎ − 1 + 𝑀𝑀 ℎ − 2 + 1
+• 𝐹𝐹 𝑛𝑛 = 𝐹𝐹 𝑛𝑛 − 1 + 𝐹𝐹(𝑛𝑛 − 2)
+    • Fibonacci Sequence
+• So 𝑀𝑀 ℎ > 𝐹𝐹(ℎ)
+• For large values of ℎ, 𝐹𝐹 ℎ ≈ 𝜙𝜙 ℎ
+    • 𝜙𝜙 being the golden ratio. 𝜙𝜙 > 1.6
+• This means that an AVL tree of height ℎ has at least 𝜙𝜙 ℎ nodes
+    • And not more than 2ℎ+1 − 1 nodes
+• So a tree of 𝑛𝑛 nodes has height at most log 𝜙𝜙 (𝑛𝑛)
+    • We need 𝑛𝑛 ≥ 𝜙𝜙 ℎ , so log 𝜙𝜙 𝑛𝑛 ≥ ℎ
+• All operations run in time 𝑂𝑂(log 𝑛𝑛)
+    • The maximum number of nodes for height ℎ is 2ℎ+1 − 1, so they are also Ω(log 𝑛𝑛)
+
+                                                                                         35
+

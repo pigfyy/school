@@ -1,0 +1,775 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>CSE332 - Topic Summary - AVL Trees</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">q { quotes: "“" "”" "‘" "’"; }</style>
+  <link rel="stylesheet" href="../style.css?v=2" />
+</head>
+<main>
+<body>
+    <div role="navigation" class="navbar navbar-static-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <span class="doc-title">CSE 332 &ndash; Topic Summary - AVL
+Trees</span>
+        <ul class="nav pull-right doc-info">
+                    <li><p class="navbar-text"><a href="../index.html">Home</a></p></li>
+          <li><p class="navbar-text"><a href="../syllabus.html">Syllabus</a></p></li>
+          <li><p class="navbar-text"><a href="../calendar.html">Calendar</a></p></li>
+          <li><p class="navbar-text"><a href="../tasks.html">Tasks</a></p></li>
+          <li><p class="navbar-text"><a href="../exams.html">Exams</a></p></li>
+          <li><p class="navbar-text"><a href="../summaries.html">Summaries</a></p></li>
+          <li><p class="navbar-text"><a href="../oh.html">Office Hours</a></p></li>
+          <li><p class="navbar-text"><a href="../staff.html">Staff</a></p></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+    <div class="container">
+    <div class="row">
+            <div id="TOC" class="span3">
+        <div class="well toc">
+        <ul>
+          <li class="nav-header">Table of Contents</li>
+        </ul>
+        <ul>
+        <li><a href="#dictionary-adt" id="toc-dictionary-adt"><span
+        class="toc-section-number">1</span> Dictionary ADT</a>
+        <ul>
+        <li><a href="#dictionaries-using-lists"
+        id="toc-dictionaries-using-lists"><span
+        class="toc-section-number">1.1</span> Dictionaries Using
+        Lists</a></li>
+        <li><a href="#dictionaries-using-a-heap"
+        id="toc-dictionaries-using-a-heap"><span
+        class="toc-section-number">1.2</span> Dictionaries Using a
+        Heap</a></li>
+        <li><a href="#dictionaries-using-binary-search-trees"
+        id="toc-dictionaries-using-binary-search-trees"><span
+        class="toc-section-number">1.3</span> Dictionaries Using Binary
+        Search Trees</a></li>
+        </ul></li>
+        <li><a href="#avl-trees" id="toc-avl-trees"><span
+        class="toc-section-number">2</span> AVL Trees</a>
+        <ul>
+        <li><a href="#definition" id="toc-definition"><span
+        class="toc-section-number">2.1</span> Definition</a>
+        <ul>
+        <li><a href="#aside-tree-height"
+        id="toc-aside-tree-height"><span
+        class="toc-section-number">2.1.1</span> Aside: Tree
+        Height</a></li>
+        </ul></li>
+        <li><a href="#avl-tree-operations"
+        id="toc-avl-tree-operations"><span
+        class="toc-section-number">2.2</span> AVL Tree Operations</a>
+        <ul>
+        <li><a href="#right-rotation" id="toc-right-rotation"><span
+        class="toc-section-number">2.2.1</span> Right Rotation</a></li>
+        <li><a href="#left-rotation" id="toc-left-rotation"><span
+        class="toc-section-number">2.2.2</span> Left Rotation</a></li>
+        <li><a href="#left-right-rotation"
+        id="toc-left-right-rotation"><span
+        class="toc-section-number">2.2.3</span> Left-Right
+        Rotation</a></li>
+        <li><a href="#right-left-rotation"
+        id="toc-right-left-rotation"><span
+        class="toc-section-number">2.2.4</span> Right-Left
+        Rotation</a></li>
+        </ul></li>
+        <li><a href="#avl-tree-insert" id="toc-avl-tree-insert"><span
+        class="toc-section-number">2.3</span> AVL Tree Insert</a></li>
+        <li><a href="#avl-tree-delete" id="toc-avl-tree-delete"><span
+        class="toc-section-number">2.4</span> AVL Tree Delete</a></li>
+        <li><a href="#justifying-logarithmic-height"
+        id="toc-justifying-logarithmic-height"><span
+        class="toc-section-number">2.5</span> Justifying Logarithmic
+        Height</a></li>
+        </ul></li>
+        </ul>
+        </div>
+      </div>
+            <div class="span9">
+            <!--<blockquote style="background-color:#fbb; font-size:150%">This page is from a previous offering of the course. It has been left up for archival purposes.</blockquote>-->
+      <!--<blockquote style="background-color:#fbb; font-size:150%">This page is under construction. Any content you see now is subject to change until the first day of class. Expect some links to be broken until that time.</blockquote>-->
+      <!--<blockquote style="background-color:#FFD700; font-size:150%">Looking for someone to talk to about CSE332? Try the Study Center in CSE room 006! There's a table there just for working on and discussing CSE332!</blockquote>-->
+      <h1 data-number="1" id="dictionary-adt"><span
+      class="header-section-number">1</span> Dictionary ADT</h1>
+      <p>In this section we introduced a new ADT called a
+      <strong>dictionary</strong>. A dictionary should hold a collection
+      of key-value pairs. The idea is that keys are used to access
+      values in this collection similar to how variables access values
+      in a program. In the dictionary we can use a key to obtain its
+      associated value, update a key so that it is associated with a new
+      value. Depending on the programming language, this ADT may have a
+      different name. Some examples: in python it’s referred to as a
+      dictionary, in Java it’s called a map, in php it’s called an
+      associative array, and in JavaScript it’s simply called an
+      <q>Object</q>.</p>
+      <p>Here’s how we’ll define the dictionary ADT:</p>
+      <ul>
+      <li>Notion: A collection of key-value pairs</li>
+      <li>Operations:
+      <ul>
+      <li>insert: Given a key-value pair, if there is already a
+      key-value pair corresponding to the given key, update the
+      dictionary so that the key is associated with the given value.
+      Otherwise add the new given key-value pair.</li>
+      <li>find: Given a key, return the value it is already associated
+      with, if there is one. If there is no key-value pair for that key
+      then return a default value (e.g. null).</li>
+      <li>delete: given a key, remove that key-value pair from the
+      collection.</li>
+      </ul></li>
+      </ul>
+      <p>For our first dictionary data structure we will assume that
+      keys can be compared. That is, there is some way that we can
+      compare two keys to determine which is <q>larger</q>. For example,
+      in Java we would need the type of the keys to implement the
+      Comparable interface so that we could use the compareTo method to
+      determine which is larger. Our next dictionary data structure will
+      not have this requirement.</p>
+      <h2 data-number="1.1" id="dictionaries-using-lists"><span
+      class="header-section-number">1.1</span> Dictionaries Using
+      Lists</h2>
+      <p>Similar to what we saw with priority queues, we can first
+      explore how we might attempt to design a data structure for the
+      dictionary ADT using a form of sequential storage like a resizing
+      array (like an array list) or a chain of linked nodes (like a
+      linked list).</p>
+      <p>Suppose we plan to store all of our key-value pairs in an
+      <strong>ordered array</strong>, meaning all key-value pairs are
+      stored in an array, where the keys are arranged in ascending
+      order. When doing this, we may have the following algorithms for
+      the ADT operations:</p>
+      <ul>
+      <li>insert: Perform a binary search for the given key. If it is
+      present then update the value. Otherwise insert the key at the
+      appropriate index. The binary search can be done in
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log n)</annotation></semantics></math>
+      time, but adding a new key-value pair may require
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      time in the worst case to shift all the element in the array to
+      make room.</li>
+      <li>find: Perform a binary search for the given key. If it is
+      found then return it, otherwise return the default value. This
+      requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log n)</annotation></semantics></math>
+      time in the worst case.</li>
+      <li>delete: Perform a binary search for the given key. If it is
+      found the remove the key-value pair from the array by shifting all
+      elements to overwrite it. This requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      time in the worst case.</li>
+      </ul>
+      <p>Suppose we instead use an <strong>unordered array</strong>:</p>
+      <ul>
+      <li>insert: Do a linear search through the array for the given
+      key. If it is present the update its value. Otherwise add the new
+      key-value pair at the end of the array. This requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      time in the worst case. because of the need to search for if the
+      key is already present.</li>
+      <li>find: Do a linear search through the array for the given key.
+      If found return its value, otherwise return the default value.
+      This requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      time in the worst case.</li>
+      <li>delete: Do a linear search through the array for the given
+      key. If it is found the remove the key-value pair from the array
+      by shifting all elements to overwrite it. This requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      time in the worst case.</li>
+      </ul>
+      <p>Suppose we use <strong>ordered linked nodes</strong>:</p>
+      <ul>
+      <li>insert: Do a linear search through the array for the given
+      key. If you come across the key then update its value. If you come
+      across a key larger than the key then add a new node before it for
+      the new key-value pair. If you come to the end of the chain then
+      add the new key-value pair to the end (it must be the largest
+      key). This requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      time in the worst case.</li>
+      <li>find: Do a linear search through the array for the given key.
+      If you come across the key then return its value. If you come
+      across a key larger than the key or you come to the end of the
+      chain then return the default value. This requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      time in the worst case.</li>
+      <li>delete: Do a linear search through the array for the given
+      key. If you come across the key then remove that node. If you come
+      across a key larger than the key or you come to the end of the
+      chain then the key was not present so return without making a
+      change. This requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      time in the worst case.</li>
+      </ul>
+      <p>Finally, suppose we use <strong>unordered linked
+      nodes</strong>:</p>
+      <ul>
+      <li>insert: Do a linear search through the array for the given
+      key. If you come across the key then update its value. If you come
+      to the end of the chain then add the new key-value pair to the
+      end. This requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      time in the worst case.</li>
+      <li>find: Do a linear search through the array for the given key.
+      If you come across the key then return its value. If you come to
+      the end of the chain then return the default value. This requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      time in the worst case.</li>
+      <li>delete: Do a linear search through the array for the given
+      key. If you come across the key then remove that node. If you come
+      to the end of the chain then the key was not present so return
+      without making a change. This requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      time in the worst case.</li>
+      </ul>
+      <p>Notice that all of the approaches above require
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      time for all operations, with the exception of the find operation
+      for an ordered array which requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log n)</annotation></semantics></math>
+      time.</p>
+      <h2 data-number="1.2" id="dictionaries-using-a-heap"><span
+      class="header-section-number">1.2</span> Dictionaries Using a
+      Heap</h2>
+      <p>Since we now know of this nifty new heap data structure for
+      priority queues, let’s consider whether we can apply it as a
+      dictionary data structure as well. We’ll suppose we’re using a min
+      heap, but we could make a parallel argument for max heaps.</p>
+      <p>The first thing to note is that the running times of insert and
+      delete must be <em>at least</em> that of find. This is because
+      both of insert and delete have different behavior depending on
+      whether or not the given key is already present, and so they must
+      do a find somewhere as a subroutine. For this reason, we will
+      first consider the find operation for heaps.</p>
+      <p>At first, heaps may seem promising as a dictionary data
+      structure. If the key we want to find is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≤</mo><annotation encoding="application/x-tex">\leq</annotation></semantics></math>
+      the smallest key used so far, then we can do our insert in
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log n)</annotation></semantics></math>
+      time (constant if it is equal to the smallest key, logarithmic if
+      we need to insert a new node that will become the root). Let’s
+      consider, though, what happens if we want to do an insert
+      operation where the key is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≥</mo><annotation encoding="application/x-tex">\geq</annotation></semantics></math>
+      the largest key currently present. The heap property guarantees
+      every node is smaller than (or equal to) its children. This
+      property allows for the largest item to appear as <em>any</em>
+      leaf in the tree. Since there are
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>n</mi><mn>2</mn></mfrac><annotation encoding="application/x-tex">\frac{n}{2}</annotation></semantics></math>
+      leaves in a heap, our find algorithm must check at least
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>n</mi><mn>2</mn></mfrac><annotation encoding="application/x-tex">\frac{n}{2}</annotation></semantics></math>
+      locations to ensure the key is not already present. This means our
+      worst case running time for find must be
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Ω</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Omega(n)</annotation></semantics></math>,
+      and so heaps do no better than any of the list-based options
+      above.</p>
+      <h2 data-number="1.3"
+      id="dictionaries-using-binary-search-trees"><span
+      class="header-section-number">1.3</span> Dictionaries Using Binary
+      Search Trees</h2>
+      <p>We saw above that efficient finds are a prerequisite for
+      efficient inserts and deletes, and that ordering (in our sorted
+      array) helped to make find more efficient. Next let’s consider a
+      data structure that maintains ordering to help keep finds
+      efficient, but potentially addresses the challenge of sorted
+      arrays (the need to shift elements when inserting/deleting). For
+      this we’ll use a <strong>binary search tree</strong>. The binary
+      search tree should make find efficient because we will only need
+      to explore one branch per node. Because we represent the tree
+      using linked nodes, it should also make inserting/deleting a node
+      more efficient since this largely involves updating references
+      rather that shifting around contents.</p>
+      <p>So first, let’s look at what a find algorithm would look
+      like:</p>
+      <ol type="1">
+      <li>If the current node is null then the key does not exist in the
+      dictionary, so return the default value.</li>
+      <li>If the key is equal to the current node, return the associated
+      value.</li>
+      <li>If the key is less than the current node, return the result of
+      a recursive find in the left subtree</li>
+      <li>Otherwise the key is greater than the current node, return the
+      result of a recursive find in the right subtree</li>
+      </ol>
+      <p>We could then define an insert algorithm as follows:</p>
+      <ol type="1">
+      <li>If the current node is null then the key does not exist in the
+      dictionary, so create a new node with the given key-value pair at
+      the current location.</li>
+      <li>If the key is equal to the current node, update the associated
+      value.</li>
+      <li>If the key is less than the current node, recursively insert
+      the key-value pair into the left subtree</li>
+      <li>Otherwise the key is greater than the current node,
+      recursively insert the key-value pair into the right subtree</li>
+      </ol>
+      <p>Notice that since we only create new nodes when we reach an
+      empty location of the tree, every new node will be a leaf.</p>
+      <p>Finally we could define a delete algorithm as follows:</p>
+      <ol type="1">
+      <li>If the current node is null then the key does not exist in the
+      dictionary, return without making any changes.</li>
+      <li>If the key is equal to the current node then delete the
+      current node.:
+      <ol type="1">
+      <li>If the current node is a leaf then set its parent reference to
+      null</li>
+      <li>If the current node has one child then set its parent
+      reference to that child</li>
+      <li>If the current node has two children then first delete the
+      largest (i.e. right-most) key from the left subtree, then update
+      the current node’s key-value pair to become the key-value pair
+      just deleted. (Note that because the largest key from the left
+      subtree must not have a right child it either has 0 or 1 child,
+      and so we can use one of the first two cases above to delete that
+      node.)</li>
+      </ol></li>
+      <li>If the key is less than the current node, recursively delete
+      the key-value pair from the left subtree</li>
+      <li>Otherwise the key is greater than the current node,
+      recursively delete the key-value pair from the right subtree</li>
+      </ol>
+      <p>For each of the algorithms, we must do only a constant number
+      of operations per level of the tree. This means that the running
+      time should be linear in terms of the tree’s height. The problem
+      is, in the worst case the height of the tree might be linear in
+      the number of nodes. Overall, this means our worst-case running
+      time is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>
+      just like all of the other data structure options above.</p>
+      <p>That being said, just a minor modification of binary search
+      trees will allow us to achieve worst case
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log n)</annotation></semantics></math>
+      running times for all operations. Since the binary search tree
+      operations are all linear in the tree’s height, if can modify our
+      insert and delete algorithms in order to <em>guarantee</em> that
+      the height of the tree is logarithmic in its size, then suddenly
+      all running times will be
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log n)</annotation></semantics></math>.</p>
+      <h1 data-number="2" id="avl-trees"><span
+      class="header-section-number">2</span> AVL Trees</h1>
+      <h2 data-number="2.1" id="definition"><span
+      class="header-section-number">2.1</span> Definition</h2>
+      <p>An <strong>AVL Tree</strong> (named for its designers Georgy
+      Adelson-Velsky and Evgenii Landis) is a type of <em>balanced
+      binary search tree</em> data structure (sometimes it’s also called
+      a <em>self-balancing binary search tree</em>). This type of data
+      structure is one where items are stored in a binary search tree,
+      but nodes may be moved around when new nodes are added/removed in
+      order to keep the tree’s height low.</p>
+      <p>Specifically an AVL tree maintains the property that for each
+      node, the height of it’s left subtree and the height of its right
+      subtree may differ by no more than 1. When we add/remove a node,
+      and as a result this property no longer holds, we move nodes
+      around using a process called <q>rotation</q> in order to restore
+      this balance property.</p>
+      <h3 data-number="2.1.1" id="aside-tree-height"><span
+      class="header-section-number">2.1.1</span> Aside: Tree Height</h3>
+      <p>We define the height of a tree to be the <em>maximum</em>
+      distance from the root to a leaf. When measuring <q>distance</q>
+      there are two ways I’ve seen to do this. The first is to count the
+      number of nodes in the path from the root (inclusive) to the
+      deepest leaf (inclusive). The second is to count the number of
+      edges in that path (which gives the same result as being exclusive
+      of either the path’s start or end). To highlight the difference,
+      the first option would suggest that a one-node tree has height 1,
+      whereas the second options would suggest that a one-node tree has
+      height 0. Since we would want an empty tree’s height to be smaller
+      than that of a one-node tree, the first option would suggest that
+      a zero-node tree has height 0, and the second would suggest that a
+      zero-node tree has height -1. Poking around various sources, my
+      impression is that the second option (height is the count of
+      edges) is actually the more commonly used, and so that’s what we
+      presented in lecture. That being said, either choice made
+      consistently will result in identical behavior of an AVL
+      trees.</p>
+      <p>The height of a tree can be computed as follows:</p>
+      <ul>
+      <li>The height of an empty tree is -1</li>
+      <li>The height of a non-empty tree is one more than the maximum of
+      the height of its left subtree and its right subtree.</li>
+      </ul>
+      <p>Or in Java code:</p>
+      <pre><code>public int height(Node curr){
+    if (curr == null){
+        return -1;
+    }
+    return Math.max(height(curr.left), height(curr.right)) + 1;
+}</code></pre>
+      <h2 data-number="2.2" id="avl-tree-operations"><span
+      class="header-section-number">2.2</span> AVL Tree Operations</h2>
+      <p>AVL trees are a special case of binary search trees because all
+      items it contains follow the binary search property (that for each
+      node, its left subtree only contains smaller items, and its right
+      subtree only contains larger items). Because of this, all
+      <q>read-only</q> binary search tree operations (operations that
+      navigate but do not modify the tree) can be used for an AVL tree
+      without making any change. Namely, the AVL tree
+      <strong>find</strong> algorithm is exactly the binary search tree
+      find algorithm presented above.</p>
+      <p>For the operations which do modify the tree, we will begin by
+      performing the binary search tree algorithm for that operation,
+      and then afterwards perform rotations in the case that the tree is
+      no longer balanced, meaning there is some node whose subtree’s
+      heights differ by more than 1. We will refer to a node whose
+      subtrees are not balanced as a <em>problem node</em>.</p>
+      <p>When we modify the tree, there are four different types of
+      rotations we may do. The choice depends on where in the tree we
+      made the change relative to the problem node.</p>
+      <h3 data-number="2.2.1" id="right-rotation"><span
+      class="header-section-number">2.2.1</span> Right Rotation</h3>
+      <p>A right rotation has the effect of lifting the <q>left-left</q>
+      subtree and dropping the <q>right-right</q> subtree of the problem
+      node. The left-left subtree is the one rooted at problem node’s
+      left child’s left child. In other words, we can navigate to the
+      left-left subtree from the problem node by going left twice. In
+      the images below, the left-left subtree is the one labeled
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>.
+      The right-right subtree is the one reached by going right twice
+      from the problem node, and it is labeled
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="application/x-tex">z</annotation></semantics></math>.</p>
+      <p>The image below depicts a right rotation. Observe that before
+      the rotation the problem node
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+      is the root of the subtree. After the rotation its left child
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
+      becomes the root, and
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+      becomes its right child. We call this a right rotation because the
+      nodes shifted in a counter-clockwise direction.</p>
+      <p><img src="files/right_rotation.png" alt="An illustration of a right rotation. Initially, the problem node is labeled a. Its left subtree is rooted at a node labeled b, and it has a height of h+2. Its right subtree is labeled z and has a height of h. The left subtree of b is labeled x and has height h+1. The right subtree of b is labeled y and has a height of h. After performing a right rotation the node b becomes the root of the tree. The right child of b is the node a (the former root), and the left child of b is unchanged. The left subtree of a is y (the former right subtree of b), and the right subtree of a is unchanged. Because x has height h+1 and y and z had height h, both subtrees of b now have height h+1, making the tree balanced." height="150"/></p>
+      <p>Notice that before the rotation, the node
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+      was not balanced because its left subtree’s height was two more
+      than its right subtree’s. We successfully rebalanced the tree by
+      taking the tallest subtree
+      (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>,
+      the left-left subtree of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>)
+      and moving it so it became a direct child of the root.</p>
+      <p>Also note that the rotation is guaranteed to preserve the
+      binary search tree ordering property. From the original tree we
+      know that the values must be in the order
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>&lt;</mo><mi>b</mi><mo>&lt;</mo><mi>y</mi><mo>&lt;</mo><mi>a</mi><mo>&lt;</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">x &lt; b &lt; y &lt; a &lt; z</annotation></semantics></math>.
+      After the rotation we have
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+      to the left of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+      to the left of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+      to the right of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>,
+      and
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="application/x-tex">z</annotation></semantics></math>
+      to the right of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>,
+      all of which are consistent with that ordering.</p>
+      <h3 data-number="2.2.2" id="left-rotation"><span
+      class="header-section-number">2.2.2</span> Left Rotation</h3>
+      <p>A left rotation has the effect of lifting the
+      <q>right-right</q> subtree and dropping the <q>left-left</q>
+      subtree of the problem node.</p>
+      <p>The image below depicts a left rotation. Observe that before
+      the rotation the problem node
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+      is the root of the subtree. After the rotation its right child
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
+      becomes the root, and
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+      becomes its left child. We call this a left rotation because the
+      nodes shifted in a clockwise direction.</p>
+      <p><img src="files/left_rotation.png" alt="An illustration of a left rotation. Initially, the problem node is labeled a. Its right subtree is rooted at a node labeled b, and it has a height of h+2. Its left subtree is labeled x and has a height of h. The right subtree of b is labeled z and has height h+1. The left subtree of b is labeled y and has a height of h. After performing a left rotation the node b becomes the root of the tree. The left child of b is the node a (the former root), and the right child of b is unchanged. The right subtree of a is y (the former left subtree of b), and the left subtree of a is unchanged. Because z has height h+1 and y and z had height h, both subtrees of b now have height h+1, making the tree balanced." height="150"/></p>
+      <p>This rotation is exactly the mirror image of a right rotation,
+      and so behaves following the exact same intuition.</p>
+      <h3 data-number="2.2.3" id="left-right-rotation"><span
+      class="header-section-number">2.2.3</span> Left-Right
+      Rotation</h3>
+      <p>We saw above that a left rotation raises the right-right
+      subtree of the problem node and a right rotation raises the
+      left-left subtree. Neither rotation impacts the level of the
+      left-right or right-left subtrees of the problem node. To impact
+      those subtrees we’ll need to use two rotations. We call this
+      left-right rotation and the right-left rotation to follow
+      <em>double rotations</em>, and intuitively they operate similarly
+      to each other. Because we know that a left rotation overall raises
+      the right side of the tree, and a right rotation raises the left
+      side, we will use a combination of each to raise the <q>middle</q>
+      subtrees.</p>
+      <p>A left-right rotation has the effect of lifting the left-right
+      subtree of the problem node (this is the subtree we get to by
+      going from the problem node, to its left child, then to the
+      child’s right subtree) in exchange for lowering the right subtree
+      of the problem node. To do this we will first do a left rotation
+      on the problem node’s left child. This has the impact of lifting
+      the left-right subtree of the problem node, but comes at the
+      expense of lowering the left-left subtree of the problem node.
+      Because in this case it was the problem node’s left subtree that
+      was too low, this may not have actually fixed the unbalance. To
+      ensure the tree is balanced we will now do a right rotation at the
+      problem node to lift that left-left subtree an lower the
+      right-right subtree.</p>
+      <p>The image below depicts a left-right rotation. Observe that
+      before the rotation the problem node
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+      is the root of the subtree. After the rotation the node
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>,
+      which is left-right grandchild of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>,
+      becomes the root of the subtree. The left-left subtree ends at
+      exactly the same level as where it started. The right-right
+      subtree is lower than it was previously. The original left-right
+      subtree has been <q>split</q>. The overall impact is that all
+      nodes in the left-right subtree are higher than they were before
+      the double rotation and the right subtree of the problem node is
+      lower, therefore balancing the tree.</p>
+      <p><img src="files/leftright_rotation.png" alt="An illustration of a left-right rotation. Initially, the problem node is labeled a. Its left subtree is rooted at a node labeled b, and it has a height of h+2. Its right subtree is labeled z and has a height of h. The left subtree of b is labeled w and has height h. The right child of b is labeled c, and its subtree has height h+1. The left and right subtrees of c are labeled x and y respectively, and at least one of those subtrees has height h (the other could also be height h, or it could be height h-1). To balance the tree we perform a left rotation at b (the left child of a) then a right rotation at a.
+      After performing both rotations the node c becomes the root of the tree. The left child of c is the node b, and the right child of c is a (the former root). The left subtree of b is unchanged, and the right subtree of b is x (the former left subtree of c). The right subtree of a is unchanged, and the left subtree of a is y (the former right subtree of c). Because we have split the original subtrees of c, we have lifted both subtrees up by 1 level in exchange for lowering z (the original right subtree of a)." height="150"/></p>
+      <p>Because a left-right rotation is simply a left rotation
+      followed by a right rotation, and we already established that both
+      left and right rotations preserve the binary search tree ordering
+      property, a left-right rotation will do so as well.</p>
+      <h3 data-number="2.2.4" id="right-left-rotation"><span
+      class="header-section-number">2.2.4</span> Right-Left
+      Rotation</h3>
+      <p>A right-left rotation is the mirror image of a left-right
+      rotation. It has the overall effect of lifting the right-left
+      subtree of the problem node in exchange for lowering the left
+      subtree of the problem node. It operates by first doing a right
+      rotation on the right child of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>,
+      and then doing a left rotation on
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>.</p>
+      <p><img src="files/rightleft_rotation.png" alt="An illustration of a left-right rotation. Initially, the problem node is labeled a. Its right subtree is rooted at a node labeled b, and it has a height of h+2. Its left subtree is labeled w and has a height of h. The right subtree of b is labeled z and has height h. The left child of b is labeled c, and its subtree has height h+1. The left and right subtrees of c are labeled x and y respectively, and at least one of those subtrees has height h (the other could also be height h, or it could be height h-1). To balance the tree we perform a right rotation at b (the right child of a) then a left rotation at a.
+      After performing both rotations the node c becomes the root of the tree. The right child of c is the node b, and the left child of c is a (the former root). The right subtree of b is unchanged, and the left subtree of b is y (the former right subtree of c). The left subtree of a is unchanged, and the right subtree of a is x (the former left subtree of c). Because we have split the original subtrees of c, we have lifted both subtrees up by 1 level in exchange for lowering w (the original left subtree of a)." height="150"/></p>
+      <h2 data-number="2.3" id="avl-tree-insert"><span
+      class="header-section-number">2.3</span> AVL Tree Insert</h2>
+      <p>We now have all of the tools necessary in order to completely
+      define our insert algorithm for AVL trees, which proceeds as
+      follows:</p>
+      <ol type="1">
+      <li>First perform a BST insert, which will either update the value
+      associated with the given key, or else create a new node with the
+      given key-value pair.</li>
+      <li>If the key was already present in the tree, and we therefore
+      updated the value associated with it, we did not modify the tree
+      and therefore are finished with the insert.</li>
+      <li>We we added a new node (which will always be a leaf) then we
+      may have caused the AVL tree to become unbalanced, and so we must
+      check for unbalance and perhaps perform rotations.</li>
+      <li>Starting from the new leaf and moving one level at a time
+      toward the root, check to see if any node is a <q>problem
+      node</q>, meaning that the heights of its left and right subtrees
+      differ by more than 1.</li>
+      <li>If the current node is a problem node, identify where the new
+      node was added relative to that problem node:
+      <ul>
+      <li>If the new node was added to the left-left subtree then do a
+      right rotation.</li>
+      <li>If the new node was added to the right-right subtree then do a
+      left rotation.</li>
+      <li>If the new node was added to the left-right subtree then do a
+      left-right double rotation.</li>
+      <li>If the new node was added to the right-left subtree then do a
+      right-left double rotation.</li>
+      </ul></li>
+      </ol>
+      <p>To evaluate the running time of this algorithm we observe the
+      following:</p>
+      <ul>
+      <li>A BST insert is linear in the height of the tree</li>
+      <li>Supposing there is a height field within each node that is
+      correctly maintained, step 4 requires only constant time per
+      level</li>
+      <li>Step 5 also requires constant time because each rotation
+      requires only updating references and height fields for the nodes
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>,
+      and
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>
+      (in the case of a double rotation only).</li>
+      </ul>
+      <p>Overall, the running time of an AVL tree insert is
+      <em>also</em> linear in the height of the tree.</p>
+      <h2 data-number="2.4" id="avl-tree-delete"><span
+      class="header-section-number">2.4</span> AVL Tree Delete</h2>
+      <p>The AVL tree delete algorithm proceeds as follows:</p>
+      <ol type="1">
+      <li>First perform a BST delete. If the key was not present then we
+      do not modify the tree and therefore can return without any
+      further steps. If the key was present then we removed a node from
+      the tree, and so we may have caused the AVL tree to become
+      unbalanced, and so we must check for unbalance and perhaps perform
+      rotations.</li>
+      <li>Starting from the parent of the node whose <em>position</em>
+      was removed (if the key-value pair removed had either 0 or 1 child
+      then we start from the parent of that node, if the key-value pair
+      removed had two children then we start from the parent of where we
+      found the largest node on the left) and moving one level at a time
+      toward the root, check to see if any node is a <q>problem
+      node</q>, meaning that the heights of its left and right subtrees
+      differ by more than 1.</li>
+      <li>If the current node is a problem node, identify where the node
+      was removed relative to that problem node:
+      <ul>
+      <li>If the node was removed from the left-left subtree then do a
+      left rotation.</li>
+      <li>If the node was removed from the right-right subtree then do a
+      right rotation.</li>
+      <li>If the node was removed from the left-right subtree then do a
+      right-left double rotation.</li>
+      <li>If the node was removed from the right-left subtree then do a
+      left-right double rotation.</li>
+      </ul></li>
+      </ol>
+      <p>Note that the cases for rotations are exactly the opposite of
+      inserting relative to where the change happened (they are the same
+      relative to which subtree was too tall/short).</p>
+      <p>Similar to inserting, we still do constant work per level of
+      the tree, and so the running time is linear in the tree’s
+      height.</p>
+      <h2 data-number="2.5" id="justifying-logarithmic-height"><span
+      class="header-section-number">2.5</span> Justifying Logarithmic
+      Height</h2>
+      <p>Now that we have established that, like with binary search
+      trees, AVL tree operations run in linear time relative to the
+      tree’s height, all that remains to justify our logarithm running
+      time is an argument to show that the height of an AVL tree is
+      logarithmic in terms of the number of nodes it contains.</p>
+      <p>Similar to what we did with heaps, we will begin by first
+      fixing the height of the tree to
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>,
+      and then identifying the minimum number of nodes that tree could
+      contain. Because our running time is linear in the trees height,
+      this will serve as a worst case analysis because that maximizes
+      the height relative to the number of nodes.</p>
+      <p>We will define the function
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">M(h)</annotation></semantics></math>
+      to return the minimum number of nodes in an AVL tree of height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>.
+      We can define
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">M(h)</annotation></semantics></math>
+      using a recurrence relation as follows:</p>
+      <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo>−</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">M(h) = M(h-1)+ M(h-2) + 1</annotation></semantics></math>.</p>
+      <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn><mo>,</mo><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">M(-1)=0, M(0)=1</annotation></semantics></math></p>
+      <p>Let’s discuss how we derived this. First of all, a tree of
+      height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math>
+      must have
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+      nodes and a tree of height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+      must have exactly
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+      node, giving the base cases of the recurrence.</p>
+      <p>For the recursive we’re saying that we can form the
+      minimum-sized AVL tree of height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+      by first finding the minimum-sized AVL tree of height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">h-1</annotation></semantics></math>
+      (which will have
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">M(h-1)</annotation></semantics></math>
+      nodes) and of height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>−</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">h-2</annotation></semantics></math>
+      (which will have
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo>−</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">M(h-2)</annotation></semantics></math>
+      nodes). Then we connect those together with a shared parent node
+      (thus we add
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>).
+      This must be the minimum because for a tree to be height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+      at least one subtree of the root must have height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">h-1</annotation></semantics></math>,
+      and the other subtree must then have height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">h-1</annotation></semantics></math>
+      or lower. Because an AVL tree requires that the height of sibling
+      subtrees may differ by no more than
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>,
+      the minimum height of the other subtree is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>−</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">h-2</annotation></semantics></math>.</p>
+      <p>From here, we can get an asymptotic lower bound on
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">M(h)</annotation></semantics></math>
+      by comparing it to the Fibbonacci sequence.</p>
+      <p>The
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>th
+      Fibbonacci number can be calculated following the recurrence:</p>
+      <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">F(n)=F(n-1)+F(n-2)</annotation></semantics></math></p>
+      <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn><mo>,</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">F(0)=0, F(1)=1</annotation></semantics></math></p>
+      <p>We can observe that for all values of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>≥</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">x\geq 0</annotation></semantics></math>
+      it holds that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≥</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">M(x)\geq F(x)</annotation></semantics></math>.
+      This would be best justified using induction. We’ll skip a formal
+      inductive proof and instead just provide a sketch of the argument.
+      The inequality holds true for the base cases, and then for each
+      application of the recursive case the
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>
+      recurrence grows by 1 more than the Fibbonacci recurrence
+      does.</p>
+      <p>We can then approximate the value of the
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>th
+      Fibonacci number as
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><msup><mi>ϕ</mi><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">F(n)\approx \phi^n</annotation></semantics></math>
+      where
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ϕ</mi><mo>=</mo><mfrac><mrow><mn>1</mn><mo>=</mo><msqrt><mn>5</mn></msqrt></mrow><mn>2</mn></mfrac><mo>≈</mo><mn>1.62</mn></mrow><annotation encoding="application/x-tex">\phi=\frac{1=\sqrt{5}}{2}\approx 1.62</annotation></semantics></math>
+      is the golden ratio.</p>
+      <p>Because
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≥</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">M(x)\geq F(x)</annotation></semantics></math>,
+      we can lower bound the minimum number of nodes in a tree of height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+      as
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>ϕ</mi><mi>h</mi></msup><annotation encoding="application/x-tex">\phi^h</annotation></semantics></math>.
+      Because the running time of our AVL tree operations are
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(h)</annotation></semantics></math>,
+      we can define an upper bound on worst case the running time in
+      terms of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      by setting
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><msup><mi>ϕ</mi><mi>h</mi></msup></mrow><annotation encoding="application/x-tex">n=\phi^h</annotation></semantics></math>,
+      then solving for
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>.
+      This gives a worst case running time of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mo>log</mo><mi>ϕ</mi></msub><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(\log_\phi n)=O(\log n)</annotation></semantics></math>.</p>
+      <p>We can also get a
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Ω</mi><annotation encoding="application/x-tex">\Omega</annotation></semantics></math>
+      bound on the worst case running time by observing that the maximum
+      number of nodes in a tree of height
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+      is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mrow><mi>h</mi><mo>+</mo><mn>1</mn></mrow></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^{h+1}-1</annotation></semantics></math>.
+      Setting
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><msup><mn>2</mn><mrow><mi>h</mi><mo>+</mo><mn>1</mn></mrow></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">n=2^{h+1}-1</annotation></semantics></math>
+      and solving for
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+      gives
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>=</mo><msub><mo>log</mo><mn>2</mn></msub><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">h=\log_2{n+1}-1</annotation></semantics></math>,
+      and so the worst case running time is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Ω</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Omega(\log n)</annotation></semantics></math>.
+      Because the running time is both
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(\log n)</annotation></semantics></math>
+      and
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Ω</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Omega(\log n)</annotation></semantics></math>,
+      we conclude the worst case running time is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(\log n)</annotation></semantics></math>.</p>
+            </div>
+    </div>
+  </div>
+  <footer>
+          Copyright © 2026 Paul G. Allen School of Computer Science & Engineering, University of Washington. Site design by Nathan Brunelle.
+              <p>Released under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /> CC-BY-NC-SA 4.0</a> license</a>.
+      </p>
+        <p>Last updated 2026-10-16 16:52</p>
+  </footer>
+</body>
+</main>
+</html>

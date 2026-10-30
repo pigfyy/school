@@ -1,0 +1,1436 @@
+<!doctype html>
+<!--
+  CSE 332 (26au) · Week 4 (Mon Oct 19 – Fri Oct 23). Built with the course-teaching-site skill from week 3's page.
+  Sources (materials/cse332/w04/): Lecture 9 AVL Trees 2, Lecture 10 Hashing 1, Section 4 AVL Trees (slides, worksheet
+  and official solutions), Lecture 11 Hashing 2, the AVL and Hashing topic summaries, calendar, tasks.
+  Graded work (EX2, EX3, EX4, the Week 3 survey) is listed by due date only.
+  Every stateful element has a stable data-id. Change the id when the question changes.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE 332 week 4</title>
+<link rel="stylesheet" href="../../core/fonts.css">
+<link rel="stylesheet" href="../../core/base.css">
+<link rel="stylesheet" href="../../core/katex/katex.min.css">
+<link rel="stylesheet" href="week.css">
+</head>
+<body data-course="cse332" data-week="w04">
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+
+<nav class="rail" aria-label="Week 4 modules">
+  <div class="rail-top">
+    <a class="brand" href="#home"><span class="brand-kicker">CSE 332 · week 4</span>AVL trees and hashing<small>AVL trees 2 · hash functions · chaining and probing</small></a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="rail-body">Menu</button>
+  </div>
+  <div class="rail-body" id="rail-body">
+    <div>
+      <h2>Lecture 9: AVL Trees 2 <span class="today" data-date="2026-10-19">Mon Oct 19</span></h2>
+      <ol class="modules">
+        <li><a href="#l9-insert">Insert, start to finish</a></li>
+        <li><a href="#l9-minimal">Minimal AVL trees</a></li>
+        <li><a href="#l9-practice">Practice</a></li>
+        <li><a href="#l9-quiz">Check your understanding</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 10: Hashing <span class="today" data-date="2026-10-21">Wed Oct 21</span></h2>
+      <ol class="modules">
+        <li><a href="#l10-idea">From arrays to hash tables</a></li>
+        <li><a href="#l10-hashfn">Good hash functions</a></li>
+        <li><a href="#l10-chain">Separate chaining</a></li>
+        <li><a href="#l10-practice">Practice</a></li>
+        <li><a href="#l10-quiz">Check your understanding</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Section 4: AVL Trees <span class="today" data-date="2026-10-22">Thu Oct 22</span></h2>
+      <ol class="modules">
+        <li><a href="#s4-avl">The worksheet, worked</a></li>
+        <li><a href="#s4-practice">Practice</a></li>
+        <li><a href="#s4-quiz">Check your understanding</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 11: Hashing 2 <span class="today" data-date="2026-10-23">Fri Oct 23</span></h2>
+      <ol class="modules">
+        <li><a href="#l11-linear">Linear probing</a></li>
+        <li><a href="#l11-quad">Quadratic and double hashing</a></li>
+        <li><a href="#l11-rehash">Rehashing</a></li>
+        <li><a href="#l11-practice">Practice</a></li>
+        <li><a href="#l11-quiz">Check your understanding</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Due</h2>
+      <ul class="later-list">
+        <li><span>Mon Oct 19 · EX2 Heaps closes</span><em>late days only</em></li>
+        <li><span>Tue Oct 20 · Week 3 survey</span><em>on Canvas</em></li>
+        <li><span>Fri Oct 23 · EX3 Recurrences</span><em><a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-3" target="_blank" rel="noopener">tasks page</a></em></li>
+        <li><span>Fri Oct 23 · "Meet the staff"</span><em>any office hour</em></li>
+        <li><span>Fri Oct 30 · EX4 AVL Trees</span><em><a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-4" target="_blank" rel="noopener">tasks page</a></em></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Reference</h2>
+      <ul class="plain-links">
+        <li><a href="#home">Week overview</a></li>
+        <li><a href="#readings">Readings</a></li>
+        <li><a href="#cheatsheet">Cheat sheet</a></li>
+      </ul>
+    </div>
+    <p class="rail-foot"><kbd>←</kbd> <kbd>→</kbd> modules · <kbd>N</kbd> next step · <kbd>H</kbd> next hint</p>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ================================================================ HOME -->
+<section class="page" id="home" data-title="Week overview">
+  <div class="hero">
+    <p class="kicker">Lecture 11 · <span data-date="2026-10-23" data-plain>Fri Oct 23</span></p>
+    <h1>Room in the table, <em>nowhere</em> to go</h1>
+    <p class="lede question">Slide 29 inserts 76, 40, 48, 5, 55 and 47 into a table of size 7 with quadratic probing. After five inserts, two slots are still empty. Where does 47 go?</p>
+    <div class="panel hashlab" id="hl-hero" data-presets='[{"label":"Slide 29: size 7, quadratic","mode":"quadratic","size":7,"seq":[76,40,48,5,55,47],"say":"Press Insert six times to add 76, 40, 48, 5, 55, 47."},{"label":"Same keys, linear","mode":"linear","size":7,"seq":[76,40,48,5,55,47],"say":"The same keys with linear probing."}]'>
+      <div class="controls">
+        <label>Key <input type="text" inputmode="numeric" class="hl-key" aria-label="Key" placeholder="next in queue"></label>
+        <button class="btn primary hl-insert" type="button">Insert</button>
+        <button class="btn hl-find" type="button">Find</button>
+        <button class="btn hl-delete" type="button">Delete</button>
+        <button class="btn hl-rehash" type="button">Rehash</button>
+        <button class="btn quiet hl-reset" type="button">Clear</button>
+      </div>
+      <div class="controls">
+        <label>Collisions <select class="hl-mode" aria-label="Collision resolution"><option value="chain">separate chaining</option><option value="linear">linear probing</option><option value="quadratic">quadratic probing</option></select></label>
+        <label>Table size <input type="number" class="hl-size" min="2" max="31" value="7" aria-label="Table size"></label>
+      </div>
+      <div class="controls hl-presets" role="group" aria-label="Examples"></div>
+      <div class="hl-grid" aria-label="Hash table"></div>
+      <p class="hl-stat"></p>
+      <p class="out hl-out" role="status"></p>
+    </div>
+  </div>
+  <div class="prose">
+    <p>Nowhere. 47 % 7 = 5, and quadratic probing tries \(5 + i^2\): indices 5, 6, 2, 0, 0, 2, 6, … The empty slots are 1 and 4, and \(i^2 \bmod 7\) is only ever 0, 1, 2 or 4, so the probe path never reaches them. Slide 30's guarantee needs a prime table size <em>and</em> \(\lambda &lt; \frac12\). Here \(\lambda = \frac57\). Fixing that is rehashing.</p>
+  </div>
+
+  <h2>This week</h2>
+  <div class="week">
+    <a href="#l9-insert" class="day"><strong>Mon, Oct 19</strong><span class="tag-today" data-date="2026-10-19">Today</span><span>Lecture 9: AVL Trees 2</span><span>The four insert cases again, a full example, and minimal AVL trees. Weiss 4.4.</span></a>
+    <div class="day"><strong>Tue, Oct 20</strong><span class="tag-today" data-date="2026-10-20">Today</span><span>Week 3 survey due</span><span>On Canvas. Graded participation, so it's listed here only.</span></div>
+    <a href="#l10-idea" class="day"><strong>Wed, Oct 21</strong><span class="tag-today" data-date="2026-10-21">Today</span><span>Lecture 10: Hashing</span><span>Hash tables, what makes a hash function good, separate chaining, load factor. Weiss 5.1–5.5.</span></a>
+    <a href="#s4-avl" class="day"><strong>Thu, Oct 22</strong><span class="tag-today" data-date="2026-10-22">Today</span><span>Section 4: AVL Trees</span><span>Rotation references, two full insert sequences, and a minimal tree.</span></a>
+    <a href="#l11-linear" class="day"><strong>Fri, Oct 23</strong><span class="tag-today" data-date="2026-10-23">Today</span><span>Lecture 11: Hashing 2</span><span>Open addressing: linear, quadratic and double hashing; delete with tombstones; rehashing. Weiss 5.1–5.5.</span></a>
+  </div>
+
+  <h2>Due</h2>
+  <div class="table-wrap">
+  <table class="plain due">
+    <tr><th>Mon Oct 19</th><td>EX2 Heaps closes (late days)</td></tr>
+    <tr><th>Tue Oct 20</th><td>Week 3 survey (Canvas)</td></tr>
+    <tr><th>Fri Oct 23</th><td>EX3 Recurrences (Gradescope) · "Meet the staff" (visit any office hour)</td></tr>
+    <tr><th>Fri Oct 30</th><td>EX4 AVL Trees (programming, Gradescope)</td></tr>
+    <tr><th>Mon Nov 9</th><td>Midterm, 5:00–6:00 pm (review session Fri Nov 6, in lecture)</td></tr>
+  </table>
+  </div>
+  <p class="note">Exercises and surveys are graded work, so this site lists their dates only. New this week: conceptual office hours, Thursdays 10–11 am in CSE2 128, for course content rather than exercise help.</p>
+
+  <h2>How to use this site</h2>
+  <div class="prose">
+    <ul>
+      <li>Each lecture's pages follow its slides, end with a quick check, and finish with a practice page and a "Check your understanding" quiz. Section 4's practice page is the worksheet, checked against the official solutions.</li>
+      <li><strong>Teaching notes</strong> are the amber blocks.</li>
+      <li>Answer boxes take arithmetic like <code>3/10</code> or <code>0.3</code>, classes like <code>log n</code>, and key sequences separated by spaces or commas. Some parts use a menu.</li>
+      <li>Widgets: the AVL insert stepper (from week 3), a string-hash calculator, and a hash table that does chaining or any of the three probes.</li>
+    </ul>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes: the week</summary>
+    <ul>
+      <li>Monday finishes AVL insert; EX4 (AVL trees, due Oct 30) implements it. AVL delete is "not covered this quarter" (Lecture 10, slide 5).</li>
+      <li>Wednesday and Friday are the two hashing lectures. EX5 (hashing) follows.</li>
+      <li>The midterm (Mon Nov 9) covers through these topics; Section 4 points to section problems and past midterms for study.</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ================================================================ L9: INSERT -->
+<section class="page" id="l9-insert" data-title="Insert, start to finish">
+  <p class="where">Lecture 9 · slides 3–30 · <span class="today-chip" data-date="2026-10-19">Mon Oct 19</span> · Weiss 4.4</p>
+  <h1>AVL insert, start to finish</h1>
+  <div class="prose"><p>Slides 3–27 repeat Friday's material: the balance rule, the slide-32 and slide-39 inserts, the two single rotations, and the double rotations. Week 3's pages cover them in detail. Here is the summary, then the new example.</p></div>
+  <div class="rule">
+    <p><strong>Insert summary (slide 27).</strong> Do a BST insert, then update the heights of the new node's ancestors, from the leaf up. At the deepest unbalanced node:</p>
+    <ul>
+      <li><strong>LL</strong> (left subtree of the left child): rotate right.</li>
+      <li><strong>RR</strong> (right subtree of the right child): rotate left.</li>
+      <li><strong>LR</strong> (right subtree of the left child): rotate left at the left child, then right at the node.</li>
+      <li><strong>RL</strong> (left subtree of the right child): rotate right at the right child, then left at the node.</li>
+    </ul>
+    <p>Done after reaching the root or applying one case.</p>
+  </div>
+
+  <h2>Insert 1, 2, 5, 3, 4 (slides 28–29)</h2>
+  <div class="panel treelab" id="avl-12534" data-mode="avl" data-presets='[{"label":"1, 2, 5, 3, 4 (slide 28)","shape":"","seq":[1,2,5,3,4],"say":"Empty tree, queue 1, 2, 5, 3, 4. Press Insert (and Rotate when it asks)."},{"label":"Empty","shape":"","say":"Empty tree. Type keys and press Insert."}]'>
+    <div class="controls">
+      <label>Key <input type="text" inputmode="numeric" class="tl-key" aria-label="Key" placeholder="next in queue"></label>
+      <button class="btn primary tl-insert" type="button">Insert</button>
+      <button class="btn tl-next" type="button" disabled>Rotate</button>
+      <button class="btn quiet tl-reset" type="button">Reset</button>
+      <span class="tl-queue"></span>
+    </div>
+    <div class="controls tl-presets" role="group" aria-label="Start from"></div>
+    <div class="chart-box"><svg class="chart tl-svg" role="img"></svg></div>
+    <p class="out tl-out" role="status"></p>
+    <p class="tl-orders"></p>
+  </div>
+  <div class="prose">
+    <p>Inserting 5 makes 1 unbalanced: right, then right, so RR and a left rotation at 1, giving 2 with children 1 and 5. Then 3 goes to 5's left, which is fine. Then 4 goes to 3's right, and 5 is unbalanced: from 5 the key went left (to 3), then right. That's LR: rotate left at 3, then right at 5. The slide's three arrows are exactly these three rotations. Result: 2 with children 1 and 4; 4 with children 3 and 5.</p>
+  </div>
+  <pre class="code"><span class="cm">// slide 30</span>
+insertHelper(key, value, root) {
+  if (root == null) return new Node(key, value);
+  if (root.key &lt; key) root.right = insertHelper(key, value, root.right);
+  else root.left = insertHelper(key, value, root.left);
+  if (isUnbalanced(root)) root = rotate(root);
+  return root;
+}</pre>
+  <p class="note">The recursion unwinds from the new leaf up, so the first unbalanced node it meets is the deepest one.</p>
+
+  <div class="check" data-id="cse332-w4-l9-qc-case-4">
+    <p>Quick check: when 4 is inserted, which case applies at 5?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w4-l9-qc-case-4"> LL<span class="why" hidden>From 5 the key goes left to 3, then <em>right</em> (4 &gt; 3).</span></label>
+      <label data-correct><input type="radio" name="cse332-w4-l9-qc-case-4"> LR<span class="why" hidden>Right: left child 3, then its right subtree.</span></label>
+      <label><input type="radio" name="cse332-w4-l9-qc-case-4"> RL<span class="why" hidden>4 &lt; 5, so the first step from 5 is left.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w4-l9-qc-rotations" data-grader="exact" data-answer="3" data-miscon='{"2":"single-for-double"}'>
+    <p>Quick check: how many single rotations does the whole sequence 1, 2, 5, 3, 4 take?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Ask the room to do 1, 2, 5, 3, 4 on paper first (slide 28 has no answers), then step through it. Most people stop after the first rotation and miss that 4 creates a zig-zag.</li>
+      <li>Recall the definition of height for the class: a leaf is 0, an empty subtree −1. Heights are what the code stores and compares.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L9: MINIMAL -->
+<section class="page" id="l9-minimal" data-title="Minimal AVL trees">
+  <p class="where">Lecture 9 · slides 31–35 · <span class="today-chip" data-date="2026-10-19">Mon Oct 19</span></p>
+  <h1>Minimal AVL trees</h1>
+  <div class="prose">
+    <p>Slide 31 asks: for an AVL tree of height \(h\), what is the <em>minimum</em> number of nodes? With \(h = 0\) it's 1 node; with \(h = 1\) it's 2. In general, take a root, give it one subtree of height \(h - 1\) (it needs one to reach height \(h\)), and make the other as short as the balance rule allows, height \(h - 2\). Both subtrees should themselves be minimal.</p>
+    <p>\[M(h) = M(h-1) + M(h-2) + 1,\qquad M(0) = 1,\ M(1) = 2.\]</p>
+  </div>
+  <div class="tree-grid">
+    <figure class="treeview" data-shape="1" data-heights><figcaption>\(h = 0\): \(M = 1\)</figcaption></figure>
+    <figure class="treeview" data-shape="2(1,)" data-heights><figcaption>\(h = 1\): \(M = 2\)</figcaption></figure>
+    <figure class="treeview" data-shape="3(2(1,),4)" data-heights><figcaption>\(h = 2\): \(M = 4\)</figcaption></figure>
+    <figure class="treeview" data-shape="5(3(2(1,),4),7(6,))" data-heights><figcaption>\(h = 3\): \(M = 7\)</figcaption></figure>
+  </div>
+  <figure class="treeview" data-shape="8(5(3(2(1,),4),7(6,)),11(10(9,),12))" data-heights><figcaption>\(h = 4\): \(M = 12\). Left: the minimal tree of height 3. Right: the minimal tree of height 2. (Keys are numbered in order so it's a BST.)</figcaption></figure>
+  <div class="table-wrap">
+  <table class="plain num">
+    <tr><th>\(h\)</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr>
+    <tr><th>\(M(h)\)</th><td>1</td><td>2</td><td>4</td><td>7</td><td>12</td><td>20</td><td>33</td><td>54</td><td>88</td><td>143</td><td>232</td></tr>
+  </table>
+  </div>
+  <div class="rule">
+    <p><strong>Why \(\Theta(\log n)\) (slides 34–35).</strong> \(M(h) &gt; F(h)\), the Fibonacci numbers, and \(F(h) \approx \phi^h\) with \(\phi &gt; 1.6\). So an AVL tree of height \(h\) has at least \(\phi^h\) nodes, and at most \(2^{h+1} - 1\). With \(n\) nodes, \(n \ge \phi^h\) gives \(h \le \log_\phi n\): every operation is \(O(\log n)\), and \(\Omega(\log n)\) because even a full tree is that tall.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w4-l9-qc-m6" data-grader="exact" data-answer="33" data-miscon='{"8":"fib-not-m","13":"fib-not-m","21":"fib-not-m"}'>
+    <p>Quick check: \(M(6)\).</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w4-l9-qc-maxh100" data-grader="exact" data-answer="8" data-miscon='{"99":"bst-height","9":"off-by-one-height","6":"off-by-one-height"}'>
+    <p>Quick check: the greatest height an AVL tree with 100 nodes can have.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide 33 draws the minimal trees without keys. Have students check each one: every node's subtrees differ by exactly 1 or are both empty. Removing any leaf would either shrink the height or break the balance.</li>
+      <li>"Greatest height with \(n\) nodes" = the largest \(h\) with \(M(h) \le n\). For 100 nodes, \(M(8) = 88 \le 100 &lt; 143 = M(9)\), so 8. A full tree with 100 nodes has height 6.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L9: PRACTICE -->
+<section class="page" id="l9-practice" data-title="Lecture 9: practice">
+  <p class="where">Lecture 9 · <span class="today-chip" data-date="2026-10-19">Mon Oct 19</span> · practice</p>
+  <h1>Lecture 9: practice</h1>
+  <div class="prose"><p>Four problems: the slide-28 sequence and three new ones. Every tree was built by running the slides' AVL insert, and checked against a second, independent implementation (<code>checks/cse332/w04/verify.mjs</code>). Traversal boxes take keys separated by spaces or commas.</p></div>
+
+  <article class="task" data-id="cse332-w4-l9-12534">
+    <h2>1. Insert 1, 2, 5, 3, 4</h2>
+    <p class="prompt">Into an empty AVL tree (slide 28).</p>
+    <div class="answer-spec" data-part="case5" data-grader="choice" data-answer="rr" data-options="none:no rotation|ll:LL|rr:RR|lr:LR|rl:RL" data-label="case when 5 is inserted"></div>
+    <div class="answer-spec" data-part="case4" data-grader="choice" data-answer="lr" data-options="none:no rotation|ll:LL|rr:RR|lr:LR|rl:RL" data-label="case when 4 is inserted"></div>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="2 1 4 3 5|2, 1, 4, 3, 5" data-label="final pre-order"></div>
+    <div class="answer-spec" data-part="height" data-grader="exact" data-answer="2" data-label="final height"></div>
+    <ol class="hints">
+      <li>Draw the tree after each insert and write the heights. Find the deepest unbalanced node, then the first two steps from it toward the new key.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>1, 2, 5: 1 is unbalanced, the key went right then right: RR, rotate left at 1. Tree: 2(1, 5).</li>
+      <li>3: goes to 5's left. All balanced.</li>
+      <li>4: goes to 3's right. 5's left height is 1, right −1: unbalanced. Left then right: LR. Rotate left at 3, then right at 5: 4(3, 5).</li>
+      <li class="answer">RR; LR; 2 1 4 3 5; height 2.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-l9-lr">
+    <h2>2. A zig-zag at the root</h2>
+    <p class="prompt">Insert 40, 20, 60, 10, 30, 25 into an empty AVL tree.</p>
+    <div class="answer-spec" data-part="problem" data-grader="exact" data-answer="40" data-miscon='{"20":"not-deepest"}' data-label="deepest unbalanced node after inserting 25"></div>
+    <div class="answer-spec" data-part="case" data-grader="choice" data-answer="lr" data-options="ll:LL|rr:RR|lr:LR|rl:RL" data-label="its case"></div>
+    <div class="answer-spec" data-part="root" data-grader="exact" data-answer="30" data-miscon='{"20":"single-for-double"}' data-label="final root"></div>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="30 20 10 25 40 60|30, 20, 10, 25, 40, 60" data-label="final pre-order"></div>
+    <ol class="hints">
+      <li>The first five inserts need no rotation. Where does 25 land, and what are the heights on its path?</li>
+      <li>20 has children of heights 0 and 1, so it's fine. 40 has 2 and 0.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>After 40, 20, 60, 10, 30: 40(20(10, 30), 60), balanced.</li>
+      <li>25 goes to 30's left. 30 has height 1, 20 height 2, and 40's children are 2 and 0: 40 is unbalanced. 20 is balanced (0 and 1).</li>
+      <li>From 40: left to 20, then right to 30. LR. Rotate left at 20 (30 rises), then right at 40 (30 becomes the root). 25 moves to 20's right.</li>
+      <li class="answer">40; LR; root 30; 30 20 10 25 40 60.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-l9-sorted">
+    <h2>3. Sorted input</h2>
+    <p class="prompt">Insert 5, 10, 15, 20, 25, 30, 35 in that order into an empty AVL tree.</p>
+    <div class="answer-spec" data-part="rotations" data-grader="exact" data-answer="4" data-label="number of single rotations"></div>
+    <div class="answer-spec" data-part="root" data-grader="exact" data-answer="20" data-label="final root"></div>
+    <div class="answer-spec" data-part="height" data-grader="exact" data-answer="2" data-miscon='{"6":"bst-height"}' data-label="final height"></div>
+    <ol class="hints">
+      <li>Every rotation here is RR. They happen on inserting 15, 25, 30 and 35.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>15: RR at 5, giving 10(5, 15). 25: RR at 15. 30: RR at the root 10, so 20 becomes the root. 35: RR at 25.</li>
+      <li>The result is the full tree 20(10(5, 15), 30(25, 35)). A plain BST would be a chain of height 6.</li>
+      <li class="answer">4 rotations; root 20; height 2.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-l9-minimal">
+    <h2>4. Minimal trees and the height bound</h2>
+    <p class="prompt">Use \(M(h) = M(h-1) + M(h-2) + 1\), \(M(0) = 1\), \(M(1) = 2\).</p>
+    <div class="answer-spec" data-part="m5" data-grader="exact" data-answer="20" data-miscon='{"8":"fib-not-m","13":"fib-not-m"}' data-label="\(M(5)\)"></div>
+    <div class="answer-spec" data-part="leaves4" data-grader="exact" data-answer="5" data-miscon='{"12":"nodes-not-leaves"}' data-label="leaves in the minimal tree of height 4 (pictured on the previous page)"></div>
+    <div class="answer-spec" data-part="maxh1000" data-grader="exact" data-answer="13" data-miscon='{"999":"bst-height","9":"off-by-one-height","14":"off-by-one-height"}' data-label="greatest height of an AVL tree with 1000 nodes"></div>
+    <ol class="hints">
+      <li>The leaves of a minimal tree are the leaves of its two minimal subtrees, so they follow a Fibonacci-like rule too.</li>
+      <li>Keep extending the table: 232, 376, 609, 986, 1596.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(M(5) = 12 + 7 + 1 = 20\).</li>
+      <li>Leaves: \(L(0) = L(1) = 1\), \(L(h) = L(h-1) + L(h-2)\): 1, 1, 2, 3, 5. Height 4 has 5 leaves (1, 4, 6, 9 and 12 in the picture).</li>
+      <li>\(M(13) = 986 \le 1000 &lt; 1596 = M(14)\), so the height is at most 13. A full tree with 1000 nodes has height 9.</li>
+      <li class="answer">20; 5; 13.</li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L9: QUIZ -->
+<section class="page" id="l9-quiz" data-title="Check your understanding: AVL trees 2">
+  <p class="where">Lecture 9 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: AVL trees 2</h1>
+  <div class="prose"><p>Eight questions on Lecture 9. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="l9" role="status"></div>
+  <ol class="cyu-list" data-quiz="l9">
+    <li class="cyu" data-id="cse332-w4-l9-cyu-order" data-kind="mc" data-topic="l9-insert">
+      <p class="q">After a BST insert, in what order does AVL insert check nodes for balance?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w4-l9-cyu-order"> From the root down to the new leaf<span class="why" hidden>The recursion fixes things as it returns, which is bottom-up.</span></label>
+        <label data-correct><input type="radio" name="cse332-w4-l9-cyu-order"> From the new leaf up to the root<span class="why" hidden>Correct, so the first unbalanced node found is the deepest.</span></label>
+        <label><input type="radio" name="cse332-w4-l9-cyu-order"> Every node in the tree, level by level<span class="why" hidden>Only the new node's ancestors can change.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l9-cyu-root-12534" data-kind="num" data-answer="2" data-topic="l9-insert">
+      <p class="q">Insert 1, 2, 5, 3, 4 into an empty AVL tree. What is the root?</p>
+      <p class="why" hidden>The RR rotation at 1 makes 2 the root, and the later LR happens below it, at 5.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l9-cyu-zigzag" data-kind="mc" data-topic="l9-insert">
+      <p class="q">From the deepest unbalanced node, the new key went right, then left. What do you do?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w4-l9-cyu-zigzag"> Rotate left at the node<span class="why" hidden>That's RR. A single rotation leaves a zig-zag unbalanced.</span></label>
+        <label data-correct><input type="radio" name="cse332-w4-l9-cyu-zigzag"> Rotate right at its right child, then left at the node<span class="why" hidden>Correct: case RL.</span></label>
+        <label><input type="radio" name="cse332-w4-l9-cyu-zigzag"> Rotate left at its right child, then right at the node<span class="why" hidden>That's the LR recipe mirrored the wrong way.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l9-cyu-m3" data-kind="num" data-answer="7" data-topic="l9-minimal" data-miscon='{"15":"bst-height","4":"off-by-one-height"}'>
+      <p class="q">The fewest nodes in an AVL tree of height 3.</p>
+      <p class="why" hidden>\(M(3) = M(2) + M(1) + 1 = 4 + 2 + 1 = 7\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l9-cyu-why-h2" data-kind="mc" data-topic="l9-minimal">
+      <p class="q">Why can a minimal AVL tree of height \(h\) have one subtree of height \(h-2\)?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-l9-cyu-why-h2"> The other subtree has height \(h-1\), and heights may differ by 1<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w4-l9-cyu-why-h2"> Because Fibonacci numbers skip a term<span class="why" hidden>The Fibonacci comparison comes after; the reason is the balance rule.</span></label>
+        <label><input type="radio" name="cse332-w4-l9-cyu-why-h2"> Every AVL tree has subtrees of heights \(h-1\) and \(h-2\)<span class="why" hidden>Full trees have both subtrees at \(h-1\). Only the minimal ones use \(h-2\).</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l9-cyu-phi" data-kind="mc" data-topic="l9-minimal">
+      <p class="q">An AVL tree has \(n\) nodes. Its height is at most about…</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w4-l9-cyu-phi"> \(n - 1\)<span class="why" hidden>That's a chain. The balance rule rules it out.</span></label>
+        <label data-correct><input type="radio" name="cse332-w4-l9-cyu-phi"> \(\log_\phi n\), about \(1.44\log_2 n\)<span class="why" hidden>Correct: \(n \ge \phi^h\).</span></label>
+        <label><input type="radio" name="cse332-w4-l9-cyu-phi"> \(\log_2 n\) exactly<span class="why" hidden>That's for a full tree. AVL trees can be a bit taller, still \(\Theta(\log n)\).</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l9-cyu-insert-cost" data-kind="bigo" data-answer="log n" data-topic="l9-minimal">
+      <p class="q">Worst-case time of AVL insert with \(n\) nodes.</p>
+      <p class="why" hidden>Walk down and back up a path of length \(O(\log n)\), with at most two \(\Theta(1)\) rotations.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l9-cyu-root-sorted" data-kind="num" data-answer="4" data-topic="l9-insert">
+      <p class="q">Insert 1, 2, 3, 4, 5, 6, 7 in order into an empty AVL tree. What is the root?</p>
+      <p class="why" hidden>Four RR rotations give the full tree 4(2(1, 3), 6(5, 7)).</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="l9" role="status"></div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L10: IDEA -->
+<section class="page" id="l10-idea" data-title="From arrays to hash tables">
+  <p class="where">Lecture 10 · slides 3–14 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span> · Weiss 5.1–5.5</p>
+  <h1>From arrays to hash tables</h1>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Dictionary data structure (slide 7)</th><th>insert</th><th>find</th><th>delete</th></tr>
+    <tr><td>Sorted array</td><td>\(\Theta(n)\)</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(n)\)</td></tr>
+    <tr><td>Binary search tree</td><td>\(\Theta(\text{height})\)</td><td>\(\Theta(\text{height})\)</td><td>\(\Theta(\text{height})\)</td></tr>
+    <tr><td>AVL tree</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(\log n)\)</td></tr>
+    <tr><td>Hash table (worst case)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
+    <tr><td>Hash table (average)</td><td>\(\Theta(1)\)</td><td>\(\Theta(1)\)</td><td>\(\Theta(1)\)</td></tr>
+  </table>
+  </div>
+  <div class="prose">
+    <p>The AVL tree is an <em>ordered</em> dictionary: keys must be comparable. A hash table is <em>unordered</em>: instead of comparing keys, each key has a <strong>hash function</strong> (slide 8). AVL delete is "not covered this quarter" (slide 5); Java's <code>TreeMap</code> uses a red-black tree, a cousin with a more relaxed shape (slide 6).</p>
+    <p><strong>A "really big array" (slides 9–10).</strong> Treat each key as a number and give it its own index: <code>arr[key] = value</code>. Every operation is \(\Theta(1)\). The problem: the array has to be as big as the range of keys.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Hash tables (slide 11).</strong> Use a small array. A hash function turns the key into an integer, and it should "scatter" the keys as if assigning them randomly. Store the key and value at <code>hash % table.length</code>. When two keys land on the same index, that's a <strong>collision</strong>, and we need a collision-resolution strategy.</p>
+  </div>
+  <div class="prose">
+    <p><strong>Caller ID (slide 12).</strong> Key: a phone number as a string. Hash: the number as an integer, \(h(\text{"2068675309"}) = 2068675309\). With table size 10 it goes to index \(2068675309 \bmod 10 = 9\).</p>
+    <p><strong>What influences running time (slide 13):</strong> how long hashing takes; how likely collisions are (the hash function's quality, and the array size compared to the number of values); and what we do on a collision.</p>
+    <p><strong>Keys that are objects (slide 14).</strong> Equal objects must hash the same: if <code>a.equals(b)</code>, then <code>a.hashCode() == b.hashCode()</code>. If you override <code>equals()</code>, override <code>hashCode()</code> consistently too.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w4-l10-qc-callerid-7" data-grader="exact" data-answer="1" data-miscon='{"9":"no-mod","2068675309":"no-mod"}'>
+    <p>Quick check: with table size 7 instead of 10, at what index does "2068675309" go?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w4-l10-qc-equals">
+    <p>Quick check: you override <code>equals</code> on <code>Point</code> so points with the same x and y are equal, but keep <code>Object</code>'s <code>hashCode</code>. What goes wrong in a hash table?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w4-l10-qc-equals"> Two equal points can hash to different indices, so <code>find</code> misses one that's there<span class="why" hidden>Right: equal objects must hash the same, or find looks in the wrong place.</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-equals"> Nothing; <code>hashCode</code> only affects speed<span class="why" hidden>It affects correctness: find computes the index from the hash.</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-equals"> Every point collides at index 0<span class="why" hidden><code>Object</code>'s hash differs per object, which is exactly the problem for equal ones.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Ask the room for the problems with the really big array before slide 11: memory for every possible key, and keys that aren't small integers at all.</li>
+      <li>Average \(\Theta(1)\) versus worst \(\Theta(n)\): the worst case is every key colliding. The rest of the two lectures is about making that unlikely and cheap.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L10: HASH FUNCTIONS -->
+<section class="page" id="l10-hashfn" data-title="Good hash functions">
+  <p class="where">Lecture 10 · slides 15–20 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span></p>
+  <h1>Good hash functions</h1>
+  <div class="rule">
+    <p><strong>Properties of a "good" hash function (slide 15).</strong> It maps objects to integers and is:</p>
+    <ul>
+      <li><strong>Consistent:</strong> equal keys hash to the same integer; hashing the same key twice gives the same result (deterministic).</li>
+      <li><strong>Uniform:</strong> it can use every index of a fixed-size array, at roughly equal rates.</li>
+      <li><strong>Effective:</strong> it's hard to find two unequal keys with the same hash; a small change to the key gives a big change in the hash (the "avalanche effect").</li>
+      <li><strong>Efficient:</strong> it's fast to compute.</li>
+    </ul>
+  </div>
+  <div class="prose">
+    <p><strong>A bad one (slides 16–17):</strong> the first digit of a phone number. Consistent, yes. Uniform, no: no US number starts with 0 or 1, and in this class 2 is by far the most likely. Effective, no: \(h(\text{"2068675309"}) = h(\text{"2068675305"}) = 2\). Efficient, yes.</p>
+  </div>
+
+  <h2>Four hashes for strings (slides 18–19)</h2>
+  <div class="prose"><p>For \(s = s_0 s_1 \dots s_{m-1}\) with ASCII codes \(a(s_i)\):</p></div>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Hash</th><th>Properties (slide 19)</th></tr>
+    <tr><td>\(h_1(s) = a(s_0)\)</td><td>consistent, efficient</td></tr>
+    <tr><td>\(h_2(s) = \sum_{i=0}^{m-1} a(s_i)\)</td><td>consistent, efficient, possibly uniform</td></tr>
+    <tr><td>\(h_3(s) = \sum_{i=0}^{m-1} a(s_i)\cdot 31^i\)</td><td>consistent, efficient, uniform, effective</td></tr>
+    <tr><td>\(h_4(s) = 2\cdot\sum_{i=0}^{m-1} a(s_i)\cdot 31^i\)</td><td>consistent, efficient, effective</td></tr>
+  </table>
+  </div>
+  <div class="prose"><p>\(h_2\) gives every anagram the same hash ("cat" and "act"). \(h_4\) is always even, so with an even table size it never uses an odd index: not uniform.</p></div>
+  <div class="panel hashcalc" id="hc">
+    <div class="controls">
+      <label>String <input type="text" class="hc-s" value="cat" aria-label="String" spellcheck="false"></label>
+      <label>Table size <input type="number" class="hc-m" value="10" min="1" aria-label="Table size"></label>
+    </div>
+    <p class="hc-out"></p>
+    <div class="table-wrap"><table class="plain num hc-table"></table></div>
+    <p class="hc-horner"></p>
+    <p class="note">Exact integers. Java's <code>int</code> would wrap around for long strings; the indices here use the true values.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Computing \(h_3\) quickly (slide 20).</strong> Don't call <code>Math.pow</code>. For \(m = 4\), \(h_3 = s_0 + 31(s_1 + 31(s_2 + 31\cdot s_3))\), which is a loop from the last character down:</p>
+    <pre class="code">for (i = m-1; i &gt;= 0; i--) {
+  h = 31*h + s[i];
+}</pre>
+  </div>
+
+  <div class="check" data-id="cse332-w4-l10-qc-h2-cat" data-grader="exact" data-answer="312">
+    <p>Quick check: \(h_2(\text{"cat"})\), with c = 99, a = 97, t = 116.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w4-l10-qc-h4-property">
+    <p>Quick check: which property does \(h_4\) lose compared with \(h_3\)?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w4-l10-qc-h4-property"> Consistent<span class="why" hidden>Doubling is deterministic; equal strings still hash the same.</span></label>
+      <label data-correct><input type="radio" name="cse332-w4-l10-qc-h4-property"> Uniform<span class="why" hidden>Right: it's always even, so half the indices of an even-sized table are never used.</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-h4-property"> Effective<span class="why" hidden>Two strings collide under \(h_4\) exactly when they collide under \(h_3\).</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Type "cat" then "act" in the calculator: \(h_1\) and \(h_3\) differ, \(h_2\) doesn't. Then set the table size to 10 and look at \(h_4\)'s index column.</li>
+      <li>Why 31: an odd prime, so multiplying spreads bits without losing them. The slides don't dwell on it; Java's <code>String.hashCode</code> uses the same polynomial, highest power first.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L10: CHAINING -->
+<section class="page" id="l10-chain" data-title="Separate chaining">
+  <p class="where">Lecture 10 · slides 21–30 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span></p>
+  <h1>Separate chaining</h1>
+  <div class="prose">
+    <p>The ideal insert just does <code>arr[h % table.length] = (key, value)</code>, but two different keys can map to the same index: a <strong>collision</strong> (slide 21). Two strategies (slide 22): <strong>separate chaining</strong>, where each index holds a secondary data structure such as a linked list, and <strong>open addressing</strong>, where we use a different spot in the table (Friday).</p>
+  </div>
+  <div class="rule">
+    <p><strong>Separate chaining (slides 23–25).</strong> Compute \(i = h(k) \bmod \text{table.length}\), then call insert, find or delete on the structure at <code>table[i]</code>. (Insert checks for the key first: no duplicates.)</p>
+  </div>
+  <div class="panel hashlab" id="hl-chain" data-presets='[{"label":"Size 10, keys 12, 22, 7, 42, 5, 17","mode":"chain","size":10,"seq":[12,22,7,42,5,17],"say":"Press Insert to add each key. Then find 32."},{"label":"Size 7, keys 10, 24, 3, 17, 31, 5, 12","mode":"chain","size":7,"seq":[10,24,3,17,31,5,12],"say":"A bad mix: five keys share one bucket."}]'>
+    <div class="controls">
+      <label>Key <input type="text" inputmode="numeric" class="hl-key" aria-label="Key" placeholder="next in queue"></label>
+      <button class="btn primary hl-insert" type="button">Insert</button>
+      <button class="btn hl-find" type="button">Find</button>
+      <button class="btn hl-delete" type="button">Delete</button>
+      <button class="btn hl-rehash" type="button">Rehash</button>
+      <button class="btn quiet hl-reset" type="button">Clear</button>
+    </div>
+    <div class="controls">
+      <label>Collisions <select class="hl-mode" aria-label="Collision resolution"><option value="chain">separate chaining</option><option value="linear">linear probing</option><option value="quadratic">quadratic probing</option></select></label>
+      <label>Table size <input type="number" class="hl-size" min="2" max="31" value="10" aria-label="Table size"></label>
+    </div>
+    <div class="controls hl-presets" role="group" aria-label="Examples"></div>
+    <div class="hl-grid" aria-label="Hash table"></div>
+    <p class="hl-stat"></p>
+    <p class="out hl-out" role="status"></p>
+  </div>
+
+  <h2>Load factor (slides 26–30)</h2>
+  <div class="rule">
+    <p>The <strong>load factor</strong> \(\lambda = \frac{n}{\text{length}}\) is the average number of items per bucket. With a linked list per bucket, an <strong>unsuccessful</strong> find expects \(\lambda\) comparisons (it scans the whole bucket), and a <strong>successful</strong> find expects \(\frac{\lambda}{2}\). To keep the expected time \(\Theta(1)\), pick a constant and resize the array whenever \(\lambda\) exceeds it.</p>
+  </div>
+  <div class="prose"><p>Slides 28–30 draw three tables of length 10 holding 3, 8 and 15 items: \(\lambda = 0.3\), \(0.8\) and \(1.5\). A load factor above 1 is fine for chaining.</p></div>
+
+  <div class="check" data-id="cse332-w4-l10-qc-lambda" data-grader="exact" data-answer="0.6">
+    <p>Quick check: after inserting 12, 22, 7, 42, 5, 17 into the size-10 table, what is \(\lambda\)?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w4-l10-qc-success" data-grader="exact" data-answer="0.75" data-miscon='{"1.5":"lambda-not-half"}'>
+    <p>Quick check: with \(\lambda = 1.5\), how many comparisons does a successful find expect?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The size-7 preset shows why the average-case claim needs a good hash: 10, 24, 3, 17 and 31 all leave remainder 3. \(\lambda = 1\), but finding 31 takes 5 comparisons.</li>
+      <li>The buckets don't have to be lists. With an AVL tree per bucket, operations cost what the tree costs (Lecture 11, slide 33).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L10: PRACTICE -->
+<section class="page" id="l10-practice" data-title="Lecture 10: practice">
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span> · practice</p>
+  <h1>Lecture 10: practice</h1>
+  <div class="prose"><p>Five problems on the lecture's examples. Every number was computed by running the hashes and the table (<code>checks/cse332/w04/verify.mjs</code>). ASCII: a = 97, c = 99, t = 116.</p></div>
+
+  <article class="task" data-id="cse332-w4-l10-caller">
+    <h2>1. Caller ID</h2>
+    <p class="prompt">Slide 12's hash: the phone number as an integer, stored at hash % table size.</p>
+    <div class="answer-spec" data-part="a10" data-grader="exact" data-answer="4" data-miscon='{"2065551234":"no-mod"}' data-label="index of “2065551234”, size 10"></div>
+    <div class="answer-spec" data-part="a7" data-grader="exact" data-answer="5" data-label="index of “2065551234”, size 7"></div>
+    <div class="answer-spec" data-part="first" data-grader="exact" data-answer="2" data-label="slide 16's first-digit hash of “2065551234”"></div>
+    <div class="answer-spec" data-part="collide" data-grader="yesno" data-answer="yes" data-label="does it collide with “2068675309” under the first-digit hash?"></div>
+    <ol class="hints">
+      <li>Mod 10 is the last digit. For mod 7, divide (or reduce piece by piece).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(2065551234 \bmod 10 = 4\).</li>
+      <li>\(2065551234 = 7 \cdot 295078747 + 5\), so index 5.</li>
+      <li>Both numbers start with 2, so the first-digit hash sends both to 2: a collision, which is why that hash isn't effective.</li>
+      <li class="answer">4; 5; 2; yes.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-l10-strings">
+    <h2>2. Hashing "cat"</h2>
+    <p class="prompt">Compute slide 18's hashes of "cat" (\(s_0\) = c, \(s_1\) = a, \(s_2\) = t).</p>
+    <div class="answer-spec" data-part="h1" data-grader="exact" data-answer="99" data-label="\(h_1\)"></div>
+    <div class="answer-spec" data-part="h2" data-grader="exact" data-answer="312" data-label="\(h_2\)"></div>
+    <div class="answer-spec" data-part="h3" data-grader="exact" data-answer="114582" data-miscon='{"99*961+97*31+116":"ascii-sum-order"}' data-label="\(h_3\)"></div>
+    <div class="answer-spec" data-part="h4idx" data-grader="exact" data-answer="4" data-miscon='{"2":"forgot-double"}' data-label="\(h_4\) index in a table of size 10"></div>
+    <ol class="hints">
+      <li>\(h_3 = a(s_0) + a(s_1)\cdot 31 + a(s_2)\cdot 31^2\), with \(31^2 = 961\).</li>
+      <li>Or Horner from the last character: \(h = 116\), then \(31\cdot 116 + 97\), then \(31\cdot h + 99\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(h_1 = 99\). \(h_2 = 99 + 97 + 116 = 312\).</li>
+      <li>\(h_3 = 99 + 97\cdot 31 + 116\cdot 961 = 99 + 3007 + 111476 = 114582\). Horner: 116 → 3693 → 114582.</li>
+      <li>\(h_4 = 229164\), and \(229164 \bmod 10 = 4\). Always even, so only even indices.</li>
+      <li class="answer">99; 312; 114582; 4.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-l10-props">
+    <h2>3. The first-digit hash</h2>
+    <p class="prompt">Slide 16: \(h(\text{phone})\) is the phone number's first digit. Is it…</p>
+    <div class="answer-spec" data-part="consistent" data-grader="yesno" data-answer="yes" data-label="consistent?"></div>
+    <div class="answer-spec" data-part="uniform" data-grader="yesno" data-answer="no" data-label="uniform?"></div>
+    <div class="answer-spec" data-part="effective" data-grader="yesno" data-answer="no" data-label="effective?"></div>
+    <div class="answer-spec" data-part="efficient" data-grader="yesno" data-answer="yes" data-label="efficient?"></div>
+    <ol class="hints"><li>Go through slide 15's four definitions one at a time. Which first digits can a US number have?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The same number always gives the same digit: consistent. One character to read: efficient.</li>
+      <li>No US number starts with 0 or 1, and most here start with 2: not uniform.</li>
+      <li>Changing any digit but the first leaves the hash alone: not effective.</li>
+      <li class="answer">yes; no; no; yes (slide 17).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-l10-chain">
+    <h2>4. A chained table</h2>
+    <p class="prompt">Separate chaining, table size 7, \(h(k) = k\), each bucket an unsorted linked list. Insert 10, 24, 3, 17, 31, 5, 12.</p>
+    <div class="answer-spec" data-part="bucket3" data-grader="exact" data-answer="5" data-label="number of keys in bucket 3"></div>
+    <div class="answer-spec" data-part="lambda" data-grader="exact" data-answer="1" data-label="\(\lambda\)"></div>
+    <div class="answer-spec" data-part="miss" data-grader="exact" data-answer="5" data-miscon='{"1":"counted-index"}' data-label="comparisons for <code>find(38)</code> (not present)"></div>
+    <div class="answer-spec" data-part="hit" data-grader="exact" data-answer="5" data-label="comparisons for <code>find(31)</code>, if new keys go at the end of the list"></div>
+    <ol class="hints"><li>Work out each key mod 7. Five of them agree.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>10, 24, 3, 17, 31 all give 3. 5 and 12 give 5.</li>
+      <li>\(\lambda = 7/7 = 1\).</li>
+      <li>38 mod 7 = 3: compare with all 5 keys in bucket 3, then fail. 31 is the fifth key in bucket 3: 5 comparisons.</li>
+      <li class="answer">5; 1; 5; 5. The averages \(\lambda\) and \(\lambda/2\) assume a hash that spreads keys out; this one doesn't.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-l10-load">
+    <h2>5. Load factors</h2>
+    <p class="prompt">Slides 28–30: tables of length 10 holding 3, 8 and 15 items. Decimals or fractions are fine.</p>
+    <div class="answer-spec" data-part="ex1" data-grader="exact" data-answer="0.3" data-label="\(\lambda\), example 1"></div>
+    <div class="answer-spec" data-part="ex3" data-grader="exact" data-answer="1.5" data-label="\(\lambda\), example 3"></div>
+    <div class="answer-spec" data-part="miss3" data-grader="exact" data-answer="1.5" data-miscon='{"0.75":"half-not-lambda"}' data-label="expected comparisons, unsuccessful find, example 3"></div>
+    <div class="answer-spec" data-part="hit3" data-grader="exact" data-answer="0.75" data-miscon='{"1.5":"lambda-not-half"}' data-label="expected comparisons, successful find, example 3"></div>
+    <ol class="hints"><li>\(\lambda = n / \text{length}\). Unsuccessful: \(\lambda\). Successful: \(\lambda/2\).</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(3/10 = 0.3\); \(15/10 = 1.5\).</li>
+      <li>An unsuccessful find scans a whole bucket: 1.5 on average. A successful one stops halfway on average: 0.75.</li>
+      <li class="answer">0.3; 1.5; 1.5; 0.75.</li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L10: QUIZ -->
+<section class="page" id="l10-quiz" data-title="Check your understanding: hashing 1">
+  <p class="where">Lecture 10 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: hashing 1</h1>
+  <div class="prose"><p>Ten questions on Lecture 10. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="l10" role="status"></div>
+  <ol class="cyu-list" data-quiz="l10">
+    <li class="cyu" data-id="cse332-w4-l10-cyu-avg" data-kind="mc" data-topic="l10-idea">
+      <p class="q">Average-case time of <code>find</code> in a hash table with a good hash and a bounded load factor.</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-l10-cyu-avg"> \(\Theta(1)\)<span class="why" hidden>Correct (slide 7).</span></label>
+        <label><input type="radio" name="cse332-w4-l10-cyu-avg"> \(\Theta(\log n)\)<span class="why" hidden>That's an AVL tree. A hash table jumps straight to a bucket.</span></label>
+        <label><input type="radio" name="cse332-w4-l10-cyu-avg"> \(\Theta(n)\)<span class="why" hidden>That's the worst case, when everything collides.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l10-cyu-worst" data-kind="bigo" data-answer="n" data-topic="l10-idea">
+      <p class="q">Worst-case time of <code>find</code> in a hash table with \(n\) keys.</p>
+      <p class="why" hidden>Every key can collide into one bucket: \(\Theta(n)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l10-cyu-big-array" data-kind="mc" data-topic="l10-idea">
+      <p class="q">What's wrong with the "really big array" dictionary?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w4-l10-cyu-big-array"> Its operations are slow<span class="why" hidden>They're all \(\Theta(1)\).</span></label>
+        <label data-correct><input type="radio" name="cse332-w4-l10-cyu-big-array"> It needs an index for every possible key<span class="why" hidden>Correct: the memory is the size of the key range, not the number of keys.</span></label>
+        <label><input type="radio" name="cse332-w4-l10-cyu-big-array"> Keys collide<span class="why" hidden>Every key has its own index, so nothing collides.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l10-cyu-consistent" data-kind="mc" data-topic="l10-hashfn">
+      <p class="q">"Consistent" means…</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-l10-cyu-consistent"> equal keys always hash to the same integer<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w4-l10-cyu-consistent"> different keys never hash to the same integer<span class="why" hidden>That would be effectiveness taken to the extreme; collisions are still allowed.</span></label>
+        <label><input type="radio" name="cse332-w4-l10-cyu-consistent"> every index is used equally often<span class="why" hidden>That's uniform.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l10-cyu-anagram" data-kind="mc" data-topic="l10-hashfn">
+      <p class="q">Which hash gives "dog" and "god" the same value?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w4-l10-cyu-anagram"> \(h_1\)<span class="why" hidden>\(h_1\) looks at the first character: d versus g.</span></label>
+        <label data-correct><input type="radio" name="cse332-w4-l10-cyu-anagram"> \(h_2\)<span class="why" hidden>Correct: a sum doesn't care about order.</span></label>
+        <label><input type="radio" name="cse332-w4-l10-cyu-anagram"> \(h_3\)<span class="why" hidden>Each position has its own power of 31, so order matters.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l10-cyu-h1-ab" data-kind="num" data-answer="97" data-topic="l10-hashfn">
+      <p class="q">\(h_1(\text{"ab"})\), with a = 97 and b = 98.</p>
+      <p class="why" hidden>The first character's code: 97.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l10-cyu-h3-ab" data-kind="num" data-answer="3135" data-topic="l10-hashfn" data-miscon='{"3105":"ascii-sum-order","195":"ascii-sum-order"}'>
+      <p class="q">\(h_3(\text{"ab"})\), with a = 97 and b = 98.</p>
+      <p class="why" hidden>\(97 + 98\cdot 31 = 97 + 3038 = 3135\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l10-cyu-lambda" data-kind="num" data-answer="2.5" data-topic="l10-chain">
+      <p class="q">A chained table of length 8 holds 20 keys. What is \(\lambda\)?</p>
+      <p class="why" hidden>\(20/8 = 2.5\). Above 1 is possible with chaining.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l10-cyu-unsuccessful" data-kind="mc" data-topic="l10-chain">
+      <p class="q">With linked-list chaining, an unsuccessful find expects how many comparisons?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-l10-cyu-unsuccessful"> \(\lambda\)<span class="why" hidden>Correct: the whole bucket.</span></label>
+        <label><input type="radio" name="cse332-w4-l10-cyu-unsuccessful"> \(\lambda/2\)<span class="why" hidden>That's a successful find, which stops partway.</span></label>
+        <label><input type="radio" name="cse332-w4-l10-cyu-unsuccessful"> \(n\)<span class="why" hidden>That's the worst case, when everything shares a bucket.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l10-cyu-keep-1" data-kind="mc" data-topic="l10-chain">
+      <p class="q">How does chaining keep the expected time \(\Theta(1)\) as keys are added?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w4-l10-cyu-keep-1"> Sort each bucket<span class="why" hidden>That speeds up a bucket a little but doesn't bound its length.</span></label>
+        <label data-correct><input type="radio" name="cse332-w4-l10-cyu-keep-1"> Resize whenever \(\lambda\) exceeds a chosen constant<span class="why" hidden>Correct (slide 27).</span></label>
+        <label><input type="radio" name="cse332-w4-l10-cyu-keep-1"> Refuse inserts once \(\lambda = 1\)<span class="why" hidden>Chaining can go past 1; the fix is a bigger array.</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="l10" role="status"></div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S4: WORKSHEET -->
+<section class="page" id="s4-avl" data-title="Section 4: the worksheet, worked">
+  <p class="where">Section 4 · AVL Trees · <span class="today-chip" data-date="2026-10-22">Thu Oct 22</span></p>
+  <h1>Section 4: AVL trees</h1>
+  <div class="prose">
+    <p>The section reviews the AVL properties, names the four rotation cases on one picture, and plants two full trees. Everything below follows the section slides and the <a href="https://docs.google.com/document/d/1evX84yeqeAb__5t3lvtl0DhkRAVA1GcA/edit" target="_blank" rel="noopener">worksheet</a>'s <a href="https://docs.google.com/document/d/1T0mqYDv1H32V9A4ISk3HHi4zhc540bSo/edit" target="_blank" rel="noopener">official solutions</a>.</p>
+  </div>
+  <div class="rule">
+    <p><strong>AVL tree:</strong> a BST (order property) where every node has at most 2 children and its subtrees' heights differ by at most 1 (structural property). Find, insert and delete are \(O(\log n)\), against \(O(h)\) for an unbalanced BST.</p>
+  </div>
+
+  <h2>Problem 0: the ABCs</h2>
+  <div class="prose"><p>Keys must be <strong>comparable</strong>; values can be any type. An AVL tree beats a <code>HashMap</code> when you need order: iterating keys in sorted order, or finding the next and previous key (EX4 uses this). It beats a plain BST when the input might be sorted, because balancing prevents the degenerate chain.</p></div>
+
+  <h2>Problem 1: the rotation picture</h2>
+  <div class="split">
+    <div class="rule">
+      <p>\(p\) is the deepest problem node, the left child of \(a\) (whose other subtree is \(V\)). \(p\)'s children are \(b\) (subtrees \(W\), \(X\)) and \(c\) (subtrees \(Y\), \(Z\)).</p>
+      <table class="plain">
+        <tr><th>Inserted into</th><th>Rotation</th></tr>
+        <tr><td>\(W\), left of left</td><td>single right rotation</td></tr>
+        <tr><td>\(X\), right of left</td><td>double left-right</td></tr>
+        <tr><td>\(Y\), left of right</td><td>double right-left</td></tr>
+        <tr><td>\(Z\), right of right</td><td>single left rotation</td></tr>
+      </table>
+    </div>
+    <div class="rule">
+      <p><strong>Right rotation at \(p\)</strong> (insert in \(W\)), slide 13:</p>
+      <pre class="code">a.left = b
+p.left = b.right
+b.right = p</pre>
+      <p><strong>Left rotation at \(p\)</strong> (insert in \(Z\)), problem 1:</p>
+      <pre class="code">a.left = c
+p.right = c.left
+c.left = p</pre>
+      <p class="note">Tip for EX4 from the slides: remember to update the height fields.</p>
+    </div>
+  </div>
+
+  <h2>Problems 2 and 4: plant a tree</h2>
+  <div class="panel treelab" id="avl-s4" data-mode="avl" data-presets='[{"label":"Problem 2","shape":"","seq":[10,4,5,8,9,6,11,3,2,1,14],"say":"Queue 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14. Press Insert, and Rotate when it asks."},{"label":"Problem 4","shape":"","seq":[6,5,4,3,2,1,10,9,8,7],"say":"Queue 6, 5, 4, 3, 2, 1, 10, 9, 8, 7."}]'>
+    <div class="controls">
+      <label>Key <input type="text" inputmode="numeric" class="tl-key" aria-label="Key" placeholder="next in queue"></label>
+      <button class="btn primary tl-insert" type="button">Insert</button>
+      <button class="btn tl-next" type="button" disabled>Rotate</button>
+      <button class="btn quiet tl-reset" type="button">Reset</button>
+      <span class="tl-queue"></span>
+    </div>
+    <div class="controls tl-presets" role="group" aria-label="Start from"></div>
+    <div class="chart-box"><svg class="chart tl-svg" role="img"></svg></div>
+    <p class="out tl-out" role="status"></p>
+    <p class="tl-orders"></p>
+  </div>
+  <div class="tree-grid">
+    <figure class="treeview" data-shape="8(3(2(1,),5(4,6)),10(9,11(,14)))"><figcaption>Problem 2's final tree (official solution)</figcaption></figure>
+    <figure class="treeview" data-shape="6(3(2(1,),5(4,)),9(8(7,),10))"><figcaption>Problem 4's final tree (official solution)</figcaption></figure>
+  </div>
+  <div class="prose">
+    <p>Problem 2 uses all four cases: LR at 10 (inserting 5), LR at 10 again (9), RL at 5 (6), RR at 9 (11), LL at 4 (2) and LL at 5 (1). Problem 4 starts with sorted-descending inserts (three LLs), then 9, 8 and 7 come in from the other side (RL, RL, RR).</p>
+  </div>
+
+  <h2>Problem 3: a minimal tree of height 4</h2>
+  <figure class="treeview" data-shape="8(5(3(2(1,),4),7(6,)),11(10(9,),12))" data-heights><figcaption>12 nodes, the fewest possible: \(M(4) = 1 + M(3) + M(2) = 1 + 7 + 4\). In general, minNum(h) = 1 + minNum(h−1) + minNum(h−2).</figcaption></figure>
+
+  <div class="check" data-id="cse332-w4-s4-qc-left-pright">
+    <p>Quick check: in the left rotation at \(p\), what does <code>p.right</code> become?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w4-s4-qc-left-pright"> <code>c</code><span class="why" hidden>That's what it was before. \(c\) moves up above \(p\).</span></label>
+      <label data-correct><input type="radio" name="cse332-w4-s4-qc-left-pright"> <code>c.left</code><span class="why" hidden>Right: \(c\)'s old left subtree \(Y\) sits between \(p\) and \(c\), so it becomes \(p\)'s right.</span></label>
+      <label><input type="radio" name="cse332-w4-s4-qc-left-pright"> <code>null</code><span class="why" hidden>\(Y\) has to go somewhere, and \(p\)'s right is the only spot that keeps BST order.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w4-s4-qc-p2-root" data-grader="exact" data-answer="8" data-miscon='{"5":"single-for-double","10":"not-deepest"}'>
+    <p>Quick check: what is the root at the end of problem 2?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The section's method for each insert: (1) find the lowest problem node \(p\); (2) find which of \(W, X, Y, Z\) the key went into; (3) identify the bad edges, remove them, and replace them. Drawing the "bad edges" makes the reference list in problem 1 obvious.</li>
+      <li>Problem 2 is long (20 steps in the slides). Have pairs alternate inserts and check each other's heights.</li>
+      <li>The solution draws problem 3 with letters A–L that aren't in BST order. The shape is what counts; the version here numbers the keys in order.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S4: PRACTICE -->
+<section class="page" id="s4-practice" data-title="Section 4: practice">
+  <p class="where">Section 4 · AVL Trees · <span class="today-chip" data-date="2026-10-22">Thu Oct 22</span> · practice</p>
+  <h1>Section 4: practice</h1>
+  <div class="prose"><p>The worksheet's problems, answerable here and checked against the official solutions. The trees were also built by running the lecture's AVL insert (<code>checks/cse332/w04/verify.mjs</code>).</p></div>
+
+  <article class="task" data-id="cse332-w4-s4-q0">
+    <h2>1. Problem 0: the ABCs of AVL trees</h2>
+    <p class="prompt">What are the constraints on the types you can store in an AVL tree? When is an AVL tree preferred over a <code>HashMap</code>?</p>
+    <div class="answer-spec" data-part="keys" data-grader="choice" data-answer="comparable" data-options="comparable:comparable|hashable:hashable|integers:integers only|any:any type" data-label="keys must be"></div>
+    <div class="answer-spec" data-part="values" data-grader="choice" data-answer="any" data-options="comparable:comparable|hashable:hashable|integers:integers only|any:any type" data-label="values can be"></div>
+    <div class="answer-spec" data-part="when" data-grader="self" data-long data-label="when you'd choose an AVL tree over a HashMap"></div>
+    <ol class="hints"><li>What does an AVL tree do with keys that a hash table never does?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Keys must be comparable, because every operation compares them. Values can be anything, as in any dictionary.</li>
+      <li>An AVL tree keeps keys in order: you can iterate in sorted order, or find the next or previous key, cheaply. A hash table scatters them.</li>
+      <li class="answer">Keys comparable; values any type; prefer an AVL tree when you need sorted order (iteration, next/previous key), and over a plain BST when input may be sorted.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-s4-q1">
+    <h2>2. Problem 1: left rotation references</h2>
+    <p class="prompt">\(p\) is \(a\)'s left child and the lowest problem node; the insert went into \(Z\) (the right subtree of \(p\)'s right child \(c\)). Rotate left at \(p\). What does each reference become?</p>
+    <div class="answer-spec" data-part="aleft" data-grader="choice" data-answer="c" data-options="p:p|b:b|c:c|cleft:c.left|cright:c.right" data-label="<code>a.left</code> ="></div>
+    <div class="answer-spec" data-part="pright" data-grader="choice" data-answer="cleft" data-options="p:p|b:b|c:c|cleft:c.left|cright:c.right" data-label="<code>p.right</code> ="></div>
+    <div class="answer-spec" data-part="cleft" data-grader="choice" data-answer="p" data-options="p:p|b:b|a:a|y:Y (unchanged)" data-label="<code>c.left</code> ="></div>
+    <ol class="hints"><li>After the rotation, \(c\) is where \(p\) was, \(p\) is \(c\)'s left child, and \(Y\) (keys between \(p\) and \(c\)) needs a new parent.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(c\) replaces \(p\) under \(a\): <code>a.left = c</code>.</li>
+      <li>\(Y\) = <code>c.left</code> moves to <code>p.right</code> (it holds keys greater than \(p\), less than \(c\)).</li>
+      <li>\(p\) becomes \(c\)'s left: <code>c.left = p</code>. Then update the heights of \(p\) and \(c\).</li>
+      <li class="answer"><code>a.left = c</code>; <code>p.right = c.left</code>; <code>c.left = p</code>.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-s4-q2">
+    <h2>3. Problem 2: let's plant an AVL tree</h2>
+    <p class="prompt">Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an empty AVL tree.</p>
+    <div class="answer-spec" data-part="case5" data-grader="choice" data-answer="lr" data-options="none:no rotation|ll:LL|rr:RR|lr:LR|rl:RL" data-label="case when 5 is inserted"></div>
+    <div class="answer-spec" data-part="case6" data-grader="choice" data-answer="rl" data-options="none:no rotation|ll:LL|rr:RR|lr:LR|rl:RL" data-label="case when 6 is inserted"></div>
+    <div class="answer-spec" data-part="count" data-grader="exact" data-answer="6" data-label="how many inserts need a rotation"></div>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="8 3 2 1 5 4 6 10 9 11 14|8, 3, 2, 1, 5, 4, 6, 10, 9, 11, 14" data-label="final pre-order"></div>
+    <ol class="hints">
+      <li>After 10, 4, 5 the tree is 5(4, 10). Keep a running drawing with heights.</li>
+      <li>Rotations happen on inserting 5, 9, 6, 11, 2 and 1.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>5: LR at 10 → 5(4, 10). 8: no rotation. 9: LR at 10 → 5(4, 9(8, 10)).</li>
+      <li>6: 5 is unbalanced; the key went right (9) then left (8): RL → 8(5(4, 6), 9(, 10)).</li>
+      <li>11: RR at 9 → 10(9, 11) under 8. 3: no rotation. 2: LL at 4 → 3(2, 4). 1: LL at 5 → 3(2(1), 5(4, 6)). 14: no rotation.</li>
+      <li class="answer">LR; RL; 6; 8 3 2 1 5 4 6 10 9 11 14 (root 8, height 3), as in the official solution.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-s4-q3">
+    <h2>4. Problem 3: MinAVL trees</h2>
+    <p class="prompt">Draw an AVL tree of height 4 with the minimum possible number of nodes.</p>
+    <div class="answer-spec" data-part="nodes" data-grader="exact" data-answer="12" data-miscon='{"5":"off-by-one-height","31":"bst-height"}' data-label="how many nodes"></div>
+    <div class="answer-spec" data-part="leaves" data-grader="exact" data-answer="5" data-miscon='{"12":"nodes-not-leaves"}' data-label="how many of them are leaves"></div>
+    <div class="answer-spec" data-part="drawing" data-grader="self" data-long data-label="describe your tree (root, then each subtree)"></div>
+    <ol class="hints"><li>Root, a minimal tree of height 3 on one side, a minimal tree of height 2 on the other.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(M(4) = 1 + M(3) + M(2) = 1 + 7 + 4 = 12\).</li>
+      <li>Leaves: 3 in the height-3 subtree plus 2 in the height-2 subtree = 5.</li>
+      <li class="answer">12 nodes, 5 leaves; for example 8(5(3(2(1), 4), 7(6)), 11(10(9), 12)). Any mirror image works too.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-s4-q4">
+    <h2>5. Problem 4: another tree</h2>
+    <p class="prompt">Insert 6, 5, 4, 3, 2, 1, 10, 9, 8, 7 into an empty AVL tree.</p>
+    <div class="answer-spec" data-part="case9" data-grader="choice" data-answer="rl" data-options="none:no rotation|ll:LL|rr:RR|lr:LR|rl:RL" data-label="case when 9 is inserted"></div>
+    <div class="answer-spec" data-part="case7" data-grader="choice" data-answer="rr" data-options="none:no rotation|ll:LL|rr:RR|lr:LR|rl:RL" data-label="case when 7 is inserted"></div>
+    <div class="answer-spec" data-part="root" data-grader="exact" data-answer="6" data-label="final root"></div>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="6 3 2 1 5 4 9 8 7 10|6, 3, 2, 1, 5, 4, 9, 8, 7, 10" data-label="final pre-order"></div>
+    <ol class="hints">
+      <li>After 6, 5, 4, 3, 2, 1 (three LL rotations) the tree is 3(2(1), 5(4, 6)).</li>
+      <li>Inserting 7 makes the root 3 unbalanced. From 3, which way did 7 go twice?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>4: LL at 6. 2: LL at 4. 1: LL at 5. Tree: 3(2(1), 5(4, 6)).</li>
+      <li>10: fine. 9: 6 is unbalanced (right then left): RL → 9(6, 10).</li>
+      <li>8: 5 is unbalanced (right to 9, left to 6): RL → 6(5(4), 9(8, 10)) under 3.</li>
+      <li>7: 3 is unbalanced (right to 6, right to 9): RR, rotate left at 3 → 6 is the root.</li>
+      <li class="answer">RL; RR; root 6; 6 3 2 1 5 4 9 8 7 10, as in the official solution.</li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S4: QUIZ -->
+<section class="page" id="s4-quiz" data-title="Check your understanding: Section 4">
+  <p class="where">Section 4 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: Section 4</h1>
+  <div class="prose"><p>Eight questions on the section. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="s4" role="status"></div>
+  <ol class="cyu-list" data-quiz="s4">
+    <li class="cyu" data-id="cse332-w4-s4-cyu-w" data-kind="mc" data-topic="s4-avl">
+      <p class="q">The insert went into \(W\), the left subtree of \(p\)'s left child. Which rotation?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-s4-cyu-w"> Single right rotation at \(p\)<span class="why" hidden>Correct (case LL).</span></label>
+        <label><input type="radio" name="cse332-w4-s4-cyu-w"> Single left rotation at \(p\)<span class="why" hidden>That's for \(Z\).</span></label>
+        <label><input type="radio" name="cse332-w4-s4-cyu-w"> Double left-right<span class="why" hidden>That's for \(X\).</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-s4-cyu-y" data-kind="mc" data-topic="s4-avl">
+      <p class="q">The insert went into \(Y\), the left subtree of \(p\)'s right child. Which rotation?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w4-s4-cyu-y"> Single left rotation at \(p\)<span class="why" hidden>That's \(Z\). \(Y\) is the inner side.</span></label>
+        <label data-correct><input type="radio" name="cse332-w4-s4-cyu-y"> Double right-left: right at \(c\), then left at \(p\)<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w4-s4-cyu-y"> Double left-right<span class="why" hidden>That's \(X\), on the other side.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-s4-cyu-right-refs" data-kind="mc" data-topic="s4-avl">
+      <p class="q">In a right rotation at \(p\) (insert in \(W\)), which assignment happens?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-s4-cyu-right-refs"> <code>p.left = b.right</code><span class="why" hidden>Correct: \(X\) moves to \(p\)'s left.</span></label>
+        <label><input type="radio" name="cse332-w4-s4-cyu-right-refs"> <code>p.right = b</code><span class="why" hidden>\(b\) goes above \(p\), not below it.</span></label>
+        <label><input type="radio" name="cse332-w4-s4-cyu-right-refs"> <code>b.left = p</code><span class="why" hidden>In a right rotation \(p\) becomes \(b\)'s <em>right</em> child.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-s4-cyu-keys" data-kind="mc" data-topic="s4-avl">
+      <p class="q">Which requirement does an AVL tree put on its keys?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-s4-cyu-keys"> They must be comparable<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w4-s4-cyu-keys"> They must have a hash function<span class="why" hidden>That's a hash table's requirement.</span></label>
+        <label><input type="radio" name="cse332-w4-s4-cyu-keys"> They must be inserted in sorted order<span class="why" hidden>Any order works; that's the point of balancing.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-s4-cyu-why-avl" data-kind="mc" data-topic="s4-avl">
+      <p class="q">You need the next key larger than \(x\). Which dictionary is the better fit?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-s4-cyu-why-avl"> AVL tree<span class="why" hidden>Correct: it keeps keys in order, so next/previous is a short walk.</span></label>
+        <label><input type="radio" name="cse332-w4-s4-cyu-why-avl"> Hash table<span class="why" hidden>A hash table scatters keys; finding the next one means scanning everything.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-s4-cyu-min4" data-kind="num" data-answer="12" data-topic="s4-avl" data-miscon='{"31":"bst-height","8":"fib-not-m"}'>
+      <p class="q">The fewest nodes in an AVL tree of height 4.</p>
+      <p class="why" hidden>\(1 + 7 + 4 = 12\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-s4-cyu-desc-root" data-kind="num" data-answer="3" data-topic="s4-avl">
+      <p class="q">Insert 6, 5, 4, 3, 2, 1 into an empty AVL tree. What is the root?</p>
+      <p class="why" hidden>Three LL rotations: 3(2(1), 5(4, 6)).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-s4-cyu-height-field" data-kind="mc" data-topic="s4-avl">
+      <p class="q">After a rotation in your own code (EX4), what must you not forget?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-s4-cyu-height-field"> Update the height fields of the nodes that moved<span class="why" hidden>Correct (the slides' tip): the lower node first, then the new subtree root.</span></label>
+        <label><input type="radio" name="cse332-w4-s4-cyu-height-field"> Re-insert every key in the subtree<span class="why" hidden>Rotations move whole subtrees by changing references.</span></label>
+        <label><input type="radio" name="cse332-w4-s4-cyu-height-field"> Rotate every ancestor too<span class="why" hidden>One case fixes the tree.</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="s4" role="status"></div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L11: LINEAR PROBING -->
+<section class="page" id="l11-linear" data-title="Linear probing">
+  <p class="where">Lecture 11 · slides 16–27 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span> · Weiss 5.1–5.5</p>
+  <h1>Open addressing: linear probing</h1>
+  <div class="rule">
+    <p><strong>Linear probing (slides 17–20).</strong> On a collision, use the next open space. Insert tries \(i = h(k) \bmod \text{length}\), then \((i+1)\), \((i+2)\), \((i+3)\), …, all mod the length. Find follows the same path until it finds \(k\) or reaches an <em>empty</em> cell.</p>
+  </div>
+  <div class="panel hashlab" id="hl-linear" data-presets='[{"label":"Size 10: 38, 19, 8, 109, 10","mode":"linear","size":10,"seq":[38,19,8,109,10],"say":"Press Insert five times. Watch 8, 109 and 10 wrap around."},{"label":"A–E all map to 3 (slide 21)","mode":"linear","size":10,"seq":[3,13,23,33,43],"say":"Keys 3, 13, 23, 33, 43 play A–E: all hash to 3. Insert them, delete 13, then find 43."}]'>
+    <div class="controls">
+      <label>Key <input type="text" inputmode="numeric" class="hl-key" aria-label="Key" placeholder="next in queue"></label>
+      <button class="btn primary hl-insert" type="button">Insert</button>
+      <button class="btn hl-find" type="button">Find</button>
+      <button class="btn hl-delete" type="button">Delete</button>
+      <button class="btn hl-rehash" type="button">Rehash</button>
+      <button class="btn quiet hl-reset" type="button">Clear</button>
+    </div>
+    <div class="controls">
+      <label>Collisions <select class="hl-mode" aria-label="Collision resolution"><option value="chain">separate chaining</option><option value="linear">linear probing</option><option value="quadratic">quadratic probing</option></select></label>
+      <label>Table size <input type="number" class="hl-size" min="2" max="31" value="10" aria-label="Table size"></label>
+    </div>
+    <div class="controls hl-presets" role="group" aria-label="Examples"></div>
+    <div class="hl-grid" aria-label="Hash table"></div>
+    <p class="hl-stat"></p>
+    <p class="out hl-out" role="status"></p>
+  </div>
+
+  <h2>Delete is hard (slides 21–24)</h2>
+  <div class="prose">
+    <p>Insert A, B, C, D, E, all mapping to 3: they fill 3–7. Simply emptying B's slot breaks finds for C, D and E, because a find would stop at the hole. Slide 21 fills the hole by sliding C, D, E down. But slide 22 (A, B, E map to 3; C, D to 5) can't move C or D into index 4: that's <em>before</em> their home, so only E moves. Slide 23 shows wrap-around: with A, B, E mapping to 8 and C, D to 0, E moves from 2 up to 9.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Option 1 (harder):</strong> plug the hole with a later key whose probe path passes the hole, and repeat from where that key was. <strong>Option 2 (easier): tombstones.</strong> Leave a marker meaning "something was deleted here". A find doesn't stop at a tombstone; an insert may reuse the first tombstone it passed (slides 25–26).</p>
+  </div>
+  <div class="prose">
+    <p><strong>Downsides (slide 27).</strong> As \(\lambda\) approaches 1, contiguous blocks grow; any collision with a block makes it bigger, and bigger blocks get more collisions. That feedback loop is <strong>primary clustering</strong>. And \(\lambda\) can't exceed 1: there's nowhere left to put anything.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w4-l11-qc-109" data-grader="exact" data-answer="1" data-miscon='{"9":"no-mod","3":"first-free-not-probe"}'>
+    <p>Quick check: size 10, linear probing, insert 38, 19, 8, 109. At what index does 109 end up?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w4-l11-qc-tomb">
+    <p>Quick check: a find reaches a tombstone. What does it do?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w4-l11-qc-tomb"> Stops: the key isn't there<span class="why" hidden>The key may have been placed past the deleted one, before the delete.</span></label>
+      <label data-correct><input type="radio" name="cse332-w4-l11-qc-tomb"> Keeps probing<span class="why" hidden>Right: tombstones don't count as empty.</span></label>
+      <label><input type="radio" name="cse332-w4-l11-qc-tomb"> Removes the tombstone and stops<span class="why" hidden>Find doesn't modify the table.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>In the second preset, delete 13 then find 43: the probe walks past the tombstone (✝). Then insert 53: it lands in the tombstone's slot, after the find part confirms 53 isn't already there.</li>
+      <li>Slide 26's insert keeps searching past a tombstone before reusing it, because the key might already be further along. Ask why that matters (duplicates).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L11: QUADRATIC AND DOUBLE -->
+<section class="page" id="l11-quad" data-title="Quadratic and double hashing">
+  <p class="where">Lecture 11 · slides 28–32 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span></p>
+  <h1>Quadratic probing and double hashing</h1>
+  <div class="rule">
+    <p><strong>Quadratic probing (slide 28).</strong> Try \(i = h(k)\), then \((i + 1^2)\), \((i + 2^2)\), \((i + 3^2)\), \((i + 4^2)\), …, all mod the length.</p>
+  </div>
+  <h2>Slide 29: size 7, insert 76, 40, 48, 5, 55, 47</h2>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Key</th><th>\(k \bmod 7\)</th><th>Probes</th><th>Index</th></tr>
+    <tr><td>76</td><td>6</td><td>6</td><td>6</td></tr>
+    <tr><td>40</td><td>5</td><td>5</td><td>5</td></tr>
+    <tr><td>48</td><td>6</td><td>6, 6+1 = 0</td><td>0</td></tr>
+    <tr><td>5</td><td>5</td><td>5, 6, 5+4 = 2</td><td>2</td></tr>
+    <tr><td>55</td><td>6</td><td>6, 0, 6+4 = 3</td><td>3</td></tr>
+    <tr><td>47</td><td>5</td><td>5, 6, 2, 0, 0, 2, 6, …</td><td>none</td></tr>
+  </table>
+  </div>
+  <p class="note">The slide leaves the table blank to fill in; these indices were computed by running the probe sequence.</p>
+  <div class="rule">
+    <p><strong>Using quadratic probing (slide 30).</strong> After table.length probes, the indices repeat. If table.length is prime and \(\lambda &lt; \frac12\), you're guaranteed to find an open spot within table.length/2 probes. It helps with linear probing's clustering, but not when many keys hash to the same index.</p>
+  </div>
+  <div class="prose">
+    <p><strong>Secondary clustering (slide 31).</strong> Quadratic probing jumps \(i^2\) away, so it doesn't grow big blobs (no primary clustering). But two keys that start at the same index follow exactly the same probe sequence. That's <strong>secondary clustering</strong>, and a probe that depends on the key avoids it:</p>
+  </div>
+  <div class="rule">
+    <p><strong>Double hashing (slide 32).</strong> With two good hash functions \(h\) and \(g\): try \(i = h(k)\), then \(i + g(k)\), \(i + 2g(k)\), \(i + 3g(k)\), …, mod the length.</p>
+  </div>
+  <div class="panel hashlab" id="hl-double" data-r="7" data-presets='[{"label":"Size 11, g(k) = 7 − (k mod 7)","mode":"double","size":11,"seq":[13,24,35,2],"say":"13, 24, 35 and 2 all have k mod 11 = 2. Insert them and compare the probe paths."},{"label":"Same keys, quadratic","mode":"quadratic","size":11,"seq":[13,24,35,2],"say":"The same four keys with quadratic probing: they share one probe sequence."}]'>
+    <div class="controls">
+      <label>Key <input type="text" inputmode="numeric" class="hl-key" aria-label="Key" placeholder="next in queue"></label>
+      <button class="btn primary hl-insert" type="button">Insert</button>
+      <button class="btn hl-find" type="button">Find</button>
+      <button class="btn hl-delete" type="button">Delete</button>
+      <button class="btn hl-rehash" type="button">Rehash</button>
+      <button class="btn quiet hl-reset" type="button">Clear</button>
+    </div>
+    <div class="controls">
+      <label>Collisions <select class="hl-mode" aria-label="Collision resolution"><option value="chain">separate chaining</option><option value="linear">linear probing</option><option value="quadratic">quadratic probing</option><option value="double">double hashing</option></select></label>
+      <label>Table size <input type="number" class="hl-size" min="2" max="31" value="11" aria-label="Table size"></label>
+    </div>
+    <div class="controls hl-presets" role="group" aria-label="Examples"></div>
+    <div class="hl-grid" aria-label="Hash table"></div>
+    <p class="hl-stat"></p>
+    <p class="out hl-out" role="status"></p>
+    <p class="note">The slides leave \(g\) open. This widget uses \(g(k) = 7 - (k \bmod 7)\), which is never 0.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w4-l11-qc-55" data-grader="exact" data-answer="3" data-miscon='{"1":"linear-not-quadratic","6":"no-mod"}'>
+    <p>Quick check: in slide 29's example, where does 55 go?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w4-l11-qc-secondary">
+    <p>Quick check: which strategy avoids secondary clustering?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w4-l11-qc-secondary"> Linear probing<span class="why" hidden>Linear probing has primary clustering, and keys with the same start also share paths.</span></label>
+      <label><input type="radio" name="cse332-w4-l11-qc-secondary"> Quadratic probing<span class="why" hidden>Quadratic probing is the one that has secondary clustering.</span></label>
+      <label data-correct><input type="radio" name="cse332-w4-l11-qc-secondary"> Double hashing<span class="why" hidden>Right: the step size \(g(k)\) depends on the key.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Fill in slide 29 together. The punch line is 47: the squares mod 7 are 0, 1, 4, 2, 2, 4, 1, so from 5 the probes only ever reach 5, 6, 2 and 0. Slots 1 and 4 are empty but unreachable. \(\lambda = 5/7\) broke the \(&lt; \frac12\) condition.</li>
+      <li>The double-hashing preset makes secondary clustering visible: with quadratic probing the four keys walk the same path; with double hashing each takes its own step.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L11: REHASHING -->
+<section class="page" id="l11-rehash" data-title="Rehashing">
+  <p class="where">Lecture 11 · slides 33–35 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span></p>
+  <h1>Rehashing, and the summary</h1>
+  <div class="rule">
+    <p><strong>Rehashing (slide 34).</strong> When \(\lambda\) gets too large, make a new array roughly twice as long (probably still prime) and re-insert every item by applying the hash function again: items map to different indices in the new table. "Too large" means about \(\lambda &lt; 2\) for separate chaining, and \(\lambda &lt; \frac12\) for open addressing.</p>
+  </div>
+  <div class="prose">
+    <p><strong>Summary so far (slide 33).</strong> Separate chaining is easy: with unsorted linked lists, find, insert and delete are proportional to the load factor on average; with another structure per bucket (say an AVL tree) they cost what that structure costs. Open addressing uses probing and has clustering issues as the table fills. Why use it? Less memory allocation (no list nodes), which can make it faster, and a simpler data representation.</p>
+    <p><strong>Final word (slide 35).</strong> The hash table is one of the most important data structures: efficient find, insert and delete, but operations based on sorted order are not efficient. Use a good hash function (good distribution, uses enough of the key, cheap to compute) and keep the table a good size (prime; the preferred \(\lambda\) depends on the type of table). Hash functions have uses beyond tables, such as cryptography and checksums.</p>
+  </div>
+  <div class="check" data-id="cse332-w4-l11-qc-rehash-size" data-grader="exact" data-answer="17" data-miscon='{"14":"no-mod","13":"no-mod"}'>
+    <p>Quick check: an open-addressing table of size 7 needs rehashing. With "roughly double, and prime", what is the new size? (Take the first prime at least \(2 \times 7\).)</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w4-l11-qc-reapply">
+    <p>Quick check: when rehashing, why not copy each item to the same index in the new array?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w4-l11-qc-reapply"> Its index is \(h(k)\) mod the <em>new</em> length, which is usually different<span class="why" hidden>Right: a later find computes the index with the new length.</span></label>
+      <label><input type="radio" name="cse332-w4-l11-qc-reapply"> Copying is slower than re-inserting<span class="why" hidden>Speed isn't the issue; correctness is.</span></label>
+      <label><input type="radio" name="cse332-w4-l11-qc-reapply"> The hash function changes when the table grows<span class="why" hidden>\(h\) stays the same; the mod changes.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Rehashing is \(\Theta(n)\) once, but doubling means it happens rarely: the same amortized argument as a growing array.</li>
+      <li>In any of the hash widgets, the Rehash button goes to the first prime at least twice the size and clears tombstones as a side effect.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L11: PRACTICE -->
+<section class="page" id="l11-practice" data-title="Lecture 11: practice">
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span> · practice</p>
+  <h1>Lecture 11: practice</h1>
+  <div class="prose"><p>Six problems. Unless stated, \(h(k) = k\) and the index is \(k \bmod \text{size}\). Every index and probe count was computed by running the probes (<code>checks/cse332/w04/verify.mjs</code>). "Slots looked at" counts every index a probe examines, including the first and the last.</p></div>
+
+  <article class="task" data-id="cse332-w4-l11-linear">
+    <h2>1. Linear probing</h2>
+    <p class="prompt">Size 10, linear probing. Insert 38, 19, 8, 109, 10.</p>
+    <div class="answer-spec" data-part="i8" data-grader="exact" data-answer="0" data-miscon='{"8":"no-mod"}' data-label="index of 8"></div>
+    <div class="answer-spec" data-part="i10" data-grader="exact" data-answer="2" data-miscon='{"0":"no-mod","3":"first-free-not-probe"}' data-label="index of 10"></div>
+    <div class="answer-spec" data-part="find29" data-grader="exact" data-answer="5" data-miscon='{"4":"counted-index"}' data-label="slots looked at by <code>find(29)</code>"></div>
+    <ol class="hints"><li>38 → 8 and 19 → 9 without collisions. 8 starts at 8 and wraps around.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>8: 8 taken, 9 taken, 0 free → 0. 109: 9, 0 taken, 1 free → 1. 10: 0, 1 taken, 2 free → 2.</li>
+      <li><code>find(29)</code>: 9, 0, 1, 2 hold other keys, 3 is empty → stop. 5 slots.</li>
+      <li class="answer">0; 2; 5. Indices 8, 9, 0, 1, 2 now form one cluster.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-l11-tomb">
+    <h2>2. Tombstones</h2>
+    <p class="prompt">Size 10, linear probing, tombstone deletion. Insert 3, 13, 23, 33, 43 (all map to 3, like slide 21's A–E). Delete 13. Then find 43, find 53, and insert 53.</p>
+    <div class="answer-spec" data-part="find43" data-grader="exact" data-answer="5" data-label="slots looked at by <code>find(43)</code>"></div>
+    <div class="answer-spec" data-part="found43" data-grader="yesno" data-answer="yes" data-miscon='{"no":"tomb-is-empty"}' data-label="does it find 43?"></div>
+    <div class="answer-spec" data-part="find53" data-grader="exact" data-answer="6" data-miscon='{"2":"tomb-is-empty"}' data-label="slots looked at by <code>find(53)</code>"></div>
+    <div class="answer-spec" data-part="ins53" data-grader="exact" data-answer="4" data-miscon='{"8":"first-free-not-probe"}' data-label="index where <code>insert(53)</code> puts 53"></div>
+    <ol class="hints"><li>The keys sit at 3–7; deleting 13 leaves a tombstone at 4. Finds don't stop at it; inserts may reuse it.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>find(43)</code>: 3, 4 (tombstone, keep going), 5, 6, 7 → found. 5 slots.</li>
+      <li><code>find(53)</code>: 3, 4, 5, 6, 7, then 8 is empty → not found. 6 slots.</li>
+      <li><code>insert(53)</code> does that same search, remembers the tombstone at 4, and since 53 isn't present, puts it there.</li>
+      <li class="answer">5; yes; 6; 4.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-l11-quad">
+    <h2>3. Slide 29, quadratic probing</h2>
+    <p class="prompt">Size 7, quadratic probing. Insert 76, 40, 48, 5, 55, then try 47.</p>
+    <div class="answer-spec" data-part="i48" data-grader="exact" data-answer="0" data-label="index of 48"></div>
+    <div class="answer-spec" data-part="i5" data-grader="exact" data-answer="2" data-miscon='{"0":"linear-not-quadratic","1":"linear-not-quadratic"}' data-label="index of 5"></div>
+    <div class="answer-spec" data-part="i55" data-grader="exact" data-answer="3" data-miscon='{"1":"linear-not-quadratic"}' data-label="index of 55"></div>
+    <div class="answer-spec" data-part="fits47" data-grader="yesno" data-answer="no" data-label="can 47 be inserted?"></div>
+    <div class="answer-spec" data-part="lambda" data-grader="exact" data-answer="5/7" data-label="\(\lambda\) when 47 is tried"></div>
+    <ol class="hints">
+      <li>Probe \(h, h+1, h+4, h+9, \dots\) mod 7.</li>
+      <li>For 47 (home 5), list \(5 + i^2 \bmod 7\) for \(i = 0, \dots, 6\). Which slots are still empty?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>48: 6 taken → 0. 5: 5, 6 taken → 5+4 = 9 → 2. 55: 6, 0 taken → 6+4 = 10 → 3.</li>
+      <li>47: \(5 + i^2 \bmod 7\) gives 5, 6, 2, 0, 0, 2, 6. The empty slots are 1 and 4, never reached.</li>
+      <li>\(\lambda = 5/7 &gt; 1/2\), so slide 30's guarantee doesn't apply.</li>
+      <li class="answer">0; 2; 3; no; 5/7.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-l11-double">
+    <h2>4. Double hashing</h2>
+    <p class="prompt">Size 11, \(h(k) = k \bmod 11\), \(g(k) = 7 - (k \bmod 7)\). Probe \(h(k) + j\cdot g(k)\) for \(j = 0, 1, 2, \dots\), mod 11. Insert 13, 24, 35, 2 (all have \(h = 2\)).</p>
+    <div class="answer-spec" data-part="g24" data-grader="exact" data-answer="4" data-label="\(g(24)\)"></div>
+    <div class="answer-spec" data-part="i24" data-grader="exact" data-answer="6" data-miscon='{"3":"linear-not-quadratic"}' data-label="index of 24"></div>
+    <div class="answer-spec" data-part="i35" data-grader="exact" data-answer="9" data-label="index of 35"></div>
+    <div class="answer-spec" data-part="i2" data-grader="exact" data-answer="7" data-label="index of 2"></div>
+    <ol class="hints"><li>13 takes index 2. Each later key starts at 2 and steps by its own \(g\).</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>24: \(g = 7 - 3 = 4\); 2 taken → 6.</li>
+      <li>35: \(g = 7 - 0 = 7\); 2 taken → 9.</li>
+      <li>2: \(g = 7 - 2 = 5\); 2 taken → 7.</li>
+      <li class="answer">4; 6; 9; 7. Same starting index, three different probe paths: no secondary clustering.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-l11-rehash">
+    <h2>5. Time to rehash</h2>
+    <p class="prompt">A linear-probing table of size 7 holds 76, 40, 48 and 5.</p>
+    <div class="answer-spec" data-part="lambda" data-grader="exact" data-answer="4/7" data-label="\(\lambda\)"></div>
+    <div class="answer-spec" data-part="should" data-grader="yesno" data-answer="yes" data-label="past slide 34's threshold for open addressing?"></div>
+    <div class="answer-spec" data-part="size" data-grader="exact" data-answer="17" data-label="new size (first prime ≥ 14)"></div>
+    <div class="answer-spec" data-part="i76" data-grader="exact" data-answer="8" data-miscon='{"6":"no-mod"}' data-label="index of 76 in the new table"></div>
+    <ol class="hints"><li>Open addressing wants \(\lambda &lt; \frac12\). Re-insert by applying \(k \bmod 17\).</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(\lambda = 4/7 \approx 0.57 &gt; 0.5\): rehash.</li>
+      <li>14, 15 and 16 aren't prime; 17 is.</li>
+      <li>\(76 = 4\cdot 17 + 8\), so 76 goes to 8 (no collision: 40 → 6, 48 → 14, 5 → 5).</li>
+      <li class="answer">4/7; yes; 17; 8.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w4-l11-cluster">
+    <h2>6. Which problem is it?</h2>
+    <p class="prompt">Match each strategy to its clustering problem.</p>
+    <div class="answer-spec" data-part="linear" data-grader="choice" data-answer="primary" data-options="primary:primary clustering|secondary:secondary clustering|none:neither" data-label="linear probing"></div>
+    <div class="answer-spec" data-part="quadratic" data-grader="choice" data-answer="secondary" data-options="primary:primary clustering|secondary:secondary clustering|none:neither" data-label="quadratic probing"></div>
+    <div class="answer-spec" data-part="double" data-grader="choice" data-answer="none" data-options="primary:primary clustering|secondary:secondary clustering|none:neither" data-label="double hashing (with a good \(g\))"></div>
+    <ol class="hints"><li>Primary: blocks of filled cells that grow. Secondary: keys with the same home share a probe path.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Linear probing grows contiguous blocks: primary clustering (slide 27).</li>
+      <li>Quadratic probing jumps away, but equal homes share a path: secondary clustering (slide 31).</li>
+      <li>Double hashing's step depends on the key, which avoids secondary clustering.</li>
+      <li class="answer">primary; secondary; neither.</li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L11: QUIZ -->
+<section class="page" id="l11-quiz" data-title="Check your understanding: hashing 2">
+  <p class="where">Lecture 11 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: hashing 2</h1>
+  <div class="prose"><p>Ten questions on Lecture 11. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="l11" role="status"></div>
+  <ol class="cyu-list" data-quiz="l11">
+    <li class="cyu" data-id="cse332-w4-l11-cyu-open" data-kind="mc" data-topic="l11-linear">
+      <p class="q">"Open addressing" means…</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-l11-cyu-open"> on a collision, use a different spot in the table itself<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w4-l11-cyu-open"> each index holds a list<span class="why" hidden>That's separate chaining.</span></label>
+        <label><input type="radio" name="cse332-w4-l11-cyu-open"> the table has no fixed size<span class="why" hidden>It's a fixed array; rehashing makes a new one.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l11-cyu-linear-idx" data-kind="num" data-answer="5" data-topic="l11-linear" data-miscon='{"3":"no-mod"}'>
+      <p class="q">Size 10, linear probing, indices 3 and 4 are taken. Where does 23 go?</p>
+      <p class="why" hidden>Home 3, then 4, then 5.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l11-cyu-empty-delete" data-kind="mc" data-topic="l11-linear">
+      <p class="q">Why can't linear probing just empty a deleted key's slot?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-l11-cyu-empty-delete"> Later finds would stop at the hole and miss keys placed past it<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w4-l11-cyu-empty-delete"> The load factor would be wrong<span class="why" hidden>\(n\) goes down either way; the issue is find.</span></label>
+        <label><input type="radio" name="cse332-w4-l11-cyu-empty-delete"> Inserts would never reuse it<span class="why" hidden>An empty slot is the easiest to reuse.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l11-cyu-primary" data-kind="mc" data-topic="l11-linear">
+      <p class="q">Primary clustering is…</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-l11-cyu-primary"> filled blocks growing, which makes them collide more<span class="why" hidden>Correct: a feedback loop (slide 27).</span></label>
+        <label><input type="radio" name="cse332-w4-l11-cyu-primary"> keys with the same home following the same path<span class="why" hidden>That's secondary clustering.</span></label>
+        <label><input type="radio" name="cse332-w4-l11-cyu-primary"> a bucket's list getting long<span class="why" hidden>That's chaining with a poor hash.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l11-cyu-lambda-max" data-kind="num" data-answer="1" data-topic="l11-linear">
+      <p class="q">What is the largest load factor an open-addressing table can have?</p>
+      <p class="why" hidden>1: every slot holds one item. You can't insert more.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l11-cyu-quad-third" data-kind="num" data-answer="2" data-topic="l11-quad" data-miscon='{"0":"linear-not-quadratic","9":"no-mod"}'>
+      <p class="q">Size 7, quadratic probing, a key with home 5. What is the third index it tries (after 5 and 6)?</p>
+      <p class="why" hidden>The third try is \(i = 2\): \(5 + 2^2 = 9\), and \(9 \bmod 7 = 2\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l11-cyu-guarantee" data-kind="mc" data-topic="l11-quad">
+      <p class="q">When is quadratic probing guaranteed to find an open spot?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w4-l11-cyu-guarantee"> When the size is prime and \(\lambda &lt; \frac12\)<span class="why" hidden>Correct (slide 30).</span></label>
+        <label><input type="radio" name="cse332-w4-l11-cyu-guarantee"> Whenever any slot is empty<span class="why" hidden>Slide 29's 47 shows otherwise.</span></label>
+        <label><input type="radio" name="cse332-w4-l11-cyu-guarantee"> When the size is a power of 2<span class="why" hidden>Prime sizes are what the guarantee needs.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l11-cyu-double-step" data-kind="num" data-answer="9" data-topic="l11-quad">
+      <p class="q">Double hashing, size 11, \(h(k) = 3\), \(g(k) = 6\). Index 3 is taken. What's the next index tried?</p>
+      <p class="why" hidden>\(3 + 6 = 9\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l11-cyu-chain-threshold" data-kind="num" data-answer="2" data-topic="l11-rehash">
+      <p class="q">Slide 34: for separate chaining, we typically keep \(\lambda\) below what number?</p>
+      <p class="why" hidden>2. For open addressing, \(\frac12\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w4-l11-cyu-sorted" data-kind="mc" data-topic="l11-rehash">
+      <p class="q">Which operation is a hash table bad at?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w4-l11-cyu-sorted"> find<span class="why" hidden>Average \(\Theta(1)\).</span></label>
+        <label data-correct><input type="radio" name="cse332-w4-l11-cyu-sorted"> listing keys in sorted order<span class="why" hidden>Correct (slide 35): the keys are scattered.</span></label>
+        <label><input type="radio" name="cse332-w4-l11-cyu-sorted"> insert<span class="why" hidden>Average \(\Theta(1)\).</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="l11" role="status"></div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ READINGS -->
+<section class="page" id="readings" data-title="Readings">
+  <h1>Readings</h1>
+  <div class="prose"><p>The textbook is optional; the calendar lists sections per lecture. The topic summaries are a second presentation of the same material.</p></div>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Mon Oct 19 · AVL Trees 2</th><td>Weiss 4.4. <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/avl.html" target="_blank" rel="noopener">Summary: AVL Trees</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec09-AVL-2.pdf" target="_blank" rel="noopener">slides (pdf)</a></td></tr>
+    <tr><th>Wed Oct 21 · Hashing</th><td>Weiss 5.1–5.5. <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/hashing.html" target="_blank" rel="noopener">Summary: Hash Functions and Hash Tables</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec10-hashing-1.pdf" target="_blank" rel="noopener">slides (pdf)</a></td></tr>
+    <tr><th>Thu Oct 22 · Section 4</th><td><a href="https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section04.pdf" target="_blank" rel="noopener">Slides (pdf)</a> · <a href="https://docs.google.com/document/d/1evX84yeqeAb__5t3lvtl0DhkRAVA1GcA/edit" target="_blank" rel="noopener">worksheet</a> · <a href="https://docs.google.com/document/d/1T0mqYDv1H32V9A4ISk3HHi4zhc540bSo/edit" target="_blank" rel="noopener">solutions</a></td></tr>
+    <tr><th>Fri Oct 23 · Hashing 2</th><td>Weiss 5.1–5.5. <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec11-hashing-2.pdf" target="_blank" rel="noopener">Slides (pdf)</a></td></tr>
+  </table>
+  </div>
+  <h2>What to read for</h2>
+  <div class="prose">
+    <ul>
+      <li><strong>AVL summary:</strong> the same insert cases and the minimum-node argument, with more pictures.</li>
+      <li><strong>Hashing summary:</strong> hash functions and their properties, chaining, the three probing strategies, and rehashing: both lectures in one place.</li>
+      <li>Weiss isn't online, so this site doesn't summarize it.</li>
+    </ul>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CHEATSHEET -->
+<section class="page" id="cheatsheet" data-title="Cheat sheet">
+  <h1>Week 4 cheat sheet</h1>
+  <p class="where">Print with <kbd>Ctrl</kbd>+<kbd>P</kbd>; only this page prints.</p>
+  <div class="cheat">
+    <section>
+      <h3>AVL insert</h3>
+      <p>BST insert; update heights from the leaf up; at the deepest unbalanced node: LL → rotate right; RR → rotate left; LR → left at the left child, then right; RL → right at the right child, then left. One case, done.</p>
+    </section>
+    <section>
+      <h3>Rotation references (Section 4)</h3>
+      <p>Right at \(p\) (child \(b\)): <code>a.left = b; p.left = b.right; b.right = p</code>. Left at \(p\) (child \(c\)): <code>a.left = c; p.right = c.left; c.left = p</code>. Then fix heights.</p>
+    </section>
+    <section>
+      <h3>Minimal AVL trees</h3>
+      <p>\(M(h) = M(h-1) + M(h-2) + 1\): 1, 2, 4, 7, 12, 20, 33, 54, 88, 143, 232. Greatest height with \(n\) nodes: largest \(h\) with \(M(h) \le n\). \(h \le \log_\phi n\).</p>
+    </section>
+    <section>
+      <h3>Hash functions</h3>
+      <p>Consistent, uniform, effective, efficient. Equal objects must hash the same (override <code>hashCode</code> with <code>equals</code>).</p>
+      <p>\(h_3(s) = \sum a(s_i)\,31^i\); Horner: <code>h = 31*h + s[i]</code> from the last character.</p>
+    </section>
+    <section>
+      <h3>Separate chaining</h3>
+      <p>Index \(h(k) \bmod\) length; operate on that bucket. \(\lambda = n/\text{length}\). Unsuccessful find \(\approx \lambda\), successful \(\approx \lambda/2\). Keep \(\lambda &lt; 2\).</p>
+    </section>
+    <section>
+      <h3>Open addressing</h3>
+      <p>Linear \(h + i\); quadratic \(h + i^2\); double \(h + i\cdot g(k)\), all mod length. Keep \(\lambda &lt; \frac12\) (and a prime size for quadratic). Delete with tombstones: finds skip them, inserts reuse them.</p>
+      <p>Linear: primary clustering. Quadratic: secondary clustering. Double hashing avoids both.</p>
+    </section>
+    <section>
+      <h3>Rehashing</h3>
+      <p>New array about twice as long, prime; re-insert every key with \(h(k) \bmod\) new length.</p>
+    </section>
+    <section>
+      <h3>Dictionaries compared</h3>
+      <table class="plain">
+        <tr><td>AVL tree</td><td>\(\Theta(\log n)\) all; keeps order</td></tr>
+        <tr><td>Hash table</td><td>\(\Theta(1)\) average, \(\Theta(n)\) worst; no order</td></tr>
+        <tr><td>Sorted array</td><td>find \(\Theta(\log n)\), insert/delete \(\Theta(n)\)</td></tr>
+      </table>
+    </section>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+</main>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="../../core/katex/katex.min.js"></script>
+<script src="../../core/katex/contrib/auto-render.min.js"></script>
+<script src="../../courses.js"></script>
+<script src="../../core/grader.js"></script>
+<script src="../../core/store.js"></script>
+<script src="sim.js"></script>
+<script src="week.js"></script>
+<script src="../../core/app.js"></script>
+</body>
+</html>

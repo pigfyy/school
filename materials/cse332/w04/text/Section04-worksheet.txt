@@ -1,0 +1,15 @@
+0. The ABC’s of AVL Trees
+What are the constraints on the data types you can store in an AVL tree? When is an AVL tree preferred over another dictionary implementation, such as a HashMap?
+
+1. Left Rotation References
+Suppose we do a left rotation on the tree below from node p. Write out what references need to change and what they need to change to.
+
+2. Let’s Plant an AVL Tree
+Insert 10, 4, 5, 8, 9, 6, 11, 3, 2, 1, 14 into an initially empty AVL Tree.
+
+3. MinVL Trees
+Draw an AVL tree of height 4 that contains the minimum possible number of nodes.
+
+4. AVL Trees
+Insert 6, 5, 4, 3, 2, 1, 10, 9, 8, 7 into an initially empty AVL Tree.
+
