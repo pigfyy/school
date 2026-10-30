@@ -1,0 +1,90 @@
+CSE 331: Programs on the web
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          CSE 331: Programs on the web
+
+        CSE 331: Programs on the web
+
+This lecture's program is a guestbook: a web page where a visitor
+leaves a name and a message, and every later visitor sees it. It
+is an interactive program, like Lecture 6's calculator, with one
+difference that shapes the whole program: its users are not at
+its keyboard. They sit at browsers, maybe on other machines, and
+reach it over a network in messages of a fixed form. The
+guestbook is a server, a program that waits for requests and
+answers each with a response. The browser is one of its users:
+it relies on what the server promises, and the server can
+assume nothing about what the browser will send. The web calls
+the browser the server's client, but in Lecture 2 a client is
+code that calls a method and can be held to a promise. The
+server's author cannot know which browsers, or which other
+programs, will send it requests, so the author can hold none of
+them to a promise.
+
+A request is text, and so is a response. A request names its
+method, such as GET or POST, and a path; a response
+carries a status, a few headers, and a body, the page,
+which is HTML, text with tags. The server builds the page
+fresh for each request, from whatever is in its book at that
+moment, and the browser draws what came back. One book is shared
+by every request from every browser. A server is harder than the
+calculator: its state lasts across people, the order is whoever's
+request arrives first, and the state a visitor cannot see is what
+another visitor changed. And nothing in a request says who sent
+it, so the server cannot tell one visitor from another.
+
+The guestbook's main has no loop. The loop is inside the JDK's
+HttpServer, which calls handle once per request, an event;
+a program whose methods are called by a loop it does not own is
+event-driven. A library is code you call, and a
+framework is code that calls you. HTTP gives GET and POST
+each a meaning: a GET asks for a page and must not change the
+server's state, and a POST may change it. Browsers and other
+programs send GETs on their own, so a GET that added a message
+would let every crawler's visit add a message.
+
+Lecture 1's standard applies to a server as to any program: every
+input a user can produce gets a response the specification
+describes. The guestbook's manual covers two requests, and
+misses four cases: a request for another path gets the page, a
+POST with no fields adds null: null, a POST whose body is not
+a form gets no response at all, and a message holding a tag is
+read by every later visitor's browser as a tag, the hole called
+cross-site scripting. The exercises close three of those
+four gaps, and two more ask what a GET form sends and what
+refresh does after a post.
+
+Notes
+
+Slides
+
+Slides (PDF)
+
+    UW Site Use Agreement

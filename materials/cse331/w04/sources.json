@@ -1,0 +1,175 @@
+{
+  "course": "CSE 331, University of Washington, Autumn 2026",
+  "week": "Week 4 (Mon Oct 19 - Fri Oct 23, 2026)",
+  "note": "Downloaded 2026-10-29. Section 3's slides are Google Drive files linked from the Topics page (the calendar calls the section Floyd-Hoare Logic; its handout is titled Reasoning). Homework 2 is saved for its due date only (Fri Oct 23); homework/hw2-solution.html was not fetched. Reading 2 is graded and is not answered on the site; Reading 3 is on week 5.",
+  "sources": [
+    {
+      "file": "calendar.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/calendar/calendar.html",
+      "what": "Course calendar (Oct 19-23 sessions, Homework 2 due Fri Oct 23)",
+      "fetchedAt": "2026-10-29T22:28:15-07:00",
+      "bytes": 41163,
+      "sha256": "aa8699ffce3186c8fd82cd0508a3f051e8503d5563e13631b5d2166c37fbaffb"
+    },
+    {
+      "file": "topics.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/topics/",
+      "what": "Topics page: links each topic's lectures, sections (with Google slides) and readings",
+      "fetchedAt": "2026-10-29T22:28:15-07:00",
+      "bytes": 10981,
+      "sha256": "c8af991df289fa316fcfcd93c10b5055d59434f8c1897d41f360421f6dcb1f46"
+    },
+    {
+      "file": "lecture09/lecture09-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture09-web/",
+      "what": "Lecture 9 (Mon Oct 19) landing page, Programs on the web (Reading 2 discussion; web backends and 90s frontends)",
+      "fetchedAt": "2026-10-29T22:28:15-07:00",
+      "bytes": 11339,
+      "sha256": "92411128593a6eb09b42a0c30fe3386c2a67891c9d2953e1fbd1841ca0d4a80c"
+    },
+    {
+      "file": "lecture09/lecture09-notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture09-web/notes.html",
+      "what": "Lecture 9 notes: main source",
+      "fetchedAt": "2026-10-29T22:28:15-07:00",
+      "bytes": 102907,
+      "sha256": "beabb96cd35e4f2f4a4136de21f971ec5a703e44e4137711eb0ebc3231628188"
+    },
+    {
+      "file": "lecture09/lecture09-slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture09-web/slides.html",
+      "what": "Lecture 9 slides",
+      "fetchedAt": "2026-10-29T22:28:15-07:00",
+      "bytes": 77870,
+      "sha256": "af2bf5fd50750e3ff4f41c0dc7804a3735cee92d62a894e33cf1438e03ead967"
+    },
+    {
+      "file": "lecture09/lecture09-slides-pdf.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture09-web/slides.pdf",
+      "what": "Lecture 9 slides (PDF)",
+      "fetchedAt": "2026-10-29T22:28:15-07:00",
+      "bytes": 480771,
+      "sha256": "8831020c30535c2a6005b9967fde68c5620f7e01d544c65f3439bb7bafad7241"
+    },
+    {
+      "file": "section03/section03.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section03.html",
+      "what": "Section 3 (Tue Oct 20) worksheet, Floyd-Hoare logic",
+      "fetchedAt": "2026-10-29T22:28:15-07:00",
+      "bytes": 24833,
+      "sha256": "05e53999a4ba976bacc9ae060a4dd0104d45e3c34c958494fa5783916d7e7f22"
+    },
+    {
+      "file": "section03/section03-solution.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section03-solution.html",
+      "what": "Section 3 solution worksheet",
+      "fetchedAt": "2026-10-29T22:28:15-07:00",
+      "bytes": 47697,
+      "sha256": "16d93e7e51f7b5826ec921642927910b915c2ce5b433f9bdad704fe093c851ed"
+    },
+    {
+      "file": "section03/section03-slides.pptx",
+      "url": "https://drive.google.com/uc?export=download&id=1D4lg8eQfb9n6v_QTRYzSuylOPVHe4B82",
+      "what": "Section 3 slides (Google Drive, linked from the Topics page)",
+      "fetchedAt": "2026-10-29T22:28:18-07:00",
+      "bytes": 2859499,
+      "sha256": "f2e8226f63d85e728e9ec47820f820acbb83e1c043359d1848446b1ac127c2d0"
+    },
+    {
+      "file": "section03/section03-solution-slides.pptx",
+      "url": "https://drive.google.com/uc?export=download&id=1Rl1yUUHCwkY5F4NQk7tS4m09WdFWM6mo",
+      "what": "Section 3 solution slides (Google Drive, linked from the Topics page)",
+      "fetchedAt": "2026-10-29T22:28:19-07:00",
+      "bytes": 3019826,
+      "sha256": "b7bb2882a7cc6d4d050a46df6a39fef72960273a1cb602bb8561cdbc9b3a42cb"
+    },
+    {
+      "file": "lecture10/lecture10-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture10-adts/",
+      "what": "Lecture 10 (Wed Oct 21) landing page, Abstract data types",
+      "fetchedAt": "2026-10-29T22:28:20-07:00",
+      "bytes": 10544,
+      "sha256": "7f37220b9dd62b24ff2e41af5d7895c9c282f1d11d359e88a46a849fcb72a403"
+    },
+    {
+      "file": "lecture10/lecture10-notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture10-adts/notes.html",
+      "what": "Lecture 10 notes: main source",
+      "fetchedAt": "2026-10-29T22:28:20-07:00",
+      "bytes": 93016,
+      "sha256": "e594c600d5d21aa1d729588f7bc9bc57ba67d269e20d2b95f371add63e5883a3"
+    },
+    {
+      "file": "lecture10/lecture10-slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture10-adts/slides.html",
+      "what": "Lecture 10 slides",
+      "fetchedAt": "2026-10-29T22:28:20-07:00",
+      "bytes": 77841,
+      "sha256": "8f7c9b5c18ec10c41e06b7abba893f7e3c4556f4abe22fd7580252e46b210d6a"
+    },
+    {
+      "file": "lecture10/lecture10-slides-pdf.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture10-adts/slides.pdf",
+      "what": "Lecture 10 slides (PDF)",
+      "fetchedAt": "2026-10-29T22:28:20-07:00",
+      "bytes": 651076,
+      "sha256": "7ebc071261382a92b07af858eee1ed5f9f47b74844f6295ee7f529fbe3248cdf"
+    },
+    {
+      "file": "lecture11/lecture11-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture11-reps/",
+      "what": "Lecture 11 (Fri Oct 23) landing page, Implementing an abstract data type",
+      "fetchedAt": "2026-10-29T22:28:20-07:00",
+      "bytes": 10729,
+      "sha256": "ba62f252fb4d05b15dd1184de8be8de88dd1e74507cc45599586d23f98a98676"
+    },
+    {
+      "file": "lecture11/lecture11-notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture11-reps/notes.html",
+      "what": "Lecture 11 notes: main source",
+      "fetchedAt": "2026-10-29T22:28:20-07:00",
+      "bytes": 195455,
+      "sha256": "0993a4ee8bf7babcdbe62d1adaad9993c27391333f0f5d78a714c083f561d85e"
+    },
+    {
+      "file": "lecture11/lecture11-slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture11-reps/slides.html",
+      "what": "Lecture 11 slides",
+      "fetchedAt": "2026-10-29T22:28:20-07:00",
+      "bytes": 125583,
+      "sha256": "b9744037bae251e4570452c0cd105e34b26ade99691a86f55d3132fee84246ef"
+    },
+    {
+      "file": "lecture11/lecture11-slides-pdf.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture11-reps/slides.pdf",
+      "what": "Lecture 11 slides (PDF)",
+      "fetchedAt": "2026-10-29T22:28:20-07:00",
+      "bytes": 905111,
+      "sha256": "c8e65f4572ea2b5262c802fb49336a82040cc11a51ab0c3800540a7fca5ffc92"
+    },
+    {
+      "file": "readings/readings-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/readings/",
+      "what": "Readings page: schedule, reflection parts, grading",
+      "fetchedAt": "2026-10-29T22:28:20-07:00",
+      "bytes": 11807,
+      "sha256": "c4cf96d3e5e6316cfd61cff7ff4347b30dedfc82fc2cd2d31d0b9453b8cad7ec"
+    },
+    {
+      "file": "readings/reading2.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/readings/reading2.html",
+      "what": "Reading 2 (discussed Mon Oct 19 in Lecture 9)",
+      "fetchedAt": "2026-10-29T22:28:20-07:00",
+      "bytes": 18377,
+      "sha256": "826d086c658b921cbb750d5efb706c82c6b3cd43da2948f12354b3c5d27888f0"
+    },
+    {
+      "file": "homework/hw2.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/homework/hw2.html",
+      "what": "Homework 2: saved for its due date only (Fri Oct 23, 11:59 pm); not reproduced or worked",
+      "fetchedAt": "2026-10-29T22:28:20-07:00",
+      "bytes": 58988,
+      "sha256": "96547acb770f62230b93aab3175701f13ddcf3246e899657c40d140736137b8e"
+    }
+  ]
+}

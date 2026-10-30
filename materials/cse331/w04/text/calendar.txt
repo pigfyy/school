@@ -1,0 +1,776 @@
+CSE 331 Autumn 2026 Schedule
+
+    CSE 331 Autumn 2026 Schedule
+
+    Subscribe to this calendar (Google, iCal, etc.)
+
+            September
+
+MondayTuesdayWednesdayThursdayFriday
+
+28
+
+29
+
+30
+Lecture: 
+Lecture
+Welcome! Whole program assertions
+
+Office Hour: 
+14:30-15:30 OH (Zach)
+Gates 201
+
+Office Hour: 
+16:30-17:30 OH (Ari)
+Allen 2nd floor
+
+01
+Office Hour: 
+12:00-13:00 OH (Kyle)
+Allen 5th floor
+
+Office Hour: 
+13:00-14:00 OH (Pratika)
+Allen 220
+
+Office Hour: 
+14:30-15:30 OH (Emily)
+Allen 2nd floor
+
+Office Hour: 
+15:30-16:30 OH (Naren)
+Allen 220
+
+02
+Lecture: 
+Lecture
+Procedural abstraction and specification
+
+Office Hour: 
+10:00-11:00 OH (Pranav)
+Allen 3rd floor
+
+Office Hour: 
+11:30-12:30 OH (Raio)
+Allen 4th floor
+
+Office Hour: 
+14:30-15:30 OH (Owen)
+Gates 153
+
+Homework: 
+23:59 Reading 1 due
+
+Homework: 
+23:59 Homework 0 due
+
+            October
+
+MondayTuesdayWednesdayThursdayFriday
+
+05
+Lecture: 
+Lecture
+Reading 1 discussion; Batch processing
+
+Office Hour: 
+11:30-12:30 OH (Hansel)
+Allen 218
+
+06
+Section: 
+Section
+Assertions and Specifications
+
+Office Hour: 
+15:30-16:30 OH (Yihong)
+Gates 131
+
+Office Hour: 
+16:30-17:30 OH (James)
+Allen 440
+
+07
+Lecture: 
+Lecture
+Testing 1
+
+Office Hour: 
+14:30-15:30 OH (Zach)
+Gates 201
+
+Office Hour: 
+16:30-17:30 OH (Ari)
+Allen 2nd floor
+
+08
+Office Hour: 
+12:00-13:00 OH (Kyle)
+Allen 5th floor
+
+Office Hour: 
+13:00-14:00 OH (Pratika)
+Allen 220
+
+Office Hour: 
+14:30-15:30 OH (Emily)
+Allen 2nd floor
+
+Office Hour: 
+15:30-16:30 OH (Naren)
+Allen 220
+
+09
+Lecture: 
+Lecture
+Testing 2
+
+Office Hour: 
+10:00-11:00 OH (Pranav)
+Allen 3rd floor
+
+Office Hour: 
+11:30-12:30 OH (Raio)
+Allen 4th floor
+
+Office Hour: 
+14:30-15:30 OH (Owen)
+Gates 153
+
+Homework: 
+23:59 Homework 1 due
+
+12
+Lecture: 
+Lecture
+Error handling + interactive programs
+
+Office Hour: 
+11:30-12:30 OH (Hansel)
+Allen 218
+
+13
+Section: 
+Section
+Testing
+
+Office Hour: 
+15:30-16:30 OH (Yihong)
+Gates 131
+
+Office Hour: 
+16:30-17:30 OH (James)
+Allen 440
+
+14
+Lecture: 
+Lecture
+Reasoning, Floyd-Hoare Logic
+
+Office Hour: 
+14:30-15:30 OH (Zach)
+Gates 201
+
+Office Hour: 
+16:30-17:30 OH (Ari)
+Allen 2nd floor
+
+15
+Office Hour: 
+12:00-13:00 OH (Kyle)
+Allen 5th floor
+
+Office Hour: 
+13:00-14:00 OH (Pratika)
+Allen 220
+
+Office Hour: 
+14:30-15:30 OH (Emily)
+Allen 2nd floor
+
+Office Hour: 
+15:30-16:30 OH (Naren)
+Allen 220
+
+16
+Lecture: 
+Lecture
+Loop Invariants
+
+Office Hour: 
+10:00-11:00 OH (Pranav)
+Allen 3rd floor
+
+Office Hour: 
+11:30-12:30 OH (Raio)
+Allen 4th floor
+
+Office Hour: 
+14:30-15:30 OH (Owen)
+Gates 153
+
+Homework: 
+23:59 Reading 2 due
+
+19
+Lecture: 
+Lecture
+Reading 2 discussion; web backends and 90s frontends
+
+Office Hour: 
+11:30-12:30 OH (Hansel)
+Allen 218
+
+20
+Section: 
+Section
+Floyd-Hoare Logic
+
+Office Hour: 
+15:30-16:30 OH (Yihong)
+Gates 131
+
+Office Hour: 
+16:30-17:30 OH (James)
+Allen 440
+
+21
+Lecture: 
+Lecture
+Data abstraction 1
+
+Office Hour: 
+14:30-15:30 OH (Zach)
+Gates 201
+
+Office Hour: 
+16:30-17:30 OH (Ari)
+Allen 2nd floor
+
+22
+Office Hour: 
+12:00-13:00 OH (Kyle)
+Allen 5th floor
+
+Office Hour: 
+13:00-14:00 OH (Pratika)
+Allen 220
+
+Office Hour: 
+14:30-15:30 OH (Emily)
+Allen 2nd floor
+
+Office Hour: 
+15:30-16:30 OH (Naren)
+Allen 220
+
+23
+Lecture: 
+Lecture
+Data abstraction 2
+
+Office Hour: 
+10:00-11:00 OH (Pranav)
+Allen 3rd floor
+
+Office Hour: 
+11:30-12:30 OH (Raio)
+Allen 4th floor
+
+Office Hour: 
+14:30-15:30 OH (Owen)
+Gates 153
+
+Homework: 
+23:59 Homework 2 due
+
+26
+Lecture: 
+Lecture
+JavaScript in the page
+
+Office Hour: 
+11:30-12:30 OH (Hansel)
+Allen 218
+
+27
+Section: 
+Section
+ADTs
+
+Office Hour: 
+15:30-16:30 OH (Yihong)
+Gates 131
+
+Office Hour: 
+16:30-17:30 OH (James)
+Allen 440
+
+28
+Lecture: 
+Lecture
+Exceptions
+
+Office Hour: 
+14:30-15:30 OH (Zach)
+Gates 201
+
+Office Hour: 
+16:30-17:30 OH (Ari)
+Allen 2nd floor
+
+29
+Office Hour: 
+12:00-13:00 OH (Kyle)
+Allen 5th floor
+
+Office Hour: 
+13:00-14:00 OH (Pratika)
+Allen 220
+
+Office Hour: 
+14:30-15:30 OH (Emily)
+Allen 2nd floor
+
+Office Hour: 
+15:30-16:30 OH (Naren)
+Allen 220
+
+30
+Lecture: 
+Lecture
+Subtyping
+
+Office Hour: 
+10:00-11:00 OH (Pranav)
+Allen 3rd floor
+
+Office Hour: 
+11:30-12:30 OH (Raio)
+Allen 4th floor
+
+Office Hour: 
+14:30-15:30 OH (Owen)
+Gates 153
+
+Homework: 
+23:59 Reading 3 due
+
+            November
+
+MondayTuesdayWednesdayThursdayFriday
+
+02
+Lecture: 
+Lecture
+Reading 3 discussion; "Modern" JS frontends
+
+Office Hour: 
+11:30-12:30 OH (Hansel)
+Allen 218
+
+03
+Section: 
+Section
+Exceptions+Subtyping
+
+Office Hour: 
+15:30-16:30 OH (Yihong)
+Gates 131
+
+Office Hour: 
+16:30-17:30 OH (James)
+Allen 440
+
+04
+Lecture: 
+Lecture
+Equality
+
+Office Hour: 
+14:30-15:30 OH (Zach)
+Gates 201
+
+Office Hour: 
+16:30-17:30 OH (Ari)
+Allen 2nd floor
+
+05
+Office Hour: 
+12:00-13:00 OH (Kyle)
+Allen 5th floor
+
+Office Hour: 
+13:00-14:00 OH (Pratika)
+Allen 220
+
+Office Hour: 
+14:30-15:30 OH (Emily)
+Allen 2nd floor
+
+Office Hour: 
+15:30-16:30 OH (Naren)
+Allen 220
+
+06
+Lecture: 
+Lecture
+Generics
+
+Office Hour: 
+10:00-11:00 OH (Pranav)
+Allen 3rd floor
+
+Office Hour: 
+11:30-12:30 OH (Raio)
+Allen 4th floor
+
+Office Hour: 
+14:30-15:30 OH (Owen)
+Gates 153
+
+Homework: 
+23:59 Homework 3 due
+
+09
+Lecture: 
+Lecture
+Storing data so it doesn't disappear on crash
+
+Office Hour: 
+11:30-12:30 OH (Hansel)
+Allen 218
+
+10
+Section: 
+Section
+Equality+Generics
+
+Office Hour: 
+15:30-16:30 OH (Yihong)
+Gates 131
+
+Office Hour: 
+16:30-17:30 OH (James)
+Allen 440
+
+11
+Holiday: 
+Veterans Day
+
+12
+Other: 
+Additional midterm practice session
+
+Office Hour: 
+12:00-13:00 OH (Kyle)
+Allen 5th floor
+
+Office Hour: 
+13:00-14:00 OH (Pratika)
+Allen 220
+
+Office Hour: 
+14:30-15:30 OH (Emily)
+Allen 2nd floor
+
+Office Hour: 
+15:30-16:30 OH (Naren)
+Allen 220
+
+13
+Exam: 
+Midterm
+
+Office Hour: 
+10:00-11:00 OH (Pranav)
+Allen 3rd floor
+
+Office Hour: 
+11:30-12:30 OH (Raio)
+Allen 4th floor
+
+Office Hour: 
+14:30-15:30 OH (Owen)
+Gates 153
+
+16
+Lecture: 
+Lecture
+Apps with user accounts; tailscale
+
+Office Hour: 
+11:30-12:30 OH (Hansel)
+Allen 218
+
+17
+Section: 
+Section
+Project proposal workshop
+
+Office Hour: 
+15:30-16:30 OH (Yihong)
+Gates 131
+
+Office Hour: 
+16:30-17:30 OH (James)
+Allen 440
+
+18
+Lecture: 
+Lecture
+Design Patterns 1
+
+Office Hour: 
+14:30-15:30 OH (Zach)
+Gates 201
+
+Office Hour: 
+16:30-17:30 OH (Ari)
+Allen 2nd floor
+
+19
+Office Hour: 
+12:00-13:00 OH (Kyle)
+Allen 5th floor
+
+Office Hour: 
+13:00-14:00 OH (Pratika)
+Allen 220
+
+Office Hour: 
+14:30-15:30 OH (Emily)
+Allen 2nd floor
+
+Office Hour: 
+15:30-16:30 OH (Naren)
+Allen 220
+
+20
+Lecture: 
+Lecture
+Design Patterns 2
+
+Office Hour: 
+10:00-11:00 OH (Pranav)
+Allen 3rd floor
+
+Office Hour: 
+11:30-12:30 OH (Raio)
+Allen 4th floor
+
+Office Hour: 
+14:30-15:30 OH (Owen)
+Gates 153
+
+Homework: 
+23:59 Reading 4 due
+
+Homework: 
+23:59 Project proposal due
+
+23
+Lecture: 
+Lecture
+Reading 4 discussion; Upgrading apps
+
+Office Hour: 
+11:30-12:30 OH (Hansel)
+Allen 218
+
+24
+Section: 
+Section
+No class - required meeting 1:1 with your TA about your project
+
+Office Hour: 
+15:30-16:30 OH (Yihong)
+Gates 131
+
+Office Hour: 
+16:30-17:30 OH (James)
+Allen 440
+
+25
+Holiday: 
+Thanksgiving travel day
+
+26
+Holiday: 
+Thanksgiving
+
+27
+Holiday: 
+Native American Heritage Day
+
+30
+Lecture: 
+Lecture
+Deploying and operating, and maintaining apps
+
+Office Hour: 
+11:30-12:30 OH (Hansel)
+Allen 218
+
+01
+Section: 
+Section
+TBD
+
+Office Hour: 
+15:30-16:30 OH (Yihong)
+Gates 131
+
+Office Hour: 
+16:30-17:30 OH (James)
+Allen 440
+
+02
+Lecture: 
+Lecture
+Design Patterns 3
+
+Office Hour: 
+14:30-15:30 OH (Zach)
+Gates 201
+
+Office Hour: 
+16:30-17:30 OH (Ari)
+Allen 2nd floor
+
+03
+Office Hour: 
+12:00-13:00 OH (Kyle)
+Allen 5th floor
+
+Office Hour: 
+13:00-14:00 OH (Pratika)
+Allen 220
+
+Office Hour: 
+14:30-15:30 OH (Emily)
+Allen 2nd floor
+
+Office Hour: 
+15:30-16:30 OH (Naren)
+Allen 220
+
+04
+Lecture: 
+Lecture
+Usability
+
+Office Hour: 
+10:00-11:00 OH (Pranav)
+Allen 3rd floor
+
+Office Hour: 
+11:30-12:30 OH (Raio)
+Allen 4th floor
+
+Office Hour: 
+14:30-15:30 OH (Owen)
+Gates 153
+
+Homework: 
+23:59 Homework 4 due
+
+Homework: 
+23:59 Project milestone due
+
+            December
+
+MondayTuesdayWednesdayThursdayFriday
+
+07
+Lecture: 
+Lecture
+Floating point
+
+Office Hour: 
+11:30-12:30 OH (Hansel)
+Allen 218
+
+08
+Section: 
+Section
+No class - required meeting 1:1 with your TA about your project
+
+Office Hour: 
+15:30-16:30 OH (Yihong)
+Gates 131
+
+Office Hour: 
+16:30-17:30 OH (James)
+Allen 440
+
+09
+Lecture: 
+Lecture
+Dafny
+
+Office Hour: 
+14:30-15:30 OH (Zach)
+Gates 201
+
+Office Hour: 
+16:30-17:30 OH (Ari)
+Allen 2nd floor
+
+10
+Other: 
+Final review
+
+Office Hour: 
+12:00-13:00 OH (Kyle)
+Allen 5th floor
+
+Office Hour: 
+13:00-14:00 OH (Pratika)
+Allen 220
+
+Office Hour: 
+14:30-15:30 OH (Emily)
+Allen 2nd floor
+
+Office Hour: 
+15:30-16:30 OH (Naren)
+Allen 220
+
+11
+Lecture: 
+Lecture
+Victory Lap
+
+Office Hour: 
+10:00-11:00 OH (Pranav)
+Allen 3rd floor
+
+Office Hour: 
+11:30-12:30 OH (Raio)
+Allen 4th floor
+
+Office Hour: 
+14:30-15:30 OH (Owen)
+Gates 153
+
+Homework: 
+23:59 Project due
+
+14
+Other: 
+Additional final exam practice session
+
+15
+Exam: 
+12:30-14:20 Final exam
+BAG 131
+
+Exam: 
+12:30-14:20 Final exam
+BAG 154
+
+16
+17
+18

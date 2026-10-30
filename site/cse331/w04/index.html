@@ -1,0 +1,1318 @@
+<!doctype html>
+<!--
+  CSE 331 (Autumn 2026) · Week 4 teaching site (Mon Oct 19 to Fri Oct 23), built with the course-teaching-site skill.
+  Sources (raw copies, URLs, fetch times and hashes in materials/cse331/w04/sources.json): Lecture 9 notes and slides
+  (Reading 2 discussion; programs on the web, Mon Oct 19); Section 3 worksheet, solution and slides (Reasoning, Tue
+  Oct 20); Lecture 10 notes and slides (Abstract data types, Wed Oct 21); Lecture 11 notes and slides (Implementing an
+  abstract data type, Fri Oct 23); Reading 2 and the readings page; Homework 2 (due date only).
+
+  Where each component lives:
+    Lecture 9 ....................... #l9-discuss … #l9-manual, #l9-quiz, #l9-problems   (.gb: guestbook-sim.js)
+    Section 3 ....................... #s3-warmup, #s3-tasks, #s3-practice
+    Lecture 10 ...................... #l10-queue … #l10-readings, #l10-quiz, #l10-problems (.qx: queue-sim.js)
+    Lecture 11 ...................... #l11-fast … #l11-exposure, #l11-quiz, #l11-problems
+    Readings / cheat sheet .......... #readings, #cheatsheet
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE 331 week 4</title>
+<link rel="stylesheet" href="../../core/fonts.css">
+<link rel="stylesheet" href="../../core/base.css">
+<link rel="stylesheet" href="week.css">
+</head>
+<body data-course="cse331" data-week="w04">
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+
+<nav class="rail" aria-label="Week 4 modules">
+  <div class="rail-top">
+    <a class="brand" href="#home"><span class="brand-kicker">CSE 331 · week 4</span>Programs on the web, data abstraction</a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="rail-body">Menu</button>
+  </div>
+  <div class="rail-body" id="rail-body">
+    <div>
+      <h2>Lecture 9 <span class="today" data-date="2026-10-19">Mon Oct 19</span></h2>
+      <ol class="modules">
+        <li><a href="#l9-discuss">Reading 2 discussion</a></li>
+        <li><a href="#l9-guestbook">A guestbook</a></li>
+        <li><a href="#l9-book">Servers, browsers, one book</a></li>
+        <li><a href="#l9-http">A request is text</a></li>
+        <li><a href="#l9-getpost">GET asks, POST changes</a></li>
+        <li><a href="#l9-manual">The manual, on every request</a></li>
+        <li><a href="#l9-quiz">Check your understanding</a></li>
+        <li><a href="#l9-problems">Problems</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Section 3 <span class="today" data-date="2026-10-20">Tue Oct 20</span></h2>
+      <ol class="modules">
+        <li><a href="#s3-warmup">Warm-up and review</a></li>
+        <li><a href="#s3-tasks">Tasks 1–4</a></li>
+        <li><a href="#s3-practice">Practice</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 10 <span class="today" data-date="2026-10-21">Wed Oct 21</span></h2>
+      <ol class="modules">
+        <li><a href="#l10-queue">The help queue</a></li>
+        <li><a href="#l10-tests">Tests from the spec alone</a></li>
+        <li><a href="#l10-impl">An implementation</a></li>
+        <li><a href="#l10-two">A second implementation</a></li>
+        <li><a href="#l10-readings">Three readings of waiting</a></li>
+        <li><a href="#l10-quiz">Check your understanding</a></li>
+        <li><a href="#l10-problems">Problems</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 11 <span class="today" data-date="2026-10-23">Fri Oct 23</span></h2>
+      <ol class="modules">
+        <li><a href="#l11-fast">FastQueue: which method is wrong?</a></li>
+        <li><a href="#l11-ri">Representation invariants, checkRep</a></li>
+        <li><a href="#l11-faster">FasterQueue and the AF</a></li>
+        <li><a href="#l11-correct">What correct means</a></li>
+        <li><a href="#l11-exposure">Copy in, copy out</a></li>
+        <li><a href="#l11-quiz">Check your understanding</a></li>
+        <li><a href="#l11-problems">Problems</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Due</h2>
+      <ul class="later-list">
+        <li><span>Fri Oct 23, 11:59 pm · Homework 2: Testing and Reasoning</span><em><a href="https://courses.cs.washington.edu/courses/cse331/26au/homework/hw2.html" target="_blank" rel="noopener">assignment page</a></em></li>
+        <li><span>Fri Oct 30, 11:59 pm · Reading 3</span><em><a href="#readings">readings</a></em></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Reference</h2>
+      <ul class="plain-links">
+        <li><a href="#home">Week overview</a></li>
+        <li><a href="#readings">Readings</a></li>
+        <li><a href="#cheatsheet">Cheat sheet</a></li>
+      </ul>
+    </div>
+    <p class="rail-foot"><kbd>←</kbd> <kbd>→</kbd> modules · <kbd>N</kbd> next step · <kbd>H</kbd> next hint</p>
+  </div>
+</nav>
+
+<main id="main">
+
+<section class="page" id="home" data-title="Week overview">
+  <div class="hero">
+    <p class="kicker">Week 4 · <span data-date="2026-10-19" data-plain>Mon Oct 19</span> to <span data-date="2026-10-23" data-plain>Fri Oct 23</span></p>
+    <h1>Users you <em>never meet</em>, and fields <em>nobody sees</em></h1>
+    <p class="lede">Monday's guestbook answers requests from browsers it cannot see, in messages that are plain text. Wednesday and Friday hide a queue's fields behind a specification, then say exactly what those fields must hold and what they stand for. Open the guestbook below in two browser windows and post a message.</p>
+    <div class="panel gb" data-start="A"></div>
+  </div>
+
+  <h2>This week</h2>
+  <div class="week">
+    <a class="day" href="#l9-discuss"><strong>Mon, Oct 19</strong><span class="tag-today" data-date="2026-10-19">Today</span><span>Lecture 9: Reading 2 discussion; programs on the web</span><span>A 1990s guestbook: HTTP requests and responses as text, GET and POST, the manual on every request.</span></a>
+    <a class="day" href="#s3-warmup"><strong>Tue, Oct 20</strong><span class="tag-today" data-date="2026-10-20">Today</span><span>Section 3: Reasoning (Floyd-Hoare logic)</span><span>Triple validity, forward and backward reasoning, an <code>if</code>, a loop invariant.</span></a>
+    <a class="day" href="#l10-queue"><strong>Wed, Oct 21</strong><span class="tag-today" data-date="2026-10-21">Today</span><span>Lecture 10: Data abstraction 1</span><span>The help queue as an ADT; tests from the spec alone; two implementations.</span></a>
+    <a class="day" href="#l11-fast"><strong>Fri, Oct 23</strong><span class="tag-today" data-date="2026-10-23">Today</span><span>Lecture 11: Data abstraction 2</span><span>Representation invariants, <code>checkRep</code>, abstraction functions, representation exposure. <b>Homework 2 due 11:59 pm.</b></span></a>
+  </div>
+
+  <h2>How to use this site</h2>
+  <div class="prose"><ul>
+    <li>Each lecture's modules follow its notes, each ending in a quick check, then a <strong>Check your understanding</strong> and a <strong>Problems</strong> page. Section 3 has a practice page.</li>
+    <li>The guestbook runs a simulator of Lecture 9's <code>Guestbook.java</code>, checked against the real server on hundreds of requests; the queues run simulators of Lectures 10 and 11's classes and drafts, checked against the real Java on thousands of calls (<code>checks/cse331/w04/verify.mjs</code>). What a browser draws is rebuilt here from a short list of safe tags, so nothing typed into the guestbook ever runs on this site.</li>
+    <li>Homework 2 is not reproduced.</li>
+  </ul></div>
+
+  <h2>Course essentials</h2>
+  <table class="plain">
+    <tr><th>Due this week</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/homework/hw2.html" target="_blank" rel="noopener">Homework 2: Testing and Reasoning</a>, Fri Oct 23 at 11:59 pm.</td></tr>
+    <tr><th>Next</th><td>Reading 3, released Fri Oct 23, due Fri Oct 30 at 11:59 pm; discussed Mon Nov 2.</td></tr>
+    <tr><th>Links</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/calendar/calendar.html" target="_blank" rel="noopener">Calendar</a> · notes: <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture09-web/notes.html" target="_blank" rel="noopener">Lecture 9</a>, <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture10-adts/notes.html" target="_blank" rel="noopener">Lecture 10</a>, <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture11-reps/notes.html" target="_blank" rel="noopener">Lecture 11</a></td></tr>
+  </table>
+  <details class="notes" open><summary>Teaching notes: the week</summary><ul>
+    <li>Lecture 9 continues Lecture 6's interactive programs, with users the program cannot see. Lectures 10 and 11 continue the course's specification thread from methods to whole types.</li>
+    <li>Two threads tie the week together: Book's <code>messages</code> returns a copy (Lecture 9), and Lecture 11 explains why, as representation exposure.</li>
+  </ul></details>
+</section>
+
+<!-- ================================================================ LECTURE 9 -->
+<section class="page" id="l9-discuss" data-title="Reading 2 discussion" data-unit="l9">
+  <p class="where">Lecture 9 · <span class="today-chip" data-date="2026-10-19">Mon Oct 19</span> · first 15–20 minutes</p>
+  <h1>Reading 2 discussion</h1>
+  <div class="rule"><p><strong>The question.</strong> Knowing takes work: saying what a method must do, testing it, and reasoning about whether it does that. Is that work the job itself, or a tax on the job?</p></div>
+  <table class="plain">
+    <tr><th>Gabriel 1991</th><td>Ship half of the right thing, then improve it.</td></tr>
+    <tr><th>Lamport 2003</th><td>A program is a mathematical object; could you prove it?</td></tr>
+    <tr><th>Dijkstra 1978</th><td>Formality is a privilege; English makes nonsense easy.</td></tr>
+  </table>
+  <h2>Run sheet</h2>
+  <ol class="phases">
+    <li><b>Groups.</b> Groups of 3 or 4 with the people next to you. Lamport readers: raise a hand, then spread out.</li>
+    <li><b>Share (5 minutes).</b> Each of you in turn: which article you read and its answer; the question you wrote for the discussion.</li>
+    <li><b>Gabriel's story, in this course's words.</b> Unix returns an error code, and every caller retries. That is a method saying no by making its caller check. Lecture 6's question: what happens when a caller forgets?</li>
+    <li><b>Argue (6 minutes).</b> Gabriel: ship half of the right thing; push the check onto the caller. The motto: deliver code that you know works. Who is right? If your group agrees, argue the other side, or take a case: binary search requires a sorted list (a fair contract, or a cop-out?); an insulin pump and a messaging app (the same philosophy?); a chatbot that asks clarifying questions (is Dijkstra's objection gone?).</li>
+    <li><b>Report.</b> A couple of groups: what did you decide, and why?</li>
+    <li><b>Half sheet (3 minutes).</b> The names of your group; what the discussion changed in your thinking, job or tax; one new point and where it came from.</li>
+  </ol>
+  <div class="check" data-id="cse331-w4-l9-qc-gabriel" data-kind="quickcheck">
+    <p>Quick check: Unix's system call returns an error code and every caller must retry. In Lecture 6's terms, the method says no by…</p>
+    <div class="opts">
+      <label data-option="special" data-correct><input type="radio" name="l9qg"> a special value or flag that the caller has to check<span class="why" hidden>Right, and Lecture 6's question follows: a caller that forgets gets silence.</span></label>
+      <label data-option="checked"><input type="radio" name="l9qg"> a checked exception<span class="why" hidden>Then the compiler would hold every caller to the check.</span></label>
+      <label data-option="pre"><input type="radio" name="l9qg"> a precondition<span class="why" hidden>The call is allowed; it reports that it did not finish.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The half sheet counts as an in-class activity. The three cases in "Argue" are on the slide for groups that agree too quickly.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l9-guestbook" data-title="A guestbook" data-unit="l9">
+  <p class="where">Lecture 9 · Programs on the web · <span class="today-chip" data-date="2026-10-19">Mon Oct 19</span> · notes: A guestbook</p>
+  <h1>A guestbook</h1>
+  <div class="prose">
+    <p>A web page where a visitor leaves a name and a message, and every later visitor sees it: the web of the 1990s, one page, one form, no JavaScript. <code>java Guestbook</code> prints <code>Serving at http://localhost:9331/</code>, then nothing happens: the program is waiting for someone to visit. Below, open the page in browser A, post Ada's message, then open the same address in browser B.</p>
+  </div>
+  <div class="panel gb"></div>
+  <ol class="prose">
+    <li>Browser A sends <code>GET /</code>: a few lines of text asking for the page at the path <code>/</code>. The terminal prints it.</li>
+    <li>The guestbook runs <code>handle</code>, which builds the page from its <em>book</em>, the messages so far, and sends it back as text. A draws it, then asks on its own for <code>/favicon.ico</code>, an icon for its tab, and gets the page again.</li>
+    <li>Pressing Post sends <code>POST /</code>, whose text ends with <code>name=Ada&amp;message=hello+world</code>. <code>handle</code> adds the message and sends the page back. It is a new page, so the boxes are empty again.</li>
+    <li>Browser B's <code>GET /</code> prints the same line as A's did. There is one book, so B's first page shows a message nobody typed in B.</li>
+  </ol>
+  <div class="prose"><p>Every arrow is a message, and every message is text. The guestbook only answers: it sends nothing until a browser asks. A window shows the page that last came back to it. Stop the program and start it again: the message is gone, since messages last only while the program runs.</p></div>
+  <div class="check" data-id="cse331-w4-l9-qc-six" data-kind="quickcheck" data-type="int" data-answer="6">
+    <p>Quick check: you open the page in A, post a message from A, and open the page in B. How many request lines does the terminal print?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>On the slide: "Then nothing happens. What is the program doing?" Ask before visiting. Then ask the room to predict the terminal after each visit.</li><li>The calculator was interactive too, but its user was at its keyboard. Here the users sit at browsers, maybe on other machines, and reach it over a network in messages of a fixed form.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l9-book" data-title="Servers, browsers, one book" data-unit="l9">
+  <p class="where">Lecture 9 · <span class="today-chip" data-date="2026-10-19">Mon Oct 19</span> · notes: Servers and browsers, The book, One book for everyone</p>
+  <h1>Servers, browsers, one book</h1>
+  <div class="rule"><p><strong>Server.</strong> A program that waits for requests and answers each with a response.</p></div>
+  <div class="prose">
+    <p>The browser relies on what the guestbook promises (a page for a GET, a message added for a POST), as Lecture 3's script relied on <code>Sum</code>. The guestbook can assume nothing about what arrives: its author can hold no browser to a promise. (The web calls the browser the server's <em>client</em>; in Lecture 2's words it is a user.) The browser's side is the <strong>frontend</strong>; the server's side, the <strong>backend</strong>.</p>
+  </div>
+  <pre class="code"><code>/** The messages posted so far, oldest first. */
+class Book {
+    private List&lt;String&gt; messages = new ArrayList&lt;String&gt;();
+    /** @modifies this
+     *  @effects adds the message, signed with the name, after the messages already posted */
+    public void add(String name, String message) {
+        messages.add(name + ": " + message);
+    }
+    /** @return the posted messages, oldest first, in a new list */
+    public List&lt;String&gt; messages() {
+        // A copy, so that a client cannot change the book through it.
+        return new ArrayList&lt;String&gt;(messages);
+    }
+}</code></pre>
+  <div class="prose">
+    <p><code>Book</code> knows nothing about the web: separation of concerns again, so a test of <code>Book</code> needs no browser, as a test of <code>CalcStack</code> needed no keyboard. The notes' second test, <code>messagesIsACopy</code>, adds to the list it got back and checks the book is unchanged. Change line 113 to <code>return messages;</code> and that test fails: any client holding the list could post without calling <code>add</code>.</p>
+    <p><strong>One book for everyone.</strong> Lecture 6's three hard things get harder with other people: state lasts across people; the order is the order requests arrive, chosen by nobody; and what a visitor cannot see is what others changed since they last looked. A fourth is new: the server does not know who it is talking to. A's <code>GET /</code> and B's print the same line; nothing in the text says who sent it. (Cookies, a later lecture.)</p>
+  </div>
+  <div class="check" data-id="cse331-w4-l9-qc-who" data-kind="quickcheck" data-type="yesno" data-answer="no">
+    <p>Quick check: from the requests it receives, can the guestbook tell browser A's <code>GET /</code> from browser B's?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>"Why does <code>messages</code> return a copy?" is put off until Lecture 11, which names the problem representation exposure. Plant the question now.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l9-http" data-title="A request is text" data-unit="l9">
+  <p class="where">Lecture 9 · <span class="today-chip" data-date="2026-10-19">Mon Oct 19</span> · notes: A request is text, Where is the loop?</p>
+  <h1>A request is text</h1>
+  <div class="code-pair">
+    <div><p class="col-label">the request (first two lines)</p><pre class="code"><code>GET / HTTP/1.1
+Host: localhost:9331</code></pre></div>
+    <div><p class="col-label">the response (without its Date line)</p><pre class="code"><code>HTTP/1.1 200 OK
+Content-type: text/html; charset=utf-8
+Content-length: 178
+
+&lt;html&gt;&lt;body&gt;
+&lt;h1&gt;Guestbook&lt;/h1&gt;
+&lt;ul&gt;
+&lt;/ul&gt;
+&lt;form method="POST" action="/"&gt;
+Name: &lt;input name="name"&gt;
+Message: &lt;input name="message"&gt;
+&lt;button&gt;Post&lt;/button&gt;
+&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;</code></pre></div>
+  </div>
+  <div class="prose">
+    <p>The rules for this text are <strong>HTTP</strong>. The request's first line gives its <em>method</em> (HTTP's word), <code>GET</code>; the path; the version. A blank line ends it. The response's first line carries a <em>status</em>: 200 means understood and answered; a status in the 400s means the server thinks the request was a mistake. Then <em>headers</em>, each a name, a colon and a value; a blank line; the body, the page in <strong>HTML</strong>: text with tags saying what each part is.</p>
+    <p><code>handle</code> builds that response: <code>page()</code> builds the text fresh from the book; line 55 turns it into bytes, since a character can take more than one byte and Content-length counts bytes; lines 56 to 60 send the header, the status and length, and the body. <code>handle</code> declares the checked <code>IOException</code> rather than catching it. Start a second copy while the first holds the port, and it ends in <code>java.net.BindException: Address already in use</code>.</p>
+  </div>
+  <h2>Where is the loop?</h2>
+  <pre class="code"><code>public static void main(String[] args) throws IOException {
+    HttpServer server =
+        HttpServer.create(new InetSocketAddress(9331), 0);
+    server.createContext("/", Guestbook::handle);
+    server.start();
+    System.out.println("Serving at http://localhost:9331/");
+}</code></pre>
+  <div class="prose">
+    <p><code>Guestbook::handle</code> is not a call: it is the method itself, handed to the server as a value, as Lecture 6 handed code to <code>assertThrows</code>. <code>main</code> returns, and the program keeps running. The loop is inside <code>HttpServer</code>: wait for a request, call the method it was handed, wait again. Each request is an <em>event</em>; a program whose methods are called by a loop it does not own is <strong>event-driven</strong>. A <strong>library</strong> is code you call (<code>Scanner</code>, <code>ArrayList</code>); a <strong>framework</strong> is code that calls you. To know when <code>handle</code> runs, read the framework's specification.</p>
+  </div>
+  <div class="check" data-id="cse331-w4-l9-qc-length" data-kind="quickcheck" data-type="int" data-answer="204">
+    <p>Quick check: after Ada posts <code>hello world</code>, the page gains the line <code>&lt;li&gt;Ada: hello world&lt;/li&gt;</code> and a newline. The first page was 178 bytes. What is the new Content-length?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Bytes vs characters: a message with é makes the page one byte longer than its character count. Try posting <code>café</code> in the guestbook and read the Content-length.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l9-getpost" data-title="GET asks, POST changes" data-unit="l9">
+  <p class="where">Lecture 9 · <span class="today-chip" data-date="2026-10-19">Mon Oct 19</span> · notes: GET asks, POST changes</p>
+  <h1>GET asks, POST changes</h1>
+  <div class="code-pair">
+    <pre class="code"><code>&lt;form method="POST" action="/"&gt;
+Name: &lt;input name="name"&gt;
+Message: &lt;input name="message"&gt;
+&lt;button&gt;Post&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+    <pre class="code"><code>POST / HTTP/1.1
+Host: localhost:9331
+Content-Length: 28
+Content-Type: application/x-www-form-urlencoded
+
+name=Ada&amp;message=hello+world</code></pre>
+  </div>
+  <div class="prose">
+    <p>Pressing the button collects the fields into one line of text: each field is its name, <code>=</code>, and what the user typed, joined by <code>&amp;</code>. Inside a value, a space becomes <code>+</code>, and most characters other than letters and digits become <code>%</code> and two hexadecimal digits. <code>parseForm</code> undoes it: split at each <code>&amp;</code>, split each pair at its first <code>=</code>, decode each half with <code>URLDecoder</code>. HTML's first standard (1995) already defines the form.</p>
+  </div>
+  <div class="rule"><p><strong>GET asks, POST changes.</strong> A GET asks for a page and must not change the server's state. A POST asks the server to do something and may change it. Browsers and other programs send GETs on their own (the favicon; a search engine's crawler follows every link), so the standard calls GET <em>safe</em>: a crawler may send one "without fear of causing harm."</p></div>
+  <div class="check" data-id="cse331-w4-l9-qc-encode" data-kind="quickcheck" data-type="output" data-answer="name=Bob&amp;message=hi+there">
+    <p>Quick check: the name is <code>Bob</code> and the message is <code>hi there</code>. What body does the form send?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="exactly as sent"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Two encodings meet here: the form's (undone by <code>parseForm</code>) and HTML's (exercise 2). Each place text goes has its own spelling.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l9-manual" data-title="The manual, on every request" data-unit="l9">
+  <p class="where">Lecture 9 · <span class="today-chip" data-date="2026-10-19">Mon Oct 19</span> · notes: The whole program, The manual, on every request</p>
+  <h1>The manual, on every request</h1>
+  <div class="prose">
+    <p>What is good is the shape: two classes keep two concerns apart, and <code>handle</code> stays short because <code>parseForm</code> parses and <code>page</code> builds the text. What is not good: Lecture 1's standard applies to a server too. Every input a user can produce gets a response the spec describes, and a stack trace is never that response. The manual names <code>GET /</code> and <code>POST /</code>, but a browser sends other requests on its own, and <code>curl</code> can send anything. Try the four cases on the curl line below, then turn on the notes' two fixes.</p>
+  </div>
+  <div class="panel gb" data-fixes></div>
+  <table class="plain">
+    <tr><th>Another path</th><td><code>GET /favicon.ico</code> gets the page: <code>HttpServer</code> sends a request to the handler whose path is the longest prefix, and <code>/</code> is a prefix of every path. Harmless, but undescribed.</td></tr>
+    <tr><th>A POST with no fields</th><td>Adds <code>null: null</code>: a map's <code>get</code> returns <code>null</code> for a missing key. Lecture 6's seventh way, on every visitor's page.</td></tr>
+    <tr><th>A body that is not a form</th><td><code>name=%&amp;message=x</code> gets no response at all: <code>parseForm</code> requires a form's body, nothing checks, <code>URLDecoder</code> throws, and <code>HttpServer</code> closes the connection. The only one of the four with no response.</td></tr>
+    <tr><th>A message holding a tag</th><td><code>&lt;b&gt;hello&lt;/b&gt;</code> goes into the page as it is, and every later browser shows it bold. A <code>&lt;script&gt;</code> tag could run code in every later visitor's browser: <strong>cross-site scripting</strong>, from treating a user's text as part of the page's text.</td></tr>
+  </table>
+  <div class="prose"><p>The lesson is Lecture 3's: a program's inputs are whatever a user can send it, not whatever its author pictured.</p></div>
+  <div class="check" data-id="cse331-w4-l9-qc-no-response" data-kind="quickcheck">
+    <p>Quick check: which of the four cases gets no response at all?</p>
+    <div class="opts">
+      <label data-option="path"><input type="radio" name="l9qm"> Another path<span class="why" hidden>It gets the page.</span></label>
+      <label data-option="empty"><input type="radio" name="l9qm"> A POST with no fields<span class="why" hidden>It gets the page, with <code>null: null</code> in it.</span></label>
+      <label data-option="notform" data-correct><input type="radio" name="l9qm"> A body that is not a form<span class="why" hidden>Right: <code>URLDecoder</code> throws and the connection closes.</span></label>
+      <label data-option="tag"><input type="radio" name="l9qm"> A message holding a tag<span class="why" hidden>It gets the page, with the tag in it.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The widget shows the response as text and rebuilds the drawn page from safe tags only; a <code>&lt;script&gt;</code> shows as a warning instead of running. That is a teaching aid, not how a browser works: a real browser would run it.</li><li>Exercises 1 and 2 close three of the four gaps (all but the body that is not a form).</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l9-quiz" data-title="Check your understanding: Lecture 9" data-unit="l9">
+  <p class="where">Lecture 9 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose"><p>Nine questions on Lecture 9. Your score counts first tries only.</p></div>
+  <div class="cyu-score" data-role="score" role="status"></div>
+  <ol class="cyu-list">
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l9-quiz-server" data-type="choice" data-topic="l9-book">
+      <p class="q">What makes the guestbook a server?</p>
+      <div class="opts">
+        <label data-option="waits" data-correct><input type="radio" name="w4a1"> It waits for requests and answers each with a response<span class="why" hidden>Right: that is the definition.</span></label>
+        <label data-option="html"><input type="radio" name="w4a1"> It produces HTML<span class="why" hidden>A batch program could print HTML too.</span></label>
+        <label data-option="remote"><input type="radio" name="w4a1"> It runs on another machine<span class="why" hidden>It runs on <code>localhost</code>, this machine.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l9-quiz-second-window" data-type="choice" data-topic="l9-book">
+      <p class="q">Why does a second window's first page show Ada's message?</p>
+      <div class="opts">
+        <label data-option="shared" data-correct><input type="radio" name="w4a2"> There is one book, shared by every request the server answers<span class="why" hidden>Right: line 23's <code>private static Book book</code>.</span></label>
+        <label data-option="cache"><input type="radio" name="w4a2"> The browser copied the page from the first window<span class="why" hidden>Browser B sent its own <code>GET /</code>; the terminal printed it.</span></label>
+        <label data-option="cookie"><input type="radio" name="w4a2"> The server knows it is the same user<span class="why" hidden>The server cannot tell A from B at all.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l9-quiz-status" data-type="int" data-answer="200" data-topic="l9-http">
+      <p class="q">What status number does the guestbook send with every page?</p>
+      <p class="why" hidden>Line 58: <code>sendResponseHeaders(200, page.length)</code>. 200 means understood and answered.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l9-quiz-bytes" data-type="choice" data-topic="l9-http">
+      <p class="q">Why does line 55 turn the page into bytes before sending the length?</p>
+      <div class="opts">
+        <label data-option="bytes" data-correct><input type="radio" name="w4a4"> Content-length counts bytes, and a character can take more than one<span class="why" hidden>Right: é is two bytes in UTF-8.</span></label>
+        <label data-option="speed"><input type="radio" name="w4a4"> Bytes travel faster than strings<span class="why" hidden>Everything travels as bytes; the point is what the length counts.</span></label>
+        <label data-option="html"><input type="radio" name="w4a4"> HTML requires bytes<span class="why" hidden>HTML is text; the header counts bytes.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l9-quiz-framework" data-type="choice" data-topic="l9-http">
+      <p class="q"><code>HttpServer</code> calls <code>handle</code> once per request, from a loop the program never sees. It is a…</p>
+      <div class="opts">
+        <label data-option="framework" data-correct><input type="radio" name="w4a5"> framework: code that calls you<span class="why" hidden>Right. The program is event-driven.</span></label>
+        <label data-option="library"><input type="radio" name="w4a5"> library: code you call<span class="why" hidden>You call <code>create</code> and <code>start</code>, but then it calls <code>handle</code>, which is the framework part.</span></label>
+        <label data-option="neither"><input type="radio" name="w4a5"> neither; <code>main</code> loops<span class="why" hidden><code>main</code> returns after starting the server.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l9-quiz-safe" data-type="choice" data-topic="l9-getpost">
+      <p class="q">Why must a GET not change the server's state?</p>
+      <div class="opts">
+        <label data-option="auto" data-correct><input type="radio" name="w4a6"> Browsers and crawlers send GETs on their own, without asking the user<span class="why" hidden>Right: a crawler's visit would post messages.</span></label>
+        <label data-option="body"><input type="radio" name="w4a6"> A GET cannot carry any data<span class="why" hidden>Its path can carry fields (exercise 3).</span></label>
+        <label data-option="slow"><input type="radio" name="w4a6"> GETs are slower<span class="why" hidden>Speed is not the reason.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l9-quiz-decode" data-type="output" data-answer="hello world &amp; tea" data-topic="l9-getpost">
+      <p class="q">What does <code>URLDecoder.decode("hello+world+%26+tea", UTF_8)</code> return?</p>
+      <p class="why" hidden><code>+</code> is a space and <code>%26</code> is <code>&amp;</code>.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l9-quiz-null" data-type="output" data-answer="null: null" data-topic="l9-manual">
+      <p class="q">A program POSTs an empty body. What line does the guestbook add to its book?</p>
+      <p class="why" hidden>The map holds neither field; <code>get</code> returns <code>null</code> for both, and <code>add</code> joins them.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l9-quiz-xss" data-type="choice" data-topic="l9-manual">
+      <p class="q">What causes cross-site scripting in the guestbook?</p>
+      <div class="opts">
+        <label data-option="join" data-correct><input type="radio" name="w4a9"> <code>page</code> joins a visitor's text into the page's HTML as it is<span class="why" hidden>Right: one <code>+</code>. Exercise 2's <code>escape</code> closes it.</span></label>
+        <label data-option="post"><input type="radio" name="w4a9"> Using POST instead of GET<span class="why" hidden>The method doesn't matter; the joining does.</span></label>
+        <label data-option="decode"><input type="radio" name="w4a9"> <code>URLDecoder</code> decoding <code>%3C</code><span class="why" hidden>Decoding gives back what was typed. The problem is putting it into the page unescaped.</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-role="summary" role="status"></div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The output answers were checked against the real <code>Guestbook</code> and <code>URLDecoder</code>.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l9-problems" data-title="Lecture 9: problems" data-unit="l9">
+  <p class="where">Lecture 9 · <span class="today-chip" data-date="2026-10-19">Mon Oct 19</span> · problems</p>
+  <h1>Lecture 9: problems</h1>
+  <div class="prose"><p>Problems 1 to 4 are the notes' exercises 1 to 4, with their official answers; problem 5 practices the encodings. You can try every request on <a href="#l9-manual">The manual, on every request</a>.</p></div>
+
+  <article class="task" data-id="cse331-w4-l9-ex1">
+    <h2>1. A missing field</h2>
+    <p class="prompt">The manual describes <code>GET /</code> and <code>POST /</code> only. Write the sentence it should have for a GET of another path and for a POST with a field missing. For the missing field, decide what the guestbook should do instead of adding <code>null</code>, and change <code>handle</code> to do it.</p>
+    <div class="answer-spec" data-part="adds-now" data-type="output" data-answer="null: hi" data-label="Today, a POST of message=hi (no name) adds" data-placeholder="exactly as stored"></div>
+    <div class="answer-spec" data-part="bytes-after" data-type="int" data-answer="178" data-label="With the fix, the Content-length of the response to an empty POST on a new server" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="change" data-type="self" data-long data-label="Your two sentences and the change to handle" data-placeholder="Any other path gets the page too. …"></div>
+    <ol class="hints"><li>A map's <code>get</code> returns <code>null</code> for a key it does not hold. Where should the check live: in <code>handle</code> or in <code>Book.add</code>?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The manual: "Any other path gets the page too. A POST adds a message only if it has both a name field and a message field."</li>
+      <li>The code: <code>String name = fields.get("name"); String message = fields.get("message"); if (name != null &amp;&amp; message != null) { book.add(name, message); }</code></li>
+      <li>The empty POST now gets the empty book's page, 178 bytes, and nothing is added. (Answering with a status in the 400s would be reasonable too; either way the manual must say which.)</li>
+      <li>The check is at the edge, where the request arrives, as <code>Sum</code>'s were. <code>Book</code> would otherwise have to know that a field can be missing, which is the web's concern.</li>
+      <li class="answer">Today it adds <code>null: hi</code>; with the fix, the empty POST gets the 178-byte page.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-l9-ex2">
+    <h2>2. Escape the message</h2>
+    <p class="prompt">Change <code>page</code> so a message is shown as typed: a tag in it appears as text and is never read as a tag.</p>
+    <div class="answer-spec" data-part="line" data-type="output" data-answer="&lt;li&gt;Eve: &amp;lt;b&amp;gt;hello&amp;lt;/b&amp;gt;&lt;/li&gt;" data-label="With escape, the page's line for Eve's message &lt;b&gt;hello&lt;/b&gt;" data-placeholder="exactly as sent"></div>
+    <div class="answer-spec" data-part="first" data-type="choice" data-answer="amp" data-options="amp:&amp; first|lt:&lt; first|gt:&gt; first|any:any order" data-label="Which replacement must come first?"></div>
+    <div class="answer-spec" data-part="where" data-type="choice" data-answer="page" data-options="page:in page, on the way out|add:in Book.add, on the way in" data-label="Where should the escaping happen?"></div>
+    <ol class="hints"><li>In HTML, <code>&lt;</code> is written <code>&amp;lt;</code>, <code>&gt;</code> is <code>&amp;gt;</code>, and <code>&amp;</code> is <code>&amp;amp;</code>. What would replacing <code>&amp;</code> second do to <code>&amp;lt;</code>?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>escape(text)</code> returns <code>text.replace("&amp;", "&amp;amp;").replace("&lt;", "&amp;lt;").replace("&gt;", "&amp;gt;")</code>, and <code>page</code> writes <code>"&lt;li&gt;" + escape(message) + "&lt;/li&gt;\n"</code>.</li>
+      <li>The <code>&amp;</code> must be replaced first, or it would replace the <code>&amp;</code> that <code>&amp;lt;</code> just introduced.</li>
+      <li><code>Book</code> stores the message as typed, and <code>page</code> escapes on the way out. Escaping in <code>add</code> would store HTML in the book, and a test of <code>Book</code> that adds <code>&lt;</code> would get <code>&amp;lt;</code> back.</li>
+      <li class="answer"><code>&lt;li&gt;Eve: &amp;lt;b&amp;gt;hello&amp;lt;/b&amp;gt;&lt;/li&gt;</code>; <code>&amp;</code> first; in <code>page</code>.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-l9-ex3">
+    <h2>3. A form that GETs</h2>
+    <p class="prompt">Change the form's method to GET, and press Post with the same name and message. What does the browser send, and what does the guestbook do?</p>
+    <div class="answer-spec" data-part="request" data-type="output" data-answer="GET /?name=Ada&amp;message=hello+world HTTP/1.1" data-label="The request's first line" data-placeholder="exactly as sent"></div>
+    <div class="answer-spec" data-part="posted" data-type="yesno" data-answer="no" data-label="Is the message posted?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="password" data-type="yesno" data-answer="no" data-label="Should a password ever go in a GET?" data-placeholder="yes or no"></div>
+    <ol class="hints"><li>A GET's fields go in the path after a <code>?</code>. Which line of <code>handle</code> decides whether to add?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The browser sends <code>GET /?name=Ada&amp;message=hello+world HTTP/1.1</code>, with the same encoding; the address bar shows it.</li>
+      <li><code>handle</code> prints the path, fields and all, but line 46 sees a GET and skips adding: the page comes back unchanged.</li>
+      <li>A GET's fields are in the address, so they land in history and server logs: never a password. A POST's are in the body. Neither hides them from the network; HTTPS does.</li>
+      <li class="answer">That first line; nothing is posted; no password in a GET.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-l9-ex4">
+    <h2>4. Refresh after posting</h2>
+    <p class="prompt">Post a message, then press the browser's refresh button and agree to send again. What does the terminal print, what does the page show, and how do many sites avoid it?</p>
+    <div class="answer-spec" data-part="log" data-type="output" data-answer="POST /" data-label="The request line the refresh adds to the terminal (before the icon request)" data-placeholder="exactly as printed"></div>
+    <div class="answer-spec" data-part="times" data-type="int" data-answer="2" data-label="How many times the message appears" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="status" data-type="int" data-answer="303" data-label="The redirect status many sites answer a POST with" data-placeholder="a status code"></div>
+    <ol class="hints"><li>Refresh repeats the request the page came from.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The page on screen came from the POST, so refresh sends the POST again, with the same body, and <code>handle</code> adds the message again: twice in the list. The browser asks first because repeating a POST is not safe.</li>
+      <li>Many sites answer a POST with a redirect, <code>303 See Other</code>, telling the browser to GET the page; refresh then repeats a GET.</li>
+      <li class="answer"><code>POST /</code>; twice; 303.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-l9-encodings">
+    <h2>5. Two encodings</h2>
+    <p class="prompt">Bob types the name <code>Bob</code> and the message <code>café &amp; tea</code>.</p>
+    <div class="answer-spec" data-part="body" data-type="output" data-answer="name=Bob&amp;message=caf%C3%A9+%26+tea" data-label="The body the form sends" data-placeholder="exactly as sent"></div>
+    <div class="answer-spec" data-part="stored" data-type="output" data-answer="Bob: café &amp; tea" data-label="What the book stores" data-placeholder="exactly as stored"></div>
+    <div class="answer-spec" data-part="bytes" data-type="int" data-answer="204" data-label="Content-length of the page on a new server after this one post (no escaping)" data-placeholder="a whole number"></div>
+    <ol class="hints"><li>é is two bytes in UTF-8, C3 A9; <code>&amp;</code> is 26.</li><li>The page grows by the bytes of <code>&lt;li&gt;</code>, the message line, <code>&lt;/li&gt;</code> and a newline.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The form encodes each byte that is not a letter or digit as <code>%</code> and two hex digits, and a space as <code>+</code>: <code>name=Bob&amp;message=caf%C3%A9+%26+tea</code>.</li>
+      <li><code>parseForm</code> decodes it back, and <code>add</code> stores <code>Bob: café &amp; tea</code>.</li>
+      <li>The line <code>Bob: café &amp; tea</code> is 15 characters but 16 bytes (é is two). With <code>&lt;li&gt;</code> (4 bytes), <code>&lt;/li&gt;</code> (5) and a newline (1), the page grows by 26 bytes: 178 + 26 = 204, the same as Ada's 16-character, 16-byte line.</li>
+      <li class="answer"><code>name=Bob&amp;message=caf%C3%A9+%26+tea</code>; <code>Bob: café &amp; tea</code>; 204 bytes.</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ SECTION 3 -->
+<section class="page" id="s3-warmup" data-title="Section 3: warm-up and review" data-unit="s3">
+  <p class="where">Section 3 · Reasoning · <span class="today-chip" data-date="2026-10-20">Tue Oct 20</span> · from the section slides</p>
+  <h1>Warm-up and review</h1>
+  <div class="prose"><p>Section 3 practiced Lectures 7 and 8. The handout, solution and slides are the source for these pages, lightly condensed. The warm-up: is each triple valid? If not, give a counterexample.</p></div>
+  <table class="plain">
+    <tr><th>A</th><td><code>{{ x &gt; 0 }} x = x - 1; {{ x &gt; 0 }}</code></td></tr>
+    <tr><th>B</th><td><code>{{ x &gt;= 10 }} if (x &lt; 5) { y = -100; } else { y = x; } {{ y &gt;= 10 }}</code></td></tr>
+    <tr><th>C</th><td><code>{{ x = a and y = b }} x = x + y; y = x - y; x = x - y; {{ x = b and y = a }}</code></td></tr>
+    <tr><th>D</th><td><code>{{ x = a and y = b }} x = y; y = x; {{ x = b and y = a }}</code></td></tr>
+    <tr><th>E</th><td><code>{{ n &gt;= 0 }} i = 1; while (i &lt;= n) { i = i + 1; } {{ i = n + 1 }}</code></td></tr>
+    <tr><th>F</th><td><code>{{ x + 1 &gt; 0 }} if (x &lt; 0) { y = -x; } else { y = x; } {{ y &gt; 0 }}</code></td></tr>
+  </table>
+  <div class="prose"><p>Three are invalid (practice problem 1 asks which).</p></div>
+  <h2>Forward reasoning: two tools</h2>
+  <table class="plain">
+    <tr><th>Subscripts</th><td>Append new facts, naming old values <code>x0</code>, <code>x1</code>, …. Gets messy, but represents everything.</td></tr>
+    <tr><th>Invertible operations</th><td>Use algebra to write the old value in terms of the new: after <code>x = x + 1</code>, <code>{{ x = y }}</code> becomes <code>{{ x - 1 = y }}</code>. More readable, but not everything inverts: after <code>x = x / 2</code>, both <code>x = 8</code> and <code>x = 9</code> give <code>x = 4</code>.</td></tr>
+  </table>
+  <div class="rule warn"><p><strong>A common error.</strong> Dropping a fact too early, or substituting away a variable's relationship: after <code>y = 3 * x; z = y + 1;</code>, keep <code>y = 3 * x</code> and <code>z = y + 1</code> rather than writing only <code>z = (3 * x) + 1</code>. Do not drop a fact while it still says something useful.</p></div>
+  <div class="prose"><p><strong>Backward reasoning</strong> is substitution: start with the postcondition, plug and chug up through each line, end at the precondition, and check that the given precondition implies it.</p></div>
+  <div class="check" data-id="cse331-w4-s3-qc-b" data-kind="quickcheck" data-type="yesno" data-answer="yes">
+    <p>Quick check: is triple B valid?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Administrivia from the slides: Homework 2 is due Friday at 11:59 pm; Reading 3 releases Friday and is due the next Friday.</li><li>The warm-up's answers come from the solution slides; the counterexamples are checked by brute force in <code>verify.mjs</code>.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="s3-tasks" data-title="Section 3: tasks 1–4" data-unit="s3">
+  <p class="where">Section 3 · <span class="today-chip" data-date="2026-10-20">Tue Oct 20</span> · the handout's four tasks, with the official solutions</p>
+  <h1>Tasks 1–4</h1>
+  <h2>Task 1: forward reasoning</h2>
+  <div class="code-pair">
+    <pre class="code"><code>{{ y &gt; 5 and z &gt; 2 }}
+x = 4 * y - 3;
+{{ y &gt; 5 and z &gt; 2 and x = 4y - 3 }}
+y = y - 5;
+{{ y0 &gt; 5 and z &gt; 2 and x = 4y0 - 3 and y = y0 - 5 }}
+z = z * y;
+{{ P: y0 &gt; 5 and z0 &gt; 2 and x = 4y0 - 3
+      and y = y0 - 5 and z = z0 * y }}
+{{ Q: x &lt; 2z + 20 }}</code></pre>
+    <pre class="code"><code>// @return (x + 1)^2
+public static int nextSquare(int x) {
+  int y = x * x;
+  {{ y = x^2 }}
+  y = y + (2 * x);
+  {{ y - 2x = x^2 }}
+  y = y + 1;
+  {{ P: y - 2x - 1 = x^2 }} &lt;--&gt; {{ y = x^2 + 2x + 1 }}
+  {{ Q: y = (x + 1)^2 }}
+  return y;
+}</code></pre>
+  </div>
+  <div class="prose"><p>The first uses subscripts; the solution also gives the invertible version, ending <code>{{ y + 5 &gt; 5 and z / y &gt; 2 and x = 4(y + 5) - 3 }}</code>. In <code>nextSquare</code>, Q comes from the <code>@return</code> clause, since <code>y</code> is what is returned, and P implies Q by algebra.</p></div>
+  <h2>Task 2: backward reasoning</h2>
+  <div class="code-pair">
+    <pre class="code"><code>{{ P: x &lt; w + 1 and w &gt; 0 }}
+{{ Q: 2x - 8 &lt; 4w }} &lt;--&gt; {{ x &lt; 2w + 4 }}
+y = 4 * w;
+{{ 2x - 8 &lt; y }}
+x = x * 2;
+{{ x - 8 &lt; y }}
+z = x - 8;
+{{ z &lt; y }}</code></pre>
+    <pre class="code"><code>{{ Q: 2c + 1 &gt;= c - 1 }} &lt;--&gt; {{ c &gt;= -2 }}
+int b = 2 * c;
+{{ b + 1 &gt;= c - 1 }}
+c = c - 1;
+{{ b + 1 &gt;= c }}
+int a = b + 1;
+{{ a &gt;= c }}
+return a;</code></pre>
+  </div>
+  <h2>Task 3: an <code>if</code>, forward</h2>
+  <pre class="code"><code>{{ 0 &lt;= s &lt; len and d &gt;= 0 }}
+int w;
+if (s + d &lt;= len) {
+  {{ 0 &lt;= s &lt; len and d &gt;= 0 and s + d &lt;= len }}
+  w = d;
+  {{ P1: 0 &lt;= s &lt; len and d &gt;= 0 and s + d &lt;= len and w = d }}
+} else {
+  {{ 0 &lt;= s &lt; len and d &gt;= 0 and s + d &gt; len }}
+  w = len - s;
+  {{ P2: 0 &lt;= s &lt; len and d &gt;= 0 and s + d &gt; len and w = len - s }}
+}
+{{ P1 or P2 }}
+return w;</code></pre>
+  <h2>Task 4: a loop</h2>
+  <pre class="code"><code>// @requires x &gt;= 0
+// @return The largest integer y such that 10 * y &lt;= x_0
+public static int divideByTen(int x) {
+  {{ x = x_0 and x_0 &gt;= 0 }}
+  int y = 0;
+  {{ P1: x = x_0 and x_0 &gt;= 0 and y = 0 }}
+  {{ Inv: x_0 - 10y = x and x &gt;= 0 }}
+  while (x &gt;= 10) {
+    {{ x_0 - 10y = x and x &gt;= 0 and x &gt;= 10 }}
+    y = y + 1;
+    {{ x_0 - 10(y_0) = x and x &gt;= 0 and x &gt;= 10 and y = y_0 + 1 }}
+    x = x - 10;
+    {{ P3: x_0 - 10(y_0) = x_1 and x_1 &gt;= 0 and x_1 &gt;= 10 and y = y_0 + 1 and x = x_1 - 10 }}
+    {{ Q2: Inv }}
+  }
+  {{ P2: Inv and x &lt; 10 }}
+  {{ Q1: 10y &lt;= x_0 and x_0 &lt; 10(y+1) and x = x_0 - 10y }}
+  return y;
+}</code></pre>
+  <div class="steps"><ol>
+    <li><strong>Check (1).</strong> <code>x_0 - 10y = x - 10y = x</code> since <code>x = x_0</code> and <code>y = 0</code>; and <code>x = x_0 &gt;= 0</code>.</li>
+    <li><strong>Check (3).</strong> <code>10y = x_0 - x &lt;= x_0</code> since <code>x &gt;= 0</code>; <code>x_0 = x + 10y &lt; 10 + 10y = 10(y + 1)</code> since <code>x &lt; 10</code>; the third fact restates the invariant.</li>
+    <li><strong>Check (2).</strong> <code>x = x_1 - 10 = x_0 - 10y_0 - 10 = x_0 - 10(y_0 + 1) = x_0 - 10y</code>; and <code>x = x_1 - 10 &gt;= 10 - 10 = 0</code>.</li>
+  </ol></div>
+  <div class="check" data-id="cse331-w4-s3-qc-c" data-kind="quickcheck" data-type="int" data-answer="-2">
+    <p>Quick check: Task 2's second snippet returns <code>a &gt;= c</code> (the new <code>c</code>) exactly when the original <code>c</code> is at least what?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Task 1's claims use integer arithmetic; with ints, the triple is valid (checked by brute force). The invertible version's <code>z / y</code> is real division in a claim, not Java's.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="s3-practice" data-title="Section 3: practice" data-unit="s3">
+  <p class="where">Section 3 · <span class="today-chip" data-date="2026-10-20">Tue Oct 20</span> · practice</p>
+  <h1>Section 3: practice</h1>
+  <div class="prose"><p>Five problems on the section's warm-up and tasks; every validity verdict and number was checked by brute force or by running the code.</p></div>
+
+  <article class="task" data-id="cse331-w4-s3-warmup">
+    <h2>1. The warm-up</h2>
+    <p class="prompt">Which of triples A to F (on the warm-up page) are invalid? Give a counterexample for D and for F.</p>
+    <div class="answer-spec" data-part="invalid" data-type="letters" data-allowed="ABCDEF" data-answer="ADF" data-label="The invalid triples" data-placeholder="letters, e.g. AB"></div>
+    <div class="answer-spec" data-part="f" data-type="int" data-answer="0" data-label="F: a starting x that is a counterexample" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="d" data-type="self" data-label="D: a counterexample" data-placeholder="a = …, b = …"></div>
+    <ol class="hints"><li>For each, try small values that make the precondition true, especially at its edge (x = 1 for A; x = 0 for F).</li><li>D: after <code>x = y;</code>, what is the old <code>x</code>?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>A: from <code>x = 1</code>, the line makes <code>x</code> 0. Invalid.</li>
+      <li>B: <code>x &gt;= 10</code> takes the else branch, so <code>y = x &gt;= 10</code>. Valid. C: the arithmetic swap leaves <code>x = b</code> and <code>y = a</code>. Valid.</li>
+      <li>D: <code>x = y</code> loses the old <code>x</code>; then <code>y = x</code> leaves both equal to <code>b</code>. Any <code>a != b</code>, such as <code>a = 1, b = 2</code>, is a counterexample. Invalid.</li>
+      <li>E: the loop ends with <code>i = n + 1</code> (for <code>n = 0</code> it never runs and <code>i = 1</code>). Valid.</li>
+      <li>F: for integers, <code>x + 1 &gt; 0</code> means <code>x &gt;= 0</code>, so the else branch sets <code>y = x</code>; from <code>x = 0</code>, <code>y = 0</code>, and <code>y &gt; 0</code> is false. Invalid.</li>
+      <li class="answer">A, D and F; for F, <code>x = 0</code>.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-s3-task1">
+    <h2>2. Task 1, checked</h2>
+    <p class="prompt">For Task 1's first part, does P imply <code>Q: x &lt; 2z + 20</code>? For <code>nextSquare</code>, what does <code>y</code> equal at P, in terms of <code>x</code>?</p>
+    <div class="answer-spec" data-part="valid" data-type="yesno" data-answer="yes" data-label="Does P imply Q (integers)?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="y" data-type="formula" data-answer="x^2+2*x+1" data-points='{"x":["0","1","-3","7","12"]}' data-label="nextSquare: y at P" data-placeholder="a formula in x"></div>
+    <div class="answer-spec" data-part="why" data-type="self" data-long data-label="The implication for the first part" data-placeholder="x = 4y0 - 3 and z = z0(y0 - 5), so …"></div>
+    <ol class="hints"><li>With integers, <code>y0 &gt; 5</code> means <code>y0 &gt;= 6</code> and <code>z0 &gt; 2</code> means <code>z0 &gt;= 3</code>.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>From P: <code>x = 4y0 - 3</code> and <code>z = z0(y0 - 5)</code> with <code>y0 - 5 &gt;= 1</code> and <code>z0 &gt;= 3</code>, so <code>2z + 20 &gt;= 6(y0 - 5) + 20 = 6y0 - 10</code>.</li>
+      <li><code>4y0 - 3 &lt; 6y0 - 10</code> exactly when <code>7 &lt; 2y0</code>, true since <code>y0 &gt;= 6</code>. So P implies Q.</li>
+      <li><code>nextSquare</code>: <code>y = x^2 + 2x + 1</code>, which is <code>(x + 1)^2</code>.</li>
+      <li class="answer">Yes; <code>y = x^2 + 2x + 1</code>.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-s3-task2">
+    <h2>3. Task 2, by substitution</h2>
+    <p class="prompt">Reason backward through each snippet.</p>
+    <div class="answer-spec" data-part="first" data-type="int" data-answer="4" data-label="First snippet: the weakest precondition simplifies to x &lt; 2w + ___" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="implies" data-type="yesno" data-answer="yes" data-label="Does P: x &lt; w + 1 and w &gt; 0 imply it?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="second" data-type="int" data-answer="-2" data-label="Second snippet: the weakest precondition is c &gt;= ___" data-placeholder="a whole number"></div>
+    <ol class="hints"><li>Substitute from the bottom: <code>x - 8</code> for <code>z</code>, then <code>2x</code> for <code>x</code>, then <code>4w</code> for <code>y</code>.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>{{ z &lt; y }}</code> ← <code>{{ x - 8 &lt; y }}</code> ← <code>{{ 2x - 8 &lt; y }}</code> ← <code>{{ 2x - 8 &lt; 4w }}</code>, that is <code>x &lt; 2w + 4</code>.</li>
+      <li>P gives <code>x &lt; w + 1</code>, and <code>w + 1 &lt; 2w + 4</code> whenever <code>w &gt; -3</code>, so P implies it.</li>
+      <li>Second: <code>{{ a &gt;= c }}</code> ← <code>{{ b + 1 &gt;= c }}</code> ← <code>{{ b + 1 &gt;= c - 1 }}</code> ← <code>{{ 2c + 1 &gt;= c - 1 }}</code>, that is <code>c &gt;= -2</code>.</li>
+      <li class="answer"><code>x &lt; 2w + 4</code>; yes; <code>c &gt;= -2</code>.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-s3-task3">
+    <h2>4. Task 3: what is <code>w</code>?</h2>
+    <p class="prompt">From <code>P1 or P2</code>, say what the method returns in one expression, and run it on <code>s = 3, d = 5, len = 6</code>.</p>
+    <div class="answer-spec" data-part="expr" data-type="choice" data-answer="min" data-options="min:min(d, len - s)|max:max(d, len - s)|d:always d|rest:always len - s" data-label="The method returns"></div>
+    <div class="answer-spec" data-part="run" data-type="int" data-answer="3" data-label="… on s = 3, d = 5, len = 6" data-placeholder="a whole number"></div>
+    <ol class="hints"><li>In P1, <code>s + d &lt;= len</code> means <code>d &lt;= len - s</code>. In P2, the other way.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>P1: <code>w = d</code> and <code>d &lt;= len - s</code>, so <code>w</code> is the smaller. P2: <code>w = len - s</code> and <code>len - s &lt; d</code>, so again the smaller.</li>
+      <li>On <code>s = 3, d = 5, len = 6</code>: <code>s + d = 8 &gt; 6</code>, the else branch: <code>w = 6 - 3 = 3</code>.</li>
+      <li class="answer"><code>min(d, len - s)</code>; 3.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-s3-task4">
+    <h2>5. Task 4: <code>divideByTen</code></h2>
+    <p class="prompt">Run <code>divideByTen(47)</code>, then do check (2) yourself.</p>
+    <div class="answer-spec" data-part="y" data-type="int" data-answer="4" data-label="divideByTen(47) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="x" data-type="int" data-answer="7" data-label="… with x at the exit" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="passes" data-type="int" data-answer="4" data-label="How many passes the loop makes" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="check2" data-type="self" data-long data-label="Check (2): P3 implies the invariant" data-placeholder="x = x_1 - 10 = …"></div>
+    <ol class="hints"><li>Each pass takes 10 from <code>x</code> and adds 1 to <code>y</code>; the loop stops when <code>x &lt; 10</code>.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>47 → 37 → 27 → 17 → 7: four passes, <code>y = 4</code>, <code>x = 7</code>. Q1 holds: 40 ≤ 47 &lt; 50, and 7 = 47 − 40.</li>
+      <li>Check (2): <code>x = x_1 - 10 = x_0 - 10y_0 - 10 = x_0 - 10(y_0 + 1) = x_0 - 10y</code>, and <code>x = x_1 - 10 &gt;= 0</code> since <code>x_1 &gt;= 10</code>.</li>
+      <li class="answer">4, with <code>x = 7</code>, after 4 passes.</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ LECTURE 10 -->
+<section class="page" id="l10-queue" data-title="The help queue" data-unit="l10">
+  <p class="where">Lecture 10 · Abstract data types · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span> · notes: The help queue</p>
+  <h1>The help queue</h1>
+  <pre class="code"><code>/**
+ * The queue for office hours: the students waiting for help, in
+ * the order they joined. A student is named by their NetID, and a
+ * student is in the queue at most once.
+ */
+public interface HelpQueue {
+    /** @return the number of students waiting */
+    int size();
+    /** @modifies this
+     *  @effects adds the student at the back of the queue
+     *  @throws IllegalArgumentException if the student is already in
+     *      the queue, and leaves the queue unchanged */
+    void join(String netid);
+    /** @modifies this
+     *  @effects removes the student at the front of the queue
+     *  @return the NetID of the student removed
+     *  @throws NoSuchElementException if the queue is empty */
+    String next();
+    /** @return the students waiting, front first, in a new list */
+    List&lt;String&gt; waiting();
+}</code></pre>
+  <div class="prose"><p>An <strong>interface</strong> is a specification with no fields and no method bodies. A class <em>implements</em> it by giving each method a body. Every specification here is written about the queue of students; none can mention a field.</p></div>
+  <div class="rule">
+    <p><strong>Abstract data type (ADT).</strong> A specification for the operations available to access and modify the underlying data, written in terms of the <em>abstract state</em>, how the client should think about the object. <strong>Data abstraction</strong> means using a type only through its specification, which hides how the data is represented.</p>
+    <p><strong>Representation.</strong> How the objects are implemented: the class's fields and what each holds. The spec never mentions it, so the implementer may change it as long as each method still satisfies its spec.</p>
+    <p><strong>Abstract invariant.</strong> A claim about the abstract state true of every object whenever no method is running. Here: a student is in the queue at most once. The specs keep it true (<code>join</code> throws on a repeat; <code>next</code> only removes), so every client can rely on it with every implementation.</p>
+  </div>
+  <div class="prose"><p>Procedural abstraction drew the line around a method; data abstraction draws it around a whole type.</p></div>
+  <div class="check" data-id="cse331-w4-l10-qc-ai" data-kind="quickcheck">
+    <p>Quick check: which is <code>HelpQueue</code>'s abstract invariant?</p>
+    <div class="opts">
+      <label data-option="once" data-correct><input type="radio" name="l10qa"> A student is in the queue at most once<span class="why" hidden>Right: a claim about the abstract state, kept by the specs.</span></label>
+      <label data-option="field"><input type="radio" name="l10qa"> The field <code>queue</code> is never <code>null</code><span class="why" hidden>The interface has no fields; that would be about one implementation.</span></label>
+      <label data-option="order"><input type="radio" name="l10qa"> <code>next</code> returns the student who joined first<span class="why" hidden>That is what one method promises, not a claim true of every queue at rest.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>"Joining at the back" is a promise of one method (<code>join</code>'s spec); "at most once" is a claim about every queue (the abstract invariant). Students blur these.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l10-tests" data-title="Tests from the spec alone" data-unit="l10">
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span> · notes: Tests from the specification alone</p>
+  <h1>Tests from the spec alone</h1>
+  <div class="prose">
+    <p>With no implementation, a test can only call the interface's methods, with expected answers from its comments: a specification-based test that passes on every correct implementation. But <code>new HelpQueue()</code> is not Java, and no class exists yet. So each test asks an <code>abstract</code> method <code>emptyQueue()</code> for its queue, in an abstract class <code>HelpQueueTest</code>. A subclass gives <code>emptyQueue</code> a body and inherits the five tests.</p>
+  </div>
+  <table class="plain">
+    <tr><th><code>studentsAreServedInTheOrderTheyJoined</code></th><td>ada, bob join; <code>waiting</code> is <code>[ada, bob]</code>; <code>next</code> is ada; then <code>[bob]</code>, size 1.</td></tr>
+    <tr><th><code>nobodyIsInTheQueueTwice</code></th><td>ada joins twice: <code>assertThrows(IllegalArgumentException.class, () -&gt; queue.join("ada"))</code>, and the queue is still <code>[ada]</code>.</td></tr>
+    <tr><th><code>aStudentWhoLeftMayComeBack</code></th><td>ada joins, is served, joins again: <code>[ada]</code>.</td></tr>
+    <tr><th><code>nextOnAnEmptyQueueThrows</code></th><td><code>NoSuchElementException</code>.</td></tr>
+    <tr><th><code>waitingIsACopy</code></th><td>Adding to the returned list does not change the queue.</td></tr>
+  </table>
+  <div class="check" data-id="cse331-w4-l10-qc-abstract" data-kind="quickcheck" data-type="yesno" data-answer="no">
+    <p>Quick check: can JUnit run <code>HelpQueueTest</code>'s tests by selecting <code>HelpQueueTest</code> itself?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Select the subclass, not the abstract class: JUnit cannot construct an abstract class, and its summary just reports zero tests found.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l10-impl" data-title="An implementation" data-unit="l10">
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span> · notes: An implementation</p>
+  <h1>An implementation</h1>
+  <pre class="code"><code>public class ListQueue implements HelpQueue {
+    private List&lt;String&gt; queue = new ArrayList&lt;String&gt;();      // line 7
+    public int size() { return queue.size(); }
+    public void join(String netid) {
+        if (queue.contains(netid)) {
+            throw new IllegalArgumentException(netid + " is in the queue");
+        }
+        queue.add(netid);
+    }
+    public String next() {
+        if (queue.isEmpty()) {
+            throw new NoSuchElementException("the queue is empty");
+        }
+        return queue.remove(0);                                   // line 24
+    }
+    public List&lt;String&gt; waiting() {
+        // A copy, so that a client cannot change the queue through it.
+        return new ArrayList&lt;String&gt;(queue);
+    }
+}</code></pre>
+  <div class="prose"><p><code>implements HelpQueue</code> makes the compiler check names and types, not that each body does what its spec says: that part is yours. Try the class below; the table shows its one field, which no client ever sees.</p></div>
+  <div class="panel qx" data-kinds="list linked listBack" data-presets='[["the first test","join:ada join:bob waiting next waiting size"],["ada twice","join:ada join:ada waiting"],["empty next","next"]]'></div>
+  <h2>Why private?</h2>
+  <div class="prose"><p><code>Shortcut</code> skips <code>join</code> and changes the list itself: <code>queue.queue.add("ada"); queue.queue.add(0, "eve");</code>. With the field private, <code>javac</code> refuses exactly those two lines (<code>queue has private access in ListQueue</code>). Were it public, the run would print <code>[eve, ada, bob, ada]</code> and <code>helping eve</code>: both rules broken (ada twice; eve did not join at the back), though <code>join</code> checks. With the field private, only <code>join</code> and <code>next</code> can change the queue, so they are the only places that must keep its rules.</p></div>
+  <div class="check" data-id="cse331-w4-l10-qc-shortcut" data-kind="quickcheck" data-type="output" data-answer="helping eve">
+    <p>Quick check: with the field made public, what is the second line <code>Shortcut</code> prints?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="exactly as printed"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The five spec tests run on <code>ListQueue</code> through <code>ListQueueSpecTest</code>, whose <code>emptyQueue</code> returns <code>new ListQueue()</code>: the only place the tests name the class. A copy of <code>ListQueue</code> without <code>join</code>'s check fails only <code>nobodyIsInTheQueueTwice</code>.</li><li>Half sheet, question 1 (3 minutes): <em><code>ListQueue</code>'s <code>join</code> walks the list for a student already waiting. How could we make this faster?</em> (Friday's <code>FastQueue</code> answers it.)</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l10-two" data-title="A second implementation" data-unit="l10">
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span> · notes: implementation-based tests, A second implementation</p>
+  <h1>A second implementation</h1>
+  <div class="prose">
+    <p>Two more tests, in <code>ListQueueImplTest.java</code>, pass on <code>ListQueue</code> but are <strong>implementation-based</strong>: <code>joinTwiceSaysWho</code> asserts the message <code>"ada is in the queue"</code>, and <code>waitingIsAnArrayList</code> asserts the class of the returned list. Neither detail is in <code>HelpQueue.java</code>; another correct implementation may choose differently.</p>
+    <p><code>LinkedQueue</code> keeps a chain of private <code>Node</code>s, each holding a NetID and the next node, with fields <code>front</code> and <code>back</code>. Its <code>join</code> says <code>"ada is already waiting"</code>. Pick it in the widget on the previous page. All ten spec tests (five per class) pass; <code>joinTwiceSaysWho</code> fails on it (<code>expected: &lt;ada is in the queue&gt; but was: &lt;ada is already waiting&gt;</code>), while <code>waitingIsAnArrayList</code> still passes, since it happens to return an <code>ArrayList</code>.</p>
+    <p>Different classes, different fields and bodies, yet a client that relies only on <code>HelpQueue</code>'s specs, like <code>OfficeHours</code> declared with <code>HelpQueue queue = new LinkedQueue();</code>, prints the same <code>[ada, bob]</code> and <code>helping ada</code>. Java's <code>List</code> is the same idea: an interface with <code>ArrayList</code> and <code>LinkedList</code> behind it.</p>
+  </div>
+  <div class="check" data-id="cse331-w4-l10-qc-joinmsg" data-kind="quickcheck" data-type="yesno" data-answer="no">
+    <p>Quick check: is <code>joinTwiceSaysWho</code> a specification-based test?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Ask "are the two classes the same or different?" before answering: different classes; the same to a client of the interface.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l10-readings" data-title="Three readings of waiting" data-unit="l10">
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span> · notes: Three readings of "returns the students waiting"</p>
+  <h1>Three readings of <code>waiting</code></h1>
+  <div class="prose"><p>Suppose <code>waiting</code>'s spec said only "returns the students waiting". A client could read it three ways:</p></div>
+  <ol class="prose">
+    <li><strong>A new list</strong>, the students waiting at the call; the client may do anything with it. What <code>HelpQueue</code> promises ("in a new list").</li>
+    <li><strong>The queue's own list</strong>, shared: the client sees later joins without calling again, and anything it does to the list happens to the queue.</li>
+    <li><strong>A list the client may read but must not change or keep</strong>, so the implementer may hand back either.</li>
+  </ol>
+  <div class="prose"><p>The first two are incomparable: each can break a client written for the other. The third is weaker than both. Under the second, a client could add a NetID already waiting, and the queue would hold that student twice without <code>join</code> ever running: outside code breaking the abstract invariant, as <code>Shortcut</code> did. The copy costs a walk of the queue on each call; in return, only <code>join</code> and <code>next</code> can change the queue.</p></div>
+  <div class="check" data-id="cse331-w4-l10-qc-third" data-kind="quickcheck" data-type="strength" data-answer="weaker">
+    <p>Quick check: as a specification of <code>waiting</code>, the third reading is ___ than the first.</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="stronger, weaker or incomparable"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Half sheet, question 2 (3 minutes): <em>Suppose <code>ListQueue</code>'s <code>waiting</code> returned its field <code>queue</code>. How could a client put ada in the queue twice?</em></li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l10-quiz" data-title="Check your understanding: Lecture 10" data-unit="l10">
+  <p class="where">Lecture 10 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose"><p>Nine questions on Lecture 10. Your score counts first tries only.</p></div>
+  <div class="cyu-score" data-role="score" role="status"></div>
+  <ol class="cyu-list">
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l10-quiz-adt" data-type="choice" data-topic="l10-queue">
+      <p class="q">An ADT's specification is written in terms of…</p>
+      <div class="opts">
+        <label data-option="abstract" data-correct><input type="radio" name="w4b1"> the abstract state, how a client thinks of the object<span class="why" hidden>Right.</span></label>
+        <label data-option="fields"><input type="radio" name="w4b1"> the fields of the class<span class="why" hidden>Those are the representation, which the spec never mentions.</span></label>
+        <label data-option="tests"><input type="radio" name="w4b1"> its tests<span class="why" hidden>Tests come from the spec, not the other way.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l10-quiz-new" data-type="choice" data-topic="l10-tests">
+      <p class="q">Why do the spec tests call <code>emptyQueue()</code> instead of <code>new ListQueue()</code>?</p>
+      <div class="opts">
+        <label data-option="every" data-correct><input type="radio" name="w4b2"> So the same tests run on every implementation; a subclass says which<span class="why" hidden>Right.</span></label>
+        <label data-option="faster"><input type="radio" name="w4b2"> It is faster<span class="why" hidden>Speed isn't the point.</span></label>
+        <label data-option="interface"><input type="radio" name="w4b2"> <code>new HelpQueue()</code> works in a subclass<span class="why" hidden>Java never constructs an interface.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l10-quiz-private" data-type="choice" data-topic="l10-impl">
+      <p class="q">With <code>ListQueue</code>'s field private, which code can break the queue's rules?</p>
+      <div class="opts">
+        <label data-option="class" data-correct><input type="radio" name="w4b3"> Only <code>ListQueue</code>'s own methods<span class="why" hidden>Right: so only <code>join</code> and <code>next</code> must keep the rules.</span></label>
+        <label data-option="any"><input type="radio" name="w4b3"> Any client that holds a <code>ListQueue</code><span class="why" hidden>Not through the field: <code>javac</code> refuses the access.</span></label>
+        <label data-option="tests"><input type="radio" name="w4b3"> Only the tests<span class="why" hidden>Tests are clients too.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l10-quiz-checks" data-type="choice" data-topic="l10-impl">
+      <p class="q">What does <code>implements HelpQueue</code> make the compiler check?</p>
+      <div class="opts">
+        <label data-option="sig" data-correct><input type="radio" name="w4b4"> That the class has every listed method, with the same names and types<span class="why" hidden>Right. Whether each body meets its spec is yours to check.</span></label>
+        <label data-option="spec"><input type="radio" name="w4b4"> That each method satisfies its specification<span class="why" hidden>The compiler cannot check that.</span></label>
+        <label data-option="tests"><input type="radio" name="w4b4"> That the five tests pass<span class="why" hidden>Tests run under JUnit, not the compiler.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l10-quiz-nocheck" data-type="int" data-answer="1" data-topic="l10-impl">
+      <p class="q">A copy of <code>ListQueue</code> drops <code>join</code>'s check. How many of the five spec tests fail?</p>
+      <p class="why" hidden>Only <code>nobodyIsInTheQueueTwice</code>: the others never join a student who is already waiting.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l10-quiz-implbased" data-type="choice" data-topic="l10-two">
+      <p class="q">An implementation-based test…</p>
+      <div class="opts">
+        <label data-option="choice" data-correct><input type="radio" name="w4b6"> checks a choice the spec left open, so a correct implementation may fail it<span class="why" hidden>Right: like the message wording or the list's class.</span></label>
+        <label data-option="wrong"><input type="radio" name="w4b6"> is always wrong to write<span class="why" hidden>It's useful while writing that class; it just isn't about the type.</span></label>
+        <label data-option="private"><input type="radio" name="w4b6"> reads private fields<span class="why" hidden>Both of the lecture's use only public methods.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l10-quiz-linked" data-type="output" data-answer="ada is already waiting" data-topic="l10-two">
+      <p class="q">On a <code>LinkedQueue</code>, ada joins twice. What is the exception's message?</p>
+      <p class="why" hidden>That is <code>LinkedQueue</code>'s wording; <code>ListQueue</code> says <code>ada is in the queue</code>.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l10-quiz-list" data-type="choice" data-topic="l10-two">
+      <p class="q">Java's <code>List</code>, with <code>ArrayList</code> and <code>LinkedList</code>, is…</p>
+      <div class="opts">
+        <label data-option="adt" data-correct><input type="radio" name="w4b8"> an ADT: an interface whose abstract state is its elements in order<span class="why" hidden>Right.</span></label>
+        <label data-option="class"><input type="radio" name="w4b8"> one class with two names<span class="why" hidden>Two classes, two representations.</span></label>
+        <label data-option="none"><input type="radio" name="w4b8"> unrelated to data abstraction<span class="why" hidden>It is the lecture's idea in the standard library.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l10-quiz-readings" data-type="strength" data-answer="incomparable" data-topic="l10-readings">
+      <p class="q">As specs of <code>waiting</code>, "a new list" is ___ than "the queue's own list".</p>
+      <p class="why" hidden>Incomparable: a client counting on later joins breaks with a copy; a client changing its list freely breaks with the shared list.</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-role="summary" role="status"></div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The numeric and output answers were checked against the real classes.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l10-problems" data-title="Lecture 10: problems" data-unit="l10">
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span> · problems</p>
+  <h1>Lecture 10: problems</h1>
+  <div class="prose"><p>Problems 1 to 3 are the notes' exercises 1 to 3, with their official answers; problem 4 is the half sheet's second question. In problems 2 and 3, the seven tests are <b>A</b> <code>studentsAreServedInTheOrderTheyJoined</code>, <b>B</b> <code>nobodyIsInTheQueueTwice</code>, <b>C</b> <code>aStudentWhoLeftMayComeBack</code>, <b>D</b> <code>nextOnAnEmptyQueueThrows</code>, <b>E</b> <code>waitingIsACopy</code>, <b>F</b> <code>joinTwiceSaysWho</code>, <b>G</b> <code>waitingIsAnArrayList</code>.</p></div>
+
+  <article class="task" data-id="cse331-w4-l10-ex1">
+    <h2>1. Add <code>front</code></h2>
+    <p class="prompt">Add a method <code>front</code> to <code>HelpQueue</code> that tells a client who is next without serving them. Write its spec in the style of the other four, one spec-based test, and its body in <code>ListQueue</code>.</p>
+    <div class="answer-spec" data-part="modifies" data-type="yesno" data-answer="no" data-label="Does front's spec have a @modifies line?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="throws" data-type="text" data-answer="NoSuchElementException" data-label="What front throws on an empty queue" data-placeholder="an exception class"></div>
+    <div class="answer-spec" data-part="all" data-type="self" data-long data-label="Spec, test and body" data-placeholder="/** @return … */ String front();"></div>
+    <ol class="hints"><li>Write it about the queue of students, not a field. Does <code>front</code> change anything?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Spec: <code>@return the NetID of the student at the front of the queue, who stays in the queue</code>; <code>@throws NoSuchElementException if the queue is empty</code>. No <code>@modifies</code>.</li>
+      <li>Test <code>frontIsWhoNextWouldServe</code>: join ada and bob; <code>front</code> is ada; <code>waiting</code> is still <code>[ada, bob]</code>; <code>next</code> is ada. Every call is to an interface method, with answers from the specs.</li>
+      <li>Body: throw <code>NoSuchElementException("the queue is empty")</code> if empty, else <code>queue.get(0)</code>. <code>LinkedQueue</code> won't compile until it has a <code>front</code> too.</li>
+      <li class="answer">No <code>@modifies</code>; <code>NoSuchElementException</code>.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-l10-ex2">
+    <h2>2. Serving from the wrong end</h2>
+    <p class="prompt">A buggy <code>ListQueue</code> has line 24 as <code>return queue.remove(queue.size() - 1);</code>. Which of the seven tests fail, and with what message? (It is in the widget on <a href="#l10-impl">An implementation</a>.)</p>
+    <div class="answer-spec" data-part="fail" data-type="letters" data-allowed="ABCDEFG" data-answer="A" data-label="The tests that fail" data-placeholder="letters, e.g. AB"></div>
+    <div class="answer-spec" data-part="got" data-type="output" data-answer="bob" data-label="In test A, what next returns where ada was expected" data-placeholder="a NetID"></div>
+    <ol class="hints"><li>Which tests call <code>next</code> with two or more students waiting?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>A fails with <code>expected: &lt;ada&gt; but was: &lt;bob&gt;</code>.</li>
+      <li>B and E never call <code>next</code>; C calls it with one student waiting, whose back is its front; D only checks the throw; F and G look at <code>join</code>'s message and <code>waiting</code>'s list.</li>
+      <li class="answer">Only A, getting <code>bob</code>. One test alone checks the order, yet the order is what makes the type a queue.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-l10-ex3">
+    <h2>3. A view instead of a copy</h2>
+    <p class="prompt">Another version returns <code>Collections.unmodifiableList(queue)</code> from <code>waiting</code>: a view that shows later changes, and throws <code>UnsupportedOperationException</code> on any attempt to change it. Which of the three readings does it satisfy? Which tests fail?</p>
+    <div class="answer-spec" data-part="reading" data-type="int" data-answer="3" data-label="The reading it satisfies (1, 2 or 3)" data-placeholder="1, 2 or 3"></div>
+    <div class="answer-spec" data-part="spec" data-type="yesno" data-answer="no" data-label="Does it satisfy HelpQueue's specification?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="fail" data-type="letters" data-allowed="ABCDEFG" data-answer="EG" data-label="The tests that fail" data-placeholder="letters, e.g. AB"></div>
+    <ol class="hints"><li>Which tests try to change the list <code>waiting</code> returns, or check its class?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>It is not a new list (reading 1), and a change to it throws rather than changing the queue (reading 2). It is a list the client can read: reading 3.</li>
+      <li><code>HelpQueue</code> promises "a new list", reading 1, so this version does not satisfy it.</li>
+      <li>E fails: <code>copy.add("eve")</code> throws <code>UnsupportedOperationException</code> before the assertion. G fails: <code>expected: &lt;true&gt; but was: &lt;false&gt;</code>, since the view is not an <code>ArrayList</code>.</li>
+      <li class="answer">Reading 3; no; E and G.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-l10-half-sheet">
+    <h2>4. Half sheet: ada twice</h2>
+    <p class="prompt">Suppose <code>ListQueue</code>'s <code>waiting</code> returned its field <code>queue</code>. How could a client put ada in the queue twice?</p>
+    <div class="answer-spec" data-part="size" data-type="int" data-answer="2" data-label="After join(&quot;ada&quot;) then waiting().add(&quot;ada&quot;), size() returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="how" data-type="self" data-long data-label="How, and which rule it breaks" data-placeholder="The client calls waiting() and …"></div>
+    <ol class="hints"><li>Under that change, the returned list and the field are one list.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The client joins ada, calls <code>waiting()</code>, and adds <code>"ada"</code> to the list it got: that list is the field, so the queue now holds ada twice, and <code>join</code>'s check never ran.</li>
+      <li>That breaks the abstract invariant (at most once), from outside the class, as <code>Shortcut</code> did through a public field.</li>
+      <li class="answer"><code>size()</code> returns 2.</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ LECTURE 11 -->
+<section class="page" id="l11-fast" data-title="FastQueue: which method is wrong?" data-unit="l11">
+  <p class="where">Lecture 11 · Implementing an abstract data type · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span> · notes: FastQueue, Which method is wrong?</p>
+  <h1>FastQueue: which method is wrong?</h1>
+  <div class="prose">
+    <p>A spec is written about the abstract state; a body about the concrete state, its fields. Between them is a gap. Wednesday's half sheet asked how to make <code>join</code>'s check faster: keep the students twice, in a list for the order and in a <code>HashSet</code> for a check that takes the same time however long the queue. That is <code>FastQueue</code>:</p>
+  </div>
+  <pre class="code"><code>private List&lt;String&gt; queue;     // line 14: the students waiting, front first
+private Set&lt;String&gt; members;     // line 16: the same students, for a fast lookup
+// RI: no NetID is in queue twice, and members holds exactly
+//     the NetIDs in queue.
+// AF(this) = the help queue of the students in queue, front first.
+…
+public void join(String netid) {          // lines 50–58
+    checkRep();
+    if (members.contains(netid)) { throw new IllegalArgumentException(netid + " is in the queue"); }
+    queue.add(netid);                     // line 55
+    members.add(netid);                   // line 56
+    checkRep();
+}
+public String next() {                    // lines 60–69
+    checkRep();
+    if (queue.isEmpty()) { throw new NoSuchElementException("nobody is waiting"); }
+    String front = queue.remove(0);       // line 65
+    members.remove(front);                // line 66
+    checkRep();
+    return front;
+}</code></pre>
+  <div class="prose"><p>The five tests pass unchanged: nothing <code>HelpQueue</code> promises mentions a list or a set (Parnas, in Reading 3: each module hides one design decision). Now the game: suppose you forgot line 66, and for now there are no <code>checkRep</code> calls. Run the two failing tests in the widget.</p></div>
+  <div class="panel qx" data-kinds="fastNo66NoCheck fast" data-presets='[["aStudentWhoLeftMayComeBack","join:ada next join:ada"],["studentsAreServed…","join:ada join:bob waiting next waiting size"]]'></div>
+  <div class="prose">
+    <p>The second <code>join</code> throws "ada is in the queue" with nobody waiting; <code>size</code> returns 2 with one student waiting. Which method's code is wrong? If <code>members</code> may hold students who have left, <code>join</code> and <code>size</code> are wrong to trust it. If <code>members</code> holds exactly the students in <code>queue</code>, <code>next</code> is wrong. Nothing <code>javac</code> checks decides. And <code>next</code> without line 66 breaks no part of its own spec. What it breaks is the comment on lines 17 and 18, a claim about the fields.</p>
+  </div>
+  <div class="check" data-id="cse331-w4-l11-qc-which" data-kind="quickcheck">
+    <p>Quick check: by the comment on lines 17 and 18, which method's code is wrong?</p>
+    <div class="opts">
+      <label data-option="next" data-correct><input type="radio" name="l11qw"> <code>next</code><span class="why" hidden>Right: it leaves <code>members</code> holding a NetID that is not in <code>queue</code>.</span></label>
+      <label data-option="join"><input type="radio" name="l11qw"> <code>join</code><span class="why" hidden>It may assume the comment's claim, and trusting the set is then right.</span></label>
+      <label data-option="size"><input type="radio" name="l11qw"> <code>size</code><span class="why" hidden>Under the claim, the set's size is the number waiting.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The widget's runs match the notes' JUnit failures: <code>ada is in the queue</code> and <code>expected: &lt;1&gt; but was: &lt;2&gt;</code>. Switch to the real <code>FastQueue</code> to see both pass.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l11-ri" data-title="Representation invariants, checkRep" data-unit="l11">
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span> · notes: Representation invariants, Checking the representation invariant with checkRep</p>
+  <h1>Representation invariants and <code>checkRep</code></h1>
+  <div class="rule">
+    <p><strong>Representation invariant (RI).</strong> A claim about a class's fields that is true of every object whenever no method of the class is running. The constructor makes it true; every method may assume it when called and must make it true again before it returns. Document it as <code>// RI: ...</code> beside the fields.</p>
+  </div>
+  <div class="prose">
+    <p>The RI is not the abstract invariant: that is about the abstract state, for the client; the RI is about one class's fields, for the implementer. Like a loop invariant, it may be false in the middle: <code>FastQueue</code>'s is false between lines 65 and 66.</p>
+  </div>
+  <pre class="code"><code>private void checkRep() {
+    if (!members.equals(new HashSet&lt;String&gt;(queue))) {
+        throw new IllegalStateException("members is not the queue");    // line 38
+    }
+    if (members.size() != queue.size()) {
+        throw new IllegalStateException("someone is in queue twice");   // line 41
+    }
+}</code></pre>
+  <div class="prose">
+    <p><strong><code>checkRep</code></strong> checks the RI in code and throws if any clause is false; it is private and changes no field. It is Lecture 6's defensive programming, turned on the class's own fields. With the checks on, the forgetful <code>next</code> fails on its own call, line 67, with <code>members is not the queue</code>: the report names the method that is wrong. Try "FastQueue without line 66, checkRep on" below.</p>
+    <p><strong>Where to call it</strong> (the course's code quality guide): at the end of each constructor; at the beginning and end of every mutator; at the beginning of every non-mutator. Never at the start of a constructor (the fields are still <code>null</code>), and not in private helpers, which may run while the RI is false. Each call walks the whole queue, so in production keep only the fast checks.</p>
+  </div>
+  <div class="panel qx" data-kinds="fastNo66 fast" data-presets='[["join, next, join","join:ada next join:ada"]]'></div>
+  <div class="check" data-id="cse331-w4-l11-qc-line" data-kind="quickcheck" data-type="int" data-answer="67">
+    <p>Quick check: with the checks on, on which line of <code>FastQueue.java</code> does the forgetful <code>next</code> call the <code>checkRep</code> that throws?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a line number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Half sheet, question 1: <em>On what line of <code>join</code> does the RI become false? When true again?</em> (Problem 2.)</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l11-faster" data-title="FasterQueue and the AF" data-unit="l11">
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span> · notes: A faster next, Abstraction functions</p>
+  <h1><code>FasterQueue</code> and the abstraction function</h1>
+  <div class="prose">
+    <p><code>queue.remove(0)</code> shifts every later element left, so <code>next</code> takes longer the longer the queue. Removing the last element moves nothing. So keep two lists, each used only at its end: <code>join</code> adds at the end of the <em>inbox</em>; <code>next</code> removes from the end of the <em>outbox</em>, which holds the front of the queue last; when the outbox runs dry, <code>next</code> refills it with the inbox reversed. The set stays, for <code>join</code>'s check.</p>
+  </div>
+  <pre class="code"><code>// RI: no NetID is in inbox or outbox twice, or in both, and
+//     members holds exactly the NetIDs in inbox and outbox.
+// AF(this) = the help queue of the students in outbox, last to
+//     first, then the students in inbox, first to last.</code></pre>
+  <div class="rule"><p><strong>Abstraction function (AF).</strong> Maps each value of the fields that the RI allows to the abstract state it stands for. A mathematical function, not code; document it as <code>// AF(this) = ...</code>. It goes one way: several values of the fields can stand for one queue, so no function goes back.</p></div>
+  <div class="panel qx" data-kinds="faster fasterDraft" data-presets='[["ada, bob, eve; next","join:ada join:bob join:eve next waiting"],["bob, eve another way","join:ada join:bob next join:eve waiting"]]'></div>
+  <div class="prose">
+    <p>Join ada, bob and eve, then call <code>next</code>: <code>inbox = []</code>, <code>outbox = [eve, bob]</code>, and by the AF the queue is bob, eve. Another route gives <code>inbox = [eve]</code>, <code>outbox = [bob]</code>: the same queue. Fields like <code>inbox = [bob]</code>, <code>outbox = [bob]</code> break the RI and stand for nothing. Every RI must guarantee the abstract invariant: <code>RI(this)</code> implies <code>AI(AF(this))</code>.</p>
+    <p>The draft <code>waiting</code> copies the outbox as stored. Wednesday's five tests all pass on it (none has two students in the outbox when it calls <code>waiting</code>); <code>FasterQueueTest</code>'s three-student test fails, <code>expected: &lt;[bob, eve]&gt; but was: &lt;[eve, bob]&gt;</code>. The AF says what it got wrong: it read the outbox in the wrong order.</p>
+  </div>
+  <div class="check" data-id="cse331-w4-l11-qc-af" data-kind="quickcheck" data-type="text" data-answer="bob, eve|bob eve|bob,eve">
+    <p>Quick check: <code>inbox = [eve]</code>, <code>outbox = [bob]</code>. By the AF, who is waiting, front first?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="NetIDs, front first"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>FastQueue's AF ignores <code>members</code>: no rule says every field appears in the AF. Its list was the queue, so nothing needed saying; FasterQueue's fields need the AF to mean anything.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l11-correct" data-title="What correct means" data-unit="l11">
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span> · notes: What correct means for an ADT method</p>
+  <h1>What correct means for an ADT method</h1>
+  <div class="rule">
+    <p><strong>Rule.</strong> A method with precondition P and postcondition Q, written about the abstract state, is correct exactly when the triple</p>
+    <pre class="code"><code>{{ RI and P(AF(this)) }}
+the method's body
+{{ RI and Q(AF(this_0), AF(this)) }}</code></pre>
+    <p>is valid and every call that begins with the precondition true terminates. <code>this_0</code> is the object as it was at the call. The body may assume the invariant and the precondition, and must leave the invariant true and the postcondition true of what the fields now stand for.</p>
+  </div>
+  <div class="steps"><ol>
+    <li><strong><code>size</code> on <code>FasterQueue</code>.</strong> <code>{{ RI }}</code>; <code>checkRep</code> changes nothing; by the RI, the lists hold <code>inbox.size() + outbox.size()</code> NetIDs, each once, and <code>members</code> holds exactly those; by the AF, that is the number of students in <code>AF(this)</code>. No field changes, so <code>AF(this)</code> is <code>AF(this_0)</code> and the RI still holds. Correct.</li>
+    <li><strong><code>next</code>, the refill case.</strong> The outbox is empty, so <code>AF(this_0)</code> is the inbox first to last. The refill puts the inbox reversed in the outbox and empties the inbox: read last to first, the same queue. Line 80 removes the outbox's last, the front; line 81 removes it from the set. RI true; <code>AF(this)</code> is <code>AF(this_0)</code> without its front, which is returned.</li>
+    <li><strong>The forgetful <code>next</code>.</strong> After line 65 removes the front, line 66 is blank, so <code>members</code> holds a NetID not in <code>queue</code>: the RI is false at the end, and the argument stops in <code>next</code>, at the missing line. Reasoning finds the mistake in the method that made it.</li>
+  </ol></div>
+  <div class="check" data-id="cse331-w4-l11-qc-middle" data-kind="quickcheck" data-type="yesno" data-answer="yes">
+    <p>Quick check: may the RI be false between two lines in the middle of a correct method?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Compare with Lecture 7: a method satisfies its spec when the triple of its spec around its body is valid. For an ADT the spec's claims are about the abstract state, so the triple is the spec translated through the AF, with the RI added at both ends.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l11-exposure" data-title="Copy in, copy out" data-unit="l11">
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span> · notes: Copy in, copy out</p>
+  <h1>Copy in, copy out</h1>
+  <div class="prose">
+    <p>Monday's question: why does <code>Book</code>'s <code>messages</code> return a copy? Make it <code>return messages;</code>, and the test's <code>copy.add</code> posts a message without calling <code>add</code>. The list in the field is <code>Book</code>'s representation; handing it out lets outside code change it.</p>
+    <p>A class can also take a list in. <code>FastQueue(List&lt;String&gt; netids)</code> keeps <code>new ArrayList&lt;String&gt;(netids)</code> (line 31), not the client's list. A draft with <code>queue = netids;</code> fails <code>aQueueMadeFromAListIsItsOwn</code> with <code>members is not the queue</code>: the test's <code>netids.add("eve")</code> changed the field through the client's name, and no method of <code>FastQueue</code> ran. Two names for one object is <strong>aliasing</strong>. A second draft, <code>waiting</code> returning <code>queue</code>, fails <code>waitingIsACopy</code> the same way.</p>
+    <p>Why <code>checkRep</code> at the start of a method (the half sheet's second question)? Between two calls, code outside the class may have changed the fields through an alias, after the last check ran. The start check catches it on the next call.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Representation exposure.</strong> A reference, held by code outside a class, to a changeable object among its fields. Through it, the RI and every spec can be broken by code the class does not control. Prevent it: <em>copy in</em> a changeable object a client passes that becomes part of the fields, and <em>copy out</em> a changeable field a method returns. A <code>String</code> field exposes nothing (strings cannot change), nor an <code>int</code> (a copy of the number).</p>
+    <p>A class is correct when every method is correct by the rule <em>and</em> the class has no representation exposure.</p>
+  </div>
+  <div class="check" data-id="cse331-w4-l11-qc-string" data-kind="quickcheck" data-type="yesno" data-answer="no">
+    <p>Quick check: does a method that returns a private <code>String</code> field expose the representation?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Even if no client ever touches a list after passing it, the draft has a bug: the implementer can no longer reason about <code>FastQueue</code> alone, and must read every client.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l11-quiz" data-title="Check your understanding: Lecture 11" data-unit="l11">
+  <p class="where">Lecture 11 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose"><p>Nine questions on Lecture 11. Your score counts first tries only.</p></div>
+  <div class="cyu-score" data-role="score" role="status"></div>
+  <ol class="cyu-list">
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l11-quiz-ri-about" data-type="choice" data-topic="l11-ri">
+      <p class="q">A representation invariant is a claim about…</p>
+      <div class="opts">
+        <label data-option="fields" data-correct><input type="radio" name="w4c1"> one class's fields, for the implementer<span class="why" hidden>Right.</span></label>
+        <label data-option="abstract"><input type="radio" name="w4c1"> the abstract state, for the client<span class="why" hidden>That is the abstract invariant.</span></label>
+        <label data-option="method"><input type="radio" name="w4c1"> what one method returns<span class="why" hidden>That is a postcondition.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l11-quiz-size-no66" data-type="int" data-answer="2" data-topic="l11-fast">
+      <p class="q">FastQueue without line 66 and without checks: ada and bob join, <code>next</code> serves ada. What does <code>size()</code> return?</p>
+      <p class="why" hidden>The set still holds ada and bob, and <code>size</code> returns the set's size.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l11-quiz-where" data-type="choice" data-topic="l11-ri">
+      <p class="q">Where does the code quality guide <em>not</em> ask for a <code>checkRep</code> call?</p>
+      <div class="opts">
+        <label data-option="ctor-start" data-correct><input type="radio" name="w4c3"> At the start of a constructor<span class="why" hidden>Right: the fields are still null there, so the RI is false.</span></label>
+        <label data-option="mut-start"><input type="radio" name="w4c3"> At the start of a mutator<span class="why" hidden>Asked for, to catch changes made through an alias.</span></label>
+        <label data-option="ctor-end"><input type="radio" name="w4c3"> At the end of a constructor<span class="why" hidden>Asked for: the constructor must make the RI true.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l11-quiz-af-code" data-type="choice" data-topic="l11-faster">
+      <p class="q">Why is the AF not a Java method?</p>
+      <div class="opts">
+        <label data-option="abstract" data-correct><input type="radio" name="w4c4"> It returns the abstract state, which no Java value holds<span class="why" hidden>Right. <code>waiting</code> comes close, but it returns a Java list.</span></label>
+        <label data-option="slow"><input type="radio" name="w4c4"> It would be too slow<span class="why" hidden>Speed isn't the reason.</span></label>
+        <label data-option="private"><input type="radio" name="w4c4"> Java forbids private functions<span class="why" hidden>Java allows private methods; <code>checkRep</code> is one.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l11-quiz-af-many" data-type="int" data-answer="3" data-topic="l11-faster">
+      <p class="q">How many values of <code>FasterQueue</code>'s fields (that the RI allows) stand for the queue bob, eve?</p>
+      <p class="why" hidden>They differ in how many students from the front the outbox holds: none, bob alone, or both.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l11-quiz-draft" data-type="output" data-answer="[eve, bob]" data-topic="l11-faster">
+      <p class="q">The draft <code>waiting</code> (outbox as stored): ada, bob and eve join, <code>next</code> serves ada. What does <code>waiting()</code> return?</p>
+      <p class="why" hidden>The outbox is <code>[eve, bob]</code> and the inbox empty; the draft copies the outbox first to last.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l11-quiz-rule" data-type="choice" data-topic="l11-correct">
+      <p class="q">In the rule for a correct ADT method, the RI appears…</p>
+      <div class="opts">
+        <label data-option="both" data-correct><input type="radio" name="w4c7"> before the body and after it<span class="why" hidden>Right: may assume it, must leave it.</span></label>
+        <label data-option="before"><input type="radio" name="w4c7"> before the body only<span class="why" hidden>The next call assumes it too, so the method owes it at the end.</span></label>
+        <label data-option="every"><input type="radio" name="w4c7"> after every line<span class="why" hidden>It may be false in the middle.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l11-quiz-alias" data-type="choice" data-topic="l11-exposure">
+      <p class="q">The draft constructor keeps the client's list (<code>queue = netids;</code>). What is wrong?</p>
+      <div class="opts">
+        <label data-option="alias" data-correct><input type="radio" name="w4c8"> The client and the queue share one list, so the client can change the field without any method running<span class="why" hidden>Right: representation exposure. Copy in.</span></label>
+        <label data-option="slow"><input type="radio" name="w4c8"> It is slower than copying<span class="why" hidden>It is faster; that is the temptation.</span></label>
+        <label data-option="ri"><input type="radio" name="w4c8"> The constructor leaves the RI false<span class="why" hidden>It leaves it true; outside code can break it later.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w4-l11-quiz-start" data-type="choice" data-topic="l11-exposure">
+      <p class="q">Why check the RI at the start of a method, when the last mutator checked it at its end?</p>
+      <div class="opts">
+        <label data-option="alias" data-correct><input type="radio" name="w4c9"> Code outside the class may have changed the fields through an alias since then<span class="why" hidden>Right: the half sheet's second question.</span></label>
+        <label data-option="habit"><input type="radio" name="w4c9"> Just a habit; it never catches anything<span class="why" hidden>It caught both drafts in the lecture.</span></label>
+        <label data-option="ctor"><input type="radio" name="w4c9"> Constructors don't check<span class="why" hidden>They do, at their end.</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-role="summary" role="status"></div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Numeric and output answers come from the simulators, which match the real classes.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l11-problems" data-title="Lecture 11: problems" data-unit="l11">
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span> · problems</p>
+  <h1>Lecture 11: problems</h1>
+  <div class="prose"><p>The notes' exercises 1 to 5, with their official answers, lightly condensed. Exercise 2's argument also answers the half sheet's first question.</p></div>
+
+  <article class="task" data-id="cse331-w4-l11-ex1">
+    <h2>1. <code>ReverseQueue</code></h2>
+    <p class="prompt">A class keeps the queue in one list, back of the queue first: <code>private List&lt;String&gt; queue; // The students waiting, back first.</code> Write its RI and AF, then its <code>next</code>.</p>
+    <div class="answer-spec" data-part="ri" data-type="choice" data-answer="dup" data-options="dup:no NetID is in queue twice|order:queue is sorted|none:it needs no RI|same:members holds exactly the NetIDs in queue" data-label="RI"></div>
+    <div class="answer-spec" data-part="af" data-type="choice" data-answer="rev" data-options="fwd:the students in queue, first to last|rev:the students in queue, last to first" data-label="AF(this) = the help queue of"></div>
+    <div class="answer-spec" data-part="next" data-type="self" data-long data-label="Its next" data-placeholder="public String next() { … }"></div>
+    <ol class="hints"><li>One field, so nothing to agree with; what's left of FastQueue's RI? By the AF, which end of the list is the front?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>// RI: no NetID is in queue twice.</code> <code>// AF(this) = the help queue of the students in queue, last to first.</code> Without the RI, <code>[ada, bob, ada]</code> would read as a queue with ada twice, which no queue is.</li>
+      <li><code>next</code>: throw <code>NoSuchElementException("nobody is waiting")</code> if empty; else <code>return queue.remove(queue.size() - 1);</code>. By the AF, the last element is the front.</li>
+      <li>That same line was Wednesday's bug in <code>ListQueue</code>; the AF decides whether a line is right. <code>join</code> adds at the start, <code>queue.add(0, netid)</code>.</li>
+      <li class="answer">No NetID twice; last to first; remove the last element.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-l11-ex2">
+    <h2>2. <code>FastQueue</code>'s <code>join</code> is correct</h2>
+    <p class="prompt">Argue by the rule that <code>join</code> (lines 50 to 58) is correct. On what line does the RI become false, and when is it true again?</p>
+    <div class="answer-spec" data-part="false-after" data-type="int" data-answer="55" data-label="The RI is false right after line" data-placeholder="a line number"></div>
+    <div class="answer-spec" data-part="true-after" data-type="int" data-answer="56" data-label="… and true again after line" data-placeholder="a line number"></div>
+    <div class="answer-spec" data-part="argument" data-type="self" data-long data-label="The argument, both cases" data-placeholder="{{ RI }} checkRep(); {{ RI }} if (members.contains(netid)) …"></div>
+    <ol class="hints"><li>Two cases at the end: the student was waiting (throw, nothing changed) or not (added at the back).</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Line 51 changes nothing. Line 53 throws exactly when the student is waiting: by the RI, <code>members</code> holds exactly the NetIDs in <code>queue</code>, which by the AF are the students waiting. No field changed, so <code>AF(this)</code> is <code>AF(this_0)</code>: the @throws case.</li>
+      <li>Otherwise line 55 adds the student at the end of the list; the set lacks them, so the RI is false. Line 56 adds them to the set; the student was in neither, so the list has no repeat and the set matches: the RI is true again.</li>
+      <li>By the AF the end of the list is the back of the queue: <code>AF(this)</code> is <code>AF(this_0)</code> with the student at the back, as @effects promises. Line 57's check passes.</li>
+      <li class="answer">False after line 55; true again after line 56.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-l11-ex3">
+    <h2>3. Set first, then list</h2>
+    <p class="prompt">A draft <code>next</code> replaces lines 65 and 66 with <code>members.remove(queue.get(0));</code> then <code>String front = queue.remove(0);</code>. Is the RI false anywhere inside? Does <code>checkRep</code> catch anything? Is it correct? What do the six tests report?</p>
+    <div class="answer-spec" data-part="false-inside" data-type="yesno" data-answer="yes" data-label="Is the RI false between the draft's lines 65 and 66?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="correct" data-type="yesno" data-answer="yes" data-label="Is the draft's next correct?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="fail" data-type="int" data-answer="0" data-label="How many of the six tests fail?" data-placeholder="a whole number"></div>
+    <ol class="hints"><li>The rule puts the RI before and after the body; what about the middle?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Between lines 65 and 66, <code>members</code> lacks a NetID that <code>queue</code> still holds: the RI is false there.</li>
+      <li><code>checkRep</code> runs only on lines 61 and 67, so it catches nothing; at 67 the RI is true again. JUnit starts six tests and none fails.</li>
+      <li>The method is correct: the rule says nothing about the middle of a method, as long as a later line makes the RI true before it returns.</li>
+      <li class="answer">Yes; yes, correct; 0 fail.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-l11-ex4">
+    <h2>4. <code>LinkedQueue</code>'s unwritten RI</h2>
+    <p class="prompt">Write <code>LinkedQueue</code>'s RI as a comment. What must <code>next</code> do to keep it? Then write <code>ListQueue</code>'s RI. What could its <code>checkRep</code> check, and what not?</p>
+    <div class="answer-spec" data-part="back-null" data-type="yesno" data-answer="yes" data-label="When next serves the last student, must it set back to null?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="list-ri" data-type="choice" data-answer="dup" data-options="dup:no NetID is in queue twice|front:queue is never empty|none:it needs no RI" data-label="ListQueue's RI"></div>
+    <div class="answer-spec" data-part="ri" data-type="self" data-long data-label="LinkedQueue's RI" data-placeholder="// RI: front and back are both null, or neither is. …"></div>
+    <ol class="hints"><li>What would a <code>back</code> left pointing at an old node do to the next <code>join</code>?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>// RI: front and back are both null, or neither is. If neither is, back is the last node of the chain from front. No NetID is in the chain twice.</code> (A chain that loops has no last node, so that is ruled out too.)</li>
+      <li>Lines 56 to 58 set <code>back = null</code> when the chain empties. Without them, ada joining again would hook her node after the old one, with <code>front</code> still <code>null</code>: ada not waiting after all.</li>
+      <li><code>ListQueue</code>'s RI: no NetID is in <code>queue</code> twice. A <code>checkRep</code> can compare <code>queue.size()</code> with the size of a set of it. It cannot check that the list <em>is</em> the queue: the queue is the abstract state, and no Java value holds it. Reasoning, one method at a time, checks that.</li>
+      <li class="answer">Yes; no NetID twice.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w4-l11-ex5">
+    <h2>5. <code>FasterQueue</code> through a refill</h2>
+    <p class="prompt">Call <code>next</code> with <code>inbox = [ada, bob, eve]</code>, <code>outbox = []</code>, <code>members = {ada, bob, eve}</code>. Give the fields and <code>AF(this)</code> after the refill (line 78) and after both removes (line 81). What is <code>AF(this)</code> just after line 77?</p>
+    <div class="answer-spec" data-part="outbox78" data-type="output" data-answer="[eve, bob, ada]" data-label="outbox after line 78" data-placeholder="as Java prints a list"></div>
+    <div class="answer-spec" data-part="outbox81" data-type="output" data-answer="[eve, bob]" data-label="outbox after line 81" data-placeholder="as Java prints a list"></div>
+    <div class="answer-spec" data-part="af81" data-type="text" data-answer="bob, eve|bob eve|bob,eve" data-label="AF(this) after line 81, front first" data-placeholder="NetIDs"></div>
+    <div class="answer-spec" data-part="af77" data-type="choice" data-answer="none" data-options="none:no value: the RI is false there|six:ada, bob, eve, ada, bob, eve|same:ada, bob, eve" data-label="AF(this) just after line 77"></div>
+    <ol class="hints"><li>The loop walks the inbox from last to first, adding each at the end of the outbox; line 78 empties the inbox.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Before line 75: the queue is ada, bob, eve.</li>
+      <li>After line 78: <code>inbox = []</code>, <code>outbox = [eve, bob, ada]</code>; read last to first, ada, bob, eve: the same queue, RI true.</li>
+      <li>After line 81: <code>outbox = [eve, bob]</code>, <code>members = {bob, eve}</code>: the queue bob, eve; line 83 returns ada. Between 80 and 81 the RI is false.</li>
+      <li>After line 77, before line 78: every student is in both lists, so the RI is false and the AF has no value there.</li>
+      <li class="answer"><code>[eve, bob, ada]</code>; <code>[eve, bob]</code>; bob, eve; no value.</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ READINGS -->
+<section class="page" id="readings" data-title="Readings">
+  <p class="where">Reading 2 discussed <span class="today-chip" data-date="2026-10-19">Mon Oct 19</span> · Reading 3 due Fri Oct 30</p>
+  <h1>Readings</h1>
+  <div class="prose">
+    <p><strong>Reading 2</strong> (due Fri Oct 16) asked: knowing takes work: is that work the job itself, or a tax on the job? Monday's discussion is on <a href="#l9-discuss">Reading 2 discussion</a>. The three articles: <a href="https://www.dreamsongs.com/RiseOfWorseIsBetter.html" target="_blank" rel="noopener">Gabriel 1991, "The Rise of Worse is Better"</a> (ship half of the right thing, then improve it); <a href="https://lamport.azurewebsites.net/pubs/future-of-computing.pdf" target="_blank" rel="noopener">Lamport 2003, "The Future of Computing: Logic or Biology"</a> (a program is a mathematical object: could you prove it?); <a href="https://www.cs.utexas.edu/~EWD/transcriptions/EWD06xx/EWD667.html" target="_blank" rel="noopener">Dijkstra 1978, "On the foolishness of "natural language programming""</a> (formality is a privilege).</p>
+    <p><strong>Reading 3</strong> is released Fri Oct 23 and due Fri Oct 30 at 11:59 pm, discussed Mon Nov 2. Its question: how much of that knowing happens before the first line of code, and how much of it is worth writing down? Lecture 11 cites one of its articles, Parnas 1972 on decomposing systems into modules. Next week's page covers it.</p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The reflections are graded; this site describes the readings and never answers them.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CHEAT SHEET -->
+<section class="page" id="cheatsheet" data-title="Cheat sheet">
+  <p class="where">Print with <kbd>Ctrl</kbd>+<kbd>P</kbd>; only this page prints.</p>
+  <h1>Week 4 cheat sheet</h1>
+  <div class="cheat">
+    <section><h3>Server</h3><p>Waits for requests, answers each with a response. Frontend (browser) / backend (server). Event-driven: a framework (<code>HttpServer</code>) owns the loop and calls your handler. Library: you call it.</p></section>
+    <section><h3>HTTP is text</h3><p>Request: <code>METHOD path HTTP/1.1</code>, headers, blank line, body. Response: <code>HTTP/1.1 200 OK</code>, headers (<code>Content-length</code> counts bytes), blank line, body (HTML). 400s: the request was a mistake.</p></section>
+    <section><h3>GET and POST</h3><p>GET asks and must not change state (safe; sent on their own by browsers and crawlers); POST may change state. Form body: <code>name=Ada&amp;message=hello+world</code>, <code>%XX</code> for other bytes.</p></section>
+    <section><h3>Every request</h3><p>Inputs are whatever a user can send. Missing fields → <code>null</code>; bad <code>%</code> → no response; a user's text joined into HTML → cross-site scripting. Escape <code>&amp;</code> first, then <code>&lt;</code> <code>&gt;</code>.</p></section>
+    <section><h3>Reasoning (Section 3)</h3><p>Forward: subscripts or invertible operations (integer division does not invert). Backward: substitute. Don't drop useful facts.</p></section>
+    <section><h3>ADT</h3><p>A spec of operations in terms of the abstract state. Representation: the fields, private. Abstract invariant: about the abstract state, kept by the specs.</p></section>
+    <section><h3>Tests</h3><p>Spec-based tests use only the interface (abstract test class + subclass per implementation). Implementation-based tests check choices the spec left open.</p></section>
+    <section><h3>RI and checkRep</h3><p>RI: claim about the fields, true whenever no method runs; may be false mid-method. checkRep: end of constructor; start and end of mutators; start of non-mutators.</p></section>
+    <section><h3>AF</h3><p>Maps field values the RI allows to the abstract state. A math function, not code; many-to-one. RI(this) ⇒ AI(AF(this)).</p></section>
+    <section><h3>Correct method</h3><p><code>{{ RI and P(AF(this)) }} body {{ RI and Q(AF(this_0), AF(this)) }}</code>, plus termination. Correct class: every method correct and no representation exposure.</p></section>
+    <section><h3>Rep exposure</h3><p>Outside code holding a reference to a changeable field. Copy in what a client passes; copy out what you return. Strings and ints are safe.</p></section>
+    <section><h3>This week</h3><p>Mon Oct 19 Lecture 9 · Tue Oct 20 Section 3 · Wed Oct 21 Lecture 10 · Fri Oct 23 Lecture 11 · Homework 2 due Fri Oct 23 · Reading 3 due Fri Oct 30.</p></section>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+</main>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script src="../../courses.js"></script>
+<script src="../../core/grader.js"></script>
+<script src="../../core/store.js"></script>
+<script src="guestbook-sim.js"></script>
+<script src="queue-sim.js"></script>
+<script src="week.js"></script>
+<script src="../../core/app.js"></script>
+</body>
+</html>

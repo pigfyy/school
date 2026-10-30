@@ -1,0 +1,443 @@
+--- slide 1 ---
+CSE 331Software Design &amp; Implementation
+
+Autumn 2026
+Section 3 – Reasoning
+
+--- slide 2 ---
+Warm-Up (Hoare Triple Validity)
+For each of the following Hoare Triples, decide whether it is valid or invalid. If it is invalid, provide a counterexample.
+{9E6DDE6C-9AEA-40B7-821D-146225BDDDFE}A
+      
+      {{ x &gt; 0 }} 
+       x = x - 1;
+      {{ x &gt; 0 }}
+B   {{ x &gt;= 10 }} 
+      if (x &lt; 5) { 
+        y = -100; 
+      } else { 
+        y = x; 
+      } 
+     {{ y &gt;= 10 }}      
+C
+ {{ x = a and y = b }} 
+  x = x + y; 
+  y = x - y; 
+  x = x - y; 
+ {{ x = b and y = a }}
+D
+{{ x = a and y = b }} 
+ x = y; 
+ y = x; 
+{{ x = b and y = a }}
+E {{ n &gt;= 0 }} 
+     i = 1; 
+     while (i &lt;= n) { 
+       i = i + 1; 
+     } 
+   {{ i = n + 1 }}
+F  {{ x + 1 &gt; 0 }}
+      if (x &lt; 0) {
+        y = -x;
+      } else {
+        y = x;
+      }
+     {{ y &gt; 0 }}
+
+--- slide 3 ---
+Administrivia
+HW2 is due Friday @ 11:59 pm!
+Reading 3 releases Friday and will be due next Friday @ 11:59pm!
+
+‹#›
+
+--- slide 4 ---
+
+
+--- slide 5 ---
+Forward Reasoning – Review
+Forward reasoning fills in the postcondition
+Gives strongest postcondition making the triple valid
+Apply forward reasoning to fill in R
+
+Check second triple by proving that R implies Q
+R
+P
+{{P}}
+  S
+{{R}}
+{{Q}}
+
+--- slide 6 ---
+Forward Reasoning Basic Example
+{{ w &gt; 0 }}
+x = 17;
+{{                  }}
+y = 42;
+{{ x - 1 &gt; 1 and y =     3 * x }}
+z = w + x + y;
+{{ x - 1 &gt; 1 and y = 3 * x and z = y + 1         }} 
+
+w &gt; 0 and x = 17
+w &gt; 0 and x = 17 and y = 42
+w &gt; 0 and x = 17 and y = 42 and z = w + x + y
+
+Append new facts to your collection as you move down the code
+Notice that we did not combine or drop any facts
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 7 ---
+Forward Reasoning Tools
+Subscripts
+Append new facts with subscripts to represent them
+Gets messy quickly in complex or strange programs
+The extra detail helps us represent everything
+
+Invertible operations
+Use algebra to put the expression in terms of the old value
+Much more readable but not everything can be inverted 
+Ex: Integer division dealing with truncation
+
+--- slide 8 ---
+Forward Reasoning Error Example
+{{ x &gt; 1 }}
+x = x + 1;
+{{ x = x0 + 1 and x0 &gt; 1 }}
+y = 3 * x;
+{{ x = x0 + 1 and y = 3 * x }}
+z = y + 1;
+{{ x = x0 + 1 and z = (3 * x) + 1 }}
+
+What’s wrong with these assertions?
+
+Drops this assertion
+
+Substitutes/simplifies assertions too early by dropping y variable relationship to x
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 9 ---
+Corrected Forward Reasoning Example
+{{ x &gt; 1 }}
+x = x + 1;
+{{ x0 &gt; 1 and x = x0 + 1 }}
+y = 3 * x;
+{{ x0 &gt; 1 and x = x0 + 1 and y = 3 * x }}
+z = y + 1
+{{ x0 &gt; 1 and x = x0 + 1 and y = 3 * x and z = y + 1 }} 
+
+does not simplify assertions early or drop variable relationships
+
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 10 ---
+Invertible Operation Examples
+The assignment is x = x0 + 1 so x0 = x - 1
+{{ x = y }}
+x = x + 1;
+{{ x - 1 = y }} or equivalently {{ x = y + 1 }}
+
+The rules fall apart here since we truncate the result so we can’t know what the previous value was
+{{ x = 8 }}  			{{ x = 9 }} 
+x = x / 2;				x = x / 2;
+{{ x = 4 }}      		{{ x = 4 }}
+
+--- slide 11 ---
+Backward Reasoning
+Backwards reasoning fills in preconditions
+Just use substitution!
+Gives weakest precondition making the triple valid
+Apply backwards reasoning to fill in R
+
+Check first triple by proving that P implies R
+
+R
+Q
+{{P}}
+{{R}}
+  S
+{{Q}}
+
+--- slide 12 ---
+Backwards Reasoning Basic Example
+{{ [2 - 4(9 + c)] / 7 &lt; 5 }}
+a = 9 + c;
+{{ (2 - 4a) / 7 &lt; 5 }}
+b = 4a;
+{{ (2 - b) / 7 &lt; 5 }}
+c = 2 - b;
+{{ c / 7 &lt; 5 }}
+d = c / 7;
+{{ d &lt; 5 }}
+
+[2 - 4(9 + c)] / 7 &lt; 5
+(2 - 4a) / 7 &lt; 5
+(2 - b) / 7 &lt; 5
+c / 7 &lt; 5
+start with the postcondition
+(input)
+
+2.   backwards substitution
+      (plug and chug)
+
+3.   end at the precondition
+(output)
+
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 13 ---
+Forward &amp; Backward General Rules
+Forward Reasoning Tools:
+Subscripts or invertible operations
+Either tool is fine
+
+Backward Reasoning Tools:
+Substitution
+
+General:
+Do not drop a fact if it still says something useful
+Understand how to use both forward reasoning tools!
+
+--- slide 14 ---
+Simplifying Assertions
+{{ [2 - 4(9 + c)] / 7 &lt; 5 }} ←→ {{c &gt; -69 / 4}} 
+a = 9 + c;
+{{ (2 - 4a) / 7 &lt; 5 }}
+b = 4a;
+{{ (2 - b) / 7 &lt; 5 }}
+c = 2 - b;
+{{ c / 7 &lt; 5 }}
+d = c / 7;
+{{ d &lt; 5 }}
+[2 - 4(9 + c)] / 7 &lt; 5
+(2 - 4a) / 7 &lt; 5
+(2 - b) / 7 &lt; 5
+c / 7 &lt; 5
+
+{{ original assertion }} ←→ {{ simplified assertion }}
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 15 ---
+Task 1b &amp; Task 2.a
+Task 1.b (forward reasoning)
+Great practice for subscripts and invertible operations.
+Task 2.a (backwards reasoning)
+Try these on your own time! Time estimate: ~20 minutes
+
+--- slide 16 ---
+Task 1 - Found Guilty of Reason
+Use forward reasoning to fill in the missing assertions in the following code. Use invertible operations.
+{{y &gt; 5 and z &gt; 2}}
+x = 4 * y - 3
+{{-}}
+y = y - 5
+{{-}}
+z = z * y
+{{P: }}
+{{Q: x &lt; 2z + 20}}
+
+--- slide 17 ---
+Task 1 - Found Guilty of Reason
+b)  Use forward reasoning to fill in the missing assertions in the following code. Use subscripts or invertible operations.
+/*
+ * Computes the square of (x + 1) 
+ * @param x The number to increment and square
+ * @return (x + 1)^2
+*/
+ public static int nextSquare(int x) {
+   int y = x * x;
+	{{ - }}
+   y = y + (2 * x);
+	{{ - }}
+   y = y + 1;
+	{{P:}}
+   return y;
+ }
+
+--- slide 18 ---
+Task 2 - Does a Duck Say “Back”?
+Use backward reasoning to fill in the missing assertions in the following code:
+{{P: x &lt; w + 1 and w &gt; 0}}
+{{Q:}}
+y = 4 * w
+{{ - }}
+x = x * 2
+{{ - }}
+z = x - 8
+	{{z &lt; y}}
+
+--- slide 19 ---
+Task 2 - Does a Duck Say “Back”?
+b)  Use backward reasoning to fill in the missing assertions in the following code:
+	{{Q:}}
+   int b = 2 * c
+	{{ - }}
+   c = c - 1
+	{{ - }}
+   int a = b + 1
+	{{a &gt;= c}}
+   return a;
+
+--- slide 20 ---
+Conditionals – Review
+Reason through “then” and “else” branches independently and combine last assertion of both branches with an “or” at the end
+Prove that each implies post condition by cases
+Note: this is important for your homework!
+public static int g(int n) {
+    {{ }}
+    int m = 0;
+    if (n &gt;= 0) {
+        m = 2 * n + 1;
+    } else {
+        m = 0;
+    }
+    {{m &gt; n}}
+    return m;
+}
+
+    {{ }}
+    int m = 0;
+    if (n &gt;= 0) {
+        m = 2 * n + 1;
+    } else {
+        m = 0;
+    }
+    {{m &gt; n}}
+    return m;
+}
+
+--- slide 21 ---
+Task 3 - Nothing to be If-ed At
+	{{0 &lt;= s &lt; len and d &gt;= 0}}
+	int w;
+	if (s + d &lt;= len) {
+	  {{ - }}
+	  w = d;
+	  {{P1:}}
+	} else {
+	  {{ - }}
+  w = len - s;
+  {{P2:}}
+}
+{{ - }}
+return w;
+
+--- slide 22 ---
+Loop Invariant – Review
+Loop invariant must be true every time at the top of the loop 
+The first time (before any iterations) and for the beginning of each iteration
+Also true every time at the bottom of the loop
+Meaning it’s true immediately after the loop exits
+During the body of the loop (during S), it isn’t true
+
+Must use “Inv” notation to indicate that it’s not a standard assertion
+true!
+{{Inv: I}}
+while (cond) {
+    S
+}
+true!
+true!
+true!
+
+--- slide 23 ---
+Question ….
+Where is it allowed for a loop invariant not to hold? 
+
+before the loop 
+
+after the loop
+
+after entering the loop
+
+before exiting the loop
+
+during the code execution inside of the loop
+
+--- slide 24 ---
+Question ….
+Where is it allowed for a loop invariant not to hold? 
+
+before the loop 
+
+after the loop
+
+after entering the loop
+
+before exiting the loop
+
+during the code execution inside of the loop
+
+--- slide 25 ---
+Rule: while loop
+{{ P }}
+{{ Inv: I }}
+while (b) {
+    {{ Inv: I and b }}
+    body
+    {{ Inv: I }}
+}
+{{ Inv: I and not b }}
+{{ Q }}
+The triple {{ P }} while ... {{ Q }} is valid if three checks pass:
+{{ P }} implies {{ Inv: I }}.
+The triple {{ Inv: I and b }} body {{ Inv: I }} is valid.
+{{ Inv: I and not b }} implies {{ Q }}.
+
+--- slide 26 ---
+In this problem, we will prove the correctness of a method containing a loop that finds the quotient of x divided by 10, i.e., the largest value y such that 10y &lt;= x. To say that y is the largest such value means that any larger value would not satisfy the inequality, i.e., that 10(y + 1) !&lt;= x…
+Task 4 - Everybody Loops
+
+--- slide 27 ---
+// Computes the integer quotient of x divided by 10
+// @param x The numerator
+// @requires x &gt;= 0
+// @return The largest integer y such that 10 * y &lt;= x_0
+public static int divideByTen(int x) {
+{{ x = x_0 and x_0 &gt;= 0 }}
+int y = 0;
+{{ P1: _________________________ }}
+{{ Inv: x_0 - 10y = x and x &gt;= 0 }}
+while (x &gt;= 10) {
+{{ _____________________________ }}
+y = y + 1;
+{{ _____________________________ }}
+x = x - 10;
+{{ P3: _________________________ }}
+{{ Q2: _________________________ }}
+}
+{{ P2: _________________________ }}
+{{ Q1: 10y &lt;= x_0 and x_0 &lt; 10(y+1) and x = x_0 - 10y }}
+return y;
+}
+
+Task 4 - Everybody Loops
+
+--- slide 28 ---
+Task 4 - Everybody Loops
+Check (1):
+Fill in P1 using subscripts, then show that the invariant is true when we get to the top of the loop the first time.
+
+{{ x = x_0 and x_0 &gt;= 0 }}
+int y = 0;
+{{ P1: _________________________ }}
+{{ Inv: x_0 - 10y = x and x &gt;= 0 }}
+
+--- slide 29 ---
+Task 4 - Everybody Loops
+ c)    Check (2):
+Fill in Q2 using subscripts (Hint: what do we know at the end of a loop?). Then, forward reason to P3. Show that P3 implies Q2, proving that the body of the loop is correct.
+
+{{ Inv: x_0 - 10y = x and x &gt;= 0 }}
+while (x &gt;= 10) {
+{{ _____________________________ }}
+y = y + 1;
+{{ _____________________________ }}
+x = x - 10;
+{{ P3: _________________________ }}
+{{ Q2: _________________________ }}
+}
+
+--- slide 30 ---
+Please turn in your halfsheets!
+:)
+

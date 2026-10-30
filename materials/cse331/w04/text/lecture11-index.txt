@@ -1,0 +1,80 @@
+CSE 331: Implementing an abstract data type
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          CSE 331: Implementing an abstract data type
+
+        CSE 331: Implementing an abstract data type
+
+An ADT's specification is written about its abstract state, the
+value as the client thinks of it. Its implementation is written
+about its concrete state, its fields. The specification says what
+every method must do, but in abstract terms, and the body does
+its work in concrete terms. So between the promise and the code
+there is a gap, and nothing yet says how to cross it: which
+values of the fields are allowed, which abstract state a value of
+the fields stands for, and so whether a body does what its
+specification says.
+
+On Wednesday we saw a version of the queue that also keeps a set, so
+that join can ask contains instead of walking the list. But then
+the implementation has to keep the set in step with the list, and the
+specification, written about the abstract state, cannot say so. The
+claim that says so is the representation invariant: a claim about
+the fields that every method may assume when called and must make
+true again before it returns. It decides which method is wrong when a
+draft forgets the set, and checkRep turns it into code that fails
+on the call that broke it.
+
+Now imagine a queue with a more complex representation, such as two
+stacks, so that both joining and leaving take constant time. Then it
+is less clear what the specification is asking of the fields: no
+field is the queue, so "the student at the front" names nothing in
+the code. The abstraction function says which abstract state the
+fields stand for. It tells a draft that passes Wednesday's five tests
+what it got wrong, and with the representation invariant it gives the
+rule for a correct method: one of Lecture 7's triples, read through
+the abstraction function, as long as no code outside the class
+changes the fields.
+
+Finally, the code outside the class. Representation exposure
+is a reference to a changeable object among a class's fields
+held by code outside the class, through a list a client passed or a
+list a method returned. The rule against it is to copy in and
+copy out, the reason Book's messages returned a copy in
+Lecture 9. A class is correct when every method is correct by the
+rule and the class has no representation exposure.
+
+Notes
+
+Slides
+
+Slides (PDF)
+
+    UW Site Use Agreement

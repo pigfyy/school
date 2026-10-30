@@ -1,0 +1,1062 @@
+CSE 331: Abstract data types
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          The help queue
+Tests from the specification alone
+An implementation
+A second implementation
+Three readings of "returns the students waiting"
+Exercises
+Further reading
+
+        CSE 331: Abstract data types
+
+lecture
+
+Course motto: Your job is to deliver code that you know works.
+
+The help queue
+
+Today's type is a queue for office hours: the students waiting
+for help, in the order they joined. Here it is in Java, written
+as an interface:
+
+HelpQueue.java
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30import java.util.List;
+
+/**
+ * The queue for office hours: the students waiting for help, in
+ * the order they joined. A student is named by their NetID, and a
+ * student is in the queue at most once.
+ */
+public interface HelpQueue {
+    /** @return the number of students waiting */
+    int size();
+
+    /**
+     * @modifies this
+     * @effects adds the student at the back of the queue
+     * @throws IllegalArgumentException if the student is already in
+     *     the queue, and leaves the queue unchanged
+     */
+    void join(String netid);
+
+    /**
+     * @modifies this
+     * @effects removes the student at the front of the queue
+     * @return the NetID of the student removed
+     * @throws NoSuchElementException if the queue is empty
+     */
+    String next();
+
+    /** @return the students waiting, front first, in a new list */
+    List<String> waiting();
+}
+
+An interface like HelpQueue is a specification with no fields
+and no method bodies. It gives the type a name and lists the
+methods that every object of the type has, and a comment above
+each method says what the method does. A class implements the
+interface by giving each method a body.
+
+The comment at the top says what a queue is: the students waiting,
+in the order they joined, each named by their NetID. Every
+method's specification is written about that queue of students:
+
+size says how many are waiting.
+
+join adds a student at the back. In its specification,
+  this is the queue: @modifies this says that the call
+  changes which students are waiting, and @effects says how.
+
+next takes the student at the front out of the queue and
+  returns their NetID.
+
+waiting lists the students waiting, front first.
+
+The interface has no fields, so no specification can mention a
+field. Nothing here says whether the students are kept in a list
+or in an array, and as a client you do not need to know.
+
+The comment makes one more claim, about every queue: a student
+is in the queue at most once. It is true because a NetID names
+one student, and a student waits in one place. The specifications
+keep it true: join throws and adds no one if the student is
+already waiting, and next only removes. So every implementation
+of HelpQueue has to keep it true, and every client can rely on
+it, whichever implementation the client has.
+
+This is an abstract data type.
+
+Definition: abstract data type
+
+An abstract data type (ADT) is a specification for the
+operations available to access and modify the underlying data.
+The specification is written in terms of the abstract
+state, which is how the client should think about the object.
+Data abstraction means only accessing a type via its
+specification, which helps isolate and hide the details of how
+the data is actually represented from the rest of the program.
+
+Procedural abstraction
+was using a method through its specification alone, with the
+specification as the line between a method's clients and its
+implementer, an abstraction barrier. Data abstraction draws that
+line around a whole type. As a client, you have the interface. As
+the implementer, you choose the fields and write the method
+bodies, and you can change both later, as long as each method
+still satisfies its specification. Both sides describe a queue
+the same way, as the students waiting in order. That shared
+description is the abstract state. The fields the implementer
+chooses are the other side of the line: the type's representation.
+
+Definition: representation
+
+The representation of an ADT is how its objects are
+implemented: the fields of the class, and what each field
+holds. The specification never mentions the representation, so
+the implementer may change it, as long as each method still
+satisfies its specification.
+
+ListQueue's representation is one list of the NetIDs waiting,
+front first. A client of HelpQueue never sees it: every
+specification is written about the abstract state, the students
+waiting in order.
+
+The claim that a student is in the queue at most once is the
+type's abstract invariant.
+
+Definition: abstract invariant
+
+An abstract invariant of an ADT is a claim about the
+abstract state that is true of every object of the type
+whenever no method of the type is running. The type's
+specifications keep it true: no method's postcondition allows
+a state in which it is false.
+
+Tests from the specification alone
+
+We have a specification and no implementation. Can we write
+tests already? Yes, and with nothing else to go on, a test can
+only call the methods the interface lists, and its expected
+answers can only come from the sentences in the interface's
+comments. A test written that way is a
+specification-based test.
+It checks only what the specification promises, so it passes on
+every correct implementation of HelpQueue, not only the first
+class we write.
+
+Every test needs a queue to start from. How do you make a
+queue from the interface alone? Two ways come to mind, and
+neither works:
+
+new HelpQueue() is not Java. Java never constructs an
+  interface: an object needs a body for every method it has, and
+  HelpQueue's methods have none.
+
+A class that implements HelpQueue could be constructed, but
+  no such class exists yet. And these tests are meant to pass on
+  every implementation of HelpQueue, so they should not
+  construct any particular class.
+
+So the tests do not make the queue themselves. Each test calls a
+method named emptyQueue to get its queue, and HelpQueueTest.java
+declares that method abstract, with no body. A class with an
+abstract method must be declared abstract too, and Java never
+constructs an abstract class, so nobody can construct a
+HelpQueueTest. What you can do is write a subclass, a class that
+extends HelpQueueTest, give emptyQueue a body there, and
+construct that. The subclass inherits the five tests, so JUnit
+runs them on whatever queue the body returns.
+
+HelpQueueTest.javapublic abstract class HelpQueueTest {
+    // A subclass says which implementation to test.
+    abstract HelpQueue emptyQueue();
+
+waiting promises the students front first, in a new list.
+next promises to remove the student at the front and return
+their NetID. size promises how many are waiting. The first test
+checks all three on two students:
+
+HelpQueueTest.java    @Test
+    void studentsAreServedInTheOrderTheyJoined() {
+        HelpQueue queue = emptyQueue();
+        queue.join("ada");
+        queue.join("bob");
+        assertEquals(List.of("ada", "bob"), queue.waiting());
+        assertEquals("ada", queue.next());
+        assertEquals(List.of("bob"), queue.waiting());
+        assertEquals(1, queue.size());
+    }
+
+join promises that if the student is already waiting, it
+throws IllegalArgumentException and leaves the queue unchanged.
+So the test checks both. assertThrows takes the exception's class
+and the call to make, handed over as a
+lambda,
+() -> queue.join("ada"), so that assertThrows can make the
+call itself and catch what it throws:
+
+HelpQueueTest.java    @Test
+    void nobodyIsInTheQueueTwice() {
+        HelpQueue queue = emptyQueue();
+        queue.join("ada");
+        assertThrows(IllegalArgumentException.class,
+            () -> queue.join("ada"));
+        assertEquals(List.of("ada"), queue.waiting());
+    }
+
+At most once is about the students waiting now. A student who
+was served is no longer waiting, so join has to let them back
+in: next promised to remove them, and join's throw is only for
+a student who is already waiting:
+
+HelpQueueTest.java    @Test
+    void aStudentWhoLeftMayComeBack() {
+        HelpQueue queue = emptyQueue();
+        queue.join("ada");
+        queue.next();
+        queue.join("ada");
+        assertEquals(List.of("ada"), queue.waiting());
+    }
+
+next promises to throw NoSuchElementException when nobody
+is waiting:
+
+HelpQueueTest.java    @Test
+    void nextOnAnEmptyQueueThrows() {
+        HelpQueue queue = emptyQueue();
+        assertThrows(NoSuchElementException.class, () -> queue.next());
+    }
+
+waiting promises a new list. So a change to the list that came
+back cannot change the queue:
+
+HelpQueueTest.java    @Test
+    void waitingIsACopy() {
+        HelpQueue queue = emptyQueue();
+        queue.join("ada");
+        List<String> copy = queue.waiting();
+        copy.add("eve");
+        assertEquals(List.of("ada"), queue.waiting());
+    }
+
+Nothing can run them yet: a subclass has to construct a queue,
+and there is no class to construct.
+
+An implementation
+
+Here is a class that implements HelpQueue, keeping the queue in
+one list:
+
+ListQueue.java
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+/** A help queue kept as one list of the students in it. */
+public class ListQueue implements HelpQueue {
+    private List<String> queue = new ArrayList<String>();
+
+    public int size() {
+        return queue.size();
+    }
+
+    public void join(String netid) {
+        if (queue.contains(netid)) {
+            throw new IllegalArgumentException(netid + " is in the queue");
+        }
+        queue.add(netid);
+    }
+
+    public String next() {
+        if (queue.isEmpty()) {
+            throw new NoSuchElementException("the queue is empty");
+        }
+        return queue.remove(0);
+    }
+
+    public List<String> waiting() {
+        // A copy, so that a client cannot change the queue through it.
+        return new ArrayList<String>(queue);
+    }
+}
+
+implements HelpQueue on line 6 tells the compiler that
+ListQueue has every method the interface lists, with the same
+names and types. The compiler cannot check whether each body does
+what its specification says. That part is yours, and the five
+tests are where to start.
+
+The class has one field, a list of NetIDs, front first, and it is
+private: only the code in ListQueue can read or change it. A
+client can use only the methods, and each works on that list:
+
+size returns the list's size.
+
+join walks the list to see whether the student is already
+  waiting, then adds at the back.
+
+next removes the first element and returns it.
+
+waiting returns a copy of the list.
+
+Why does the field have to be private? Here is a client of
+ListQueue that takes a shortcut. Two students join, and then the
+client skips join and changes the list itself:
+
+Shortcut.java
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13/** A client that takes a shortcut past join, into ListQueue's list. */
+public class Shortcut {
+    public static void main(String[] args) {
+        ListQueue queue = new ListQueue();
+        queue.join("ada");
+        queue.join("bob");
+        // Skip join and change the list itself.
+        queue.queue.add("ada");
+        queue.queue.add(0, "eve");
+        System.out.println(queue.waiting());
+        System.out.println("helping " + queue.next());
+    }
+}
+
+Line 8 adds ada a second time without calling join. Line 9 puts
+eve at the front. Neither line compiles as written, since the
+field is private. But suppose for a moment that line 7 of
+ListQueue.java said public instead of private. Then the
+program compiles, and here is its run:
+
+$ javac Shortcut.java
+
+$ java Shortcut
+[eve, ada, bob, ada]
+helping eve
+
+A queue for office hours has two rules: each student waits at
+most once, and a student who joins goes to the back. Waiting at
+most once is the type's abstract invariant, a claim about every
+queue. Joining at the back is about what one call to join does,
+so join's specification promises it. This run breaks both. Yet
+ListQueue's join checks for a student who is already waiting.
+Lines 8 and 9 broke the rules: code outside ListQueue that
+skipped join. With the field public, any line of any client
+could do the same. When the queue went wrong, you would have to
+search every client for the line that broke a rule.
+
+With the field private, as ListQueue has it, javac refuses
+exactly those two lines:
+
+$ javac Shortcut.java
+Shortcut.java:8: error: queue has private access in ListQueue
+        queue.queue.add("ada");
+             ^
+Shortcut.java:9: error: queue has private access in ListQueue
+        queue.queue.add(0, "eve");
+             ^
+2 errors
+
+So a client of ListQueue gets only its methods. Here is a client
+that keeps to them, a short program for office hours. Two
+students join, and the TA shows who is waiting and helps the
+student at the front:
+
+OfficeHours.java
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12/** Office hours: students join the help queue, and a TA helps them. */
+public class OfficeHours {
+    public static void main(String[] args) {
+        ListQueue queue = new ListQueue();
+        // Students join at the back.
+        queue.join("ada");
+        queue.join("bob");
+        // The TA shows who is waiting, then helps the first.
+        System.out.println(queue.waiting());
+        System.out.println("helping " + queue.next());
+    }
+}
+
+It compiles, and here is its run:
+
+$ javac OfficeHours.java
+
+$ java OfficeHours
+[ada, bob]
+helping ada
+
+With the field private, only join and next can change the
+queue. So they are the only places that must keep its rules.
+
+Now back to the five tests. Nothing could run them before, since
+no class implemented HelpQueue. ListQueue does, so a subclass
+can hand each test a ListQueue. Here is that subclass:
+
+ListQueueSpecTest.javapublic class ListQueueSpecTest extends HelpQueueTest {
+    HelpQueue emptyQueue() {
+        return new ListQueue();
+    }
+}
+
+Its emptyQueue is the only place the tests say which
+implementation is under test: the name ListQueue appears
+nowhere in HelpQueueTest.java. To run the tests, compile the four
+files with JUnit, then ask JUnit to run ListQueueSpecTest. The
+commands below assume JUnit's jar file is saved as junit.jar.
+In Windows' Command Prompt or PowerShell, type each command on
+one line, without its backslash:
+
+$ javac -cp junit.jar HelpQueue.java ListQueue.java \
+    HelpQueueTest.java ListQueueSpecTest.java
+
+$ java -jar junit.jar execute --disable-banner \
+    --class-path . --select-class ListQueueSpecTest
+╷
+├─ JUnit Platform Suite ✔
+├─ JUnit Jupiter ✔
+│  └─ ListQueueSpecTest ✔
+│     ├─ nextOnAnEmptyQueueThrows() ✔
+│     ├─ waitingIsACopy() ✔
+│     ├─ nobodyIsInTheQueueTwice() ✔
+│     ├─ aStudentWhoLeftMayComeBack() ✔
+│     └─ studentsAreServedInTheOrderTheyJoined() ✔
+└─ JUnit Vintage ✔
+
+Test run finished after 32 ms
+[         4 containers found      ]
+[         0 containers skipped    ]
+[         4 containers started    ]
+[         0 containers aborted    ]
+[         4 containers successful ]
+[         0 containers failed     ]
+[         5 tests found           ]
+[         0 tests skipped         ]
+[         5 tests started         ]
+[         0 tests aborted         ]
+[         5 tests successful      ]
+[         0 tests failed          ]
+
+ListQueueSpecTest declares no tests, yet JUnit lists five under
+it. JUnit runs each on a ListQueue, and all five pass.
+
+Select the subclass, not HelpQueueTest. JUnit cannot construct
+an abstract class, so selecting HelpQueueTest runs no tests.
+JUnit's summary just counts zero tests found.
+
+Two more tests, in a second file, ListQueueImplTest.java, also
+pass against ListQueue. They say new ListQueue() outright,
+since they are tests of ListQueue itself. What sets them apart
+from the five is what they assert.
+
+The first asserts the words of join's exception message:
+
+ListQueueImplTest.java    @Test
+    void joinTwiceSaysWho() {
+        HelpQueue queue = new ListQueue();
+        queue.join("ada");
+        IllegalArgumentException e = assertThrows(
+            IllegalArgumentException.class, () -> queue.join("ada"));
+        assertEquals("ada is in the queue", e.getMessage());
+    }
+
+The message "ada is in the queue" appears nowhere in
+HelpQueue.java. The interface promises an
+IllegalArgumentException and says nothing about its message, so
+the test got those words from ListQueue.java, line 15. As a test
+of ListQueue it is fine, and useful while you write join. It
+is not a specification-based test, because it depends on a
+detail of ListQueue that the specification left open, and
+another correct implementation may word its message differently.
+Against that implementation the test fails, though nothing is
+wrong with the implementation.
+
+The second asserts the class of the list that waiting returns:
+
+ListQueueImplTest.java    @Test
+    void waitingIsAnArrayList() {
+        HelpQueue queue = new ListQueue();
+        queue.join("ada");
+        assertTrue(queue.waiting() instanceof ArrayList);
+    }
+
+ArrayList appears nowhere in HelpQueue.java either. The
+interface promises a List, and the test got ArrayList from
+ListQueue.java, line 29. The same holds: fine as a test of
+ListQueue, not specification-based, and the test would fail
+against a correct implementation that returned a LinkedList.
+
+HelpQueueTest.java holds the specification-based tests. Each
+passes on every correct implementation of HelpQueue, so the
+subclass for any implementation can run all five.
+ListQueueImplTest.java holds the implementation-based tests. Each
+checks a choice ListQueue made where the specification left the
+choice open, so these tests are about ListQueue alone: another
+correct implementation that chose differently can fail them.
+
+A test that passes on every correct implementation is worth
+having only if it fails on a wrong implementation. Make a copy of
+ListQueue with the check in join, lines 14 to 16, taken out,
+and run ListQueueSpecTest against the copy. Four still pass,
+and nobodyIsInTheQueueTwice fails, since the second join
+threw nothing. In JUnit's report, the five tests' lines read:
+
+│     ├─ nextOnAnEmptyQueueThrows() ✔
+│     ├─ waitingIsACopy() ✔
+│     ├─ nobodyIsInTheQueueTwice() ✘ Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
+│     ├─ aStudentWhoLeftMayComeBack() ✔
+│     └─ studentsAreServedInTheOrderTheyJoined() ✔
+
+The other four never join a student who is already waiting, so
+they cannot tell the copy from ListQueue. A test file with only
+those four would pass on the copy.
+
+A second implementation
+
+Here is another class that implements HelpQueue. Each student
+waiting is a Node, holding a NetID and the node after it, and
+LinkedQueue holds the first node and the last:
+
+LinkedQueue.java
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+/** A help queue kept as a chain of nodes, one node per student. */
+public class LinkedQueue implements HelpQueue {
+    /** One student waiting, and the node of the student after them. */
+    private static class Node {
+        String netid;
+        Node next;  // null for the last node in the chain
+
+        Node(String netid) {
+            this.netid = netid;
+        }
+    }
+
+    // The first and last nodes of the chain, both null when nobody
+    // is waiting.
+    private Node front;
+    private Node back;
+
+    public int size() {
+        int n = 0;
+        for (Node node = front; node != null; node = node.next) {
+            n++;
+        }
+        return n;
+    }
+
+    public void join(String netid) {
+        // Walk the chain for the student, as ListQueue walks its list.
+        for (Node node = front; node != null; node = node.next) {
+            if (node.netid.equals(netid)) {
+                throw new IllegalArgumentException(
+                    netid + " is already waiting");
+            }
+        }
+        // Add the new node after the last node, or start the chain with it.
+        Node node = new Node(netid);
+        if (back == null) {
+            front = node;
+        } else {
+            back.next = node;
+        }
+        back = node;
+    }
+
+    public String next() {
+        if (front == null) {
+            throw new NoSuchElementException("nobody is waiting");
+        }
+        // Unhook the first node; if it was also the last, the chain is
+        // empty now.
+        String netid = front.netid;
+        front = front.next;
+        if (front == null) {
+            back = null;
+        }
+        return netid;
+    }
+
+    public List<String> waiting() {
+        List<String> list = new ArrayList<String>();
+        for (Node node = front; node != null; node = node.next) {
+            list.add(node.netid);
+        }
+        return list;
+    }
+}
+
+Node is a class declared inside LinkedQueue, and it is
+private, so no code outside LinkedQueue can use it. The nodes
+form a linked list, and each method works on that chain:
+
+size walks the chain and counts the nodes.
+
+join walks the chain to see whether the student is already
+  waiting, then adds a node at the back.
+
+next unhooks the node at the front and returns its NetID.
+
+waiting walks the chain and copies each NetID into a new list.
+
+To run the five specification-based tests on LinkedQueue, write
+one more subclass:
+
+LinkedQueueSpecTest.javapublic class LinkedQueueSpecTest extends HelpQueueTest {
+    HelpQueue emptyQueue() {
+        return new LinkedQueue();
+    }
+}
+
+Compile the two new files with the rest, and select both
+subclasses, one --select-class for each. Before you run them,
+predict what JUnit reports.
+
+JUnit starts ten tests, five on each class, and all ten pass. In
+JUnit's report, the two classes' lines read:
+
+│  ├─ ListQueueSpecTest ✔
+│  │  ├─ nextOnAnEmptyQueueThrows() ✔
+│  │  ├─ waitingIsACopy() ✔
+│  │  ├─ nobodyIsInTheQueueTwice() ✔
+│  │  ├─ aStudentWhoLeftMayComeBack() ✔
+│  │  └─ studentsAreServedInTheOrderTheyJoined() ✔
+│  └─ LinkedQueueSpecTest ✔
+│     ├─ nextOnAnEmptyQueueThrows() ✔
+│     ├─ waitingIsACopy() ✔
+│     ├─ nobodyIsInTheQueueTwice() ✔
+│     ├─ aStudentWhoLeftMayComeBack() ✔
+│     └─ studentsAreServedInTheOrderTheyJoined() ✔
+
+None of the five can tell the two classes apart, since each test
+uses only what HelpQueue promises. One of the two
+implementation-based tests can. Change the two new ListQueue()
+in ListQueueImplTest.java to new LinkedQueue(), and run
+ListQueueImplTest. In JUnit's report, its two tests' lines read:
+
+│     ├─ joinTwiceSaysWho() ✘ expected: <ada is in the queue> but was: <ada is already waiting>
+│     └─ waitingIsAnArrayList() ✔
+
+joinTwiceSaysWho fails, since LinkedQueue says "ada is already
+waiting" where ListQueue says "ada is in the queue".
+waitingIsAnArrayList still passes, since LinkedQueue also
+happens to return an ArrayList. The specification leaves both
+choices to each implementation. So are the two classes the same
+or different?
+
+They are two classes, with different fields and different bodies:
+a method body from either class would not compile in the other.
+But both implement HelpQueue, and each is written to satisfy
+the specifications there. A client that relies only on what
+those specifications promise works with either class. As the
+implementer, you could even rewrite ListQueue to keep a chain
+of nodes, as LinkedQueue does, and such a client would not have
+to change.
+
+OfficeHours is such a client: it calls only join, waiting,
+and next. Change its line 4 to
+HelpQueue queue = new LinkedQueue();, and leave the rest alone.
+Declaring queue a HelpQueue holds OfficeHours to the methods
+the interface lists, whichever class it gets. The program prints
+the same two lines as it did on a ListQueue:
+
+$ javac OfficeHours.java
+
+$ java OfficeHours
+[ada, bob]
+helping ada
+
+You have used this idea all along. Java's List is an
+interface, and ArrayList and LinkedList are two classes that
+implement it. An ArrayList keeps its elements in an array. A
+LinkedList keeps them in a chain of nodes, much like
+LinkedQueue. Code that declares a variable a List, and calls
+only List's methods, works with either class. Only the line that
+makes the list has to change. So List is an ADT too. Its
+abstract state is its elements, in order. Its specification leaves
+how they are stored to each class.
+
+Three readings of "returns the students waiting"
+
+The waiting method's specification could have said less.
+Suppose it said only "returns the students waiting". A client
+could read that sentence three ways, and write code against any
+one of them:
+
+A new list, holding the students waiting at the moment of the
+  call. The client may do what it likes with it, and the queue
+  does not change. This is the reading HelpQueue promises, in
+  its words "in a new list", and what both of our classes do.
+
+The queue's own list, so the client and the queue share one
+  list. The list changes as the queue changes, so the client sees
+  later joins without calling again, and anything the client
+  does to the list happens to the queue.
+
+A list the client may read but must not change or keep, so
+  that the implementer may hand back either of the other two.
+
+The first two promises are
+incomparable:
+an implementation that keeps either promise can break a client
+written for the other. A client that counts on seeing later joins
+breaks when it gets a copy. A client that changes its list freely
+breaks when it gets the queue's own list. The third is weaker
+than both, since a waiting that returns a copy, or the queue's
+own list, satisfies it. ListQueue keeps the first promise on
+lines 27 to 30:
+
+ListQueue.java
+27
+28
+29
+30    public List<String> waiting() {
+        // A copy, so that a client cannot change the queue through it.
+        return new ArrayList<String>(queue);
+    }
+
+waitingIsACopy checks that promise, and the comment on line 28
+says why the copy is there. Under the second reading, some client
+could take the list waiting gave it and add a NetID that is
+already waiting. The queue would then hold that student twice,
+and join's check would never run: code outside the type would
+have broken the abstract invariant, as Shortcut did through a
+public field. Making the copy walks the whole queue on each
+call to waiting. In return, only join and next can change
+the queue.
+
+Exercises
+
+Each answer is folded under its question. Write yours first.
+
+1. Add a method front to HelpQueue that tells a client
+who is next without serving them. Write its specification in the
+style of the other four, then one specification-based test of
+it, and then its body in ListQueue.
+
+Answer
+
+The specification promises the student at the front, who
+  stays. Like the other four, it is written about the queue of
+  students, not about any field. It throws on an empty queue as
+  next does. Unlike next, it has no @modifies line, since
+  front changes nothing:
+
+HelpQueue.java    /**
+     * @return the NetID of the student at the front of the queue,
+     *     who stays in the queue
+     * @throws NoSuchElementException if the queue is empty
+     */
+    String front();
+
+The test checks front against next and waiting.
+front and next must name the same student, and waiting
+  must show that front left the queue alone:
+
+HelpQueueTest.java    @Test
+    void frontIsWhoNextWouldServe() {
+        HelpQueue queue = emptyQueue();
+        queue.join("ada");
+        queue.join("bob");
+        assertEquals("ada", queue.front());
+        assertEquals(List.of("ada", "bob"), queue.waiting());
+        assertEquals("ada", queue.next());
+    }
+
+Every call in it is to a method the interface lists, and the
+expected answers come from the specifications of join,
+front, waiting, and next, so it passes on any correct
+implementation, not only on ListQueue.
+
+ListQueue returns the first element of its list. It
+  makes the same check for an empty queue that next makes:
+
+ListQueue.java    public String front() {
+        if (queue.isEmpty()) {
+            throw new NoSuchElementException("the queue is empty");
+        }
+        return queue.get(0);
+    }
+
+With front added to the interface, to ListQueue, and to
+the tests, ListQueueSpecTest runs six tests, and all six pass.
+LinkedQueue will not compile until it has a front too.
+
+2. Consider a buggy version of ListQueue whose next serves
+from the wrong end, with line 24 changed:
+
+ListQueue.java
+20
+21
+22
+23
+24
+25    public String next() {
+        if (queue.isEmpty()) {
+            throw new NoSuchElementException("the queue is empty");
+        }
+        return queue.remove(queue.size() - 1);
+    }
+
+Which of the seven tests, the five in HelpQueueTest.java and the
+two in ListQueueImplTest.java, fail against the buggy version, and
+with what message? Decide first, then run ListQueueSpecTest and
+ListQueueImplTest against it.
+
+Answer
+
+One test fails. studentsAreServedInTheOrderTheyJoined,
+  with expected: <ada> but was: <bob>: with ada and bob
+  waiting, next returned bob.
+
+Six pass. nobodyIsInTheQueueTwice and waitingIsACopy
+  never call next. aStudentWhoLeftMayComeBack calls it with
+  one student waiting, and the back of a one-student queue is
+  its front. nextOnAnEmptyQueueThrows checks only the throw,
+  which the buggy version kept. The two tests in
+  ListQueueImplTest.java look at join's message and waiting's
+  list, not at next.
+
+One test alone checks the order. Only
+  studentsAreServedInTheOrderTheyJoined asks which student
+  next returns when two are waiting. Yet the order is the
+  promise that makes the type a queue.
+
+3. Consider another version of ListQueue whose waiting
+hands back a view of its list instead of a new list, with line 29
+changed and the comment above it:
+
+ListQueue.java
+27
+28
+29
+30    public List<String> waiting() {
+        // A view, so that a client cannot change the queue through it.
+        return java.util.Collections.unmodifiableList(queue);
+    }
+
+Collections.unmodifiableList, from Java's
+standard library, returns a view of queue: a list that stores
+nothing itself and reads each element from queue. So the view
+shows every later change to the queue, and any attempt to change
+the view throws UnsupportedOperationException. (The
+java.util. in front saves adding an import.) Which of the three
+readings above does this version satisfy? Which of the seven tests
+fail against this version, and why?
+
+Answer
+
+The view satisfies only the third reading. It is not a new
+  list, so it fails the first. A change to it throws instead of
+  changing the queue, so it fails the second. It is a list the
+  client can read, which is all the third promises.
+
+This version does not satisfy HelpQueue's specification.
+HelpQueue promises "a new list", the first reading. A
+  specification that promised only the third reading would have
+  allowed the view.
+
+Two tests fail. waitingIsACopy fails: its
+  copy.add("eve") threw an UnsupportedOperationException
+  before the assertion ran, so JUnit reports that exception as
+  the failure. waitingIsAnArrayList, in
+  ListQueueImplTest.java, fails with
+  expected: <true> but was: <false>, since the view is not an
+  ArrayList. The other five never try to change the list that
+  waiting returns.
+
+Further reading
+
+The vocabulary. Barbara Liskov and John Guttag, Program
+  Development in Java (2001), chapter 5, "Data Abstraction".
+  Sections 5.1 to 5.3 cover this lecture's ideas: a type is
+  specified by its operations, not by any implementation; the
+  specification's overview, like the comment at the top of
+  HelpQueue, describes the objects in terms the reader already
+  knows, such as a mathematical set or sequence; and how the
+  objects are stored is chosen afterward and kept private.
+
+The idea, before classes. David Parnas,
+  "On the Criteria To Be Used in Decomposing Systems into Modules"
+  (1972). Parnas splits a system by its design decisions, not by
+  its processing steps: each module hides one decision the others
+  never learn, such as how a line of text is stored. In Java, such
+  a module is a class with private fields. The decision
+  HelpQueue hides is how the queue is kept.
+
+    UW Site Use Agreement

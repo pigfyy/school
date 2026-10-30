@@ -1,0 +1,502 @@
+CSE 331 Homework 2: Testing and Reasoning
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          Task 1 — All Bases Covered
+Task 2 — Crosscheck Your Tests
+Getting the starter codeSoftware setup
+
+Task 3 — Nothing But Net-Pay
+Task 4 — Seahawks or Mariners: The Choice is Hoare's
+Task 5 — The Reign Remains the Same
+AI Policy
+Submission
+
+        CSE 331 Homework 2: Testing and Reasoning
+
+Due Friday, October 23 at 11:59pm (late policy).
+
+Task 1 — All Bases Covered
+
+For each of the following functions, state the minimum number of tests required to
+meet our coverage requirements (Lecture 5)
+and explain why that is the required number.
+
+Then, describe a specific set of tests to use (with the same number of tests
+as you said before). Describe each test by giving the input (identify a
+specific input rather than saying, e.g., “some positive number”),
+saying what portion of the function it tests, and explaining why our rules
+require that test.
+
+public static int f(int n) {
+    if (n < 0) {
+        return -6 * n;
+    } else {
+        return 7 * n;
+    }
+}
+
+/** @requires 1 <= n */
+public static int h(int n) {
+    int k = 0;
+    while (1 < n) {
+        n = n / 2;
+        k++;
+    }
+    return k;
+}
+
+Task 2 — Crosscheck Your Tests
+
+It's hockey season! Kyle Sherman wants to know how many estimated points his
+favorite forward, Sherman Kyle, will score this season. He has written the
+following function to help him out.
+
+/**
+ * Calculates the total estimated points scored by a forward playing on a
+ * line in a 4-line rotation, over a range of shifts in a game. Line k is
+ * on the ice for exactly the shifts s with s mod 4 = k.
+ *
+ * @param startShift         the shift number to begin calculations, inclusive
+ * @param endShift           the shift number to end calculations, inclusive
+ * @param lineNumber         the forward's line in the rotation (0-based,
+ *                           for example, 3 for the "fourth line")
+ * @param avgPointsPerShift  the average points the forward scores per shift
+ *                           when his line is on the ice
+ * @requires 0 <= lineNumber <= 3
+ *           0 <= avgPointsPerShift
+ *           startShift <= endShift
+ * @return the total estimated points scored in that range
+ */
+public static int totalPoints(int startShift, int endShift,
+                              int lineNumber, int avgPointsPerShift) {
+    if (lineNumber < 0 || 3 < lineNumber
+        || avgPointsPerShift < 0 || endShift < startShift) {
+        throw new IllegalArgumentException();
+    }
+
+    int totalPoints = 0;
+    for (int shift = startShift; shift < endShift; shift++) {
+        if (shift % 4 == lineNumber) {
+            totalPoints = totalPoints + avgPointsPerShift;
+        }
+    }
+
+    return totalPoints;
+}
+
+Consider the following three tests, A, B, and C, written as one JUnit
+method. Determine whether together they meet our coverage requirements:
+statement, branch, and loop coverage. Count only what allowed inputs can
+reach, as Lecture 5
+does. For each kind of coverage, explain which of A, B, and C provide it,
+alone or together, or what they miss.
+
+@Test
+void testTotalPoints() {
+    // A
+    assertEquals(6, totalPoints(4, 5, 0, 6));
+
+    // B
+    assertEquals(12, totalPoints(10, 24, 1, 4));
+
+    // C
+    assertEquals(0, totalPoints(9, 9, 3, 5));
+}
+
+Senior developer Emily peeks over Kyle's shoulder, claiming that while the
+tests pass, the implementation fails to satisfy the specification under
+specific inputs. Identify and write out a test case that would reveal this
+and explain why the current tests failed to catch it.
+
+Now imagine a more complex function with many more lines (maybe a function
+to calculate total Kraken wins this season). Weigh the pros and cons of using
+coverage-based testing as your only safety metric. What role does testing
+actually play if it cannot provide a proof of correctness?
+
+Getting the starter code
+
+Get the starter code via
+gitlab.
+Click the "Code" button in the top right, and then click Download
+directory as zip at the very bottom of the popup. Extract the resulting
+file on your machine and find the hw2 folder inside it. It holds the
+following files:
+
+GeneralManager1.java, GeneralManager2.java: Starter code for your two
+  implementations in Task 3.
+
+GeneralManager1Tests.java, GeneralManager2Tests.java: Starter code for
+  your tests in Task 3.
+
+junit.jar: JUnit, for running your tests.
+
+Software setup
+
+This course uses JDK 25; the resources page
+describes how to install it if you do not already have it.
+
+You may use any Java development environment you want. If you have one you are
+already comfortable with, we recommend you use it.
+
+Running your tests
+
+As in Lecture 4, compile your code together
+with JUnit, then ask JUnit to run each test class. From the hw2 folder:
+
+javac -cp junit.jar GeneralManager1.java GeneralManager2.java GeneralManager1Tests.java GeneralManager2Tests.java
+java -jar junit.jar execute --class-path . --select-class GeneralManager1Tests
+java -jar junit.jar execute --class-path . --select-class GeneralManager2Tests
+
+JUnit lists each test it ran, with a check mark beside each test that passed.
+The starter's placeholder tests fail until you replace them with your own.
+
+Working on attu
+
+If you would rather not install Java on your own computer, you can work on
+attu, the Allen School's Linux servers, which already have JDK 25. You log in
+with your CSE NetID and its password; off campus, first connect to the
+Husky OnNet
+VPN. To work on attu from Visual Studio Code:
+
+Install the "Remote - SSH" extension from the extensions panel.
+
+Use View -> Command Palette..., run Remote-SSH: Connect to
+   Host..., and enter YourCSENetID@attu.cs.washington.edu. If VS Code asks
+   for the platform, choose Linux. The first time, VS Code takes a minute to
+   set itself up on attu; once you are connected, the bottom-left corner shows
+   SSH: attu.cs.washington.edu.
+
+Use View -> Terminal and run this command to get the starter code:
+
+git clone https://gitlab.cs.washington.edu/cse331-26au/cse331-26au-public.git
+
+Use File -> Open Folder... and select
+   cse331-26au-public/homework/hw2.
+
+Your files then live on attu. To submit, right-click each one in the Explorer
+and choose Download... to copy it to your computer, then upload it to
+Gradescope.
+
+Task 3 — Nothing But Net-Pay
+
+Zach and James, the new co-general managers of the Seattle Storm, want to add
+some new players to the team. Zach and James have received a scouting report
+of players, each with a name and a desired salary in millions of dollars.
+Your job is to implement a method that chooses some players from the scouting
+report to form a roster whose total salary is within a required range.
+
+This problem has coding parts and written parts. Submit your code to the
+"HW2 Coding" assignment
+on Gradescope. Submit your written answers along with the rest of the
+problems to the "HW2 Written"
+assignment on Gradescope.
+AI use is not permitted for this problem.
+
+Start by reading the specification for Player and the static method
+buildRoster below.
+
+public class GeneralManager1 {
+    /**
+     * An individual player in Zach and James's scouting report.
+     *
+     * @param salary The player's desired salary in millions of dollars.
+     *               Must be non-negative.
+     * @param name The name of the player. Must not be null or empty.
+     */
+    public static record Player(String name, int salary) { ... }
+
+    /**
+     * Build a roster of players using players from the scouting report.
+     *
+     * @param scoutingReport The players in Zach and James's scouting report.
+     *                       Must not be null, and none of the players it
+     *                       contains may be null.
+     * @param minimumSalary The minimum total salary of the roster in millions
+     *                      of dollars. Must be non-negative.
+     * @param maximumSalary The maximum total salary of the roster in millions
+     *                      of dollars. Must be non-negative.
+     * @requires
+     *   - minimumSalary <= maximumSalary
+     *   - No player occurs in the scouting report more than once.
+     *   - The total salary of all players in the scouting report is at least
+     *     minimumSalary.
+     *   - Every player in the scouting report has salary at most
+     *     maximumSalary - minimumSalary.
+     * @return A non-null list of players (the roster) such that:
+     *   - every player in the roster is from the scouting report, and no
+     *     player occurs in the roster more than once
+     *   - minimumSalary <= (total salary of the roster) <= maximumSalary
+     */
+    public static List<Player> buildRoster(
+        final Player[] scoutingReport,
+        final int minimumSalary,
+        final int maximumSalary
+    ) { ... }
+}
+
+Notice that the specification places some requirements on the returned
+roster, but there can still be multiple allowed return values for a
+particular input. Write two implementations (one for Zach, one for James) of
+buildRoster, in GeneralManager1.java and GeneralManager2.java, that both
+satisfy the specification and, on some allowed input, return different lists.
+In a comment within each implementation, briefly describe how that
+implementation chooses its rosters.
+
+Write unit tests for both of your implementations of buildRoster, in
+GeneralManager1Tests.java and GeneralManager2Tests.java. Your tests
+should meet
+Lecture 5's coverage standard
+and test only allowed inputs. Each test file runs only against your own
+implementation, so a test may expect the exact roster your code returns;
+parts (d) and (e) take up tests that must pass on any correct
+implementation.
+
+Give an example input, one that meets the precondition, where your two
+implementations return different lists, and show what each returns.
+
+Consider your example input from part (c). Suppose we want to write a unit
+test that calls buildRoster on this input, and we want this unit test to
+pass on both of your implementations of buildRoster. (Each class declares
+its own Player, so the test builds the same names and salaries for each.)
+Explain why this is more challenging than writing a unit test for a single
+implementation.
+
+How might we overcome the challenge from part (d) and write a unit test that
+will pass on any correct implementation of buildRoster?
+
+Task 4 — Seahawks or Mariners: The Choice is Hoare's
+
+In this problem, you will practice proving correctness of code with
+conditionals using forward and backward reasoning. Recall from lecture that
+we can use assertions (true/false claims at specific program points) to
+reason about what is true before and after each line of code.
+
+In this task and the next, fill in each blank by applying the reasoning
+rules as lecture gives them. You may simplify a claim, but do not weaken it;
+when you do, write the simplified claim on its own line under the original,
+as the notes do. You may name a variable's old value as lecture does,
+bonus0 for bonus. Treat the arithmetic in the claims as exact.
+
+The Seattle Seahawks need to calculate bonuses (after their Super Bowl win)
+for their receivers depending on their performance this season. Consider the
+following method:
+
+/**
+ * Computes the bonus of a receiver.
+ * @param touchdowns    the number of touchdowns the receiver
+ *                      scored this season
+ * @requires 0 <= touchdowns
+ * @return the bonus, which must be at least 500k
+ */
+public static double receiverBonus(int touchdowns) {
+    double bonus;
+    if (6 <= touchdowns) {
+        bonus = 3L * touchdowns - 10;
+    } else {
+        bonus = 5 + (touchdowns * 0.5);
+    }
+    bonus = bonus * 100000;
+    return bonus;
+}
+
+The precondition and postcondition for this method come from its
+specification: the @requires clause tells us what we can assume about the
+input, and the @return clause tells us what the method must guarantee about
+the output.
+
+Use forward reasoning to fill in the assertions below. Then, show that the
+code is correct by explaining briefly (in a few sentences) why \(P\) implies
+\(Q\).
+
+{{ 0 <= touchdowns }}
+if (6 <= touchdowns) {
+    {{ ____________________________________ }}
+    bonus = 3L * touchdowns - 10;
+    {{ ____________________________________ }}
+} else {
+    {{ ____________________________________ }}
+    bonus = 5 + (touchdowns * 0.5);
+    {{ ____________________________________ }}
+}
+{{ _________________ or _________________ }}
+bonus = bonus * 100000;
+{{ P: _______________ or _________________ }}
+{{ Q: 500000 <= bonus }}
+
+Coincidentally, the Mariners need to calculate paycuts after a disastrous
+2026 season. Consider the following method:
+
+/**
+ * Computes the paycuts given to a player.
+ * @param battingAvg    player's batting average (hits / at bats)
+ * @param gamesPlayed   the number of games played by the player
+ * @requires 0 <= gamesPlayed
+ * @requires 0 <= battingAvg < 0.5
+ * @return the fraction of pay cut, which cannot be more than 0.9
+ */
+public static double paycutPercent(double battingAvg, int gamesPlayed) {
+    double paycut;
+    if (100 <= gamesPlayed) {  // starters get a break for experience
+        paycut = 0.9 - battingAvg - (gamesPlayed - 100) * 0.001;
+    } else {  // role players
+        paycut = 1 - battingAvg;
+    }
+    return paycut;
+}
+
+Use forward reasoning to fill in \(P_1\) and \(P_2\) (what is known upon
+entering each branch). Use backward reasoning to fill in \(Q_1\) and \(Q_2\)
+(what must be true before each assignment in order for the postcondition to
+hold) and the claim at the end of each branch.
+
+Then, determine whether \(P_1\) implies \(Q_1\) and whether \(P_2\) implies \(Q_2\).
+Where an implication holds, explain briefly why. Where it does not, give a
+specific counterexample input and explain what goes wrong.
+
+{{ 0 <= gamesPlayed and 0 <= battingAvg < 0.5 }}
+if (100 <= gamesPlayed) {
+    {{ P1: ________________________________ }}
+    {{ Q1: ________________________________ }}
+    paycut = 0.9 - battingAvg - (gamesPlayed - 100) * 0.001;
+    {{ ____________________________________ }}
+} else {
+    {{ P2: ________________________________ }}
+    {{ Q2: ________________________________ }}
+    paycut = 1 - battingAvg;
+    {{ ____________________________________ }}
+}
+{{ paycut <= 0.9 }}
+
+Task 5 — The Reign Remains the Same
+
+Zach and James's co-GM duties have expanded: they also handle kit orders for
+the Seattle Reign's youth academy. Code snippets A and B below both claim to
+compute the total cost of ordering one kit (jersey, shorts, socks, etc.) for
+every team in the academy, given the price of each piece in a kit; both
+order for t = 4 teams. Zach wrote snippet A; James wrote snippet B.
+Naturally, neither will admit the other's is also correct.
+
+We will define \(\textsf{cost}(\text{kit})\) to make the invariant more concise.
+
+If kit is empty, then \(\textsf{cost}(\text{kit}) = 0\).
+
+If kit is not empty, then \(\textsf{cost}(\text{kit})\) = the sum of the
+  elements of kit.
+
+We will also define \(\textsf{mult}(\text{kit}, t)\).
+
+If kit is empty, then \(\textsf{mult}(\text{kit}, t)\) returns an empty
+  array.
+
+If kit is not empty, then \(\textsf{mult}(\text{kit}, t)\) returns each
+  element of kit \(\cdot\ t\).
+
+We write kit[i:n] for the elements of kit from index i up to, but not
+including, index n; kit[n:n] is empty. Each invariant below says that the
+whole equals what is done so far plus what is left: for A the cost of the
+full order, and for B the cost of one kit, which B multiplies by t at the
+end.
+
+A. (Zach's version)
+
+{{ kit = kit0 }}
+int zCost = 0;
+int t = 4;
+int i = 0;
+int n = kit.length;
+{{ Inv: 0 <= i and i <= n and
+        cost(mult(kit0, t)) = zCost + cost(mult(kit[i:n], t)) }}
+while (i != n) {
+    {{ P0: ________________________________ }}
+    {{ Q2: ________________________________ }}
+    zCost = zCost + kit[i] * t;
+    {{ Q1: ________________________________ }}
+    i = i + 1;
+    {{ Q0: ________________________________ }}
+}
+{{ zCost = cost(mult(kit0, t)) }}
+
+B. (James's version)
+
+{{ kit = kit0 }}
+int jCost = 0;
+int t = 4;
+int i = 0;
+int n = kit.length;
+{{ Inv: 0 <= i and i <= n and cost(kit0) = jCost + cost(kit[i:n]) }}
+while (i != n) {
+    {{ P0: ________________________________ }}
+    {{ Q2: ________________________________ }}
+    jCost = jCost + kit[i];
+    {{ Q1: ________________________________ }}
+    i = i + 1;
+    {{ Q0: ________________________________ }}
+}
+jCost = jCost * t;
+{{ jCost = cost(mult(kit0, t)) }}
+
+Fill in the remaining assertions for A. Fill in \(P_0\) and \(Q_0\) using the
+rule for a while loop from lecture: they are the two ends of the triple about
+the body, the rule's check (2). Use backward reasoning to derive \(Q_1\)
+and \(Q_2\).
+
+Does \(P_0\) imply \(Q_2\) in snippet A? Informally explain why or why not. (No
+proof required.)
+
+Fill in the remaining assertions for B, in the same manner as part (a).
+
+Does \(P_0\) imply \(Q_2\) in snippet B? Informally explain why or why not. (No
+proof required.)
+
+Is the value in zCost at the end of snippet A equal to the value in jCost
+at the end of snippet B? Informally explain your answer in 1 or 2 sentences.
+(No proof required.)
+
+AI Policy
+
+You should not use any AI assistance for any part of this assignment. See
+the course's AI policy.
+
+Submission
+
+Submit your answers to Tasks 1, 2, 4, and 5, and the written parts of
+Task 3, to the
+"HW2 Written"
+assignment on Gradescope. Submit
+GeneralManager1.java, GeneralManager2.java, GeneralManager1Tests.java,
+and GeneralManager2Tests.java to the
+"HW2 Coding"
+assignment on Gradescope.
+
+HW2 Written and HW2 Coding each need their own Friday submission to unlock
+their late day. A Friday submission to one does not unlock the other; see
+the late policy.
+
+    UW Site Use Agreement

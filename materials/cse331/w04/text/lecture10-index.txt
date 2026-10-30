@@ -1,0 +1,78 @@
+CSE 331: Abstract data types
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          CSE 331: Abstract data types
+
+        CSE 331: Abstract data types
+
+Programs keep track of data in order to perform their function. For
+example, a program that keeps track of an office hours queue will have
+some way to store the students in the queue. Program data often has
+"rules" that must be followed. For example, the office hours queue
+should store the students in the order they joined and ensure that
+each student is present in the queue at most once.
+
+We can use the techniques of testing and reasoning to ensure that the
+rules are followed. But the question is: how much of the code do we
+have to test or reason about in order to be sure the rules are
+followed? Answer: all the code that modifies the data. In a poorly
+organized program, where many parts of the code all directly modify
+the data, we need to test and reason about all of them.
+
+A related problem is that we may later decide to change the details
+of how exactly the data is represented. For example, we may change from
+a queue based on an array to a queue based on a linked list. Here the
+question is: how much of the code must be updated to make this change?
+The answer again is: all the code that modifies the data. In a poorly
+organized program, that may be a large amount of code.
+
+A well organized program can address both of these problems with
+an abstract data type. An abstract data type (ADT) is a
+specification for the operations available to access and modify
+the underlying data. The specification is written in terms of the
+abstract state, which is how the client should think about the
+object. Data abstraction means only accessing a type via its
+specification, which helps isolate and hide the details of how the
+data is actually represented from the rest of the program.
+
+An ADT allows the programmer to isolate and minimize the part of the
+code that directly depends on the details of how the data is
+represented. To ensure the rules are followed, we only need to test
+and reason about the ADT itself, not the rest of the program.
+Similarly, if we change our mind about how to represent the data, only
+the ADT implementation needs to change, not the rest of the program.
+
+Notes
+
+Slides
+
+Slides (PDF)
+
+    UW Site Use Agreement

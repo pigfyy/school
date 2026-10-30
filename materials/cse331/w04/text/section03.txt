@@ -1,0 +1,154 @@
+CSE 331: Section 3 — Reasoning
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          Task 1 — Found Guilty of Reason
+Task 2 — Does a Duck Say “Back”?
+Task 3 — Nothing To Be If-ed At
+Task 4 — Everybody Loops
+
+        CSE 331: Section 3 — Reasoning
+
+Task 1 — Found Guilty of Reason
+
+In this problem, you will practice proving correctness of straight-line code using forward reasoning.
+
+Fill in each blank by applying the rules exactly as taught in lecture. Then, if you want, you can simplify the final resulting assertion, but do not weaken it (such as dropping facts that are useful). Separate any simplified statement from the original by “\(\leftrightarrow\)”.
+
+Use forward reasoning to fill in the missing assertions in the following code. Use invertible operations.
+
+{{ y > 5 and z > 2 }}
+x = 4 * y - 3;
+{{ _________________________ }}
+y = y - 5;
+{{ _________________________ }}
+z = z * y;
+{{ P: ______________________ }}
+{{ Q: x < 2z + 20 }}
+
+First, fill in Q using the postcondition (hint, how does y relate to the @returns clause?).
+Then, use forward reasoning to fill in the missing assertions in the following code. Use subscripts or invertible operations.
+
+// Computes the square of (x + 1)
+// @param x The number to increment and square
+// @return (x + 1)^2
+public static int nextSquare(int x) {
+  int y = x * x;
+  {{ _________________________ }}
+  y = y + (2 * x);
+  {{ _________________________ }}
+  y = y + 1;
+  {{ P: ______________________ }}
+  {{ Q: ______________________ }}
+  return y;
+}
+
+Task 2 — Does a Duck Say “Back”?
+
+In this problem, you will practice proving correctness of straight-line code using backward reasoning.
+
+Use backward reasoning to fill in the missing assertions in the following code:
+
+{{ P: x < w + 1 and w > 0 }}
+{{ Q: ______________________ }}
+y = 4 * w;
+{{ _________________________ }}
+x = x * 2;
+{{ _________________________ }}
+z = x - 8;
+{{ z < y }}
+
+Use backward reasoning to fill in the missing assertions in the following code snippet:
+
+    {{ Q: ______________________ }}
+    int b = 2 * c;
+    {{ _________________________ }}
+    c = c - 1;
+    {{ _________________________ }}
+    int a = b + 1;
+    {{ a >= c }}
+    return a;
+
+Task 3 — Nothing To Be If-ed At
+
+Use forward reasoning to fill in the assertions.
+
+  {{ 0 <= s < len and d >= 0 }}
+  int w;
+  if (s + d <= len) {
+    {{ ___________________________________ }}
+    w = d;
+    {{ P1: ________________________________ }}
+  } else {
+    {{ ___________________________________ }}
+    w = len - s;
+    {{ P2: ________________________________ }}
+  }
+    {{ _________________________ }}
+  return w;
+
+Task 4 — Everybody Loops
+
+In this problem, we will show the correctness of a method containing a loop that finds the quotient of \(x\) divided by 10, i.e., the largest value \(y\) such that \(10y \le x\). To say that \(y\) is the largest such value means that any larger value would not satisfy the inequality, i.e., that \(10(y+1) \not\le x\).
+
+We denote the initial value of the parameter \(x\) at the top of the method by \(x_0\). This is explicitly stated in the precondition as the fact “\(x = x_0\)” (note this is not strictly necessary - you always know \(x = x_0\) until you modify it!). The first two facts of Q are from the spec postcondition, which say that \(y\) is the quotient of \(x_0\) divided by 10. The third fact is specific to our implementation, and says that \(x\) is the remainder, i.e., the remaining amount not divisible by 10.
+
+This method calculates the quotient without division. Instead, it just uses subtraction. It operates by increasing y and decreasing x each time around. The first part of the invariant says that the distance from \(x_0\) down to \(10y\) (i.e., \(x_0 - 10y\)) is the same as the distance from \(x\) down to 0 (i.e., \(x - 0 = x\)). The second part of the invariant says that \(x\) has not moved below 0 (i.e., \(x \ge 0\)).
+
+Use subscripts only.
+
+// Computes the integer quotient of x divided by 10
+// @param x The numerator
+// @requires x >= 0
+// @return The largest integer y such that 10 * y <= x_0
+public static int divideByTen(int x) {
+  {{ x = x_0 and x_0 >= 0 }}
+  int y = 0;
+  {{ P1: _________________________ }}
+  {{ Inv: x_0 - 10y = x and x >= 0 }}
+  while (x >= 10) {
+    {{ _________________________ }}
+    y = y + 1;
+    {{ _________________________ }}
+    x = x - 10;
+    {{ P3: _________________________ }}
+    {{ Q2: _________________________ }}
+  }
+  {{ P2: _________________________ }}
+  {{ Q1: 10y <= x_0 and x_0 < 10(y+1) and x = x_0 - 10y }}
+  return y;
+}
+
+Check (1): Fill in P1, then show that the invariant is true when we get to the top of the loop the first time.
+
+Check (3): Fill in P2, then show that Q1 holds when we exit the loop.
+
+Check (2): Fill in Q2 (Hint: what do we know at the end of a loop?). Then, forward reason to P3. Show that P3 implies Q2, proving that the body of the loop is correct.
+
+    UW Site Use Agreement

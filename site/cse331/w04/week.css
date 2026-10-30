@@ -1,0 +1,46 @@
+/* CSE 331 week 4: widget styles only. Loaded after base.css; uses only base tokens. */
+
+/* ---------------------------------------------------------------- the guestbook */
+.gb { padding: 0.9rem; }
+.gb .controls { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; margin: 0 0 0.5rem; }
+.gb .controls input[type="text"] { width: 9rem; min-width: 0; }
+.gb .controls .gb-path { width: 6rem; }
+.gb-curl { background: var(--paper); border-radius: var(--r); padding: 0.4rem 0.5rem; }
+.gb-curl .mono { font-family: var(--mono); font-size: 0.85rem; color: var(--ink-soft); }
+.gb-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.7rem; margin-top: 0.6rem; }
+.gb-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.gb-grid > div { min-width: 0; }
+.gb-view { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 0.5rem 0.7rem; min-height: 8rem; font-size: 0.92rem; overflow-wrap: anywhere; }
+.gb-view ul { margin: 0.2rem 0 0.4rem; padding-left: 1.2rem; }
+.gb-h1 { font-family: var(--display); font-weight: 700; font-size: 1.15rem; margin: 0 0 0.3rem; }
+.gb-formmock { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-soft); margin: 0.3rem 0 0; }
+.gb-blank { color: var(--ink-faint); margin: 0; }
+.gb-warn { color: var(--wrong); font-weight: 600; }
+.gb-term, .gb-text { margin: 0; background: var(--night); color: var(--night-ink); border-radius: var(--r); padding: 0.5rem 0.7rem; font-family: var(--mono); font-size: 0.78rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 16rem; overflow-y: auto; min-height: 8rem; }
+@media (max-width: 860px) { .gb-grid, .gb-grid.two { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------------- the help queues */
+.qx { padding: 0.9rem; }
+.qx .controls { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; margin: 0 0 0.5rem; }
+.qx select { max-width: 100%; min-width: 0; }
+.qx-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 0.9rem; margin-top: 0.4rem; }
+.qx-grid > div { min-width: 0; }
+.qx-fields td code { overflow-wrap: anywhere; }
+.qx-ri { font-weight: 700; margin: 0.4rem 0; }
+.qx-ri.ok { color: var(--right); }
+.qx-ri.bad { color: var(--wrong); }
+.qx-af { margin: 0.3rem 0 0; font-size: 0.95rem; }
+.qx-log { margin: 0; padding-left: 1.4rem; font-size: 0.88rem; max-height: 15rem; overflow-y: auto; }
+.qx-log li.bad { color: var(--wrong); }
+@media (max-width: 860px) { .qx-grid { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------------- shared */
+.code-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.75rem; }
+.code-pair > * { min-width: 0; }
+.code-pair pre.code { margin: 0; }
+.phases { padding-left: 1.3rem; }
+.phases li { margin: 0.3rem 0; }
+.ans-rows { grid-template-columns: minmax(0, 1fr); }
+.ans-row select { width: 14rem; min-width: 0; max-width: 100%; }
+@media (max-width: 860px) { .ans-row select { flex: 1 1 100%; width: 100%; } }
+.cyu .q code, table.plain td code, table.plain th code, .prose code, .task .prompt code { overflow-wrap: anywhere; }

@@ -1,0 +1,2222 @@
+CSE 331: Implementing an abstract data type
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          FastQueue: a faster join
+Which method is wrong?
+Representation invariants
+Checking the representation invariant with checkRep
+A faster next
+Abstraction functions
+What correct means for an ADT method
+Copy in, copy out
+Exercises
+Further reading
+
+        CSE 331: Implementing an abstract data type
+
+lecture
+
+Course motto: Your job is to deliver code that you know works.
+
+A specification is written about the abstract state, the queue
+as the client thinks of it. An implementation is written about
+the concrete state, its fields. The specification says what every
+method must do, but in abstract terms: the students waiting,
+front first. The body does its work in concrete terms: a list, a
+set. So between the promise and the code there is a gap, and
+nothing yet says how to cross it: which values of the fields are
+allowed, which abstract state a value of the fields stands for,
+and so whether a body does what its specification says. This
+lecture closes the gap with two additions: a claim about the
+concrete state, the representation invariant, and a function from
+the concrete state to the abstract state, the abstraction
+function. Together they say what it means for a method, and then
+a class, to be correct, and they show why no code outside the
+class may reach the fields.
+
+FastQueue: a faster join
+
+Recall Wednesday's half sheet: a queue that keeps the students
+twice, in a list for the order and in a set, so that join's
+check for a student already waiting asks the set instead of
+walking the list. A HashSet answers in "constant
+time", however long the queue.1 Here is that class,
+FastQueue. Its check is faster. But now two fields hold the
+same students, and every change to one has to be made to the
+other.
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+/**
+ * A help queue kept as a list and a set, so that join's check for
+ * a student already in the queue takes the same time however long
+ * the queue is.
+ */
+public class FastQueue implements HelpQueue {
+    // The students waiting, front first.
+    private List<String> queue;
+    // The same students, for a fast lookup.
+    private Set<String> members;
+    // RI: no NetID is in queue twice, and members holds exactly
+    //     the NetIDs in queue.
+    // AF(this) = the help queue of the students in queue, front first.
+
+    public FastQueue() {
+        queue = new ArrayList<String>();
+        members = new HashSet<String>();
+        checkRep();
+    }
+    /** @requires no NetID is in netids twice
+     *  @effects makes a queue of the students given, front first */
+    public FastQueue(List<String> netids) {
+        // A copy, so that the client cannot change the queue through
+        // the list it passed.
+        queue = new ArrayList<String>(netids);
+        members = new HashSet<String>(netids);
+        checkRep();
+    }
+
+    private void checkRep() {
+        if (!members.equals(new HashSet<String>(queue))) {
+            throw new IllegalStateException("members is not the queue");
+        }
+        if (members.size() != queue.size()) {
+            throw new IllegalStateException("someone is in queue twice");
+        }
+    }
+
+    public int size() {
+        checkRep();
+        return members.size();
+    }
+
+    public void join(String netid) {
+        checkRep();
+        if (members.contains(netid)) {
+            throw new IllegalArgumentException(netid + " is in the queue");
+        }
+        queue.add(netid);
+        members.add(netid);
+        checkRep();
+    }
+
+    public String next() {
+        checkRep();
+        if (queue.isEmpty()) {
+            throw new NoSuchElementException("nobody is waiting");
+        }
+        String front = queue.remove(0);
+        members.remove(front);
+        checkRep();
+        return front;
+    }
+
+    public List<String> waiting() {
+        checkRep();
+        return new ArrayList<String>(queue);
+    }
+}
+
+The field queue, on line 14, holds what ListQueue's list
+held: the students waiting, front first. The field members, on
+line 16, is new: a set of the same students. For now, read past
+the private method on lines 36 to 43, and the calls to it in
+every constructor and method. The section
+Checking the representation invariant with checkRep
+comes back to them. Here is what each public method does with
+the two fields:
+
+size returns the size of the set, on line 47.
+
+join asks the set whether the student is already waiting, on
+  line 52. Then it adds the student to both fields: at the back
+  of the list on line 55, and to the set on line 56.
+
+next removes the first student from the list on line 65, and
+  the same student from the set on line 66.
+
+waiting returns a copy of the list on line 73, as
+  ListQueue's did.
+
+The second constructor, lines 26 to 34, makes a queue from a list
+of NetIDs that the client passes. The section
+Copy in, copy out comes back to it too.
+
+Notice that join's check, on line 52, never walks the list.
+(The private method we read past does walk it, twice in each
+join. The section
+Checking the representation invariant with checkRep
+comes back to that cost.)
+
+Is FastQueue right? Wednesday's five tests are a place to start.
+They are specification-based, so each passes on every correct
+implementation of HelpQueue. The name of no class that
+implements HelpQueue appears in HelpQueueTest.java. As on
+Wednesday, a subclass says which class to test:
+
+FastQueueSpecTest.javapublic class FastQueueSpecTest extends HelpQueueTest {
+    HelpQueue emptyQueue() {
+        return new FastQueue();
+    }
+}
+
+One more file, FastQueueTest.java, holds a sixth test, of the
+second constructor. The section Copy in, copy
+out shows it. Compile FastQueue.java and its
+two test classes with Lecture 10's HelpQueue.java and
+HelpQueueTest.java. Then select both FastQueueSpecTest and
+FastQueueTest, as Lecture 10 ran ListQueueSpecTest.
+JUnit starts six tests, and none fails: the five from Wednesday on
+a FastQueue, and the test of the constructor.
+
+The five tests did not change at all. Each uses only what
+HelpQueue promises, and nothing HelpQueue promises mentions a
+list or a set. So the fields could change from one list to a
+list and a set, and a test, or a client, that keeps to the
+interface did not have to change with them. In
+Reading 3, David Parnas builds one
+system twice. In his second version, each module hides one design
+decision from the rest of the program, so that a change to the
+decision changes that module alone.2 The decision
+HelpQueue hides is how the queue is kept. Today we kept the
+queue a second way. Since the fields are private, every line that
+reads or changes them is in FastQueue.java.
+
+Lecture 10 asked whether ListQueue and LinkedQueue are
+the same or different. They are different classes,
+with different fields and bodies. To a client that relies only on
+HelpQueue's specifications, they are the same. FastQueue adds
+a third answer: it is different in something the specification
+never mentions, how long join's check for the student takes. A
+client that relies only on HelpQueue's specifications can
+switch to FastQueue and change nothing but the line that makes
+the queue.
+
+Now look again at the fields. Lines 13 and 15 say what each field
+holds, as LinkedQueue's comment on its fields did. The three
+comment lines after them, lines 17 to 19, are new. ListQueue had
+nothing like them. Those three lines are today's subject.
+
+FastQueue keeps the students twice, so its two fields have to
+agree: each method that changes one field has to change the
+other to match. Two fields that have to agree is the lecture's
+first problem.
+
+Which method is wrong?
+
+Here is a game. The next few pages show FastQueue with one line
+missing, and two of Wednesday's tests failing on it. The question is
+the one in this section's title: which method is wrong? The missing
+line: suppose that when you wrote next, you forgot line 66, the
+line that removes the student from the set. Here is the heart of
+next, from FastQueue.java, with the missing line struck out:
+
+FastQueue.java
+62
+63
+64
+65
+66        if (queue.isEmpty()) {
+            throw new NoSuchElementException("nobody is waiting");
+        }
+        String front = queue.remove(0);
+        members.remove(front);
+
+FastQueue.java
+68
+69        return front;
+    }
+
+To run it, take FastQueue.java and leave line 66,
+members.remove(front), blank. Blank every checkRep(); line
+too, in each constructor and method, since we are
+still reading past that private method. Blank lines keep every
+other line at its number, so the line numbers below are
+FastQueue.java's.
+
+Run Wednesday's five tests and the test of the constructor against
+FastQueue.java without line 66, as before. JUnit starts six tests,
+and two fail. In JUnit's report, the five tests' lines read:
+
+│  │  ├─ nextOnAnEmptyQueueThrows() ✔
+│  │  ├─ waitingIsACopy() ✔
+│  │  ├─ nobodyIsInTheQueueTwice() ✔
+│  │  ├─ aStudentWhoLeftMayComeBack() ✘ ada is in the queue
+│  │  └─ studentsAreServedInTheOrderTheyJoined() ✘ expected: <1> but was: <2>
+
+Let's follow each failing test through the fields. Here is
+the first:
+
+HelpQueueTest.java
+33
+34
+35
+36
+37
+38
+39
+40    @Test
+    void aStudentWhoLeftMayComeBack() {
+        HelpQueue queue = emptyQueue();
+        queue.join("ada");
+        queue.next();
+        queue.join("ada");
+        assertEquals(List.of("ada"), queue.waiting());
+    }
+
+The test joins ada, on its line 36. In FastQueue, line 55 adds
+ada to the list, and line 56 adds ada to the set, so the field
+queue is [ada] and members is {ada} (square brackets for a
+list, braces for a set; the test's own variable queue is the
+whole FastQueue). Next, the test calls next. Line 65 removes
+ada from the list, so queue is []. Line 66 is blank, so
+members is still {ada}. Finally, the test joins ada again. Line
+52 asks the set whether ada is in the queue. members.contains
+returns true, so line 53 throws: "ada is in the queue". But
+nobody is waiting! The test expected the second join to add ada.
+It never reached its assertion.
+
+Here is the second:
+
+HelpQueueTest.java
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22    @Test
+    void studentsAreServedInTheOrderTheyJoined() {
+        HelpQueue queue = emptyQueue();
+        queue.join("ada");
+        queue.join("bob");
+        assertEquals(List.of("ada", "bob"), queue.waiting());
+        assertEquals("ada", queue.next());
+        assertEquals(List.of("bob"), queue.waiting());
+        assertEquals(1, queue.size());
+    }
+
+The test joins ada and bob, so the field queue is [ada, bob]
+and members is {ada, bob}. next removes ada from the list and
+returns "ada", so queue is [bob]. Again the set is unchanged:
+members is still {ada, bob}. waiting copies the list, so it
+returns [bob]. That assertion passes. Then size returns the size
+of the set, on line 47, which is 2. So the last assertion fails:
+expected: <1> but was: <2>.
+
+On both runs, the client saw behavior that breaks a specification:
+join threw though ada was not in the queue, and size returned 2
+with one student waiting. So FastQueue without line 66 is wrong.
+But here is the question: which method's code is wrong? Not
+necessarily the method whose call misbehaved! The last method to run
+can be written perfectly and still give a wrong answer, if an earlier
+method left the fields in a state it was never meant to see. join
+and size each ran on fields that next had just left. So: next,
+join, or size?
+
+Each answer is right under one reading of what the fields hold:
+
+If members may hold students who have left, then next is
+  fine. join is wrong to trust the set on line 52, and size is
+  wrong to count the set on line 47. Each should ask the list
+  instead.
+
+If members holds exactly the students in queue, then
+  join and size are fine, since the set and the list name the
+  same students. next is wrong, since it leaves ada in the set
+  after taking ada out of the list.
+
+Nothing javac checks decides between the two readings. Under
+either reading, the three methods have the same lines. javac
+accepts them.
+
+Here is a sharper question. Which part of next's specification does
+removing line 66 break? Here it is, lines 20 to 26 of Lecture 10's
+HelpQueue.java:
+
+HelpQueue.java
+20
+21
+22
+23
+24
+25
+26    /**
+     * @modifies this
+     * @effects removes the student at the front of the queue
+     * @return the NetID of the student removed
+     * @throws NoSuchElementException if the queue is empty
+     */
+    String next();
+
+The answer is nowhere! The list queue holds the students waiting,
+front first, as the comment on line 13 says. When the list is empty,
+line 63 throws NoSuchElementException. Otherwise, line 65 removes
+the first student from the list, and line 68 returns that student's
+NetID. Those are all the cases, and in each next without line 66
+does what the specification promises. The second test even checks the
+removal: after next returned "ada", waiting returned [bob]. So
+FastQueue without line 66 is wrong, and yet its next satisfies
+its specification.
+
+What removing line 66 breaks is a claim about the concrete
+state, the comment on lines 17 and 18: "no NetID is in queue
+twice, and members holds exactly the NetIDs in queue". The
+comment picks the second reading. With line 66 gone, next
+leaves members holding a NetID that is not in queue, so the
+claim is false after the
+call. Nothing goes wrong during that call. The failure shows up
+later, in a method that assumed the claim: join on line 52 and
+size on line 47 each take the set to be exactly the students in
+the list. So the tests caught wrong answers from join and
+size. next changed one field and forgot the other, and the
+cost showed up a call later, in another method.
+
+Here is the problem in two sentences. A specification is written
+about the abstract state, so it says nothing about how the fields
+must agree with one another. When the fields drift apart and a
+client sees a promise broken, nothing in the specification says
+which method's code is wrong; the representation invariant does.
+
+Representation invariants
+
+Definition: representation invariant
+
+A representation invariant (RI) of a class is a claim about
+its fields that is true of every object of the class whenever
+no method of the class is running.
+
+The constructor makes it true. Every method may assume it when
+called and must make it true again before it returns. An
+implementation should document its representation invariant
+with a comment like // RI: ... beside the fields.
+
+In the example from the previous section, lines 17 and 18 of
+FastQueue.java make a claim of this kind. join and size may
+assume the RI when they are called, so they are right to trust
+the set. next must make the RI true again before it returns,
+and without line 66 it does not. So next is the method that is
+wrong.
+
+The RI is not Wednesday's abstract invariant, though
+both definitions say "whenever no method ... is running". The two
+claims differ in what each is about:
+
+The abstract invariant was a claim about the abstract
+  state, the students waiting: a student is in the queue at most
+  once. It is there for
+  the client's benefit. HelpQueue's specifications keep it true,
+  so a client can rely on the abstract invariant with any class
+  that satisfies them.
+
+The RI is a claim about FastQueue's concrete state, the
+  values of its fields queue and members. It is there for the
+  implementer's benefit. Each class has its own, and not every
+  class needs one written down: ListQueue and LinkedQueue
+  have no members to keep in step, and neither has an RI
+  comment. Wednesday's "at most once" does not appear in
+  FastQueue's. Its first half says that no NetID is in the list
+  queue twice, a claim about a field that a client never sees.
+
+Whenever no method of the class is running says when the RI
+has to be true. Lecture 8's loop invariant was placed
+the same way: its definition puts the claim at the point where the
+loop checks its condition, and nowhere inside the body. In
+Lecture 8's sum, the invariant includes
+s = a[0] + ... + a[i - 1]. sum's line 17 adds a[i] to s,
+so s becomes the sum of the first i + 1 elements. So between
+sum's lines 17 and 18, that claim is false unless a[i] is 0.
+sum's line 18 adds 1 to i, and the invariant is true again at
+the next condition check.
+
+The RI is not always true either. It is true between every two
+calls to the class's methods, and it may be false inside a method.
+Even in FastQueue.java as written, the RI is false between line 65
+and line 66: the list has lost the front, and the set still has
+it. Line 66 makes the RI true again before next returns.
+
+A claim written in a comment is one that a method can forget, as
+next without line 66 did, so the next section turns the RI into
+code.
+
+Checking the representation invariant with checkRep
+
+The RI on lines 17 and 18 is a claim about two fields. Java can
+compute each part of the claim from the fields' values. So the
+class can check its own RI, and throw an exception each time it
+finds the RI false. This section introduces the method that does
+that: checkRep, the private method on lines 36 to 43.
+
+FastQueue.java
+36
+37
+38
+39
+40
+41
+42
+43    private void checkRep() {
+        if (!members.equals(new HashSet<String>(queue))) {
+            throw new IllegalStateException("members is not the queue");
+        }
+        if (members.size() != queue.size()) {
+            throw new IllegalStateException("someone is in queue twice");
+        }
+    }
+
+Each if checks one clause of the RI. Line 37 checks the second
+clause, that members holds exactly the NetIDs in queue.
+new HashSet<String>(queue) makes a set of the NetIDs in the list,
+and equals compares that set with members. If the two sets
+differ, line 38 throws, with the message
+"members is not the queue".
+
+Line 40 checks the first clause, that no NetID is in queue twice.
+A set drops a repeat: the set of [ada, ada] is {ada}. So a list
+with a repeat is longer than its set. By line 40, line 37 has
+passed, so members is the set of the list. If the list is longer
+than members, line 41 throws, with the message
+"someone is in queue twice". If neither check fails, checkRep
+returns and does nothing else.
+
+Lines 38 and 41 both throw IllegalStateException. Java's
+documentation says that this exception signals "that a method has
+been invoked at an illegal or inappropriate time".3 Every
+method of FastQueue may assume the RI when it is called. So a
+call to any of them while the RI is false comes at such a time.
+
+FastQueue's checkRep checks FastQueue's RI. Any class with
+an RI can have one:
+
+Definition: checkRep
+
+A checkRep method of a class checks the class's
+representation invariant in code: it reads the fields,
+computes each clause of the RI from them, and throws an
+exception if any clause is false.
+
+It is private, since it is the implementer's check and not
+part of the specification, and it changes no field.
+
+This is Lecture 6's defensive programming, turned
+on the class's own fields. There, a method with a precondition was
+under no obligation to check it, and checked it anyway, as a good
+citizen. Here, every method may assume the RI when it is called,
+and FastQueue checks it anyway. The check costs something and
+promises nothing to the client. What it buys is a failure in the
+method that made the mistake, on the call that made it.
+
+Now let's go back to the forgetful next. This time, the copy of
+FastQueue.java blanks line 66 alone, and keeps every checkRep();
+line. Run the six tests against it, as before. JUnit starts six
+tests, and the same two fail: aStudentWhoLeftMayComeBack and
+studentsAreServedInTheOrderTheyJoined. But each now fails with
+the same message, "members is not the queue". Under each failure,
+JUnit prints a stack trace. Its first lines are the same for both
+tests:
+
+    => java.lang.IllegalStateException: members is not the queue
+       FastQueue.checkRep(FastQueue.java:38)
+       FastQueue.next(FastQueue.java:67)
+
+Follow the first test again. It joins ada, so the field queue
+is [ada] and members is {ada}. Then it calls next. Line 61's
+check passes.
+Line 65 removes ada from the list, so queue is []. Line 66 is
+blank, so members is still {ada}. Then line 67 calls checkRep.
+On line 37, the set of the list is {}, which is not {ada}, so line
+38 throws. The exception leaves next before line 68 can return.
+The test stops in its first call to next, and never reaches its
+second join. The second test stops the same way: after its first
+next, queue is [bob] and members is {ada, bob}, so line 67's
+check throws.
+
+Compare the two reports. Without the checks, the failures showed
+up in join and size, the two methods that were right. A reader
+of that report would likely start looking in the wrong place. With
+the checks, the stack trace names next, on line 67, the call
+that made the RI false. The exception is thrown on line 38, inside
+the checkRep that line 67 calls. The message tells which clause
+of the RI is false. So the report points at the method that is
+wrong, and at the moment it went wrong.
+
+Which methods should call checkRep, and where? The course's code
+quality guide gives a rule, in its section
+checkRep. The rule uses a word the notes have not:
+a method that changes the object, as join and next change the
+queue, is a mutator. The guide says to call checkRep in
+three places:
+
+at the end of the constructor;
+
+at the beginning and end of every mutator method;
+
+at the beginning of every non-mutator method.
+
+FastQueue keeps the rule. Each constructor checks once, at its
+end: line 24, and line 33. join and next are mutators, so each
+checks twice: join on lines 51 and 57, and next on lines 61 and
+67. size and waiting change nothing, so each checks once, at
+its start: size on line 46, and waiting on line 72.
+
+Why these places and no others? A method that changes nothing
+leaves the fields as they were, so it cannot make the RI false.
+So a non-mutator does not check at its end. A constructor is
+different. When a constructor starts, queue and members are
+both null. So the RI is false, and a checkRep at the start
+would throw. The constructor may not assume the RI. It must make
+the RI true. Every method after it may assume what the call before
+it left. So the RI a method assumes at its start was checked
+already, at the end of the last call that changed the object.
+
+Then why check at the start at all? The section
+Copy in, copy out answers that.
+
+The guide's list says nothing of private methods, but one kind of
+method should not check: a private one. Only the class's own code
+can call a private method. So a private method may be
+called in the middle of another method, with the RI false, as it
+is between lines 65 and 66. A check at the start of such a method
+could throw though nothing is wrong.
+
+Now the cost that the section FastQueue: a faster join
+put off. Line 37 builds a new set from the whole list, at every call
+to checkRep. With two hundred students waiting, that set gets two
+hundred NetIDs. A join calls checkRep twice, so each join walks
+the list twice, though its own check on line 52 never does.
+ListQueue's join walked the list at most once. So FastQueue as
+written does more work in each join than ListQueue does. Its
+join is fast only once the checks are off.
+
+The code quality guide's section
+Defensive programming says which checks to keep.
+In production (the program as its users run it), check only the
+fast parts of the RI. A flag turns on the slow parts during
+debugging and testing. This lecture is debugging and testing, and
+the checks caught the forgetful next on its own call, on line
+67. So it keeps every check on.
+
+Here is a question to answer yourself. The half sheet's first
+question asks: on what line of join does the RI become false,
+and when does it become true again? Read lines 50 to 58 with the
+RI's two clauses in hand, as the section
+Representation invariants read
+next. Exercise 2, in the section Exercises, comes
+back to it.
+
+The RI says which values of queue and members are allowed. It
+does not say what those values mean: which abstract state a list
+and a set stand for. The next section changes the fields, and
+asks what they stand for.
+
+A faster next
+
+FastQueue made join faster, and left next as it was. Its
+next removes the front student with queue.remove(0), on line 65
+of FastQueue.java, just as line 24 of ListQueue.java does. An
+ArrayList keeps its elements in an array, in order. So when
+remove takes out the first element, it moves every element after
+it one place to the left, to close the gap.4 With two
+hundred students waiting, each next moves the other hundred
+and ninety-nine. So the longer the queue, the longer each next
+takes to run.
+
+No element comes after the last one, so removing the last
+element of an ArrayList moves nothing. So let's keep the queue
+in two lists, and add to or remove from each list only at its end:
+
+join adds the student at the end of one list, the inbox.
+
+next removes the student at the end of the other list, the
+  outbox. The outbox holds the front of the queue last, so its
+  last student is the next one served.
+
+When the outbox runs dry, next refills it, moving the inbox
+  over in reverse. The student who joined first lands at the end
+  of the outbox.
+
+Between joining and being served, each student is moved from the
+inbox to the outbox once. The set stays, for join's check. (The
+class's comment, on line 8, calls the two lists stacks. A
+stack is a collection that is added to and taken from at one
+end only, so the last one in is the first one out.) Here is that
+class, FasterQueue:
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+/**
+ * A help queue kept as two stacks and a set: join adds at the end of
+ * one list, next removes from the end of the other, and the set
+ * answers join's check, so that neither walks the whole queue.
+ */
+public class FasterQueue implements HelpQueue {
+    // The students who joined since the last refill, oldest first.
+    private List<String> inbox;
+    // The students ahead of them, with the front of the queue last.
+    private List<String> outbox;
+    // The same students, for a fast lookup.
+    private Set<String> members;
+    // RI: no NetID is in inbox or outbox twice, or in both, and
+    //     members holds exactly the NetIDs in inbox and outbox.
+    // AF(this) = the help queue of the students in outbox, last to
+    //     first, then the students in inbox, first to last.
+
+    public FasterQueue() {
+        inbox = new ArrayList<String>();
+        outbox = new ArrayList<String>();
+        members = new HashSet<String>();
+        checkRep();
+    }
+    /** @requires no NetID is in netids twice
+     *  @effects makes a queue of the students given, front first */
+    public FasterQueue(List<String> netids) {
+        // A copy, so that the client cannot change the queue through
+        // the list it passed.
+        inbox = new ArrayList<String>(netids);
+        outbox = new ArrayList<String>();
+        members = new HashSet<String>(netids);
+        checkRep();
+    }
+
+    private void checkRep() {
+        Set<String> waiting = new HashSet<String>(inbox);
+        waiting.addAll(outbox);
+        if (!members.equals(waiting)) {
+            throw new IllegalStateException("members is not the queue");
+        }
+        if (members.size() != inbox.size() + outbox.size()) {
+            throw new IllegalStateException("someone is in the queue twice");
+        }
+    }
+
+    public int size() {
+        checkRep();
+        return members.size();
+    }
+
+    public void join(String netid) {
+        checkRep();
+        if (members.contains(netid)) {
+            throw new IllegalArgumentException(netid + " is in the queue");
+        }
+        inbox.add(netid);
+        members.add(netid);
+        checkRep();
+    }
+
+    public String next() {
+        checkRep();
+        if (members.isEmpty()) {
+            throw new NoSuchElementException("nobody is waiting");
+        }
+        // When the outbox runs dry, move the inbox over in reverse, so
+        // that the front of the queue is at the end of the outbox.
+        if (outbox.isEmpty()) {
+            for (int i = inbox.size() - 1; i >= 0; i--) {
+                outbox.add(inbox.get(i));
+            }
+            inbox.clear();
+        }
+        String front = outbox.remove(outbox.size() - 1);
+        members.remove(front);
+        checkRep();
+        return front;
+    }
+
+    public List<String> waiting() {
+        checkRep();
+        List<String> list = new ArrayList<String>();
+        for (int i = outbox.size() - 1; i >= 0; i--) {
+            list.add(outbox.get(i));
+        }
+        list.addAll(inbox);
+        return list;
+    }
+}
+
+The fields and their comments are on lines 13 to 18:
+
+inbox, on line 14, holds the students who joined since the
+  last refill, oldest first.
+
+outbox, on line 16, holds the students ahead of them, with the
+  front of the queue last.
+
+members, on line 18, holds the same students as the two lists
+  together, as FastQueue's set did.
+
+The four comment lines after the fields, lines 19 to 22, come back
+below. Here is what each public method does with the three fields:
+
+size returns the size of the set, on line 54, as in
+  FastQueue.
+
+join asks the set whether the student is already waiting, on
+  line 59. Then it adds the student at the end of the inbox on
+  line 62, and to the set on line 63.
+
+next throws on line 70 if the set is empty. Lines 72 to 79 are
+  the refill. If the outbox is empty, the loop on lines 75 to 77
+  walks the inbox from its last student to its first, adding each
+  at the end of the outbox. Line 78 then empties the inbox. Either
+  way, line 80 removes the last student of the outbox, and line 81
+  removes the same student from the set.
+
+waiting builds a new list. The loop on lines 89 to 91 adds the
+  students in the outbox, from last to first. Then line 92 adds the
+  students in the inbox, in their own order.
+
+The checks are still on. As the section
+Checking the representation invariant with checkRep
+found for FastQueue, each call to checkRep walks the whole
+queue, so neither join nor next in FasterQueue is fast
+until the checks are off.
+
+HelpQueue did not change, so Wednesday's five tests did not
+change either. One more subclass says which class to test:
+
+FasterQueueSpecTest.javapublic class FasterQueueSpecTest extends HelpQueueTest {
+    HelpQueue emptyQueue() {
+        return new FasterQueue();
+    }
+}
+
+FasterQueueTest.java holds a sixth test. It joins three students,
+serves one, asks who is waiting, and serves the other two:
+
+FasterQueueTest.java    @Test
+    void threeStudentsAreServedInTheOrderTheyJoined() {
+        FasterQueue queue = new FasterQueue();
+        queue.join("ada");
+        queue.join("bob");
+        queue.join("eve");
+        assertEquals("ada", queue.next());
+        assertEquals(List.of("bob", "eve"), queue.waiting());
+        assertEquals("bob", queue.next());
+        assertEquals("eve", queue.next());
+    }
+
+Compile FasterQueue.java and its two test classes with Lecture
+10's HelpQueue.java and HelpQueueTest.java, as before. Then select
+both FasterQueueSpecTest and FasterQueueTest. JUnit starts six
+tests, and none fails.
+
+The fields changed, so the RI did too. Lines 19 and 20 say that
+no NetID is in inbox or outbox twice, or in both, and that
+members holds exactly the NetIDs in inbox and outbox.
+checkRep, on lines 41 to 50, checks it as FastQueue's did.
+Line 44 compares members with the set of NetIDs in both lists.
+Line 47 compares the size of members with the sizes of the two
+lists added together.
+
+The fields changed, and so did the gap from the top of these
+notes. next's specification, on line 22 of HelpQueue.java, says
+that it removes the student at the front of the queue. In
+ListQueue and FastQueue, the list queue was the students
+waiting, front first, so the front was queue.get(0), and the
+gap between the specification's words and the fields was one
+step. In FasterQueue, no field is the queue. The inbox holds
+only the students who joined since the last refill. The outbox
+holds the rest, backwards. Which student is at the front? Which
+queue do these fields stand for at all? The specification cannot
+say, since it never mentions a field. The fields cannot say,
+since they are two lists and a set.
+
+Abstraction functions
+
+Definition: abstraction function
+
+The abstraction function (AF) of a class maps each value of
+the fields that the representation invariant allows to the
+abstract state it stands for.
+
+The AF is a mathematical function, not code. An implementation
+should document its abstraction function with a comment like
+// AF(this) = ... beside the fields.
+
+In the example from the previous section, what crosses the gap is a
+function from the concrete state to the abstract state, and
+FasterQueue's comment on lines 21 and 22 gives it: the queue is the
+students in outbox, last to first, then the students in inbox,
+first to last. That is today's second addition. Let's read
+FasterQueue's fields by its AF as students come and go. Start with
+a new FasterQueue, and join ada, bob, and eve. Each join adds to
+the inbox on line 62 and to the set on line 63. So inbox is [ada,
+bob, eve], outbox is [], and members is {ada, bob, eve}. The
+outbox holds nobody, and the inbox, first to last, is ada, bob, eve.
+So these fields stand for the queue ada, bob, eve, the order the
+three joined.
+
+Now call next. The outbox is empty, so the loop on lines 75 to 77
+adds eve, then bob, then ada to the outbox. Line 78 empties the
+inbox. Line 80 removes ada, the last student of the outbox,
+and line 81 removes ada from the set. So inbox is [], outbox is
+[eve, bob], and members is {bob, eve}. The outbox, last to first,
+is bob, eve, and the inbox adds nobody. So these fields stand for
+the queue bob, eve. That is right: ada was served, and bob is at
+the front.
+
+The comment on lines 21 and 22 says, for each value of the fields:
+if the fields look like this, here is what the client should be
+thinking. A client of this queue, after the one next, should be
+thinking bob, eve.
+
+Other values of the fields stand for the same queue. Here is
+another way to reach bob, eve. ada and bob join, so inbox is
+[ada, bob]. next moves them over in reverse, so outbox is [bob,
+ada], and serves ada, so outbox is [bob] and inbox is []. Then
+eve joins. Now inbox is [eve], outbox is [bob], and members
+is {bob, eve}. The outbox, last to first, is bob, and then the
+inbox adds eve. So these fields stand for bob, eve too. In all,
+three values of the fields stand for the queue bob, eve. They
+differ in how many students, counted from the front, the outbox
+holds: none, bob alone, or both. (With none, inbox is [bob, eve]
+and outbox is [].) The drawing below shows two of them.
+
+So the comment goes one way, from the concrete state to the
+abstract state. Given the fields, the comment names one queue.
+Given the queue bob, eve, no one value of the fields is the
+value for it. So no function goes back the other way, from the
+queue to the fields.
+
+Two queues, three values of the fields.
+
+The definition says that the AF is not code, and the comment on
+lines 21 and 22 shows why. It reads like a function: given this,
+it says what queue this stands for. But a function in Java
+returns a Java value. A queue of students is the abstract
+state, and no Java method returns that. So the comment describes
+a mathematical function. The client does
+not know the fields, so the client cannot read it. The function is
+the implementer's alone, and every method relies on it. By the
+comment, for one, the end of the inbox is the back of the queue,
+so join adds there.
+
+Here is what three of the definition's phrases mean:
+
+That the representation invariant allows says where the AF
+  is defined: only on values of the fields that the RI allows.
+  Take fields where inbox is [bob], outbox is
+  [bob], and members is {bob}. bob is in both lists, so the RI
+  is false. Read by lines 21 and 22, these fields would be the
+  queue bob, bob. But a student is in the queue at most once, so
+  no queue is bob, bob. These fields stand for nothing, and the AF
+  need not say what they mean.
+
+A mathematical function, not code rules out reading the
+  comment as a method. No method of FasterQueue computes the AF.
+  (waiting comes close: it lists the students in the order that
+  lines 21 and 22 give. But what it returns is a Java list, a
+  value in the program, and not the queue itself.)
+
+A comment like // AF(this) = ... is the form of lines 21
+  and 22. this is the object whose fields the AF maps.
+
+The fields bob, bob show a requirement that every RI must meet.
+Whenever the RI is true of the fields, the abstract state they
+stand for must satisfy the type's abstract invariant: a student
+is in the queue at most once. Written with AI for the abstract
+invariant: RI(this) implies AI(AF(this)).
+FasterQueue's RI meets it. No NetID is in either list twice, or
+in both, so the queue that lines 21 and 22 read off the two lists
+has each student at most once. An RI that allowed the fields bob,
+bob would let the fields stand for a queue no client can be
+promised.
+
+Now look back at FastQueue. Its line 19 is a comment of the same
+form:
+
+FastQueue.java
+19    // AF(this) = the help queue of the students in queue, front first.
+
+FastQueue's AF is the queue of the students in queue, front
+first. members plays no part in it. By the RI, the set holds
+the same students as the list. So the set adds nothing to which
+queue the fields stand for. No rule says that every field appears
+in the AF. That line has been on today's program sheet since the
+lecture began, and until now we read past it. The field queue
+was the queue, so nothing needed saying.
+
+In FasterQueue, something does need saying. Here is a draft
+that shows why. Recall waiting, lines 86 to 94:
+
+FasterQueue.java
+86
+87
+88
+89
+90
+91
+92
+93
+94    public List<String> waiting() {
+        checkRep();
+        List<String> list = new ArrayList<String>();
+        for (int i = outbox.size() - 1; i >= 0; i--) {
+            list.add(outbox.get(i));
+        }
+        list.addAll(inbox);
+        return list;
+    }
+
+The loop on lines 89 to 91 walks the outbox from last to first.
+Our draft copies the outbox as stored instead. It is a copy of
+FasterQueue.java whose three lines 89 to 91 are replaced by one,
+list.addAll(outbox);. So the draft's waiting adds the outbox
+first to last, then the inbox. Before you run the six tests
+against the draft, predict which fail.
+
+JUnit starts six tests, and one fails:
+threeStudentsAreServedInTheOrderTheyJoined, with
+"expected: <[bob, eve]> but was: <[eve, bob]>". Wednesday's five
+all pass.
+
+Why do the five pass? Let's follow
+studentsAreServedInTheOrderTheyJoined through the draft's
+fields. The test joins ada and bob, so inbox is [ada, bob] and
+outbox is []. The draft's waiting adds the empty outbox, then
+the inbox, and returns [ada, bob]. That assertion passes. Then
+next moves the inbox over in reverse, so outbox is [bob, ada],
+and serves ada, so outbox is [bob]. The draft's waiting adds
+the outbox as stored, and returns [bob]. A list of one student has
+no order to get wrong, so that assertion passes too. size
+returns 1, and the test passes. None of the five tests has more
+than one student in the outbox when it calls waiting.
+
+The sixth test does. It joins ada, bob, and eve, and serves ada.
+As in the walk above, outbox is then [eve, bob]. The draft's
+waiting returns the outbox as stored, [eve, bob]. The queue is
+bob, eve, so the test expected [bob, eve].
+
+Nothing in waiting's specification mentions an outbox. The
+specification is in abstract terms: it promises "the students
+waiting, front first, in a new list". So the specification says
+that the list must be front first. It does not say where in the
+fields the front is. The AF on lines 21 and 22 says where. By the
+AF, the outbox stands for its students last to first, so its last
+student is the front. The
+draft handed the outbox's students out first to last. The failing
+test is one run on which the draft returned the wrong list. The
+AF tells us what
+the draft got wrong: it read the outbox in the wrong order.
+
+The section Which method is wrong? asked
+a question like this one. There, a claim about the fields, the RI,
+decided which method was wrong. Here, the AF decides what a wrong
+answer from waiting is: any list other than the students of the
+queue the fields stand for, front first.
+
+With the RI and the AF both in hand, the next section says what
+it means for a method to be correct.
+
+What correct means for an ADT method
+
+Let's put FasterQueue's size beside its specification. Here
+is the specification, lines 9 and 10 of Lecture 10's HelpQueue.java:
+
+HelpQueue.java
+ 9
+10    /** @return the number of students waiting */
+    int size();
+
+The body does its work on line 54 of FasterQueue.java,
+return members.size();. The specification promises the number
+of students waiting. The body returns the size of a set. Nothing
+in either line mentions the other.
+
+This is the gap the paragraph at the top of these notes
+described. size's specification is in abstract terms.
+HelpQueue.java has no fields, so no line of it mentions one.
+size's body is in concrete terms. No line of the body mentions
+the queue of students. One thing translates between the two: the
+abstraction function, from the concrete state to the abstract
+state. By the AF on lines 21 and 22,
+the fields stand for a queue of students. The specification is
+about that queue.
+
+So what do we check? In Lecture 7, a method satisfies its
+specification exactly when the triple of its
+specification around its body is valid, and every call that
+begins with the precondition true terminates. Lecture 10 asked
+the same of an implementation: the fields may change,
+as long as each method still satisfies its specification.
+But for a method of an ADT, the specification's claims do not
+meet the body's. size's postcondition is a claim about the
+abstract state, the students waiting. The claims between the
+body's lines are about the concrete state: inbox, outbox, and
+members. So the triple to check is the
+specification's translation, read through the AF:
+
+The precondition P becomes P(AF(this)): P is true of
+  the abstract state that the fields stand for. That is P with
+  the abstract state replaced by AF(this), the substitution of
+  Lecture 7's rules for an assignment.
+
+The postcondition Q becomes Q(AF(this_0), AF(this)),
+  where this_0 is the object as it was when the method was
+  called. A postcondition may compare two states. next's does:
+  the queue after the call is the queue before it with its front
+  removed. So Q takes the abstract state from before the call
+  and the one after. Lecture 7's
+  rule for an assignment wrote x0 for a
+  variable's old value. this_0 does the same for an object.
+
+One more claim goes in, at both ends. The constructor made the RI
+true, and every earlier call left it true. So before the body,
+the method may assume the RI. The next call will assume the RI
+too. So after the body, the method owes it. Here is the whole
+condition, as a rule:
+
+Rule: a method of an abstract data type is correct
+
+A method with precondition P and postcondition Q, written
+about the abstract state, is correct exactly when the Hoare
+triple
+
+{{ RI and P(AF(this)) }}
+the method's body
+{{ RI and Q(AF(this_0), AF(this)) }}
+
+is valid and every call that begins with the precondition true
+terminates, where RI is the representation invariant, AF is
+the abstraction function, and this_0 is the object as it was
+when the method was called. The body may assume the invariant and
+the precondition, and must leave the invariant true and the
+postcondition true of what the fields now stand for.
+
+The rule's triple has two parts that Lecture 7's triples did not,
+both this lecture's: the RI, a claim about the concrete state,
+and the AF, the function from the concrete state to the abstract
+state. The rule's last sentence, may assume and must leave,
+is the second paragraph of the RI's definition in the triple's
+shape. The RI that every method may assume when called sits in
+the precondition. The RI that every method must make true again
+before it returns sits in the postcondition. Correct is the word
+for a method that meets the rule. Each loop in FastQueue.java and
+FasterQueue.java counts i down to 0, and no method calls itself.
+So every method in this lecture terminates.
+So, as in Lecture 7, the triple is the whole question: a correct
+method satisfies its specification, as long as no code outside
+the class changes its fields (the section
+Copy in, copy out comes back to this).
+
+The translation is the new work. Once the triple is written about
+the fields, the argument is Lecture 7's forward reasoning, as
+before. Let's argue size on FasterQueue. size has no
+precondition, so P is true, and the triple's first claim is
+the RI alone. Here is size's body, lines 52 to 55 of
+FasterQueue.java, with claims between its lines:
+
+public int size() {
+    {{ RI }}
+    checkRep();
+    {{ RI }}
+    {{ no NetID is in inbox or outbox twice, or in both, and
+       members holds exactly the NetIDs in inbox and outbox }}
+    {{ members.size() = inbox.size() + outbox.size() }}
+    {{ members.size() = the number of students in AF(this) }}
+    return members.size();
+}
+
+Read the claims in order. With no line between them, each claim
+after line 53 follows from the one above it, by Lecture 7's
+rule of consequence:
+
+Line 53 calls checkRep, which changes no field. The RI is
+  true, so neither of its checks throws. So the RI is still true
+  after line 53.
+
+The next claim is the RI written out, as lines 19 and 20 of
+  FasterQueue.java state it.
+
+No NetID is in the two lists twice, so the two lists hold
+  inbox.size() + outbox.size() NetIDs in all, each once.
+  members holds exactly those NetIDs, so members.size() is
+  that sum.
+
+By the AF, the queue is the students in outbox, last to
+  first, then the students in inbox, first to last. So the
+  queue has one student for each NetID in the two lists, and
+  members.size() is the number of students in AF(this).
+
+Line 54 returns members.size(). No line of size changes a
+field, so AF(this) is AF(this_0). So the value returned is
+the number of students waiting when size was called. Line 9
+promises exactly that number. The queue is as it was, as a method
+with no @modifies must leave it. The fields are unchanged too,
+so the RI is still true when size returns. Both halves of the
+rule's last claim are true, so size is correct.
+
+next has more cases, so let's take one, the refill. Suppose
+someone is waiting. By the RI and the AF, as for size,
+members holds one NetID for each student waiting. So members
+is not empty, and line 70 does not throw. Suppose too that the
+outbox is empty, so lines 75 to 78 run. An empty outbox adds
+nobody to the queue. So by the AF, AF(this_0) is the students
+in the inbox, first to last. The inbox is not empty. The loop
+on lines 75 to 77 adds the inbox's students to the outbox from
+last to first. Line 78 empties the inbox. So the outbox is the old
+inbox reversed. Read last to first, as the AF reads it, the outbox
+is the old inbox first to last. So after line 78, AF(this) is
+still the queue AF(this_0). The lists hold the same NetIDs as
+before, each once, so the RI is still true. Line 80 removes the
+outbox's last student, which is the old inbox's first: the front
+of the queue. That student was in the lists once, so now the
+student is in neither. Line 81 removes the same student from the
+set. So the RI is true when next returns. (The calls to
+checkRep on lines 68 and 82 change no field.) AF(this) is now
+AF(this_0) with its front removed, and line 83 returns that
+student's NetID. That is what next's @effects and @return
+promise. So in the refill case, next meets the rule too.
+
+Now take the forgetful next from the section
+Which method is wrong?, FastQueue's
+next with line 66 blank, and try to argue it by the rule.
+Suppose someone is waiting, so line 63 does not throw. Before
+line 65, the RI says that members holds exactly the NetIDs in
+queue, and that no NetID is in queue twice. Line 65 removes
+the front from the list. The front was in the list once, so it
+is no longer in queue. Line 66 is blank, so members still
+holds the student the list lost. So at the end of next,
+members holds a NetID that is not in queue. So the RI is
+false, and the argument stops in next, at the line we left
+blank. The tests in that section only reported failures, in
+join and size, a call later. Reasoning finds the mistake
+in the method that made it.
+
+The section Abstraction functions looked
+back at FastQueue's AF on line 19, in which members plays no
+part. With that AF, the queue is the list queue, read front first,
+so reading the specification through the AF changes nothing. So the
+section Which method is wrong? was this
+rule at work, with an AF that reads the queue straight off one field.
+There, read through that AF, the draft's next did what its
+specification promised. The RI alone decided that next was wrong.
+Exercise 2, in the section Exercises, asks you to argue
+by the rule that FastQueue's join is correct.
+
+The call before a method left the RI true, so the rule lets the
+method assume the RI at its start. That reason assumes that only
+the class's own methods ran between the two calls. The next
+section is about what else can run between two calls.
+
+Copy in, copy out
+
+Let's start with a question that Monday's lecture put off: why
+does Book's messages return a copy? Here is Book again,
+lines 97 to 115 of Lecture 9's Guestbook.java:
+
+Guestbook.java
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115/** The messages posted so far, oldest first. */
+class Book {
+    private List<String> messages = new ArrayList<String>();
+
+    /**
+     * @modifies this
+     * @effects adds the message, signed with the name, after the
+     *     messages already posted
+     */
+    public void add(String name, String message) {
+        messages.add(name + ": " + message);
+    }
+
+    /** @return the posted messages, oldest first, in a new list */
+    public List<String> messages() {
+        // A copy, so that a client cannot change the book through it.
+        return new ArrayList<String>(messages);
+    }
+}
+
+And here is the second of Lecture 9's two tests:
+
+BookTest.java    @Test
+    void messagesIsACopy() {
+        Book book = new Book();
+        book.add("Ada", "hello world");
+        List<String> copy = book.messages();
+        copy.add("Eve: not posted");
+        assertEquals(List.of("Ada: hello world"), book.messages());
+    }
+
+The test passes on Guestbook.java. Lecture 9 then changed line
+113 to return messages;, so that messages returns the book's
+own list. Run the test on that version, and it fails: "expected:
+<[Ada: hello world]> but was: <[Ada: hello world, Eve: not
+posted]>". The test's copy was not a copy at all. It was the
+list in the field messages. So when the test called copy.add,
+it put a message in the book without calling add.
+
+Now we have the words for what went wrong. The list in the field
+messages is Book's representation. The specifications of
+add and messages promise things about the abstract state, the
+messages posted.
+The field is where those messages are kept. Handing out the list
+lets code outside Book change the field. So every promise in
+the specifications of add and messages can be broken by code
+that Book does not control, such as the test's copy.add.
+
+That version of Book handed its own list out. A class can also
+take a list in. FastQueue's second constructor, lines 26 to 34,
+makes a queue from a list of NetIDs that the client passes:
+
+FastQueue.java
+26
+27
+28
+29
+30
+31
+32
+33
+34    /** @requires no NetID is in netids twice
+     *  @effects makes a queue of the students given, front first */
+    public FastQueue(List<String> netids) {
+        // A copy, so that the client cannot change the queue through
+        // the list it passed.
+        queue = new ArrayList<String>(netids);
+        members = new HashSet<String>(netids);
+        checkRep();
+    }
+
+Line 26 asks the client for a list with no NetID twice, since
+with one the RI could not be made true, and line 33 would throw
+an exception that the specification never promised. Line 31
+makes a new ArrayList holding the same NetIDs in the same
+order, and keeps that instead of the client's list. The
+comment on lines 29 and 30 says why: "so that the client cannot
+change the queue through the list it passed". (Line
+32 makes a new set, so members is the queue's own as well.)
+FastQueueTest.java checks the copy. Its one test plays the
+client: it builds a queue from its list, adds a NetID to its
+list, and asks the queue who is waiting. The drawing after the
+test follows the test through a draft that keeps the client's
+list, and then through line 31 as written.
+
+FastQueueTest.java    @Test
+    void aQueueMadeFromAListIsItsOwn() {
+        List<String> netids = new ArrayList<String>(List.of("ada"));
+        FastQueue queue = new FastQueue(netids);
+        netids.add("eve");
+        assertEquals(List.of("ada"), queue.waiting());
+    }
+
+(netids), the queue holds its own list, and
+     the client's add changes only the client's.
+
+     Alt text, for the whole: a client variable and a FastQueue
+     field pointing at the same list, which the client then grows
+     so that the field no longer agrees with the set; then the
+     copy, two separate lists, so that the client's change stays
+     the client's. -->
+
+After new FastQueue(netids) with line 31 as
+   queue = netids, the client's variable and the queue's field
+   name one list.
+
+netids.add("eve") changed the queue's field through the
+   client's name, and no method of FastQueue ran.
+
+With line 31 as written, new ArrayList<String>(netids), the
+   queue holds its own list, and the client's add changes only
+   the client's.
+
+The test passes on FastQueue.java, as the section
+FastQueue: a faster join reported. Now for the draft.
+It is a copy of FastQueue.java with line 31 replaced by
+queue = netids;, so the queue keeps the client's own list.
+Before you run the six tests against it, predict which fails.
+JUnit starts six tests, and one fails:
+aQueueMadeFromAListIsItsOwn, with "members is not the queue".
+
+Let's follow the test through the draft's fields. Line 11 of
+FastQueueTest.java makes the list [ada], and the test's variable
+netids refers to it. Line 12 calls the constructor. The draft's
+line 31 stores that same list in queue. Line 32 makes members
+the set {ada}. So the RI is true, and line 33's check passes.
+But the test's netids and the field queue are now two names
+for one list. Line 13 of the test adds eve through the
+client's name, so the one list is now [ada, eve]. members is
+still {ada}. So members no longer holds exactly the NetIDs in
+queue: the RI is false. Line 14 calls waiting. At the start
+of waiting, line 72 calls checkRep, and line 38 throws
+"members is not the queue". No method of FastQueue ran between
+the constructor's return and that call. The fields are private.
+Yet the list in queue changed.
+
+When two names refer to one object, as netids and the field
+queue do here, that is aliasing. Each name is an alias of
+the other. Lecture 10 met aliasing without the name, in the
+second reading of "returns the students waiting".
+Under that reading, waiting hands out the queue's own list, so
+the client and the queue share one list. The draft's constructor
+makes the same sharing, with the list going the other way, from
+the client to the queue.
+
+Lecture 7's arguments never met aliasing. Its
+rule for an assignment says that after an
+assignment to x, a fact about another variable is still true.
+Every variable in Lecture 7's methods held a number. A number has
+no second name, so no line could change one variable through
+another. A list can have two names. Line 13 of the test changes
+netids, and a fact about another variable, the RI about the
+field queue, turned false. Line 13 is a call, not an
+assignment, but the question is the same: can a line change a
+fact about a variable it does not name?
+
+Now suppose that no client of the draft ever touches a list
+again after passing it to the constructor. Then no run of those
+clients goes wrong. Even so, the implementer can no longer reason
+about FastQueue alone. To know that the RI is true at the start
+of a method, the implementer must read every client that ever
+passes a list to the constructor. Each new client brings more
+code to read. For a class with many clients, that reading may
+never be done. Lecture 10's Shortcut made the same
+demand through a public field. Here the field is private. The
+demand is back anyway. So the draft has a bug even if no run
+goes wrong.
+
+The way out is line 31 as written. The queue keeps its own list,
+and the client's add changes only the client's.
+
+waiting hands out a list, as messages does. So the mistake in
+that version of Book can happen in FastQueue too. Here is a
+second draft: a copy of FastQueue.java with line 73 replaced by
+return queue;, so waiting returns the queue's own list. Which
+test fails now? JUnit starts six tests, and one fails:
+waitingIsACopy, with "members is not the queue". Here is that
+test, from Lecture 10's HelpQueueTest.java:
+
+HelpQueueTest.java    @Test
+    void waitingIsACopy() {
+        HelpQueue queue = emptyQueue();
+        queue.join("ada");
+        List<String> copy = queue.waiting();
+        copy.add("eve");
+        assertEquals(List.of("ada"), queue.waiting());
+    }
+
+The test joins ada, so the field queue is [ada] and members
+is {ada}. The draft's waiting returns the list in queue
+itself, so the test's copy and the field queue are aliases.
+The test's copy.add("eve") makes that one list [ada, eve].
+members is
+still {ada}, so the RI is false. Then the test calls waiting
+again, for assertEquals to compare. Line 72 calls checkRep,
+and line 38 throws before assertEquals can run.
+
+The half sheet's second question asks why FastQueue calls
+checkRep at the start of a method, and not only at the end. The
+section
+Checking the representation invariant with checkRep
+found that the RI a method assumes at its start was checked
+already, at the end of the last call that changed the object.
+Now we can say why the start check is there anyway. Between two
+calls, code that is not the class's may have changed the fields,
+through an alias. The change comes after the method returns, so a
+check at the end of that method cannot see it. So checkRep runs
+at the start of a method too. The check at the start catches the
+change on the next call, as line 72 did in both drafts, rather
+than in some wrong answer later. The code quality
+guide's section checkRep gives the same reason.
+
+Each draft gave code outside FastQueue a reference to a list in
+its fields. This definition names that mistake:
+
+Definition: representation exposure
+
+Representation exposure is a reference, held by code outside
+a class, to a changeable object among the class's fields.
+Through it, that code can change the fields without calling
+any method of the class, so the representation invariant and
+every specification can be broken by code the class does not
+control. To prevent it, copy in a changeable object a
+client passes that becomes part of the fields, and copy out
+a changeable field that a method returns.
+
+Here is what the definition's words mean:
+
+A reference to a changeable object needs both of its
+  parts. First, the object must be changeable. Java's
+  documentation says that "Strings are constant; their values
+  cannot be changed after they are created".5 So a method
+  that returns a String field exposes nothing. The client holds
+  a reference to the field's string, but no method of String
+  can change the string through it. Second, the client must hold
+  a reference. int is a primitive type, which holds
+  a plain value, so a method that returns an int field hands the
+  client a copy of the number. Nothing the client does to that
+  number reaches the field. So exposure needs a reference that
+  the client can change the fields through.
+
+Copy in and copy out are the two fixes we saw. Copy in is
+  line 31: the constructor keeps a new list, not the client's.
+  Copy out is line 73, and line 113 in Book: the method returns
+  a new list, not the field's. The code quality guide's section
+  Avoid representation exposure asks for both.
+
+Look back at the draft that keeps the client's list. Only its
+constructor differs from
+FastQueue.java, and only on line 31. That constructor still
+leaves the RI true. So an argument by the rule of the section
+What correct means for an ADT method, for any method of
+FastQueue.java, is right for the draft too. Yet in the draft,
+waiting threw an exception that its specification never
+mentions. So a method that is correct by the rule satisfies its
+specification only when no code outside the class changes the
+fields between calls. For a class as a whole, then, we count one
+more thing as part of being correct. A class is correct when
+every method is correct by the rule and the class has no
+representation exposure.
+
+Exercises
+
+Each answer is folded under its question. Write yours first.
+
+1. Here is the start of one more class that implements
+HelpQueue. Like ListQueue, it keeps the queue in one list. But
+this list holds the students in reverse order, the back of the
+queue first:
+
+ReverseQueue.javapublic class ReverseQueue implements HelpQueue {
+    // The students waiting, back first.
+    private List<String> queue = new ArrayList<String>();
+
+Write its representation invariant and its abstraction function,
+as comments in the form // RI: ... and // AF(this) = ...,
+beside the field. Then
+write its next, which has to satisfy next's specification,
+lines 20 to 26 of Lecture 10's HelpQueue.java:
+
+HelpQueue.java
+20
+21
+22
+23
+24
+25
+26    /**
+     * @modifies this
+     * @effects removes the student at the front of the queue
+     * @return the NetID of the student removed
+     * @throws NoSuchElementException if the queue is empty
+     */
+    String next();
+
+Answer
+
+The RI is that no NetID is in queue twice. The class has
+  one field, so nothing has to agree with it. What is left is the
+  first clause of FastQueue's RI. The AF reads the list from its
+  last element to its first:
+
+ReverseQueue.java    // RI: no NetID is in queue twice.
+    // AF(this) = the help queue of the students in queue, last to first.
+
+Without the RI, a list such as [ada, bob, ada] would be read by
+the AF as the queue ada, bob, ada. A student is in the queue at
+most once, so no queue is ada, bob, ada.
+
+next removes the last element of the list. By the AF, the
+  last element of queue is the front of the queue:
+
+ReverseQueue.java    public String next() {
+        if (queue.isEmpty()) {
+            throw new NoSuchElementException("nobody is waiting");
+        }
+        return queue.remove(queue.size() - 1);
+    }
+
+An empty list stands for an empty queue, so next throws
+exactly when the specification says to. Otherwise, the list
+loses its last element. Read last to first, what remains is the
+old queue without its front. next returns that student's
+NetID. Removing an element adds no repeat, so the RI is still
+true when next returns.
+
+The same line was a bug on Wednesday. Lecture 10's
+  exercise 2 put
+  return queue.remove(queue.size() - 1); in ListQueue's next,
+  and that next served from the back of the queue. In
+  ReverseQueue, the same line serves the front. The two classes
+  have the same field. Their AFs read it in opposite orders. So the
+  AF decides whether the line is right.
+
+The rest of the class follows the AF too. In
+  ReverseQueue.java, join adds the student at the start of the
+  list, queue.add(0, netid), since by the AF the first element is
+  the back. waiting copies the list into a new one from last to
+  first. Through a subclass whose emptyQueue returns
+  new ReverseQueue(), JUnit runs Wednesday's five tests on the
+  class. It starts five tests, and none fails.
+
+2. Argue that FastQueue's join is correct, by the rule in
+the section What correct means for an ADT method: start
+from
+the RI and join's precondition before line 51, and end with the
+RI and join's postcondition after line 57, as that section
+argued size. Here is join's specification, lines 12 to 18 of
+Lecture 10's HelpQueue.java:
+
+HelpQueue.java
+12
+13
+14
+15
+16
+17
+18    /**
+     * @modifies this
+     * @effects adds the student at the back of the queue
+     * @throws IllegalArgumentException if the student is already in
+     *     the queue, and leaves the queue unchanged
+     */
+    void join(String netid);
+
+Here are the RI and the AF, lines 17 to 19 of FastQueue.java:
+
+FastQueue.java
+17
+18
+19    // RI: no NetID is in queue twice, and members holds exactly
+    //     the NetIDs in queue.
+    // AF(this) = the help queue of the students in queue, front first.
+
+And here is join, lines 50 to 58:
+
+FastQueue.java
+50
+51
+52
+53
+54
+55
+56
+57
+58    public void join(String netid) {
+        checkRep();
+        if (members.contains(netid)) {
+            throw new IllegalArgumentException(netid + " is in the queue");
+        }
+        queue.add(netid);
+        members.add(netid);
+        checkRep();
+    }
+
+Your argument also answers the half sheet's first question: on
+what line of join does the RI become false, and when does it
+become true again?
+
+Answer
+
+The triple has two cases at its end. The specification has
+  no @requires, so P is true, and the triple's first claim is
+  the RI alone. The postcondition is @effects and @throws
+  together. If the student is in AF(this_0), join throws
+  IllegalArgumentException, and AF(this) is AF(this_0).
+  Otherwise, AF(this) is AF(this_0) with the student added at
+  the back. Here is the body with claims between its lines. Write
+  this_0.queue and this_0.members for the two fields' values
+  when join was called:
+
+public void join(String netid) {
+    {{ RI }}
+    checkRep();
+    {{ RI }}
+    if (members.contains(netid)) {
+        {{ RI, and netid is in members }}
+        {{ RI, netid is in AF(this), and no field has changed }}
+        throw new IllegalArgumentException(netid + " is in the queue");
+    }
+    {{ RI, and netid is not in members }}
+    queue.add(netid);
+    {{ the RI is true of this_0, netid is not in this_0.members,
+       members is this_0.members, and queue is this_0.queue
+       with netid at the end }}
+    members.add(netid);
+    {{ the RI is true of this_0, netid is not in this_0.members,
+       members is this_0.members with netid added, and queue is
+       this_0.queue with netid at the end }}
+    checkRep();
+    {{ RI, and AF(this) is AF(this_0) with netid at the back }}
+}
+
+Line 51 changes nothing. The RI is true, so neither of
+  checkRep's checks throws. checkRep changes no field.
+
+Line 53 throws exactly when the student is waiting. By the
+  RI, members holds exactly the NetIDs in queue. By the AF on
+  line 19, the NetIDs in queue are the students in the queue. So
+  members.contains(netid) is true exactly when the student is in
+  AF(this_0), the case in which @throws promises the exception.
+  No line before the throw changes a field. So the RI is still
+  true, and AF(this) is AF(this_0), the queue unchanged.
+
+The RI is false between lines 55 and 56. Line 55 adds the
+  student at the end of the list. The set is as it was, so it lacks
+  the NetID that the list just gained. next has the same gap
+  between lines 65 and 66, the other way around: there, the list
+  loses the front before the set does.
+
+After line 56, the RI is true again. The student was not in
+  this_0.members. So, by the RI, true of this_0, the student
+  was not in this_0.queue either. So the new list has no repeat.
+  The old
+  set held exactly the NetIDs of the old list. Each gained the one
+  NetID, so members holds exactly the NetIDs in queue.
+
+AF(this) is AF(this_0) with the student at the back. By
+  the AF on line 19, the list is read front first, so its end is
+  the back of the queue. Line 55 put the student there. That is
+  what @effects promises. The RI is true, so line 57's
+  checkRep does not throw. It changes no field. Both cases end in
+  the rule's last claim, so join is correct.
+
+The claims between the lines answer the half sheet's first
+  question. After line 55, queue holds the student and
+  members does not, so the RI's second clause is false: the RI
+  becomes false on line 55. Line 56 adds the student to
+  members, and the RI is true again after it, before line 57
+  checks it and line 58 returns. In words:
+
+After join returns, queue is its old value with the
+student at the end. members is its old value with the
+student added. The student was not waiting before, so the RI
+is true again.
+
+3. Here is a draft of FastQueue's next that takes the
+front out of the set before taking it out of the list. It is a
+copy of FastQueue.java with lines 65 and 66 replaced, so every
+line keeps its number:
+
+FastQueue.java
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69    public String next() {
+        checkRep();
+        if (queue.isEmpty()) {
+            throw new NoSuchElementException("nobody is waiting");
+        }
+        members.remove(queue.get(0));
+        String front = queue.remove(0);
+        checkRep();
+        return front;
+    }
+
+The RI and the AF are lines 17 to 19 of FastQueue.java, shown in
+exercise 2, and next's specification is lines 20 to 26 of
+HelpQueue.java, shown in exercise 1. queue.get(0) returns the
+first element of the list and leaves the list as it was. Is the
+RI false at any point inside the draft's next? Does checkRep
+catch anything? Is the method correct? Predict what the six tests
+report against the draft before you run them.
+
+Answer
+
+The RI is false between lines 65 and 66. Line 65 takes the
+  front out of the set, and the list still holds it. So members
+  lacks a NetID that is in queue. In FastQueue.java's own next,
+  the RI is false at the same spot, the other way around: its list
+  has lost the front, and its set still has it.
+
+checkRep catches nothing. It runs on lines 61 and 67 only.
+  The call before left the RI true, so the check on line 61
+  passes. At line 67 the RI is true again, as the next bullet
+  argues. No check runs between lines 65 and 66. Against the draft,
+  JUnit starts six tests, and none fails.
+
+The method is correct. By the AF, nobody is waiting exactly
+  when the list is empty. Then line 63 throws before any field
+  changes. Otherwise, the list has a first element, so
+  queue.get(0) on line 65 has a student to return. By the RI,
+  that student is in members, and line 65 removes the student
+  from the set. Line 66 removes the same student from the list.
+  The student was in the list once, so the student is now in
+  neither field. So members again holds exactly the NetIDs in
+  queue. The RI is true at line 67. Read front first, the list
+  is AF(this_0) without its front. Line 68 returns the front's
+  NetID. That is what next's specification promises.
+
+The rule says nothing about the middle of a method. Its
+  triple puts the RI before the body and after it. Between the
+  two, any line may leave the RI false, as long as a later line
+  makes it true again before the method returns. FastQueue.java's
+  next and the join of exercise 2 each do just that.
+
+4. LinkedQueue, from Wednesday, keeps a chain of nodes. Here
+are its fields, lines 17 to 20 of Lecture 10's LinkedQueue.java:
+
+LinkedQueue.java
+17
+18
+19
+20    // The first and last nodes of the chain, both null when nobody
+    // is waiting.
+    private Node front;
+    private Node back;
+
+And here is its next, lines 48 to 60:
+
+LinkedQueue.java
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60    public String next() {
+        if (front == null) {
+            throw new NoSuchElementException("nobody is waiting");
+        }
+        // Unhook the first node; if it was also the last, the chain is
+        // empty now.
+        String netid = front.netid;
+        front = front.next;
+        if (front == null) {
+            back = null;
+        }
+        return netid;
+    }
+
+LinkedQueue has a representation invariant that no // RI:
+comment states. Lines 17 and 18 give part of it. In full: back
+is the last node of the chain from front, both are null
+exactly when nobody is waiting, and no NetID is in the chain
+twice. Write it as an // RI: comment. What must next do
+to keep it? Then write ListQueue's RI, for its one field, line 7
+of ListQueue.java:
+
+ListQueue.java
+7    private List<String> queue = new ArrayList<String>();
+
+What could a checkRep in ListQueue check, and what not?
+
+Answer
+
+The RI is a claim about front and back. "Nobody is
+  waiting" is about the abstract state. The RI is about the
+  concrete state.
+  LinkedQueue's AF, also never written down, reads the queue off
+  the chain from front, first to last. So nobody is waiting
+  exactly when front is null. The comment can say that with the
+  fields alone:
+
+LinkedQueue.java    // RI: front and back are both null, or neither is. If neither
+    //     is, back is the last node of the chain from front. No
+    //     NetID is in the chain twice.
+
+A chain that loops back on itself has no last node, so the
+second sentence rules out that chain too.
+
+next must set back to null when the chain empties.
+  Lines 56 to 58 do that. Take a queue with ada alone, so front
+  and back both refer to ada's node. Line 55 moves front to
+  the node after it, which is null. Without lines 56 to 58,
+  back would still be ada's old node, and the RI would be false.
+  Then suppose ada joins again. join's loop starts from front,
+  which is null, so it finds nobody. back is not null, so
+  join hooks the new node after the old one and makes the new
+  node back. front is still null, so the chain from front
+  is empty. ada is not waiting after all. With lines 56 to 58 in
+  place, both fields are null. So the RI is true. When the chain
+  does not empty, line 55 moves only front. So back is still
+  the last node.
+
+ListQueue's RI is that no NetID is in queue twice. It is
+  the first clause of FastQueue's, and the whole of
+  ReverseQueue's in exercise 1:
+
+ListQueue.java    private List<String> queue = new ArrayList<String>();
+    // RI: no NetID is in queue twice.
+
+A checkRep could check the list for a repeat. It could
+  compare the size of queue with the size of
+  new HashSet<String>(queue). FastQueue.java makes the same
+  comparison in two steps: line 37 finds members equal to that
+  set, and line 40 compares the sizes.
+
+It could not check that the list is the queue. The queue
+  itself is the abstract state, and no Java value holds it. So no
+  checkRep can compare the list with it, in ListQueue or in
+  FastQueue, whose line 37 compares only the set with the list.
+  Whether queue holds the students in the order they joined
+  depends on what every method did to the list. An argument by the
+  rule, one method at a time, is what checks it.
+
+5. Here are the RI and the AF, lines 19 to 22 of
+FasterQueue.java:
+
+FasterQueue.java
+19
+20
+21
+22    // RI: no NetID is in inbox or outbox twice, or in both, and
+    //     members holds exactly the NetIDs in inbox and outbox.
+    // AF(this) = the help queue of the students in outbox, last to
+    //     first, then the students in inbox, first to last.
+
+And here is its next, lines 67 to 84:
+
+FasterQueue.java
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84    public String next() {
+        checkRep();
+        if (members.isEmpty()) {
+            throw new NoSuchElementException("nobody is waiting");
+        }
+        // When the outbox runs dry, move the inbox over in reverse, so
+        // that the front of the queue is at the end of the outbox.
+        if (outbox.isEmpty()) {
+            for (int i = inbox.size() - 1; i >= 0; i--) {
+                outbox.add(inbox.get(i));
+            }
+            inbox.clear();
+        }
+        String front = outbox.remove(outbox.size() - 1);
+        members.remove(front);
+        checkRep();
+        return front;
+    }
+
+Call next with inbox [ada, bob, eve], outbox [], and
+members {ada, bob, eve}, so the refill runs. Write the fields and
+AF(this) at three points:
+
+just before the loop on lines 75 to 77;
+
+just after the refill ends, on line 78;
+
+just after both removes, on lines 80 and 81.
+
+Check that the first two are the same queue. Then one more: what
+is AF(this) just after line 77, before line 78 runs?
+
+Answer
+
+Before line 75, the queue is ada, bob, eve. The fields are
+  as given. The outbox adds nobody, and the inbox, first to last,
+  is ada, bob, eve.
+
+After line 78, the queue is ada, bob, eve again. The loop
+  adds eve, then bob, then ada to the outbox, and line 78 empties
+  the inbox. So inbox is [], outbox is [eve, bob, ada], and
+  members is {ada, bob, eve}. Read last to first, the outbox is
+  ada, bob, eve, and the inbox adds nobody. Each NetID is in the
+  two lists once, so the RI is true. The refill changed two
+  fields and left AF(this) as it was. So the first two queues
+  are the same.
+
+After line 81, the queue is bob, eve. Line 80 removes ada,
+  the last student of the outbox, and line 81 removes ada from the
+  set. So inbox is [], outbox is [eve, bob], and members is
+  {bob, eve}. The outbox, last to first, is bob, eve. That is the
+  old queue without its front. Line 83 returns "ada". Between
+  lines 80 and 81, members still holds ada, so the RI is false
+  there, as it is in FastQueue between lines 65 and 66.
+
+After line 77, AF(this) has no value. The loop has filled
+  the outbox, and line 78 has not yet emptied the inbox. So
+  inbox is [ada, bob, eve] and outbox is [eve, bob, ada]. Each
+  student is in both lists, so the RI is false. Read by lines 21
+  and 22, these fields would be ada, bob, eve, ada, bob, eve. No
+  queue holds a student twice. The AF is defined only on values
+  of the fields that the RI allows, so these fields stand for
+  nothing. Line 78 makes the RI true again before next returns,
+  as the rule asks.
+
+Further reading
+
+The invariant and the function, and reasoning with them.
+  Barbara Liskov and
+  John Guttag, Program Development in Java (2001), chapter 5,
+  "Data Abstraction", sections 5.5 to 5.7. Section 5.5, "Aids
+  to Understanding Implementations", takes the abstraction
+  function and then the representation invariant, the other order
+  from this lecture's. Section 5.6, "Properties of Data
+  Abstraction Implementations", has a part on exposing the rep,
+  the book's phrase for representation exposure. Section 5.7,
+  "Reasoning about Data Abstractions", covers preserving the rep
+  invariant and reasoning about operations, the work of the
+  section What correct means for an ADT method.
+
+Copy in, copy out. Joshua Bloch, Effective Java, third
+  edition (2018), chapter 8, "Methods", item 50, "Make defensive
+  copies when needed". The item's defensive copies are the copies
+  that the section Copy in, copy out makes.
+
+The documentation of
+HashSet
+in Java 25 makes the promise for add, remove, contains,
+and size, "assuming the hash function disperses the elements
+properly among the buckets". ↩
+
+David L. Parnas, "On the Criteria To Be Used in
+Decomposing Systems into Modules", Communications of the
+ACM (1972). Each module of his second decomposition is
+"characterized by its knowledge of a design decision which it
+hides from all others". ↩
+
+The documentation of
+IllegalStateException
+in Java 25. ↩
+
+The documentation of ArrayList's
+remove(int) in Java 25 says that it
+shifts "any subsequent elements to the left". ↩
+
+The documentation of
+String in Java 25. ↩
+
+    UW Site Use Agreement
