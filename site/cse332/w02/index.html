@@ -5,6 +5,7 @@
   quick checks: .check, quiz questions: li.cyu). Change the id when the question changes.
   Added later in the week: Priority Queues 1 and 2 slides (lec04, lec05) and the Section 2 slides (Runtime), raw copies in
   materials/cse332/w02/. Exercise 0 (graded) is not used.
+  Oct 29 recheck: the Section 2 worksheet and solutions (Google Docs) were linked after Oct 14; one problem uses them.
 -->
 <html lang="en">
 <head>
@@ -1147,7 +1148,7 @@ print(extract)</code></pre>
   <p class="where">Section 2 · Runtime · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
   <h1>Section 2: Runtime</h1>
   <div class="prose">
-    <p>Section 2 reviews the definitions and practises proofs with \(c\) and \(n_0\), then analyses a program. The worked answers below follow the section slides.</p>
+    <p>Section 2 reviews the definitions and practises proofs with \(c\) and \(n_0\), then analyses a program. The worked answers below follow the section slides and the <a href="https://docs.google.com/document/d/1g0358q2oi3J5rrVmuhcALK6zyPdfaeRn/edit" target="_blank" rel="noopener">worksheet</a>'s <a href="https://docs.google.com/document/d/1HKruUEoMpMcAT95d2jFrr35pVZGVfCWB/edit" target="_blank" rel="noopener">official solutions</a>, which agree.</p>
   </div>
   <div class="rule">
     <p>\(f(n)\in O(g(n))\): there are positive constants \(c, n_0\) with \(f(n)\le c\cdot g(n)\) for all \(n\ge n_0\). \(\Omega\) is the same with \(\ge\). \(\Theta\) means both. Big-O is an upper bound, not necessarily tight; \(c\) ignores the scale of the curve and \(n_0\) ignores small \(n\).</p>
@@ -1240,7 +1241,7 @@ print(extract)</code></pre>
 <section class="page" id="s2-practice" data-title="Section 2: practice">
   <p class="where">Section 2 · Runtime · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span> · practice</p>
   <h1>Section 2: practice</h1>
-  <div class="prose"><p>Four problems from the section's worksheet: the true/false claims of question 0, the smallest \(n_0\) in the question 1 proofs, a Θ proof in the style of question 2, and the <code>numUnique</code> loops of question 3. Write your reasoning in the work box.</p></div>
+  <div class="prose"><p>Five problems from the section's <a href="https://docs.google.com/document/d/1g0358q2oi3J5rrVmuhcALK6zyPdfaeRn/edit" target="_blank" rel="noopener">worksheet</a>, checked against its <a href="https://docs.google.com/document/d/1HKruUEoMpMcAT95d2jFrr35pVZGVfCWB/edit" target="_blank" rel="noopener">official solutions</a>: the true/false claims of question 0, the smallest \(n_0\) in the question 1 proofs, a Θ proof in the style of question 2, the <code>numUnique</code> loops of question 3, and your own \(c\) and \(n_0\) for the question 1 and 2 proofs. Write your reasoning in the work box.</p></div>
 
   <article class="task" data-id="cse332-w2-s2-q0-claims">
     <h2>1. Suppose \(f(n) \in O(n)\)</h2>
@@ -1328,6 +1329,38 @@ print(extract)</code></pre>
     <details class="notes" open>
       <summary>Teaching notes</summary>
       <ul><li>Add the first loop (\(n\) iterations) to get the full counts: worst \(n + \frac{n(n+1)}{2}\), best \(2n\). Those are the section's \(f(n)\) and \(g(n)\).</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w2-s2-worksheet-pairs">
+    <h2>5. Worksheet questions 1 and 2: your own \(c\) and \(n_0\)</h2>
+    <p class="prompt">Give a \(c &gt; 0\) and \(n_0 &gt; 0\) that prove each claim from the worksheet. Any pair that works is accepted; the checker tests the inequality exactly for every \(n \ge n_0\).</p>
+    <div class="answer-spec" data-part="q1a-c" data-grader="bound" data-role="c" data-pair="q1a" data-bound='{"f":["0","7"],"g":["0","1/10"],"rel":"O"}' data-label="1a \(7n \in O(n/10)\): your \(c\)"></div>
+    <div class="answer-spec" data-part="q1a-n0" data-grader="bound" data-role="n0" data-pair="q1a" data-label="1a: your \(n_0\)"></div>
+    <div class="answer-spec" data-part="q1b-c" data-grader="bound" data-role="c" data-pair="q1b" data-bound='{"f":["1000"],"g":["0","0","3"],"rel":"O"}' data-label="1b \(1000 \in O(3n^2)\): your \(c\)"></div>
+    <div class="answer-spec" data-part="q1b-n0" data-grader="bound" data-role="n0" data-pair="q1b" data-label="1b: your \(n_0\)"></div>
+    <div class="answer-spec" data-part="q2b-o-c" data-grader="bound" data-role="c" data-pair="q2bo" data-bound='{"f":["0","10","0","1"],"g":["0","0","0","3"],"rel":"O"}' data-label="2b \(n^3+10n \in O(3n^3)\): your \(c\)"></div>
+    <div class="answer-spec" data-part="q2b-o-n0" data-grader="bound" data-role="n0" data-pair="q2bo" data-label="2b \(O\): your \(n_0\)"></div>
+    <div class="answer-spec" data-part="q2b-omega-c" data-grader="bound" data-role="c" data-pair="q2bw" data-bound='{"f":["0","10","0","1"],"g":["0","0","0","3"],"rel":"Omega"}' data-label="2b \(n^3+10n \in \Omega(3n^3)\): your \(c\)"></div>
+    <div class="answer-spec" data-part="q2b-omega-n0" data-grader="bound" data-role="n0" data-pair="q2bw" data-label="2b \(\Omega\): your \(n_0\)"></div>
+    <ol class="hints">
+      <li>Pick \(c\) first so the algebra is easy, then solve the inequality for \(n\). For 1a, what \(c\) makes \(c\cdot\frac{n}{10}\) equal \(7n\)?</li>
+      <li>For 2b's \(O\), when is \(10n \le n^3\)? For its \(\Omega\), \(n^3 + 10n\) is never below \(n^3\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>1a: \(c = 70\), \(n_0 = 1\). Then \(c\cdot\frac{n}{10} = 7n\), so \(7n \le 7n\) for every \(n\).</li>
+      <li>1b: \(c = 1\), \(n_0 = 20\). At \(n = 20\), \(3n^2 = 1200 \ge 1000\), and \(3n^2\) only grows. (The smallest \(n_0\) for \(c = 1\) is 19.)</li>
+      <li>2b \(O\): \(c = 1\), \(n_0 = 4\) (the section slides). For \(n \ge 4\), \(10 \le n^2\), so \(10n \le n^3\) and \(n^3 + 10n \le 2n^3 \le 3n^3\).</li>
+      <li>2b \(\Omega\): \(c = \tfrac13\), \(n_0 = 1\). \(n^3 + 10n \ge n^3 = \tfrac13\cdot 3n^3\) for every \(n \ge 1\).</li>
+      <li class="answer">Any valid pairs, e.g. 1a (70, 1); 1b (1, 20); 2b \(O\) (1, 4); 2b \(\Omega\) (\(\tfrac13\), 1). These are the official solutions' choices, except that the written solution for 2b's \(O\) uses \(n_0 = 3\), which also works.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul>
+        <li>The official solutions write each proof the same way: "Let \(c = \_\) and \(n_0 = \_\)", then show the inequality for every \(n\) past \(n_0\). Have students say their pair aloud before checking it.</li>
+        <li>The written solution for 2b's \(O\) part says \(n^3 + 10\) where the worksheet has \(n^3 + 10n\), and picks \(n_0 = 3\). For \(n^3 + 10n\) with \(c = 1\), 3 is in fact the smallest \(n_0\) (\(27 + 30 = 57 \le 81\)). The slides use 4.</li>
+        <li>1c (\(2^n \in O(3^{2n})\), \(c = 1, n_0 = 2\)), 1d (\(7n^2+3n \in O(n^4)\), \(c = 10, n_0 = 1\), bounding each term by \(n^4\)) and 1e (\(n + 2n\log_2 n \in O(n\log_2 n)\), \(c = 3, n_0 = 2\)) are in the table on the Section 2 page; the checker here handles polynomials up to \(n^3\) only.</li>
+      </ul>
     </details>
   </article>
 
@@ -1626,7 +1659,7 @@ extract() {
   <table class="plain">
     <tr><th>Lecture 3 · Mon Oct 5</th><td>Weiss 2.1–2.4 (algorithm analysis). Math review: Weiss 1.1–1.6. <br><a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec03-Analysis2.pdf" target="_blank" rel="noopener">Slides (pdf)</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec03-Analysis2.pptx" target="_blank" rel="noopener">slides (pptx)</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/math_identities_quick_reference.pdf" target="_blank" rel="noopener">Math identities</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/asymptotics.html" target="_blank" rel="noopener">Summary: Asymptotics</a></td></tr>
     <tr><th>Wed Oct 7 · Priority Queues 1</th><td>Weiss 6.1–6.3. <br><a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec04-PQs-1.pdf" target="_blank" rel="noopener">Slides (pdf)</a></td></tr>
-    <tr><th>Thu Oct 8 · Section 2</th><td><a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/heaps.html" target="_blank" rel="noopener">Summary: Heaps</a> (linked from the section's last slide)</td></tr>
+    <tr><th>Thu Oct 8 · Section 2</th><td><a href="https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section02.pdf" target="_blank" rel="noopener">Slides (pdf)</a> · <a href="https://docs.google.com/document/d/1g0358q2oi3J5rrVmuhcALK6zyPdfaeRn/edit" target="_blank" rel="noopener">worksheet</a> · <a href="https://docs.google.com/document/d/1HKruUEoMpMcAT95d2jFrr35pVZGVfCWB/edit" target="_blank" rel="noopener">solutions</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/heaps.html" target="_blank" rel="noopener">Summary: Heaps</a> (linked from the section's last slide)</td></tr>
     <tr><th>Fri Oct 9 · Priority Queues 2</th><td>Weiss 6.4–6.5. <br><a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec05-PQs-2.pdf" target="_blank" rel="noopener">Slides (pdf)</a></td></tr>
   </table>
   </div>

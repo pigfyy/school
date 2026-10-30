@@ -287,6 +287,11 @@ const BOUND_SOLUTIONS = [
   ["cse332-w2-l3-example2-omega", "c", [["12", "50"], ["1", "5"], ["11", "25"]], [["12", "49"], ["13", "1000"]]],
   ["cse332-w2-l3-sq17-theta", "upper-c", [["20", "1"], ["4", "5"]], [["4", "4"], ["3", "1000"]]],
   ["cse332-w2-l3-sq17-theta", "lower-c", [["3", "1"], ["1", "1"]], [["4", "1000"]]],
+  // Section 2 worksheet (Oct 29 recheck): the official solutions' pairs hold; near misses fail
+  ["cse332-w2-s2-worksheet-pairs", "q1a-c", [["70", "1"], ["100", "1"]], [["69", "1"], ["1", "1000"]]],
+  ["cse332-w2-s2-worksheet-pairs", "q1b-c", [["1", "20"], ["1", "19"]], [["1", "18"], ["1/1000", "500"]]],
+  ["cse332-w2-s2-worksheet-pairs", "q2b-o-c", [["1", "4"], ["1", "3"]], [["1", "2"], ["1/3", "1000"]]],
+  ["cse332-w2-s2-worksheet-pairs", "q2b-omega-c", [["1/3", "1"], ["1/3", "5"]], [["1", "1000"], ["1/2", "10"]]],
 ];
 for (const [tid, part, good, bad] of BOUND_SOLUTIONS) {
   const at = html.indexOf(`data-id="${tid}"`);

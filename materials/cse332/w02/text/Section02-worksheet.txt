@@ -1,0 +1,79 @@
+0. True/False Questions
+Suppose that f(n) ∈O(n). Indicate if each statement is guaranteed to be always true, guaranteed to be always false, or is sometimes true (and thus also sometimes false).
+f(n) ∈O(n2)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈O(4n)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈O(logn)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈O(nlogn)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈O(1)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈Ω(n)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈Ω(logn)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈Ω (n2)
+
+Always True
+Sometimes True
+Always False
+
+Big-Oh Proofs
+For each of the following, prove that f(n)∈𝒪(g):
+f(n)=7ng(n)=n10
+
+f(n)=1000g(n)=3n2
+
+f(n)=2ng(n)=32n
+
+f(n)=7n2+3ng(n)=n4
+
+f(n)=n+2nlgng(n)=nlgn
+
+Big-Theta Proofs
+For each of the following, prove that f(n)∈Θ(g):
+f(n)=7ng(n)=n10
+
+f(n)=n3+10ng(n)=3n3
+
+Algorithm Running Time
+Consider the following method which finds the number of unique Strings within a given array of length n.
+
+1  int numUnique(String[] values) {2      boolean[] visited = new boolean[values.length]3      for (int i = 0; i &lt; values.length; i++) {4          visited[i] = false5      }6      int out = 07      for (int i = 0; i &lt; values.length; i++) {8          if (!visited[i]) {9              out += 110             for (int j = i; j &lt; values.length; j++) {11                 if (values[i].equals(values[j])) {12                     visited[j] = true13                 }14             }15         }16     }17     return out;18 }
+
+Determine a Θ(⋅) bound on each function below. Start by (1) constructing an equation that models each function then (2) simplifying and finding a closed form.
+
+f(n)= the worst-case runtime of numUnique
+
+g(n)= the best-case runtime of numUnique
+

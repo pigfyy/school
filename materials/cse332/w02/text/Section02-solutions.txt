@@ -1,0 +1,87 @@
+0. True/False Questions
+Suppose that f(n) ∈O(n). Indicate if each statement is guaranteed to be true, guaranteed to be false, or might be either.
+f(n) ∈O(n2)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈O(4n)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈O(logn)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈O(nlogn)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈O(1)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈Ω(n)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈Ω(logn)
+
+Always True
+Sometimes True
+Always False
+
+f(n) ∈Ω (n2)
+
+Always True
+Sometimes True
+Always False
+
+Big-Oh Proofs
+For each of the following, prove that f(n)∈𝒪(g):
+f(n)=7ng(n)=n10
+
+f(n)=1000g(n)=3n2
+
+f(n)=2ng(n)=32n
+
+f(n)=7n2+3ng(n)=n4
+
+f(n)=n+2nlgng(n)=nlgn
+
+Big-Theta Proofs
+For each of the following, prove that f(n)∈Θ(g):
+f(n)=7ng(n)=n10
+
+f(n)=n3+10ng(n)=3n3
+
+Algorithm Running Time
+Consider the following method which finds the number of unique Strings within a given array of length n.
+
+1  int numUnique(String[] values) {2      boolean[] visited = new boolean[values.length]3      for (int i = 0; i &lt; values.length; i++) {4          visited[i] = false5      }6      int out = 07      for (int i = 0; i &lt; values.length; i++) {8          if (!visited[i]) {9              out += 110             for (int j = i; j &lt; values.length; j++) {11                 if (values[i].equals(values[j])) {12                     visited[j] = true13                 }14             }15         }16     }17     return out;18 }
+
+Determine a Θ(⋅) bound on each function below. Start by (1) constructing an equation that models each function then (2) simplifying and finding a closed form.
+
+f(n)= the worst-case runtime of numUnique
+
+The worst case occurs when all strings in the array are unique. The running time will be quadratic because:
+The for-loop beginning on line 7 runs n times regardless of the inputs
+Visited[i] becomes true on line 12 whenever the string at index i matches some previous string. By having all strings be unique no indices of visited will become true, and so we will always enter the if statement on line 8
+The for loop on line 10 will occur n-i times, which is asymptotically the same as n (certainly not more than n and certainly also more than n/2 for at least half of the iterations)
+Between the loop on lines 7 and 10, we have quadratic running time.
+
+g(n)= the best-case runtime of numUnique
+The best case occurs when all strings match. The running time will be linear because:
+In the first iteration of the for-loop on line 7 we will mark visited[j] true for every index in the visited array, this means that the loop on line 10 will only ever occur once.
+

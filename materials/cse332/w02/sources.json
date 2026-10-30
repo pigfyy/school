@@ -1,10 +1,10 @@
 {
   "course": "CSE 332 Autumn 2026 (26au)",
   "week": "Week 2: 2026-10-05 to 2026-10-09 (America/Los_Angeles)",
-  "extractedText": "raw/text/ (pdftotext -layout for PDFs; slide text + speaker notes from the pptx XML; tag-stripped text for HTML). raw/png/ has every Lecture 3 slide rendered at 60 dpi (pdftoppm) for checking figures.",
+  "extractedText": "text/ (pdftotext -layout for PDFs; slide text from the pptx XML, plus text/cse332-26au-lec03-Analysis2.pptx-with-notes.txt with speaker notes; docx text; tag-stripped text for HTML). png/ has every Lecture 3 slide rendered at 60 dpi (pdftoppm) for checking figures. All files sit at the top of materials/cse332/w02/; there is no raw/ folder.",
   "sources": [
     {
-      "file": "raw/cse332-26au-lec03-Analysis2.pdf",
+      "file": "cse332-26au-lec03-Analysis2.pdf",
       "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec03-Analysis2.pdf",
       "what": "Lecture 3 slides (pdf, 37 pages)",
       "covers": "lecture-3",
@@ -13,7 +13,7 @@
       "sha256": "d5fa3ddd4f2a3f3215b1161a4dfff32751ee43f6548048db4f41ef1c497b8e26"
     },
     {
-      "file": "raw/cse332-26au-lec03-Analysis2.pptx",
+      "file": "cse332-26au-lec03-Analysis2.pptx",
       "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec03-Analysis2.pptx",
       "what": "Lecture 3 slides (pptx; 37 slides, speaker notes on slide 18, one fade animation on slide 11, no hidden slides)",
       "covers": "lecture-3",
@@ -22,7 +22,7 @@
       "sha256": "816c30a61e304f03595bcefc39e15c2c0a7136190ffec6794dff56249bb7e783"
     },
     {
-      "file": "raw/math_identities_quick_reference.pdf",
+      "file": "math_identities_quick_reference.pdf",
       "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/math_identities_quick_reference.pdf",
       "what": "Math identities quick reference (summations, log rules)",
       "covers": "lecture-3",
@@ -31,7 +31,7 @@
       "sha256": "fa2a42cd90a165deb150d2d3516f280616923b4a76845cd06a6d57504ceee315"
     },
     {
-      "file": "raw/calendar.html",
+      "file": "calendar.html",
       "url": "https://courses.cs.washington.edu/courses/cse332/26au/calendar.html",
       "what": "Course calendar (last updated 2026-10-05 11:54); no slide links for Oct 7-9",
       "covers": "week",
@@ -40,7 +40,7 @@
       "sha256": "f452ae9ec92b089c422d835b436bad00bb94bcb69bbf2ef31840f886cfc5abd3"
     },
     {
-      "file": "raw/tasks.html",
+      "file": "tasks.html",
       "url": "https://courses.cs.washington.edu/courses/cse332/26au/tasks.html",
       "what": "Tasks page: Preliminary Survey, Exercise 0",
       "covers": "week",
@@ -49,7 +49,7 @@
       "sha256": "290ad88ff34d4a5ba04ad1126c69bd9709635f1ff315b150e57f6df9529531c6"
     },
     {
-      "file": "raw/index.html",
+      "file": "index.html",
       "url": "https://courses.cs.washington.edu/courses/cse332/26au/index.html",
       "what": "Course home page",
       "covers": "course-wide",
@@ -58,7 +58,7 @@
       "sha256": "5e9bd5a34ae399d2a9d71ce9a577ed03c0fb1ed8a26546254c328e40f193ab98"
     },
     {
-      "file": "raw/syllabus.html",
+      "file": "syllabus.html",
       "url": "https://courses.cs.washington.edu/courses/cse332/26au/syllabus.html",
       "what": "Syllabus: meetings, grading, late days",
       "covers": "course-wide",
@@ -67,7 +67,7 @@
       "sha256": "f004044b0d3ea86ddc19c7e2028997dc8236489f02e2e2fe4e005abe708cb60f"
     },
     {
-      "file": "raw/staff.html",
+      "file": "staff.html",
       "url": "https://courses.cs.washington.edu/courses/cse332/26au/staff.html",
       "what": "Staff page",
       "covers": "course-wide",
@@ -76,7 +76,7 @@
       "sha256": "3366cabe82c1d23e8de0c50c50b53a69c36817626eebab6e604465d99f38902d"
     },
     {
-      "file": "raw/summaries.html",
+      "file": "summaries.html",
       "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries.html",
       "what": "Topic summaries index",
       "covers": "course-wide",
@@ -85,7 +85,7 @@
       "sha256": "98a955ea9ef31219fb6f1f45ba060c28f8b5d3263c0aa1870b0b47afabab52e8"
     },
     {
-      "file": "raw/summary_asymptotics.html",
+      "file": "summary_asymptotics.html",
       "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries/asymptotics.html",
       "what": "Topic summary: Asymptotic Notation (same definitions as slide 15)",
       "covers": "lecture-3",
@@ -94,7 +94,7 @@
       "sha256": "fc3628460422907408ff615131676489be279d82c1431c76f982da01dad8ebe8"
     },
     {
-      "file": "raw/summary_heaps.html",
+      "file": "summary_heaps.html",
       "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries/heaps.html",
       "what": "Topic summary: Heaps. Fetched for the record only; NOT taught (PQ lectures not yet given, slides not posted)",
       "covers": "upcoming",
@@ -172,7 +172,69 @@
       "fetchedAt": "2026-10-14T17:59:50-07:00",
       "bytes": 6259703,
       "sha256": "1f9608743e95a372af6a59e4a32a032e4dd168a8a59443b7978e0c4172573f0a"
+    },
+    {
+      "file": "Section02-worksheet.docx",
+      "url": "https://docs.google.com/document/d/1g0358q2oi3J5rrVmuhcALK6zyPdfaeRn/export?format=docx",
+      "what": "Section 2 worksheet (Google Doc linked from the calendar row, exported as docx)",
+      "fetchedAt": "2026-10-29T22:00:49-07:00",
+      "bytes": 13087,
+      "sha256": "c27302660396b5d916070bc37ab2fa36e2d58905092ad4754031164855520fc0",
+      "covers": "section-2"
+    },
+    {
+      "file": "Section02-solutions.docx",
+      "url": "https://docs.google.com/document/d/1HKruUEoMpMcAT95d2jFrr35pVZGVfCWB/export?format=docx",
+      "what": "Section 2 worksheet solutions (Google Doc linked from the calendar row, exported as docx)",
+      "fetchedAt": "2026-10-29T22:00:50-07:00",
+      "bytes": 390891,
+      "sha256": "5c37a9c0ac5469edeb5c99e5e08485e7f59eee6e6ad0ee3385054cd03f85af26",
+      "covers": "section-2"
     }
   ],
-  "note": "The Monday 2026-10-05 availability probes were superseded by these official files, posted Oct 7\u201311. Only the requested PQ lectures and Section 2 are included for this update."
+  "note": "The Monday 2026-10-05 availability probes were superseded by these official files, posted Oct 7–11. Only the requested PQ lectures and Section 2 are included for this update.",
+  "recheck": {
+    "at": "2026-10-29",
+    "how": "Every URL above was downloaded again into an empty temp folder and its sha256 compared with the record. The repo copies are the recorded versions; the newer pages were not copied over them.",
+    "unchanged": [
+      "cse332-26au-lec03-Analysis2.pdf",
+      "cse332-26au-lec03-Analysis2.pptx",
+      "math_identities_quick_reference.pdf",
+      "index.html",
+      "staff.html",
+      "summaries.html",
+      "summary_asymptotics.html",
+      "summary_heaps.html",
+      "cse332-26au-lec04-PQs-1.pdf",
+      "cse332-26au-lec04-PQs-1.pptx",
+      "cse332-26au-lec05-PQs-2.pdf",
+      "cse332-26au-lec05-PQs-2.pptx",
+      "Section02.pdf",
+      "Section02.pptx"
+    ],
+    "changed": [
+      {
+        "file": "calendar.html",
+        "bytes": 38470,
+        "sha256": "055dcd54709c49cf4c26560b0aaf84ff16a34e7a55801eb1f1cdcfb3c98af570",
+        "fetchedAt": "2026-10-29T22:00:30-07:00",
+        "why": "later weeks' slide links added (last updated 2026-10-29 18:38); for Oct 5-9 the only change is the Section 2 row (title now 'S2 Algorithm Analysis', and worksheet + solutions Google Docs links, recorded above)"
+      },
+      {
+        "file": "tasks.html",
+        "bytes": 33696,
+        "sha256": "75cd4a2d6fc41fb4a992e07ab0a7e80563997be185b282c2b74899c68b0e0e65",
+        "fetchedAt": "2026-10-29T22:00:30-07:00",
+        "why": "Week Three Self Reflection survey and Exercises 1-5 added; nothing for Oct 5-9 changed"
+      },
+      {
+        "file": "syllabus.html",
+        "bytes": 28983,
+        "sha256": "d157ff2f8a96aaa9cee8ed732cd72f53c555fe31e9de6c294a3204ce9e0b6f78",
+        "fetchedAt": "2026-10-29T22:00:31-07:00",
+        "why": "midterm time and rooms set (Mon Nov 9, 5:00-6:00pm, SMI 120 and SMI 205); nothing taught in week 2 changed"
+      }
+    ],
+    "pageChange": "Section 2 worksheet and solutions linked on the Section 2 pages and Readings, and one new problem (cse332-w2-s2-worksheet-pairs) built from worksheet questions 1 and 2 and their official solutions. Their content otherwise matches the Section 2 slides the page already used."
+  }
 }
