@@ -1,0 +1,302 @@
+CSE 331 Homework 1: Procedural Abstraction
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          Task 1: Specification–implementation matching
+Task 2: Specification strength
+Getting the starter codeSoftware setup
+
+Task 3: Run and Document Histogram.java
+Task 4: Complete the implementation of Gradebook.java according to its specification.
+AI Policy
+Submission
+
+        CSE 331 Homework 1: Procedural Abstraction
+
+Due Friday, October 9 at 11:59pm (late policy).
+
+Task 1: Specification–implementation matching
+
+We will consider several variants of the following method specification:
+
+/**
+ * "Clamps" the values of an array towards a certain value range.
+ *
+ * @param a the array to clamp; must be non-null
+ * @param lo the low end of the target range
+ * @param hi the high end of the target range
+ * @requires lo <= hi
+ * @modifies a
+ * ... @effects given below ...
+ */
+public static void clamp(int[] a, int lo, int hi)
+
+The five variants differ in their @effects as follows:
+
+Spec A
+  @effects sets every element less than lo to lo, every element greater than hi
+           to hi, and every element already between lo and hi (inclusive) is
+           left unchanged
+
+Spec B
+  @effects after the call, every element of a satisfies lo <= a[i] <= hi
+
+Spec C
+  @effects after the call, every element of a satisfies a[i] <= hi, and every
+           element that was already between lo and hi (inclusive) is left
+           unchanged
+
+Spec D
+  @effects after the call, every element of a satisfies a[i] <= hi
+
+Spec E
+  @effects after the call, every element of a satisfies a[i] >= lo
+
+And now consider the following 4 implementations:
+
+// Implementation 1
+for (int i = 0; i < a.length; i++) {
+    if (a[i] < lo) a[i] = lo;
+    else if (a[i] > hi) a[i] = hi;
+}
+
+// Implementation 2
+for (int i = 0; i < a.length; i++) {
+    if (a[i] > hi) a[i] = hi;
+}
+
+// Implementation 3
+for (int i = 0; i < a.length; i++) {
+    if (a[i] < lo) a[i] = lo;
+}
+
+// Implementation 4
+for (int i = 0; i < a.length; i++) {
+    a[i] = hi;
+}
+
+For each implementation, say which specifications it satisfies.
+
+Please format your answer as a list like this:
+
+Impl 1: A, B, C
+
+Impl 2: C, D, E
+
+and so forth
+
+(Note that those are not the actual answers.)
+
+Or, if you prefer, you can draw a table like we did on
+slide 32 of lecture 2:
+
+Impl
+A
+B
+C
+D
+E
+
+1
+
+2
+
+3
+
+4
+
+Task 2: Specification strength
+
+Compare the five specifications from Task 1. For each pair, fill in
+the cell in the table below by writing S if the spec on the left
+(the row) is stronger than the spec on top (the column), W if the
+row spec is weaker, and --- if the two are incomparable. The
+diagonal is marked X, because each spec is equivalent to itself.
+Feel free to only fill out the entries above the diagonal, since the
+others are symmetric.
+
+Spec
+A
+B
+C
+D
+E
+
+A
+X
+
+B
+
+X
+
+C
+
+X
+
+D
+
+X
+
+E
+
+X
+
+Getting the starter code
+
+Get the starter code via
+gitlab.
+Click the "Code" button in the top right, and then click Download
+directory as zip at the very bottom of the popup. Extract the resulting
+file on your machine and find the hw1 folder inside it. It holds the
+following files:
+
+Histogram.java: Code you need to read, understand, and document for Task 3.
+
+Csv.java: Provided helper library for reading CSV files.
+
+Gradebook.java: Starter code for Task 4.
+
+assignments.csv, categories.csv, grades.csv: Sample data for Task 4.
+
+expected_output.csv: What Gradebook should print on the sample data.
+
+Software setup
+
+This course uses JDK 25; the resources page
+describes how to install it if you do not already have it.
+
+You may use any Java development environment you want. If you have one you are
+already comfortable with, we recommend you use it.
+
+Visual Studio Code and the Terminal
+
+If you are looking for a Java development environment, we recommend Visual
+Studio Code because it is easy to set up. You
+will need the "Extension Pack for Java". (Open the extensions panel in VS Code
+and search for "Extension Pack for Java" and install it.)
+
+Once you have VS Code and the extension pack installed, then:
+
+Use File -> Open Folder... and select the hw1 folder you extracted
+earlier.
+
+Open the Histogram.java file.
+
+Use View -> Terminal and run the following commands:
+
+javac Histogram.java
+
+The code should compile without errors. Then run the program like this:
+
+java Histogram --column 2 grades.csv
+
+You should see this output:
+
+Histogram of "quiz2"  (6 values, 10 bins)
+ [ 60.00,  63.70):   1  ****************************************
+ [ 63.70,  67.40):   1  ****************************************
+ [ 67.40,  71.10):   0
+ [ 71.10,  74.80):   0
+ [ 74.80,  78.50):   0
+ [ 78.50,  82.20):   1  ****************************************
+ [ 82.20,  85.90):   0
+ [ 85.90,  89.60):   1  ****************************************
+ [ 89.60,  93.30):   1  ****************************************
+ [ 93.30,  97.00]:   1  ****************************************
+
+Task 3: Run and Document Histogram.java
+
+Write a user manual for Histogram aimed at someone who is
+comfortable using the command line, but who is not a Java programmer.
+
+You will need to read the code and probably try it out on some more
+examples to figure out what it does.
+
+Write your user manual as a comment right above the line public class Histogram.
+
+Task 4: Complete the implementation of Gradebook.java according to its specification.
+
+The starter code contains a partial implementation of a gradebook terminal
+application that reads in grade data and computes student course grades.
+
+Start by reading the user manual at the top of the Gradebook.java file.
+Once your program runs, compare its output on the sample data with
+expected_output.csv.
+
+There are four unimplemented methods in this file:
+
+indexOfMin
+
+dropLowest
+
+computeCourseGrades
+
+main
+
+You are responsible for implementing dropLowest() and main(). You are not
+required to implement computeCourseGrades or indexOfMin.
+
+You must follow these additional rules:
+
+Your implementation of dropLowest must use indexOfMin to figure out which
+  scores to drop.
+
+Your implementation of main must use computeCourseGrades to compute the
+  course grades.
+
+When grading your code, we will plug in our own implementations of
+  indexOfMin and computeCourseGrades, so your code must be correct
+  assuming any correct implementation of these methods.
+
+Users make mistakes. Your main method should make no assumptions about user behavior.
+  If the user does something that the manual forbids, your program should not crash or
+  show an exception stack trace. Instead, you should report a nice error message and
+  exit.
+
+In order to actually run your code, you may find it necessary to implement a
+version of indexOfMin and computeCourseGrades, but they will not be graded,
+and you do not need to turn them in. We will also provide an autograder
+environment on Gradescope where you can run your code and get some limited
+feedback.
+
+AI Policy
+
+You should not use any AI assistance for any part of this assignment.
+Note that this rule overrides the course's default AI
+policy for this assignment.
+
+Submission
+
+Submit your solutions to tasks 1 and 2 to the
+"HW1 Written"
+assignment on Gradescope. Submit your solutions to tasks 3 and 4 to the
+"HW1 Coding"
+assignment on Gradescope.
+
+    UW Site Use Agreement

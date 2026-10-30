@@ -45,6 +45,13 @@
   main table:not([class]) th {
     background: #f0f0f5;
   }
+  /* A blank corner, where the row headers meet the column headers,
+     is a plain empty cell with no top or left border, so the two
+     runs of headers meet at an open corner. */
+  main table:not([class]) tr:first-child > td:first-child:empty {
+    border-top: none;
+    border-left: none;
+  }
   .lecture-modes { float: right; font-size: 0.9em; }
 </style>
 
@@ -495,11 +502,12 @@ an implementation like 4.</p>
 tests confirms claims about many runs. Still, no set of tests
 confirms a claim about every run, since an input you did not choose
 may go wrong. Lecture 1 put it this way: testing can refute a claim
-about every run and never confirm it. Tests are still among the best
-reasons we have, and the course motto asks for reasons: to <em>know</em>
-that code works is to have reasons, from tests and from arguments.
-Friday asks how many tests are enough, and how to use the code
-itself to choose them.</p>
+about every run and never confirm it. The one exception is testing
+every allowed input, which is rarely possible. Tests are still among
+the best reasons we have, and the course motto asks for reasons: to
+<em>know</em> that code works is to have reasons, from tests and from
+arguments. Friday asks how many tests are enough, and how to use the
+code itself to choose them.</p>
 <h2 id="exercises">Exercises</h2>
 <p>Each answer is folded under its question. Write yours first.</p>
 <p><strong>1.</strong> Choose inputs for testing <code>indexOf</code> against specification D,

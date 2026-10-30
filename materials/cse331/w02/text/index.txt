@@ -53,8 +53,9 @@ specification promises, so it passes on every correct implementation.
 An implementation-based test also checks behavior the
 specification does not promise, so it can fail on a correct
 implementation if that implementation happens to make different
-choices. No set of tests confirms a claim about every run. In the
-next lecture, we will discuss how many tests are enough.
+choices. Short of testing every allowed input, no set of tests
+confirms a claim about every run. In the next lecture, we will
+discuss how many tests are enough.
 
 Notes
 

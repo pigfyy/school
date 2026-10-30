@@ -124,7 +124,7 @@
       .reveal .admonition > :not(.admonition-title) {
         margin: 0.3em 0.6em;
       }
-      .reveal .admonition.warning { --admonition-color: #c09020; background: #fdf8ec; }
+      .reveal .admonition.warning { --admonition-color: #b4530a; background: #fdf8ec; }
       .reveal .admonition.danger { --admonition-color: #991111; background: #fceced; }
       .reveal .admonition.tip { --admonition-color: #2a7a2a; background: #eef6ee; }
       .reveal .admonition.about { --admonition-color: #555; background: #f5f5f5; }
@@ -184,6 +184,23 @@
         text-align: right; color: #999;
       }
       .reveal .codebox .claim { color: #177500; font-weight: 700; }
+      /* A mistaken line the notes mark (main.css, .hll): the site's
+         danger colors, a bar at the row's left and a light tint
+         across it. Where the room is asked to find the mistake, the
+         mark is a fragment: the line shows from the start, and the
+         bar and tint arrive on its click. */
+      .reveal .codebox .mistake {
+        display: inline-block; width: 100%; box-sizing: border-box;
+        margin-left: -0.5em; padding-left: 0.3em;
+        border-left: 0.2em solid #991111; background: #fceced;
+      }
+      .reveal .codebox .mistake.fragment {
+        opacity: 1; visibility: inherit;
+        border-color: transparent; background: none;
+      }
+      .reveal .codebox .mistake.fragment.visible {
+        border-color: #991111; background: #fceced;
+      }
       /* Lines a callout points to: a fragment that never hides, and
          while its callout is current the lines take the callout's
          look, so the two read as a pair. */
@@ -217,6 +234,9 @@
          enough to read from the back; at 0.8em a listing about 70
          columns wide, line numbers included, still fits the slide. */
       .reveal .figure pre { margin: 0 auto; font-size: 0.8em; }
+      /* A figure the class also holds on paper may be smaller, at
+         the grid of four's size, so a long argument fits its slide. */
+      .reveal .figure.small pre { font-size: 0.65em; }
       /* Two figures stacked, such as a code box over its run, keep the
          gap between them that a run has on its own. */
       .reveal .figure + .figure { margin-top: var(--r-block-margin); }
@@ -253,6 +273,30 @@
          that a line written for a whole slide still fits beside the
          code. */
       .reveal .context-left > :not(.context) { font-size: 0.52em; }
+      /* A zoom beside the context: one box per piece of a long
+         argument, at the small figure size. The boxes take turns,
+         each shown from its first fragment until the next box's
+         first, so the argument is walked piece by piece with the
+         whole method in view on the left. */
+      .reveal .context-left > .zoom { font-size: 1em; }
+      .reveal .zoom .figure pre { font-size: 0.65em; }
+      .reveal .zoom > .figure + .figure { margin-top: 0; }
+      html:not(.print-pdf) .reveal .zoom > .figure:has(~ .figure .fragment.visible) { display: none; }
+      html:not(.print-pdf) .reveal .zoom > .figure + .figure:not(:has(.fragment.visible)) { display: none; }
+      /* In print view the zoom's boxes all show, stacked and smaller,
+         so the page carries the whole argument. */
+      html.print-pdf .reveal .zoom > .figure + .figure { margin-top: 0.5em; }
+      html.print-pdf .reveal .zoom .figure pre { font-size: 0.4em; }
+      .reveal .context-left:has(> .zoom) > .context pre { font-size: 0.55em; }
+      /* On the map, the lines the zoom is on are lit: a region lit from
+         the start goes dark once a later region's fragment arrives. */
+      .reveal .context .lit {
+        display: inline-block; width: 100%; box-sizing: border-box;
+        background: #e6e6e6; border-radius: 0.2em;
+      }
+      .reveal .context .lit.fragment { opacity: 1; visibility: inherit; background: none; }
+      .reveal .context .lit.fragment.visible { background: #e6e6e6; }
+      .reveal .context:has(.lit.fragment.visible) .lit:not(.fragment) { background: none; }
       /* Four code boxes in a 2x2 grid, all one size. Their code is
          smaller than a figure's, since students also hold it on the
          program sheet. */
@@ -308,6 +352,28 @@
         background: #fff; color: #9a1b1b; font-weight: 700;
         box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
       }
+      /* An optional slide, its heading marked {: .optional }, is one
+         the instructor may skip (the script below). While optional
+         slides are shown, a faint "optional" sits in the lower right
+         corner of one, so the instructor knows it can be skipped. The
+         word belongs to the slides' frame, not to the slide, so the
+         slide check, which measures each slide and the text in it,
+         never sees it; it sits beside reveal's slide number, which
+         takes the window's corner, and it never prints. */
+      html:not(.print-pdf) .reveal:not(.overview) .slides:has(> section.optional.present)::after {
+        content: "optional"; position: absolute; right: 0.5em; bottom: 0.3em;
+        font-size: 18px; color: #bbb; white-space: nowrap;
+      }
+      /* The line that confirms the optional-slides key, at the top of
+         the window for two seconds. */
+      .optional-toast {
+        position: fixed; top: 1em; left: 50%; transform: translateX(-50%);
+        z-index: 100; padding: 0.3em 0.8em; border-radius: 0.3em;
+        background: rgba(0, 0, 0, 0.7); color: #fff;
+        font: 18px 'Source Sans Pro', Helvetica, sans-serif;
+        pointer-events: none; opacity: 0; transition: opacity 0.4s;
+      }
+      .optional-toast.on { opacity: 1; transition: none; }
       /* In print view (?print-pdf), each slide shows once, with no
          fragment current (pdfSeparateFragments, below). A current-visible
          fragment shows only while current, so print view would hide it.
@@ -321,6 +387,16 @@
         display: flex; flex-wrap: wrap; gap: 0.3em;
       }
       html.print-pdf .reveal .stack > * { margin: 0; font-size: 0.75em; }
+      /* A stack's turn that leaves on a click (fade-out) prints too,
+         beside or above the turn that replaces it. */
+      html.print-pdf .reveal .stack > .fragment.fade-out.visible {
+        opacity: 1; visibility: inherit;
+      }
+      /* A marked line that arrives on a click prints marked, as the
+         notes print theirs. */
+      html.print-pdf .reveal .codebox .mistake.fragment {
+        border-color: #991111; background: #fceced;
+      }
       /* In print view, reveal measures each slide's height once, on
          load, two frames after the print rules apply, to set its pages
          and, if it is centered, its place. reveal measures at the
@@ -329,6 +405,13 @@
          give each slide reveal's --slide-width before it is measured. */
       html.print-pdf .reveal .fragment { transition: none; }
       html.print-pdf .reveal .slides > section { width: var(--slide-width); }
+      /* The slide number, three times reveal's size, as plain black text on
+         the white slide, with no grey box behind it, so it reads from
+         the back of the room and does not look like a control. */
+      .reveal .slide-number {
+        font-size: 36px; color: #000; background-color: transparent;
+        padding: 0; right: 12px; bottom: 12px;
+      }
     </style>
 
     <script>
@@ -566,7 +649,7 @@ when they don't match.</span></p>
 </ul>
 </li>
 <li class="fragment">Cover each case and each boundary<ul>
-<li>Element appears in the list 0 times, 1 time, many times; empty list</li>
+<li>x appears in the range 0 times, 1 time, many times; empty range</li>
 </ul>
 </li>
 </ol>
@@ -714,6 +797,72 @@ when they don't match.</span></p>
         box.textContent = frame.title + '\n' + frame.dataset.embed;
         frame.replaceWith(box);
       }
+      // An optional slide, its heading written `## Heading {: .optional }`,
+      // is one the instructor may skip. By default it is shown like any
+      // other. Pressing X before lecturing hides every optional slide:
+      // it leaves the deck, so the arrows, space, fragments, the slide
+      // number, and the progress bar all pass over it; X again puts it
+      // back where it was. reveal's own data-visibility="hidden" is read
+      // only once, as reveal starts, so each optional slide is taken out
+      // and put back by hand beside a comment that keeps its place, and
+      // Reveal.sync() recounts the deck. The choice is kept per deck in
+      // localStorage, so a reload keeps it; the speaker view, whose
+      // frames load this page, follows it through the storage event.
+      // Print view and the slide check always keep every slide.
+      const optionalSlides = [];
+      for (const slide of document.querySelectorAll(
+          '.slides > section:has(> h2.optional)')) {
+        slide.classList.add('optional');
+        const place = document.createComment(' optional slide ');
+        slide.before(place);
+        optionalSlides.push([slide, place]);
+      }
+      const keepAll = printing ||
+        new URLSearchParams(window.location.search).has('check');
+      const optionalKey = 'cse331-optional-hidden:' + window.location.pathname;
+      const storedHidden = () => {
+        try { return localStorage.getItem(optionalKey) === 'hidden'; }
+        catch (e) { return false; }
+      };
+      const placeOptional = hide => {
+        for (const [slide, place] of optionalSlides) {
+          if (hide) slide.remove();
+          else if (!slide.isConnected) place.after(slide);
+        }
+      };
+      let optionalHidden = !keepAll && storedHidden();
+      placeOptional(optionalHidden);
+      const toast = document.createElement('div');
+      toast.className = 'optional-toast';
+      document.body.append(toast);
+      let toastTimer;
+      const setOptionalHidden = hide => {
+        if (keepAll || hide === optionalHidden) return;
+        optionalHidden = hide;
+        // The slide on screen stays, or, if it is leaving, the next
+        // slide that stays takes its place (the one before, at the end).
+        const current = Reveal.getCurrentSlide();
+        const { f } = Reveal.getIndices();
+        let target = current;
+        if (hide && current.classList.contains('optional')) {
+          const all = [...document.querySelectorAll('.slides > section')];
+          const at = all.indexOf(current);
+          const stays = s => !s.classList.contains('optional');
+          target = all.slice(at + 1).find(stays) ||
+            all.slice(0, at).reverse().find(stays);
+        }
+        placeOptional(hide);
+        Reveal.sync();
+        const { h, v } = Reveal.getIndices(target);
+        Reveal.slide(h, v, target === current ? f : undefined);
+        toast.textContent = 'Optional slides: ' + (hide ? 'hidden' : 'shown');
+        toast.classList.add('on');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('on'), 2000);
+      };
+      window.addEventListener('storage', e => {
+        if (e.key === optionalKey) setOptionalHidden(storedHidden());
+      });
       Reveal.initialize({
         width: 1280,
         height: 720,
@@ -728,6 +877,19 @@ when they don't match.</span></p>
         pdfSeparateFragments: false,
         plugins: [ RevealNotes ],
       });
+      // X is a key reveal leaves free (O opens its overview), and it
+      // is listed in reveal's help, under ?.
+      Reveal.addKeyBinding(
+        { keyCode: 88, key: 'X', description: 'Hide or show optional slides' },
+        () => {
+          if (keepAll) return;
+          const hide = !optionalHidden;
+          try {
+            if (hide) localStorage.setItem(optionalKey, 'hidden');
+            else localStorage.removeItem(optionalKey);
+          } catch (e) { /* the choice lasts until the page closes */ }
+          setOptionalHidden(hide);
+        });
       // In print view, reveal leaves every slide but the first
       // aria-hidden, and Chrome keeps hidden content out of a PDF's
       // tags. Once reveal has laid out the pages, the attribute comes

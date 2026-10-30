@@ -3,7 +3,7 @@
   CSE 331 (Autumn 2026) · Week 2 teaching site (Mon Oct 5 to Fri Oct 9), built with the course-teaching-site skill.
   Sources (raw copies, URLs, fetch times and hashes in materials/cse331/w02/sources.json): Lecture 3 notes, slides (HTML and PDF)
   and index ("Reading 1 discussion; Batch processing", Mon Oct 5), Reading 1 and the readings page, the calendar,
-  Homework 1 (due date only). Added later in the week: Section 1 handout and solution (Tue Oct 6), the Testing lecture
+  Homework 1 (due date only). Added later in the week: Section 1 handout, solution and slides (Tue Oct 6), the Testing lecture
   (lecture 4: notes, slides) and the Coverage lecture (lecture 5: notes, slides); raw copies in materials/cse331/w02/.
 
   Where each component lives:
@@ -52,6 +52,7 @@
     <div>
       <h2>Section 1 <span class="today" data-date="2026-10-06">Tue Oct 6</span></h2>
       <ol class="modules">
+        <li><a href="#s1-review">Review: what makes a spec stronger</a></li>
         <li><a href="#s1-strength">Task 1: comparing specs</a></li>
         <li><a href="#s1-remove">Task 2: removeValue</a></li>
         <li><a href="#s1-practice">Practice</a></li>
@@ -112,7 +113,7 @@
   <h2>This week</h2>
   <div class="week">
     <a class="day now" href="#l3-discuss"><strong>Mon, Oct 5</strong><span class="tag-today" data-date="2026-10-05">Today</span><span>Lecture 3: Reading 1 discussion; batch processing</span><span>6 modules, an 11-question check, 9 problems</span></a>
-    <a class="day" href="#s1-strength"><strong>Tue, Oct 6</strong><span class="tag-today" data-date="2026-10-06">Today</span><span>Section 1: Specifications</span><span>Comparing five specs for strength; four implementations of <code>removeValue</code> against four specs.</span></a>
+    <a class="day" href="#s1-strength"><strong>Tue, Oct 6</strong><span class="tag-today" data-date="2026-10-06">Today</span><span>Section 1: Specifications</span><span>How each tag moves a spec's strength; comparing five specs; four implementations of <code>removeValue</code> against four specs.</span></a>
     <a class="day" href="#l4-test"><strong>Wed, Oct 7</strong><span class="tag-today" data-date="2026-10-07">Today</span><span>Lecture 4: Testing</span><span>What a test is, four steps, choosing inputs, specification-based tests.</span></a>
     <a class="day" href="#l5-coverage"><strong>Fri, Oct 9</strong><span class="tag-today" data-date="2026-10-09">Today</span><span>Lecture 5: Coverage</span><span>How many tests are enough: statement, branch and loop coverage. <b>Homework 1 due 11:59 pm.</b></span></a>
   </div>
@@ -137,7 +138,7 @@
     <tr><th>Sections</th><td>Tuesdays, TA-led, not recorded; the printed material is posted on the course site. Section 1 was Tue Oct 6.</td></tr>
     <tr><th>Due this week</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/homework/hw1.html" target="_blank" rel="noopener">Homework 1: Procedural Abstraction</a>, Fri Oct 9 at 11:59 pm.</td></tr>
     <tr><th>Next reading</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/readings/reading2.html" target="_blank" rel="noopener">Reading 2</a>, due Fri Oct 16; discussed Mon Oct 19.</td></tr>
-    <tr><th>Late days</th><td>Submit by Friday to unlock one late day for that assignment, then resubmit through Saturday 11:59 pm. Nothing submitted by Friday means no late day.</td></tr>
+    <tr><th>Late days</th><td>Submit by Friday to unlock one late day for that assignment, then resubmit through Saturday 11:59 pm. Each Gradescope part (for example HW1 Written and HW1 Coding) needs its own Friday submission. Nothing submitted by Friday means no late day.</td></tr>
     <tr><th>Links</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/calendar/calendar.html" target="_blank" rel="noopener">Calendar and office hours</a> · <a href="https://courses.cs.washington.edu/courses/cse331/26au/info/" target="_blank" rel="noopener">Syllabus</a> · <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/notes.html" target="_blank" rel="noopener">Lecture 3 notes</a> · <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture03-batch/slides.html" target="_blank" rel="noopener">slides</a></td></tr>
   </table>
 
@@ -165,9 +166,9 @@
   </div>
 
   <table class="plain articles">
-    <tr><th>Willison 2025</th><td>Watch your code work, then write a test for it. "Proven" here means evidence you can show someone else; neither step is optional, even when a coding agent wrote the code.</td></tr>
-    <tr><th>Fishman 1996</th><td>The strict process of the space shuttle's software team: 260 people, three versions of 420,000 lines with one error each, and a process even their manager says stifles creativity.</td></tr>
-    <tr><th>Hoare 1996</th><td>Reliable software, though almost none of it is proven. His answer is careful engineering, with testing a large part of it.</td></tr>
+    <tr><th>Willison 2025</th><td>You know when you have seen the code do the right thing yourself and have a test that proves it. Two steps, neither optional: test by hand and show your reviewers, then write an automated test that fails if the change is reverted. A coding agent must prove its changes the same way.</td></tr>
+    <tr><th>Fishman 1996</th><td>The space shuttle's software group: three versions of 420,000 lines with one error each. The reason is their process, not their people: planning before code, rival coders and testers, and every mistake traced back to what let it through.</td></tr>
+    <tr><th>Hoare 1996</th><td>How did software get so reliable when almost none of it was proved correct? Programmers use the same techniques as every other kind of engineer: reviews, testing planned before the code, fixing what is in use, over-engineering.</td></tr>
   </table>
 
   <h2>Two kinds of testing</h2>
@@ -974,6 +975,69 @@
 </section>
 
 <!-- ================================================================ SECTION 1 -->
+<section class="page" id="s1-review" data-title="Section 1: what makes a spec stronger" data-unit="s1">
+  <p class="where">Section 1 · <span class="today-chip" data-date="2026-10-06">Tue Oct 6</span> · review, from the section slides</p>
+  <h1>Review: what makes a spec stronger</h1>
+  <div class="prose">
+    <p>Section 1 opened with a review before its two tasks. A specification is an <strong>abstraction barrier</strong>: implementers promise the code follows it, and clients promise not to rely on anything it doesn't say.</p>
+  </div>
+
+  <h2>The tags</h2>
+  <table class="plain">
+    <tr><th><code>@param a</code></th><td>what <code>a</code> represents, and any condition on it alone</td></tr>
+    <tr><th><code>@requires</code></th><td>rules about several parameters together (the precondition)</td></tr>
+    <tr><th><code>@return</code></th><td>a detailed description of the return value</td></tr>
+    <tr><th><code>@throws</code></th><td>when an exception is thrown, and which</td></tr>
+    <tr><th><code>@modifies</code></th><td>what the method may change (only for methods that mutate)</td></tr>
+    <tr><th><code>@effects</code></th><td>the changes it guarantees</td></tr>
+  </table>
+  <p class="prose"><code>@requires</code>, <code>@modifies</code> and <code>@effects</code> are CSE 331's own tags, not standard JavaDoc.</p>
+
+  <div class="rule">
+    <p><strong>Stronger assertion.</strong> Holds in a subset of the states where the weaker one holds, so the stronger implies the weaker. <strong>Stronger spec.</strong> A weaker (or equal) precondition and a stronger (or equal) postcondition.</p>
+  </div>
+
+  <h2>How each change moves the strength</h2>
+  <table class="plain">
+    <tr><th>Add to <code>@requires</code></th><td>Fewer inputs are allowed: a stronger precondition, so a <em>weaker</em> spec. "The list must be sorted" is weaker than no rule about order.</td></tr>
+    <tr><th>Accept a more general parameter</th><td>More inputs are allowed: a <em>stronger</em> spec. (More on this with generics.)</td></tr>
+    <tr><th>Add to <code>@return</code></th><td>A stronger postcondition: a <em>stronger</em> spec.</td></tr>
+    <tr><th>Replace a <code>@requires</code> with a <code>@throws</code></th><td>The input is still accepted, and now its behavior is defined: a <em>stronger</em> spec.</td></tr>
+  </table>
+
+  <h2>The slides' question</h2>
+  <pre class="code"><code>/** Returns the square root of a given number x       (S1)
+ * @requires x &gt;= 0
+ * @return the integer y such that y^2 = x
+ */
+
+/** Returns the square root of a given number x       (S2)
+ * @requires x &gt;= 0
+ * @return the integer y such that y^2 = x and y &gt;= 0
+ */</code></pre>
+
+  <div class="check" data-id="cse331-w2-s1-qc-sqrt" data-kind="quickcheck" data-type="strength" data-answer="stronger">
+    <p>Quick check: S2 is ___ than S1.</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="stronger, weaker or incomparable"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse331-w2-s1-qc-add-requires" data-kind="quickcheck" data-type="strength" data-answer="weaker">
+    <p>Quick check: you add <code>@requires lst is sorted</code> to a method that had no rule about order, and change nothing else. The new spec is ___ than the old one.</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="stronger, weaker or incomparable"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The slides start from Lecture 2's specs B and D with implementation 1: whenever B is satisfied, D is too. Ask the room what that says about B and D before showing the rule.</li>
+      <li>The square-root pair: same precondition, and S2's postcondition adds <code>y &gt;= 0</code>, so S2 is stronger. An implementation returning −2 for 4 meets S1 and not S2. As written, both promise an integer even when <code>x</code> is not a perfect square, where none exists; the comparison doesn't depend on that.</li>
+      <li>"@throws is stronger than @requires" surprises people: throwing feels like failing. The point is that the spec now says what happens on that input instead of nothing.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
 <section class="page" id="s1-strength" data-title="Section 1: comparing specs" data-unit="s1">
   <p class="where">Section 1 · <span class="today-chip" data-date="2026-10-06">Tue Oct 6</span> · Task 1</p>
   <h1>Section 1: comparing specs</h1>
@@ -1074,7 +1138,7 @@
   <p class="where">Section 1 · <span class="today-chip" data-date="2026-10-06">Tue Oct 6</span> · practice</p>
   <h1>Section 1: practice</h1>
   <div class="prose">
-    <p>Three problems on Section 1's specs. Answer before looking back at the tables on the previous two pages. Problem 3 re-asks the section's own table; problems 1 and 2 build on it. Type your reasoning in the work box as you go.</p>
+    <p>Four problems on Section 1's specs. Answer before looking back at the tables on the previous pages. Problem 3 re-asks the section's own table; problems 1 and 2 build on it; problem 4 extends the slides' square-root question. Type your reasoning in the work box as you go.</p>
   </div>
 
   <article class="task" data-id="cse331-w2-s1-removevalue-strength">
@@ -1147,6 +1211,28 @@
     <details class="notes" open>
       <summary>Teaching notes</summary>
       <ul><li>This is Section 1's own table (Task 2), re-asked. The self-check box is the sentence the solution writes: D's precondition makes "all", "first" and "last" the same thing.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse331-w2-s1-sqrt-specs">
+    <h2>4. Square roots, three ways</h2>
+    <p class="prompt">Take the slides' two square-root specs, S1 (<code>@requires x &gt;= 0</code>; returns an integer <code>y</code> with <code>y^2 = x</code>) and S2 (the same, and <code>y &gt;= 0</code>). S3 is S2 with its <code>@requires</code> replaced by <code>@throws IllegalArgumentException if x &lt; 0</code>. Compare them, and place one implementation.</p>
+    <div class="answer-spec" data-part="s2-s1" data-type="strength" data-answer="stronger" data-label="S2 is ___ than S1" data-placeholder="stronger, weaker or incomparable"></div>
+    <div class="answer-spec" data-part="s3-s2" data-type="strength" data-answer="stronger" data-label="S3 is ___ than S2" data-placeholder="stronger, weaker or incomparable"></div>
+    <div class="answer-spec" data-part="minus-two" data-type="choice" data-answer="s1" data-options="all:S1, S2 and S3|s1:S1 only|s1s2:S1 and S2 only|none:None of them" data-label="An implementation returns −2 for x = 4 (and throws for negative x). Which specs does it meet on x = 4?"></div>
+    <ol class="hints">
+      <li>Use the rule: precondition weaker or the same, and where the other's precondition holds, postcondition stronger or the same.</li>
+      <li>S2 and S3 agree on every <code>x &gt;= 0</code>. What does each promise for <code>x = -1</code>?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>S1 and S2 have the same precondition. S2's postcondition says everything S1's does and adds <code>y &gt;= 0</code>, so it is stronger. S2 is stronger than S1.</li>
+      <li>S3 has no precondition, which is weaker than <code>x &gt;= 0</code>. On every <code>x &gt;= 0</code> it promises what S2 does; on negative <code>x</code> it adds a promise (the exception) where S2 promised nothing. S3 is stronger than S2.</li>
+      <li>On <code>x = 4</code>, −2 squared is 4, so S1 is met. S2 and S3 both require <code>y &gt;= 0</code>, and −2 is not.</li>
+      <li class="answer">S2 is stronger than S1; S3 is stronger than S2; returning −2 meets S1 only.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>This is the slides' "Specification strength" pair of rules in one problem: adding to the return strengthens; trading a <code>@requires</code> for a <code>@throws</code> strengthens. Strength is transitive, so S3 is also stronger than S1.</li></ul>
     </details>
   </article>
 
@@ -1258,7 +1344,7 @@ void findsTheOnlyMatch() {
     <p><strong>Specification-based test.</strong> Checks only behavior the spec promises, so it passes on every correct implementation. An <strong>implementation-based test</strong> also checks behavior the spec does not promise, so it can fail on a correct implementation. <code>findsTheFirstMatch</code> expects 0, fails implementation 4 (<code>expected: &lt;0&gt; but was: &lt;4&gt;</code>) even though 4 meets D.</p>
   </div>
   <div class="prose">
-    <p>A test is a client too. Exercise 2: under B (smallest), <code>findsTheFirstMatch</code> is specification-based; under C (largest) it fails every correct implementation; under D it is implementation-based. <code>findsSomeMatch</code> is specification-based under all three but checks less than B or C promise. No set of tests confirms a claim about every run: testing can refute, never confirm.</p>
+    <p>A test is a client too. Exercise 2: under B (smallest), <code>findsTheFirstMatch</code> is specification-based; under C (largest) it fails every correct implementation; under D it is implementation-based. <code>findsSomeMatch</code> is specification-based under all three but checks less than B or C promise. Short of testing every allowed input, which is rarely possible, no set of tests confirms a claim about every run: testing can refute, not confirm.</p>
   </div>
 
   <div class="check" data-id="cse331-w2-l4-qc-first-match-d" data-kind="quickcheck" data-type="yesno" data-answer="no">
@@ -1629,7 +1715,7 @@ void findsTheOnlyMatch() {
   <p class="where">Reading 1 · due Fri Oct 2 · discussed today, Mon Oct 5</p>
   <h1>Readings</h1>
   <div class="prose">
-    <p>Four readings this quarter. For each, students choose one of three articles, read it, and write a short reflection, due on a Friday; the class discusses it the following Monday. Reading 1 asks what "know" means in the course motto, <em>"Your job is to deliver code that you know works."</em> Does knowing require a proof? Does testing count?</p>
+    <p>Four readings this quarter. For each, students choose one of three articles, read it, and write a short reflection, due on a Friday; the class discusses it the following Monday. Each reading asks a question about the course motto, <em>"Your job is to deliver code that you know works,"</em> and its three articles answer differently. Reading 1's question: when you say you know your code works, what do you actually know, and how did you come to know it?</p>
   </div>
 
   <h2>Reading 1: the three choices</h2>
@@ -1637,35 +1723,37 @@ void findsTheOnlyMatch() {
     <article class="reading-card">
       <p class="rc-meta">About 5 minutes</p>
       <h3><a href="https://simonwillison.net/2025/Dec/18/code-proven-to-work/" target="_blank" rel="noopener">Willison 2025, "Your job is to deliver code you have proven to work"</a></h3>
-      <p>Nearly the motto, with "proven" for "know". By proof he means evidence you can show someone else: run the code yourself and watch it do the right thing, then write an automated test that fails if you undo your change. Neither step is optional. Written about programmers who send large, untested, AI-written changes to code review; the same two steps apply when a coding agent writes the code, and the human is still accountable.</p>
+      <p>Written about programmers who hand large, untested, AI-written changes to code review and expect the reviewer to find the problems. Proving a change works is the programmer's job, in two steps, neither optional. First, test it by hand: get the system into a known state, exercise the change, and show your reviewers it did what you meant. Second, write an automated test that fails if the change is reverted. A coding agent must prove its changes the same way, and the human stays accountable for them.</p>
     </article>
     <article class="reading-card">
       <p class="rc-meta">About 20 minutes</p>
-      <h3><a href="https://www.fastcompany.com/28121/they-write-right-stuff" target="_blank" rel="noopener">Fishman 1996, "They Write the Right Stuff"</a></h3>
-      <p>The 260 people who wrote the space shuttle's software. In 1996 their three most recent versions, each 420,000 lines long, had one error each. The answer is in how the group plans, checks and records its work, and what it does when it finds a mistake. Its own manager says the process stifles creativity. Ask what these programmers know that most don't, and what it costs.</p>
+      <h3><a href="https://web.archive.org/web/19990430033916/http://www.fastcompany.com/online/06/writestuff.html" target="_blank" rel="noopener">Fishman 1996, "They Write the Right Stuff"</a></h3>
+      <p>The 260 people who wrote the software that flew the space shuttle. Their last three versions, each 420,000 lines long, had one error each, and Fishman finds the reason in their process, not their people. About a third of the work happens before any code is written, and no line changes without a change to the specification. Coders and testers are rival teams. A mistake is never just fixed: the group asks what let it through and fixes the process. Yes, the process stifles creativity, and that is the point: nobody improvises code that flies a spaceship.</p>
     </article>
     <article class="reading-card">
       <p class="rc-meta">About an hour</p>
       <h3><a href="https://gwern.net/doc/math/1996-hoare.pdf" target="_blank" rel="noopener">Hoare 1996, "How Did Software Get So Reliable Without Proof?"</a></h3>
-      <p>Some hoped programmers would prove their programs correct. Hoare helped invent the logic for that (the course uses it later), yet almost no software is proven, and most of it works anyway. He looks at how working engineers manage, test and debug large programs, and has a surprising view of what a test really checks. An academic paper; its last section is addressed to researchers.</p>
+      <p>Hoare helped invent the logic for proving programs correct (the course uses it later). Twenty years earlier, people predicted unreliable programs would cap the size of software; instead telephone exchanges run on tens of millions of lines, almost none of it proved. His answer is the practice of every other branch of engineering: design reviews at every stage, testing planned before the code, fixing products already in use, over-engineering. His view of a test is the quality controller's: it checks the methods that produced the code, and a failure means fixing the process, not just the product. Proof's theory still gave practice structured programming, types and information hiding.</p>
     </article>
   </div>
 
   <h3>Optional extras</h3>
   <ul class="extras">
-    <li><a href="https://how.complexsystems.fail/" target="_blank" rel="noopener">Cook 1998, "How Complex Systems Fail"</a> (about 10 minutes): eighteen short claims about how hazardous systems fail and why they usually don't.</li>
-    <li><a href="https://web.stanford.edu/class/archive/cs/cs240/cs240.1236/old//sp2014/readings/therac-25.pdf" target="_blank" rel="noopener">Leveson and Turner 1993, "An Investigation of the Therac-25 Accidents"</a> (about two hours; the Wikipedia article covers it in about 20 minutes). Content note: both describe patients' injuries and deaths in detail.</li>
+    <li><a href="https://how.complexsystems.fail/" target="_blank" rel="noopener">Cook 1998, "How Complex Systems Fail"</a> (about 10 minutes): eighteen numbered claims. Hazardous systems are always partly broken; a catastrophe needs several small failures at once, so blaming one root cause is a mistake; fixes after an accident usually add complexity instead of safety.</li>
+    <li><a href="https://web.stanford.edu/class/archive/cs/cs240/cs240.1236/old//sp2014/readings/therac-25.pdf" target="_blank" rel="noopener">Leveson and Turner 1993, "An Investigation of the Therac-25 Accidents"</a> (about two hours; the <a href="https://en.wikipedia.org/wiki/Therac-25" target="_blank" rel="noopener">Wikipedia article</a> covers it in about 20 minutes). Real bugs, but most accidents are system accidents with many causes; the machine relied on software where earlier ones had hardware interlocks. Content note: both describe patients' injuries and deaths in detail.</li>
     <li><a href="https://dl.acm.org/doi/10.1145/358198.358210" target="_blank" rel="noopener">Thompson 1984, "Reflections on Trusting Trust"</a> (about 10 minutes): a back door hidden in a compiler, and why reading source can't tell you everything a program does.</li>
+    <li>The extras are optional. A reflection may bring one in if it connects it to the article you chose.</li>
   </ul>
 
   <h2>What the reflection asks</h2>
   <ol class="reflection-parts">
     <li><strong>What does the reading argue?</strong> The author's main claim and how they support it, in your own words: the argument, not just the conclusion, specific enough for a classmate who read a different article. (About 5 sentences.)</li>
-    <li><strong>What is your reaction?</strong> What you agreed or disagreed with, or are unsure about, connected to your own experience as a programmer. (About 5 sentences.)</li>
-    <li><strong>What do you want to discuss in class?</strong> Something left unresolved, something to challenge the author on, or something you want classmates' views on. (One or more items.)</li>
+    <li><strong>What is your reaction?</strong> What you agreed or disagreed with, or are unsure about, connected to your own experience as a programmer: a bug you chased, a project that got away from you, a test that saved you, code someone else wrote. (About 5 sentences.)</li>
+    <li><strong>What do you want to discuss in class?</strong> A question for your group, one classmates might answer differently. Point to what in the reading raises it, give a concrete case that sharpens it, then sketch two answers: yours and one a classmate might give. (About 5 sentences.)</li>
   </ol>
   <div class="prose">
-    <p>Reflections are graded on thoughtful completion: each of the three parts is marked Complete, Partial or Missing. The late policy applies as for homework. Submission is on <a href="https://www.gradescope.com/courses/1390633/assignments/8688421" target="_blank" rel="noopener">Gradescope</a>.</p>
+    <p>Reflections are graded on thoughtful completion: each of the three parts is marked Complete (does what its prompt asks, in your own thinking), Partial (a real attempt that misses some of it, such as a summary that never reaches the main claim) or No credit (empty, or no real effort). "About 5 sentences" is a rough guide. The late policy applies as for homework. Submission is on <a href="https://www.gradescope.com/courses/1390633/assignments/8688421" target="_blank" rel="noopener">Gradescope</a>.</p>
+    <p><strong>AI use.</strong> Read the article and write the reflection yourself. You may ask AI to explain a term or an idea in the article, but not to summarize it or tell you what it argues. Light editing (grammar, spelling, trimming) is allowed if you say so on the submission form.</p>
   </div>
 
   <h2>In class today</h2>
@@ -1689,7 +1777,7 @@ void findsTheOnlyMatch() {
   <details class="notes" open>
     <summary>Teaching notes</summary>
     <ul>
-      <li>For the discussion, it helps to know each article's one-line answer to "what do you know?": Willison, what you watched work and what your test re-checks; Fishman, what a strict, recorded process makes very likely; Hoare, what careful engineering and testing make reliable in practice, without proof.</li>
+      <li>For the discussion, it helps to know each article's one-line answer to "what do you know?": Willison, what you watched work and what your test re-checks; Fishman, what a planned, recorded process that learns from each mistake makes very likely; Hoare, what the ordinary practices of engineering make reliable in practice, without proof.</li>
       <li>Lecture 3's further reading connects back: the Rule of Repair ("fail noisily and as soon as possible") is exactly what the copy of <code>Sum</code> without its count check breaks.</li>
     </ul>
   </details>
@@ -1758,7 +1846,7 @@ void findsTheOnlyMatch() {
     <section>
       <h3>Testing (Lecture 4)</h3>
       <p>Code is correct if it meets its spec. Test = chosen input, expected behavior <em>from the spec</em>, run, compare. Tips: allowed inputs only; each method separately; exhaustive when few inputs; each case and each boundary.</p>
-      <p>Specification-based tests pass every correct implementation; implementation-based ones may fail a correct one. Testing refutes, never confirms.</p>
+      <p>Specification-based tests pass every correct implementation; implementation-based ones may fail a correct one. Short of testing every allowed input, testing refutes and never confirms.</p>
     </section>
     <section>
       <h3>Coverage (Lecture 5)</h3>

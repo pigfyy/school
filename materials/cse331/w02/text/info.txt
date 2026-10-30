@@ -1,0 +1,562 @@
+CSE 331: Syllabus
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          Course StructurePrerequisites
+Goals
+Topics
+Textbook
+Lectures
+Sections
+Homework
+Exams
+Getting Help
+
+Homework MechanicsSubmission
+Regrades
+
+PoliciesInclusiveness
+Late Policy
+Collaboration
+AI Assistance
+Academic Integrity
+Accommodations
+Wellbeing
+
+GradingCourse Grades
+
+Exam Mechanics
+Advice For Students
+
+        CSE 331: Syllabus
+
+Students are expected to be familiar with all of the information below.
+Read it fully and carefully.
+
+Course Structure
+
+Prerequisites
+
+The course assumes knowledge of the Java programming language at the level
+covered in CSE 123. Among other things, we assume that all students are
+familiar with writing recursive methods and with data structures
+such as binary search trees.
+
+Goals
+
+The goals of this course are to teach students to:
+
+Organize software so that it is easy to test, understand, and change.
+
+Write precise specifications for individual components so that the only
+  implementations satisfying the specification are the ones intended.
+
+Understand which bugs are caught by the type system and which are not.
+
+Choose test cases that meet industry standards for coverage.
+
+Ensure that implementations are fully correct for all inputs
+  through reasoning.
+
+Practice defensive programming so that any bugs not caught by the type
+  system, testing, or reasoning are quickly visible and easy to debug.
+
+Topics
+
+The course topics will include both software design and implementation.
+
+Design topics will focus on writing precise specifications, first for
+individual methods and then for classes (via abstract data types). Later, we
+will discuss ways to make certain kinds of bugs impossible, either with
+the type system or with design patterns, and ways to make our designs more
+extensible with subtyping and generics.
+
+Implementation topics will focus on ensuring that code is fully correct for
+all inputs, which is achieved only through reasoning.
+
+Textbook
+
+There is no required textbook for the course. However, the lecture slides will
+at times make reference to the following book, which may be a useful reference
+for students working in Java:
+
+Effective Java by Joshua Bloch, 3rd Edition, Addison-Wesley, 2018.
+
+Lectures
+
+Lecture will be in person in SAV 260: lecture A meets MWF
+12:30–1:20, and lecture B meets MWF 1:30–2:20. Lecture will be
+recorded and posted on Panopto, linked from Canvas.
+You are welcome to attend either lecture.
+
+We have found that success in the course is correlated with in-person
+lecture attendance. Most lectures will have in-class activities
+involving discussion with peers and a brief written response on paper.
+These activities are graded on completion and count toward coursework (see
+Grading).
+
+We recommend students take notes on paper. If you would like to take notes
+digitally, please use a tablet or other device that lays flat on the desk. If
+you must use a device whose screen is upright and visible to those behind you,
+then please sit in the back row.
+
+Sections
+
+Each week includes a TA-led quiz section. These will not be recorded, but
+the printed material used will be posted on this website.
+
+Past experience indicates that section attendance is extremely
+important for being successful in the course. Similar to lecture, most
+sections will have in-class activities, graded on completion as part of
+coursework. If you cannot make your own section one week, you may attend
+another section that week instead; its activity counts the same.
+
+Homework
+
+Homework will be a mix of worksheet-style problems and programming problems.
+
+Occasionally, we will discover errors in the problems after they are posted
+(typically, just small typos). If (and only if) we believe there is potential
+for students to submit correct solutions to the earlier version, we will
+announce the correction on the message board. In particular, we will not
+announce it if the earlier version is obviously nonsensical. (Most typos fall
+into this category.)
+
+Exams
+
+The course will have a midterm exam and a final exam. See the Exam Mechanics
+section below for further details.
+
+Getting Help
+
+Students can ask questions at any time on the message board. They should
+receive a response within a day.
+
+Each member of the course staff will have at least one office hour every week,
+where students can get one-on-one help. See the home page for times and
+locations.
+
+Homework Mechanics
+
+Submission
+
+Homework will be turned in via Gradescope. After each assignment is
+reviewed by TAs, students will be able to see their feedback in Gradescope.
+
+Regrades
+
+If grading mistakes occur, students should bring them to the attention of
+the staff and see that they are corrected. They can do so by requesting a
+regrade in Gradescope, with the following caveats:
+
+We will only entertain regrade requests for one week after the grades are
+  initially posted. In particular, students searching for extra points late
+  in the quarter by requesting regrades of problems from early assignments will
+  be ignored.
+
+While regrades can (and should) be used to fix mistakes where a correct
+  solution is mistakenly marked incorrect, they cannot (and should not) be used
+  to request changes to amounts of points deducted for errors. Deductions are
+  applied consistently to all students. We will not give one student a smaller
+  deduction than others who made the same (or very similar) mistakes, so do not
+  ask us to do so.
+
+Policies
+
+Inclusiveness
+
+Students should expect and demand to be treated with respect by their classmates
+and the course staff. All students belong here, and the staff is here to help
+them learn and enjoy a challenging course. If any incident occurs that
+challenges this commitment to a supportive and inclusive environment, students
+should let the staff know so the issue can be addressed. You can use the
+anonymous feedback tool if you would like
+to tell us something anonymously.
+
+Late Policy
+
+All assignments (homework, readings, and the project) are due Fridays
+at 11:59pm. That is a real deadline: it is when we expect your work
+to be submitted.
+
+But we know things come up, and we want to accommodate different needs
+and unforeseen issues. The staff do not have the capacity to handle
+individual exceptions, so instead you can unlock one late day for each
+assignment, with no penalty, by starting early:
+
+Make progress and submit by Friday to unlock the late day.
+  Then you may submit again through Saturday at 11:59pm.
+
+Each part needs its own Friday submission.
+  Some assignments have separate parts on Gradescope,
+  like HW1 Written and HW1 Coding.
+  A Friday submission to one part does not unlock another.
+  Within a part, a Friday submission still missing a file counts.
+
+Otherwise, there is no late day.
+  If you do not make progress and submit by Friday,
+  anything you submit after Friday scores zero.
+
+You do not need an emergency to use the late day. If you finished on time,
+you can use it to polish or correct your work.
+
+We expect a good-faith effort to get things in on time. Uploading the
+starter code, or making only minor changes to it, abuses this generous
+policy, and that is academic misconduct. See
+Academic Integrity.
+
+For a serious emergency, email the instructors.
+
+Collaboration
+
+Students are allowed to discuss homework problems with others, but they must
+write or type their solution individually, without assistance.
+
+Student solutions are not group work. Students can work together to solve
+problems, but then, they must leave the group, taking no written or
+electronic records of group work with them; wait at least 20 minutes;
+and then write up their solution on their own, unassisted.
+
+This policy clearly precludes copying code or other solutions off of the
+Internet. Hence, students should not consult the Internet for problems or
+key-phrases. This includes Google, Stack Overflow, reddit, and any other
+website. However, students may consult the internet for ideas, definitions, and
+understanding general concepts.
+
+Each student should keep anything they plan to submit as a solution completely
+private. Under no circumstances should they give a copy of their code or
+written work to another student or post it on the internet.
+
+AI Assistance
+
+This course follows the Allen School's shared AI policy template 4, AI for
+Support and Growth
+(Allen School version),
+with this course's authorized graded work filled in below.
+
+Overview
+
+You may use AI for general course questions and ungraded work. You may also
+use AI on graded work when that work is specifically listed in Authorized
+Graded Work. AI is not allowed on any graded assignment that is not included
+in the authorized list. Read the full policy carefully before using AI.
+
+Definition of AI
+
+For this policy, "AI" refers to generative AI systems that can produce or
+modify text, code, images, audio, video, or other content — whether in a
+single response to a prompt or by operating autonomously across multiple
+steps (e.g., chatbots such as ChatGPT, Claude, and Gemini; code assistants
+and agents such as GitHub Copilot, Cursor, and Claude Code; and AI-powered
+writing, translation, and image-generation tools). This includes AI features
+built into IDEs, operating systems, or browsers when they generate or
+substantially rewrite content, but excludes non-generative tools such as
+basic spell-check, grammar/syntax highlighting, and linters.
+
+Rationale
+
+AI can be valuable for exploring concepts, practicing skills, and developing
+one's capabilities. AI use is allowed on some assignments to give you
+experience working with these tools to supplement and grow your own
+knowledge. However, you are still ultimately responsible for your own
+learning, and some assignments will require you to demonstrate your
+knowledge and skills without the use of AI.
+
+Authorized Graded Work
+
+AI use is permitted only for the following graded work:
+
+Reading reflections, for light editing only: grammar, spelling, and
+  trimming.
+
+Programming tasks whose handout explicitly authorizes AI. The handout
+  states any limits, and for that task you may put its prompt and starter
+  code into an AI tool.
+
+AI use is not allowed on any graded assignment that is not listed above. The
+instructor may provide additional instructions or limits for any authorized
+activity.
+
+Permitted Actions
+
+You may use AI for general questions and support–including concept
+  explanations, study questions, practice problems, ungraded exercises, and
+  exploratory coding–on all work.
+
+You may use AI to help develop your submissions only for the specific
+  assignments listed in Authorized Graded Work, subject to any instructions
+  or limits stated for that activity.
+
+Prohibited Actions
+
+Do not use AI to produce work you submit on any graded assignment that is
+  not listed under Authorized Graded Work.
+
+Do not use AI in ways that exceed the stated limits for an authorized
+  graded activity.
+
+Do not submit AI-generated work, or lightly edited AI-generated work, as
+  your own when the activity's instructions require work to be independently
+  produced.
+
+If an assignment has stricter rules, those rules override this policy for
+  that assignment.
+
+Examples
+
+Allowed: using AI to explain a concept, generate practice questions, or
+  help you study for a quiz.
+
+Allowed: using AI on an ungraded practice exercise or exploratory code that
+  will not be submitted for credit.
+
+Allowed: using AI to help produce your submission on a graded assignment if
+  that activity is listed under Authorized Graded Work.
+
+Not allowed: using AI to fix a bug or rewrite a proof for you on an
+  assignment that is not listed under Authorized Graded Work.
+
+Not allowed: copying work produced by an AI into your submission that is
+  not listed under Authorized Graded Work.
+
+Required Attribution
+
+If you utilized AI on an authorized assignment, specify the tool you used and
+how you utilized it in your work.
+
+Example: "Used ChatGPT to produce an initial solution to all problems, which I
+then refined and corrected."
+
+Guidelines for Effective AI Use
+
+Before using AI on graded work, confirm that the activity is listed under
+  Authorized Graded Work and review any activity-specific instructions.
+
+Use AI to expand your thinking, not to replace it.
+
+Verify AI output carefully; AI can be inaccurate, incomplete, biased, or
+  inconsistent with course expectations.
+
+Maintain control of your work: you should be able to explain and defend
+  every part of what you submit.
+
+When in doubt, err on the side of not using AI and ask the course staff for
+  clarification.
+
+Data Privacy Expectations
+
+Do not upload course-specific materials—including assignment prompts,
+  course code, datasets, class notes, hidden tests, solution keys, or other
+  restricted content—to AI tools without the instructor's explicit approval.
+
+Some AI tools (e.g., Cursor, Claude Code, and similar coding agents) can
+  automatically access files beyond what you explicitly share — including
+  your entire local repository, file system, or connected accounts. Before
+  using such a tool, confirm what it can access and restrict or scope that
+  access so it does not read private repositories, hidden test files, other
+  students' code, solution keys, or other restricted materials without your
+  intent.
+
+Do not submit personal, sensitive, or university-protected information into
+  AI tools.
+
+Be aware that prompts and outputs may be stored or reused by third-party AI
+  providers.
+
+UW's Purple tool and certain GenAI tools provided by the Allen School for
+  use in courses are designed specifically for UW students and staff and have
+  stronger privacy protections than public commercial tools. When AI usage is
+  permitted, using Purple or Allen School-provided tools is advised if
+  possible.
+
+Academic Integrity
+
+Using AI in ways prohibited by this policy or by assignment-specific
+instructions will be considered academic misconduct and referred to CSSC.
+Students found responsible for violating this policy will, at minimum,
+receive no credit for the affected assignment. Stronger penalties, up to and
+including failing the course, may apply for repeated or egregious violations.
+In cases of group work, all students will be held equally responsible for
+violation unless there is clear evidence that a subset of team members were
+not involved or aware.
+
+Accommodations and Approved Exceptions
+
+Students with accessibility needs or other extenuating circumstances should
+contact the instructor to discuss exceptions. Accommodations or exceptions
+require instructor approval before they are used.
+
+AI Acknowledgment
+
+The course staff use AI tools to help draft and revise course materials: the
+lecture notes, slides, handouts, and this site. We make considerable effort to
+double check things before they are published, but if something seems wrong (or
+even just hard to follow!), tell us on Ed; we want to know.
+
+Your work is graded by people, not by AI: an autograder runs the staff tests
+along with your own tests, and the staff grade the rest by hand.
+
+Academic Integrity
+
+As noted above, the staff expects each student to write their own solutions,
+independently. Attempting to misrepresent another student's solution as their
+own would be unfair to the other students in the course and constitute academic
+misconduct in violation of the Allen School
+policy. Any such violation
+will be reported to the University, and the instructors will make every attempt
+to ensure the harshest allowable penalty.
+
+Note that, in cases where one student copies the solution of another, both
+students have violated the policy and both will be reported. Again, all
+students should keep their solutions private.
+
+If a student is ever unclear about whether their discussions with other students
+went over the line, they should (a) ask and (b) describe their collaboration
+clearly on their assignment. If they do, the worst that will happen is losing
+some points. That is much better than the alternative.
+
+Accommodations
+
+Please refer to university policies regarding disability
+accommodations.
+
+Washington state law requires that UW develop a policy for accommodation of
+student absences or significant hardship due to reasons of faith or
+conscience, or for organized religious activities. The UW's policy, including
+more information about how to request an accommodation, is available at
+Religious Accommodations Policy.
+Accommodations must be requested within the first two weeks of this course
+using the Religious Accommodations Request
+form.
+
+Wellbeing
+
+If you are struggling, please reach out to us or to these resources:
+
+The Allen School's mental health consultant, John Rumney, meets with
+  Allen School students for free and in confidence, Monday through Friday,
+  in person or online: same-day 15-minute drop-ins, or 30-minute
+  appointments. Visits are brief, informal consultations, not a substitute
+  for therapy, counseling, or psychiatric care.
+  Schedule a visit.
+
+UW's Husky Mental Health
+  Resources
+  page lists the mental health resources on campus.
+
+Grading
+
+Course Grades
+
+Your course grade combines two scores: coursework and exams.
+
+Coursework score (C) is the weighted average of:
+
+60%: homework and the project
+
+20%: reading reflections
+
+20%: in-class activities in lecture and section, graded on completion;
+  we drop your 5 lowest
+
+Exam score (E) is the weighted average of the midterm (40%) and the
+final (60%), or the final alone if that is higher.
+
+Your course grade is the lower of your exam score and your coursework score,
+where coursework at 90% or above counts as 100%:
+
+course grade = min(E, C / 0.9), where C / 0.9 is capped at 100%
+
+In words:
+
+Your exams set your grade. Coursework cannot raise it above your exam score.
+
+Coursework can lower it: if C is below 90% of E, your grade is C / 0.9.
+
+Coursework past 90% earns nothing extra, so there is no reason to polish
+  it further, with AI or otherwise. Spend that time learning the material.
+
+For example:
+
+Exams 85%, coursework 95%: coursework counts as 100%, so the grade is 85%.
+
+Exams 85%, coursework 72%: coursework counts as 80% (72 / 0.9), so the
+  grade is 80%.
+
+Midterm 60%, final 90%: the final alone (90%) beats the mix (78%), so E is
+  90%.
+
+Exams show what you can do on your own, so they set the grade. Coursework is
+where you learn to do it, so you cannot skip it.
+
+Exam Mechanics
+
+There will be a midterm exam and a final exam.
+
+The midterm exam will be held in lecture on Friday, November 13.
+
+The final exam will be held on Tuesday, December 15, 12:30–2:20:
+lecture A in BAG 131, and lecture B in BAG 154.
+
+If you have a conflict with either exam, please contact course staff as soon as
+possible and at least a week in advance of the exam.
+
+Students must bring their UW ID and have it ready to be checked during the exam.
+You may bring one sheet of notes to each exam: letter size, handwritten,
+both sides. Otherwise the exams are closed notes, with no electronics.
+
+The exams ask about the concepts the course teaches. The homework is designed
+to help you learn those concepts, so doing it carefully is good preparation.
+
+Advice For Students
+
+Prefer the message board to office hours. Office hours get very busy,
+  especially in the last 48 hours before assignments are due. (Yet another
+  reason to start early is so that students can attend office hours that are
+  less busy.) Since a message board answer can take up to a day, ask early.
+
+Do not skip class to work on homework, not even late in the quarter when
+  students are more tired and busy. Doing so often seems like it will save time
+  in the short run, but it will cost time in the long run.
+
+Think about which lecture material applies to that homework problem. Each
+  assignment is intended to apply ideas from lecture, so if it does not seem
+  that any lectures apply to a given problem, it is nearly certain that the
+  student did not understand some part of some lecture.
+
+Do not blindly trust outside resources. Most people do not program like we
+  do in this course. A student's goal should be to solve homework problems "like
+  a 331 student" and not "like an average programmer". Outside resources may
+  mislead you about what we are trying to teach you.
+
+Focus on understanding, not on getting points. A student's understanding of
+  the material, not the points they received, is what will get them a job and
+  ensure a successful career as a programmer.
+
+    UW Site Use Agreement

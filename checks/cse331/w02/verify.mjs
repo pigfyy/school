@@ -348,6 +348,20 @@ for (const stdin of ["3 4 5", "1 2 three 4", "2147483647 1", "", "2147483648", "
     const body = (n) => { let c = 0; for (let i = 1; i <= n; i++) c++; return c; };
     ok("practice", keyOf("cse331-w2-l5-plan-tests", "fewest") === "3" && body(0) === 0 && body(1) === 1 && body(3) > 1, "sumUpTo needs three tests (0, 1, many body runs)"); }
   ok("practice", quizKey("cse331-w2-q2-fewest-tests") === "2", "two tests are the least");
+  { // Section 1 slides: square-root specs S1-S3, compared by enumerating every outcome on small inputs
+    const OUT = [...Array.from({ length: 11 }, (_, i) => i - 5), "throw"];
+    const SQ = {
+      S1: { pre: (x) => x >= 0, ok: (x, y) => y !== "throw" && y * y === x },
+      S2: { pre: (x) => x >= 0, ok: (x, y) => y !== "throw" && y * y === x && y >= 0 },
+      S3: { pre: () => true, ok: (x, y) => (x < 0 ? y === "throw" : y !== "throw" && y * y === x && y >= 0) },
+    };
+    const xs = Array.from({ length: 30 }, (_, i) => i - 5);
+    const st = (a, b) => xs.every((x) => !SQ[b].pre(x) || (SQ[a].pre(x) && OUT.every((y) => !SQ[a].ok(x, y) || SQ[b].ok(x, y))));
+    const rel = (a, b) => (st(a, b) && st(b, a) ? "same" : st(a, b) ? "stronger" : st(b, a) ? "weaker" : "incomparable");
+    const meets = ["S1", "S2", "S3"].filter((s) => SQ[s].ok(4, -2));
+    ok("practice", keyOf("cse331-w2-s1-sqrt-specs", "s2-s1") === rel("S2", "S1") && keyOf("cse331-w2-s1-sqrt-specs", "s3-s2") === rel("S3", "S2") && keyOf("cse331-w2-s1-sqrt-specs", "minus-two") === (meets.join() === "S1" ? "s1" : meets.join()), `sqrt specs: S2/S1 ${rel("S2", "S1")}, S3/S2 ${rel("S3", "S2")}, -2 meets ${meets}`);
+    const qcAt = html.indexOf('data-id="cse331-w2-s1-qc-sqrt"'); ok("practice", attr(html.slice(qcAt, html.indexOf(">", qcAt)), "data-answer") === rel("S2", "S1"), "sqrt quick check");
+  }
   console.log(`practice keys: ${counts.practice} checks`);
 }
 

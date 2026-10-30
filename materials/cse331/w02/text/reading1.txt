@@ -1,0 +1,183 @@
+CSE 331 Reading 1
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          ArticlesWillison 2025, Your job is to deliver code you have proven to work
+Fishman 1996, They Write the Right Stuff
+Hoare 1996, How Did Software Get So Reliable Without Proof?
+
+ExtrasCook 1998, How Complex Systems Fail
+Leveson and Turner 1993, An Investigation of the Therac-25 Accidents
+Thompson 1984, Reflections on Trusting Trust
+
+Submit
+
+        CSE 331 Reading 1
+
+Due Friday, October 2 at 11:59pm (late policy).
+
+Our motto for this course is: Your job is to deliver code that you
+know works. When you say you know your code works, what do you
+actually know, and how did you come to know it?
+
+The three articles below answer differently. Willison says you know
+when you have seen the code do the right thing yourself and have a
+test that proves it. Fishman reports on the group that wrote the
+space shuttle's software, whose last three versions had one error
+each, and finds the reason in their process, not their people. Hoare
+asks how software got so reliable when almost none of it was proved
+correct, and answers that programmers use the same techniques as
+every other kind of engineer.
+
+Your task: Choose one article, read it, and write a reflection.
+See the readings page for information on what you need
+to submit and how reflections are graded. When you are done, submit on
+Gradescope as described in the "Submit" section below.
+
+Each title below is a link to the original. If for any reason a
+link does not work, you can also use the "cached" links, which point
+to copies stored on UW servers: a PDF of each article and, for some,
+an HTML version that is easier to read with a screen reader or on a
+phone. (Cached links require UW NetID login).
+
+Articles
+
+Willison 2025, Your job is to deliver code you have proven to work
+
+Willison wrote this about programmers who hand large, untested,
+AI-written changes to code review and expect the reviewer to find the
+problems. Proving that a change works is the programmer's job, he
+says, and it takes two steps, neither optional. First, test it by
+hand: get the system into a known state, exercise the change, and
+show your reviewers that it did what you meant. Second, write an
+automated test that fails if the change is reverted. A coding agent
+must prove its changes the same way, and the human stays accountable
+for them. About 5 minutes to read
+(cached: PDF,
+HTML).
+
+Fishman 1996, They Write the Right Stuff
+
+Fishman reports on the 260 people who wrote the software that flew
+the space shuttle. Their last three versions, each 420,000 lines
+long, had one error each. The group has no superstars, and nothing in
+its process depends on any one person. The product is only as good as
+the plan for it: about a third of the work happens before any code is
+written, and no line changes without a change to the specification.
+The coders and the testers are rival teams, each trying to find the
+errors first. And a mistake is never just fixed: the group asks what
+let it through, fixes the process, and looks for the same mistake
+elsewhere. The group's manager says yes, the process stifles
+creativity, and Fishman says that is the point: nobody improvises
+code that flies a spaceship. About 20 minutes to read
+(cached: PDF,
+HTML).
+
+Hoare 1996, How Did Software Get So Reliable Without Proof?
+
+Hoare helped invent the logic for proving programs correct. The paper
+opens on a prediction from twenty years earlier, that unreliable
+programs would cap the size of software. Instead, telephone exchanges
+run on tens of millions of lines of code, and almost none of it was
+ever proved. Hoare asks why the prediction failed, and finds the
+answer in the practices of every other branch of engineering: design
+reviews at every stage, testing planned before the code is written,
+errors removed from products already in use, and over-engineering.
+Testing cannot show the absence of bugs, so his view of a test is the
+quality controller's: a test checks the methods that produced the
+code, not the code, and a failing test means fixing the process and
+not just the product. Proof itself has played a small direct role,
+but the theory behind it gave practice structured programming, types,
+and information hiding. About an hour to read
+(cached: PDF,
+HTML).
+
+Extras
+
+These are optional. You may bring one into your reflection if you
+connect it to the article you chose.
+
+Cook 1998, How Complex Systems Fail
+
+Cook is a physician who studies safety in hospitals and other
+hazardous systems. The essay is eighteen numbered claims about how
+such systems fail, and why they usually do not. Such systems are
+always partly broken, and keep working because people catch problems
+as they come up. A catastrophe needs several small failures at once.
+So blaming an accident on one root cause is a mistake. Hindsight
+makes the warning signs look plainer than they were. The fixes made
+after an accident usually add complexity instead of safety. He never
+mentions software. About 10 minutes to read
+(cached PDF).
+
+Leveson and Turner 1993, An Investigation of the Therac-25 Accidents
+
+The Therac-25 was a radiation therapy machine controlled by software.
+Between 1985 and 1987 it gave six patients massive
+overdoses.1 Leveson, then at UW, and Turner reconstruct the
+accidents from public records. They find real bugs, but argue that
+blaming the bugs misses the point: most accidents are system
+accidents, with many contributing causes, and naming a single cause
+is usually a serious mistake. Earlier machines had hardware
+interlocks to block unsafe operation; the Therac-25 relied on
+software instead. More than once the manufacturer fixed one fault and
+declared the machine safe. Among the lessons they draw: there is
+always another bug, and a design must stay safe when the software
+fails. About two hours to read
+(cached PDF).
+The Wikipedia article
+covers the same events in about 20 minutes
+(cached PDF).
+
+Thompson 1984, Reflections on Trusting Trust
+
+Thompson is one of the creators of Unix. In this short lecture he
+shows how to hide a back door in a compiler so that it persists even
+after it is removed from the compiler's source code. His point is
+that reading a program's source cannot tell you everything the
+program does. You also have to trust the tools that built it, and the
+people who wrote those tools. The examples are in C, and the last few
+paragraphs are about hackers in the 1984 news. About 10 minutes to
+read, longer if you work through the code
+(cached: PDF,
+HTML).
+
+Submit
+
+Submit your reflection on
+Gradescope
+by Friday, October 2 at 11:59pm. The Gradescope assignment will ask
+you which article you read and whether you used AI for editing, and
+it has spaces for you to write your reflection. See the readings
+page for more information.
+
+Content note: both the paper and the Wikipedia article
+describe patients' injuries and deaths in detail. ↩
+
+    UW Site Use Agreement

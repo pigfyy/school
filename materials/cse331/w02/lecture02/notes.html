@@ -26,6 +26,32 @@
     padding: 0.5em 1em;
     margin: 1em 0;
   }
+  /* A table in the notes, written in Markdown or as HTML: the
+     page's width, rules around every cell, room in each cell, and
+     the headers of rows and columns set off. A listing is a table
+     too, with a class from Pygments, which this leaves alone. */
+  main table:not([class]) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+  }
+  main table:not([class]) th,
+  main table:not([class]) td {
+    border: 1px solid #ccc;
+    padding: 12px 16px;
+    line-height: 1.6;
+    vertical-align: top;
+  }
+  main table:not([class]) th {
+    background: #f0f0f5;
+  }
+  /* A blank corner, where the row headers meet the column headers,
+     is a plain empty cell with no top or left border, so the two
+     runs of headers meet at an open corner. */
+  main table:not([class]) tr:first-child > td:first-child:empty {
+    border-top: none;
+    border-left: none;
+  }
   .lecture-modes { float: right; font-size: 0.9em; }
 </style>
 
@@ -403,10 +429,11 @@ last lecture's double braces:</p>
 postcondition says what is in the returned list. Line 8 stores that
 list in <code>list</code>. So the claim holds after line 8. The claim is last
 lecture's assertion at <code>(1)</code>. This time it came from a specification
-instead of a loop. The argument uses last lecture's P, code, Q rule,
-with a call as the code. The precondition is P, and the postcondition
-is Q. The specification promises that running the call from any state
-in which P is true ends in a state in which Q is true.</p>
+instead of a loop. The argument uses last lecture's <code>P</code>, code, <code>Q</code>
+rule, with a call as the code. The precondition is <code>P</code>, and the
+postcondition is <code>Q</code>. The specification promises that running
+the call from any state in which <code>P</code> is true ends in a state
+in which <code>Q</code> is true.</p>
 <p>The same rule covers the call on line 10. <code>readList</code> promised a list,
 so <code>list</code> is not <code>null</code>, as the precondition of <code>sumList</code> requires.
 The call then returns the wrapped sum of the elements of <code>list</code>.
@@ -539,8 +566,8 @@ promises more is met by fewer implementations. That fact gives a way
 to compare two specifications directly.</p>
 <div class="admonition note">
 <p class="admonition-title">Definition: stronger and weaker</p>
-<p>An assertion P is <strong>stronger</strong> than an assertion Q if Q is true
-whenever P is. A specification S1 is <strong>stronger</strong> than a
+<p>An assertion <code>P</code> is <strong>stronger</strong> than an assertion <code>Q</code> if <code>Q</code> is
+true whenever <code>P</code> is. A specification S1 is <strong>stronger</strong> than a
 specification S2 if every implementation that meets S1 also meets
 S2.</p>
 <p>In either case the second is <strong>weaker</strong> than the first, and two
@@ -912,8 +939,8 @@ authors can read each other's specifications.</p>
   from, and Chapter 4 advises, for a procedure used beyond its
   immediate context, an exception instead of a requires clause unless
   the condition cannot be checked or is very expensive to check.</li>
-<li><strong>A method's contract.</strong> Joshua Bloch, <em>Effective Java</em>, second
-  edition (2008), Item 44, says what a method's documentation owes
+<li><strong>A method's contract.</strong> Joshua Bloch, <em>Effective Java</em>, third
+  edition (2018), Item 56, says what a method's documentation owes
   its client: what the method does rather than how, with its
   preconditions, postconditions, and side effects. Bloch reads a
   documented unchecked exception as marking a precondition the

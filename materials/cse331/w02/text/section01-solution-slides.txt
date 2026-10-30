@@ -1,0 +1,600 @@
+--- slide 1 ---
+CSE 331Software Design &amp; Implementation
+
+Autumn 2026
+Section 1 – Specifications
+
+--- slide 2 ---
+Welcome!
+Let’s all introduce ourselves:
+Name and pronouns
+Year
+Anything fun you’re going to be doing this quarter?
+Would you rather be a dinosaur or a unicorn and why?
+
+--- slide 3 ---
+Homework Cycle
+Section:
+Every Tuesday
+Content review &amp; practice problems
+
+Participation:
+Lecture &amp; section graded on participation (half-sheets)
+5 absences, and a 90% coursework grade is full credit, see syllabus for details
+
+Homework:
+Released Friday @ 12:00
+Due on Gradescope @ 11:59pm Friday
+make progress &amp; submit by Friday gives one late day
+
+--- slide 4 ---
+Review - Abstraction
+Hides unnecessary details from clients via specification
+Creates an Abstraction Barrier between clients and implementers
+Implementers promise that the code follows the specification
+Clients promise not to rely on details outside the specification
+
+--- slide 5 ---
+Documenting Methods w/ JavaDoc
+JavaDoc comments use “tags” to describe what methods do
+/**
+ * High level description of what function does
+ * @param a + What &quot;a&quot; represents + any conditions about a
+ * @requires Rules about multiple params
+ * @returns Detailed description of return value
+ * @throws Condition when errors will be thrown
+ */
+For methods that mutate variables/state, will have 2 additional tags to describe mutation
+ * @modifies states what could be mutated by function
+ * @effects Detailed description of guaranteed changes
+
+*Note: @requires, @modifies, and @effects are all unique to 331
+
+--- slide 6 ---
+Spec/Impl Lecture Exercise
+// Spec B
+// @requires 0 &lt;= lo &lt;= hi &lt;= a.length
+// @returns the *smallest* index i with lo &lt;= i &lt; hi and a[i] == x,
+//          or -1 if no such index exists
+
+// Spec D
+// @requires 0 &lt;= lo &lt;= hi &lt;= a.length
+// @returns *some* index i with lo &lt;= i &lt; hi and a[i] == x,
+//          or -1 if no such index exists
+
+// Impl 1
+public static int indexOf(int[] a, int lo, int hi, int x) {
+   for (int i = lo; i &lt; hi; i++) {
+       if (a[i] == x) {
+           return i;
+       }
+   }
+   return -1;
+}
+When spec B is satisfied, spec D is also satisfied!
+(311 implication)
+What do you notice about these two specs and Impl 1?
+style.visibility
+
+--- slide 7 ---
+Review: Stronger vs Weaker Assertions
+An assertion is stronger if and only if it holds in a subset of states
+A stronger assertion implies the weaker one 
+This means that if the stronger assertion is true, then the weaker assertion must also be true.
+
+Below, Q2 is the stronger assertion as knowing Q2 is true tells us that Q1 is true. However, knowing Q1 is true doesn’t tell us Q2 is true.
+
+--- slide 8 ---
+Review: Stronger vs Weaker Specs
+Specification S1 is stronger than S2 if it has…
+a weaker (or equal) precondition, and
+a stronger (or equal) postcondition
+In this case, we also say S2 is weaker than S1 
+If neither is stronger than the other, then they are incomparable
+
+P2
+P1
+precondition
+postcondition
+
+Q1
+Q2
+
+--- slide 9 ---
+Question - Specifications
+Which of the two specs is stronger?:
+
+/** Returns the square root of a given number x
+ * @requires x &gt;= 0
+ * @return the integer y such that y^2 = x
+ */
+
+Or
+/** Returns the square root of a given number x
+ * @requires x &gt;= 0
+ * @return the integer y such that y^2 = x and y &gt;= 0
+ */
+
+--- slide 10 ---
+Question - Specifications
+Which of the two specs is stronger?:
+
+/** Returns the square root of a given number x
+ * @requires x &gt;= 0
+ * @return the integer y such that y^2 = x
+ */
+
+Or
+/** Returns the square root of a given number x
+ * @requires x &gt;= 0
+ * @return the integer y such that y^2 = x and y &gt;= 0
+ */
+
+--- slide 11 ---
+Accepting more generic @params increases specification strength (same params w/ less restrictions)
+We’ll talk about this later with generics
+
+Adding more to @requires decreases specification strength
+Strengthens the precondition (takes in less inputs)
+Ex: param List lst must be sorted is more restrictive = stronger precondition = weaker spec than no requirement about order
+Specification Strength: Precondition
+
+--- slide 12 ---
+Adding more to @returns increases specification strength
+Strengthens the postcondition
+
+@throws still specifies behavior, so it is stronger than @requires
+Still accepts that input and defines the behavior for it
+
+Specification Strength: Postcondition
+
+--- slide 13 ---
+New Notation for Task 1 &amp; 2
+We use the notation a[i..j] to refer to the elements of an array a from index i (inclusive) to j (exclusive). So a[0..n] is the elements of a at indices 0, 1, ..., n-1.
+
+--- slide 14 ---
+Task 1: Spec Comparisons
+{C1EF62FE-79C2-46E0-BF3A-F3F0A529CE53}
+A
+B
+C
+D
+E
+A
+X
+
+B
+
+X
+
+C
+
+X
+
+D
+
+X
+
+E
+
+X
+Using the specs listed, fill in the following table explaining the relationships between each pair of specifications. Write an “S” if the spec on left (the row) is stronger than the spec on top (the column), a “W” if the left spec is weaker, and “-” if the specs are incomparable.
+
+--- slide 15 ---
+Task 1: Spec Comparisons
+A is weaker than everything else.
+
+B is stronger than A because it has a less restrictive precondition and a more restrictive postcondition. 
+
+C is stronger than A for the same reasons as B.
+
+D and A both return an index if x exists in range, but D is stronger because it has a less restrictive precondition.
+
+E is stronger than A because it has a less restrictive precondition and a more restrictive post condition.
+{C1EF62FE-79C2-46E0-BF3A-F3F0A529CE53}
+A
+B
+C
+D
+E
+A
+X
+W
+W
+W
+W
+B
+S
+X
+
+C
+S
+
+X
+
+D
+S
+
+X
+
+E
+S
+
+X
+
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 16 ---
+Task 1: Spec Comparisons
+B is stronger than D, but incomparable with C and E.
+
+B is incomparable with C since they have contradicting postconditions, B wants the smallest index while C wants the largest index.
+
+B is stronger than D since they have the same precondition but the post condition of B is more restrictive.
+
+B is incomparable with E since in the case where x is missing B will return -1 while E throws an exception.
+{C1EF62FE-79C2-46E0-BF3A-F3F0A529CE53}
+A
+B
+C
+D
+E
+A
+X
+
+B
+
+X
+
+C
+
+X
+
+D
+
+X
+
+E
+
+X
+{C1EF62FE-79C2-46E0-BF3A-F3F0A529CE53}
+A
+B
+C
+D
+E
+A
+X
+W
+W
+W
+W
+B
+S
+X
+—
+S
+—
+C
+S
+—
+X
+
+D
+S
+W
+
+X
+
+E
+S
+—
+
+X
+
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 17 ---
+Task 1: Spec Comparisons
+C is stronger than D but incomparable with E.
+
+C is stronger than D because the post condition in C is a more restrictive postcondition but they both have a similar precondition.
+
+C is incomparable with E because the postconditions are fundamentally different in that E throws an exception and C returns -1.
+
+{C1EF62FE-79C2-46E0-BF3A-F3F0A529CE53}
+A
+B
+C
+D
+E
+A
+X
+
+B
+
+X
+
+C
+
+X
+
+D
+
+X
+
+E
+
+X
+{C1EF62FE-79C2-46E0-BF3A-F3F0A529CE53}
+A
+B
+C
+D
+E
+A
+X
+W
+W
+W
+W
+B
+S
+X
+—
+S
+—
+C
+S
+—
+X
+S
+—
+D
+S
+W
+W
+X
+
+E
+S
+—
+—
+
+X
+
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 18 ---
+Task 1: Spec Comparisons
+D and E are also incomparable.
+
+D and E are incomparable because they have fundamentally different post conditions. Spec E will throw an exception but Spec D will return -1 on cases where x isn’t in range.
+
+{C1EF62FE-79C2-46E0-BF3A-F3F0A529CE53}
+A
+B
+C
+D
+E
+A
+X
+
+B
+
+X
+
+C
+
+X
+
+D
+
+X
+
+E
+
+X
+{C1EF62FE-79C2-46E0-BF3A-F3F0A529CE53}
+A
+B
+C
+D
+E
+A
+X
+W
+W
+W
+W
+B
+S
+X
+—
+S
+—
+C
+S
+—
+X
+S
+—
+D
+S
+W
+W
+X
+—
+E
+S
+—
+—
+—
+X
+
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 19 ---
+Task 2: Mutable Spec/Impl Satisfaction
+First, what does each implementation do?
+Second, determine which implementations satisfy which specifications and explain your reasoning.
+
+We use the notation a[i..j] to refer to the elements of an array a from index i (inclusive) to j (exclusive). So a[0..n] is the elements of a at indices 0, 1, ..., n-1.
+
+--- slide 20 ---
+Task 2: Mutable Spec/Impl Satisfaction
+
+This is the common prefix of each spec./**
+ * Removes x from the prefix a[0..n] (but see below for details)
+ *
+ * @param a the non-null array to remove from
+ * @param n the length of the prefix
+ * @param x the value to remove
+ * @requires 0 &lt;= n &lt;= a.length
+ * @modifies a
+ */
+
+--- slide 21 ---
+Task 2: Mutable Spec/Impl Satisfaction
+// Spec A
+// @effects if the first occurrence of x in a[0..n] is at index i,
+//   then the new values in a[0..n-1] will be the old values of a[0..i]
+//   followed by the old values of a[i+1..n], and the new value of a[n-1]
+//   is unspecified. else, if x does not occur in a[0..n], leaves a unchanged;  
+// @return n - 1 if x was removed, else n
+
+// Spec B
+// @effects if x does not occur in a[0..n], leaves a unchanged;
+//   otherwise, the new values in a[0..n-1] are a possibly reordered version
+//   of the old values of a[0..n] with one fewer occurrence of x,
+//   and the new value of a[n-1] is unspecified
+// @return n - 1 if x was removed, else n
+
+--- slide 22 ---
+Task 2: Mutable Spec/Impl Satisfaction
+// Spec C
+// @effects if x does not occur in a[0..n], leaves a unchanged;
+//   otherwise, if x occurs k &gt; 0 times in a[0..n], then remove all k
+//   occurrences of x, leaving remaining elements in the same relative
+//   order as before; the new value of elements in a[n-k..n] is unspecified
+// @return n - k
+
+// Spec D
+// @requires a[0..n] contains no duplicates
+// @effects if x does not occur in a[0..n], leaves a unchanged;
+//   otherwise, if x occurs in a[0..n] at index i, then the new values
+//   in a[0..n-1] will be the old values of a[0..i] followed by the
+//   old values of a[i+1..n], and the new value of a[n-1] is unspecified.
+// @return n - 1 if x was removed, else n
+
+--- slide 23 ---
+Task 2: Implementation 1
+// Impl 1
+int w = 0;
+for (int r = 0; r &lt; n; r++) {
+    if (a[r] != x) {
+        a[w] = a[r];
+        w++;
+    }
+}
+return w;
+Impl 1 removes all occurrences of x in a[0..n], leaving remaining elements in order.
+
+Doesn't satisfy A because it requires only one occurrence to be removed.
+B not satisfied for same reason as A.
+Does exactly what C says.
+Also satisfies D because D's precondition (no duplicates) means removing all occurrences is the same thing as removing one occurrence.
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 24 ---
+Task 2: Implementation 2
+// Impl 2
+for (int i = 0; i &lt; n; i++) {
+    if (a[i] == x) {
+        for (int k = i; k &lt; n - 1; k++) {
+            a[k] = a[k + 1];
+        }
+        return n - 1;
+    }
+}
+return n;
+Impl 2 removes the first occurrence of x in a[0..n] by shifting everything left by one.
+
+Does exactly what A says.
+Also satisfies B because B says &quot;possibly reordered&quot;, but reordering is not required, and B doesn't care which occurrence is removed.
+Doesn't satisfy C because it requires all occurrences to be removed.
+Also satisfies D, since under D's precondition, the only occurrence of x is also the first occurrence of x.
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 25 ---
+Task 2: Implementation 3
+// Impl 3
+for (int i = n - 1; i &gt;= 0; i--) {
+    if (a[i] == x) {
+        for (int k = i; k &lt; n - 1; k++) {
+            a[k] = a[k + 1];
+        }
+        return n - 1;
+    }
+}
+return n;
+
+Impl 3 removes the last occurrence of x in a[0..n] by shifting everything left by one.
+
+Doesn't satisfy A because A asks for the first occurrence to be removed, not the last.
+Satisfies B because B says &quot;possibly reordered&quot;, but reordering is not required, and B doesn't care which occurrence is removed.
+Doesn't satisfy C because it requires all occurrences to be removed.
+Also satisfies D, since under D's precondition, the only occurrence of x is also the last occurrence of x.
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 26 ---
+Task 2: Implementation 4
+// Impl 4
+for (int i = 0; i &lt; n; i++) {
+    if (a[i] == x) {
+        a[i] = a[n - 1];
+        return n - 1;
+    }
+}
+return n;
+
+Impl 4 overwrites the first occurrence of x with a copy of a[n-1].
+
+Doesn't satisfy A because it requires relative order to be preserved, but now a[n-1] got moved into the relative position that used to be occupied by x.
+Satisfies B because B allows reordering as long as there is one fewer occurrence of x, which there is, because Impl 4 overwrote one.
+Doesn't satisfy C because C requires removing all occurrences of x.
+D not satisfied for same reason as A.
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 27 ---
+Task 2: Solution Grid
+{C1EF62FE-79C2-46E0-BF3A-F3F0A529CE53}
+A
+B
+C
+D
+1
+N
+N
+Y
+Y
+2
+Y
+Y
+N
+Y
+3
+N
+Y
+N
+Y
+4
+N
+Y
+N
+N
+
+--- slide 28 ---
+End
+Please turn in your half sheets to us as you leave!!!!
+

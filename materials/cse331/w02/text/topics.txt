@@ -1,0 +1,117 @@
+CSE 331: Topics
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          1. Assertions and Specifications
+2. Testing and Interactive Programs
+3. Reasoning
+4. Programs on the Web
+5. Data Abstraction
+6. Exceptions and Subtyping
+
+        CSE 331: Topics
+
+Each topic's lectures, sections, homework, and readings are linked here as
+they are released.
+
+1. Assertions and Specifications
+
+  Lecture 1
+
+  Lecture 2
+
+  Homework 0
+
+  Reading 1
+
+  Homework 1
+
+  Lecture 3
+
+  Section 1 slides
+  and Section 1 solution slides
+
+  Section 1 worksheet
+  and Section 1 solution worksheet
+
+2. Testing and Interactive Programs
+
+  Lecture 4
+
+  Lecture 5
+
+  Lecture 6
+
+  Reading 2
+
+  Section 2 slides
+  and Section 2 solution slides
+
+  Section 2 worksheet
+  and Section 2 solution worksheet
+
+3. Reasoning
+
+  Lecture 7
+
+  Lecture 8
+
+  Homework 2
+
+  Section 3 slides
+  and Section 3 solution slides
+
+  Section 3 worksheet
+  and Section 3 solution worksheet
+
+4. Programs on the Web
+
+  Lecture 9
+
+  Lecture 12
+
+5. Data Abstraction
+
+  Lecture 10
+
+  Lecture 11
+
+  Reading 3
+
+  Section 4 slides
+  and Section 4 solution slides
+
+  Section 4 worksheet
+  and Section 4 solution worksheet
+
+6. Exceptions and Subtyping
+
+  Lecture 13
+
+    UW Site Use Agreement

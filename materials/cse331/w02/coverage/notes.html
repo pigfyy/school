@@ -45,6 +45,13 @@
   main table:not([class]) th {
     background: #f0f0f5;
   }
+  /* A blank corner, where the row headers meet the column headers,
+     is a plain empty cell with no top or left border, so the two
+     runs of headers meet at an open corner. */
+  main table:not([class]) tr:first-child > td:first-child:empty {
+    border-top: none;
+    border-left: none;
+  }
   .lecture-modes { float: right; font-size: 0.9em; }
 </style>
 
