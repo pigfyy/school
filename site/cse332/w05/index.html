@@ -1,0 +1,1143 @@
+<!doctype html>
+<!--
+  CSE 332 (26au) · Week 5 (Mon Oct 26 – Fri Oct 30). Built with the course-teaching-site skill from week 4's page.
+  Sources (materials/cse332/w05/): Lecture 12 Sorting 1, Lecture 13 Sorting 2, Section 5 Hashing and Sorting (both slide
+  decks, both worksheets and both official solutions), the Hashing summary, calendar, tasks.
+  Fri Oct 30 Graphs 1 (Intro to Graphs): no slides posted (checked the calendar and the slides folder on Oct 29), so it is
+  listed as upcoming only. Graded work (EX4, EX5, EX6) is listed by due date only.
+  Every stateful element has a stable data-id. Change the id when the question changes.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE 332 week 5</title>
+<link rel="stylesheet" href="../../core/fonts.css">
+<link rel="stylesheet" href="../../core/base.css">
+<link rel="stylesheet" href="../../core/katex/katex.min.css">
+<link rel="stylesheet" href="week.css">
+</head>
+<body data-course="cse332" data-week="w05">
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+
+<nav class="rail" aria-label="Week 5 modules">
+  <div class="rail-top">
+    <a class="brand" href="#home"><span class="brand-kicker">CSE 332 · week 5</span>Sorting<small>comparison sorts · bucket and radix sort · Section 5</small></a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="rail-body">Menu</button>
+  </div>
+  <div class="rail-body" id="rail-body">
+    <div>
+      <h2>Lecture 12: Sorting 1 <span class="today" data-date="2026-10-26">Mon Oct 26</span></h2>
+      <ol class="modules">
+        <li><a href="#l12-insertion">Sorting, and insertion sort</a></li>
+        <li><a href="#l12-heap">Heap sort</a></li>
+        <li><a href="#l12-practice">Practice</a></li>
+        <li><a href="#l12-quiz">Check your understanding</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 13: Sorting 2 <span class="today" data-date="2026-10-28">Wed Oct 28</span></h2>
+      <ol class="modules">
+        <li><a href="#l13-merge">Merge sort</a></li>
+        <li><a href="#l13-quick">Quicksort</a></li>
+        <li><a href="#l13-linear">Bucket and radix sort</a></li>
+        <li><a href="#l13-practice">Practice</a></li>
+        <li><a href="#l13-quiz">Check your understanding</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Section 5: Hashing and Sorting <span class="today" data-date="2026-10-29">Thu Oct 29</span></h2>
+      <ol class="modules">
+        <li><a href="#s5-hashing">Hashing worksheet, worked</a></li>
+        <li><a href="#s5-sorting">Sorting worksheet, worked</a></li>
+        <li><a href="#s5-practice">Practice</a></li>
+        <li><a href="#s5-quiz">Check your understanding</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Later this week</h2>
+      <ul class="later-list">
+        <li><span>Fri Oct 30 · Lecture 14: Graphs 1 (Intro to Graphs)</span><em>Weiss 9.1 · materials not posted yet</em></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Due</h2>
+      <ul class="later-list">
+        <li><span>Fri Oct 30 · EX4 AVL Trees</span><em><a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-4" target="_blank" rel="noopener">tasks page</a></em></li>
+        <li><span>Fri Nov 6 · EX5 Hashing</span><em><a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-5" target="_blank" rel="noopener">tasks page</a></em></li>
+        <li><span>Mon Nov 9 · Midterm, 5–6 pm</span><em>through AVL trees</em></li>
+        <li><span>Fri Nov 13 · EX6 Sorting</span><em>posted later this week</em></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Reference</h2>
+      <ul class="plain-links">
+        <li><a href="#home">Week overview</a></li>
+        <li><a href="#readings">Readings</a></li>
+        <li><a href="#cheatsheet">Cheat sheet</a></li>
+      </ul>
+    </div>
+    <p class="rail-foot"><kbd>←</kbd> <kbd>→</kbd> modules · <kbd>N</kbd> next step · <kbd>H</kbd> next hint</p>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ================================================================ HOME -->
+<section class="page" id="home" data-title="Week overview">
+  <div class="hero">
+    <p class="kicker">Section 5 · <span data-date="2026-10-29" data-plain>Thu Oct 29</span></p>
+    <h1>Same ten numbers, <em>five</em> sorts</h1>
+    <p class="lede question">Section 5 sorts {11, 13, 55, 67, 79, 10, 8, 6, 4, 2}. Insertion sort, selection sort, heap sort, merge sort and quicksort all finish with the same array. Which one compares the fewest pairs of items?</p>
+    <div class="panel sortlab" id="sl-hero" data-presets='[{"label":"Section 5 array","arr":[11,13,55,67,79,10,8,6,4,2],"alg":"merge"},{"label":"Ten 17s","arr":[17,17,17,17,17,17,17,17,17,17],"alg":"quick"},{"label":"Already sorted","arr":[1,2,3,4,5,6,7,8,9,10],"alg":"insertion"}]' data-algs="insertion,selection,heap,merge,quick">
+      <div class="controls">
+        <label>Sort <select class="sl-alg" aria-label="Algorithm"></select></label>
+        <label class="grow">Array <input type="text" class="sl-arr" aria-label="Array" spellcheck="false"></label>
+        <button class="btn primary sl-run" type="button">Sort it</button>
+      </div>
+      <div class="controls sl-presets" role="group" aria-label="Examples"></div>
+      <div class="sl-cells" aria-label="Array"></div>
+      <div class="controls"><button class="btn sl-prev" type="button">Back</button><button class="btn primary sl-next" type="button">Next step</button><button class="btn quiet sl-end" type="button">Last step</button><span class="sl-count"></span></div>
+      <p class="out sl-out" role="status"></p>
+      <div class="table-wrap"><table class="plain num sl-compare"></table></div>
+    </div>
+  </div>
+  <div class="prose">
+    <p>Merge sort, with 17 comparisons; selection sort makes 45, as it does on every array of 10. But try the other examples. On an array that's already sorted, insertion sort needs only 9. On ten equal keys, quicksort (with the first item as the pivot) hits its worst case. "No sorting algorithm can have only all the 'best' attributes" (Lecture 12, slide 5). This week is about which attributes each sort has.</p>
+  </div>
+
+  <h2>This week</h2>
+  <div class="week">
+    <a href="#l12-insertion" class="day"><strong>Mon, Oct 26</strong><span class="tag-today" data-date="2026-10-26">Today</span><span>Lecture 12: Sorting 1</span><span>What sorting is, the properties to compare, insertion sort and heap sort. Weiss 7.1–7.3, 7.5–7.7.</span></a>
+    <a href="#l13-merge" class="day"><strong>Wed, Oct 28</strong><span class="tag-today" data-date="2026-10-28">Today</span><span>Lecture 13: Sorting 2</span><span>Divide and conquer: merge sort and quicksort. Then bucket sort and radix sort. Weiss 7.8–7.11.</span></a>
+    <a href="#s5-hashing" class="day"><strong>Thu, Oct 29</strong><span class="tag-today" data-date="2026-10-29">Today</span><span>Section 5: Hashing and Sorting</span><span>Probing and chaining by hand, then the sorts' running times on special inputs and a radix sort.</span></a>
+    <div class="day later"><span class="when">Fri, Oct 30</span><strong>Lecture 14: Graphs 1</strong><span>Intro to Graphs. Weiss 9.1. Materials not posted yet.</span></div>
+  </div>
+
+  <h2>Due</h2>
+  <div class="table-wrap">
+  <table class="plain due">
+    <tr><th>Fri Oct 30</th><td>EX4 AVL Trees (programming, Gradescope)</td></tr>
+    <tr><th>Fri Nov 6</th><td>EX5 Hashing (programming, Gradescope) · "Meet the staff" stays open through this week, de-prioritized in office hours</td></tr>
+    <tr><th>Mon Nov 9</th><td>Midterm, 5:00–6:00 pm, Smith 120 &amp; 205. Content: everything up to AVL trees (no hashing, sorting or graphs). Review in both lectures Fri Nov 6; no lecture Mon Nov 9; sample exams on the exams page.</td></tr>
+    <tr><th>Fri Nov 13</th><td>EX6 Sorting (coming later this week)</td></tr>
+  </table>
+  </div>
+  <p class="note">Exercises are graded work, so this site lists their dates only. The midterm scope is from Section 5's slides.</p>
+
+  <h2>How to use this site</h2>
+  <div class="prose">
+    <ul>
+      <li>Each lecture's pages follow its slides, end with a quick check, and finish with a practice page and a quiz. Section 5's practice page is both worksheets, checked against the official solutions.</li>
+      <li>The sort stepper runs the lecture's algorithms on any array, one step at a time, and counts comparisons. The hash table from week 4 is back for Section 5.</li>
+      <li>Array answers take numbers separated by spaces or commas.</li>
+    </ul>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes: the week</summary>
+    <ul>
+      <li>Today (Thu Oct 29) is Section 5. Sorting is new; the hashing half reviews last Friday.</li>
+      <li>Friday starts graphs. Its slides weren't posted when this page was built.</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ================================================================ L12: INSERTION -->
+<section class="page" id="l12-insertion" data-title="Sorting, and insertion sort">
+  <p class="where">Lecture 12 · slides 3–11 · <span class="today-chip" data-date="2026-10-26">Mon Oct 26</span> · Weiss 7.1–7.3</p>
+  <h1>Sorting, and insertion sort</h1>
+  <div class="rule">
+    <p><strong>Sorting (slide 4).</strong> Input: an array \(A\) of items and a comparison function (for any \(x, y\) we can tell \(x &lt; y\), \(x &gt; y\) or \(x = y\)). Output: a permutation of \(A\) (the same items, maybe reordered) such that \(i \le j\) implies \(A[i] \le A[j]\).</p>
+  </div>
+  <div class="prose"><p>Why sort? It enables binary search, makes some algorithms faster, and is nicer for humans. There's no single best sort: some are faster, some use less memory, some are very fast when the data fits an assumption, and some have other special properties (slide 5).</p></div>
+
+  <h2>Properties to consider (slide 10)</h2>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Worst-case running time</th><td></td></tr>
+    <tr><th>In place</th><td>only the given array, plus constant extra space</td></tr>
+    <tr><th>Adaptive</th><td>faster as the input gets closer to sorted: linear for a sorted list, nearly linear if nearly sorted</td></tr>
+    <tr><th>Online</th><td>can start sorting before the whole list has arrived</td></tr>
+    <tr><th>Stable</th><td>tied elements keep their original order</td></tr>
+  </table>
+  </div>
+
+  <h2>Insertion sort (slides 6–8)</h2>
+  <div class="rule">
+    <p>Keep a sorted prefix and extend it by "inserting" the next element: swap the item at index \(i\) with its left neighbour as long as the neighbour is larger. Worst case \(\Theta(n^2)\), best case \(\Theta(n)\).</p>
+  </div>
+  <pre class="code">for (i = 1; i &lt; a.length; i++) {
+  j = i;
+  while (j &gt; 0 &amp;&amp; a[j-1] &gt; a[j]) {
+    swap a[j-1] and a[j];
+    j--;
+  }
+}</pre>
+  <div class="panel sortlab" id="sl-insertion" data-presets='[{"label":"Slide 6 array","arr":[3,5,7,8,10,12,9,2,4,6,1,11],"alg":"insertion"},{"label":"8, 3, 5, 1, 9, 2","arr":[8,3,5,1,9,2],"alg":"insertion"},{"label":"Reversed","arr":[10,9,8,7,6,5,4,3,2,1],"alg":"insertion"}]' data-algs="insertion">
+    <div class="controls">
+      <label>Sort <select class="sl-alg" aria-label="Algorithm"></select></label>
+      <label class="grow">Array <input type="text" class="sl-arr" aria-label="Array" spellcheck="false"></label>
+      <button class="btn primary sl-run" type="button">Sort it</button>
+    </div>
+    <div class="controls sl-presets" role="group" aria-label="Examples"></div>
+    <div class="sl-cells" aria-label="Array"></div>
+    <div class="controls"><button class="btn sl-prev" type="button">Back</button><button class="btn primary sl-next" type="button">Next step</button><button class="btn quiet sl-end" type="button">Last step</button><span class="sl-count"></span></div>
+    <p class="out sl-out" role="status"></p>
+  </div>
+  <div class="rule">
+    <p><strong>Insertion sort's properties (slide 11):</strong> "except for its asymptotic running time, it has everything you might want." Worst case \(\Theta(n^2)\), with very small constants (nothing is faster for about 50 or fewer items). In place: yes. Adaptive: yes, only out-of-position items move. Online: yes, insert each item as it arrives. Stable: yes, don't swap on a tie.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w5-l12-qc-best" data-grader="bigo" data-answer="n" data-miscon='{}'>
+    <p>Quick check: insertion sort's running time on an array that's already sorted.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w5-l12-qc-swaps" data-grader="exact" data-answer="45" data-miscon='{"100":"inversions","90":"inversions","10":"inversions"}'>
+    <p>Quick check: how many swaps does insertion sort make on 10, 9, 8, …, 1?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide 7's loop has two slips worth pointing out if students copy it: the swap writes <code>a[prev] = a[i]</code> instead of <code>a[prev] = temp</code> (so nothing is swapped), and it reads <code>a[prev]</code> before checking <code>prev &gt; -1</code>. The version above swaps and checks the bound first.</li>
+      <li>Each swap fixes exactly one out-of-order pair (an inversion), so the number of swaps equals the number of inversions: 0 for sorted input, \(\frac{n(n-1)}{2}\) for reversed.</li>
+      <li>Bubble sort (slide 9) isn't covered: Knuth says it has "nothing to recommend it, except a catchy name".</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L12: HEAP SORT -->
+<section class="page" id="l12-heap" data-title="Heap sort">
+  <p class="where">Lecture 12 · slides 12–30 · <span class="today-chip" data-date="2026-10-26">Mon Oct 26</span> · Weiss 7.5</p>
+  <h1>Heap sort</h1>
+  <div class="rule">
+    <p><strong>Idea (slide 12).</strong> Build a <strong>max heap</strong> (every node larger than its children), then repeatedly extract the max to fill the sorted list from right to left. Build it with Floyd's buildHeap: working toward the root, percolate each node down.</p>
+    <p><strong>Extract (slide 15):</strong> remove the root, replace it with the last element, and percolate down: if the node is larger than its children, stop; otherwise swap with the <em>larger</em> child and repeat.</p>
+  </div>
+  <div class="prose"><p>Slide 14's max heap, in array order (0-indexed): 10, 9, 6, 8, 7, 5, 2, 4, 1, 3. The first extract takes 10, moves 3 to the root, and percolates it down past 9, 8 and 4.</p></div>
+
+  <h2>In place (slides 21–29)</h2>
+  <div class="rule">
+    <p>A sort is <strong>in place</strong> if it uses only \(\Theta(1)\) extra space. Heap sort with a separate heap isn't. The fix: the heap and the sorted list share the array. To extract, swap the root with the heap's last item, then "pretend" the heap is one item shorter.</p>
+  </div>
+  <pre class="code">buildHeap(a);
+for (int i = a.length - 1; i &gt;= 0; i--) {
+  temp = a[i];
+  a[i] = a[0];
+  a[0] = temp;
+  percolateDown(0);   // within a[0..i-1]
+}</pre>
+  <div class="panel sortlab" id="sl-heap" data-presets='[{"label":"Slide 14 values","arr":[10,9,6,8,7,5,2,4,1,3],"alg":"heap"},{"label":"3, 1, 6, 5, 2, 4","arr":[3,1,6,5,2,4],"alg":"heap"}]' data-algs="heap">
+    <div class="controls">
+      <label>Sort <select class="sl-alg" aria-label="Algorithm"></select></label>
+      <label class="grow">Array <input type="text" class="sl-arr" aria-label="Array" spellcheck="false"></label>
+      <button class="btn primary sl-run" type="button">Sort it</button>
+    </div>
+    <div class="controls sl-presets" role="group" aria-label="Examples"></div>
+    <div class="sl-cells" aria-label="Array"></div>
+    <div class="controls"><button class="btn sl-prev" type="button">Back</button><button class="btn primary sl-next" type="button">Next step</button><button class="btn quiet sl-end" type="button">Last step</button><span class="sl-count"></span></div>
+    <p class="out sl-out" role="status"></p>
+    <p class="note">Step 0 is the array after buildHeap. Green cells are the sorted part at the end of the array.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Heap sort's properties (slides 20, 30):</strong> worst and best case \(\Theta(n\log n)\). In place: yes. Adaptive: no, the running time doesn't depend on the input's order. Online: no, it needs every element in the heap before extracting. Stable: no.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w5-l12-qc-after-first" data-grader="text" data-answer="9 8 6 4 7 5 2 3 1 10|9, 8, 6, 4, 7, 5, 2, 3, 1, 10" data-miscon='{"3 9 6 8 7 5 2 4 1 10":"max-not-min"}'>
+    <p>Quick check: in-place heap sort on slide 14's heap. What is the array after the first extract (and its percolate down)?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w5-l12-qc-adaptive">
+    <p>Quick check: is heap sort adaptive?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w5-l12-qc-adaptive"> Yes: a sorted array is already almost a heap<span class="why" hidden>A sorted array is a <em>min</em> heap; heap sort still does every extract and percolate.</span></label>
+      <label data-correct><input type="radio" name="cse332-w5-l12-qc-adaptive"> No: it does \(\Theta(n\log n)\) work whatever the order<span class="why" hidden>Right (slide 30).</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The slides draw the heap 0-indexed (children of \(i\) at \(2i+1\), \(2i+2\)); week 2's priority-queue pseudocode was 1-indexed. Say which you're using.</li>
+      <li>Heap sort's stability is a question on EX6, so this site doesn't work it.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L12: PRACTICE -->
+<section class="page" id="l12-practice" data-title="Lecture 12: practice">
+  <p class="where">Lecture 12 · <span class="today-chip" data-date="2026-10-26">Mon Oct 26</span> · practice</p>
+  <h1>Lecture 12: practice</h1>
+  <div class="prose"><p>Four problems. Every array and count was produced by running the sorts (<code>checks/cse332/w05/verify.mjs</code> checks them against a second implementation). Array boxes take numbers separated by spaces or commas.</p></div>
+
+  <article class="task" data-id="cse332-w5-l12-insertion">
+    <h2>1. Trace insertion sort</h2>
+    <p class="prompt">Run insertion sort on 8, 3, 5, 1, 9, 2.</p>
+    <div class="answer-spec" data-part="after3" data-grader="text" data-answer="1 3 5 8 9 2|1, 3, 5, 8, 9, 2" data-label="the array once the first four items are sorted"></div>
+    <div class="answer-spec" data-part="swaps" data-grader="exact" data-answer="9" data-miscon='{"15":"inversions","6":"inversions"}' data-label="total swaps"></div>
+    <div class="answer-spec" data-part="sorted" data-grader="exact" data-answer="9" data-miscon='{"45":"worst-for-best","0":"counted-swaps"}' data-label="comparisons on 1, 2, …, 10 (already sorted)"></div>
+    <ol class="hints">
+      <li>Swaps = out-of-order pairs. For 8: it's bigger than 3, 5, 1 and 2.</li>
+      <li>On sorted input each new item is compared once with its left neighbour and stays.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>3 swaps past 8: 3 8 5 1 9 2. 5 swaps past 8: 3 5 8 1 9 2. 1 swaps three times: 1 3 5 8 9 2.</li>
+      <li>9 stays. 2 swaps past 9, 8, 5, 3: four swaps. Total 1 + 1 + 3 + 0 + 4 = 9, the number of inversions.</li>
+      <li>Sorted, \(n = 10\): items 2 to 10 each make one comparison: 9.</li>
+      <li class="answer">1 3 5 8 9 2; 9 swaps; 9 comparisons.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-l12-cases">
+    <h2>2. Best and worst</h2>
+    <p class="prompt">Insertion sort on \(n\) items.</p>
+    <div class="answer-spec" data-part="rev10" data-grader="exact" data-answer="45" data-label="swaps on 10, 9, …, 1"></div>
+    <div class="answer-spec" data-part="worst" data-grader="bigo" data-answer="n^2" data-label="worst case"></div>
+    <div class="answer-spec" data-part="best" data-grader="bigo" data-answer="n" data-label="best case"></div>
+    <ol class="hints"><li>Reversed: every pair is out of order. How many pairs are there among 10 items?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Reversed input: item \(i\) swaps \(i\) times: \(0 + 1 + \cdots + 9 = 45 = \frac{10\cdot 9}{2}\).</li>
+      <li>In general \(\frac{n(n-1)}{2} \in \Theta(n^2)\). Sorted input: one comparison per item, \(\Theta(n)\).</li>
+      <li class="answer">45; \(\Theta(n^2)\); \(\Theta(n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-l12-heap">
+    <h2>3. Heap sort by hand</h2>
+    <p class="prompt">In-place heap sort, 0-indexed max heap (children of \(i\) at \(2i+1\) and \(2i+2\)).</p>
+    <div class="answer-spec" data-part="second" data-grader="text" data-answer="8 7 6 4 1 5 2 3 9 10|8, 7, 6, 4, 1, 5, 2, 3, 9, 10" data-label="slide 14's heap after the second extract"></div>
+    <div class="answer-spec" data-part="build" data-grader="text" data-answer="6 5 4 1 2 3|6, 5, 4, 1, 2, 3" data-miscon='{"1 2 4 5 3 6":"max-not-min"}' data-label="buildHeap (Floyd) on 3, 1, 6, 5, 2, 4"></div>
+    <div class="answer-spec" data-part="cost" data-grader="bigo" data-answer="n log n" data-label="best-case running time"></div>
+    <ol class="hints">
+      <li>After the first extract the array is 9 8 6 4 7 5 2 3 1 | 10. Swap 9 with the heap's last item (1), then percolate 1 down within the first 8 slots.</li>
+      <li>Floyd's method: percolate down index 2, then 1, then 0. Each time swap with the larger child.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Swap 9 and 1: 1 8 6 4 7 5 2 3 | 9 10. 1 goes down: swap with 8, then with 7 (8's children are 4 and 7). Result 8 7 6 4 1 5 2 3 9 10.</li>
+      <li>Build: index 2 (6) has child 4: fine. Index 1 (1) has children 5, 2: swap with 5. Index 0 (3) has children 5, 6: swap with 6; then 3 has child 4: swap. Result 6 5 4 1 2 3.</li>
+      <li>Every extract percolates down a height of \(\Theta(\log n)\), whatever the input: \(\Theta(n\log n)\) even in the best case.</li>
+      <li class="answer">8 7 6 4 1 5 2 3 9 10; 6 5 4 1 2 3; \(\Theta(n\log n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-l12-props">
+    <h2>4. Which properties?</h2>
+    <p class="prompt">From slides 11 and 30.</p>
+    <div class="answer-spec" data-part="ins-inplace" data-grader="yesno" data-answer="yes" data-label="insertion sort: in place?"></div>
+    <div class="answer-spec" data-part="ins-online" data-grader="yesno" data-answer="yes" data-label="insertion sort: online?"></div>
+    <div class="answer-spec" data-part="ins-stable" data-grader="yesno" data-answer="yes" data-label="insertion sort: stable?"></div>
+    <div class="answer-spec" data-part="heap-inplace" data-grader="yesno" data-answer="yes" data-label="heap sort (slide 29's version): in place?"></div>
+    <div class="answer-spec" data-part="heap-adaptive" data-grader="yesno" data-answer="no" data-label="heap sort: adaptive?"></div>
+    <div class="answer-spec" data-part="heap-online" data-grader="yesno" data-answer="no" data-label="heap sort: online?"></div>
+    <ol class="hints"><li>Go through slide 10's definitions one at a time for each sort.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Insertion sort: swaps within the array (in place); each arriving item is inserted into the prefix (online); no swap on a tie (stable).</li>
+      <li>Heap sort: the heap and the sorted part share the array (in place); same work whatever the order (not adaptive); it needs all items in the heap first (not online).</li>
+      <li class="answer">yes; yes; yes; yes; no; no.</li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L12: QUIZ -->
+<section class="page" id="l12-quiz" data-title="Check your understanding: sorting 1">
+  <p class="where">Lecture 12 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: sorting 1</h1>
+  <div class="prose"><p>Eight questions on Lecture 12. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="l12" role="status"></div>
+  <ol class="cyu-list" data-quiz="l12">
+    <li class="cyu" data-id="cse332-w5-l12-cyu-stable" data-kind="mc" data-topic="l12-insertion">
+      <p class="q">A sort is <em>stable</em> if…</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-l12-cyu-stable"> tied elements keep their original order<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w5-l12-cyu-stable"> its running time doesn't depend on the input<span class="why" hidden>That's the opposite of adaptive, not stability.</span></label>
+        <label><input type="radio" name="cse332-w5-l12-cyu-stable"> it uses constant extra space<span class="why" hidden>That's in place.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l12-cyu-adaptive" data-kind="mc" data-topic="l12-insertion">
+      <p class="q">Which sort is adaptive?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-l12-cyu-adaptive"> Insertion sort<span class="why" hidden>Correct: linear on sorted input.</span></label>
+        <label><input type="radio" name="cse332-w5-l12-cyu-adaptive"> Heap sort<span class="why" hidden>\(\Theta(n\log n)\) whatever the order.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l12-cyu-ins-worst" data-kind="bigo" data-answer="n^2" data-topic="l12-insertion">
+      <p class="q">Insertion sort's worst-case running time.</p>
+      <p class="why" hidden>Reversed input: \(\frac{n(n-1)}{2}\) swaps, \(\Theta(n^2)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l12-cyu-swaps6" data-kind="num" data-answer="3" data-topic="l12-insertion" data-miscon='{"6":"inversions"}'>
+      <p class="q">How many swaps does insertion sort make on 2, 1, 4, 3, 6, 5?</p>
+      <p class="why" hidden>Three out-of-order pairs: (2,1), (4,3), (6,5). One swap each.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l12-cyu-online" data-kind="mc" data-topic="l12-insertion">
+      <p class="q">Items arrive one at a time over a network. Which sort can start before they've all arrived?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-l12-cyu-online"> Insertion sort<span class="why" hidden>Correct: it's online.</span></label>
+        <label><input type="radio" name="cse332-w5-l12-cyu-online"> Heap sort<span class="why" hidden>It needs everything in the heap before extracting.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l12-cyu-heap-cost" data-kind="bigo" data-answer="n log n" data-topic="l12-heap">
+      <p class="q">Heap sort's worst-case running time.</p>
+      <p class="why" hidden>\(n\) extracts at \(O(\log n)\) each, after a \(\Theta(n)\) buildHeap.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l12-cyu-percolate" data-kind="mc" data-topic="l12-heap">
+      <p class="q">During heap sort's percolate down, a node smaller than a child swaps with…</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-l12-cyu-percolate"> its larger child<span class="why" hidden>Correct: so the new parent is larger than both children.</span></label>
+        <label><input type="radio" name="cse332-w5-l12-cyu-percolate"> its smaller child<span class="why" hidden>That's for a min heap. Heap sort uses a max heap.</span></label>
+        <label><input type="radio" name="cse332-w5-l12-cyu-percolate"> its left child<span class="why" hidden>If the right child is larger, the left would end up above it, breaking the heap.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l12-cyu-inplace" data-kind="mc" data-topic="l12-heap">
+      <p class="q">How does heap sort become in place?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-l12-cyu-inplace"> The heap and the sorted part share the array: swap the max to the end, shrink the heap<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w5-l12-cyu-inplace"> It uses a min heap instead<span class="why" hidden>A min heap would put the smallest at the front, where the heap still lives.</span></label>
+        <label><input type="radio" name="cse332-w5-l12-cyu-inplace"> It skips buildHeap<span class="why" hidden>buildHeap already works in place.</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="l12" role="status"></div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L13: MERGE -->
+<section class="page" id="l13-merge" data-title="Merge sort">
+  <p class="where">Lecture 13 · slides 3–14 · <span class="today-chip" data-date="2026-10-28">Wed Oct 28</span> · Weiss 7.6</p>
+  <h1>Merge sort</h1>
+  <div class="rule">
+    <p><strong>Divide and conquer (slides 4–6).</strong> Base case: if the problem is small, solve it directly. Divide: break it into smaller instances. Conquer: solve them recursively. Combine: build the answer from their solutions.</p>
+    <p><strong>Merge sort (slide 7).</strong> Base case: a list of length 0 or 1 is sorted. Divide: split into two halves. Conquer: sort both recursively. Combine: <strong>merge</strong> the sorted halves.</p>
+  </div>
+  <div class="split">
+    <pre class="code"><span class="cm">// slide 10</span>
+void ms_helper(myArray, low, high) {
+  if (low == high) return;   // base case
+  mid = (low+high)/2;
+  ms_helper(low, mid);
+  ms_helper(mid+1, high);
+  merge(myArray, low, mid, high);
+}</pre>
+    <pre class="code"><span class="cm">// slide 11 (the core)</span>
+while (l_next &lt;= mid &amp;&amp; r_next &lt;= high) {
+  if (myArray[l_next] &lt;= myArray[r_next])
+    merged[m_next++] = myArray[l_next++];
+  else
+    merged[m_next++] = myArray[r_next++];
+}
+<span class="cm">// then copy the rest of whichever side remains,</span>
+<span class="cm">// and copy merged back into myArray[low..high]</span></pre>
+  </div>
+  <div class="panel sortlab" id="sl-merge" data-presets='[{"label":"Slide 8 array","arr":[5,8,2,9,4,1,3,7],"alg":"merge"},{"label":"Section 5 array","arr":[11,13,55,67,79,10,8,6,4,2],"alg":"merge"}]' data-algs="merge">
+    <div class="controls">
+      <label>Sort <select class="sl-alg" aria-label="Algorithm"></select></label>
+      <label class="grow">Array <input type="text" class="sl-arr" aria-label="Array" spellcheck="false"></label>
+      <button class="btn primary sl-run" type="button">Sort it</button>
+    </div>
+    <div class="controls sl-presets" role="group" aria-label="Examples"></div>
+    <div class="sl-cells" aria-label="Array"></div>
+    <div class="controls"><button class="btn sl-prev" type="button">Back</button><button class="btn primary sl-next" type="button">Next step</button><button class="btn quiet sl-end" type="button">Last step</button><span class="sl-count"></span></div>
+    <p class="out sl-out" role="status"></p>
+  </div>
+  <div class="rule">
+    <p><strong>Analysis (slides 12–13).</strong> Divide: 0 comparisons. Conquer: two lists of size \(\frac n2\). Combine: at most \(n\) comparisons. So \(T(n) = 2T(n/2) + n\): \(n\) work on each of \(\log_2 n\) levels, \(\Theta(n\log n)\). Week 3's tree method, applied.</p>
+    <p><strong>Properties (slide 14):</strong> \(\Theta(n\log n)\) worst case. In place: no, it merges into a second array. Adaptive: no. Online: no. Stable: yes, on a tie take the left element (the <code>&lt;=</code>).</p>
+  </div>
+
+  <div class="check" data-id="cse332-w5-l13-qc-final-merge" data-grader="exact" data-answer="6" data-miscon='{"8":"worst-for-best","16":"counted-swaps"}'>
+    <p>Quick check: slide 8 sorts 5 8 2 9 4 1 3 7. Its last merge combines 2 5 8 9 with 1 3 4 7. How many comparisons does that merge make?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w5-l13-qc-stable-why">
+    <p>Quick check: what makes merge sort stable?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w5-l13-qc-stable-why"> On a tie, merge takes the element from the left half<span class="why" hidden>Right: the left half came first in the input.</span></label>
+      <label><input type="radio" name="cse332-w5-l13-qc-stable-why"> It splits at the exact middle<span class="why" hidden>Any split point works; it's the tie rule that matters.</span></label>
+      <label><input type="radio" name="cse332-w5-l13-qc-stable-why"> It uses a second array<span class="why" hidden>That's why it isn't in place; it has nothing to do with ties.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Two off-by-ones on the slides: slide 10 calls <code>ms_helper(myArray, 0, myArray.length())</code>, but <code>high</code> is inclusive, so it should be <code>length() - 1</code>; slide 11's copy-back loop runs <code>i &lt;= merged.length</code> and should stop at <code>&lt;</code>. The stepper uses the corrected bounds.</li>
+      <li>A merge of two runs of length \(k\) makes between \(k\) and \(2k - 1\) comparisons. The last merge here makes 6: it stops when the left run (2 5 8 9) still has 8 and 9 left.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L13: QUICK -->
+<section class="page" id="l13-quick" data-title="Quicksort">
+  <p class="where">Lecture 13 · slides 15–29 · <span class="today-chip" data-date="2026-10-28">Wed Oct 28</span> · Weiss 7.7</p>
+  <h1>Quicksort</h1>
+  <div class="prose"><p>Like merge sort: divide and conquer, \(O(n\log n)\) "kind of". Unlike it: the divide step is the hard part, and it's typically faster (slide 15). Divide: pick a pivot \(p\) and partition. Conquer: sort the left and right parts. Combine: nothing to do (slide 16).</p></div>
+  <div class="rule">
+    <p><strong>Partition (slide 22).</strong> Put \(p\) at the beginning. Put <em>Begin</em> just after \(p\) and <em>End</em> at the end. While Begin &lt; End: if Begin's value &lt; \(p\), move Begin right; else swap Begin's value with End's and move End left. When they meet: if the value there is &lt; \(p\), swap \(p\) with it; otherwise swap \(p\) with the value just to its left. Running time \(O(n)\).</p>
+  </div>
+  <div class="prose">
+    <p><strong>Slides 17–20:</strong> partition 8 5 7 3 12 10 1 2 4 9 6 11 around 8. Begin passes 5, 7, 3; 12 is swapped to the end; then 11, 10 and 9 are swapped back, and Begin and End meet at 2, which is &lt; 8 (case 1). Swapping 8 with 2 gives</p>
+    <p class="mono-line"><code>2 5 7 3 6 4 1 8 9 10 11 12</code></p>
+    <p>with 8 exactly where it belongs, index 7.</p>
+  </div>
+  <div class="panel sortlab" id="sl-quick" data-presets='[{"label":"Slide 17 array","arr":[8,5,7,3,12,10,1,2,4,9,6,11],"alg":"quick"},{"label":"Eight 17s","arr":[17,17,17,17,17,17,17,17],"alg":"quick"}]' data-algs="quick">
+    <div class="controls">
+      <label>Sort <select class="sl-alg" aria-label="Algorithm"></select></label>
+      <label class="grow">Array <input type="text" class="sl-arr" aria-label="Array" spellcheck="false"></label>
+      <button class="btn primary sl-run" type="button">Sort it</button>
+    </div>
+    <div class="controls sl-presets" role="group" aria-label="Examples"></div>
+    <div class="sl-cells" aria-label="Array"></div>
+    <div class="controls"><button class="btn sl-prev" type="button">Back</button><button class="btn primary sl-next" type="button">Next step</button><button class="btn quiet sl-end" type="button">Last step</button><span class="sl-count"></span></div>
+    <p class="out sl-out" role="status"></p>
+    <p class="note">Each step is one partition; the orange cell is where its pivot landed.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Running time (slides 25–27).</strong> If the pivot is always the median, each partition halves the list: \(T(n) = 2T(n/2) + n \in O(n\log n)\). If it's always at an extreme, the list shrinks by 1: \(T(n) = T(n-1) + n = \sum_{i=1}^{n} i = \frac{n(n+1)}{2} \in \Theta(n^2)\).</p>
+    <p><strong>Picking a pivot (slide 28).</strong> Ideally the median, but finding it in linear time is complicated and slow. In practice: a random value, or the <strong>median of three</strong> (first, middle and last elements), which takes constant time.</p>
+    <p><strong>Properties (slide 29):</strong> \(\Theta(n^2)\) worst case but "almost always" \(\Theta(n\log n)\), with better constants than merge sort. In place: "kinda" (the recursion uses stack space). Adaptive: no. Online: no. Stable: no, partition's swaps can reorder ties.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w5-l13-qc-pivot-index" data-grader="exact" data-answer="7" data-miscon='{"0":"pivot-at-start"}'>
+    <p>Quick check: after partitioning slide 17's array, at what index is the pivot 8?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w5-l13-qc-median3" data-grader="exact" data-answer="10">
+    <p>Quick check: median of three for slide 17's array (first 8, middle index 5, last 11). Which value is the pivot?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide 20 shows 10 and 9 in the other order (… 8 10 9 11 12). Following slide 19's last row, where 9 was swapped into index 5 and 10 into index 9, the result is … 8 9 10 11 12. Either way both are on the right of 8, which is what partition promises.</li>
+      <li>Slide 21's case 2 (meeting at a value &gt; \(p\)) is a different array; in that case \(p\) swaps with the value to the left of the meeting point.</li>
+      <li>With ten equal keys every key goes to one side, so each partition only places the pivot: the \(T(n-1) + n\) worst case (Section 5, problem 0).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L13: BUCKET AND RADIX -->
+<section class="page" id="l13-linear" data-title="Bucket and radix sort">
+  <p class="where">Lecture 13 · slides 30–38 · <span class="today-chip" data-date="2026-10-28">Wed Oct 28</span> · Weiss 7.11</p>
+  <h1>"Linear time" sorting: bucket and radix sort</h1>
+  <div class="prose"><p>These sorts use more than the ability to compare: for example, that the list holds only positive integers less than \(k\), or few distinct values. Their running times always have a second term for that assumption, like \(\Theta(n + k)\) (slide 30).</p></div>
+  <div class="rule">
+    <p><strong>BucketSort (slides 31–33).</strong> For integers from 0 to \(k-1\): use each value as an index into an array of \(k\) buckets (say, linked lists), add each item to its bucket, then append the buckets in order. Creating the buckets is \(\Theta(k)\) or \(\Theta(1)\), inserting is \(\Theta(n)\), emptying is \(\Theta(n + k)\). Overall \(\Theta(n + k)\). Not in place, not adaptive, <strong>stable</strong>.</p>
+    <p><strong>RadixSort (slides 34–38).</strong> BucketSort by each digit, from least significant to most significant, with base \(b\) (the slides use 10; real implementations use larger bases). With largest value \(m\): \(\log_b m\) passes of a bucket sort with \(b\) buckets, so \(\Theta(n\log_b m + b\log_b m)\).</p>
+  </div>
+  <div class="panel sortlab" id="sl-radix" data-presets='[{"label":"Slide 34 numbers","arr":[103,801,401,323,255,823,999,101,113,901,555,512,245,800,18,121],"alg":"radix"},{"label":"Section 5 numbers","arr":[170,45,75,90,802,24,2,66],"alg":"radix"}]' data-algs="radix">
+    <div class="controls">
+      <label>Sort <select class="sl-alg" aria-label="Algorithm"></select></label>
+      <label class="grow">Array <input type="text" class="sl-arr" aria-label="Array" spellcheck="false"></label>
+      <button class="btn primary sl-run" type="button">Sort it</button>
+    </div>
+    <div class="controls sl-presets" role="group" aria-label="Examples"></div>
+    <div class="sl-cells" aria-label="Array"></div>
+    <div class="controls"><button class="btn sl-prev" type="button">Back</button><button class="btn primary sl-next" type="button">Next step</button><button class="btn quiet sl-end" type="button">Last step</button><span class="sl-count"></span></div>
+    <p class="out sl-out" role="status"></p>
+  </div>
+  <div class="prose">
+    <p>After the 1's pass, the slide-34 numbers read 800 801 401 101 901 121 512 103 323 823 113 255 555 245 018 999. Each later pass keeps that order within a bucket, which is why the bucket sort has to be stable: after the 10's pass, the list is sorted by its last two digits.</p>
+    <p><strong>When is this better than merge sort?</strong> Bucket sort when \(k\) is small compared with \(n \log n\); radix sort when the number of digits \(\log_b m\) is small compared with \(\log n\).</p>
+  </div>
+
+  <div class="check" data-id="cse332-w5-l13-qc-radix-passes" data-grader="exact" data-answer="3">
+    <p>Quick check: how many passes does base-10 radix sort make on the slide-34 numbers (largest 999)?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w5-l13-qc-lsd">
+    <p>Quick check: radix sort buckets first by…</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w5-l13-qc-lsd"> the least significant digit<span class="why" hidden>Right: the 1's digit, then the 10's, then the 100's.</span></label>
+      <label><input type="radio" name="cse332-w5-l13-qc-lsd"> the most significant digit<span class="why" hidden>The lecture's version goes the other way, and relies on stability to keep earlier passes' order.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Have the room predict the order after the 10's pass before showing slide 36. The question to ask: why does 101 come before 103 after the 100's pass? Because the earlier passes put it first, and the bucket kept that order.</li>
+      <li>Section 5's bucket-sort slide example lists "11, 12, 13, 2, …" as its output; 2 should come first. Use the lecture's definition.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L13: PRACTICE -->
+<section class="page" id="l13-practice" data-title="Lecture 13: practice">
+  <p class="where">Lecture 13 · <span class="today-chip" data-date="2026-10-28">Wed Oct 28</span> · practice</p>
+  <h1>Lecture 13: practice</h1>
+  <div class="prose"><p>Five problems on the lecture's own arrays. Every array and count was produced by running the slides' algorithms (<code>checks/cse332/w05/verify.mjs</code>). Array boxes take numbers separated by spaces or commas.</p></div>
+
+  <article class="task" data-id="cse332-w5-l13-merge">
+    <h2>1. Merge sort on slide 8's array</h2>
+    <p class="prompt">Merge sort 5 8 2 9 4 1 3 7 with slide 10's code (inclusive bounds, mid = (low+high)/2).</p>
+    <div class="answer-spec" data-part="left" data-grader="text" data-answer="2 5 8 9|2, 5, 8, 9" data-label="the left half after its recursive sort"></div>
+    <div class="answer-spec" data-part="right" data-grader="text" data-answer="1 3 4 7|1, 3, 4, 7" data-label="the right half after its recursive sort"></div>
+    <div class="answer-spec" data-part="last" data-grader="exact" data-answer="6" data-label="comparisons in the last merge"></div>
+    <div class="answer-spec" data-part="total" data-grader="exact" data-answer="16" data-label="comparisons in all"></div>
+    <ol class="hints">
+      <li>The merges happen bottom-up: pairs first (5 8, 2 9, 4 1, 3 7), then fours, then the whole.</li>
+      <li>Each merge of two single items makes 1 comparison. A merge stops comparing as soon as one side runs out.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Pairs: 5 8 (1), 2 9 (1), 1 4 (1), 3 7 (1).</li>
+      <li>Fours: 5 8 + 2 9 → 2 5 8 9 (3 comparisons); 1 4 + 3 7 → 1 3 4 7 (3).</li>
+      <li>Last: 2 5 8 9 + 1 3 4 7: compares 2/1, 2/3, 5/3, 5/4, 5/7, 8/7; then the right side is empty and 8 9 are copied. 6 comparisons.</li>
+      <li class="answer">2 5 8 9; 1 3 4 7; 6; 4 + 6 + 6 = 16.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-l13-partition">
+    <h2>2. Partition</h2>
+    <p class="prompt">Partition 8 5 7 3 12 10 1 2 4 9 6 11 with pivot 8 (already first), using slide 22's procedure.</p>
+    <div class="answer-spec" data-part="result" data-grader="text" data-answer="2 5 7 3 6 4 1 8 9 10 11 12|2, 5, 7, 3, 6, 4, 1, 8, 9, 10, 11, 12" data-label="the array after partition"></div>
+    <div class="answer-spec" data-part="meet" data-grader="exact" data-answer="2" data-label="the value where Begin and End meet"></div>
+    <div class="answer-spec" data-part="at" data-grader="exact" data-answer="7" data-miscon='{"0":"pivot-at-start"}' data-label="the pivot's final index"></div>
+    <ol class="hints">
+      <li>Keep two fingers on the array. Begin only moves right when its value is &lt; 8; End only moves left after a swap.</li>
+      <li>The swaps send 12, 11, 10 and 9 to the right end, in that order of arrival.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Begin passes 5, 7, 3. At 12: swap with 11 (End), End moves to 6. At 11: swap with 6, End to 9. 6 &lt; 8: Begin moves to 10. Swap 10 with 9, End to 4. Swap 9 with 4, End to 2.</li>
+      <li>4 and 1 &lt; 8: Begin moves to 2, where it meets End. 2 &lt; 8: case 1, swap 8 with it.</li>
+      <li class="answer">2 5 7 3 6 4 1 8 9 10 11 12; they meet at 2; the pivot is at index 7.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-l13-pivot">
+    <h2>3. Pivots and running time</h2>
+    <p class="prompt">Quicksort with the first element as the pivot.</p>
+    <div class="answer-spec" data-part="worst" data-grader="bigo" data-answer="n^2" data-label="worst case"></div>
+    <div class="answer-spec" data-part="best" data-grader="bigo" data-answer="n log n" data-label="best case (pivot always the median)"></div>
+    <div class="answer-spec" data-part="same8" data-grader="exact" data-answer="28" data-label="comparisons with the pivot when sorting eight equal keys"></div>
+    <div class="answer-spec" data-part="median3" data-grader="exact" data-answer="6" data-label="median-of-three pivot for 9 2 7 4 5 1 8 3 6 (first, middle, last)"></div>
+    <ol class="hints">
+      <li>Equal keys are never &lt; the pivot, so partition swaps every one to the right. How big is the next subproblem?</li>
+      <li>For median of three, look at indices 0, 4 and 8.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Worst: \(T(n) = T(n-1) + n \in \Theta(n^2)\). Best: \(T(n) = 2T(n/2) + n \in \Theta(n\log n)\).</li>
+      <li>Eight equal keys: the pivot lands at the start each time and the rest go on with one fewer: \(7 + 6 + \cdots + 1 = 28\) comparisons.</li>
+      <li>Median of three: index 0 holds 9, the middle (index 4) holds 5, the last holds 6. Sorted, {5, 6, 9}: the median is 6.</li>
+      <li class="answer">\(\Theta(n^2)\); \(\Theta(n\log n)\); 28; 6.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-l13-radix">
+    <h2>4. Radix sort on slide 34's numbers</h2>
+    <p class="prompt">Base 10, least significant digit first, on 103 801 401 323 255 823 999 101 113 901 555 512 245 800 018 121.</p>
+    <div class="answer-spec" data-part="first4" data-grader="text" data-answer="800 801 401 101|800, 801, 401, 101" data-miscon='{"18 101 103 113":"msd-first"}' data-label="the first four numbers after the 1's pass"></div>
+    <div class="answer-spec" data-part="after10" data-grader="text" data-answer="800 801 401 101 901 103|800, 801, 401, 101, 901, 103" data-label="the first six after the 10's pass"></div>
+    <div class="answer-spec" data-part="passes" data-grader="exact" data-answer="3" data-label="number of passes"></div>
+    <ol class="hints">
+      <li>The 1's pass: bucket 0 holds 800; bucket 1 holds 801, 401, 101, 901, 121 in their input order.</li>
+      <li>The 10's pass reads the 1's-pass order and buckets by the middle digit. Bucket 0: 800, 801, 401, 101, 901, 103.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>1's pass: 800 | 801 401 101 901 121 | 512 | 103 323 823 113 | 255 555 245 | 018 | 999.</li>
+      <li>10's pass: 800 801 401 101 901 103 | 512 113 018 | 121 323 823 | 245 | 255 555 | 999.</li>
+      <li>100's pass gives the sorted list. Three digits, three passes.</li>
+      <li class="answer">800 801 401 101; 800 801 401 101 901 103; 3.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-l13-bucket">
+    <h2>5. Bucket sort</h2>
+    <p class="prompt">Bucket sort 3 0 2 3 1 0 with \(k = 4\) buckets (values 0 to 3).</p>
+    <div class="answer-spec" data-part="out" data-grader="text" data-answer="0 0 1 2 3 3|0, 0, 1, 2, 3, 3" data-label="the output"></div>
+    <div class="answer-spec" data-part="cost" data-grader="choice" data-answer="nk" data-options="n:Θ(n)|nk:Θ(n + k)|nlogn:Θ(n log n)|ntimesk:Θ(n · k)" data-label="running time"></div>
+    <div class="answer-spec" data-part="stable" data-grader="yesno" data-answer="yes" data-miscon='{"no":"unstable-bucket"}' data-label="stable?"></div>
+    <ol class="hints"><li>Each value goes into the bucket with its own index. Then read the buckets 0, 1, 2, 3.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Buckets: 0 → [0, 0], 1 → [1], 2 → [2], 3 → [3, 3].</li>
+      <li>\(\Theta(n)\) to place, \(\Theta(n + k)\) to empty. Items join the end of their bucket, so ties keep their order.</li>
+      <li class="answer">0 0 1 2 3 3; \(\Theta(n + k)\); yes.</li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L13: QUIZ -->
+<section class="page" id="l13-quiz" data-title="Check your understanding: sorting 2">
+  <p class="where">Lecture 13 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: sorting 2</h1>
+  <div class="prose"><p>Ten questions on Lecture 13. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="l13" role="status"></div>
+  <ol class="cyu-list" data-quiz="l13">
+    <li class="cyu" data-id="cse332-w5-l13-cyu-recurrence" data-kind="mc" data-topic="l13-merge">
+      <p class="q">Merge sort's recurrence is…</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-l13-cyu-recurrence"> \(T(n) = 2T(n/2) + n\)<span class="why" hidden>Correct (slide 12).</span></label>
+        <label><input type="radio" name="cse332-w5-l13-cyu-recurrence"> \(T(n) = T(n-1) + n\)<span class="why" hidden>That's quicksort's worst case.</span></label>
+        <label><input type="radio" name="cse332-w5-l13-cyu-recurrence"> \(T(n) = 2T(n/2) + 1\)<span class="why" hidden>Merging costs up to \(n\) comparisons, not 1.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l13-cyu-merge-cost" data-kind="bigo" data-answer="n log n" data-topic="l13-merge">
+      <p class="q">Merge sort's running time on an already sorted array.</p>
+      <p class="why" hidden>It isn't adaptive: still \(\Theta(n\log n)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l13-cyu-merge-inplace" data-kind="mc" data-topic="l13-merge">
+      <p class="q">Why isn't merge sort in place?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-l13-cyu-merge-inplace"> It merges into a second array<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w5-l13-cyu-merge-inplace"> It's recursive<span class="why" hidden>Quicksort is recursive too, and is "kinda" in place.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l13-cyu-merge-two" data-kind="num" data-answer="3" data-topic="l13-merge">
+      <p class="q">How many comparisons does merging 1 2 3 with 4 5 6 take?</p>
+      <p class="why" hidden>1/4, 2/4, 3/4; the left side is then empty and 4 5 6 are copied. 3.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l13-cyu-partition-cost" data-kind="bigo" data-answer="n" data-topic="l13-quick">
+      <p class="q">Running time of one partition of \(n\) items.</p>
+      <p class="why" hidden>Begin and End close the gap by one each step: \(O(n)\) (slide 23).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l13-cyu-quick-worst" data-kind="mc" data-topic="l13-quick">
+      <p class="q">When does quicksort take \(\Theta(n^2)\)?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-l13-cyu-quick-worst"> When the pivot is always at an extreme<span class="why" hidden>Correct: \(T(n) = T(n-1) + n\).</span></label>
+        <label><input type="radio" name="cse332-w5-l13-cyu-quick-worst"> When the pivot is always the median<span class="why" hidden>That's the best case.</span></label>
+        <label><input type="radio" name="cse332-w5-l13-cyu-quick-worst"> Never; it's always \(n\log n\)<span class="why" hidden>Only "almost always" in practice.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l13-cyu-median3-cost" data-kind="mc" data-topic="l13-quick">
+      <p class="q">Why use median of three rather than the true median?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-l13-cyu-median3-cost"> It takes constant time and usually splits well<span class="why" hidden>Correct (slide 28).</span></label>
+        <label><input type="radio" name="cse332-w5-l13-cyu-median3-cost"> It always gives the true median<span class="why" hidden>Only the median of three values, which can still be far from the middle.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l13-cyu-quick-stable" data-kind="mc" data-topic="l13-quick">
+      <p class="q">Is quicksort stable?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w5-l13-cyu-quick-stable"> Yes<span class="why" hidden>Partition swaps across long distances, so equal keys can change order.</span></label>
+        <label data-correct><input type="radio" name="cse332-w5-l13-cyu-quick-stable"> No<span class="why" hidden>Correct (slide 29).</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l13-cyu-bucket" data-kind="mc" data-topic="l13-linear">
+      <p class="q">Bucket sort of \(n\) integers from 0 to \(k-1\) runs in…</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-l13-cyu-bucket"> \(\Theta(n + k)\)<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w5-l13-cyu-bucket"> \(\Theta(n\log n)\)<span class="why" hidden>It never compares items, so the comparison-sort bound doesn't apply.</span></label>
+        <label><input type="radio" name="cse332-w5-l13-cyu-bucket"> \(\Theta(n\cdot k)\)<span class="why" hidden>Each item goes straight to its bucket; the \(k\) is added once, for the empty buckets.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-l13-cyu-radix-passes" data-kind="num" data-answer="4" data-topic="l13-linear">
+      <p class="q">Base-10 radix sort on numbers up to 9,999. How many passes?</p>
+      <p class="why" hidden>Four digits, four bucket-sort passes.</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="l13" role="status"></div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S5: HASHING -->
+<section class="page" id="s5-hashing" data-title="Section 5: hashing, worked">
+  <p class="where">Section 5 · Hashing · <span class="today-chip" data-date="2026-10-29">Thu Oct 29</span></p>
+  <h1>Section 5: hashing</h1>
+  <div class="prose">
+    <p>Problem 1 inserts the same six keys four ways; problem 2 compares the strategies. Everything below follows the section slides and the <a href="https://docs.google.com/document/d/119G538OV5qN-g_Q3R89bCsjYCRwNDqyF/edit" target="_blank" rel="noopener">hashing worksheet</a>'s <a href="https://docs.google.com/document/d/1mGEE1gMEY3Sb4I092oJTXVaVi8skw4XM/edit" target="_blank" rel="noopener">official solutions</a>.</p>
+    <p><strong>Warm-up.</strong> Insert every element of a list into an AVL tree. If all \(n\) are unique, each insert is \(O(\log n)\): \(O(n\log n)\). If all are the same, every insert after the first finds the key at the root and just overwrites the value: \(O(n)\).</p>
+  </div>
+  <div class="rule">
+    <p>On the \(i\)th probe, check index \((h(\text{key}) + f(i)) \bmod \text{TableSize}\): linear \(f(i) = i\), quadratic \(f(i) = i^2\), double hashing \(f(i) = i\cdot g(\text{key})\).</p>
+  </div>
+
+  <h2>Problem 1: insert 7, 9, 48, 8, 37, 57 (size 10, \(h(k) = k\))</h2>
+  <div class="panel hashlab" id="hl-s5" data-presets='[{"label":"1a: linear probing","mode":"linear","size":10,"seq":[7,9,48,8,37,57],"say":"Insert six times, then delete 37, 7, 57, then delete 17."},{"label":"1b: quadratic probing","mode":"quadratic","size":10,"seq":[7,9,48,8,37,57],"say":"Insert six times."},{"label":"1c: separate chaining","mode":"chain","size":10,"seq":[7,9,48,8,37,57],"say":"Insert six times."}]'>
+    <div class="controls">
+      <label>Key <input type="text" inputmode="numeric" class="hl-key" aria-label="Key" placeholder="next in queue"></label>
+      <button class="btn primary hl-insert" type="button">Insert</button>
+      <button class="btn hl-find" type="button">Find</button>
+      <button class="btn hl-delete" type="button">Delete</button>
+      <button class="btn hl-rehash" type="button">Rehash</button>
+      <button class="btn quiet hl-reset" type="button">Clear</button>
+    </div>
+    <div class="controls">
+      <label>Collisions <select class="hl-mode" aria-label="Collision resolution"><option value="chain">separate chaining</option><option value="linear">linear probing</option><option value="quadratic">quadratic probing</option></select></label>
+      <label>Table size <input type="number" class="hl-size" min="2" max="31" value="10" aria-label="Table size"></label>
+    </div>
+    <div class="controls hl-presets" role="group" aria-label="Examples"></div>
+    <div class="hl-grid" aria-label="Hash table"></div>
+    <p class="hl-stat"></p>
+    <p class="out hl-out" role="status"></p>
+  </div>
+  <div class="table-wrap">
+  <table class="plain num">
+    <tr><th>Index</th><td>0</td><td>1</td><td>2</td><td>3–5</td><td>6</td><td>7</td><td>8</td><td>9</td></tr>
+    <tr><th>1a linear</th><td>8</td><td>37</td><td>57</td><td></td><td></td><td>7</td><td>48</td><td>9</td></tr>
+    <tr><th>1a after deleting 37, 7, 57</th><td>8</td><td>✝</td><td>✝</td><td></td><td></td><td>✝</td><td>48</td><td>9</td></tr>
+    <tr><th>1b quadratic</th><td></td><td>37</td><td>8</td><td></td><td>57</td><td>7</td><td>48</td><td>9</td></tr>
+    <tr><th>1c chaining</th><td></td><td></td><td></td><td></td><td></td><td>7 → 37 → 57</td><td>48 → 8</td><td>9</td></tr>
+  </table>
+  </div>
+  <div class="prose">
+    <p>In 1a, 8 probes 8, 9, 0; 37 probes 7, 8, 9, 0, 1; 57 probes 7 through 2. After the deletes (tombstones, ✝), deleting 17, which isn't there, probes 7, 8, 9, 0, 1, 2 and stops at the empty index 3: "we have reached an empty slot, but have not encountered 17. Therefore, it must not exist." In 1b, 8 probes 8, 9, then \(8 + 4 = 12 \to 2\); 37 probes 7, 8, then \(7 + 4 = 11 \to 1\); 57 probes 7, 8, 1, then \(7 + 9 = 16 \to 6\).</p>
+  </div>
+
+  <h2>Problem 2: double, double, toil and trouble</h2>
+  <div class="prose">
+    <p><strong>Double hashing:</strong> the first hash picks where to try first; on a collision the second hash sets the step, trying \(1\cdot h_2(\text{key})\), \(2\cdot h_2(\text{key})\), \(3\cdot h_2(\text{key})\), … away from the original spot.</p>
+    <p><strong>Two cons of quadratic probing:</strong> (1) once the table is half full (\(\lambda \ge \frac12\)) you aren't guaranteed a spot; (2) secondary clustering, since keys with the same home resolve the collision identically. With a good second hash, double hashing avoids both.</p>
+  </div>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Open addressing</th><th>Separate chaining</th></tr>
+    <tr><td>Moves a colliding element to a different index. Can use less memory. Linear probing: easiest, but primary clustering and frequent resizing. Quadratic: secondary clustering; finds a spot if \(\lambda &lt; \frac12\). Double hashing: low chance of clustering, but needs another hash function.</td><td>Puts all elements for an index in a "bucket" there. Easier to implement. More memory for the bucket structures. Average insert/delete/find \(O(1 + \lambda)\); best \(O(1)\), worst \(O(n)\).</td></tr>
+  </table>
+  </div>
+
+  <div class="check" data-id="cse332-w5-s5-qc-37-linear" data-grader="exact" data-answer="1" data-miscon='{"7":"no-mod","3":"first-free-not-probe"}'>
+    <p>Quick check: in 1a (linear probing), at what index does 37 go?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w5-s5-qc-57-quad" data-grader="exact" data-answer="6" data-miscon='{"2":"linear-not-quadratic","3":"linear-not-quadratic"}'>
+    <p>Quick check: in 1b (quadratic probing), at what index does 57 go?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The section slide on the midterm says: everything up to AVL trees, no hashing, sorting or graphs. Hashing is still on EX5 (due Nov 6) and the final.</li>
+      <li>In the widget's 1a preset, delete 37, 7, 57 and then delete 17 to reproduce the section's "experiment" slide.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S5: SORTING -->
+<section class="page" id="s5-sorting" data-title="Section 5: sorting, worked">
+  <p class="where">Section 5 · Sorting · <span class="today-chip" data-date="2026-10-29">Thu Oct 29</span></p>
+  <h1>Section 5: sorting</h1>
+  <div class="prose">
+    <p>Following the section slides and the <a href="https://docs.google.com/document/d/1Sw0ZMM2_67con9MjMmkGg9wBLdHEFBHw/edit" target="_blank" rel="noopener">sorting worksheet</a>'s <a href="https://docs.google.com/document/d/1HFzwrcbsHpsOu0MNJeL_E04j62enPv0D/edit" target="_blank" rel="noopener">official solutions</a>. The section adds one sort the lectures didn't: <strong>selection sort</strong>.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Selection sort (section slide 5).</strong> Build a sorted part at the front: find the smallest item in the unsorted part and swap it into place at the end of the sorted part. In place; not usually stable (it can be made stable by shifting instead of swapping and picking the left-most minimum). Best and worst case \(O(n^2)\): it scans the whole unsorted part every time.</p>
+  </div>
+  <div class="panel sortlab" id="sl-s5" data-presets='[{"label":"Problem 1 array","arr":[11,13,55,67,79,10,8,6,4,2],"alg":"selection"},{"label":"Problem 0: all 17s","arr":[17,17,17,17,17,17,17,17,17,17],"alg":"selection"},{"label":"Problem 2 (radix)","arr":[170,45,75,90,802,24,2,66],"alg":"radix"}]'>
+    <div class="controls">
+      <label>Sort <select class="sl-alg" aria-label="Algorithm"></select></label>
+      <label class="grow">Array <input type="text" class="sl-arr" aria-label="Array" spellcheck="false"></label>
+      <button class="btn primary sl-run" type="button">Sort it</button>
+    </div>
+    <div class="controls sl-presets" role="group" aria-label="Examples"></div>
+    <div class="sl-cells" aria-label="Array"></div>
+    <div class="controls"><button class="btn sl-prev" type="button">Back</button><button class="btn primary sl-next" type="button">Next step</button><button class="btn quiet sl-end" type="button">Last step</button><span class="sl-count"></span></div>
+    <p class="out sl-out" role="status"></p>
+    <div class="table-wrap"><table class="plain num sl-compare"></table></div>
+  </div>
+
+  <h2>Problems 0 and 1</h2>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Sort</th><th>0: all equal, {17, 17, …, 17}</th><th>1: {11, 13, 55, 67, 79, 10, 8, 6, 4, 2}</th></tr>
+    <tr><td>Insertion</td><td>\(O(n)\): nothing is less than its left neighbour, one pass</td><td>\(O(n^2)\): at least half the items move past half the array</td></tr>
+    <tr><td>Selection</td><td>\(O(n^2)\): always scans for the minimum \(n\) times</td><td>\(O(n^2)\)</td></tr>
+    <tr><td>Merge</td><td>\(O(n\log n)\): always</td><td>\(O(n\log n)\)</td></tr>
+    <tr><td>Quick (leftmost pivot)</td><td>\(O(n^2)\): every item lands on one side of each partition</td><td>\(O(n^2)\): after the first pivot (11), the left part is reverse sorted and costs the worst case</td></tr>
+  </table>
+  </div>
+  <p class="note">These are claims about arrays of this shape as \(n\) grows (an increasing run followed by a decreasing one), not about the ten numbers alone.</p>
+
+  <h2>Problem 2: radix sort [170, 45, 75, 90, 802, 24, 2, 66]</h2>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Pass</th><th>Buckets (non-empty)</th><th>Order after the pass</th></tr>
+    <tr><td>1's digit</td><td>0: 170, 90 · 2: 802, 2 · 4: 24 · 5: 45, 75 · 6: 66</td><td>170 90 802 2 24 45 75 66</td></tr>
+    <tr><td>10's digit</td><td>0: 802, 2 · 2: 24 · 4: 45 · 6: 66 · 7: 170, 75 · 9: 90</td><td>802 2 24 45 66 170 75 90</td></tr>
+    <tr><td>100's digit</td><td>0: 2, 24, 45, 66, 75, 90 · 1: 170 · 8: 802</td><td>2 24 45 66 75 90 170 802</td></tr>
+  </table>
+  </div>
+
+  <div class="check" data-id="cse332-w5-s5-qc-selection-same" data-grader="bigo" data-answer="n^2" data-miscon='{}'>
+    <p>Quick check: selection sort's running time on \(n\) equal keys.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w5-s5-qc-radix-10s" data-grader="text" data-answer="802 2 24 45 66 170 75 90|802, 2, 24, 45, 66, 170, 75, 90" data-miscon='{"2 24 45 66 75 90 170 802":"msd-first"}'>
+    <p>Quick check: the order of problem 2's numbers after the 10's-digit pass.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The section's advice: spend the most time on the non-comparison sorts. The question to keep asking is where the second variable in the running time comes from: it's the assumption that let us skip comparisons.</li>
+      <li>Problem 0's surprise is quicksort: all-equal input is its worst case with this partition, because nothing is strictly less than the pivot.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S5: PRACTICE -->
+<section class="page" id="s5-practice" data-title="Section 5: practice">
+  <p class="where">Section 5 · <span class="today-chip" data-date="2026-10-29">Thu Oct 29</span> · practice</p>
+  <h1>Section 5: practice</h1>
+  <div class="prose"><p>Both worksheets, answerable here and checked against the official solutions. Tables and orders were also produced by running the probes and sorts (<code>checks/cse332/w05/verify.mjs</code>).</p></div>
+
+  <article class="task" data-id="cse332-w5-s5-linear">
+    <h2>1. Hashing 1a: linear probing</h2>
+    <p class="prompt">Size 10, \(h(k) = k\). Insert 7, 9, 48, 8, 37, 57. Then delete 37, 7, 57 (tombstones), then try to delete 17.</p>
+    <div class="answer-spec" data-part="i8" data-grader="exact" data-answer="0" data-miscon='{"8":"no-mod"}' data-label="index of 8"></div>
+    <div class="answer-spec" data-part="i37" data-grader="exact" data-answer="1" data-label="index of 37"></div>
+    <div class="answer-spec" data-part="i57" data-grader="exact" data-answer="2" data-label="index of 57"></div>
+    <div class="answer-spec" data-part="del17" data-grader="exact" data-answer="7" data-miscon='{"1":"tomb-is-empty"}' data-label="slots looked at when deleting 17"></div>
+    <ol class="hints"><li>Indices 7, 8, 9 fill first; later keys wrap around to 0, 1, 2. Deleting 17 searches like a find.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>7 → 7, 9 → 9, 48 → 8. 8: 8, 9 taken → 0. 37: 7, 8, 9, 0 taken → 1. 57: 7, 8, 9, 0, 1 taken → 2.</li>
+      <li>After the deletes, indices 1, 2 and 7 hold tombstones.</li>
+      <li>Delete 17: 7 (tombstone), 8, 9, 0, 1 (tombstone), 2 (tombstone), 3 (empty, stop). 7 slots; 17 isn't there.</li>
+      <li class="answer">0; 1; 2; 7.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-s5-quad">
+    <h2>2. Hashing 1b: quadratic probing</h2>
+    <p class="prompt">The same keys and table, quadratic probing.</p>
+    <div class="answer-spec" data-part="i8" data-grader="exact" data-answer="2" data-miscon='{"0":"linear-not-quadratic"}' data-label="index of 8"></div>
+    <div class="answer-spec" data-part="i37" data-grader="exact" data-answer="1" data-label="index of 37"></div>
+    <div class="answer-spec" data-part="i57" data-grader="exact" data-answer="6" data-miscon='{"2":"linear-not-quadratic","3":"linear-not-quadratic"}' data-label="index of 57"></div>
+    <ol class="hints"><li>Try \(h\), \(h+1\), \(h+4\), \(h+9\), … mod 10.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>8: 8, 9, then 12 → 2.</li>
+      <li>37: 7, 8, then 11 → 1.</li>
+      <li>57: 7, 8, 11 → 1 (taken), then 16 → 6.</li>
+      <li class="answer">2; 1; 6.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-s5-chain">
+    <h2>3. Hashing 1c: separate chaining</h2>
+    <p class="prompt">The same keys, separate chaining with an unsorted linked list per slot, new keys added at the end.</p>
+    <div class="answer-spec" data-part="b7" data-grader="text" data-answer="7 37 57|7, 37, 57" data-label="bucket 7, front to back"></div>
+    <div class="answer-spec" data-part="b8" data-grader="text" data-answer="48 8|48, 8" data-label="bucket 8, front to back"></div>
+    <div class="answer-spec" data-part="lambda" data-grader="exact" data-answer="0.6" data-label="\(\lambda\)"></div>
+    <ol class="hints"><li>Each key goes to bucket \(k \bmod 10\), in arrival order.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>7, 37, 57 → bucket 7. 48, 8 → bucket 8. 9 → bucket 9.</li>
+      <li>\(\lambda = 6/10\).</li>
+      <li class="answer">7 → 37 → 57; 48 → 8; 0.6.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-s5-double">
+    <h2>4. Hashing 2: compare the strategies</h2>
+    <p class="prompt">Describe double hashing; give two cons of quadratic probing; compare open addressing with separate chaining.</p>
+    <div class="answer-spec" data-part="fixes" data-grader="choice" data-answer="both" data-options="cluster:secondary clustering only|half:the λ &lt; 1/2 limit only|both:both of them" data-label="with a good second hash, double hashing fixes which of quadratic probing's two cons?"></div>
+    <div class="answer-spec" data-part="avg" data-grader="choice" data-answer="1lambda" data-options="1:O(1)|lambda:O(λ²)|1lambda:O(1 + λ)|n:O(n)" data-label="chaining's average find, per the solution"></div>
+    <div class="answer-spec" data-part="written" data-grader="self" data-long data-label="your description and comparison"></div>
+    <ol class="hints"><li>The cons: what happens past half full, and what happens to keys that start at the same index?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Double hashing: \(h_1\) gives the first spot; on a collision, step by \(1\cdot h_2\), \(2\cdot h_2\), \(3\cdot h_2\), … from it.</li>
+      <li>Quadratic probing's cons: no guaranteed spot once \(\lambda \ge \frac12\); secondary clustering. A good \(h_2\) avoids both.</li>
+      <li>Open addressing: less memory, probing, clustering. Chaining: easier, more memory, average \(O(1 + \lambda)\), worst \(O(n)\).</li>
+      <li class="answer">Both; \(O(1 + \lambda)\); compare your written answer with the steps above.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-s5-same">
+    <h2>5. Sorting 0: all keys equal</h2>
+    <p class="prompt">Every element of the array is the same, e.g. {17, 17, …, 17}. Give each running time.</p>
+    <div class="answer-spec" data-part="ins" data-grader="bigo" data-answer="n" data-label="insertion sort"></div>
+    <div class="answer-spec" data-part="sel" data-grader="bigo" data-answer="n^2" data-label="selection sort"></div>
+    <div class="answer-spec" data-part="merge" data-grader="bigo" data-answer="n log n" data-label="merge sort"></div>
+    <div class="answer-spec" data-part="quick" data-grader="bigo" data-answer="n^2" data-label="quicksort"></div>
+    <ol class="hints"><li>Which of these can stop early when nothing is out of order? Which one puts every equal key on one side?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Insertion: no item is less than its neighbour, one pass: \(O(n)\).</li>
+      <li>Selection: always \(n\) scans for the minimum: \(O(n^2)\). Merge: always \(O(n\log n)\).</li>
+      <li>Quick: nothing is less than the pivot, so every partition puts all the rest on one side: \(O(n^2)\).</li>
+      <li class="answer">\(O(n)\); \(O(n^2)\); \(O(n\log n)\); \(O(n^2)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-s5-mixed">
+    <h2>6. Sorting 1: up, then down</h2>
+    <p class="prompt">Arrays shaped like {11, 13, 55, 67, 79, 10, 8, 6, 4, 2}: increasing, then decreasing, with the first item bigger than the second run's first. Quicksort uses the leftmost element as the pivot.</p>
+    <div class="answer-spec" data-part="ins" data-grader="bigo" data-answer="n^2" data-label="insertion sort"></div>
+    <div class="answer-spec" data-part="sel" data-grader="bigo" data-answer="n^2" data-label="selection sort"></div>
+    <div class="answer-spec" data-part="merge" data-grader="bigo" data-answer="n log n" data-label="merge sort"></div>
+    <div class="answer-spec" data-part="quick" data-grader="bigo" data-answer="n^2" data-label="quicksort"></div>
+    <ol class="hints"><li>The second half is reverse sorted. What does that cost insertion sort, and what does it leave for quicksort after the first pivot?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Insertion: the decreasing half moves past at least half the array each time: \(O(n^2)\).</li>
+      <li>Selection: always \(O(n^2)\). Merge: always \(O(n\log n)\).</li>
+      <li>Quick: after the first pivot, one side is reverse sorted and each later pivot is an extreme: \(O(n^2)\).</li>
+      <li class="answer">\(O(n^2)\); \(O(n^2)\); \(O(n\log n)\); \(O(n^2)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-s5-radix">
+    <h2>7. Sorting 2: radix sort</h2>
+    <p class="prompt">Radix sort [170, 45, 75, 90, 802, 24, 2, 66], base 10.</p>
+    <div class="answer-spec" data-part="ones" data-grader="text" data-answer="170 90 802 2 24 45 75 66|170, 90, 802, 2, 24, 45, 75, 66" data-label="order after the 1's digit"></div>
+    <div class="answer-spec" data-part="tens" data-grader="text" data-answer="802 2 24 45 66 170 75 90|802, 2, 24, 45, 66, 170, 75, 90" data-label="order after the 10's digit"></div>
+    <div class="answer-spec" data-part="hundreds" data-grader="text" data-answer="2 24 45 66 75 90 170 802|2, 24, 45, 66, 75, 90, 170, 802" data-label="order after the 100's digit"></div>
+    <ol class="hints"><li>Each pass reads the previous pass's order and appends to buckets; read the buckets 0 to 9.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>1's: 0 → 170, 90; 2 → 802, 2; 4 → 24; 5 → 45, 75; 6 → 66.</li>
+      <li>10's: 0 → 802, 2; 2 → 24; 4 → 45; 6 → 66; 7 → 170, 75; 9 → 90.</li>
+      <li>100's: 0 → 2, 24, 45, 66, 75, 90; 1 → 170; 8 → 802.</li>
+      <li class="answer">170 90 802 2 24 45 75 66; 802 2 24 45 66 170 75 90; 2 24 45 66 75 90 170 802.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w5-s5-warmup">
+    <h2>8. Warm-up: filling an AVL tree</h2>
+    <p class="prompt"><code>fillUniqueTree</code> inserts each of a list's \(n\) elements into an AVL tree (key and value both the element).</p>
+    <div class="answer-spec" data-part="unique" data-grader="bigo" data-answer="n log n" data-label="running time if all elements are unique"></div>
+    <div class="answer-spec" data-part="same" data-grader="bigo" data-answer="n" data-label="running time if all elements are the same"></div>
+    <ol class="hints"><li>When every key is the same, where does each insert find it?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Unique: \(n\) inserts at \(O(\log n)\) each.</li>
+      <li>All the same: after the first, every insert finds the key at the root and overwrites the value: \(O(1)\) each.</li>
+      <li class="answer">\(O(n\log n)\); \(O(n)\).</li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S5: QUIZ -->
+<section class="page" id="s5-quiz" data-title="Check your understanding: Section 5">
+  <p class="where">Section 5 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: Section 5</h1>
+  <div class="prose"><p>Eight questions on the section. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="s5" role="status"></div>
+  <ol class="cyu-list" data-quiz="s5">
+    <li class="cyu" data-id="cse332-w5-s5-cyu-probe-f" data-kind="mc" data-topic="s5-hashing">
+      <p class="q">Double hashing's probe offset on the \(i\)th try is…</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w5-s5-cyu-probe-f"> \(i\)<span class="why" hidden>That's linear probing.</span></label>
+        <label><input type="radio" name="cse332-w5-s5-cyu-probe-f"> \(i^2\)<span class="why" hidden>That's quadratic probing.</span></label>
+        <label data-correct><input type="radio" name="cse332-w5-s5-cyu-probe-f"> \(i\cdot g(\text{key})\)<span class="why" hidden>Correct.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-s5-cyu-48-quad" data-kind="num" data-answer="8" data-topic="s5-hashing">
+      <p class="q">In problem 1b, at what index does 48 go?</p>
+      <p class="why" hidden>48 mod 10 = 8, and 8 is free at that point.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w5-s5-cyu-delete-missing" data-kind="mc" data-topic="s5-hashing">
+      <p class="q">With tombstones, how does a delete decide a key isn't in the table?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-s5-cyu-delete-missing"> It reaches an empty slot without seeing the key<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w5-s5-cyu-delete-missing"> It reaches a tombstone<span class="why" hidden>Tombstones don't stop the search.</span></label>
+        <label><input type="radio" name="cse332-w5-s5-cyu-delete-missing"> It checks only the home index<span class="why" hidden>The key might have been placed further along its probe path.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-s5-cyu-chain-memory" data-kind="mc" data-topic="s5-hashing">
+      <p class="q">Which typically uses more memory?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-s5-cyu-chain-memory"> Separate chaining<span class="why" hidden>Correct: the bucket data structures cost extra.</span></label>
+        <label><input type="radio" name="cse332-w5-s5-cyu-chain-memory"> Open addressing<span class="why" hidden>Open addressing stores items in the array itself.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-s5-cyu-selection-best" data-kind="bigo" data-answer="n^2" data-topic="s5-sorting">
+      <p class="q">Selection sort's best-case running time.</p>
+      <p class="why" hidden>It always scans the rest of the array for the minimum: \(O(n^2)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w5-s5-cyu-ins-equal" data-kind="bigo" data-answer="n" data-topic="s5-sorting">
+      <p class="q">Insertion sort on \(n\) equal keys.</p>
+      <p class="why" hidden>Nothing is less than its neighbour: one pass, \(O(n)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w5-s5-cyu-quick-equal" data-kind="mc" data-topic="s5-sorting">
+      <p class="q">Why is quicksort \(O(n^2)\) on all-equal keys?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w5-s5-cyu-quick-equal"> Every key lands on the same side of the pivot, so each partition places only one item<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w5-s5-cyu-quick-equal"> Equal keys can't be compared<span class="why" hidden>They compare fine; they're just never less than the pivot.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w5-s5-cyu-radix-first" data-type="text" data-answer="170 90 802 2 24 45 75 66|170, 90, 802, 2, 24, 45, 75, 66" data-topic="s5-sorting" data-miscon='{"2 24 45 66 75 90 170 802":"msd-first"}'>
+      <p class="q">Radix sort [170, 45, 75, 90, 802, 24, 2, 66]: type the order after the 1's-digit pass.</p>
+      <p class="why" hidden>Buckets 0: 170, 90 · 2: 802, 2 · 4: 24 · 5: 45, 75 · 6: 66.</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="s5" role="status"></div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ READINGS -->
+<section class="page" id="readings" data-title="Readings">
+  <h1>Readings</h1>
+  <div class="prose"><p>The textbook is optional; the calendar lists sections per lecture. There's no topic summary for sorting yet; the Hashing summary covers Section 5's first half.</p></div>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Mon Oct 26 · Sorting 1</th><td>Weiss 7.1–7.3, 7.5–7.7. <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec12-sorting-1.pdf" target="_blank" rel="noopener">Slides (pdf)</a></td></tr>
+    <tr><th>Wed Oct 28 · Sorting 2</th><td>Weiss 7.8–7.11. <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec13-sorting-2.pdf" target="_blank" rel="noopener">Slides (pdf)</a></td></tr>
+    <tr><th>Thu Oct 29 · Section 5</th><td><a href="https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section05-Hashing.pdf" target="_blank" rel="noopener">Hashing slides</a> · <a href="https://docs.google.com/document/d/119G538OV5qN-g_Q3R89bCsjYCRwNDqyF/edit" target="_blank" rel="noopener">worksheet</a> · <a href="https://docs.google.com/document/d/1mGEE1gMEY3Sb4I092oJTXVaVi8skw4XM/edit" target="_blank" rel="noopener">solutions</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section05-Sorting.pdf" target="_blank" rel="noopener">Sorting slides</a> · <a href="https://docs.google.com/document/d/1Sw0ZMM2_67con9MjMmkGg9wBLdHEFBHw/edit" target="_blank" rel="noopener">worksheet</a> · <a href="https://docs.google.com/document/d/1HFzwrcbsHpsOu0MNJeL_E04j62enPv0D/edit" target="_blank" rel="noopener">solutions</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/hashing.html" target="_blank" rel="noopener">Summary: Hashing</a></td></tr>
+    <tr><th>Fri Oct 30 · Graphs 1</th><td>Weiss 9.1. Slides not posted yet.</td></tr>
+  </table>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CHEATSHEET -->
+<section class="page" id="cheatsheet" data-title="Cheat sheet">
+  <h1>Week 5 cheat sheet</h1>
+  <p class="where">Print with <kbd>Ctrl</kbd>+<kbd>P</kbd>; only this page prints.</p>
+  <div class="cheat">
+    <section>
+      <h3>Properties</h3>
+      <p><strong>In place:</strong> \(\Theta(1)\) extra space. <strong>Adaptive:</strong> faster on nearly sorted input. <strong>Online:</strong> can start before all input arrives. <strong>Stable:</strong> ties keep their order.</p>
+    </section>
+    <section>
+      <h3>Comparison sorts</h3>
+      <table class="plain">
+        <tr><th></th><th>worst</th><th>best</th><th>in place</th><th>adaptive</th><th>online</th><th>stable</th></tr>
+        <tr><td>Insertion</td><td>\(n^2\)</td><td>\(n\)</td><td>yes</td><td>yes</td><td>yes</td><td>yes</td></tr>
+        <tr><td>Selection</td><td>\(n^2\)</td><td>\(n^2\)</td><td>yes</td><td>no</td><td>no</td><td>not usually</td></tr>
+        <tr><td>Heap</td><td>\(n\log n\)</td><td>\(n\log n\)</td><td>yes</td><td>no</td><td>no</td><td>no</td></tr>
+        <tr><td>Merge</td><td>\(n\log n\)</td><td>\(n\log n\)</td><td>no</td><td>no</td><td>no</td><td>yes</td></tr>
+        <tr><td>Quick</td><td>\(n^2\)</td><td>\(n\log n\)</td><td>kinda</td><td>no</td><td>no</td><td>no</td></tr>
+      </table>
+    </section>
+    <section>
+      <h3>Recurrences</h3>
+      <p>Merge sort and quicksort with a median pivot: \(T(n) = 2T(n/2) + n \in \Theta(n\log n)\). Quicksort with an extreme pivot: \(T(n) = T(n-1) + n \in \Theta(n^2)\).</p>
+    </section>
+    <section>
+      <h3>Partition</h3>
+      <p>Pivot first; Begin after it, End at the end. Begin value &lt; \(p\): Begin right; else swap with End, End left. Meet at a value &lt; \(p\): swap \(p\) there; otherwise one to the left. \(O(n)\). Median of three: first, middle, last.</p>
+    </section>
+    <section>
+      <h3>Linear-time sorts</h3>
+      <p>Bucket sort, values 0 to \(k-1\): \(\Theta(n + k)\), stable, not in place. Radix sort, base \(b\), max \(m\): bucket by each digit, least significant first; \(\Theta(n\log_b m + b\log_b m)\).</p>
+    </section>
+    <section>
+      <h3>Hashing (Section 5)</h3>
+      <p>Probe \(i\): \((h + f(i)) \bmod\) size, with \(f(i) = i\), \(i^2\) or \(i\cdot g(k)\). Tombstones don't stop a search. Chaining average \(O(1 + \lambda)\). Quadratic: secondary clustering, needs \(\lambda &lt; \frac12\).</p>
+    </section>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+</main>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="../../core/katex/katex.min.js"></script>
+<script src="../../core/katex/contrib/auto-render.min.js"></script>
+<script src="../../courses.js"></script>
+<script src="../../core/grader.js"></script>
+<script src="../../core/store.js"></script>
+<script src="sim.js"></script>
+<script src="week.js"></script>
+<script src="../../core/app.js"></script>
+</body>
+</html>

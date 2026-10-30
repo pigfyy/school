@@ -1,0 +1,644 @@
+ CSE 332 Autumn 2026
+Lecture 13: Sorting, pt. 2
+             Ruth Anderson
+       http://www.cs.uw.edu/332
+
+
+
+
+                                  1
+Announcements
+• “Meet the staff” activity – Come meet us in office hours!
+   • Will keep this open thru end of week 6 (Nov 6), but will be de-prioritized in OH
+• Participate in Section, earn a late day (see Ed Board post)
+• Exercise 4 AVL Trees: Due Friday Oct 30
+• Exercise 5 Hashing: Due Friday Nov 6
+• Exercise 6 Sorting: coming later this week, due Nov 13
+• Midterm: 5-6pm Monday November 9
+   • Review during both lecture sections on Fri Nov 6
+   • No lecture on Mon Nov 9
+   • Sample exams posted! See exams page.
+
+                                                                                    2
+Properties To Consider
+• Worst case running time
+• In place:
+   • We only need to use the pre-existing array to do sorting
+   • Constant extra space (only some additional variables needed)
+• Adaptive
+   • The running time improves as the given list is closer to being sorted
+   • It should be linear time for a pre-sorted list, and nearly linear time if the list is nearly
+     sorted
+• Online
+   • We can start sorting before we have the entire list.
+• Stable
+   • “Tied” elements keep their original order
+
+
+                                                                                                    3
+Divide And Conquer Sorting
+• Divide and Conquer:
+   • Recursive algorithm design technique
+   • Solve a large problem by breaking it up into smaller versions of the same
+     problem
+
+
+
+
+                                                                                 4
+Divide and Conquer
+         • Base Case:
+            • If the problem is “small” then solve directly and return
+
+
+         • Divide:
+            • Break the problem into subproblem(s), each smaller instances
+
+
+         • Conquer:
+            • Solve subproblem(s) recursively
+
+
+         • Combine:
+            • Use solutions to subproblems to solve original problem
+                                                                         5
+    Divide and Conquer Template Pseudocode
+def my_DandC(problem) {
+  // Base Case
+  if (problem.size() <= small_value) {
+      return solve(problem); // directly solve (e.g., brute force)
+  }
+  // Divide
+  List subproblems = divide(problem);
+
+    // Conquer
+    solutions = new List();
+    for (sub : subproblems) {
+       subsolution = my_DandC(sub);
+       solutions.add(subsolution);
+    }
+    // Combine
+    return combine(solutions);
+}                                                                    6
+                                                                          5   8   2   9   4   1
+
+        Merge Sort
+    5
+                        • Base Case:
+                           • If the list is of length 1 or 0, it’s already sorted, so just return it
+
+5   8   2   9   4   1   • Divide:
+                           • Split the list into two “sublists” of (roughly) equal length
+
+2   5   8   1   4   9   • Conquer:
+                           • Sort both lists recursively
+
+2   5   8   1   4   9   • Combine:
+                           • Merge sorted sublists into one sorted list
+1   2   4   5   8   9
+                                                                                                       7
+     Merge Sort In Action!
+Sort between indices 𝑙𝑙𝑙𝑙𝑙𝑙 and ℎ𝑖𝑖𝑖𝑖𝑖
+
+                                 5       8       2            9           4          1            3           7
+
+                           𝑙𝑙𝑙𝑙𝑙𝑙                                                                         ℎ𝑖𝑖𝑖𝑖𝑖
+Base Case: if 𝑙𝑙𝑙𝑙𝑙𝑙 == ℎ𝑖𝑖𝑖𝑖𝑖 then that range is already sorted!
+                                                                                        𝑙𝑙𝑙𝑙𝑙𝑙+ℎ𝑖𝑖𝑖𝑖𝑖             𝑙𝑙𝑙𝑙𝑙𝑙+ℎ𝑖𝑖𝑖𝑖𝑖
+Divide and Conquer: Otherwise call mergesort on ranges 𝑙𝑙𝑙𝑙𝑙𝑙,                                          and                     + 1, ℎ𝑖𝑖𝑖𝑖𝑖
+                                                                                              2                         2
+
+
+                           5         8       2            9           4          1            3           7
+
+                        𝑙𝑙𝑙𝑙𝑙𝑙                   𝑙𝑙𝑙𝑙𝑙𝑙 + ℎ𝑖𝑖𝑖𝑖𝑖   𝑙𝑙𝑙𝑙𝑙𝑙 + ℎ𝑖𝑖𝑖𝑖𝑖                      ℎ𝑖𝑖𝑖𝑖𝑖
+                                                        2                          +1
+                                                                          2
+
+
+After Recursion:           2         5       8            9           1          3            4           7
+
+                                                                                                        ℎ𝑖𝑖𝑖𝑖𝑖                                8
+                        𝑙𝑙𝑙𝑙𝑙𝑙
+Merge (the combine part)
+        Create a new array to merge into, and 3 pointers/indices:
+        • L_next: the smallest “unmerged” thing on the left
+        • R_next: the smallest “unmerged” thing on the right
+        • M_next: where the next smallest thing goes in the merged array
+
+        One-by-one: put the smallest of L_next and R_next into M_next,
+        then advance both M_next and whichever of L/R was used.
+
+
+                2     5     8         9           1           3      4     7
+
+                                𝑙𝑙𝑙𝑙𝑙𝑙 + ℎ𝑖𝑖𝑖𝑖𝑖 𝑙𝑙𝑙𝑙𝑙𝑙 + ℎ𝑖𝑖𝑖𝑖𝑖          ℎ𝑖𝑖𝑖𝑖𝑖
+             𝑙𝑙𝑙𝑙𝑙𝑙                                             +1
+                                       2               2
+
+
+
+
+                                                                                  9
+ Merge Sort Pseudocode
+void mergesort(myArray) {
+      ms_helper(myArray, 0, myArray.length());
+}
+void ms_helper(myArray, low, high) {
+      if (low == high) {return;} // Base Case
+      mid = (low+high)/2;
+      ms_helper(low, mid);
+      ms_helper(mid+1, high);
+      merge(myArray, low, mid, high);
+}
+                                                 10
+Merge Pseudocode
+void merge(myArray, low, mid, high) {
+       merged = new int[high-low+1]; // or whatever type is in myArray
+       l_next = low;
+       r_next = mid + 1;
+       m_next = 0;
+       while (l_next <= mid && r_next <= high) {
+                 if (myArray[l_next] <= myArray[r_next]) {
+                         merged[m_next++] = myArray[l_next++];
+                 }
+                 else {
+                         merged[m_next++] = myArray[r_next++];
+                 }
+       }
+       while (l_next <= mid) { merged[m_next++] = myArray[l_next++]; }
+       while (r_next <= high) { merged[m_next++] = myArray[r_next++]; }
+       for (i = 0; i <= merged.length; i++) { myArray[i+low] = merged[i];}
+}                                                                            11
+ Analyzing Merge Sort
+1.   Identify time required to Divide and Combine
+2.   Identify all subproblems and their sizes
+3.   Use recurrence relation to express recursive running time
+4.   Solve and express running time asymptotically
+
+• Divide: 0 comparisons
+                                              𝑛𝑛
+• Conquer: recursively sort two lists of size
+                                              2
+• Combine: 𝑛𝑛 comparisons
+• Recurrence:
+                         𝑛𝑛          𝑛𝑛
+     𝑇𝑇 𝑛𝑛 = 0 + 𝑇𝑇           + 𝑇𝑇        + 𝑛𝑛
+                         2           2
+                    𝑛𝑛
+     𝑇𝑇(𝑛𝑛) = 2𝑇𝑇        + 𝑛𝑛
+                    2
+                                                                 12
+                                                                                  𝑛𝑛
+       Tree Method 𝑇𝑇 𝑛𝑛 = 2𝑇𝑇                                                           + 𝑛𝑛
+                                                                                  2
+   Red box represents a
+    problem instance
+                                                          𝑛𝑛
+                                                                   𝑛𝑛                                            ⇒ 𝑛𝑛 work per level
+ Blue value next to each
+box represents time spent
+  at that recursive call                    𝑛𝑛                                          𝑛𝑛
+                               𝑛𝑛⁄2         2                               𝑛𝑛⁄2        2
+
+                              𝑛𝑛                     𝑛𝑛                      𝑛𝑛                  𝑛𝑛             log 2 𝑛𝑛 levels
+                 𝑛𝑛⁄4         4        𝑛𝑛⁄4          4         𝑛𝑛⁄4          4     𝑛𝑛⁄4          4              of recursion
+                 …
+
+                                   …
+
+
+                                                               …
+
+                                                                                   …
+             1
+                  1
+                          1
+                               1
+                                   1
+                                        1
+                                                 …             1
+                                                                        1
+                                                                             1
+                                                                                   1
+                                                                                        1
+                                                                                             1
+
+                                                                                                      log2 𝑛𝑛
+
+                                                                                       𝑇𝑇 𝑛𝑛 = � 𝑛𝑛 = Θ 𝑛𝑛 log 𝑛𝑛
+                                                                                                                                  13
+                                                                                                       𝑖𝑖=0
+Merge Sort Properties
+• Worst case running time
+    • Θ(𝑛𝑛 log 𝑛𝑛)
+• In place:
+    • NO!
+    • We need a second array to merge into
+• Adaptive
+    • NO!
+    • Running time is the same regardless of original list’s order
+• Online
+    • NO!
+    • We need all elements before we can divide
+• Stable
+    • YES!
+    • When merging, and there’s a tie, choose the element from the left
+
+                                                                          14
+Quicksort Vs. Mergesort
+• Like Mergesort:
+   • Divide and conquer
+   • 𝑂𝑂(𝑛𝑛 log 𝑛𝑛) run time (kind of…)
+• Unlike Mergesort:
+   • Divide step is the “hard” part
+   • Typically faster than Mergesort
+
+
+
+
+                                         15
+Quicksort Overview
+Idea: pick a pivot element from the array, recursively sort two sublists
+around that element
+• Divide: select pivot element 𝑝𝑝, Partition(𝑝𝑝)
+• Conquer: recursively sort left and right sublists
+• Combine: Nothing to do!
+
+
+
+
+                                                                           16
+Partition (Divide step)
+     Given: a list, a pivot 𝑝𝑝
+     • (We’ll talk later about how to select the pivot)
+     • Move the pivot to the first location in the array
+
+
+     Start: unordered list
+         8    5     7    3    12   10    1    2     4      9    6   11
+
+
+
+
+     Goal: All elements < 𝑝𝑝 on left, all > 𝑝𝑝 on right
+         5    7     3    1    2     4    6    8    12      10   9   11
+
+
+                                                                         17
+Partition Procedure (Slide 1 of 2)
+      If Begin value < 𝑝𝑝, move Begin right
+      Else swap Begin value with End value, move End Left
+      Done when Begin = End
+
+              8   5   7   3   12   10   1   2   4   9   6   11
+
+
+
+              8   5   7   3   12   10   1   2   4   9   6   11
+
+
+
+              8   5   7   3   12   10   1   2   4   9   6   11
+
+
+
+
+              8   5   7   3   11   10   1   2   4   9   6   12
+                                                                 18
+Partition Procedure (Slide 2 of 2)
+      If Begin value < 𝑝𝑝, move Begin right
+      Else swap Begin value with End value, move End Left
+      Done when Begin = End
+
+            8   5   7   3   11   10   1   2   4   9    6    12
+
+
+
+            8   5   7   3   6    10   1   2   4   9    11   12
+
+
+
+            8   5   7   3   6    10   1   2   4   9    11   12
+
+
+
+            8   5   7   3   6    9    1   2   4   10   11   12
+                                                                 19
+Partition – Begin Meets End (Case 1)
+      If Begin value < 𝑝𝑝, move Begin right
+      Else swap Begin value with End value, move End Left
+      Done when Begin = End
+
+            8   5   7   3   6   4   1   2   10   9   11   12
+
+
+
+       Case 1: meet at element < 𝑝𝑝
+             Swap 𝑝𝑝 with pointer position (2 in this case)
+
+            2   5   7   3   6   4   1   8   10   9   11   12
+
+
+                                                               20
+Partition – Begin Meets End (Case 2)
+      If Begin value < 𝑝𝑝, move Begin right
+      Else swap Begin value with End value, move End Left
+      Done when Begin = End
+
+            8   5   7   3   6   4   1   2   10   9   11   12
+
+
+
+       Case 2: meet at element > 𝑝𝑝
+             Swap 𝑝𝑝 with value to the left of pointer (2 in this case)
+
+
+            2   5   7   3   6   4   1   8   10   9   11   12
+
+
+
+                                                                          21
+Partition Summary
+1. Put 𝑝𝑝 at beginning of list
+2. Put a pointer (Begin) just after 𝑝𝑝, and a pointer (End) at the end of
+   the list
+3. While Begin < End:
+  1. If Begin value < 𝑝𝑝, move Begin right
+  2. Else swap Begin value with End value, move End Left
+4. If pointers meet at element < 𝑝𝑝: Swap 𝑝𝑝 with pointer position
+5. Else If pointers meet at element > 𝑝𝑝: Swap 𝑝𝑝 with value to the left
+
+                                                       Run time?
+                                                                            22
+Partition Summary (Answers)
+1. Put 𝑝𝑝 at beginning of list
+2. Put a pointer (Begin) just after 𝑝𝑝, and a pointer (End) at the end of
+   the list
+3. While Begin < End:
+  1. If Begin value < 𝑝𝑝, move Begin right
+  2. Else swap Begin value with End value, move End Left
+4. If pointers meet at element < 𝑝𝑝: Swap 𝑝𝑝 with pointer position
+5. Else If pointers meet at element > 𝑝𝑝: Swap 𝑝𝑝 with value to the left
+
+                                                       Run time?   𝑂𝑂(𝑛𝑛)
+                                                                            23
+Conquer
+       2   5   7   3   6   4   1   8   10   9   11   12
+
+
+
+           All elements < 𝑝𝑝           All elements > 𝑝𝑝
+
+                       Exactly where it belongs!
+
+
+
+
+      Recursively sort Left and Right sublists
+
+                                                           24
+Quicksort Run Time (Best)
+     If the pivot is always the median:
+        2   5   1   3     6   4   7   8   10     9    11   12
+
+
+
+
+        2   1   3   5     6   4   7   8   9      10   11   12
+
+
+     Then we divide in half each time
+                                      𝑛𝑛
+                        𝑇𝑇 𝑛𝑛 = 2𝑇𝑇       + 𝑛𝑛
+                                      2
+                         𝑇𝑇 𝑛𝑛 = 𝑂𝑂(𝑛𝑛 log 𝑛𝑛)
+                                                                25
+Quicksort Run Time (Worst)
+     If the pivot is always at the extreme:
+        1   5   2   3   6   4   7   8   10   9   11   12
+
+
+
+
+        1   2   3   5   6   4   7   8   10   9   11   12
+
+
+     Then we shorten by 1 each time
+
+                    𝑇𝑇 𝑛𝑛 = 𝑇𝑇 𝑛𝑛 − 1 + 𝑛𝑛
+
+                        𝑇𝑇 𝑛𝑛 = 𝑂𝑂(𝑛𝑛2 )
+                                                           26
+Quicksort Worst Case Tree Method
+ 𝑇𝑇 𝑛𝑛 = 𝑇𝑇 𝑛𝑛 − 1 + 𝑛𝑛
+                  𝑛𝑛                              𝑛𝑛−1         𝑛𝑛
+           𝑛𝑛                                                        𝑛𝑛(𝑛𝑛 + 1)
+                                          𝑇𝑇 𝑛𝑛 = � 𝑛𝑛 − 𝑖𝑖 = � 𝑖𝑖 =
+                                                                          2
+                  𝑛𝑛 − 1                          𝑖𝑖=0        𝑖𝑖=1
+        𝑛𝑛 − 1
+                                                         = Θ 𝑛𝑛2
+                  𝑛𝑛 − 2
+        𝑛𝑛 − 2               𝑛𝑛 levels
+                  𝑛𝑛 − 3   of recursion
+        𝑛𝑛 − 3
+          …
+                  1
+           1
+                                                                            27
+Picking a Good Pivot
+• What makes a good Pivot?
+   • Roughly even split between left and right
+   • Ideally: median
+• There are ways to find the median in linear time, but it’s complicated
+  and slow and you’re better off using mergesort
+• In Practice:
+   • Pick a “random” value as a pivot
+   • Median of Three: Pick the middle of 3 “random” values as the pivot
+      • E.g. Compare the elements in the: first, last and middle locations of the array;
+        Pick the middle of these 3 values. Can be done in constant time!
+
+
+                                                                                           28
+Quick Sort Properties
+• Worst case running time
+    • Θ(𝑛𝑛2 ), but “almost always” Θ(𝑛𝑛 log 𝑛𝑛) in practice
+    • Better constants than merge sort
+• In place:
+    • Kinda…
+    • We swap within the given array, but do so using recursion, so we need space for the stack frames
+    • Different textbooks disagree on whether call-stack space “counts” towards your space use
+• Adaptive
+    • NO!
+• Online
+    • NO!
+    • We need all elements before we can divide
+• Stable
+    • NO!
+    • Swapping during Partition procedure may rearrange tied elements
+
+
+                                                                                                         29
+“Linear Time” Sorting Algorithms
+• Useable when you are able to make additional assumptions about the
+  contents of your list (beyond the ability to compare)
+   • Examples:
+      • The list contains only positive integers less than 𝑘𝑘
+      • The number of distinct values in the list is much smaller than the length of the list
+• The running time expression will always have a term other than the
+  list’s length to account for this assumption
+   • Examples:
+      • Running time might be Θ(𝑘𝑘 + 𝑛𝑛) where 𝑘𝑘 is the range/count of values
+
+
+
+
+                                                                                                30
+        BucketSort
+        • Assumes the array contains integers between 0 and 𝑘𝑘 − 1 (or some
+          other small range)
+        • Idea:
+                • Use each value as an index into an array of size 𝑘𝑘
+                • Add the item into the “bucket” at that index (e.g. linked list)
+                • Get sorted array by “appending” all the buckets
+
+
+                                                 0
+                                                 0        2
+                                                     1        3
+0   2   3   0    0   1   2   1   3   0   2   0   0        2            0   0   0    0   0   1   1   2   2    2   3   3
+                                                     1        3
+                                                 0        2
+                                                 0
+                                                                                                            31
+                                                 0   1    2   3
+BucketSort Running Time
+• Create array of 𝑘𝑘 buckets
+   • Either Θ(𝑘𝑘) or Θ(1) depending on some things…
+• Insert all 𝑛𝑛 things into buckets
+   • Θ(𝑛𝑛)
+• Empty buckets into an array
+   • Θ(𝑛𝑛 + 𝑘𝑘)
+• Overall:
+   • Θ 𝑛𝑛 + 𝑘𝑘
+• When is this better than mergesort?
+
+                                                      32
+Properties of BucketSort
+• In-Place?
+   • No
+• Adaptive?
+   • No
+• Stable?
+   • Yes!
+
+
+
+
+                           33
+     RadixSort
+• Radix: The base of a number system
+     • We’ll use base 10, most implementations will use larger bases
+• Idea:
+     • BucketSort by each digit, one at a time, from least significant to most significant
+
+103 801 401 323 255 823 999 101 113 901 555 512 245 800 018 121
+ 0    1      2   3   4   5   6      7   8   9   10   11       12       13       14   15
+
+
+                                                          801
+                                                                  103
+                                                          401                             255
+          Place each element into                     800 101 512
+                                                                  323
+                                                                                          555           018 999
+                                                                  823
+          a “bucket” according to                         901
+                                                                  113
+                                                                                          245
+          its 1’s place                                   121
+                                                          0        1        2    3    4   5     6   7   8
+                                                                                                        34   9
+    RadixSort – Re-Bucket by 10s
+• Radix: The base of a number system
+    • We’ll use base 10, most implementations will use larger bases
+• Idea:
+    • BucketSort by each digit, one at a time, from least significant to most significant
+    801
+            103
+    401                255
+            323
+800 101 512            555             018 999
+            823
+    901                245
+            113
+    121
+                                                  800
+0    1     2   3   4   5     6     7   8    9     801
+                                                      512 121
+                                                  401                     255
+                                                      113 323       245                     999
+                                                  101                     555
+         Place each element into                  901
+                                                      018 823
+         a “bucket” according to                  103
+         its 10’s place                            0   1   2    3   4     5     6   7   8 35 9
+     RadixSort – Re-Bucket by 100s
+  • Radix: The base of a number system
+      • We’ll use base 10, most implementations will use larger bases
+  • Idea:
+      • BucketSort by each digit, one at a time, from least significant to most significant
+800
+801
+    512 121
+401                     255
+    113 323       245                     999
+101                     555
+    018 823
+901
+103
+                                                       101
+ 0   1   2    3   4     5     6   7   8    9                                            800
+                                                       103 245         512                  901
+                                                   018         323 401                  801
+                                                       113 255         555                  999
+        Place each element into                        121
+                                                                                        823
+        a “bucket” according to
+        its 100’s place                             0    1   2    3   4   5    6    7    8 36 9
+         RadixSort – Empty Buckets into Output Array
+    • Radix: The base of a number system
+         • We’ll use base 10, most implementations will use larger bases
+    • Idea:
+         • BucketSort by each digit, one at a time, from least significant to most significant
+
+    101
+                                     800
+    103 245         512                  901
+018         323 401                  801
+    113 255         555                  999                      Convert back into an array
+                                     823
+    121
+
+0    1     2   3   4    5    6   7    8   9
+
+
+
+    018 101 103 113 121 245 255 323 401 512 555 800 801 823 901 999
+                                                                                                 37
+     0    1    2   3    4   5    6   7    8    9   10   11   12   13   14   15
+RadixSort Running Time
+• Suppose largest value is 𝑚𝑚
+• Choose a radix (base of representation) 𝑏𝑏
+• BucketSort all 𝑛𝑛 things using 𝑏𝑏 buckets
+   • Θ(𝑛𝑛 + 𝑘𝑘)
+• Repeat once per each digit
+   • log 𝑏𝑏 𝑚𝑚 iterations
+• Overall:
+   • Θ 𝑛𝑛 log 𝑏𝑏 𝑚𝑚 + 𝑏𝑏 log 𝑏𝑏 𝑚𝑚
+• In practice, you can select the value of 𝑏𝑏 to optimize running time
+• When is this better than mergesort?
+
+                                                                         38
+

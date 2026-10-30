@@ -1,0 +1,284 @@
+CSE 332 Se c t io n 5
+So rt in g
+
+Original slides by James Richie Sulaeman
+Revised by Rubee Zhao & Vicky Ye
+Pro p e rt ie s : Ho w t o c h o o s e s o rt in g m e t h o d ?
+➔ Comparison-based / non-comparison-based: <, >, =
+➔ Stable: preserve the given order if =
+➔ In-place: no need for extra data structure to store values
+➔ Online: begin with an incomplete list
+➔ Adaptive: better running time for nearly sorted input
+➔ Running Time
+Co m p a ris o n -b a s e d So rt in g
+In s e rt io n So rt
+Insertion sort builds a sorted subarray at the
+front of the original array. Takes the first
+element of the unsorted subarray and inserts
+it into the sorted subarray.
+
+Properties:
+
+ ●   In-place and stable
+ ●   Best-case runtime: O(n)
+ ●   Worst-case runtime: O(n²)
+Se le c t io n So rt
+Selection sort builds a sorted subarray at the
+front of the original array. Takes the first
+element of the unsorted subarray and swaps
+it into the correct location at the end of the
+sorted subarray.
+
+Properties:
+
+ ●   In-place and not usually stable
+       ○ Can be made stable if you shift
+           instead of swapping and break
+           ties by selecting the left-most
+           element
+ ●   Best-case runtime: O(n²)
+ ●   Worst-case runtime: O(n²)
+Me rg e So rt
+Merge sort recursively splits an array into
+two halves, sorts them, and then merges
+them back together to obtain a sorted array.
+
+Properties:
+
+ ●   Not in-place but stable
+ ●   Best-case runtime: O(n log n)
+ ●   Worst-case runtime: O(n log n)
+
+
+mergeSort(input) -> sorted input:
+1. sortedLeft = mergeSort(left half of input)
+2. sortedRight = mergeSort(right half of input)
+3. return (merged ‘sortedLeft’ and ‘sortedRight’)
+Qu ic k So rt
+                                             quickSort(input) -> void:
+Quick sort recursively partitions an array   1. pick pivot
+                                             2. partition input into ‘lessThanPivot’
+based on a pivot element, sorts the          and
+subarrays on either side of the pivot, and       ‘greaterThanPivot’ parts
+                                             3. quickSort(lessThanPivot)
+merges them back together to obtain a        4. quickSort(greaterThanPivot)
+sorted array.
+
+Properties:
+
+ ●   In-place but not stable.
+ ●   Best-case runtime: O(n log n)
+ ●   Worst-case runtime: O(n²)
+Pro b le m 0
+Pro b le m 0 : Se t u p
+Suppose we sort an array of numbers, but it turns out every element of the array is
+the same (e.g. [17, 17, 17, …, 17]).
+
+What is the asymptotic runtime of the following sorting algorithms?
+
+Sorting Algorithm   Asymptotic Runtime   Explanation
+
+Insertion Sort
+
+Selection Sort
+
+Merge Sort
+
+Quick Sort
+Pro b le m 0 : So lu t io n
+
+Sorting Algorithm   Asymptotic Runtime   Explanation
+
+Insertion Sort      O(n)                 Insertion Sort will traverse the array, but since it is already
+                                         ‘sorted’, no extra computation is necessary.
+
+Selection Sort      O(n²)                Selection Sort always has O(n²) runtime since it has to find
+                                         the smallest item in the unsorted subarray n times.
+
+Merge Sort          O(n log n)           Merge Sort always has O(n log n) runtime. You can prove
+                                         this using recurrences!
+
+Quick Sort          O(n²)                This is the worst case for Quick Sort. Since all the
+                                         elements are the same, all items will end up on the same
+                                         side of each partition.
+Pro b le m 1
+Pro b le m 1: Se t u p
+Given an array of integers as such: {11, 13, 55, 67, 79, 10, 8, 6, 4, 2}. Please answer
+the following questions (assume all sorts to be done in ascending order):
+What is the asymptotic runtime of the following sorting algorithms?
+Here, assume we choose the leftmost element as the pivot each time for QS.
+
+
+Sorting Algorithm   Asymptotic Runtime   Explanation
+
+Insertion Sort
+
+Merge Sort
+
+Selection Sort
+
+Quick Sort
+Pro b le m 1: So lu t io n
+Given an array of integers as such: {11, 13, 55, 67, 79, 10, 8, 6, 4, 2}.
+Please answer the following questions (assume all sorts to be done in
+ascending order):
+
+What is the asymptotic runtime of the following sorting algorithms?
+
+Here, assume we choose the leftmost element as the pivot each time for QS.
+
+Sorting Algorithm         Asymptotic Runtime           Explanation
+
+Insertion Sort            O(n²)                        The array is not already sorted. At least half of the
+                                                       elements need to iterate through half of the array. So
+                                                       this is the worst case runtime.
+
+Merge Sort                O(n log n)                   Always has O(n log n) runtime.
+
+Selection Sort            O(n²)                        Always has O(n²) runtime
+
+Quick Sort                O(n²)                        After finishing the sorting of the first pivot (11), we end
+                                                       up sorting the left subarray in worst-case runtime.
+No n -Co m p a ris o n So rt in g
+                                                bucketSort(input) -> sorted input:
+                                                1. create array of size B
+Bu c ke t So rt                                 2. put each element into their corresponding bucket
+                                                3. generate sorted array by iterating through the
+                                                   buckets in order
+Distributes elements into their corresponding
+                                                           B: 5
+buckets. Buckets have an inherent ordering
+                                                           Original Input:
+and are merged together in this ordering to                [51, 11, 31, 41, 32, 2, 12, 13, 52, 42,
+produce the sorted array.                                  53]
+                                                                           Bucket Array
+Properties:
+                                                                      1        11, 12, 13
+ ●   Not in-place but stable
+                                                                      2             2
+ ●   Runtime: O(n + B)
+      ○ Need to iterate over n elements                               3           31, 32
+
+           and B buckets.                                             4           41, 42
+      ○ Good when B << n or B ≈ n.
+      ○ Bad when B >> n.                                              5        51, 52, 53
+
+                                                           Final output:
+                                                           [11, 12, 13, 2, 31, 32, 41, 42, 51, 52,
+                                                           53]
+                                                      radixSort(input) -> sorted input:
+                                                      1. create array of size b
+Ra d ix So rt - 1’s Dig it                            2. for each significant digit:
+                                                         3. run bucket sort on the elements using their
+                                                            corresponding significant digit values
+
+Radix Sort repeatedly runs bucket sort on the elements for each significant digit, from least
+significant to most significant.
+Original input: [478, 537, 9, 721, 3, 38, 143, 67],      b: 10
+
+  Bucket Sort on 1’s Digit
+
+       0            1          2       3          4              5     6        7         8      9
+
+                  721               3, 143                                   537, 67   478, 38   9
+
+
+  Bucket Sort on 10’s Digit
+
+       0            1          2       3          4              5     6        7         8      9
+
+    3,3 9                     721   537, 38      143                  67       478
+                                                      radixSort(input) -> sorted input:
+                                                      1. create array of size b
+Ra d ix So rt - 10 ’s Dig it                          2. for each significant digit:
+                                                         3. run bucket sort on the elements using their
+                                                            corresponding significant digit values
+
+Radix Sort repeatedly runs bucket sort on the elements for each significant digit, from least significant to
+most significant.
+Original input: [478, 537, 9, 721, 3, 38, 143, 67],       b: 10
+
+
+  Bucket Sort on 10’s Digit
+
+       0            1          2       3          4               5    6          7         8          9
+
+     3,3 9                    721   537, 38      143                  67        478
+
+
+
+ ●    Notice how elements are now sorted with respect to their last two digits.
+ ●    By running bucket sort from the least to the most significant digit, the order of the more
+      significant digits take precedence over the less significant digits.
+Ra d ix So rt - 10 0 ’s Dig it
+
+Radix Sort repeatedly runs bucket sort on the elements for each significant digit, from least
+significant to most significant.
+
+Original input: [478, 537, 9, 721, 3, 38, 143, 67],   b: 10
+
+
+  Bucket Sort on 10’s Digit
+
+       0            1           2       3       4      5         6         7         8          9
+
+    3,3 9                      721     53738
+                                     537,      143              67        478
+
+
+  Bucket Sort on 100’s Digit
+
+       0            1           2       3       4      5         6         7         8          9
+
+   3,
+    3,39,
+        9         143                          478    537                 721
+   38,
+     3867
+Ra d ix So rt - Fin a l Ou t p u t
+
+Radix Sort repeatedly runs bucket sort on the elements for each significant digit, from least
+significant to most significant.
+
+Original input: [478, 537, 9, 721, 3, 38, 143, 67],   b: 10
+
+  Bucket Sort on 100’s Digit
+
+       0           1           2    3          4       5         6         7         8          9
+
+     3,
+      3,39,
+          9       143                         478     537                 721
+     38,
+       3867
+
+
+ ●     Not in-place but stable
+ ●     Runtime: O(p(n + b))
+        ○ Bucket sort has O(n + b) runtime, and we’re running it p = log b(max(n)) times.
+De c is io n Tre e
+De c is io n Tre e : Qu ic k In t ro d u c t io n
+● A decision tree is a tree-like model representing all possible
+  decisions or comparisons in a process.
+● Nodes: points where a comparison or decision is made.
+● Branches: possible outcomes of that comparison.
+● Leaves: final outcomes after all decisions.
+● Useful for visualizing sorting, searching, or algorithm paths.
+De c is io n Tre e Exa m p le
+                              a<b<c; a<c<b;
+                              b<a<c; b<c<a;
+                              c<b<a; c<a<b
+                        yes   Ask: is a < b?    no
+
+
+             a<b<c; a<c<b;                 b<a<c; b<c<a;
+             c<a<b                         c<b<a
+       yes    Ask: is b<c?    no           yes     Ask: is      no
+                                                     a<c?
+
+    a<b<c              a<c<b; c<a<b b<a<c                     b<c<a; c<b<a
+                     yes Ask: is a<c? no                    yes Ask: is b<c? no
+
+                   a<c<b           c<a<b                    b<c<a        c<b<a
+Th a n k Yo u !
+

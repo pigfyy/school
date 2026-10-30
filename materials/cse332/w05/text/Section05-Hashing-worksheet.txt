@@ -1,0 +1,98 @@
+1. Hash... Browns? 
+For the following scenarios, insert the following elements in this order: 7, 9, 48, 8, 37, 57. For each table, TableSize = 10, and you should use the primary hash function 
+h(k) = k.
+
+Linear Probing - Insertion
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+Linear Probing - 
+Delete 37, 7, 57
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+Quadratic Probing 
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+Separate chaining hash table - Use an unsorted linked list for each slot.
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+2. Double Double Toil and Trouble 
+Describe double hashing. 
+
+List 2 cons of quadratic probing and describe how one of those is fixed by using double hashing. 
+
+Compare open addressing and separate chaining.
+

@@ -1,0 +1,1658 @@
+--- slide 1 ---
+CSE332 Section 5
+Hashing
+Originally by James Richie Sulaeman,
+Revised by Rubee Zhao & Vicky Ye
+
+--- slide 2 ---
+Announcement
+"/>Midterm: Monday, Nov 9, 2026 5pm-6pm Smith 120 & 205
+"/>Content: Everything up to AVL (no hashing and sorting, no graphs)
+Past exams posted on course website
+Come to office hours if you have questions about anything!
+"/>Review session: Friday, Nov 6 in lecture
+
+--- slide 3 ---
+Warm-Up
+public AVLTree fillUniqueTree(List lst){
+    AVLTree avl = AVLTree();
+for(int i = 0; i < lst.size(); i++){
+	avl.insert(lst.get(i), lst.get(i));
+}
+return avl;
+}
+
+What is the running time if the all elements in lst are unique?
+What is the running time if all elements in lst are the same?
+O(nlogn)
+O(n)
+style.visibilitystyle.visibility
+[notes]
+When all elements are the same, O(n) because the element will always be at the root so avl.contains() returns true in constant time for i > 0.
+Otherwise contains()/find() and get() are generally O(logn) so total runtime is O(nlogn)
+
+--- slide 4 ---
+Hashing
+
+--- slide 5 ---
+Collision Resolution
+Collision Resolution
+A collision occurs when two keys map onto the same location in a hash table.
+Impossible to eliminate since the number of possible keys exceeds table size.
+Separate Chaining
+All elements with keys that map to the same table location are kept in a linked list.
+Open Addressing
+If the slot is occupied, we probe the next slot.
+On the ith probe, we check the slot with index (h(key) + f(i)) % TableSize.
+Linear Probing:            f(i) = i
+Quadratic Probing:      f(i) = i^2
+Double Hashing:          f(i) = i ᐧ g(key)
+There are multiple ways to resolve conflicts:
+style.visibilitystyle.visibilitystyle.visibility
+
+--- slide 6 ---
+Problem 1a
+"/>Linear Probing
+ith probe: (h(key) + i) % TableSize
+
+--- slide 7 ---
+Problem 1a: insertion
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+Linear Probing
+ith probe: (h(key) + i) % TableSize
+
+--- slide 8 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+Problem 1a: insert 7
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+
+9
+
+(h(7) + 0) % 10 = 7
+
+Linear Probing
+ith probe: (h(key) + i) % TableSize
+style.visibilitystyle.visibility
+
+--- slide 9 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+
+9
+
+Problem 1a: insert 9
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+
+9
+9
+(h(9) + 0) % 10 = 9
+
+Linear Probing
+ith probe: (h(key) + i) % TableSize
+style.visibilitystyle.visibility
+
+--- slide 10 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+
+9
+9
+Problem 1a: insert 48
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+(h(48) + 0) % 10 = 8
+
+Linear Probing
+ith probe: (h(key) + i) % TableSize
+style.visibilitystyle.visibility
+
+--- slide 11 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+Problem 1a: insert 8
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+(h(8) + 0) % 10 = 8
+
+(h(8) + 1) % 10 = 9
+
+(h(8) + 2) % 10 = 0
+
+Linear Probing
+ith probe: (h(key) + i) % TableSize
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 12 ---
+(h(37) + 3) % 10 = 0
+(h(37) + 2) % 10 = 9
+(h(37) + 1) % 10 = 8
+(h(37) + 0) % 10 = 7
+(h(37) + 4) % 10 = 1
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+Problem 1a: insert 37
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+37
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+Linear Probing
+ith probe: (h(key) + i) % TableSize
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 13 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+37
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+Problem 1a: insert 57
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+37
+2
+57
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+(h(57) + 0) % 10 = 7
+(h(57) + 1) % 10 = 8
+(h(57) + 2) % 10 = 9
+(h(57) + 3) % 10 = 0
+(h(57) + 4) % 10 = 1
+(h(57) + 5) % 10 = 2
+Linear Probing
+ith probe: (h(key) + i) % TableSize
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 14 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+37
+2
+57
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+Problem 1a: deletion
+Delete 37, 7, 57 from the table.
+Linear Probing
+ith probe: (h(key) + i) % TableSize
+
+--- slide 15 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+37
+2
+57
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+DELETED
+2
+57
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+Problem 1a: delete 37
+(h(37) + 0) % 10 = 7
+
+(h(37) + 1) % 10 = 8
+(h(37) + 2) % 10 = 9
+(h(37) + 3) % 10 = 0
+(h(37) + 4) % 10 = 1
+Linear Probing
+ith probe: (h(key) + i) % TableSize
+Delete 37, 7, 57 from the table.
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 16 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+DELETED
+2
+57
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+DELETED
+2
+57
+3
+
+4
+
+5
+
+6
+
+7
+DELETED
+8
+48
+9
+9
+Problem 1a: delete 7
+(h(7) + 0) % 10 = 7
+
+Linear Probing
+ith probe: (h(key) + i) % TableSize
+Delete 37, 7, 57 from the table.
+style.visibilitystyle.visibility
+
+--- slide 17 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+DELETED
+2
+57
+3
+
+4
+
+5
+
+6
+
+7
+DELETED
+8
+48
+9
+9
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+DELETED
+2
+DELETED
+3
+
+4
+
+5
+
+6
+
+7
+DELETED
+8
+48
+9
+9
+Problem 1a: delete 57
+(h(57) + 0) % 10 = 7
+Linear Probing
+ith probe: (h(key) + i) % TableSize
+Delete 37, 7, 57 from the table.
+(h(57) + 1) % 10 = 8
+(h(57) + 2) % 10 = 9
+(h(57) + 3) % 10 = 0
+(h(57) + 4) % 10 = 1
+(h(57) + 5) % 10 = 2
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 18 ---
+Experiment on 1a
+What happens if we now try to remove a
+non-existent element (e.g. 17) from the table?
+
+--- slide 19 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+DELETED
+2
+DELETED
+3
+
+4
+
+5
+
+6
+
+7
+DELETED
+8
+48
+9
+9
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+8
+1
+DELETED
+2
+DELETED
+3
+
+4
+
+5
+
+6
+
+7
+DELETED
+8
+48
+9
+9
+Experiment: delete 17
+(h(17) + 0) % 10 = 7
+Linear Probing
+ith probe: (h(key) + i) % TableSize
+Delete 17 from the table.
+(h(17) + 1) % 10 = 8
+
+(h(17) + 2) % 10 = 9
+(h(17) + 3) % 10 = 0
+(h(17) + 4) % 10 = 1
+(h(17) + 5) % 10 = 2
+(h(17) + 6) % 10 = 3
+We have reached an empty slot, but have not encountered 17. Therefore, it must not exist.
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 20 ---
+Problem 1b
+"/>Quadratic Probing
+ith probe: (h(key) + i2) % TableSize
+
+--- slide 21 ---
+Problem 1b: insertion
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+Quadratic Probing
+ith probe: (h(key) + i2) % TableSize
+
+--- slide 22 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+Problem 1b: insert 7
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+
+9
+
+(h(7) + 02) % 10 = 7
+
+Quadratic Probing
+ith probe: (h(key) + i2) % TableSize
+style.visibilitystyle.visibility
+
+--- slide 23 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+
+9
+
+Problem 1b: insert 9
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+
+9
+9
+(h(9) + 02) % 10 = 9
+
+Quadratic Probing
+ith probe: (h(key) + i2) % TableSize
+style.visibilitystyle.visibility
+
+--- slide 24 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+
+9
+9
+Problem 1b: insert 48
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+(h(48) + 02) % 10 = 8
+
+Quadratic Probing
+ith probe: (h(key) + i2) % TableSize
+style.visibilitystyle.visibility
+
+--- slide 25 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+Problem 1b: insert 8
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+8
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+(h(8) + 02) % 10 = 8
+
+(h(8) + 12) % 10 = 9
+
+(h(8) + 22) % 10 = 2
+
+Quadratic Probing
+ith probe: (h(key) + i2) % TableSize
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 26 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+8
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+37
+2
+8
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+(h(37) + 22) % 10 = 1
+(h(37) + 12) % 10 = 8
+(h(37) + 02) % 10 = 7
+Problem 1b: insert 37
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+Quadratic Probing
+ith probe: (h(key) + i2) % TableSize
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 27 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+37
+2
+8
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+37
+2
+8
+3
+
+4
+
+5
+
+6
+57
+7
+7
+8
+48
+9
+9
+Problem 1b: insert 57
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+(h(57) + 02) % 10 = 7
+(h(57) + 12) % 10 = 8
+(h(57) + 22) % 10 = 1
+(h(57) + 32) % 10 = 6
+Quadratic Probing
+ith probe: (h(key) + i2) % TableSize
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 28 ---
+Problem 1c
+"/>Separate Chaining
+Use a linked list for each slot
+
+--- slide 29 ---
+Problem 1c: insertion
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+Separate Chaining
+Use a linked list for each slot
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+/
+1
+/
+2
+/
+3
+/
+4
+/
+5
+/
+6
+/
+7
+/
+8
+/
+9
+/
+
+--- slide 30 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+/
+1
+/
+2
+/
+3
+/
+4
+/
+5
+/
+6
+/
+7
+/
+8
+/
+9
+/
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}7
+/
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+/
+1
+/
+2
+/
+3
+/
+4
+/
+5
+/
+6
+/
+7
+
+8
+/
+9
+/
+(h(7) + 0) % 10 = 7
+
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+"/>"/>"/>Separate Chaining
+Use a linked list for each slot
+
+Problem 1c: insert 7
+
+--- slide 31 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+/
+1
+/
+2
+/
+3
+/
+4
+/
+5
+/
+6
+/
+7
+
+8
+/
+9
+/
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}7
+/
+Problem 1c: insert 9
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+(h(9) + 0) % 10 = 9
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+/
+1
+/
+2
+/
+3
+/
+4
+/
+5
+/
+6
+/
+7
+
+8
+/
+9
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}9
+/
+"/>"/>"/>Separate Chaining
+Use a linked list for each slot
+
+--- slide 32 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+/
+1
+/
+2
+/
+3
+/
+4
+/
+5
+/
+6
+/
+7
+
+8
+/
+9
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+/
+1
+/
+2
+/
+3
+/
+4
+/
+5
+/
+6
+/
+7
+
+8
+
+9
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}7
+/
+Problem 1c: insert 48
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+(h(48) + 0) % 10 = 8
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}9
+/
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}48
+/
+"/>"/>"/>Separate Chaining
+Use a linked list for each slot
+
+--- slide 33 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+/
+1
+/
+2
+/
+3
+/
+4
+/
+5
+/
+6
+/
+7
+
+8
+
+9
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}7
+/
+Problem 1c: insert 8
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+Separate Chaining
+Use a linked list for each slot
+
+(h(8) + 0) % 10 = 8
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}9
+/
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}48
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}8
+/
+
+--- slide 34 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}48
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+/
+1
+/
+2
+/
+3
+/
+4
+/
+5
+/
+6
+/
+7
+
+8
+
+9
+
+Problem 1c: insert 37
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+Separate Chaining
+Use a linked list for each slot
+
+(h(37) + 0) % 10 = 7
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}9
+/
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}8
+/
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}7
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}37
+/
+
+--- slide 35 ---
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}48
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+/
+1
+/
+2
+/
+3
+/
+4
+/
+5
+/
+6
+/
+7
+
+8
+
+9
+
+Problem 1c: insert 57
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+(h(57) + 0) % 10 = 7
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}9
+/
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}8
+/
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}7
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}37
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}57
+/
+"/>"/>"/>Separate Chaining
+Use a linked list for each slot
+
+--- slide 36 ---
+Problem 2
+
+--- slide 37 ---
+Problem 2a
+On the ith probe, we check the slot with index (h(key) + i ᐧ g(key)) % TableSize.
+The first hash function h determines the location where we initially try to place the item.
+If there is a collision, then the second hash function g determines the probing step size (i.e. 1 ᐧ g(key), 2 ᐧ g(key), … distance away from the initial location).
+Describe double hashing.
+
+style.visibilitystyle.visibilitystyle.visibility
+
+--- slide 38 ---
+Problem 2b
+If the table is more than half full (i.e. load factor > 0.5), then we are not guaranteed to find a location to insert an item.
+Suffers from secondary clustering since items that initially hash to the same location resolve the collision identically.
+List two disadvantages of quadratic probing.
+
+Describe how double hashing fixes one of these disadvantages.
+
+A good second hash function prevents secondary clustering since items that initially hash to the same location will likely resolve the collision differently.
+Items that have the same value for the first hash function f, will likely have different values for the second hash function g, leading to different probing step sizes.
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 39 ---
+Problem 2c
+Compare open addressing with separate chaining.
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}Attributes
+Open Addressing
+Separate Chaining
+Collision Handling
+Handles collisions by searching for an open slot within the table itself.
+Handles collisions by adding elements to a chain at the corresponding index.
+Memory Access
+Array is laid out contiguously in memory → better memory locality.
+Non-contiguous memory → worse memory locality.
+Runtime
+Linear probing suffers from primary clustering, but is guaranteed to find an open slot.
+
+Quadratic probing suffers from secondary clustering, and is only guaranteed to find an empty slot when 𝜆 < 0.5.
+
+Double hashing does not suffer from clustering, but requires an additional hash function (computationally expensive).
+Average runtime: O(1 + 𝜆)
+
+Best-case runtime: O(1)
+
+Worst-case runtime: O(n)
+style.visibility
+[notes]
+Remove comparison of memory usage and replace with comparison regarding locality
+
+--- slide 40 ---
+Problem 2 (Double Hashing Example)
+"/>Double Hashing
+ith probe: (h(key) + i ᐧ g(key)) % TableSize
+
+--- slide 41 ---
+Problem 2: insertion
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+h(k) = k % 10
+g(k) = 1 + (k % 9)
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+Double Hashing
+ith probe: (h(key) + i * g(key)) % TableSize
+
+--- slide 42 ---
+Problem 2: insert 7
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+h(k) = k % 10
+g(k) = 1 + (k % 9)
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+
+9
+
+Double Hashing
+ith probe: (h(key) + i * g(key)) % TableSize
+
+--- slide 43 ---
+Problem 2: insert 9
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+h(k) = k % 10
+g(k) = 1 + (k % 9)
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+
+9
+9
+Double Hashing
+ith probe: (h(key) + i * g(key)) % TableSize
+
+--- slide 44 ---
+Problem 2: insert 48
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+h(k) = k % 10
+g(k) = 1 + (k % 9)
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+7
+8
+48
+9
+9
+Double Hashing
+ith probe: (h(key) + i * g(key)) % TableSize
+[notes]
+Must double hash twice to find a spot!
+
+--- slide 45 ---
+Problem 2: insert 8
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+h(k) = k % 10
+g(k) = 1 + (k % 9)
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+8
+7
+7
+8
+48
+9
+9
+Double Hashing
+ith probe: (h(key) + i * g(key)) % TableSize
+
+--- slide 46 ---
+Problem 2: insert 37
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+h(k) = k % 10
+g(k) = 1 + (k % 9)
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+37
+2
+
+3
+
+4
+
+5
+
+6
+8
+7
+7
+8
+48
+9
+9
+Double Hashing
+ith probe: (h(key) + i * g(key)) % TableSize
+
+--- slide 47 ---
+Problem 2: insert 57
+Insert 7, 9, 48, 8, 37, 57 into an empty table.
+
+h(k) = k % 10
+g(k) = 1 + (k % 9)
+
+{EA3C088E-0154-4F7B-9A64-764C31AB3C3F}idx
+elem
+0
+
+1
+37
+2
+
+3
+
+4
+
+5
+57
+6
+8
+7
+7
+8
+48
+9
+9
+Double Hashing
+ith probe: (h(key) + i * g(key)) % TableSize
+
+--- slide 48 ---
+Thank You!
+

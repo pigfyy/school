@@ -1,0 +1,29 @@
+/* CSE 332 week 5 widgets: the sort stepper (.sortlab) and week 4's hash table lab (.hashlab). Base tokens only. */
+.sl-arr { font-family: var(--mono); flex: 1 1 16rem; }
+.sl-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(2.6rem, 1fr)); gap: 3px; margin: 0.75rem 0 0.5rem; }
+.sl-cell { display: flex; flex-direction: column; align-items: stretch; }
+.sl-cell b { text-align: center; font-family: var(--mono); font-weight: 600; font-size: 0.95rem; padding: 0.35rem 0; border: 2px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface); }
+.sl-cell span { text-align: center; font-family: var(--mono); font-size: 0.72rem; color: var(--ink-soft); }
+.sl-cell.done b { background: var(--s3); border-color: var(--s3); color: #fff; }
+.sl-cell.hi b { background: var(--s2-tint); border-color: var(--s2); color: var(--ink); }
+.sl-count { font-size: 0.85rem; color: var(--ink-soft); }
+.sl-compare td, .sl-compare th { font-size: 0.9rem; }
+.sl-compare tr.on td { font-weight: 700; color: var(--accent-deep); }
+.hl-key { width: 6rem; }
+.hl-size { width: 5rem; }
+.hl-grid { display: grid; grid-template-columns: repeat(var(--cols, 10), minmax(0, 1fr)); gap: 3px; margin: 0.75rem 0 0.5rem; align-items: end; }
+.hl-cell { display: flex; flex-direction: column; align-items: stretch; position: relative; min-width: 0; }
+.hl-cell > b, .hl-chain b { display: block; text-align: center; font-family: var(--mono); font-weight: 600; font-size: 0.95rem; padding: 0.35rem 0; border: 2px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface); min-height: 2.1rem; overflow: hidden; }
+.hl-cell > b.empty { border-style: dashed; color: var(--ink-faint); }
+.hl-cell > b.tomb { color: var(--ink-soft); background: var(--paper-2); }
+.hl-chain { display: flex; flex-direction: column-reverse; gap: 2px; min-height: 2.1rem; justify-content: flex-start; border-bottom: 3px solid var(--line-strong); padding-bottom: 2px; }
+.hl-chain b { background: var(--s1-tint); border-color: var(--s1); font-size: 0.85rem; padding: 0.2rem 0; min-height: 0; }
+.hl-cell.path > b { border-color: var(--s1); background: var(--s1-tint); }
+.hl-cell.path .hl-chain { border-bottom-color: var(--s1); }
+.hl-cell.at > b { border-color: var(--s3); background: var(--s3); color: #fff; }
+.hl-chain b.hit, .hl-cell > b.hit { background: var(--s3); border-color: var(--s3); color: #fff; }
+.hl-idx { text-align: center; font-family: var(--mono); font-size: 0.75rem; color: var(--ink-soft); margin-top: 0.15rem; }
+.hl-step { position: absolute; top: -0.9rem; right: 2px; font-size: 0.68rem; font-weight: 700; color: var(--s1); font-family: var(--mono); }
+.hl-stat { font-size: 0.85rem; color: var(--ink-soft); }
+.hl-out { font-size: 0.95rem; }
+@media (max-width: 600px) { .hl-cell > b, .hl-chain b { font-size: 0.72rem; } }

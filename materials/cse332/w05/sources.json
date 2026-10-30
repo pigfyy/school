@@ -1,0 +1,158 @@
+{
+  "course": "CSE 332 Autumn 2026 (26au)",
+  "week": "Week 5: 2026-10-26 to 2026-10-30 (America/Los_Angeles)",
+  "extractedText": "text/: pdftotext -layout for every PDF (<name>.txt), slide text plus speaker notes for every deck (<name>.pptx-with-notes.txt), docx text, tag-stripped HTML. All raw files sit at the top of this folder; PDFs, decks and docx are git-ignored, so their sha256 here is the record.",
+  "fetchTimeSource": "fetchedAt = local time right after curl wrote the file",
+  "sources": [
+    {
+      "file": "cse332-26au-lec12-sorting-1.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec12-sorting-1.pdf",
+      "what": "Lecture 12 Sorting 1 slides (pdf)",
+      "fetchedAt": "2026-10-29T22:37:40-07:00",
+      "bytes": 368308,
+      "sha256": "b5c8eca0f2562b1c2621ac891592547fc8384ec1d37eb5bd79e366b3688db3f0"
+    },
+    {
+      "file": "cse332-26au-lec12-sorting-1.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec12-sorting-1.pptx",
+      "what": "Lecture 12 Sorting 1 slides (pptx, with speaker notes)",
+      "fetchedAt": "2026-10-29T22:37:41-07:00",
+      "bytes": 588157,
+      "sha256": "3da84c0f692a04532e8751a72495353e313fc69527bb6071e4b5ab4a30f7b4d4"
+    },
+    {
+      "file": "cse332-26au-lec13-sorting-2.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec13-sorting-2.pdf",
+      "what": "Lecture 13 Sorting 2 slides (pdf)",
+      "fetchedAt": "2026-10-29T22:37:41-07:00",
+      "bytes": 361287,
+      "sha256": "e7c32addc83b2944658c109bb453348b1bdc2d863f733ba88c39621e7c0374ea"
+    },
+    {
+      "file": "cse332-26au-lec13-sorting-2.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec13-sorting-2.pptx",
+      "what": "Lecture 13 Sorting 2 slides (pptx, with speaker notes)",
+      "fetchedAt": "2026-10-29T22:37:41-07:00",
+      "bytes": 894467,
+      "sha256": "6aed9be5597be30cc400e731c4914dd8c22b08ba93823e48c69112ac22bd3b68"
+    },
+    {
+      "file": "Section05-Hashing.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section05-Hashing.pdf",
+      "what": "Section 5 Hashing slides (pdf)",
+      "fetchedAt": "2026-10-29T22:37:41-07:00",
+      "bytes": 486092,
+      "sha256": "780234e694985e800d044219c1c52b172b2d852355ad8eb7e2ee4cc6649baa08"
+    },
+    {
+      "file": "Section05-Hashing.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section05-Hashing.pptx",
+      "what": "Section 5 Hashing slides (pptx)",
+      "fetchedAt": "2026-10-29T22:37:41-07:00",
+      "bytes": 1011106,
+      "sha256": "c3e4812d0a65540036cb97844dba1e3e510de4f89648a5013a956dcc6099040c"
+    },
+    {
+      "file": "Section05-Sorting.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section05-Sorting.pdf",
+      "what": "Section 5 Sorting slides (pdf)",
+      "fetchedAt": "2026-10-29T22:37:41-07:00",
+      "bytes": 453768,
+      "sha256": "c22ff8125d2cf1054e47b220e582975334108d13afdb87e0bd006b98afbb44b1"
+    },
+    {
+      "file": "Section05-Sorting.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section05-Sorting.pptx",
+      "what": "Section 5 Sorting slides (pptx)",
+      "fetchedAt": "2026-10-29T22:37:41-07:00",
+      "bytes": 1040458,
+      "sha256": "b3f2e2ec93cc6b54c656d37eb5cbfb8d22c194405bd5a895a4f43c092647d72c"
+    },
+    {
+      "file": "Section05-Hashing-worksheet.docx",
+      "url": "https://docs.google.com/document/d/119G538OV5qN-g_Q3R89bCsjYCRwNDqyF/export?format=docx",
+      "what": "Section 5 Hashing worksheet (Google Doc linked from the calendar, exported as docx)",
+      "fetchedAt": "2026-10-29T22:37:42-07:00",
+      "bytes": 13375,
+      "sha256": "f2fa8762607bc16c6778e6a7e7e3d48475c455b4b5b19818cc0facb4170aeeef"
+    },
+    {
+      "file": "Section05-Hashing-solutions.docx",
+      "url": "https://docs.google.com/document/d/1mGEE1gMEY3Sb4I092oJTXVaVi8skw4XM/export?format=docx",
+      "what": "Section 5 Hashing worksheet solutions (Google Doc linked from the calendar, exported as docx)",
+      "fetchedAt": "2026-10-29T22:37:43-07:00",
+      "bytes": 786076,
+      "sha256": "64d53594fa79f356fa8c7239e48fb5146a1f46d7fdf7082354c3a435712dbaea"
+    },
+    {
+      "file": "Section05-Sorting-worksheet.docx",
+      "url": "https://docs.google.com/document/d/1Sw0ZMM2_67con9MjMmkGg9wBLdHEFBHw/export?format=docx",
+      "what": "Section 5 Sorting worksheet (Google Doc linked from the calendar, exported as docx)",
+      "fetchedAt": "2026-10-29T22:37:43-07:00",
+      "bytes": 13990,
+      "sha256": "7f5154595032c3b0c116244e2e744868e919cc43361451715d984c7512f45e02"
+    },
+    {
+      "file": "Section05-Sorting-solutions.docx",
+      "url": "https://docs.google.com/document/d/1HFzwrcbsHpsOu0MNJeL_E04j62enPv0D/export?format=docx",
+      "what": "Section 5 Sorting worksheet solutions (Google Doc linked from the calendar, exported as docx)",
+      "fetchedAt": "2026-10-29T22:37:44-07:00",
+      "bytes": 1342209,
+      "sha256": "8bd2b95e3b38e5a5e1dca985d53183f9c098d8e75a9062841c5589fa884d781c"
+    },
+    {
+      "file": "summary_hashing.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries/hashing.html",
+      "what": "Topic summary: Hash Functions and Hash Tables (for Section 5's hashing half)",
+      "fetchedAt": "2026-10-29T22:37:44-07:00",
+      "bytes": 58886,
+      "sha256": "93f65693e634a993f6091a1de94f772740b19fad50a5dafc0555c6f52e27e3c5"
+    },
+    {
+      "file": "calendar.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/calendar.html",
+      "what": "Course calendar (last updated 2026-10-29 18:38); Graphs 1 on Fri Oct 30 has no slide link",
+      "fetchedAt": "2026-10-29T22:37:44-07:00",
+      "bytes": 38470,
+      "sha256": "055dcd54709c49cf4c26560b0aaf84ff16a34e7a55801eb1f1cdcfb3c98af570"
+    },
+    {
+      "file": "tasks.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/tasks.html",
+      "what": "Tasks page (exercise objectives and due dates only; graded work not downloaded)",
+      "fetchedAt": "2026-10-29T22:37:44-07:00",
+      "bytes": 33696,
+      "sha256": "75cd4a2d6fc41fb4a992e07ab0a7e80563997be185b282c2b74899c68b0e0e65"
+    }
+  ],
+  "notPosted": [
+    {
+      "session": "Fri 2026-10-30 Lecture 14: Graphs 1 (Intro to Graphs), Weiss 9.1",
+      "checked": "2026-10-29: the calendar row has no slide links (calendar last updated 2026-10-29 18:38); https://courses.cs.washington.edu/courses/cse332/26au/files/slides/ lists nothing after lec13; guessed names cse332-26au-lec14-graphs-1.pdf/.pptx and variants return 404",
+      "shownAs": "dashed upcoming card and rail item, 'materials not posted yet'"
+    }
+  ],
+  "notFetched": [
+    {
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/exercises/ex4.zip",
+      "why": "EX4 AVL Trees (due Fri Oct 30): graded work, deliberately not downloaded"
+    },
+    {
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/exercises/ex5.zip",
+      "why": "EX5 Hashing (due Fri Nov 6): graded work, deliberately not downloaded"
+    },
+    {
+      "url": "EX6 Sorting (due Fri Nov 13)",
+      "why": "Not posted yet; graded work in any case"
+    },
+    {
+      "url": "Weiss, Data Structures & Algorithm Analysis in Java, 7.1-7.11, 9.1",
+      "why": "Textbook not available; listed, not summarized"
+    }
+  ],
+  "notes": [
+    "Slide errors noted on the pages, not copied: Lecture 12 slide 7's insertion-sort swap (a[prev] = a[i]) and bound check order; Lecture 13 slide 10's ms_helper(myArray, 0, length()) and slide 11's i <= merged.length; slide 20's 10/9 order (slide 19's steps give 9 then 10); Section 5 sorting slide 15's bucket output listing 2 after 13.",
+    "Heap sort's stability is a question on EX6 (Lecture 12 slide 30), so the site doesn't work it."
+  ],
+  "pages": "site/cse332/w05/index.html: Lecture 12 (l12-insertion, l12-heap, l12-practice, l12-quiz), Lecture 13 (l13-merge, l13-quick, l13-linear, l13-practice, l13-quiz), Section 5 (s5-hashing, s5-sorting, s5-practice, s5-quiz), Graphs 1 as upcoming only, readings, cheatsheet"
+}

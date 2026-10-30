@@ -1,0 +1,219 @@
+CSE332 - Tasks
+
+        CSE 332 – Tasks
+
+                    Home
+
+          Syllabus
+
+          Calendar
+
+          Tasks
+
+          Exams
+
+          Summaries
+
+          Office Hours
+
+          Staff
+
+          Table of Contents
+
+        1 Surveys
+
+        2 Exercises
+
+        2.1 Exercise 0
+
+        2.2 Exercise 1
+
+        2.3 Exercise 2
+
+        2.4 Exercise 3
+
+        2.5 Exercise 4
+
+        2.6 Exercise 5
+
+            This page is from a previous offering of the course. It has been left up for archival purposes.-->
+      This page is under construction. Any content you see now is subject to change until the first day of class. Expect some links to be broken until that time.-->
+      Looking for someone to talk to about CSE332? Try the Study Center in CSE room 006! There's a table there just for working on and discussing CSE332!-->
+      1 Surveys
+
+      Preliminary
+      Survey
+
+      Week
+      Three Self Reflection
+
+      2 Exercises
+
+      All exercises will be submitted and graded on this Gradescope for
+      exercises and exams.
+
+      Some exercises may require submitting to multiple gradescope
+      assignments (e.g. if there is a programming component as well as a
+      written component). The assignment instructions will make it clear
+      when this is the case.
+
+      You may find this Math Identities
+      Quick Reference useful for some exercises.
+
+      2.1 Exercise 0
+
+      The objectives of this exercise are to:
+
+      Set up your Java environment
+
+      Refresh our Java programming skills
+
+      Gain experience implementing data structures from an ADT
+
+      Use Java generics
+
+      Use benchmarking to study the running time of algorithms
+
+      This assignment has three main parts. The first involves
+      setting up your java programming environment. The second involves
+      implementing some data structures. The third involves analyzing
+      the running times of your implementations using benchmarking.
+      There is no deliverable for part 1. Parts 2 and 3 each have a
+      separate Gradescope submission, which will combine together to
+      count as your exercise 0 grade.
+
+      For this exercise, you will need:
+      Share->publish to the web to get a link to share with students. Do not change the file perms to share the doc with anyone for viewer permissions - this does not work for some students. -->
+
+      CSE332
+      VSCode Profile - Our recommended configuration profile for
+      VSCode. This disables gen-AI tools for you.
+
+      EX00 Starter Code -
+      which contains various classes that will be needed for this
+      assignment.
+
+      EX00
+      Specification - which contains all instructions for what to do
+      for this assignment.
+
+      2.2 Exercise 1
+
+      The objectives of this exercise are to:
+
+      Gain experience identifying running times of given code
+
+      Use the formal definitions of big-Oh, big-Omega, and
+      big-Theta
+
+      See examples of what changes to functions do/don’t change
+      their asymptotic behavior
+
+      Instructions for this exercise appear in Gradescope. To submit
+      you will provide your answers there (either as a fill-in-the-blank
+      or by uploading your work as an image or pdf).
+
+      2.3 Exercise 2
+
+      The objectives of this exercise are to:
+
+      Implement the binary heap data structure
+
+      See how to modify the binary heap data structure to add new
+      operations efficiently
+
+      Apply the binary heap data structure towards the creation of a
+      new data structure
+
+      This is a programming exercise which you will submit to
+      gradescope. There is no written component to this exercise, your
+      code is your only submission.
+
+      For this exercise, you will need:
+
+      EX02 Starter Code -
+      which contains various classes that will be needed for this
+      assignment.
+
+      EX02
+      Specification - which contains all instructions for what to do
+      for this assignment.
+
+      2.4 Exercise 3
+
+      The objectives of this exercise are to:
+
+      Gain experience with solving recurrence relations using the
+      tree method
+
+      See examples of how different changes to recurrence relations
+      do/don’t change their asymptotic behavior
+
+      Instructions for this exercise appear in Gradescope. To submit
+      you will provide your answers there (either as a fill-in-the-blank
+      or by uploading your work as an image or pdf).
+
+      2.5 Exercise 4
+
+      The objectives of this exercise are to:
+
+      Identify the relationships between binary search trees and AVL
+      trees by implementing AVL trees as a subclass of binary search
+      trees (and thereby inheriting methods whenever possible).
+
+      Develop familiarity with the AVLTree data structure by
+      implementing it. In particular: identify what information needs to
+      be maintained in order to preserve the structure property (height
+      of subtrees differs by 0 or 1), use that information to correctly
+      identify to perform rotation operations.
+
+      Highlight the advantages of using an ordered dictionary data
+      structure (like a binary search tree) by using one to implement a
+      new data structure
+
+      This is a programming exercise which you will submit to
+      gradescope. There is no written component to this exercise, your
+      code is your only submission.
+
+      For this exercise, you will need:
+
+      EX04 Starter Code -
+      which contains various classes that will be needed for this
+      assignment.
+
+      EX04
+      Specification - which contains all instructions for what to do
+      for this assignment.
+
+      2.6 Exercise 5
+
+      The objectives of this exercise are:
+
+      Implement the mechanics of an efficient chaining hash
+      table
+
+      Write a good hash function for a new object and observe its
+      properties
+
+      Apply the advantages of a hash table by using it as part of an
+      algorithm that involves a large number of inserts and finds of a
+      large dictionary.
+
+      This is a programming exercise which you will submit to
+      gradescope. There is no written component to this exercise, your
+      code is your only submission.
+
+      For this exercise, you will need:
+
+      EX05 Starter Code -
+      which contains various classes that will be needed for this
+      assignment.
+
+      EX05
+      Specification - which contains all instructions for what to do
+      for this assignment.
+
+          Copyright © 2026 Paul G. Allen School of Computer Science & Engineering, University of Washington. Site design by Nathan Brunelle.
+              Released under the  CC-BY-NC-SA 4.0 license.
+
+        Last updated 2026-10-21 18:06

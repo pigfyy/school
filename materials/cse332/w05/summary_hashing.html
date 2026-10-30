@@ -1,0 +1,833 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>CSE332 - Topic Summary - Hash Tables</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">q { quotes: "“" "”" "‘" "’"; }</style>
+  <link rel="stylesheet" href="../style.css?v=2" />
+</head>
+<main>
+<body>
+    <div role="navigation" class="navbar navbar-static-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <span class="doc-title">CSE 332 &ndash; Topic Summary - Hash
+Tables</span>
+        <ul class="nav pull-right doc-info">
+                    <li><p class="navbar-text"><a href="../index.html">Home</a></p></li>
+          <li><p class="navbar-text"><a href="../syllabus.html">Syllabus</a></p></li>
+          <li><p class="navbar-text"><a href="../calendar.html">Calendar</a></p></li>
+          <li><p class="navbar-text"><a href="../tasks.html">Tasks</a></p></li>
+          <li><p class="navbar-text"><a href="../exams.html">Exams</a></p></li>
+          <li><p class="navbar-text"><a href="../summaries.html">Summaries</a></p></li>
+          <li><p class="navbar-text"><a href="../oh.html">Office Hours</a></p></li>
+          <li><p class="navbar-text"><a href="../staff.html">Staff</a></p></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+    <div class="container">
+    <div class="row">
+            <div id="TOC" class="span3">
+        <div class="well toc">
+        <ul>
+          <li class="nav-header">Table of Contents</li>
+        </ul>
+        <ul>
+        <li><a href="#big-array-dictionary-data-structure"
+        id="toc-big-array-dictionary-data-structure"><span
+        class="toc-section-number">1</span> Big Array Dictionary Data
+        Structure</a></li>
+        <li><a href="#hash-table-ideal" id="toc-hash-table-ideal"><span
+        class="toc-section-number">2</span> Hash Table Ideal</a></li>
+        <li><a href="#designing-hash-functions"
+        id="toc-designing-hash-functions"><span
+        class="toc-section-number">3</span> Designing Hash Functions</a>
+        <ul>
+        <li><a href="#good-and-bad-examples"
+        id="toc-good-and-bad-examples"><span
+        class="toc-section-number">3.1</span> Good and Bad
+        Examples</a></li>
+        <li><a href="#design-considerations"
+        id="toc-design-considerations"><span
+        class="toc-section-number">3.2</span> Design
+        Considerations</a></li>
+        </ul></li>
+        <li><a href="#collision-resolution"
+        id="toc-collision-resolution"><span
+        class="toc-section-number">4</span> Collision Resolution</a>
+        <ul>
+        <li><a href="#separate-chaining"
+        id="toc-separate-chaining"><span
+        class="toc-section-number">4.1</span> Separate Chaining</a>
+        <ul>
+        <li><a href="#why-linked-lists" id="toc-why-linked-lists"><span
+        class="toc-section-number">4.1.1</span> Why Linked
+        Lists?</a></li>
+        </ul></li>
+        <li><a href="#open-addressing" id="toc-open-addressing"><span
+        class="toc-section-number">4.2</span> Open Addressing</a>
+        <ul>
+        <li><a href="#probing-patterns" id="toc-probing-patterns"><span
+        class="toc-section-number">4.2.1</span> Probing
+        Patterns</a></li>
+        </ul></li>
+        </ul></li>
+        <li><a href="#running-time-analysis"
+        id="toc-running-time-analysis"><span
+        class="toc-section-number">5</span> Running Time Analysis</a>
+        <ul>
+        <li><a href="#rehashing" id="toc-rehashing"><span
+        class="toc-section-number">5.1</span> Rehashing</a></li>
+        </ul></li>
+        <li><a href="#advice" id="toc-advice"><span
+        class="toc-section-number">6</span> Advice</a></li>
+        </ul>
+        </div>
+      </div>
+            <div class="span9">
+            <!--<blockquote style="background-color:#fbb; font-size:150%">This page is from a previous offering of the course. It has been left up for archival purposes.</blockquote>-->
+      <!--<blockquote style="background-color:#fbb; font-size:150%">This page is under construction. Any content you see now is subject to change until the first day of class. Expect some links to be broken until that time.</blockquote>-->
+      <!--<blockquote style="background-color:#FFD700; font-size:150%">Looking for someone to talk to about CSE332? Try the Study Center in CSE room 006! There's a table there just for working on and discussing CSE332!</blockquote>-->
+      <p>Hash tables are the second data structure we’ll discuss for the
+      dictionary ADT. With AVL trees we required that the keys are
+      comparable, meaning we are able to perform &gt; and &lt;
+      comparisons. We typically refer to a dictionary requiring this
+      assumption as an <em>ordered dictionary</em>. Our hash tables will
+      not require such an assumption, and therefore we call this type of
+      dictionary an <em>unordered dictionary</em>.</p>
+      <h1 data-number="1" id="big-array-dictionary-data-structure"><span
+      class="header-section-number">1</span> Big Array Dictionary Data
+      Structure</h1>
+      <p>The overall idea of a hash table is to build a dictionary data
+      structure that behaves like one really big array, but in reality
+      is a relatively small array. If we have no regard for the amount
+      of memory we can use for our data structures, the following would
+      be a dictionary data structure that could perform all dictionary
+      operations in constant time.</p>
+      <p>We will store all of our key-value pairs in an array. Because
+      all computer data can be represented using 1s and 0s, and
+      sequences of 1s and 0s can represent numbers, we can represent
+      each key as a number. Our array will therefore have enough indices
+      such that every possible key is an index in this array. Our
+      dictionary operations can then be defined as follows:</p>
+      <ul>
+      <li>insert: Considering the given key as an index in the array,
+      set the value at that index to be the one given. In code, this
+      would be something like <code>arr[(int) key] = value</code>.</li>
+      <li>find: Considering the given key as an index in the array,
+      return the value found at that index. In code,
+      <code>return arr[(int) key].value</code>.</li>
+      <li>delete: Considering the given key as an index in the array,
+      set the value at that index to be null. In code,
+      <code>arr[(int) key] = null</code>.</li>
+      </ul>
+      <p>Now let’s see exactly how big our array would need to be in
+      order to implement this data structure. To do this, we’ll assume
+      that our keys and values both can be represented using one 64-bit
+      word (the word size for most modern processors). This means that
+      the length of our array will need to be
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><mn>64</mn></msup><annotation encoding="application/x-tex">2^{64}</annotation></semantics></math>
+      indices of 64 bits each, or
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>64</mn><mo>⋅</mo><msup><mn>2</mn><mn>64</mn></msup><mo>=</mo><msup><mn>2</mn><mn>6</mn></msup><mo>⋅</mo><msup><mn>2</mn><mn>64</mn></msup><mo>=</mo><msup><mn>2</mn><mn>70</mn></msup></mrow><annotation encoding="application/x-tex">64\cdot 2^{64}= 2^6\cdot 2^{64}=2^{70}</annotation></semantics></math>
+      bits, which is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><mn>67</mn></msup><annotation encoding="application/x-tex">2^{67}</annotation></semantics></math>
+      bytes or 128 exabytes of storage. To put this into perspective, 1
+      exabyte is approximately the total amount of data that has been
+      collected cumulatively by the Large Hadron Collider for its entire
+      existence (as of 2025, so 17 years). Clearly, this is just too
+      much to be reasonable.</p>
+      <p>The goal of a hash table is to mimic the behavior of this
+      gigantic array, but have it use substantially less storage. Hash
+      tables will be similar to the big array data structure in the
+      following ways:</p>
+      <ul>
+      <li>We will store key-value pairs in an array</li>
+      <li>We will somehow convert keys into numbers to be used to select
+      an index of the array</li>
+      </ul>
+      <p>But importantly, here’s how it will be different:</p>
+      <ul>
+      <li>The size of the big array depended on the number of
+      <em>possible keys</em>, the size of the array in a hash table will
+      depend on the number of keys <em>actually used</em> (i.e. the
+      number of elements inserted into the hash table).</li>
+      <li>We will map keys to integers using something called a <em>hash
+      function</em>, which should behave as if we’re using the key to
+      select an integer at random.</li>
+      <li>The integer we map to may not necessarily be a valid index of
+      the array, so we will mod the selected integer by the array’s
+      length to obtain an index.</li>
+      <li>The number of <em>possible</em> keys will be greater than the
+      number of indices in the array, and therefore we may have multiple
+      key-value pairs mapping to the same index (due to the pigeonhole
+      principle), so we’ll need to have a strategy to account for
+      this.</li>
+      </ul>
+      <h1 data-number="2" id="hash-table-ideal"><span
+      class="header-section-number">2</span> Hash Table Ideal</h1>
+      <p>At this point, we’ll discuss the overall idea for how a hash
+      table will work. There are still plenty of details that we’ll need
+      to fill in, but it will be helpful to see the most basic intention
+      for their behavior as a starting point. For this basic overview,
+      we will ignore the possibility of collisions (multiple keys using
+      the same index) in order to show the <q>ideal</q> behavior. All of
+      these operations will need to change once we account for
+      collisions.</p>
+      <p>A hash table will store key-value pairs in an array. It assumes
+      that we have a hash function, which serves to map keys to an
+      integer. The dictionary operations will behave as follows:</p>
+      <ul>
+      <li>insert (key, value): Use the hash function to map the key to
+      an integer, mod that integer by the length of the array to get an
+      index, set the (key, value) pair stored at that index to be the
+      one given. In code, this would be something like
+      <code>arr[hash(key) % arr.length] = (key, value)</code>. If the
+      numer of items stored in the hash table reaches a fixed ratio with
+      the length of the array, resize the array, and re-insert all
+      key-value pairs.</li>
+      <li>find(key): Use the hash function to map the key to an integer,
+      mod that integer by the length of the array to get an index,
+      return the value found at that index. In code,
+      <code>return arr[hash(key) % arr.length]</code>.</li>
+      <li>delete(key): Use the hash function to map the key to an
+      integer, mod that integer by the length of the array to get an
+      index, set what is stored at that index to be null. In code,
+      <code>arr[hash(key) % arr.length] = null</code>.</li>
+      </ul>
+      <p>This should hopefully appear to you to be quite similar to the
+      operations for the big array data structure, with the main changes
+      being:</p>
+      <ul>
+      <li>We use the hash function to pick an integer and then modulus
+      to pick an index for our hash tables (as opposed to somehow
+      directly using the key itself as an index).</li>
+      <li>We will occasionally need to resize the array as we add more
+      key-value pairs. This is because the changes of a collision will
+      go up as more indices of the array are occupied, and so we will
+      resize to keep that probability low.</li>
+      </ul>
+      <p>These small differences are incredibly important. In the big
+      array we always need one index per potential key, regardless of
+      how many keys we actually used. For hash tables we can accommodate
+      any length of the array. The result is that we can use the number
+      of keys <em>actually present</em> in the hash table to select
+      whatever array length gives the best tradeoff for running time
+      vs. memory usage.</p>
+      <h1 data-number="3" id="designing-hash-functions"><span
+      class="header-section-number">3</span> Designing Hash
+      Functions</h1>
+      <p>Whenever our hash table’s behavior matches the <q>ideal</q>
+      above, our performance should match that of the big array. That
+      is, if we never have collisions then all operations run in
+      constant time. For this reason, we must take care when designing
+      our hash functions so that they minimize how frequently we have
+      collisions. Remember, it is impossible for us to prevent
+      collisions entirely (because the whole goal is to have fewer
+      indices in our array than <em>possible</em> keys), but we can take
+      action to make collisions as unlikely as possible.</p>
+      <p>Because we’re not going to know exactly what keys we might see
+      when designing our hash function, the safest way to design our
+      hash function to minimize the number of collisions is to make it
+      look like <code>hash(key) % arr.length</code> selects an index of
+      our array completely at random. We cannot literally select a
+      random index, though, because we need to make sure that for a
+      given key, we always select the same index. When we insert a
+      key-value pair at some index, we need to make sure to look at the
+      same index to find it later. If we simply use
+      <code>Math.Random</code> to select an index, then the next time we
+      need an index for the same key we will get a different random
+      value.</p>
+      <p>With all of this in mind, we want a hash function to have all
+      of the following properties:</p>
+      <ul>
+      <li><strong>Consistent</strong>: Equal keys should hash to the
+      same integer
+      <ul>
+      <li>To be consistent, it must also be deterministic</li>
+      </ul></li>
+      <li><strong>Uniform</strong>: Should use every index of a
+      fixed-sized array, and use each index at a roughly equal rate</li>
+      <li><strong>Effective</strong>: It should behave as if the
+      selection of an integer was random. This can be achieved by
+      satisfying all of:
+      <ul>
+      <li>It is hard to find two unequal keys which hash to the same
+      integer</li>
+      <li>Given a key, it is hard to find another unequal key which
+      hashes to the same integer</li>
+      <li>The <q>avalanche effect</q>: making even a small change to a
+      key results in an arbitrary change to the integer it hashes
+      to</li>
+      </ul></li>
+      <li><strong>Efficient</strong>: The hash function itself should
+      not take much time to run</li>
+      </ul>
+      <h2 data-number="3.1" id="good-and-bad-examples"><span
+      class="header-section-number">3.1</span> Good and Bad
+      Examples</h2>
+      <p>Let’s look at some examples of potential hash functions for
+      strings, and discuss which of these properties they do/do not
+      have. We will assume that each string
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
+      has
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      characters, where
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>s</mi><mi>i</mi></msub><annotation encoding="application/x-tex">s_i</annotation></semantics></math>
+      is the ascii encoding of the
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
+      character in the string.</p>
+      <p>To be a <q>good</q> hash function, the function must satisfy
+      <em>all</em> of the properties above.</p>
+      <blockquote>
+      <p><strong>Option 0</strong>: Use a random character</p>
+      <p>For this hash function, we will use
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mn>0</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>s</mi><mrow><mi>r</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>o</mi><mi>m</mi><mi>.</mi><mi>n</mi><mi>e</mi><mi>x</mi><mi>t</mi><mi>I</mi><mi>n</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub></mrow><annotation encoding="application/x-tex">h_0(s)=s_{random.nextInt(n)}</annotation></semantics></math>.</p>
+      <ul>
+      <li><strong>Consistent?</strong>: No! If we run the hash function
+      twice we may get a different result each time. For example, the
+      first time we run
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">&quot;silent&quot;</mtext><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">h(\text{&quot;silent&quot;})</annotation></semantics></math>
+      we might randomly select the character at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>,
+      and so the output would be
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>115</mn><annotation encoding="application/x-tex">115</annotation></semantics></math>
+      (the ascii encoding of the character <q>s</q>). The next time we
+      run it we may randomly select the character at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3</mn><annotation encoding="application/x-tex">3</annotation></semantics></math>,
+      and so the output would be
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>101</mn><annotation encoding="application/x-tex">101</annotation></semantics></math>
+      (the ascii encoding of the character <q>e</q>). Because running
+      the hash function twice on the same key gave different results, it
+      is not consistent.</li>
+      <li><strong>Uniform?</strong>: No! Some characters are more common
+      than others, so we’re more likely to hash to the ascii values of
+      more common characters.</li>
+      <li><strong>Effective?</strong>: No! All strings that are just the
+      same character repeated multiple times will be different, but
+      always hash to the same integer. For example, the strings
+      <q>a</q>, <q>aa</q>, and <q>aaaaaa</q> always hash to the same
+      integer, even though they are different strings. It’s easy to find
+      more examples (e.g. <q>b</q> with <q>bbbbb</q>, etc.).</li>
+      <li><strong>Efficient?</strong>: Yes! this will be a very fast
+      operation.</li>
+      </ul>
+      </blockquote>
+      <blockquote>
+      <p><strong>Option 1</strong>: Use the first character</p>
+      <p>For this hash function, we will use
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>s</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">h_1(s)=s_1</annotation></semantics></math>.</p>
+      <ul>
+      <li><strong>Consistent?</strong>: Yes! If we apply the hash
+      function to the same string over and over again, we will always
+      get the same result</li>
+      <li><strong>Uniform?</strong>: No! Some characters are more common
+      than others, so we’re more likely to hash to the ascii values of
+      more common characters.</li>
+      <li><strong>Effective?</strong>: No! Any two strings which start
+      with the same character will hash to the same integer. For
+      example, the string <q>banana</q> hashes to the same integer as
+      the string <q>bagel</q>.</li>
+      <li><strong>Efficient?</strong>: Yes! this will be a very fast
+      operation.</li>
+      </ul>
+      </blockquote>
+      <blockquote>
+      <p><strong>Option 2</strong>: Sum the characters</p>
+      <p>For this hash function, we will use
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>0</mn></mrow><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msubsup><msub><mi>s</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">h_2(s)=\sum_{i=0}^{n-1} s_i</annotation></semantics></math>.</p>
+      <ul>
+      <li><strong>Consistent?</strong>: Yes! If we apply the hash
+      function to the same string over and over again, we will always
+      get the same result</li>
+      <li><strong>Uniform?</strong>: Probably not. This one is harder to
+      see, but words formed by different combinations of common letter
+      are more likely to appear.</li>
+      <li><strong>Effective?</strong>: No! Any two strings which contain
+      the same characters (i.e. anagrams) will hash to the same integer.
+      For example, the string <q>silent</q> hashes to the same integer
+      as the string <q>listen</q>.</li>
+      <li><strong>Efficient?</strong>: Yes! this will be a very fast
+      operation.</li>
+      </ul>
+      </blockquote>
+      <blockquote>
+      <p><strong>Option 3</strong>: Sum the characters multiplied by a
+      power of a prime number</p>
+      <p>For this hash function, we will use
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mn>3</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>0</mn></mrow><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msubsup><msub><mi>s</mi><mi>i</mi></msub><mo>⋅</mo><msup><mn>31</mn><mi>i</mi></msup></mrow><annotation encoding="application/x-tex">h_3(s)=\sum_{i=0}^{n-1} s_i \cdot 31^i</annotation></semantics></math>.</p>
+      <ul>
+      <li><strong>Consistent?</strong>: Yes! If we apply the hash
+      function to the same string over and over again, we will always
+      get the same result</li>
+      <li><strong>Uniform?</strong>: Yes! As long as the array’s length
+      is not exactly 31, we will use all indices, and in equal
+      proportion.</li>
+      <li><strong>Effective?</strong>: Yes! Changing any character at
+      any index in the string will change the integer we hash to in an
+      unpredictable way.</li>
+      <li><strong>Efficient?</strong>: Yes! This is actually pretty
+      efficient. It may not seem so at first due to the exponentiation
+      of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>31</mn><annotation encoding="application/x-tex">31</annotation></semantics></math>,
+      but this could be computed efficiently by repeatedly doing
+      <code>sum = (sum + s[i]) * 31</code> for each character in the
+      string.</li>
+      </ul>
+      </blockquote>
+      <blockquote>
+      <p><strong>Option 4</strong>: Sum the characters multiplied by a
+      power of a prime number, double the result</p>
+      <p>For this hash function, we will use
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mn>4</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>2</mn><mo>⋅</mo><msub><mi>h</mi><mn>3</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">h_4(s)=2\cdot h_3(s)</annotation></semantics></math>.</p>
+      <ul>
+      <li><strong>Consistent?</strong>: Yes! For the same reason option
+      3 is.</li>
+      <li><strong>Uniform?</strong>: No! we never use odd indices.</li>
+      <li><strong>Effective?</strong>: Yes! For the same reason option 3
+      is.</li>
+      <li><strong>Efficient?</strong>: Yes! For the same reason option 3
+      is.</li>
+      </ul>
+      </blockquote>
+      <blockquote>
+      <p><strong>Option 5</strong>: First alphabetize the characters,
+      then apply option 3.</p>
+      <p>For this hash function, we will sort the string by character,
+      for example, the string <q>banana</q> would become <q>aaabnn</q>,
+      then we apply
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mn>3</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">h_3(s)</annotation></semantics></math>
+      to that.</p>
+      <ul>
+      <li><strong>Consistent?</strong>: Yes! For the same reason option
+      3 is.</li>
+      <li><strong>Uniform?</strong>: Yes! For the same reason option 3
+      is.</li>
+      <li><strong>Effective?</strong>: No! Any two strings which contain
+      the same characters (i.e. anagrams) will hash to the same integer.
+      For example, the string <q>silent</q> hashes to the same integer
+      as the string <q>listen</q>.</li>
+      <li><strong>Efficient?</strong>: Yes! For the same reason option 3
+      is.</li>
+      </ul>
+      </blockquote>
+      <h2 data-number="3.2" id="design-considerations"><span
+      class="header-section-number">3.2</span> Design
+      Considerations</h2>
+      <p>When designing your hash functions, here are some things to
+      keep in mind.</p>
+      <ul>
+      <li>To be consistent, you should never use aspects of your keys
+      which are not relevant for determining equivalence. Because we
+      need equal keys to give the same result, any aspect (e.g. field)
+      of your key object which is not used in a <code>.equals</code>
+      method should not be used in the hash function. Otherwise, this
+      means we can make a change to the key object which does not make
+      it different according to <code>.equals</code>, but causes it to
+      hash to a different integer.</li>
+      <li>To be effective, you should use <em>all</em> aspects of the
+      keys which <em>are</em> relevant for determining equivalence. If
+      you exclude some aspect of your key which is used in a
+      <code>.equals</code> method, then we can make a change to that
+      aspect to change the key without changing the integer that is
+      hashes to.</li>
+      <li>Use prime numbers. Because of number theoretic properties that
+      we won’t get into, prime numbers result in better uniformity of
+      the integers that we hash to.</li>
+      </ul>
+      <h1 data-number="4" id="collision-resolution"><span
+      class="header-section-number">4</span> Collision Resolution</h1>
+      <p>While a good has function will minimize the odds of a collision
+      (i.e. two different keys mapping to the same index after applying
+      the hash function), we will never be able to avoid collisions
+      completely (unless we’re using exabytes of storage, I suppose).
+      For this reason, we <em>must</em> have some strategy for resolving
+      collisions. In general, there are two major approaches to this:
+      Separate Chaining and Open Addressing.</p>
+      <h2 data-number="4.1" id="separate-chaining"><span
+      class="header-section-number">4.1</span> Separate Chaining</h2>
+      <p>A separate chaining hash table accounts for collisions by using
+      an array of linked lists rather than an array of key-value pairs.
+      The idea is that instead of storing just one key-value pair at
+      each index, it will store a list of key-value pairs at each index.
+      This way if multiple keys map to the same index we can just store
+      all of those keys at this index.</p>
+      <p>The operations for a separate chaining hash table would be as
+      follows:</p>
+      <ul>
+      <li>insert: Use the hash function to map the key to an integer,
+      mod that integer by the length of the array to get an index. If
+      the linked list at that index contains the key already, update the
+      value. Otherwise, add the key-value pair to the linked list. If
+      the size of the hash table reaches a fixed ratio with the length
+      of the array, resize the array, and re-insert all key-value
+      pairs.</li>
+      <li>find: Use the hash function to map the key to an integer, mod
+      that integer by the length of the array to get an index. Check for
+      the key in the linked list at that index, and return the
+      corresponding value if present.</li>
+      <li>delete: Use the hash function to map the key to an integer,
+      mod that integer by the length of the array to get an index,
+      remove the key-value pair from the linked list at that index.</li>
+      </ul>
+      <h3 data-number="4.1.1" id="why-linked-lists"><span
+      class="header-section-number">4.1.1</span> Why Linked Lists?</h3>
+      <p>We use a linked list data structure at each index of the array.
+      Each of these linked list data structures is actually being used
+      as if it were a dictionary data structure because the hash table
+      insert involves an insert operation on the linked list, hash table
+      find involves a find operation on the linked list, and hash table
+      delete involves a delete operation on the linked list. In general,
+      we could use any dictionary data structure at each index of the
+      separate-chaining hash table (array list, binary search tree, AVL
+      tree, another hash table etc.), so why a linked list? Recall that
+      The goal of using a good hash function and occasionally resizing
+      the array is to make collisions rare. This means that a linked
+      list makes the most sense because:</p>
+      <ul>
+      <li>Very often our per-index data structures will be empty, so we
+      want a data structure that does not use much excess space (this
+      excludes array-based data structures like array lists or hash
+      tables)</li>
+      <li>When not empty, our per-index data structure should never
+      contain a large number of elements, so we do not care about the
+      asymptotic running time (so AVL trees or other complex but
+      asymptotically efficient data structures are not helpful)</li>
+      </ul>
+      <p>In summary, linked lists have the best combination of being
+      memory efficient and time efficient for empty or small
+      dictionaries, making them the best choice.</p>
+      <h2 data-number="4.2" id="open-addressing"><span
+      class="header-section-number">4.2</span> Open Addressing</h2>
+      <p>An open addressing hash table (also known as a probing hash
+      table) stores key-value pairs directly in an array of key-value
+      pairs, and accounts for collisions by using a strategy called
+      <q>probing</q> to find an alternative index to store a key-value
+      pair whenever the mapped-to index is occupied. To probe simply
+      means to check sequence of alternative indices</p>
+      <p>The operations for an open-addressing hash table would work as
+      follows:</p>
+      <ul>
+      <li>insert: Use the hash function to map the key to an integer,
+      mod that integer by the length of the array to get an index. If
+      the hashed-to index is empty, put the key-value pair at that
+      index. If the hashed-to index contains that key, update the value.
+      If the index contains a key-value pair with a different key then
+      begin probing to check alternative indices. For each index while
+      probing:
+      <ul>
+      <li>If the index contains the given key, update the value and end
+      the probe</li>
+      <li>If the index is empty, add the given key-value pair at that
+      index and end the probe</li>
+      <li>Otherwise continue probing</li>
+      </ul></li>
+      <li>find: Use the hash function to map the key to an integer, mod
+      that integer by the length of the array to get an index. If the
+      hashed-to index contains the given key, return the value. If the
+      index is empty, the key was not present. If the index contains a
+      key-value pair with a different key then begin probing to check
+      alternative indices. For each index while probing:
+      <ul>
+      <li>If the index contains the given key, return the value and end
+      the probe</li>
+      <li>If the index is empty, the key was not present, end the
+      probe</li>
+      <li>Otherwise continue probing</li>
+      </ul></li>
+      <li>delete: This one is a bit complicated, we’ll discuss it
+      below.</li>
+      </ul>
+      <h3 data-number="4.2.1" id="probing-patterns"><span
+      class="header-section-number">4.2.1</span> Probing Patterns</h3>
+      <p>A probing pattern refers to which sequence of indices to pick
+      as the alternative. We get different performance behaviors for
+      different choices of probing pattern.</p>
+      <h4 data-number="4.2.1.1" id="linear-probing"><span
+      class="header-section-number">4.2.1.1</span> Linear Probing</h4>
+      <p>Linear probing is the simplest probing pattern. Suppose that we
+      want to do a find/insert/delete operation for a given key
+      <code>k</code>, and so we compute <code>h(k) % arr.length</code>
+      to be index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+      As long as we see collisions, we will follow the pattern:
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">i+1</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">i+2</annotation></semantics></math>,
+      etc. This means that the
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+      index we check in the probe sequence is index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mi>j</mi></mrow><annotation encoding="application/x-tex">i+j</annotation></semantics></math>.
+      In other words, we just check the very next index in the arr as we
+      continue probing.</p>
+      <p>The primary downside of linear probing is that the running time
+      scales poorly as the hash table fills with more key-value pairs
+      due to a phenomenon called <strong>primary clustering</strong>.
+      Consider that we have a value at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      of the hash table. If we have a collision at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      when inserting, that new item will be added at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">i+1</annotation></semantics></math>.
+      Now if we have an insert that hashes to index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      or
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">i+1</annotation></semantics></math>
+      then that item will go at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">i+2</annotation></semantics></math>.
+      At this point there are 3 different places that cause a new
+      key-value pair to be placed at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">i+3</annotation></semantics></math>
+      (those being
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">i+1</annotation></semantics></math>,
+      or
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">i+2</annotation></semantics></math>).</p>
+      <p>Here’s why this is important. Observe that when we have a
+      contiguous segment of our array that is filled with key-value
+      pairs, an insert which hashes to any index in that segment
+      guarantees that this new insert will occur at the index
+      immediately following this segment, thereby growing the size of
+      the filled segment. As a consequence of the segment growing in
+      size, future inserts have a higher likelihood of hashing to an
+      index within this segment. This produces a feedback loop where as
+      a segment grows, we more likely to hash to an index with the
+      segment, which grows the segment, which increases the odds that we
+      hash to within the segment, which means we’re more likely to hash
+      to within that segment again. Overall this means that as our table
+      gets more full, our running time may increase dramatically due to
+      this clustering of keys.</p>
+      <p>To help address this primary clustering concern, we could use
+      an alternative probing pattern where we take large steps away when
+      probing so that we hopefully space apart our key-value pairs when
+      adding them, so we have better running times as our hash table
+      fills. Quadratic probing is one such way to do this.</p>
+      <h4 data-number="4.2.1.2" id="quadratic-probing"><span
+      class="header-section-number">4.2.1.2</span> Quadratic
+      Probing</h4>
+      <p>Suppose that we want to do a find/insert/delete operation for a
+      given key <code>k</code>, and so we compute
+      <code>h(k) % arr.length</code> to be index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+      As long as we see collisions, we will follow the pattern:
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><msup><mn>1</mn><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">i+1^2</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><msup><mn>2</mn><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">i+2^2</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><msup><mn>3</mn><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">i+3^2</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><msup><mn>4</mn><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">i+4^2</annotation></semantics></math>,
+      etc. This means that the
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+      index we check in the probe sequence is index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><msup><mi>j</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">i+j^2</annotation></semantics></math>.</p>
+      <p>Notice that each time we need to check another index while
+      probing we looking increasingly farther away. This behavior
+      addresses the primary clustering issue we saw with linear probing.
+      By taking large steps away in our probe path we are unlikely to
+      extend the size of a cluster.</p>
+      <p>Quadratic probing, while not susceptible to primary clustering,
+      is still susceptible to <strong>secondary clustering</strong>.
+      Even if two different keys hash to different values, they may map
+      to the same index after we mod by the length of the array. For
+      quadratic probing (as with linear probing), two keys which map to
+      the same index will follow the same probe path. We may get better
+      performance if different keys were more likely to follow different
+      probing paths. To achieve this, we could consider double
+      hashing.</p>
+      <h4 data-number="4.2.1.3" id="double-hashing"><span
+      class="header-section-number">4.2.1.3</span> Double Hashing</h4>
+      <p>For this option we will need two hash functions. We will call
+      the primary hash function <code>h</code> and the secondary hash
+      function <code>g</code> (it may be that <code>g</code> is derived
+      from <code>h</code>). Suppose that we want to do a
+      find/insert/delete operation for a given key <code>k</code>, and
+      so we compute <code>h(k) % arr.length</code> to be index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+      As long as we see collisions, we will follow the pattern:
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">i+g(k)</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>2</mn><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">i+2g(k)</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>3</mn><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">i+3g(k)</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mn>4</mn><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">i+4g(k)</annotation></semantics></math>,
+      etc. This means that the
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+      index we check in the probe sequence is index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mi>j</mi><mo>⋅</mo><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">i+j\cdot g(k)</annotation></semantics></math>.</p>
+      <p>Because <code>g</code> and <code>h</code> are both good hash
+      functions, it is very unlikely that both hash different keys to
+      the same values. This resolves secondary clustering because even
+      when we have two keys map to the same index using <code>h</code>,
+      they are very unlikely to follow the same probe path, since that
+      depends on <code>g</code>.</p>
+      <p>One issue we must consider when implementing double hashing,
+      though, is that if <code>g(k)</code> is a multiple the length of
+      the array, the probe path will not contain many distinct indices.
+      For example, if <code>g(k) == arr.length</code> then
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>+</mo><mi>j</mi><mo>⋅</mo><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>i</mi></mrow><annotation encoding="application/x-tex">i+j\cdot g(k)=i</annotation></semantics></math>
+      for all choices of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+      (the same goes for if <code>g(k) == x*arr.length</code>). For this
+      reason we want to ensure that <code>g(k)</code> is not a multiple
+      of <code>arr.length</code>. One way to do this is to say if
+      <code>g(k)==x*arr.length</code> then use <code>g(k)=1</code>
+      instead.</p>
+      <h1 data-number="5" id="running-time-analysis"><span
+      class="header-section-number">5</span> Running Time Analysis</h1>
+      <p>For our running time analysis we will consider a
+      separate-chaining hash table for simplicity. Running time analysis
+      for open addressing hash tables yields a similar result, but
+      requires more probabilistic analysis to look at things like the
+      expected length of a probing pattern, so we will omit this
+      analysis.</p>
+      <p>Let’s begin by considering the time required for an
+      unsuccessful find operation. We say a find operation is
+      unsuccessful if the key given does not appear in the dictionary
+      (and therefore the operation will return null or some other
+      default value). We use an unsuccessful find for our analysis
+      because this is the worst-case for a find operation (the running
+      time of a successful find is less than or equal to that of an
+      unsuccessful find), and insert and delete each require only a
+      constant amount of work in addition to a find operation.</p>
+      <p>For a separate-chaining hash table, the find operation would
+      behave as follows (copied from above):</p>
+      <p>find: Use the hash function to map the key to an integer, mod
+      that integer by the length of the array to get an index. Check for
+      the key in the linked list at that index, and return the
+      corresponding value if present.</p>
+      <p>For an unsuccessful find, we must look at all of the key-value
+      pairs in the linked list found at hashed-to index before returning
+      the default value. This means the running time of find is linear
+      in terms of the length of that linked list. In the worst case,
+      it’s certainly possible that, for a hash table containing
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      key-value pairs, the length of the linked list is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>.
+      This means that the <strong>worst case</strong> running time for
+      find is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>.</p>
+      <p>Provided we have a good hash function, however, this situation
+      is exceptionally unlikely. For this reason, we would be better off
+      looking at the expected running time to get an idea of the time
+      find requires in practice. To find the expected running time we
+      will begin by assuming we have a good hash function, meaning it
+      will behave as though each key is assigned to a random index in
+      the hash table. Now we can look at the expected (i.e. average
+      probabilistically) length of a linked list in this separate
+      chaining hash table.</p>
+      <p>Suppose that our hash table has
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      key-value pairs in it. Each of these key-value pairs is then
+      randomly assigned to an index in the array of linked lists.
+      Suppose that the length of this array is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>ℓ</mo><annotation encoding="application/x-tex">\ell</annotation></semantics></math>.
+      The expected size of each linked list will then be
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>n</mi><mo>ℓ</mo></mfrac><annotation encoding="application/x-tex">\frac{n}{\ell}</annotation></semantics></math>
+      (because the keys should be uniformly distributed for a good hash
+      function). The value
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>n</mi><mo>ℓ</mo></mfrac><annotation encoding="application/x-tex">\frac{n}{\ell}</annotation></semantics></math>
+      represents both the expected size of each linked list, and also
+      the average number of key-value pairs per index. We call this
+      value the <strong>load factor</strong> of the hash table. The
+      convention is to represent the load factor using the Greek letter
+      lambda
+      (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>).</p>
+      <p>Because the expected size of the linked list is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>,
+      the expected running time of an unsuccessful find is also
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>.
+      Since our goal is to have our expected running time be
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(1)</annotation></semantics></math>,
+      we need
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mfrac><mi>n</mi><mo>ℓ</mo></mfrac></mrow><annotation encoding="application/x-tex">\lambda = \frac{n}{\ell}</annotation></semantics></math>
+      to be constant, which requires
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ℓ</mo><mo>≤</mo><mi>c</mi><mo>⋅</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">\ell \leq c\cdot n</annotation></semantics></math>
+      for a constant
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>.
+      In other words, the size of the array holding our linked lists
+      must be linear in the size of the hash table.</p>
+      <p>As a consequence of this analysis, hash tables will behave in a
+      way similar to array lists. In order to keep
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>≤</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">\lambda \leq c</annotation></semantics></math>
+      for a constant
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>,
+      we will need to resize our array whenever
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>&gt;</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">\lambda &gt; c</annotation></semantics></math>.
+      This hash table resizing operation is called
+      <strong>rehashing</strong>.</p>
+      <h2 data-number="5.1" id="rehashing"><span
+      class="header-section-number">5.1</span> Rehashing</h2>
+      <p>When resizing an array list we created a new array whose length
+      was twice that of the original, then copied all items from the old
+      array into the same index of the new array. Because we performed a
+      modulus operation on the hash of our keys to select the index to
+      store each key-value pair at, when we change the size of the array
+      the index for each key-value pair may need to change as well.
+      Therefore we cannot simply move the key-value pair at index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      of the old array to index
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      of the new array. Instead we will need to re compute the index by
+      modding the hash by the new table’s length. The rehashing
+      procedure is therefore:</p>
+      <ol type="1">
+      <li>If `table.size / arr.length &gt; c’ then do the
+      following.</li>
+      <li>create a new array whose length is at least
+      <code>2*arr.length</code> (see advice below for more on the length
+      to select), call this <code>newArr</code></li>
+      <li>for each key-value pair in the hash table re-insert that
+      key-value pair at the index <code>h(k) % newArr.length</code></li>
+      <li>set <code>arr = newArr</code></li>
+      </ol>
+      <h1 data-number="6" id="advice"><span
+      class="header-section-number">6</span> Advice</h1>
+      <p>Here are some general tips for implementing hash tables:</p>
+      <ul>
+      <li>Use prime numbers: whenever values used for the hash function
+      share common factors with the length of the array we will lose
+      some uniformity of our hash function. For this reason, it’s
+      helpful to use prime numbers inside the hash function as well as
+      for the lengths of the array to minimize the odds of this
+      occurring</li>
+      <li>Because we want to use prime numbers as the length of our
+      array, and computing prime numbers is expensive, use a
+      pre-computed and hard-coded list of primes as a field in your data
+      structure to use for rehashing. Similar to with array lists, we
+      want the resized array’s length to be roughly double that of the
+      original array.</li>
+      <li>If you need the hash table’s size to be larger than the
+      largest pre-computed prime, use values of the form
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>k</mi></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^k-1</annotation></semantics></math>
+      as your array length, as these values on average tend to have few
+      prime factors (and in fact have a high chance of being
+      prime).</li>
+      <li>When rehashing, you should bound
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+      by the following constants:
+      <ul>
+      <li>For a separate chaining hash table, keep
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>&lt;</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">\lambda &lt; 2</annotation></semantics></math>.</li>
+      <li>For an open addressing hash table, keep
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>&lt;</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">\lambda &lt; \frac{1}{2}</annotation></semantics></math>
+      (observe that we cannot mathematically have a load factor greater
+      than 1 in an open addressing hash table because this would imply
+      that there is more than 1 item per index on average, and so the
+      pigeon hole principle requires at least one index would need to
+      contain at least 2 key-value pairs, which is not possible).</li>
+      </ul></li>
+      </ul>
+            </div>
+    </div>
+  </div>
+  <footer>
+          Copyright © 2026 Paul G. Allen School of Computer Science & Engineering, University of Washington. Site design by Nathan Brunelle.
+              <p>Released under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /> CC-BY-NC-SA 4.0</a> license</a>.
+      </p>
+        <p>Last updated 2026-10-21 10:29</p>
+  </footer>
+</body>
+</main>
+</html>

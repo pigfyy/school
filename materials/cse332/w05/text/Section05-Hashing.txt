@@ -1,0 +1,880 @@
+CSE332 Section 5
+Hashing
+Originally by James RichieSulaeman,
+Revised by Rubee Zhao & Vicky Ye
+Announcement
+
+> Midterm: Monday, Nov 9, 2026 5pm-6pm Smith 120 & 205
+> Content: Everything up to AVL (no hashing and sorting, no
+  graphs)
+   – Past exams posted on course website
+   – Come to office hours if you have questions about anything!
+> Review session: Friday, Nov 6 in lecture
+  Warm - Up
+public AVLTree fillUniqueTree(List lst){
+    AVLTree avl = AVLTree();
+    for(int i = 0; i < lst.size(); i++){
+        avl.insert(lst.get(i), lst.get(i));
+    }
+    return avl;
+}
+
+
+What is the running time if the all elements in lst are unique? O(nlogn)
+What is the running time if all elements in lst are the same?   O(n)
+Hashing
+Collision Resolution
+Collision Resolution
+A collision occurs when two keys map onto the same location in a hash table.
+     Impossible to eliminate since the number of possible keys exceeds table size.
+There are multiple ways to resolve conflicts:
+ 1. Separate Chaining
+All elements with keys that map to the same table location are kept in a linked list.
+ 1. Open Addressing
+If the slot is occupied, we probe the next slot.
+On the ith probe, we check the slot with index (h(key) + f(i)) % TableSize.
+     Linear Probing:        f(i) = i
+     Quadratic Probing:     f(i) = i^2
+     Double Hashing:        f(i) = i ᐧ g(key)
+Problem 1a
+
+> Linear Probing
+   – ith probe: (h(key) + i) % TableSize
+                                      Linear Probing
+                             ith probe: (h(key) + i) % TableSize
+
+
+Problem 1a: insertion                idx        elem
+
+                                      0
+
+                                      1
+Insert 7, 9, 48, 8, 37, 57            2
+into an empty table.
+                                      3
+
+                                      4
+
+                                      5
+
+                                      6
+
+                                      7
+
+                                      8
+
+                                      9
+                                      Linear Probing
+                             ith probe: (h(key) + i) % TableSize
+
+
+Problem 1a: insert 7                 idx        elem
+                                                elem
+
+                                      0
+
+                                      1
+Insert 7, 9, 48, 8, 37, 57            2
+into an empty table.
+                                      3
+
+(h(7) + 0) % 10 = 7                   4
+
+                                      5
+
+                                      6
+
+                                      7          7
+
+                                      8
+
+                                      9
+                                      Linear Probing
+                             ith probe: (h(key) + i) % TableSize
+
+
+Problem 1a: insert 9                 idx        elem
+                                                elem
+
+                                      0
+
+                                      1
+Insert 7, 9, 48, 8, 37, 57            2
+into an empty table.
+                                      3
+
+(h(9) + 0) % 10 = 9                   4
+
+                                      5
+
+                                      6
+
+                                      7          7
+
+                                      8
+
+                                      9          9
+                                      Linear Probing
+                             ith probe: (h(key) + i) % TableSize
+
+
+Problem 1a: insert 48                idx        elem
+                                                elem
+
+                                      0
+
+                                      1
+Insert 7, 9, 48, 8, 37, 57            2
+into an empty table.
+                                      3
+(h(48) + 0) % 10 = 8                  4
+
+                                      5
+
+                                      6
+
+                                      7          7
+
+                                      8          48
+
+                                      9          9
+                                      Linear Probing
+                             ith probe: (h(key) + i) % TableSize
+
+
+Problem 1a: insert 8                 idx        elem
+                                                elem
+
+                                      0          8
+
+                                      1
+Insert 7, 9, 48, 8, 37, 57            2
+into an empty table.
+                                      3
+
+(h(8) + 0) % 10 = 8                   4
+
+(h(8) + 1) % 10 = 9                   5
+
+(h(8) + 2) % 10 = 0                   6
+
+                                      7          7
+
+                                      8          48
+
+                                      9          9
+                                      Linear Probing
+                             ith probe: (h(key) + i) % TableSize
+
+
+Problem 1a: insert 37                idx        elem
+                                                elem
+
+                                      0          8
+
+                                      1          37
+Insert 7, 9, 48, 8, 37, 57            2
+into an empty table.
+                                      3
+(h(37) + 0) % 10 = 7                  4
+
+(h(37) + 1) % 10 = 8                  5
+
+(h(37) + 2) % 10 = 9                  6
+
+(h(37) + 3) % 10 = 0                  7          7
+
+
+(h(37) + 4) % 10 = 1                  8          48
+
+                                      9          9
+                                      Linear Probing
+                             ith probe: (h(key) + i) % TableSize
+
+
+Problem 1a: insert 57                idx        elem
+                                                elem
+
+                                      0          8
+
+                                      1          37
+Insert 7, 9, 48, 8, 37, 57            2          57
+into an empty table.
+                                      3
+(h(57) + 0) % 10 = 7                  4
+(h(57) + 1) % 10 = 8                  5
+
+(h(57) + 2) % 10 = 9                  6
+
+(h(57) + 3) % 10 = 0                  7          7
+
+(h(57) + 4) % 10 = 1                  8          48
+
+(h(57) + 5) % 10 = 2                  9          9
+                                            Linear Probing
+                                   ith probe: (h(key) + i) % TableSize
+
+
+Problem 1a: deletion                       idx        elem
+
+                                            0          8
+
+                                            1          37
+Delete 37, 7, 57 from the table.            2          57
+
+                                            3
+
+                                            4
+
+                                            5
+
+                                            6
+
+                                            7          7
+
+                                            8          48
+
+                                            9          9
+                                            Linear Probing
+                                   ith probe: (h(key) + i) % TableSize
+
+
+Problem 1a: delete 37                      idx        elem
+
+                                            0          8
+
+                                            1      DELETED
+                                                     37
+Delete 37, 7, 57 from the table.            2          57
+(h(37) + 0) % 10 = 7                        3
+(h(37) + 1) % 10 = 8                        4
+
+(h(37) + 2) % 10 = 9                        5
+
+(h(37) + 3) % 10 = 0                        6
+
+(h(37) + 4) % 10 = 1                        7          7
+
+                                            8          48
+
+                                            9          9
+                                            Linear Probing
+                                   ith probe: (h(key) + i) % TableSize
+
+
+Problem 1a: delete 7                       idx        elem
+
+                                            0          8
+
+                                            1      DELETED
+Delete 37, 7, 57 from the table.            2          57
+(h(7) + 0) % 10 = 7                         3
+
+                                            4
+
+                                            5
+
+                                            6
+
+                                            7      DELETED
+                                                      7
+
+                                            8          48
+
+                                            9          9
+                                            Linear Probing
+                                   ith probe: (h(key) + i) % TableSize
+
+
+Problem 1a: delete 57                      idx        elem
+
+                                            0          8
+
+                                            1      DELETED
+Delete 37, 7, 57 from the table.            2      DELETED
+                                                     57
+(h(57) + 0) % 10 = 7                        3
+(h(57) + 1) % 10 = 8                        4
+
+(h(57) + 2) % 10 = 9                        5
+
+(h(57) + 3) % 10 = 0                        6
+
+(h(57) + 4) % 10 = 1                        7      DELETED
+
+(h(57) + 5) % 10 = 2                        8          48
+
+                                            9          9
+Experiment on 1a
+
+What happens if we now try to remove a
+non-existent element (e.g. 17) from the table?
+                                       Linear Probing
+                              ith probe: (h(key) + i) % TableSize
+
+
+Experiment:       delete 17           idx        elem
+
+                                       0          8
+
+                                       1      DELETED
+Delete 17 from the table.              2      DELETED       We have reached an
+(h(17) + 0) % 10 = 7                   3
+                                                            empty slot, but have
+                                                            not encountered 17.
+(h(17) + 1) % 10 = 8                   4                    Therefore, it must
+                                                            not exist.
+(h(17) + 2) % 10 = 9                   5
+
+(h(17) + 3) % 10 = 0                   6
+
+(h(17) + 4) % 10 = 1                   7      DELETED
+
+(h(17) + 5) % 10 = 2                   8          48
+
+(h(17) + 6) % 10 = 3                   9          9
+Problem 1b
+
+> Quadratic Probing
+   – ith probe: (h(key) + i2) % TableSize
+                                    Quadratic Probing
+                             ith probe: (h(key) + i2) % TableSize
+
+
+Problem 1b: insertion                idx        elem
+
+                                      0
+
+                                      1
+Insert 7, 9, 48, 8, 37, 57            2
+into an empty table.
+                                      3
+
+                                      4
+
+                                      5
+
+                                      6
+
+                                      7
+
+                                      8
+
+                                      9
+                                    Quadratic Probing
+                             ith probe: (h(key) + i2) % TableSize
+
+
+Problem 1b: insert 7                 idx        elem
+                                                elem
+
+                                      0
+
+                                      1
+Insert 7, 9, 48, 8, 37, 57            2
+into an empty table.
+                                      3
+
+(h(7) + 02) % 10 = 7                  4
+
+                                      5
+
+                                      6
+
+                                      7           7
+
+                                      8
+
+                                      9
+                                    Quadratic Probing
+                             ith probe: (h(key) + i2) % TableSize
+
+
+Problem 1b: insert 9                 idx        elem
+                                                elem
+
+                                      0
+
+                                      1
+Insert 7, 9, 48, 8, 37, 57            2
+into an empty table.
+                                      3
+
+(h(9) + 02) % 10 = 9                  4
+
+                                      5
+
+                                      6
+
+                                      7           7
+
+                                      8
+
+                                      9           9
+                                    Quadratic Probing
+                             ith probe: (h(key) + i2) % TableSize
+
+
+Problem 1b: insert 48                idx        elem
+                                                elem
+
+                                      0
+
+                                      1
+Insert 7, 9, 48, 8, 37, 57            2
+into an empty table.
+                                      3
+
+(h(48) + 02) % 10 = 8                 4
+
+                                      5
+
+                                      6
+
+                                      7           7
+
+                                      8          48
+
+                                      9           9
+                                    Quadratic Probing
+                             ith probe: (h(key) + i2) % TableSize
+
+
+Problem 1b: insert 8                 idx        elem
+                                                elem
+
+                                      0
+
+                                      1
+Insert 7, 9, 48, 8, 37, 57            2           8
+into an empty table.
+                                      3
+
+(h(8) + 02) % 10 = 8                  4
+
+(h(8) + 12) % 10 = 9                  5
+
+(h(8) + 22) % 10 = 2                  6
+
+                                      7           7
+
+                                      8          48
+
+                                      9           9
+                                    Quadratic Probing
+                             ith probe: (h(key) + i2) % TableSize
+
+
+Problem 1b: insert 37                idx        elem
+
+                                      0
+
+                                      1          37
+Insert 7, 9, 48, 8, 37, 57            2           8
+into an empty table.
+                                      3
+
+(h(37) + 02) % 10 = 7                 4
+
+(h(37) + 12) % 10 = 8                 5
+
+(h(37) + 22) % 10 = 1                 6
+
+                                      7           7
+
+                                      8          48
+
+                                      9           9
+                                    Quadratic Probing
+                             ith probe: (h(key) + i2) % TableSize
+
+
+Problem 1b: insert 57                idx        elem
+
+                                      0
+
+                                      1          37
+Insert 7, 9, 48, 8, 37, 57            2           8
+into an empty table.
+                                      3
+(h(57) + 02) % 10 = 7                 4
+(h(57) + 12) % 10 = 8                 5
+
+(h(57) + 22) % 10 = 1                 6          57
+
+(h(57) + 32) % 10 = 6                 7           7
+
+                                      8          48
+
+                                      9           9
+Problem 1c
+
+> Separate Chaining
+   – Use a linked list for each slot
+                                     idx   elem
+
+
+Problem 1c: insertion                0      /
+
+                                     1      /
+
+                                     2      /
+Insert 7, 9, 48, 8, 37, 57
+                                     3      /
+into an empty table.
+                                     4      /
+
+                                     5      /
+
+                                     6      /
+
+                                     7      /
+
+                                     8      /
+
+                                     9      /
+       Separate Chaining
+   Use a linked list for each slot
+                                     idx   elem
+
+
+Problem 1c: insert 7                 0      /
+
+                                     1      /
+
+                                     2      /
+Insert 7, 9, 48, 8, 37, 57
+                                     3      /
+into an empty table.
+                                     4      /
+(h(7) + 0) % 10 = 7                  5      /
+
+                                     6      /
+
+                                     7      /     7   /
+
+                                     8      /
+
+                                     9      /
+       Separate Chaining
+   Use a linked list for each slot
+                                     idx   elem
+                                           elem
+
+
+Problem 1c: insert 9                 0      /
+
+                                     1      /
+
+                                     2      /
+Insert 7, 9, 48, 8, 37, 57
+                                     3      /
+into an empty table.
+                                     4      /
+(h(9) + 0) % 10 = 9                  5      /
+
+                                     6      /
+
+                                     7            7   /
+
+                                     8      /
+
+                                     9      /     9   /
+       Separate Chaining
+   Use a linked list for each slot
+                                     idx   elem
+
+
+Problem 1c: insert 48                0      /
+
+                                     1      /
+
+                                     2      /
+Insert 7, 9, 48, 8, 37, 57
+                                     3      /
+into an empty table.
+                                     4      /
+(h(48) + 0) % 10 = 8                 5      /
+
+                                     6      /
+
+                                     7            7    /
+
+                                     8      /     48   /
+
+                                     9            9    /
+       Separate Chaining
+   Use a linked list for each slot
+                                     idx   elem
+
+
+Problem 1c: insert 8                 0      /
+
+                                     1      /
+
+                                     2      /
+Insert 7, 9, 48, 8, 37, 57
+                                     3      /
+into an empty table.
+                                     4      /
+(h(8) + 0) % 10 = 8                  5      /
+
+                                     6      /
+
+                                     7            7    /
+
+                                     8            48       8   /
+
+                                     9            9    /
+       Separate Chaining
+   Use a linked list for each slot
+                                     idx   elem
+
+
+Problem 1c: insert 37                0      /
+
+                                     1      /
+
+                                     2      /
+Insert 7, 9, 48, 8, 37, 57
+                                     3      /
+into an empty table.
+                                     4      /
+(h(37) + 0) % 10 = 7                 5      /
+
+                                     6      /
+
+                                     7            7        37   /
+
+                                     8            48       8    /
+
+                                     9            9    /
+       Separate Chaining
+   Use a linked list for each slot
+                                     idx   elem
+
+
+Problem 1c: insert 57                0      /
+
+                                     1      /
+
+                                     2      /
+Insert 7, 9, 48, 8, 37, 57
+                                     3      /
+into an empty table.
+                                     4      /
+(h(57) + 0) % 10 = 7                 5      /
+
+                                     6      /
+
+                                     7            7        37       57   /
+
+                                     8            48       8    /
+
+                                     9            9    /
+       Separate Chaining
+   Use a linked list for each slot
+Problem 2
+Problem 2a
+Describe double hashing.
+● On the ith probe, we check the slot with index
+  (h(key) + i ᐧ g(key)) % TableSize.
+● The first hash function h determines the location
+  where we initially try to place the item.
+● If there is a collision, then the second hash function g
+  determines the probing step size
+  (i.e. 1 ᐧ g(key), 2 ᐧ g(key), … distance away from the
+  initial location).
+Problem 2b
+List two disadvantages of quadratic probing.
+● If the table is more than half full (i.e. load factor > 0.5), then
+  we are not guaranteed to find a location to insert an item.
+● Suffers from secondary clustering since items that initially
+  hash to the same location resolve the collision identically.
+Describe how double hashing fixes one of these disadvantages.
+● A good second hash function prevents secondary clustering
+  since items that initially hash to the same location will likely
+  resolve the collision differently.
+● Items that have the same value for the first hash function f, will
+  likely have different values for the second hash function g,
+  leading to different probing step sizes.
+ Problem 2c
+ Compare open addressing with separate chaining.
+ Attributes                            Open Addressing                                        Separate Chaining
+
+Collision     Handles collisions by searching for an open slot within the table    Handles collisions by adding elements
+Handling      itself.                                                              to a chain at the corresponding index.
+
+Memory                                                                             Non-contiguous memory → worse
+              Array is laid out contiguously in memory → better memory locality.
+Access                                                                             memory locality.
+
+              Linear probing suffers from primary clustering, but is guaranteed
+              to find an open slot.
+                                                                                   Average runtime: O(1 + 𝜆𝜆)
+              Quadratic probing suffers from secondary clustering, and is only
+Runtime                                                                            Best-case runtime: O(1)
+              guaranteed to find an empty slot when 𝜆𝜆 < 0.5.
+                                                                                   Worst-case runtime: O(n)
+              Double hashing does not suffer from clustering, but requires an
+              additional hash function (computationally expensive).
+Problem 2 (Double Hashing Example)
+
+> Double Hashing
+   – ith probe: (h(key) + i ᐧ g(key)) % TableSize
+                                            Double Hashing
+                             ith probe: (h(key) + i * g(key)) % TableSize
+
+
+Problem 2: insertion                  idx         elem
+
+                                       0
+
+                                       1
+Insert 7, 9, 48, 8, 37, 57             2
+into an empty table.
+                                       3
+
+                                       4
+h(k) = k % 10                          5
+g(k) = 1 + (k % 9)                     6
+
+                                       7
+
+                                       8
+
+                                       9
+                                            Double Hashing
+                             ith probe: (h(key) + i * g(key)) % TableSize
+
+
+Problem 2: insert 7                   idx         elem
+
+                                       0
+
+                                       1
+Insert 7, 9, 48, 8, 37, 57             2
+into an empty table.
+                                       3
+
+                                       4
+h(k) = k % 10                          5
+g(k) = 1 + (k % 9)                     6
+
+                                       7           7
+
+                                       8
+
+                                       9
+                                            Double Hashing
+                             ith probe: (h(key) + i * g(key)) % TableSize
+
+
+Problem 2: insert 9                   idx         elem
+
+                                       0
+
+                                       1
+Insert 7, 9, 48, 8, 37, 57             2
+into an empty table.
+                                       3
+
+                                       4
+h(k) = k % 10                          5
+g(k) = 1 + (k % 9)                     6
+
+                                       7           7
+
+                                       8
+
+                                       9           9
+                                            Double Hashing
+                             ith probe: (h(key) + i * g(key)) % TableSize
+
+
+Problem 2: insert 48                  idx         elem
+
+                                       0
+
+                                       1
+Insert 7, 9, 48, 8, 37, 57             2
+into an empty table.
+                                       3
+
+                                       4
+h(k) = k % 10                          5
+g(k) = 1 + (k % 9)                     6
+
+                                       7           7
+
+                                       8          48
+
+                                       9           9
+                                            Double Hashing
+                             ith probe: (h(key) + i * g(key)) % TableSize
+
+
+Problem 2: insert 8                   idx         elem
+
+                                       0
+
+                                       1
+Insert 7, 9, 48, 8, 37, 57             2
+into an empty table.
+                                       3
+
+                                       4
+h(k) = k % 10                          5
+g(k) = 1 + (k % 9)                     6           8
+
+                                       7           7
+
+                                       8          48
+
+                                       9           9
+                                            Double Hashing
+                             ith probe: (h(key) + i * g(key)) % TableSize
+
+
+Problem 2: insert 37                  idx         elem
+
+                                       0
+
+                                       1          37
+Insert 7, 9, 48, 8, 37, 57             2
+into an empty table.
+                                       3
+
+                                       4
+h(k) = k % 10                          5
+g(k) = 1 + (k % 9)                     6           8
+
+                                       7           7
+
+                                       8          48
+
+                                       9           9
+                                            Double Hashing
+                             ith probe: (h(key) + i * g(key)) % TableSize
+
+
+Problem 2: insert 57                  idx         elem
+
+                                       0
+
+                                       1          37
+Insert 7, 9, 48, 8, 37, 57             2
+into an empty table.
+                                       3
+
+                                       4
+h(k) = k % 10                          5          57
+g(k) = 1 + (k % 9)                     6           8
+
+                                       7           7
+
+                                       8          48
+
+                                       9           9
+Thank You!
+
