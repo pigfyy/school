@@ -50,13 +50,11 @@
 
     /* ================================================================ sorter: manual vs observed */
     "cse331-w2-l3-sort-file-sum": { type: "choice", answer: "described", why: SORT_WHY },
-    "cse331-w2-l3-sort-average-two-decimals": { type: "choice", answer: "described", why: SORT_WHY },
     "cse331-w2-l3-sort-too-big-integer": { type: "choice", answer: "contradicted", why: SORT_WHY },
     "cse331-w2-l3-sort-empty-sum": { type: "choice", answer: "described", why: SORT_WHY },
     "cse331-w2-l3-sort-empty-average": { type: "choice", answer: "silent", why: SORT_WHY },
     "cse331-w2-l3-sort-word-in-input": { type: "choice", answer: "silent", why: SORT_WHY },
     "cse331-w2-l3-sort-exit-status": { type: "choice", answer: "silent", why: SORT_WHY },
-    "cse331-w2-l3-sort-help": { type: "choice", answer: "silent", why: SORT_WHY },
 
     /* ================================================================ quiz */
     "cse331-w2-l3-quiz-not-input": { type: "choice", answer: "exit-status" },

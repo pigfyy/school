@@ -290,33 +290,6 @@ function setupShell(box) {
   reset();
 }
 
-/* =========================================================== command line, word by word */
-function setupArgWalk() {
-  const input = $("#argwalk-input"), arr = $("#argwalk-array"), steps = $("#argwalk-steps"), verdict = $("#argwalk-verdict");
-  function go() {
-    const sp = splitArgs(input.value);
-    steps.replaceChildren();
-    if (sp.error) { arr.textContent = ""; verdict.className = "verdict warn"; verdict.textContent = sp.error; return; }
-    arr.replaceChildren("main gets ", el("code", { text: `args = { ${sp.args.map((a) => JSON.stringify(a)).join(", ")} }` }), el("span", { class: "muted", text: ` (${sp.args.length} element${sp.args.length === 1 ? "" : "s"})` }));
-    const r = S.run(sp.args, { stdin: "1 2\n" });
-    r.argSteps.forEach((s) => {
-      const failed = /fail$/.test(s.effect);
-      steps.append(el("li", { class: failed ? "bad" : "" },
-        el("code", { class: "argword", text: JSON.stringify(s.arg) }),
-        el("span", { class: "argline", text: `line ${s.line}` }),
-        el("span", { text: s.effect })));
-    });
-    if (!sp.args.length) steps.append(el("li", {}, el("span", { text: "No arguments: the loop on line 28 runs zero times." })));
-    const outcome = r.how === "fail" ? `Sum stops: ${r.stderr.trim()} (status 1).` : r.readsStdin ? "Every argument passed. No file was named, so Sum reads standard input." : `Every argument passed. Sum reads ${r.source && r.source.name ? r.source.name : "a file"}.`;
-    if (r.how === "fail" && r.endLine === 54) steps.append(el("li", { class: "bad" }, el("code", { class: "argword", text: "after the loop" }), el("span", { class: "argline", text: "line 53" }), el("span", { text: "precisionGiven && !average, so fail" })));
-    verdict.className = `verdict ${r.how === "fail" ? "bad" : "ok"}`;
-    verdict.textContent = outcome;
-  }
-  input.addEventListener("input", go);
-  $$("#argwalk [data-try]").forEach((b) => b.addEventListener("click", () => { input.value = b.dataset.try; go(); }));
-  go();
-}
-
 /* =========================================================== Lecture 1 vs Lecture 3 */
 function setupCompare() {
   const input = $("#compare-input"), a = $("#compare-l1"), b = $("#compare-l3"), verdict = $("#compare-verdict");
@@ -367,79 +340,6 @@ function setupProgramMap() {
   $$("#program-map [data-range]").forEach((b) => b.setAttribute("aria-pressed", "false"));
 }
 
-/* =========================================================== promises: stronger and weaker */
-// Five responses to `java Sum -a` with nothing typed. P1 and P3 are real (Sum.java and the copy without
-// lines 73-75); P4 is a version dividing longs (java.lang.ArithmeticException: / by zero, checked with java);
-// P2 and P5 are hypothetical versions the notes mention (print 0; exit with status 2 and print nothing).
-const PROGRAMS = [
-  { id: "P1", name: "Lecture 3's Sum", out: "", err: "Sum: cannot average zero values", status: 1 },
-  { id: "P2", name: "prints 0 instead", out: "0.0", err: "", status: 0 },
-  { id: "P3", name: "Sum without lines 73–75", out: "NaN", err: "", status: 0 },
-  { id: "P4", name: "divides longs instead", out: "", err: "Exception in thread \"main\" java.lang.ArithmeticException: / by zero\n\tat Sum.main(Sum.java:76)", status: 1 },
-  { id: "P5", name: "exits with 2, prints nothing", out: "", err: "", status: 2 },
-];
-
-const MANUALS = [
-  { id: "MA", text: "It prints Sum: cannot average zero values on standard error and exits with status 1.", ok: (p) => p.err === "Sum: cannot average zero values" && p.status === 1 },
-  { id: "MB", text: "It exits with a nonzero status.", ok: (p) => p.status !== 0 },
-  { id: "MC", text: "It prints one line on standard output, nothing on standard error, and exits with status 0.", ok: (p) => p.out !== "" && !p.out.includes("\n") && p.err === "" && p.status === 0 },
-  { id: "MD", text: "It does not end in a stack trace.", ok: (p) => !p.err.startsWith("Exception in thread") },
-  { id: "ME", text: "It prints something on standard error.", ok: (p) => p.err !== "" },
-];
-
-// The true relation over every possible program (not just these five), with the reason.
-const RELATION = {
-  "MA|MB": ["stronger", "Status 1 is in particular a nonzero status, so every program meeting MA meets MB. A program that exits with 2 meets MB and not MA."],
-  "MA|MC": ["incomparable", "MA requires status 1 and MC requires status 0, so no program meets both, and each is met by some program."],
-  "MA|MD": ["stronger", "MA fixes standard error to one message line, which is not a stack trace. A program printing 0.0 meets MD and not MA."],
-  "MA|ME": ["stronger", "MA's message is something on standard error. A stack trace meets ME and not MA."],
-  "MB|MC": ["incomparable", "MB needs a nonzero status and MC needs 0: no program meets both."],
-  "MB|MD": ["incomparable", "A stack trace (status 1) meets MB and not MD; printing 0.0 (status 0) meets MD and not MB."],
-  "MB|ME": ["incomparable", "Exiting with 2 and printing nothing meets MB and not ME. Here the five programs mislead: every one that meets ME also meets MB. But a program that prints a warning on standard error and exits with 0 meets ME and not MB. Stronger comes from the definition, not from a sample."],
-  "MC|MD": ["stronger", "MC requires nothing on standard error, so no stack trace. A program that fails with a message meets MD and not MC."],
-  "MC|ME": ["incomparable", "MC requires nothing on standard error and ME requires something: no program meets both."],
-  "MD|ME": ["incomparable", "Printing 0.0 meets MD and not ME; a stack trace meets ME and not MD."],
-};
-
-function setupPromises() {
-  const grid = $("#promise-grid"), out = $("#promise-out");
-  const table = el("table", { class: "promise-table" });
-  const head = el("tr", {}, el("th", { scope: "col", text: "Manual (click to test)" }));
-  for (const p of PROGRAMS) {
-    head.append(el("th", { scope: "col" }, el("span", { class: "pname", text: `${p.id}: ${p.name}` }),
-      el("span", { class: "pout" }, el("span", { class: "s-out", text: p.out ? `out ${p.out}` : "out —" }), el("span", { class: "s-err", text: p.err ? `err ${p.err.split("\n")[0].replace("Exception in thread \"main\" ", "")}` : "err —" }), el("span", { class: "s-st", text: `status ${p.status}` }))));
-  }
-  table.append(head);
-  let picked = [];
-  const rows = MANUALS.map((mn) => {
-    const btn = el("button", { class: "manual-btn", type: "button", "aria-pressed": "false" }, el("b", { text: mn.id }), " ", mn.text);
-    const tr = el("tr", {}, el("th", { scope: "row" }, btn));
-    const cells = PROGRAMS.map((p) => { const td = el("td", { class: "cell", text: "?" }); tr.append(td); return { td, p }; });
-    btn.addEventListener("click", () => {
-      picked = picked.filter((x) => x !== mn.id);
-      if (btn.getAttribute("aria-pressed") === "true") { btn.setAttribute("aria-pressed", "false"); }
-      else { picked.push(mn.id); if (picked.length > 2) { const drop = picked.shift(); rows.find((r) => r.mn.id === drop).btn.setAttribute("aria-pressed", "false"); } btn.setAttribute("aria-pressed", "true"); }
-      cells.forEach(({ td, p }) => { const ok = mn.ok(p); td.textContent = ok ? "meets" : "no"; td.className = `cell ${ok ? "yes" : "no"}`; });
-      explain();
-    });
-    table.append(tr);
-    return { mn, btn, cells };
-  });
-  function explain() {
-    out.replaceChildren();
-    if (!picked.length) { out.textContent = "Pick a manual."; return; }
-    const met = (id) => PROGRAMS.filter((p) => MANUALS.find((m) => m.id === id).ok(p)).map((p) => p.id);
-    if (picked.length === 1) { out.append(el("p", { text: `${picked[0]} is met by ${met(picked[0]).join(", ") || "none"} of these five. Pick a second manual to compare.` })); return; }
-    const [a, b] = [...picked].sort();
-    const [rel, why] = RELATION[`${a}|${b}`];
-    const sentence = rel === "stronger" ? `${a} is stronger than ${b}.` : `${a} and ${b} are incomparable.`;
-    out.append(el("p", {}, el("strong", { text: sentence }), " ", why),
-      el("p", { class: "where", text: `Among these five: ${a} is met by ${met(a).join(", ") || "none"}, ${b} by ${met(b).join(", ") || "none"}.` }));
-  }
-  grid.append(el("div", { class: "table-scroll" }, table));
-  explain();
-}
-
 /* =========================================================== checks removed (edge lab) */
 function setupEdgeLab() {
   const neg = $("#edge-neg"), cnt = $("#edge-count");
@@ -463,30 +363,6 @@ function setupEdgeLab() {
   paint();
 }
 
-/* =========================================================== discussion timer */
-function setupTimer() {
-  const phases = $$("#timer-phases li"), clock = $("#timer-clock"), start = $("#timer-start");
-  let i = 0, left = 0, ticking = null, up = 0;
-  const fmt = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
-  function paint() {
-    phases.forEach((li, k) => { li.classList.toggle("now", k === i); li.classList.toggle("done", k < i); });
-    const min = Number(phases[i].dataset.min);
-    clock.textContent = min ? fmt(Math.max(0, left)) : `${fmt(up)} elapsed`;
-    clock.classList.toggle("over", Boolean(min) && left <= 0 && ticking !== null);
-    start.textContent = ticking ? "Pause" : "Start";
-  }
-  function load(k) { i = k; left = Number(phases[i].dataset.min) * 60; up = 0; paint(); }
-  start.addEventListener("click", () => {
-    if (ticking) { clearInterval(ticking); ticking = null; paint(); return; }
-    ticking = setInterval(() => { if (Number(phases[i].dataset.min)) left--; else up++; paint(); }, 1000);
-    paint();
-  });
-  $("#timer-next").addEventListener("click", () => { if (i < phases.length - 1) load(i + 1); });
-  $("#timer-reset").addEventListener("click", () => { if (ticking) { clearInterval(ticking); ticking = null; } load(0); });
-  phases.forEach((li, k) => { li.tabIndex = 0; li.addEventListener("click", () => load(k)); li.addEventListener("keydown", (e) => { if (e.key === "Enter") load(k); }); });
-  load(0);
-}
-
 const CHECK_SETS = { noneg: { neg: false }, nocount: { count: false } };
 
 function setupRunButtons() {
@@ -506,24 +382,20 @@ const SORT_LABEL = { described: "Described", silent: "Silent", contradicted: "Co
 
 const SORT_HINT = {
   "cse331-w2-l3-sort-file-sum": "Read lines 6–7 and 17–18 again.",
-  "cse331-w2-l3-sort-average-two-decimals": "Read the Options on lines 12–15 again.",
   "cse331-w2-l3-sort-too-big-integer": "Is 2147483648 an integer? What does line 6 promise to read?",
   "cse331-w2-l3-sort-empty-sum": "What is the sum of no numbers? What does the manual say Sum prints by default?",
   "cse331-w2-l3-sort-empty-average": "Search lines 5–19 for anything about averaging no numbers.",
   "cse331-w2-l3-sort-word-in-input": "Does the manual say anything about input that isn't an integer?",
   "cse331-w2-l3-sort-exit-status": "Search lines 5–19 for anything about how Sum exits.",
-  "cse331-w2-l3-sort-help": "Is --help in the Options list? Does the manual mention other options at all?",
 };
 
 const SORT_EXPLAIN = {
   "cse331-w2-l3-sort-file-sum": "Lines 17–18 say a file argument is read, and the default (lines 6–7) is the sum: 12.",
-  "cse331-w2-l3-sort-average-two-decimals": "Lines 13–15: -a prints the average, and --precision=N gives N digits after the decimal point. 1.50 is that.",
   "cse331-w2-l3-sort-too-big-integer": "The manual promises to read integers, and 2147483648 is one. Sum calls it not an integer: the run goes against the manual.",
   "cse331-w2-l3-sort-empty-sum": "Sum prints 0, which the manual covers if the sum of no numbers is 0.",
   "cse331-w2-l3-sort-empty-average": "The manual never says what the average of nothing is, nor that Sum refuses with a message and status 1.",
   "cse331-w2-l3-sort-word-in-input": "The manual says nothing about a word that isn't an integer: not the message, not the stream, not the status.",
   "cse331-w2-l3-sort-exit-status": "No line of the manual mentions an exit status, for this run or any other.",
-  "cse331-w2-l3-sort-help": "The manual lists -a and --precision=N. It says nothing about any other option, or what Sum does with one.",
 };
 
 function setupSorter() {
@@ -580,12 +452,9 @@ $$("pre.code[data-src]").forEach(renderCode);
 $$(".term[data-session]").forEach(renderSessionTerm);
 createRunner($('.runner[data-runner="hero"]'));
 $$(".shell[data-shell]").forEach(setupShell);
-setupArgWalk();
 setupCompare();
 setupProgramMap();
-setupPromises();
 setupEdgeLab();
-setupTimer();
 setupRunButtons();
 setupSorter();
 };

@@ -103,23 +103,6 @@ body.plain-streams .st-badge { display: none; }
 
 table.articles { max-width: var(--measure); }
 
-/* ---------------------------------------------------------------- timer */
-.phases { list-style: none; padding: 0; margin: 0 0 0.9rem; display: grid; gap: 0.4rem; counter-reset: ph; }
-.phases li { display: grid; grid-template-columns: 9.5rem 1fr; gap: 0.75rem; padding: 0.5rem 0.75rem; border-radius: var(--r); border: 1px solid var(--line); cursor: pointer; font-size: 0.95rem; }
-.phases li b { font-family: var(--mono); font-size: 0.85rem; font-weight: 600; }
-.phases li.now { border-color: var(--ink); background: var(--paper); box-shadow: inset 4px 0 0 var(--out); }
-.phases li.done { opacity: 0.55; }
-.clock { font-family: var(--mono); font-size: 1.6rem; margin-left: auto; }
-.clock.over { color: var(--err); }
-
-/* ---------------------------------------------------------------- argument walker */
-.args-array { margin: 0.8rem 0 0.5rem; font-size: 0.95rem; }
-.arg-steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.3rem; }
-.arg-steps li { display: grid; grid-template-columns: 11rem 4.5rem 1fr; gap: 0.75rem; align-items: baseline; padding: 0.35rem 0.6rem; border-radius: var(--r); background: var(--paper); font-size: 0.93rem; }
-.arg-steps li.bad { background: var(--err-tint); }
-.argword { font-weight: 600; overflow-wrap: anywhere; background: none; padding: 0; }
-.argline { font-family: var(--mono); font-size: 0.78rem; color: var(--ink-soft); }
-
 /* ---------------------------------------------------------------- streams diagram */
 .streams-diagram { display: grid; grid-template-columns: 6rem minmax(0, 1.6fr) minmax(0, 1fr); gap: 0.75rem; align-items: stretch; margin: 1rem 0 1.5rem; max-width: 52rem; }
 .sd-prog { background: var(--night); color: #fff; font-family: var(--mono); font-size: 1.15rem; display: grid; place-items: center; border-radius: var(--r-lg); }
@@ -142,7 +125,7 @@ table.articles { max-width: var(--measure); }
 .sd-hidden span { font-size: 0.85rem; color: var(--ink-soft); }
 
 /* ---------------------------------------------------------------- interactive shell */
-.shell[data-shell] { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 1rem; margin: 1rem 0 1.5rem; align-items: start; }
+.shell[data-shell] { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 1rem; margin: 1rem 0 1.5rem; align-items: start; min-height: 0; }
 .sh-term { margin: 0; display: flex; flex-direction: column; }
 .sh-term .term-body { min-height: 12rem; max-height: 22rem; }
 .sh-prompt { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.95rem 0.6rem; border-top: 1px solid var(--night-3); font-family: var(--mono); }
@@ -191,10 +174,6 @@ table.articles { max-width: var(--measure); }
 .ef-core { background: var(--surface); border: 1px solid var(--line); }
 .ef-arrow { align-self: center; font-size: 1.5rem; color: var(--ink-soft); }
 
-/* ---------------------------------------------------------------- promises grid */
-.promise-table { border-collapse: separate; border-spacing: 3px; font-size: 0.85rem; min-width: 44rem; }
-.promise-table th { text-align: left; font-weight: 500; vertical-align: bottom; padding: 0.25rem; }
-.promise-table thead th, .promise-table tr:first-child th { min-width: 7.2rem; }
 .pname { display: block; font-weight: 600; margin-bottom: 0.2rem; }
 .pout { display: grid; gap: 0.05rem; font-family: var(--mono); font-size: 0.7rem; }
 .pout .s-out, .pout .s-err, .pout .s-st { text-decoration: none; font-weight: 500; padding: 0 0.25rem; border-radius: 2px; overflow-wrap: anywhere; }
@@ -203,12 +182,6 @@ table.articles { max-width: var(--measure); }
 .pout .s-st { background: var(--st-tint); color: var(--st); }
 .manual-btn { font: inherit; font-size: 0.86rem; text-align: left; background: var(--surface); border: 1.5px solid var(--line-strong); border-radius: var(--r); padding: 0.35rem 0.55rem; cursor: pointer; width: 100%; min-width: 15rem; line-height: 1.35; }
 .manual-btn[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--paper); }
-.promise-table .cell { text-align: center; border-radius: 4px; background: var(--paper); color: var(--ink-faint); font-family: var(--mono); font-size: 0.8rem; }
-.promise-table .cell.yes { background: var(--right-tint); color: var(--right); font-weight: 600; }
-.promise-table .cell.no { background: var(--paper-2); color: var(--ink-soft); }
-.promise-out { margin-top: 0.75rem; background: var(--paper); border-radius: var(--r); padding: 0.6rem 0.8rem; font-size: 0.95rem; }
-.promise-out p { margin: 0 0 0.35rem; }
-.promise-out p:last-child { margin: 0; }
 
 .prompt-cmds { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: -0.25rem 0 1rem; }
 .prompt-cmds code { background: var(--night); color: #fff; padding: 0.3rem 0.6rem; border-radius: var(--r); overflow-wrap: anywhere; max-width: 100%; }
@@ -231,10 +204,6 @@ ul.manuals li { background: var(--paper); border-radius: var(--r); padding: 0.5r
   .sd-lane::after { content: "↓"; right: 0.75rem; }
   .edge-figure { grid-template-columns: 1fr; }
   .ef-arrow { transform: rotate(90deg); justify-self: center; line-height: 1; }
-  .phases li { grid-template-columns: 1fr; gap: 0.15rem; }
-  .arg-steps li { grid-template-columns: 1fr auto; }
-  .arg-steps li > span:last-child { grid-column: 1 / -1; }
   .rn-file { grid-template-columns: 5.5rem minmax(0, 1fr) auto; }
-  .clock { margin-left: 0; }
   .term-body { font-size: 0.8rem; }
 }

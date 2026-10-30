@@ -10,9 +10,8 @@
     Sidebar rail .................... <nav class="rail">
     Week overview + hero widget ..... #home (hero: the Sum runner: arguments, stdin, files -> stdout, stderr, exit status)
     Lecture 3 modules ............... #l3-discuss, #l3-strength, #l3-sum, #l3-batch, #l3-manual, #l3-edge
-    Interactive widgets ............. .runner (Sum runner), #argwalk (command line word by word), .shell (bash terminal),
-                                      #compare (Lecture 1 Sum vs this Sum), #program-map, #promises (stronger/weaker),
-                                      .sorter (manual vs observed runs; graded), #edge-lab (checks removed), #timer
+    Interactive widgets ............. .runner (Sum runner), .shell (bash terminal), #compare (Lecture 1 Sum vs this Sum),
+                                      #program-map, .sorter (manual vs observed runs; graded), #edge-lab (checks removed)
     Check your understanding ........ #l3-quiz (li.cyu[data-id])
     Answerable problems ............. #l3-exercises (article.task[data-id] > .answer-spec[data-part])
     Readings / cheat sheet .......... #readings, #cheatsheet
@@ -157,45 +156,22 @@
 <section class="page" id="l3-discuss" data-title="Reading 1 discussion" data-unit="l3">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span> · first 15–20 minutes</p>
   <h1>Reading 1 discussion</h1>
-  <div class="prose">
-    <p>The course motto is <em>"Your job is to deliver code that you know works."</em> Reading 1 asked what "know" means there. Each student read one of three articles and wrote a reflection before Friday. Today the room compares the answers.</p>
-  </div>
-
   <div class="rule">
-    <p><strong>The question.</strong> When you say you know your code works, what do you actually know? How did you come to know it?</p>
+    <p><strong>Key idea.</strong> The course motto is <em>"Your job is to deliver code that you know works."</em> Reading 1 asks: how do you <em>know</em>?</p>
   </div>
 
   <table class="plain articles">
-    <tr><th>Willison 2025</th><td>You know when you have seen the code do the right thing yourself and have a test that proves it. Two steps, neither optional: test by hand and show your reviewers, then write an automated test that fails if the change is reverted. A coding agent must prove its changes the same way.</td></tr>
-    <tr><th>Fishman 1996</th><td>The space shuttle's software group: three versions of 420,000 lines with one error each. The reason is their process, not their people: planning before code, rival coders and testers, and every mistake traced back to what let it through.</td></tr>
-    <tr><th>Hoare 1996</th><td>How did software get so reliable when almost none of it was proved correct? Programmers use the same techniques as every other kind of engineer: reviews, testing planned before the code, fixing what is in use, over-engineering.</td></tr>
+    <tr><th>Willison</th><td>You know when you have watched it work and have an automated test that fails if the change is undone.</td></tr>
+    <tr><th>Fishman</th><td>The space shuttle team got nearly bug-free code from careful process, not genius.</td></tr>
+    <tr><th>Hoare</th><td>Software is reliable without proofs because of ordinary engineering: reviews, planned testing, over-engineering.</td></tr>
   </table>
 
-  <h2>Two kinds of testing</h2>
   <div class="rule">
-    <p><strong>Manual testing.</strong> You run the program and watch what it does.</p>
-    <p><strong>Automated testing.</strong> Another program runs it and checks the result, every time. A JUnit test is automated, and no AI is involved.</p>
+    <p><strong>Manual testing:</strong> you run the program and watch.</p>
+    <p><strong>Automated testing:</strong> another program runs it and checks the result, every time (JUnit, for example). "Automated" doesn't mean AI.</p>
   </div>
   <div class="prose">
-    <p>Willison asks for both: first watch the change work, then write an automated test that fails if the change is undone. Lecture 1 gave the other side: testing never confirms a claim about <em>every</em> run, because a test tries only the runs you chose.</p>
-  </div>
-
-  <h2>Run sheet</h2>
-  <div class="panel" id="timer">
-    <p class="panel-label">Discussion timer</p>
-    <ol class="phases" id="timer-phases">
-      <li data-min="0"><b>Groups</b><span>Form groups of 3 or 4 with the people next to you. Fishman and Hoare readers: raise a hand, then spread out.</span></li>
-      <li data-min="5"><b>Share · 5 min</b><span>Each of you, in turn: which article you read, and its answer to the question; one thing from your reflection you want to discuss.</span></li>
-      <li data-min="6"><b>Argue · 6 min</b><span>Willison: a test "proves the change works." Lecture 1: testing never confirms a claim about every run. Who is right? What would your article say? If your group agrees, have someone argue the other side, or take one: Does a one-line fix need both a manual test and an automated one? AI wrote it and every test passes, but nobody read it: deliver it?</span></li>
-      <li data-min="3"><b>Report · a few min</b><span>A couple of groups: what did you decide, and why?</span></li>
-      <li data-min="3"><b>Half sheet · 3 min</b><span>The names of the others in your group; what today's discussion changed in your thinking; one new point, and the article or person it came from. Hand it in at the door as you leave.</span></li>
-    </ol>
-    <div class="controls">
-      <button class="btn primary" id="timer-start">Start</button>
-      <button class="btn" id="timer-next">Next phase</button>
-      <button class="btn quiet" id="timer-reset">Reset</button>
-      <span class="clock" id="timer-clock" role="timer" aria-live="off">--:--</span>
-    </div>
+    <p>The catch, from Lecture 1: a test only checks the runs you chose. It never proves a claim about <em>every</em> run.</p>
   </div>
 
   <div class="check" data-id="cse331-w2-l3-qc-junit-kind" data-kind="quickcheck" data-type="text">
@@ -203,46 +179,26 @@
     <div class="row"><input type="text" aria-label="Your answer" placeholder="manual or automated"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>The articles take very different times to read (about 5 minutes, 20 minutes and an hour), so most groups will have several Willison readers. That's why Fishman and Hoare readers spread out first.</li>
-      <li>The productive tension in "Argue": Willison's "proves" is evidence about the runs you watched and the runs the test repeats, which is real knowledge, but about those runs. Lecture 1's claim is about the runs nobody tried. Push groups to say what each kind of evidence covers, rather than who wins.</li>
-      <li>"A JUnit test is automated, and no AI is involved" is on the slide because students mix up "automated" with "AI-generated". Ask for one example of each kind of testing from their own experience.</li>
-      <li>The half sheet counts as an in-class activity (graded on completion). Remind the room to write the names of their group members.</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ STRONGER AND WEAKER, AGAIN -->
 <section class="page" id="l3-strength" data-title="Stronger and weaker, again" data-unit="l3">
-  <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span> · from Lecture 2's slides, "Stronger and weaker"</p>
+  <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span> · recap of Lecture 2</p>
   <h1>Stronger and weaker, again</h1>
-  <div class="prose">
-    <p>Lecture 3 returns to the end of Lecture 2 before starting on the new program. The ideas come back in exercise 4, where two user manuals for <code>Sum</code> are compared the same way two method specifications were.</p>
-  </div>
-
   <div class="rule">
-    <p><strong>Stronger and weaker.</strong> An assertion P is <em>stronger</em> than an assertion Q if Q is true whenever P is. A specification S1 is <em>stronger</em> than a specification S2 if every implementation that meets S1 also meets S2. In either case the second is <em>weaker</em> than the first, and two that are neither stronger nor weaker than each other are <em>incomparable</em>.</p>
+    <p><strong>Key idea.</strong> Spec S1 is <em>stronger</em> than S2 if every implementation that meets S1 also meets S2. If neither is stronger, they are <em>incomparable</em>.</p>
   </div>
   <div class="rule">
-    <p><strong>The rule.</strong> S1 is stronger than S2 when S1's precondition is weaker than or the same as S2's, and, on every call where S2's precondition is true, S1's postcondition is stronger than or the same as S2's.</p>
+    <p><strong>How to tell.</strong> S1 is stronger when it <em>requires</em> the same or less, and <em>promises</em> the same or more.</p>
   </div>
   <div class="prose">
-    <p>A specification that promises more is met by fewer implementations. For Lecture 2's <code>indexOf</code>: B (the smallest matching index, or −1) is met by one of the four implementations, D (some matching index, or −1) by two, and A (some match, where one must exist) by all four.</p>
-    <p>Which is better? Every promise binds the implementer. <strong>Strengthening</strong> a specification can't break a client, but it can break the implementation. <strong>Weakening</strong> it can't break the implementation, but it can break a client that relied on a dropped promise. A library with a thousand clients can only make its specifications stronger.</p>
-  </div>
-
-  <h2>Promises about one run</h2>
-  <div class="prose">
-    <p>The same comparison works for a whole program. Take the run <code>java Sum -a</code> with nothing typed, and five programs that respond to it differently. Pick a manual to see which programs keep its promise, then pick a second to compare the two.</p>
-  </div>
-  <div class="panel" id="promises">
-    <p class="panel-label">Which programs meet which manual? (on <code>java Sum -a</code>, nothing typed)</p>
-    <div class="promise-grid" id="promise-grid"></div>
-    <div class="promise-out" id="promise-out" role="status"></div>
+    <ul>
+      <li>More promises means <strong>fewer</strong> implementations meet the spec.</li>
+      <li><strong>Strengthening</strong> a spec can't break a client, but it can break the implementation.</li>
+      <li><strong>Weakening</strong> a spec can't break the implementation, but it can break a client that relied on a dropped promise.</li>
+    </ul>
+    <p>Later in this lecture (problem 8) you'll compare two user manuals for <code>Sum</code> the same way.</p>
   </div>
 
   <div class="check" data-id="cse331-w2-l3-qc-b-vs-d" data-kind="quickcheck" data-type="strength">
@@ -250,15 +206,6 @@
     <div class="row"><input type="text" aria-label="Your answer" placeholder="stronger, weaker or incomparable"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>The widget's five programs are a sample, chosen to make the point visible. Five programs can show that two manuals are incomparable (one program meets each and not the other), but "stronger" comes from the rule, not from a sample.</li>
-      <li>Program 3 is the lecture's copy of <code>Sum</code> without lines 73–75 (it prints <code>NaN</code> and reports success). Program 4 is what a crash looks like. They come back in "Checks at the edge".</li>
-      <li>Ask: which manual would a script that only checks the exit status need? Which would a script that reads the message need? That's the setup of exercise 4, without giving its answer.</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
@@ -266,9 +213,11 @@
 <section class="page" id="l3-sum" data-title="Sum, from the command line" data-unit="l3">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span> · notes §1</p>
   <h1>Sum, from the command line</h1>
+  <div class="rule">
+    <p><strong>Key idea.</strong> This is a new, 99-line <code>Sum</code>. Most of its lines aren't about adding. They deal with the <em>user</em>: options, files, bad input, messages.</p>
+  </div>
   <div class="prose">
-    <p>Lectures 1 and 2 studied a <code>Sum</code> that asks for numbers, prints them, and prints their sum. The program below is a different <code>Sum</code>. It adds up numbers too, but it is 99 lines long, and most of its lines have nothing to do with adding.</p>
-    <p>Read the whole program first, with three questions in mind. <strong>What does <code>Sum</code> do? What is good about it? What is not?</strong> If some of its Java is new to you, such as the <code>try</code> on line 59, read past it.</p>
+    <p>Skim it with three questions: what does it do, what's good about it, what isn't? Click a part to see what it does.</p>
   </div>
 
   <div class="panel code-panel" id="program-map">
@@ -287,7 +236,7 @@
 
   <h2>Three runs</h2>
   <div class="prose">
-    <p>Compile and run it as you did Lecture 1's <code>Sum</code>. With nothing after <code>java Sum</code>, it reads numbers from the keyboard until you end the input (Control-D; on Windows, Control-Z, then Enter). With <code>-a</code>, it prints the average instead. Given the name of a file, it reads its numbers from that file; here <code>nums.txt</code> contains <code>3 4 5</code>.</p>
+    <p>Plain <code>java Sum</code> reads typed numbers and prints the sum. <code>-a</code> prints the average (as a <code>double</code>, so <code>4.0</code>). A file name makes it read that file. Here <code>nums.txt</code> holds <code>3 4 5</code>.</p>
   </div>
   <div class="term-row">
     <div class="term" data-session='[["java Sum","3 4 5\n"]]'></div>
@@ -295,9 +244,9 @@
     <div class="term" data-session='[["java Sum nums.txt",""]]'></div>
   </div>
 
-  <h2>Same runs, different Sum</h2>
+  <h2>What's different from Lecture 1's Sum</h2>
   <div class="prose">
-    <p>So far this <code>Sum</code> looks like Lecture 1's without the prompt and the <code>Got</code> line. The runs that broke Lecture 1's "user manual" sentence tell the two apart. On <code>1 2 three 4</code>, Lecture 1's <code>Sum</code> added 1 and 2 and ignored the rest. On <code>2147483647 1</code>, it printed a negative number. Predict what this <code>Sum</code> does with each before you press Run.</p>
+    <p>Try the two inputs that broke Lecture 1's <code>Sum</code>. Predict first.</p>
   </div>
   <div class="panel" id="compare">
     <p class="panel-label">Type the same input into both programs</p>
@@ -308,8 +257,6 @@
     <div class="controls presets">
       <button class="chip" data-try="1 2 three 4">1 2 three 4</button>
       <button class="chip" data-try="2147483647 1">2147483647 1</button>
-      <button class="chip" data-try="3 4 5">3 4 5</button>
-      <button class="chip" data-try="">nothing</button>
     </div>
     <div class="grid-2">
       <div><p class="col-label">Lecture 1's <code>Sum</code></p><div class="term" id="compare-l1"></div></div>
@@ -319,25 +266,14 @@
   </div>
 
   <div class="rule">
-    <p><strong>Two differences.</strong> This <code>Sum</code> stops at a word, and its message says which word it could not use. It also gets the second sum right: line 57 declares <code>sum</code> as a <code>long</code>, Java's 64-bit type for whole numbers, so adding two <code>int</code>s that fit does not wrap.</p>
+    <p><strong>Two fixes.</strong> It stops at a bad word and says which word. And <code>sum</code> is a <code>long</code> (line 57), so adding big <code>int</code>s no longer wraps around to a negative number.</p>
   </div>
-  <div class="prose"><p>From here on, <code>Sum</code> means this lecture's <code>Sum</code>.</p></div>
 
   <div class="check" data-id="cse331-w2-l3-qc-average-of-four" data-kind="quickcheck" data-type="output">
     <p>Quick check: you run <code>java Sum -a</code> and type <code>1 2 3 4</code>, then end the input. What exactly does <code>Sum</code> print?</p>
     <div class="row"><input type="text" aria-label="Your answer" placeholder="exactly as printed"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Collect answers to the three questions before running anything. Typical "what is good": it checks its arguments, it never shows a stack trace, its messages name the program. Typical "what is not": the manual doesn't mention errors, there is no help option, everything is in <code>main</code>. The rest of the lecture tests each of these.</li>
-      <li>Lines 89–90 choose between a file and standard input; <code>openInput</code> is the only place a file gets opened. Point at line 59's <code>try (…)</code>: the Scanner is closed for you when the block ends.</li>
-      <li>On <code>-a</code>, <code>3 4 5</code> prints <code>4.0</code>, not <code>4</code>: line 76 makes the average a <code>double</code>, and <code>println</code> writes a <code>double</code> with a decimal point. Ask the room to predict it first.</li>
-      <li>Line 57's <code>long</code> fixes the overflow from Lecture 1, but not for every run: each number read must still fit in an <code>int</code> (line 61 asks <code>hasNextInt</code>). That comes back in "The user manual, on every run".</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
@@ -346,44 +282,25 @@
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span> · notes §2</p>
   <h1>Batch programs</h1>
   <div class="rule">
-    <p><strong>Batch program.</strong> A batch program reads its input, computes, writes its output, and exits.</p>
-  </div>
-  <div class="prose">
-    <p>Lecture 1's <code>Sum</code> and this one are both batch programs. A web browser is not: it keeps running and responds to whatever the user does next, until the user tells it to stop. A later lecture takes up programs of that kind.</p>
+    <p><strong>Key idea.</strong> A <em>batch program</em> reads its input, computes, writes its output, and exits. <code>Sum</code> is one. A web browser isn't: it keeps running and waits for you.</p>
   </div>
 
-  <h2>Input: more than the numbers</h2>
+  <h2>Input: three places</h2>
   <div class="prose">
-    <p>The words typed after <code>java Sum</code> are input too. The user chooses them, and they change what <code>Sum</code> does. These are <code>Sum</code>'s <strong>command-line arguments</strong>. Java hands them to <code>main</code> as the array <code>args</code>, in the order they were typed, and the loop on line 28 reads them one at a time.</p>
     <ul>
-      <li>An argument that starts with a dash, such as <code>-a</code> or <code>--precision=2</code>, is an <strong>option</strong>.</li>
-      <li>Any other argument is the name of a <strong>file</strong> to read the numbers from.</li>
-      <li>With no file named, <code>Sum</code> reads from <strong>standard input</strong>, by default the keyboard. Lines 89 and 90 make that choice.</li>
+      <li><strong>Command-line arguments</strong>: the words after <code>java Sum</code>, given to <code>main</code> as <code>args</code>. One starting with a dash (<code>-a</code>, <code>--precision=2</code>) is an <strong>option</strong>.</li>
+      <li><strong>A file</strong>: any other argument is a file name to read numbers from.</li>
+      <li><strong>Standard input</strong>: the keyboard, used when no file is named.</li>
     </ul>
-  </div>
-  <div class="panel" id="argwalk">
-    <p class="panel-label">A command line, word by word</p>
-    <div class="cmdline-edit"><span class="ps1" aria-hidden="true">$</span><span class="fixed">java Sum</span><input type="text" id="argwalk-input" value="-a --precision=2 nums.txt" spellcheck="false" autocomplete="off" aria-label="Arguments after java Sum"></div>
-    <div class="controls presets">
-      <button class="chip" data-try="-a --precision=2 nums.txt">the slide's example</button>
-      <button class="chip" data-try="nums.txt -a">file first</button>
-      <button class="chip" data-try="--precision=2 nums.txt">precision without -a</button>
-      <button class="chip" data-try="precision=4 nums.txt">dashes missing</button>
-      <button class="chip" data-try="nums.txt bad.txt">two files</button>
-      <button class="chip" data-try="'my file.txt' -a">a quoted name</button>
-    </div>
-    <p class="args-array" id="argwalk-array"></p>
-    <ol class="arg-steps" id="argwalk-steps"></ol>
-    <p class="verdict" id="argwalk-verdict" role="status"></p>
   </div>
 
   <h2>Output: three parts</h2>
   <div class="streams-diagram" aria-label="Three arrows leave Sum. Standard output and standard error both go to the terminal, where they look the same. The exit status is not shown; echo $? prints it.">
     <div class="sd-prog">Sum</div>
     <div class="sd-lanes">
-      <div class="sd-lane s-out-bg"><b>standard output</b><span>the results · lines 78–83</span></div>
-      <div class="sd-lane s-err-bg"><b>standard error</b><span>the messages · line 96, in <code>fail</code></span></div>
-      <div class="sd-lane s-st-bg"><b>exit status</b><span>a number: 0 means success, anything else failure · line 97</span></div>
+      <div class="sd-lane s-out-bg"><b>standard output</b><span>the results</span></div>
+      <div class="sd-lane s-err-bg"><b>standard error</b><span>the messages</span></div>
+      <div class="sd-lane s-st-bg"><b>exit status</b><span>0 = success, anything else = failure</span></div>
     </div>
     <div class="sd-dest">
       <div class="sd-term"><b>the terminal</b><span>both look the same</span></div>
@@ -391,41 +308,27 @@
     </div>
   </div>
   <div class="prose">
-    <p>Results go to standard output, and messages go to standard error. <code>fail</code> exits with status 1. Java sets a status even for a program that never chooses one: 0 if <code>main</code> finishes, and 1 if the program ends in a stack trace. In a terminal, though, results and messages look the same, and the exit status does not show at all.</p>
+    <p>If a Java program never picks a status, Java uses 0 when <code>main</code> finishes and 1 when it ends in a stack trace.</p>
   </div>
 
-  <h2>Why keep them apart?</h2>
+  <h2>Why two streams?</h2>
   <div class="prose">
-    <p><code>&gt;</code> sends <em>only standard output</em> to a file. The file <code>bad.txt</code> contains <code>3 x</code>. Predict what each run shows on the terminal and leaves in <code>total.txt</code>, then run the lines one at a time. <code>echo $?</code> prints the status of the last command (on macOS and Linux; in Windows PowerShell, <code>$LASTEXITCODE</code> holds it).</p>
+    <p><code>&gt;</code> sends <em>only standard output</em> to a file. <code>bad.txt</code> holds <code>3 x</code>. Predict, then run each line.</p>
   </div>
   <div class="shell" data-shell="redirect"
        data-script='["java Sum nums.txt &gt; total.txt","echo $?","cat total.txt","java Sum bad.txt &gt; total.txt","echo $?","cat total.txt"]'></div>
-  <div class="prose">
-    <p>The first run shows nothing and leaves <code>12</code> in <code>total.txt</code>. The second still shows its message, and leaves <code>total.txt</code> empty. Either way, the file never contains a message where a sum should be. The exit status says which run failed.</p>
-  </div>
-
-  <h2>Why standard error exists</h2>
-  <div class="prose">
-    <p>macOS and Linux are both modeled on an older operating system, Unix. At first, every Unix program printed its messages on standard output. That caused trouble when output went to a file, and worse trouble once <strong>pipes</strong> let one program's output flow straight into another program as input. At Bell Labs a program's output could go to the lab's typesetter, and its messages went there too. Once, several people typesetting documents got back "a single, beautifully typeset line": <code>cannot open file foobar</code>. Soon after, Dennis Ritchie added standard error.</p>
-    <p>Standard error alone was not quite enough. With several programs in one pipeline, a message also had to say which program wrote it. <code>Sum</code> follows that convention: each of its messages begins with <code>Sum:</code>.</p>
-  </div>
-  <div class="shell" data-shell="pipe"
-       data-script='["cat nums.txt | java Sum -a","java Sum bad.txt | java Sum -a","echo $?"]'></div>
-
-  <h2>What a user sees</h2>
   <div class="rule">
-    <p><strong>Three parts.</strong> What a user sees of <code>Sum</code> is its standard output, its standard error, and its exit status. <code>Sum</code>'s specification has to say what each one is, on every run.</p>
+    <p><strong>Result.</strong> The file only ever gets results, never an error message. The message still shows on screen, and the exit status says which run failed. Each message starts with <code>Sum:</code> so you can tell which program wrote it.</p>
   </div>
+
+  <h2>Who reads the output</h2>
   <div class="prose">
-    <p>A person at the terminal reads the first two. A <strong>script</strong>, a program that runs other programs, can read all three. A script that runs <code>Sum</code> cannot make sense of a message where it expected a number. Such a script is like a client in Lecture 2: it relies on what <code>Sum</code> promises, and it is correct if it works with every version of <code>Sum</code> that keeps those promises. Unlike a method's client, though, the script owes <code>Sum</code> nothing. Like any user, it may give <code>Sum</code> anything at all.</p>
+    <p>A person reads the two streams. A <strong>script</strong> (a program that runs other programs) can read all three, and may give <code>Sum</code> any input at all. So <code>Sum</code>'s spec has to say what all three parts are, on every run.</p>
   </div>
   <blockquote class="maxim">
-    <p>Expect the output of every program to become the input to another, as yet unknown, program. Don't clutter output with extraneous information.</p>
-    <footer>M. D. McIlroy, E. N. Pinson and B. A. Tague, 1978 (often credited to McIlroy alone)</footer>
+    <p>Expect the output of every program to become the input to another, as yet unknown, program.</p>
+    <footer>McIlroy, Pinson and Tague, 1978</footer>
   </blockquote>
-  <div class="prose">
-    <p>A message among <code>Sum</code>'s results would be that clutter, and standard error keeps it out. "As yet unknown" matters too: <code>Sum</code>'s author cannot know which programs will read its output, so whatever they rely on has to be in <code>Sum</code>'s specification.</p>
-  </div>
 
   <div class="check" data-id="cse331-w2-l3-qc-status-after-bad" data-kind="quickcheck" data-type="int">
     <p>Quick check: right after <code>java Sum bad.txt &gt; total.txt</code>, you type <code>echo $?</code>. What does it print?</p>
@@ -437,17 +340,6 @@
     <div class="row"><input type="text" aria-label="Your answer" placeholder="standard output or standard error"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>The slide "A command line, word by word" is the walker above: <code>java Sum</code> starts <code>Sum</code>'s <code>main</code>, and <code>main</code> gets <code>args</code> = <code>"-a", "--precision=2", "nums.txt"</code>. Ask what <code>args</code> is for <code>java Sum</code> alone (an empty array, so the loop runs zero times).</li>
-      <li>The shell does the splitting, not Java: quotes keep <code>'my file.txt'</code> one argument. Try it in the walker.</li>
-      <li>Have students predict both terminals and both files before you run the redirect lines. The common wrong prediction is that the message goes into <code>total.txt</code> too.</li>
-      <li>The pipe example shows why messages name their program: when the first <code>Sum</code> fails, the second gets no numbers and reports its own failure. Both messages land on the terminal, and only the prefix says which is which. <code>echo $?</code> after a pipeline gives the last program's status.</li>
-      <li>If students ask how to send standard error to a file: <code>2&gt; errors.txt</code>. The terminal above understands it.</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
@@ -455,41 +347,28 @@
 <section class="page" id="l3-manual" data-title="The user manual, on every run" data-unit="l3">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span> · notes §3</p>
   <h1>The user manual, on every run</h1>
+  <div class="rule">
+    <p><strong>Key idea.</strong> A program's spec is its user manual. It must describe what the user sees on <em>every</em> run, errors included.</p>
+  </div>
   <div class="prose">
-    <p><code>Sum</code> already comes with a user manual: the comment on lines 5 to 19. It speaks to whoever runs <code>Sum</code>, not to whoever reads its code. Lecture 1 called a whole program's specification a precise version of its user manual, and some programmers write the manual first, as "a precise specification of the job to be done" (Kernighan and Plauger). How close does this one come?</p>
+    <p>Here is <code>Sum</code>'s manual, the comment on lines 5–19:</p>
   </div>
   <pre class="code manual" data-src="sum" data-from="5" data-to="19"></pre>
 
-  <h2>Test it as Lecture 1 tested its sentence</h2>
-  <div class="prose">
-    <p>Lecture 1 tested its first "user manual" sentence against runs its author may not have pictured. Do the same here. The manual promises to read integers, and <code>2147483648</code> is an integer:</p>
-  </div>
-  <div class="term-row">
-    <div class="term" data-session='[["java Sum","2147483648\n"]]'></div>
-    <div class="term" data-session='[["java Sum",""]]'></div>
-    <div class="term" data-session='[["java Sum -a",""]]'></div>
-  </div>
-  <div class="prose">
-    <p><code>Sum</code> reads only the integers that fit in an <code>int</code>, since line 61 asks <code>hasNextInt</code>. (Lecture 1's specification needed its range clause for the same reason.) With nothing typed, <code>Sum</code> prints <code>0</code>, an answer the manual covers if the sum of no numbers is 0. With <code>-a</code>, the same empty input gets a message instead of an average. The manual says nothing about this run, nor about the run on <code>1 2 three 4</code>, nor about the exit status of any run.</p>
-  </div>
-
   <h2>Sort the runs</h2>
   <div class="prose">
-    <p>For each run, compare what <code>Sum</code> did with what the manual on lines 5–19 says. Does the manual <strong>describe</strong> the response, is it <strong>silent</strong> about it, or does the run <strong>contradict</strong> it?</p>
+    <p>For each run: does the manual <strong>describe</strong> it, stay <strong>silent</strong>, or does the run <strong>contradict</strong> it?</p>
   </div>
   <div class="sorter" data-sorter="manual">
     <div class="sort-card check" data-id="cse331-w2-l3-sort-file-sum" data-kind="quickcheck" data-type="choice" data-format="sort" data-custom data-options="described|silent|contradicted">
       <div class="term" data-session='[["java Sum nums.txt",""]]'></div>
-    </div>
-    <div class="sort-card check" data-id="cse331-w2-l3-sort-average-two-decimals" data-kind="quickcheck" data-type="choice" data-format="sort" data-custom data-options="described|silent|contradicted">
-      <div class="term" data-session='[["java Sum -a --precision=2","1 2\n"]]'></div>
     </div>
     <div class="sort-card check" data-id="cse331-w2-l3-sort-too-big-integer" data-kind="quickcheck" data-type="choice" data-format="sort" data-custom data-options="described|silent|contradicted">
       <div class="term" data-session='[["java Sum","2147483648\n"]]'></div>
     </div>
     <div class="sort-card check" data-id="cse331-w2-l3-sort-empty-sum" data-kind="quickcheck" data-type="choice" data-format="sort" data-custom data-options="described|silent|contradicted">
       <div class="term" data-session='[["java Sum",""]]'></div>
-      <p class="card-note">Count it as described if the sum of no numbers is 0, as Lecture 1 granted.</p>
+      <p class="card-note">Count the sum of no numbers as 0.</p>
     </div>
     <div class="sort-card check" data-id="cse331-w2-l3-sort-empty-average" data-kind="quickcheck" data-type="choice" data-format="sort" data-custom data-options="described|silent|contradicted">
       <div class="term" data-session='[["java Sum -a",""]]'></div>
@@ -501,40 +380,28 @@
       <div class="term" data-session='[["java Sum nums.txt",""],["echo $?",""]]'></div>
       <p class="card-note">Sort the <em>exit status</em> of this run.</p>
     </div>
-    <div class="sort-card check" data-id="cse331-w2-l3-sort-help" data-kind="quickcheck" data-type="choice" data-format="sort" data-custom data-options="described|silent|contradicted">
-      <div class="term" data-session='[["java Sum --help",""]]'></div>
-    </div>
     <p class="sorter-score" id="sorter-score" role="status"></p>
   </div>
 
-  <h2>Lecture 1's standard</h2>
+  <h2>The course's standard</h2>
   <div class="rule">
-    <p><strong>The standard for every program in this course.</strong> Every input a user can produce gets a response the specification describes, and a stack trace is never that response.</p>
+    <p><strong>For every program in this course:</strong> every input a user can produce gets a response the spec describes, and a stack trace is never that response.</p>
   </div>
   <div class="prose">
-    <p>So far, <code>Sum</code> passes the second part: no run above ends in a stack trace. Each error goes through <code>fail</code>, on lines 95 to 98, which prints on standard error a message that starts with the program's name, and then exits with status 1. That consistency is part of what is good about <code>Sum</code>: every error looks the same, to a person and to a script.</p>
+    <ul>
+      <li><strong>Sum passes the second half.</strong> Every error goes through <code>fail</code> (below): one line on standard error starting <code>Sum:</code>, then exit status 1. No stack traces.</li>
+      <li><strong>Sum fails the first half.</strong> The manual describes none of its errors or exit statuses. It also says "integers", but <code>Sum</code> only reads numbers that fit in a Java <code>int</code>.</li>
+      <li><strong>The user can't see the manual.</strong> It's a comment in the source, and <code>java Sum --help</code> is just an error.</li>
+    </ul>
   </div>
   <pre class="code" data-src="sum" data-from="95" data-to="98"></pre>
-  <div class="prose">
-    <p><code>Sum</code> fails the first part. The manual describes none of its error responses, neither the messages nor the exit status. Those are responses its user sees, so a specification has to describe them. And the manual sits where its user never sees it, in the source code. Asking for it gets only an error:</p>
-  </div>
-  <div class="term" data-session='[["java Sum --help",""],["echo $?",""]]'></div>
-  <div class="prose"><p>Exercises 1 and 5 (problems 5 and 9 on this site) ask you to fix both.</p></div>
+  <div class="prose"><p>Problems 5 and 9 ask you to fix this.</p></div>
 
   <div class="check" data-id="cse331-w2-l3-qc-hasnextint-line" data-kind="quickcheck" data-type="int">
-    <p>Quick check: which line of <code>Sum.java</code> decides that <code>2147483648</code> is "not an integer"?</p>
+    <p>Quick check: which line of <code>Sum.java</code> decides that <code>2147483648</code> is "not an integer"? (Look at the program on the <a href="#l3-sum">Sum</a> page.)</p>
     <div class="row"><input type="text" aria-label="Your answer" placeholder="a line number"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>The sorter is a good pair activity: have pairs sort all eight before anyone checks. The cards that start arguments are 2147483648 (the manual's "integers" is contradicted, not just silent) and the exit status (no run's status is mentioned anywhere in the manual).</li>
-      <li>"Silent" is not harmless. A user, or a script, who relies on something the manual never promised is relying on luck; a later version of <code>Sum</code> could change it.</li>
-      <li>Point out that "Usage: java Sum [options] [file]" and the options list do describe the arguments that work, but say nothing about arguments that don't (<code>--help</code>, <code>precision=4</code>, two files).</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
@@ -542,8 +409,11 @@
 <section class="page" id="l3-edge" data-title="Checks at the edge" data-unit="l3">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span> · notes §4</p>
   <h1>Checks at the edge</h1>
+  <div class="rule">
+    <p><strong>Key idea.</strong> The user owes <code>Sum</code> nothing, so <code>main</code> checks everything that comes in and passes on only what the computation can handle.</p>
+  </div>
   <div class="prose">
-    <p><code>Sum</code> does a lot of checking. Lines 28 to 55 check its arguments, line 61 checks each word of its input, and lines 73 to 75 check that there is something to average. What are those checks for? Take one away and see. The lecture made two changed copies of <code>Sum</code>, each with one check removed and its lines left blank, so every other line keeps its number.</p>
+    <p>To see what a check is for, remove it. Turn a check off and run the same command.</p>
   </div>
 
   <div class="panel" id="edge-lab">
@@ -557,44 +427,31 @@
       <pre class="code" data-src="sum" data-from="72" data-to="81" id="edge-code-b"></pre>
     </div>
     <div class="runner" data-runner="edge" data-args="-a --precision=-1" data-stdin="1 2" data-compact="true"
-         data-presets='[["negative precision","-a --precision=-1","1 2\n"],["nothing to average","-a",""],["nothing, with a precision","-a --precision=2",""],["a normal average","-a --precision=2","1 2\n"]]'></div>
+         data-presets='[["negative precision","-a --precision=-1","1 2\n"],["nothing to average","-a",""],["a normal average","-a --precision=2","1 2\n"]]'></div>
   </div>
 
-  <h2>A negative precision</h2>
+  <h2>What each check prevents</h2>
   <div class="prose">
-    <p>With the check, <code>Sum</code> answers a negative precision with a message at once, before it reads any input. Without lines 40 to 43, the negative precision reaches the <code>printf</code> on line 78, which builds its format from the precision. A precision of 2 gives the format <code>%.2f</code>, which prints two digits after the decimal point. A precision of −1 gives <code>%.-1f</code>, which is not a format <code>printf</code> accepts. So the call throws, and the user gets a stack trace.</p>
-  </div>
-
-  <h2>Nothing to average</h2>
-  <div class="prose">
-    <p>Without lines 73 to 75, <code>java Sum -a</code> on empty input does not crash. It prints <code>NaN</code>, short for "not a number," which is what the division on line 76 gives when it divides 0 by 0. Worse, the exit status is 0, so the run reports success. A script that runs <code>java Sum -a</code> and checks the status would take <code>NaN</code> for an average. A crash would at least have said that something went wrong.</p>
+    <ul>
+      <li><strong>No negative-precision check:</strong> <code>printf</code> gets the bad format <code>%.-1f</code> and the user sees a <strong>stack trace</strong>. With the check, <code>Sum</code> stops with a message before it reads any input.</li>
+      <li><strong>No zero-count check:</strong> 0.0 / 0.0 prints <code>NaN</code> with exit status <strong>0</strong>. The run says "success", so a script would trust <code>NaN</code> as an average. That's worse than a crash.</li>
+    </ul>
   </div>
   <div class="rule warn">
-    <p><strong>No single right answer, but one wrong one.</strong> What should the average of no numbers be? <code>Sum</code> refuses and prints a message; printing 0 would be just as reasonable. But "the one guaranteed wrong answer is to ignore the problem" (Kernighan and Pike). What matters is that the manual says which answer <code>Sum</code> gives, and so far it says neither.</p>
-  </div>
-  <div class="prose">
-    <p>A program that ignored the problem once stopped a Navy cruiser, the USS Yorktown, at sea for a couple of hours, after a crew member entered a zero and the program divided by it.</p>
+    <p><strong>Pick an answer, but never ignore the problem.</strong> The average of no numbers could be an error message or 0. Either is fine if the manual says which.</p>
   </div>
 
-  <h2>Where the checks stand</h2>
-  <div class="rule">
-    <p><strong>Checks at the edge.</strong> Each check stands at the edge of the program, between the user and the computation. The user owes <code>Sum</code> nothing, so the checks take whatever arrives and pass on only what the computation can handle: a precision that is not negative, and a count that is not zero.</p>
-  </div>
+  <h2>How to organize a program like this</h2>
   <div class="edge-figure" aria-label="The user, then the checks in main, then the computation">
-    <div class="ef-box ef-user"><b>The user</b><span>owes Sum nothing; may type anything</span></div>
+    <div class="ef-box ef-user"><b>The user</b><span>may type anything</span></div>
     <div class="ef-arrow" aria-hidden="true">→</div>
-    <div class="ef-box ef-edge"><b>main: checks at the edge</b><span>arguments, each word, the count; a message and status 1 on a mistake</span></div>
+    <div class="ef-box ef-edge"><b>main: checks</b><span>bad input gets a message and status 1</span></div>
     <div class="ef-arrow" aria-hidden="true">→</div>
-    <div class="ef-box ef-core"><b>The computation</b><span>a method whose client is <code>main</code>: it may have a precondition</span></div>
+    <div class="ef-box ef-core"><b>The computation</b><span>a method that may have a precondition</span></div>
   </div>
   <div class="prose">
-    <p>That suggests a way to organize a program like <code>Sum</code>: keep the code that deals with the user (the arguments, the messages, the exit status) apart from the code that computes the answer. <code>Sum</code> does nearly all its work in <code>main</code>, both kinds together. For a program of 99 lines, keeping the work there and splitting it up can both be defended.</p>
-    <p>Split it, and Lecture 2 says what the pieces should be: methods with specifications. The checks stay at the edge, in <code>main</code>. A method inside may then have a precondition, such as a count that is not zero, since its client is <code>main</code>, code that can be held to a promise. (Lecture 2's exercise 6 made the same argument; exercise 3 below asks you to do the split.) Homework 1's Task 4 has the same shape: Gradebook is a batch program with its manual at the top of its source.</p>
-  </div>
-
-  <h2>Nearly every run</h2>
-  <div class="prose">
-    <p>The checks pass on only what the computation can handle, <em>nearly</em>. Given any numbers, <code>java Sum -a --precision=2147483647</code> ends in an <code>OutOfMemoryError</code> and a stack trace at line 78: the format asks for more digits than a Java string can hold. Specifications leave out runs on a computer without the memory to finish, but this run fails on every computer. So the precision has a limit, like the range of an <code>int</code>, and the manual has to state it. Try it in the lab above.</p>
+    <p>Keep the code that deals with the user in <code>main</code>. Put the computing in methods with specs. A method <em>may</em> have a precondition (like "count is not zero"), because its client is <code>main</code>, and code can be held to a promise. The user can't.</p>
+    <p>One gap: <code>--precision=2147483647</code> still crashes (out of memory). So the manual needs a largest precision.</p>
   </div>
 
   <div class="check" data-id="cse331-w2-l3-qc-nan-status" data-kind="quickcheck" data-type="int">
@@ -607,16 +464,6 @@
     <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Before running each changed copy, ask: crash, wrong answer, or right answer? Many students expect the missing count check to crash with a division by zero. Integer division by zero would throw; line 76 divides <code>double</code>s, and 0.0 / 0.0 is <code>NaN</code>.</li>
-      <li>"A crash would at least have said that something went wrong" is the Rule of Repair from Raymond's <em>The Art of Unix Programming</em>: when you must fail, fail noisily and as soon as possible.</li>
-      <li>Precondition vs check: the same condition (count &gt; 0) is a <em>check</em> in <code>main</code>, where the client is the user, and a <em>precondition</em> in a method whose client is <code>main</code>. Ask which of the two can be "held to a promise".</li>
-      <li>Homework 1 Task 4 (Gradebook) asks for exactly this split. Mention it, but don't preview its code.</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
@@ -625,7 +472,7 @@
   <p class="where">Lecture 3 wrap-up · original questions written for this site, not from the course</p>
   <h1>Check your understanding</h1>
   <div class="prose">
-    <p>Eleven questions on Lecture 3. Answer without looking back, then use the review links for anything you missed. Your score counts first tries only. In every question, <code>nums.txt</code> contains <code>3 4 5</code> and <code>bad.txt</code> contains <code>3 x</code>.</p>
+    <p>Eleven questions. Your score counts first tries. <code>nums.txt</code> holds <code>3 4 5</code>; <code>bad.txt</code> holds <code>3 x</code>.</p>
   </div>
   <div class="cyu-score" data-role="score" role="status"></div>
 
@@ -731,15 +578,6 @@
   </ol>
 
   <div class="cyu-score" data-role="summary" role="status"></div>
-
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Use it as an exit ticket in the last minutes, or as a warm-up on Wednesday before testing starts. Have students commit to an answer before anyone presses Check.</li>
-      <li>Questions 5 and 6 are the conceptual core (why two streams). Question 9 is the bridge to Lecture 2: same condition, check at the edge vs precondition inside.</li>
-      <li>Both numeric answers come from real runs (<code>checks/cse331/w02/verify.mjs</code>), and every <code>Sum</code> behavior in the options was run through the simulator, which matches real Java.</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
@@ -748,13 +586,12 @@
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
   <h1>Problems</h1>
   <div class="prose">
-    <p>Problems 1–4 are the predictions the notes and slides ask for as the lecture goes. Problems 5–9 are the notes' end-of-lecture exercises 1–5. Solutions follow the course's own answers, lightly condensed; every program output was checked against real runs of <code>Sum.java</code>. Throughout, <code>nums.txt</code> contains <code>3 4 5</code> and <code>bad.txt</code> contains <code>3 x</code>.</p>
-    <p>Write in the work box as you go. Everything saves in this browser. Hints and solutions stay hidden until you ask for them. Program output is checked exactly, the way a script would read it; type <em>nothing</em> if a run prints nothing.</p>
+    <p>Problems 1–4 are the lecture's predictions; 5–9 are its end-of-lecture exercises. <code>nums.txt</code> holds <code>3 4 5</code>; <code>bad.txt</code> holds <code>3 x</code>. Type output exactly, or <em>nothing</em> if a run prints nothing.</p>
   </div>
 
   <article class="task" data-id="cse331-w2-l3-predict-lecture1-runs">
     <h2>1. Predict: the runs that broke Lecture 1's manual</h2>
-    <p class="prompt">Before reading on, the notes ask you to predict what this <code>Sum</code> does on the two runs that broke Lecture 1's "user manual" sentence. What does each print, and where?</p>
+    <p class="prompt">What does this <code>Sum</code> print on the two inputs that broke Lecture 1's <code>Sum</code>, and where?</p>
     <div class="answer-spec" data-part="word-output" data-type="output" data-label="java Sum, typing 1 2 three 4: it prints" data-placeholder="exactly as printed"></div>
     <div class="answer-spec" data-part="word-stream" data-type="stream" data-label="… on which stream?" data-placeholder="standard output or standard error"></div>
     <div class="answer-spec" data-part="big-output" data-type="output" data-label="java Sum, typing 2147483647 1: it prints" data-placeholder="exactly as printed"></div>
@@ -792,13 +629,6 @@
     </ol></div>
     <div class="step-bar"><button class="btn" data-run-session='["java Sum nums.txt &gt; total.txt","echo $?","cat total.txt","java Sum bad.txt &gt; total.txt","echo $?","cat total.txt"]'>Run all six lines</button></div>
     <div class="run-out"></div></div>
-    <details class="notes" open>
-      <summary>Teaching notes</summary>
-      <ul>
-        <li>The point of the run: "Either way, the file never contains a message where a sum should be." A script that reads <code>total.txt</code> never mistakes a message for a number.</li>
-        <li>Some students expect run 2 to leave the old <code>12</code> in the file. The shell truncates the file when it sets up the redirection, before <code>Sum</code> runs.</li>
-      </ul>
-    </details>
   </article>
 
   <article class="task" data-id="cse331-w2-l3-predict-no-negative-check">
@@ -824,12 +654,12 @@
 
   <article class="task" data-id="cse331-w2-l3-read-the-program">
     <h2>4. Read the program</h2>
-    <p class="prompt">The slide "A different Sum" asks three questions about the 99-line program (it's on the <a href="#l3-sum">Sum, from the command line</a> page). Answer each in a sentence or two, then compare with what the lecture found.</p>
+    <p class="prompt">Answer the lecture's three questions about the program on the <a href="#l3-sum">Sum</a> page, a sentence or two each.</p>
     <div class="answer-spec" data-part="does" data-type="self" data-long data-label="What does Sum do?" data-placeholder="It reads …"></div>
     <div class="answer-spec" data-part="good" data-type="self" data-long data-label="What is good about it?" data-placeholder="It …"></div>
     <div class="answer-spec" data-part="not-good" data-type="self" data-long data-label="What is not?" data-placeholder="It …"></div>
     <ol class="hints">
-      <li>For "what it does", read the manual on lines 5–19, then the argument loop: there are three places its numbers can come from? (Two, really: a file or standard input.)</li>
+      <li>For "what it does", read the manual on lines 5–19. Where can its numbers come from?</li>
       <li>For good and not good, run it on the runs that broke Lecture 1's sentence, on empty input with and without <code>-a</code>, and with <code>--help</code>.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
@@ -862,13 +692,6 @@
     </ol></div>
     <div class="step-bar"><button class="btn" data-run-cmd="java Sum -a --precision=x" data-run-kb="">Run: a precision that isn't an integer</button><button class="btn" data-run-cmd="java Sum --precision=2" data-run-kb="1 2&#10;">Run: --precision without -a</button></div>
     <div class="run-out"></div></div>
-    <details class="notes" open>
-      <summary>Teaching notes</summary>
-      <ul>
-        <li>Students' manuals often promise the exact text of each message. Ask whether they want to be held to that wording forever; exercise 4 returns to it.</li>
-        <li>Homework 1 Task 3 asks for a user manual for Histogram; this is the same skill on a program everyone has seen.</li>
-      </ul>
-    </details>
   </article>
 
   <article class="task" data-id="cse331-w2-l3-misleading-message">
@@ -962,13 +785,6 @@
       <li><strong>The manual's new lines.</strong> Exercise 1's manual with three changes: an Options line for <code>--help</code>; a sentence saying <code>--help</code> prints the manual on standard output and exits with status 0; and the mistakes split by status: argument mistakes (unknown option or more than one file, a bad <code>N</code>, <code>--precision</code> without <code>-a</code>) add the "Try 'java Sum --help'" line and exit with 2; input mistakes (an unreadable file, a bad word, <code>-a</code> with nothing to average) exit with 1.</li>
       <li class="answer"><code>--help</code>: standard output, status 0. Argument mistakes: status 2, with a hint line. Input mistakes: status 1.</li>
     </ol></div></div>
-    <details class="notes" open>
-      <summary>Teaching notes</summary>
-      <ul>
-        <li>The interesting design question is the status for a usage error. Let the room argue 1 vs 2 before revealing the course's answer; both are defensible, and the point is that the manual says which.</li>
-        <li>The Command Line Interface Guidelines (clig.dev) make the same recommendations: help on <code>--help</code>, results on standard output, messages on standard error, 0 for success.</li>
-      </ul>
-    </details>
   </article>
 
   <nav class="pager"></nav>
