@@ -11,7 +11,7 @@ window.COURSES = {
         { id: "w02", title: "Batch programs and their users", dates: "Oct 5 – Oct 9", posted: true },
         { id: "w03", title: "Error handling and Floyd-Hoare logic", dates: "Oct 12 – Oct 16", posted: true },
         { id: "w04", title: "Programs on the web, data abstraction", dates: "Oct 19 – Oct 23", posted: true },
-        { id: "w05", dates: "Oct 26 – Oct 30" },
+        { id: "w05", title: "JavaScript in the page, exceptions", dates: "Oct 26 – Oct 30", posted: true },
         { id: "w06", dates: "Nov 2 – Nov 6" },
         { id: "w07", dates: "Nov 9 – Nov 13" },
         { id: "w08", dates: "Nov 16 – Nov 20" },

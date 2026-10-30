@@ -1,0 +1,247 @@
+CSE 331 Reading 3
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          ArticlesParnas 1972, On the Criteria To Be Used in Decomposing Systems into Modules
+Brooks 1986, No Silver Bullet: Essence and Accidents of Software Engineering
+Lamport 2015, Who Builds a House Without Drawing Blueprints?
+
+ExtrasSimon 1962, The Architecture of Complexity
+Reeves 1992, What Is Software Design?
+Spolsky 2002, The Law of Leaky Abstractions
+Yuan 2014, Simple Testing Can Prevent Most Critical Failures
+Holzmann 2006, The Power of Ten: Rules for Developing Safety Critical Code
+Regehr 2013, How to Fuzz an ADT Implementation
+
+Submit
+
+        CSE 331 Reading 3
+
+Due Friday, October 30 at 11:59pm (late policy).
+
+Our motto for this course is: Your job is to deliver code that you
+know works. How much of that knowing happens before the first line
+of code, and how much of it is worth writing down?
+
+The three articles below answer differently. Parnas says design is
+deciding what each module hides from the others, and that you begin
+with a list of the decisions likely to change. Brooks says the hard
+part of software is working out the ideas themselves, which no tool
+removes, and that no client can specify a system completely before
+trying a version of it. Lamport says write the plan first, in prose
+or in math: each patch makes a program a little harder to understand,
+and every line of code written without a specification is a patch.
+
+Your task: Choose one article, read it, and write a reflection.
+See the readings page for information on what you need
+to submit and how reflections are graded. When you are done, submit on
+Gradescope as described in the "Submit" section below.
+
+Each title below is a link to the original. If for any reason a
+link does not work, you can also use the "cached" links, which point
+to copies stored on UW servers: a PDF of each article and, for some,
+an HTML version that is easier to read with a screen reader or on a
+phone. (Cached links require UW NetID login).
+
+Articles
+
+Parnas 1972, On the Criteria To Be Used in Decomposing Systems into Modules
+
+Parnas builds one small system twice. The system is a KWIC index: it
+reads lines of text, forms every rotation of every line, and prints
+the rotations in alphabetical order. The first version splits the
+work by processing step: input, shift, sort, output. The second
+splits it by decision: each module hides one design decision from the
+rest, such as how the lines are stored in memory. Parnas then lists
+five changes the system might face. In the first version, two of them
+change every module; in the second, each change touches one. That is
+one of his three tests for a decomposition; the others are whether
+its modules can be built apart and understood one at a time. So, he
+says, do not begin with a flowchart. Begin with "a list of difficult
+design decisions or design decisions which are likely to change", and
+hide each one inside a module. About 25 minutes to read
+(cached: PDF,
+HTML).
+
+Brooks 1986, No Silver Bullet: Essence and Accidents of Software Engineering
+
+Brooks managed IBM's System/360 project and wrote The Mythical
+Man-Month about it. He divides the difficulties of software into two
+kinds, which he calls essence and accidents. The accidental
+difficulties come from the tools of the day: awkward languages, slow
+machines, slow turnaround. The essential difficulty is the idea of
+the program itself, which Brooks calls a "construct of interlocking
+concepts" and which stays the same however it is written down. He
+gives the essence four properties: complexity, conformity,
+changeability, and invisibility. The past gains came from removing
+accidental difficulties, so no tool can give a tenfold gain on what
+remains. What he offers instead is to grow software by prototypes and
+increments, since no client can specify a system completely before
+trying a version of it. About 35 minutes to read
+(cached: PDF,
+HTML).
+
+Lamport 2015, Who Builds a House Without Drawing Blueprints?
+
+Lamport made TLA+,
+a language for specifying systems. Architects for buildings draw
+detailed plans before a brick is laid, but many programmers do not
+write even a rough sketch of what a program will do before they start
+coding. A blueprint for a program is called a specification. Writing
+down what you are about to do shows you how sloppy your thinking is.
+Good code takes thinking above the level of the code, which no coding
+method does for you. A specification need not be formal: Lamport
+estimates that "95% of the code programmers write is trivial enough
+to be adequately specified by a couple of prose sentences". His one
+general rule is that a specification should say everything one needs
+to know to use the code, so that nobody has to read the code to find
+out what it does. Tests do not do this job: testing catches coding
+errors and misses design errors. The piece ends: "Thinking does not
+guarantee that you will not make mistakes. But not thinking
+guarantees that you will." About 15 minutes to read
+(cached: PDF,
+HTML).
+
+Extras
+
+These are optional. You may bring one into your reflection if you
+connect it to the article you chose.
+
+Simon 1962, The Architecture of Complexity
+
+Simon read this to the American Philosophical Society. It is not
+about software. It asks why complex things, from molecules to
+companies, are so often hierarchies of parts within parts. The
+parable near the start is about two watchmakers, Hora and Tempus.
+Both build watches of a thousand parts, but Hora builds his from
+stable subassemblies of ten, so an interruption costs Hora one
+subassembly and costs Tempus the whole watch. Simon argues that
+systems built from stable parts evolve faster. A hierarchy's parts
+interact more within themselves than with each other, so we can
+describe and understand it one part at a time. A complex thing can
+also be described two ways: by its state, as a blueprint does, or by
+the process that produces it, as a recipe does. About an hour to read
+(cached: PDF,
+HTML).
+
+Reeves 1992, What Is Software Design?
+
+Reeves wrote this for the C++ Journal. The goal of any engineering
+activity, he says, is a document: the design handed to a
+manufacturing team, which builds from it without the designers. In
+software, the only document that meets that test is the source code.
+Compilers and linkers do the building, so software is almost free to
+build and expensive to design. Testing and debugging are then design
+work: they validate and refine the design, as models and wind tunnels
+refine a bridge. Diagrams and design documents help, but "Never
+forget that the source code determines what the actual design really
+is, not the auxiliary documentation." His case for C++ is that it
+makes it easier to design software and program at the same time.
+About 25 minutes to read
+(cached PDF).
+
+Spolsky 2002, The Law of Leaky Abstractions
+
+Spolsky wrote this on his blog before he co-founded Stack Overflow.
+TCP promises that data sent over a network arrives intact and in
+order. It keeps that promise on top of IP, which promises nothing.
+That is an abstraction: "a simplification of something much more
+complicated that is going on under the covers." But the promise has
+limits. If the network cable is cut, no message arrives, and if the
+network is overloaded, everything is slow. TCP cannot hide either,
+and Spolsky calls this a leak. His law is that "All non-trivial
+abstractions, to some degree, are leaky," and his examples run from
+SQL queries to C++ strings. The cost is that nobody can deal with the
+leaks without learning what the abstraction hides. Abstractions "save
+us time working, but they don't save us time learning". About 10
+minutes to read
+(cached PDF).
+
+Yuan 2014, Simple Testing Can Prevent Most Critical Failures
+
+This paper's lesson is to test the error handling code, which it
+calls "the last line of defense". Yuan and seven colleagues at
+Toronto read 198 reported failures of five widely used distributed
+systems and reproduced 73 of them. Of the 48 that shut out all or
+most users, 92% began with an error the software had caught, in a
+catch block or an error return, and then mishandled. In 35% of the
+48, the handler was trivially wrong: empty, or a log line and nothing
+else, or a catch of every exception followed by an exit, or a comment
+saying TODO. One empty handler in HBase says, in its comment, "Will
+never happen". The paper's claim is its title: 58% of the
+catastrophic failures could have been found by simple testing of the
+error handling code, without understanding the system's design. The
+examples are Java catch blocks. About an hour to read
+(cached: PDF,
+HTML).
+
+Holzmann 2006, The Power of Ten: Rules for Developing Safety Critical Code
+
+Holzmann's ten rules are for the C code at NASA's Jet Propulsion
+Laboratory. Most coding standards run well past a hundred rules, and
+developers pay them little attention. Worse, a tool can rarely check
+whether code follows them. His ten rules are few enough to remember
+and strict enough that a tool can check each one: that every loop
+ends, say, or that memory use stays within a fixed budget. The one he
+expects to surprise is the ban on recursion. Each rule comes with its
+rationale. He grants that the rules are "Draconian" and answers that
+this is code for airplanes, power plants, and spacecraft. They are
+like a seat belt, he says: uncomfortable at first, then second
+nature. About 15 minutes to read
+(cached: PDF,
+HTML).
+
+Regehr 2013, How to Fuzz an ADT Implementation
+
+Regehr takes an open source red-black tree in C that comes with one
+short test and asks whether it can be trusted in production code. The
+one test runs 76% of the lines and never calls one of the two
+rotations. A fuzzer that calls the API at random reaches 99.6%.
+Covered code can still be wrong, so he strengthens the checks: a
+memory checker, a sanitizer, a checkRep that walks the whole tree and
+asserts its invariants, and a reference implementation run alongside,
+with assertions that the two agree. A checkRep must never modify the
+structure, and it is easy to write one that checks nothing, so break
+the tree on purpose and make sure the checker notices. A commenter
+adds that "you shouldn't trust any test you've never seen fail". His
+two points are that fuzzing a data structure beats handwritten tests
+at finding obscure bugs, and that it is easy: the whole job took him
+about 90 minutes. About 15 minutes to read
+(cached PDF).
+
+Submit
+
+Submit your reflection on
+Gradescope
+by Friday, October 30 at 11:59pm. The Gradescope assignment will ask
+you which article you read and whether you used AI for editing, and
+it has one box for each of the three parts of your reflection. See
+the readings page for more information.
+
+    UW Site Use Agreement

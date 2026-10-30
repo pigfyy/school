@@ -1,0 +1,1089 @@
+<!doctype html>
+<!--
+  CSE 331 (Autumn 2026) · Week 5 teaching site (Mon Oct 26 to Fri Oct 30), built with the course-teaching-site skill.
+  Sources (raw copies, URLs, fetch times and hashes in materials/cse331/w05/sources.json): Lecture 12 notes and slides
+  (JavaScript in the page, Mon Oct 26); Section 4 worksheet, solution and slides (ADTs, Tue Oct 27); Lecture 13 notes
+  and slides (Exceptions, Wed Oct 28); Reading 3 and the readings page; the calendar, Topics page and lecture listing.
+  Not posted when fetched (Thu Oct 29): Friday Oct 30's Subtyping lecture (no lecture folder), shown as upcoming.
+
+  Where each component lives:
+    Lecture 12 ...................... #l12-two … #l12-client, #l12-quiz, #l12-problems   (.eloop: eventloop-sim.js)
+    Section 4 ....................... #s4-spec, #s4-reps, #s4-loop, #s4-practice
+    Lecture 13 ...................... #l13-trace … #l13-claim, #l13-quiz, #l13-problems   (.stepper: trace-sim.js)
+    Readings / cheat sheet .......... #readings, #cheatsheet
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE 331 week 5</title>
+<link rel="stylesheet" href="../../core/fonts.css">
+<link rel="stylesheet" href="../../core/base.css">
+<link rel="stylesheet" href="week.css">
+</head>
+<body data-course="cse331" data-week="w05">
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+
+<nav class="rail" aria-label="Week 5 modules">
+  <div class="rail-top">
+    <a class="brand" href="#home"><span class="brand-kicker">CSE 331 · week 5</span>JavaScript in the page, exceptions</a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="rail-body">Menu</button>
+  </div>
+  <div class="rail-body" id="rail-body">
+    <div>
+      <h2>Lecture 12 <span class="today" data-date="2026-10-26">Mon Oct 26</span></h2>
+      <ol class="modules">
+        <li><a href="#l12-two">Two programs</a></li>
+        <li><a href="#l12-dom">The page is a tree</a></li>
+        <li><a href="#l12-fetch">Asking the server</a></li>
+        <li><a href="#l12-post">Posting</a></li>
+        <li><a href="#l12-loop">One thing at a time</a></li>
+        <li><a href="#l12-client">Who is the client?</a></li>
+        <li><a href="#l12-quiz">Check your understanding</a></li>
+        <li><a href="#l12-problems">Problems</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Section 4 <span class="today" data-date="2026-10-27">Tue Oct 27</span></h2>
+      <ol class="modules">
+        <li><a href="#s4-spec">Task 1: MutableIntSet's specs</a></li>
+        <li><a href="#s4-reps">Task 2: three representations</a></li>
+        <li><a href="#s4-loop">Task 3: removeUntil</a></li>
+        <li><a href="#s4-practice">Practice</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 13 <span class="today" data-date="2026-10-28">Wed Oct 28</span></h2>
+      <ol class="modules">
+        <li><a href="#l13-trace">Where does control go?</a></li>
+        <li><a href="#l13-catch">How can control reach a catch?</a></li>
+        <li><a href="#l13-finally">A block that runs either way</a></li>
+        <li><a href="#l13-class">The class in a catch</a></li>
+        <li><a href="#l13-claim">What is true at a catch?</a></li>
+        <li><a href="#l13-quiz">Check your understanding</a></li>
+        <li><a href="#l13-problems">Problems</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 14 <span class="today" data-date="2026-10-30">Fri Oct 30</span></h2>
+      <ul class="later-list">
+        <li><span>Subtyping</span><em>materials not posted yet</em></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Due</h2>
+      <ul class="later-list">
+        <li><span>Fri Oct 30, 11:59 pm · Reading 3</span><em><a href="#readings">readings</a></em></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Reference</h2>
+      <ul class="plain-links">
+        <li><a href="#home">Week overview</a></li>
+        <li><a href="#readings">Readings</a></li>
+        <li><a href="#cheatsheet">Cheat sheet</a></li>
+      </ul>
+    </div>
+    <p class="rail-foot"><kbd>←</kbd> <kbd>→</kbd> modules · <kbd>N</kbd> next step · <kbd>H</kbd> next hint</p>
+  </div>
+</nav>
+
+<main id="main">
+
+<section class="page" id="home" data-title="Week overview">
+  <div class="hero">
+    <p class="kicker">Week 5 · <span data-date="2026-10-26" data-plain>Mon Oct 26</span> to <span data-date="2026-10-30" data-plain>Fri Oct 30</span></p>
+    <h1>Where can control <em>go</em>, and how did it <em>get</em> here?</h1>
+    <p class="lede">Monday moves the guestbook's page-building into the browser, where an <code>await</code> lets other code run in the middle of a function. Wednesday follows an exception down the call stack to the catch that takes it. Step through Lecture 13's <code>TraceCatch</code> below and watch the stack.</p>
+    <div class="panel stepper" data-program="TraceCatch"></div>
+  </div>
+
+  <h2>This week</h2>
+  <div class="week">
+    <a class="day" href="#l12-two"><strong>Mon, Oct 26</strong><span class="tag-today" data-date="2026-10-26">Today</span><span>Lecture 12: JavaScript in the page</span><span>The DOM, fetch and JSON, promises and <code>await</code>, the event loop, the server's manual as a spec.</span></a>
+    <a class="day" href="#s4-spec"><strong>Tue, Oct 27</strong><span class="tag-today" data-date="2026-10-27">Today</span><span>Section 4: ADTs</span><span><code>MutableIntSet</code>'s specs, three representations with AFs and RIs, a loop through an AF.</span></a>
+    <a class="day" href="#l13-trace"><strong>Wed, Oct 28</strong><span class="tag-today" data-date="2026-10-28">Today</span><span>Lecture 13: Exceptions</span><span>The call stack, how a throw finds its catch, <code>finally</code>, catching a family, what is true at a catch.</span></a>
+    <div class="day later"><strong>Fri, Oct 30</strong><span class="tag-today" data-date="2026-10-30">Upcoming</span><span>Lecture 14: Subtyping</span><span>Materials not posted yet. <b>Reading 3 due 11:59 pm.</b></span></div>
+  </div>
+
+  <h2>How to use this site</h2>
+  <div class="prose"><ul>
+    <li>Each posted lecture's modules follow its notes, each ending in a quick check, then a <strong>Check your understanding</strong> and a <strong>Problems</strong> page; Section 4 has a practice page. Friday's lecture on subtyping had no materials posted on Thu Oct 29, so it appears only as upcoming.</li>
+    <li>The stepper runs a model of Lecture 13's four Trace programs whose every step matches the notes' own step tables, and whose output matches real Java (<code>checks/cse331/w05/verify.mjs</code>). The event-loop widget models Lecture 12's <code>app.js</code>; verify.mjs runs the notes' real <code>app.js</code> in every possible order of events and checks the page ends as the widget says.</li>
+  </ul></div>
+
+  <h2>Course essentials</h2>
+  <table class="plain">
+    <tr><th>Due this week</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/readings/reading3.html" target="_blank" rel="noopener">Reading 3</a> reflection, Fri Oct 30 at 11:59 pm; discussed Mon Nov 2.</td></tr>
+    <tr><th>Links</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/calendar/calendar.html" target="_blank" rel="noopener">Calendar</a> · notes: <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture12-js/notes.html" target="_blank" rel="noopener">Lecture 12</a>, <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture13-exceptions/notes.html" target="_blank" rel="noopener">Lecture 13</a></td></tr>
+  </table>
+  <details class="notes" open><summary>Teaching notes: the week</summary><ul>
+    <li>Both lectures ask the same question in two settings: where can a run be when it reaches a line? After an <code>await</code>, anything else may have run. At a <code>catch</code>, control may have come from any throw under the <code>try</code>.</li>
+    <li>Lecture 12 ends with the server's manual as the client's specification; Lecture 13 ends with a <code>@throws</code> clause as a postcondition for the exceptional exit.</li>
+  </ul></details>
+</section>
+
+<!-- ================================================================ LECTURE 12 -->
+<section class="page" id="l12-two" data-title="Two programs" data-unit="l12">
+  <p class="where">Lecture 12 · JavaScript in the page · <span class="today-chip" data-date="2026-10-26">Mon Oct 26</span> · notes: Two programs</p>
+  <h1>Two programs</h1>
+  <div class="code-pair">
+    <pre class="code"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Guestbook&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Guestbook&lt;/h1&gt;
+  &lt;ul id="messages"&gt;
+  &lt;/ul&gt;
+  Name: &lt;input id="name"&gt;
+  Message: &lt;input id="message"&gt;
+  &lt;button id="post"&gt;Post&lt;/button&gt;
+  &lt;script src="app.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+    <div class="prose">
+      <p>The second guestbook keeps the same book on the server and moves the work of building the page into the browser. Line 13's <code>&lt;script&gt;</code> tag points at <code>app.js</code>: the browser asks for it and runs it. So the guestbook is now two programs, the Java server and a JavaScript program in the page. The page holds no messages; the list arrives empty to every visitor.</p>
+      <p>One visit prints four requests: <code>GET /</code>, <code>GET /app.js</code>, <code>GET /api/messages</code> (from <code>app.js</code>, asking for the messages), <code>GET /favicon.ico</code>. Posting prints <code>POST /api/messages</code>, and the server sends no page back: the program changes the page already drawn, in place.</p>
+    </div>
+  </div>
+  <div class="prose"><p>Three questions follow. How does a program change a page the browser has already drawn? What does it do while the server is slow? What does the program in the browser know about the server?</p></div>
+  <div class="check" data-id="cse331-w5-l12-qc-four" data-kind="quickcheck" data-type="int" data-answer="4">
+    <p>Quick check: how many requests does one visit to the second guestbook send (with a browser that asks for its icon)?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>JavaScript is not Java: the two share four letters of their names and nothing else; the name was 1995 marketing.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l12-dom" data-title="The page is a tree" data-unit="l12">
+  <p class="where">Lecture 12 · <span class="today-chip" data-date="2026-10-26">Mon Oct 26</span> · notes: The page is a tree</p>
+  <h1>The page is a tree</h1>
+  <div class="rule"><p><strong>DOM (Document Object Model).</strong> The page as the browser keeps it: a tree with one node per tag, that a program in the browser can read and change. When the tree changes, the browser redraws the page from it.</p></div>
+  <div class="prose">
+    <p>An <code>id</code> names a tag so a program can find it. In the browser's console, <code>document.getElementById("messages")</code> finds the list, and setting its <code>innerHTML = "&lt;li&gt;hi&lt;/li&gt;"</code> replaces its children: the page shows hi, and no request is sent. The change is in your browser's tree and nowhere else.</p>
+  </div>
+  <pre class="code"><code>// Puts the messages on the page, one list item each, in place of
+// whatever the list held before.
+function show(messages) {
+  const list = document.getElementById("messages");
+  list.innerHTML = "";
+  for (const message of messages) {
+    const item = document.createElement("li");
+    item.textContent = message;          // line 13
+    list.appendChild(item);
+  }
+}</code></pre>
+  <div class="prose">
+    <p>Read as Java: <code>function</code> starts a function with no types; <code>const</code> declares a variable that will not be reassigned; the loop says <code>of</code> where Java says <code>:</code>. Line 13 sets <code>textContent</code>, not <code>innerHTML</code>: the characters go into the tree as text, so a tag in a message shows as typed and nothing is parsed. Setting text and not HTML closes the cross-site scripting hole of the first guestbook for free.</p>
+  </div>
+  <div class="check" data-id="cse331-w5-l12-qc-text" data-kind="quickcheck">
+    <p>Quick check: a message is <code>&lt;b&gt;hi&lt;/b&gt;</code>. With line 13 as written, what does the page show?</p>
+    <div class="opts">
+      <label data-option="bold"><input type="radio" name="l12qt"> hi, in bold<span class="why" hidden>That is what <code>innerHTML</code> would do: parse the tag.</span></label>
+      <label data-option="text" data-correct><input type="radio" name="l12qt"> the characters <code>&lt;b&gt;hi&lt;/b&gt;</code><span class="why" hidden>Right: <code>textContent</code> puts text in the tree, unparsed.</span></label>
+      <label data-option="nothing"><input type="radio" name="l12qt"> nothing; the tag is removed<span class="why" hidden>Nothing is parsed or removed.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Have students open the console on a news site and change a headline's <code>innerHTML</code>: nothing on the server changes, and nobody else sees it.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l12-fetch" data-title="Asking the server" data-unit="l12">
+  <p class="where">Lecture 12 · <span class="today-chip" data-date="2026-10-26">Mon Oct 26</span> · notes: Asking the server, What fetch returns</p>
+  <h1>Asking the server</h1>
+  <pre class="code"><code>// Asks the server for the messages, and shows them.
+async function load() {                              // line 19
+  const response = await fetch("/api/messages");     // line 20
+  const messages = await response.json();            // line 21
+  show(messages);                                    // line 22
+}</code></pre>
+  <div class="prose">
+    <p><code>fetch</code> sends a request to the server the page came from: here <code>GET /api/messages</code>. The server answers this path with the messages as data: <code>curl</code> shows <code>["ada: hello"]</code>.</p>
+  </div>
+  <div class="rule">
+    <p><strong>JSON.</strong> A way of writing a value as text (a list in square brackets, a string in double quotes, …) that programs in any languages can read back as a value.</p>
+    <p><strong>Promise.</strong> A value that stands for a result that may not have arrived yet. <code>await</code> before a promise waits until the result arrives and gives the result itself. Inside a function, <code>await</code> is allowed only if the function is declared <code>async</code>.</p>
+  </div>
+  <div class="prose">
+    <p>In the console, <code>fetch("/api/messages")</code> prints <code>Promise {&lt;pending&gt;}</code>: it returns at once, before any response. Reading the body is slow too, so <code>response.json()</code> returns a promise as well: two awaits. Leave <code>async</code> off <code>load</code> and the browser refuses the whole file (<code>Uncaught SyntaxError: await is only valid in async functions…</code>): nothing in it runs. A response also has a status (200, or 404 for a path the server lacks), and a request can get no answer at all; each is a different failure the program must decide how to handle.</p>
+  </div>
+  <div class="check" data-id="cse331-w5-l12-qc-json" data-kind="quickcheck" data-type="output" data-answer='["ada: hello", "bob: hi"]'>
+    <p>Quick check: after ada posts <code>hello</code> and bob posts <code>hi</code>, what does <code>curl http://localhost:9331/api/messages</code> print? (The server's <code>json</code> joins with a comma and a space.)</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="exactly as printed"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The console is looser than files: it allowed <code>await</code> outside any function. The rule is for code you write and turn in.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l12-post" data-title="Posting" data-unit="l12">
+  <p class="where">Lecture 12 · <span class="today-chip" data-date="2026-10-26">Mon Oct 26</span> · notes: Posting</p>
+  <h1>Posting</h1>
+  <pre class="code"><code>// Sends the name and message typed in, and shows what comes back.
+async function post() {
+  const fields = new URLSearchParams();
+  fields.append("name", document.getElementById("name").value);
+  fields.append("message", document.getElementById("message").value);
+  const response = await fetch("/api/messages", {
+    method: "POST",
+    body: fields,
+  });
+  const messages = await response.json();
+  show(messages);
+  document.getElementById("message").value = "";
+}
+
+document.getElementById("post").onclick = post;      // line 39
+load();                                              // line 40</code></pre>
+  <div class="prose">
+    <p>A <code>URLSearchParams</code> is a map from names to strings; <code>.value</code> is what the user typed. <code>fetch</code>'s second argument, an object in braces, says the method is POST and the body is the fields, encoded as the first guestbook's form encoded them, so the server reads them with the same <code>parseForm</code>. The server answers a POST with the messages, so <code>post</code> redraws from the answer.</p>
+    <p>Line 39 sets the button's <code>onclick</code> to the function <code>post</code> itself, with no parentheses: handed to the browser as a value, as <code>main</code> handed <code>handle</code> to <code>HttpServer</code>. A click is then an event, and <code>post</code> is what the browser runs for it. Line 40 calls <code>load</code> once; after that, nothing runs until an event. Refresh after posting now sends three GETs and no POST: the page came from a GET.</p>
+  </div>
+  <div class="check" data-id="cse331-w5-l12-qc-refresh" data-kind="quickcheck" data-type="int" data-answer="0">
+    <p>Quick check: you post a message, then press refresh. How many POST requests does the refresh send?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li><code>load</code> and <code>post</code> are both <code>async</code> because each has an <code>await</code>; <code>show</code> is ordinary.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l12-loop" data-title="One thing at a time" data-unit="l12">
+  <p class="where">Lecture 12 · <span class="today-chip" data-date="2026-10-26">Mon Oct 26</span> · notes: One thing at a time</p>
+  <h1>One thing at a time</h1>
+  <div class="prose">
+    <p>Slow the server down by ten seconds on <code>/api/messages</code>. The page appears at once with an empty list; during those ten seconds, while <code>load</code> waits at line 20, you can type and press Post, and <code>post</code> runs and sends its POST. Yet the browser runs your program on one thread, never two functions at once. How can both be true?</p>
+  </div>
+  <div class="rule">
+    <p><strong>Event loop.</strong> The browser runs a program in the page from a loop: wait for an event, run the function registered for it (its <em>callback</em>), wait again. A click is an event; a response arriving is an event.</p>
+    <p><strong>Concurrency.</strong> A program is concurrent when more than one task is in progress at once and the order of their steps is not the program's to choose. In the browser one callback runs at a time, and a function gives up its turn only at an <code>await</code>.</p>
+  </div>
+  <div class="prose"><p>At an <code>await</code>, the function returns to whoever called it (for a callback, the loop), with its place marked; it returns a promise, as every <code>async</code> function does. When the result arrives, the rest of the function runs as a callback. So <code>await</code> cuts a function in two, and <code>load</code>, with two awaits, runs in three pieces. Choose an order of events below.</p></div>
+  <div class="panel eloop"></div>
+  <div class="prose">
+    <p>Three things follow. At an <code>await</code>, control goes back to the loop and then to whatever event is next; you know only where your function will resume. After an <code>await</code>, anything another callback can reach (a global, an object both can see, the page's tree) may have changed. And the figure is one possible run: each order of events is another run, and a test that posts and sees the message confirms one order only. So treat an <code>await</code> as a method boundary in disguise: make the invariant true before it, and assume only the invariant after it, as with a class's RI.</p>
+  </div>
+  <div class="check" data-id="cse331-w5-l12-qc-pieces" data-kind="quickcheck" data-type="int" data-answer="3">
+    <p>Quick check: into how many pieces do <code>post</code>'s awaits cut it?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Half sheet, question 1 (3 minutes): <em>JavaScript runs one thing at a time. Yet while <code>load</code> waits for the server, a click on Post runs <code>post</code>. How?</em> The server is a loop too; so is the browser.</li><li>The widget draws each function's last two pieces as one box, as the notes' figure does.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l12-client" data-title="Who is the client?" data-unit="l12">
+  <p class="where">Lecture 12 · <span class="today-chip" data-date="2026-10-26">Mon Oct 26</span> · notes: Who is the client?</p>
+  <h1>Who is the client?</h1>
+  <div class="prose"><p>For the request <code>load</code> sends, the program in the browser is the <strong>client</strong>: it calls the server as code calls a method, with a request for a call and a response for a return value. The server is the <strong>implementation</strong>, and the specification between them is the server's manual:</p></div>
+  <pre class="code"><code> * Four kinds of request reach the program:
+ *   GET /               the page, index.html, as it is on disk
+ *   GET /app.js         the page's program, app.js, as it is on disk
+ *   GET /api/messages   the messages posted so far, as JSON
+ *   POST /api/messages  adds the message the fields send, then the
+ *                       messages posted so far, as JSON</code></pre>
+  <div class="prose">
+    <p><code>handle</code> now answers by path: files for <code>/</code> and <code>/app.js</code> (read the bytes, send the bytes), JSON for <code>/api/messages</code>, and 404 for anything else, the icon included. The JSON is written by hand: each message in double quotes with backslash, quote and newline escaped, joined with commas inside brackets.</p>
+    <p>The client knows only the manual. And the manual promises "as JSON", not that the JSON is a list, of strings, each a name, a colon and the message. <code>show</code> relies on all three: on what the server happens to send. Change the server to a list of objects and it still satisfies the manual, the old <code>app.js</code> still runs, and every list item reads <code>[object Object]</code>. No compiler sees both programs. A good manual promises the shape; many teams write it in a form a tool can check, a <em>schema</em>.</p>
+  </div>
+  <div class="check" data-id="cse331-w5-l12-qc-client" data-kind="quickcheck">
+    <p>Quick check (the half sheet's question 2): line 20 of <code>app.js</code> sends a request. Which program is the client?</p>
+    <div class="opts">
+      <label data-option="browser" data-correct><input type="radio" name="l12qc"> The program in the browser, <code>app.js</code><span class="why" hidden>Right: it relies on what the server's manual promises.</span></label>
+      <label data-option="server"><input type="radio" name="l12qc"> The Java server<span class="why" hidden>The server is the implementation here; its manual is the spec.</span></label>
+      <label data-option="user"><input type="radio" name="l12qc"> The person at the keyboard<span class="why" hidden>For this request, the client is code calling code.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Web systems often break exactly this way: the spec leaves the shape open, clients rely on what the server sent, the server changes it.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l12-quiz" data-title="Check your understanding: Lecture 12" data-unit="l12">
+  <p class="where">Lecture 12 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose"><p>Nine questions on Lecture 12. Your score counts first tries only.</p></div>
+  <div class="cyu-score" data-role="score" role="status"></div>
+  <ol class="cyu-list">
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l12-quiz-script" data-type="choice" data-topic="l12-two">
+      <p class="q">What does <code>&lt;script src="app.js"&gt;</code> make the browser do?</p>
+      <div class="opts">
+        <label data-option="run" data-correct><input type="radio" name="w5a1"> Ask the server for <code>app.js</code> and run it<span class="why" hidden>Right: the server sends a program as well as a page.</span></label>
+        <label data-option="show"><input type="radio" name="w5a1"> Show the file's text on the page<span class="why" hidden>A script is run, not shown.</span></label>
+        <label data-option="server"><input type="radio" name="w5a1"> Run <code>app.js</code> on the server<span class="why" hidden>The browser runs it.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l12-quiz-dom" data-type="choice" data-topic="l12-dom">
+      <p class="q">You set a node's <code>innerHTML</code> in the console. What happens on the server?</p>
+      <div class="opts">
+        <label data-option="nothing" data-correct><input type="radio" name="w5a2"> Nothing: the change is in your browser's tree only<span class="why" hidden>Right: no request is sent.</span></label>
+        <label data-option="saved"><input type="radio" name="w5a2"> The page is saved for every visitor<span class="why" hidden>Nobody else sees it.</span></label>
+        <label data-option="post"><input type="radio" name="w5a2"> The browser sends a POST<span class="why" hidden>The terminal prints nothing.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l12-quiz-fetch-returns" data-type="choice" data-topic="l12-fetch">
+      <p class="q">What does <code>fetch("/api/messages")</code> return?</p>
+      <div class="opts">
+        <label data-option="promise" data-correct><input type="radio" name="w5a3"> A promise, at once, before any response has come back<span class="why" hidden>Right: <code>Promise {&lt;pending&gt;}</code>.</span></label>
+        <label data-option="response"><input type="radio" name="w5a3"> The response, once it arrives<span class="why" hidden>That is what <code>await fetch(…)</code> gives.</span></label>
+        <label data-option="list"><input type="radio" name="w5a3"> The list of messages<span class="why" hidden>That takes a second await, on <code>response.json()</code>.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l12-quiz-async" data-type="choice" data-topic="l12-fetch">
+      <p class="q">Take <code>async</code> off <code>load</code>. What happens?</p>
+      <div class="opts">
+        <label data-option="file" data-correct><input type="radio" name="w5a4"> The browser refuses the whole file: nothing in it runs<span class="why" hidden>Right: a syntax error, so the button gets no callback and the list stays empty.</span></label>
+        <label data-option="load"><input type="radio" name="w5a4"> Only <code>load</code> fails; Post still works<span class="why" hidden>The browser reads the whole file first and refuses it whole.</span></label>
+        <label data-option="sync"><input type="radio" name="w5a4"> <code>load</code> runs without waiting<span class="why" hidden><code>await</code> outside an async function is a syntax error.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l12-quiz-onclick" data-type="choice" data-topic="l12-post">
+      <p class="q">Why does line 39 say <code>onclick = post</code> and not <code>onclick = post()</code>?</p>
+      <div class="opts">
+        <label data-option="value" data-correct><input type="radio" name="w5a5"> It hands the browser the function itself, to run on each click<span class="why" hidden>Right: <code>post()</code> would call it now, once.</span></label>
+        <label data-option="style"><input type="radio" name="w5a5"> Parentheses are optional in JavaScript<span class="why" hidden>They make a call.</span></label>
+        <label data-option="async"><input type="radio" name="w5a5"> Async functions cannot be called<span class="why" hidden>They can; line 40 calls <code>load()</code>.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l12-quiz-thread" data-type="int" data-answer="1" data-topic="l12-loop">
+      <p class="q">How many of your page's functions are ever running at the same instant?</p>
+      <p class="why" hidden>One: the loop runs one callback at a time. Others may be paused at an <code>await</code>, not running.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l12-quiz-after-await" data-type="choice" data-topic="l12-loop">
+      <p class="q">After an <code>await</code>, what may have changed?</p>
+      <div class="opts">
+        <label data-option="shared" data-correct><input type="radio" name="w5a7"> Anything another callback can reach: globals, shared objects, the page's tree<span class="why" hidden>Right. The function's own locals are still its own.</span></label>
+        <label data-option="nothing"><input type="radio" name="w5a7"> Nothing; JavaScript runs one thing at a time<span class="why" hidden>One at a time, but other callbacks ran while this one waited.</span></label>
+        <label data-option="locals"><input type="radio" name="w5a7"> The function's local variables<span class="why" hidden>No other callback can reach them.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l12-quiz-object" data-type="output" data-answer="[object Object]" data-topic="l12-client">
+      <p class="q">The server starts sending objects with <code>name</code> and <code>message</code> fields. What does the old <code>show</code> put in each list item?</p>
+      <p class="why" hidden>That is what an object becomes as text.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l12-quiz-404" data-type="int" data-answer="404" data-topic="l12-client">
+      <p class="q">What status does the second guestbook send for <code>GET /favicon.ico</code>?</p>
+      <p class="why" hidden>Any path but <code>/</code>, <code>/app.js</code> and <code>/api/messages</code> gets 404 and <code>not found</code>.</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-role="summary" role="status"></div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Questions 6 and 7 are the core: one thing at a time, and what an <code>await</code> lets happen.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l12-problems" data-title="Lecture 12: problems" data-unit="l12">
+  <p class="where">Lecture 12 · <span class="today-chip" data-date="2026-10-26">Mon Oct 26</span> · problems</p>
+  <h1>Lecture 12: problems</h1>
+  <div class="prose"><p>Problems 1 to 3 are the notes' exercises 1 to 3, with their official answers; problem 4 is about the server's hand-written JSON. The event-loop orders were checked by running the notes' <code>app.js</code> itself in every possible order.</p></div>
+
+  <article class="task" data-id="cse331-w5-l12-ex1">
+    <h2>1. Promise the shape</h2>
+    <p class="prompt">Write the sentence the manual should have about the JSON, so that <code>show</code> relies on a promise and not on what the server happens to send.</p>
+    <div class="answer-spec" data-part="relies" data-type="int" data-answer="13" data-label="The line of app.js that relies on each element being a string" data-placeholder="a line number"></div>
+    <div class="answer-spec" data-part="sentence" data-type="self" data-long data-label="Your sentence" data-placeholder="The messages are a JSON list of …"></div>
+    <ol class="hints"><li>List what <code>show</code> and <code>load</code> assume: that the body is JSON, that it is a list, that each element is a string, and an order.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>"The messages are a JSON list of strings, oldest first, each the poster's name, a colon, a space, and the message."</li>
+      <li>Line 21 relies on JSON; line 11's <code>for</code> on a list; line 13 on each element being a string (it goes in as text); the page shows the list's order.</li>
+      <li>With the sentence in the manual, a change to the shape is a change to the spec, and the server's author knows the client must change too.</li>
+      <li class="answer">That sentence; line 13.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w5-l12-ex2">
+    <h2>2. A slow response</h2>
+    <p class="prompt">The server handles <code>load</code>'s GET before <code>post</code>'s POST, but <code>load</code>'s response is slow on the network and reaches the browser after <code>post</code>'s. List the boxes the loop runs, and say what the page shows at the end. (Try it in the widget on <a href="#l12-loop">One thing at a time</a>.)</p>
+    <div class="answer-spec" data-part="third" data-type="choice" data-answer="post" data-options="load:the rest of load|post:the rest of post" data-label="The third box the loop runs"></div>
+    <div class="answer-spec" data-part="shows" data-type="yesno" data-answer="no" data-label="Does the page end showing the new message?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="book" data-type="yesno" data-answer="yes" data-label="Does the server's book have it?" data-placeholder="yes or no"></div>
+    <ol class="hints"><li>What was in the book when the server answered the GET?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Boxes: <code>load</code> to its await; <code>post</code> to its await; the rest of <code>post</code>; the rest of <code>load</code>.</li>
+      <li>The rest of <code>post</code> draws a list with the new message. Then the rest of <code>load</code> draws the list built from the book before the message was added. The page ends without it, though the book has it, until something calls <code>load</code> again.</li>
+      <li>Nothing in <code>load</code> or <code>post</code> is wrong on its own. The run that goes wrong is one order of the same events.</li>
+      <li class="answer">The rest of <code>post</code>; no; yes.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w5-l12-ex3">
+    <h2>3. No <code>async</code></h2>
+    <p class="prompt">Take <code>async</code> off line 19, reload, and press Post. What happens, and why does the button do nothing?</p>
+    <div class="answer-spec" data-part="runs" data-type="int" data-answer="0" data-label="How many lines of app.js run" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="why" data-type="self" data-long data-label="Why the button does nothing" data-placeholder="The browser reads the whole file first, and …"></div>
+    <ol class="hints"><li>When does the browser check the file's syntax: line by line as it runs, or before running any of it?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The console shows <code>Uncaught SyntaxError: await is only valid in async functions…</code>; the list stays empty.</li>
+      <li>The browser reads the whole file before running any of it and refuses it whole. Line 39 never ran, so a click is an event with no callback; line 40 never ran, so the list is empty.</li>
+      <li class="answer">None of it runs.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w5-l12-json">
+    <h2>4. The server's JSON</h2>
+    <p class="prompt">The server's <code>json</code> wraps each string in double quotes, replacing <code>\</code> with <code>\\</code>, <code>"</code> with <code>\"</code> and a newline with <code>\n</code>, and joins them with <code>", "</code> inside brackets. Eve posts the message <code>say "hi"</code>.</p>
+    <div class="answer-spec" data-part="out" data-type="output" data-answer='["Eve: say \"hi\""]' data-label="GET /api/messages returns (on a new server)" data-placeholder="exactly as sent"></div>
+    <div class="answer-spec" data-part="why" data-type="self" data-long data-label="What would go wrong without the quote escape" data-placeholder="The quote would end the string …"></div>
+    <ol class="hints"><li>Only the quotes inside the message get a backslash.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The book holds <code>Eve: say "hi"</code>. Escaping gives <code>Eve: say \"hi\"</code>, wrapped in quotes and brackets.</li>
+      <li>Without the escape, the quote before <code>hi</code> would end the string, and <code>response.json()</code> would fail to parse the body. In practice a library writes the JSON.</li>
+      <li class="answer"><code>["Eve: say \"hi\""]</code></li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ SECTION 4 -->
+<section class="page" id="s4-spec" data-title="Section 4: MutableIntSet's specs" data-unit="s4">
+  <p class="where">Section 4 · ADTs · <span class="today-chip" data-date="2026-10-27">Tue Oct 27</span> · Task 1, with the official solution</p>
+  <h1>Task 1: <code>MutableIntSet</code>'s specs</h1>
+  <pre class="code"><code>/** Represents a **mutable** integer set, or a collection of distinct integers. */
+public class MutableIntSet {
+    /** @return true if n is in the set, false otherwise */
+    public boolean contains(int n);
+    /** Adds n to the set if not already present.
+     *  @modifies this
+     *  @effects this is unchanged if this_0 contains n
+     *           otherwise, this contains all of this_0 and n */
+    public void add(int n);
+    public boolean remove(int n);   // spec to write
+}</code></pre>
+  <div class="prose">
+    <p>Let <code>T</code> have the abstract state {1, 2, 3}.</p>
+    <ul>
+      <li><strong><code>T.add(3)</code>.</strong> It changes nothing. <code>@modifies</code> says what <em>may</em> change; it is not a promise that anything does.</li>
+      <li><strong>A static <code>add(old, n)</code></strong> that returns a new set and has no <code>@modifies</code> promises not to change <code>old</code>; the instance <code>add</code> changes <code>this</code>.</li>
+      <li><strong>Forward reasoning:</strong> after <code>T.add(4); T.add(2); T.add(0);</code> the state is {0, 1, 2, 3, 4}.</li>
+      <li><strong><code>remove</code>'s spec</strong>, one solution: <code>@modifies this</code>; <code>@effects</code> if <code>this_0</code> contains n, <code>this = this_0</code> with n removed, otherwise <code>this = this_0</code>; <code>@return</code> true if <code>this_0</code> contains n, false otherwise.</li>
+    </ul>
+  </div>
+  <div class="check" data-id="cse331-w5-s4-qc-size" data-kind="quickcheck" data-type="int" data-answer="5">
+    <p>Quick check: from {1, 2, 3}, after <code>add(4)</code>, <code>add(2)</code>, <code>add(0)</code>, how many elements does <code>T</code> have?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The spec writes <code>this_0</code> for the abstract state at the call, as Lecture 11's rule did.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="s4-reps" data-title="Section 4: three representations" data-unit="s4">
+  <p class="where">Section 4 · <span class="today-chip" data-date="2026-10-27">Tue Oct 27</span> · Task 2, Rich AF</p>
+  <h1>Task 2: three representations</h1>
+  <div class="prose"><p>All three use <code>private int[] elems; private int size;</code> and the same AF, <code>this = this.elems[0 .. size]</code> (the first <code>size</code> elements, as an <code>ArrayList</code> would). They differ in the RI:</p></div>
+  <table class="plain">
+    <tr><th>(1)</th><td>no RI</td></tr>
+    <tr><th>(2)</th><td>RI: <code>elems[0..size]</code> contains no duplicates</td></tr>
+    <tr><th>(3)</th><td>RI: <code>elems[0..size]</code> is sorted by <code>&lt;=</code></td></tr>
+  </table>
+  <div class="prose"><p>For each method, which representations make it satisfy <code>MutableIntSet</code>'s spec (and keep the RI)?</p></div>
+  <table class="plain">
+    <tr><th><code>contains</code> by <code>Arrays.binarySearch</code></th><td>(3) only: on an unsorted array binary search may miss an element that is there.</td></tr>
+    <tr><th><code>contains</code> by a loop</th><td>(1), (2) and (3): it needs no RI.</td></tr>
+    <tr><th><code>add</code> (append if not contained, growing the array)</th><td>(1) and (2): trivially for (1); it never adds a duplicate, so (2)'s RI holds. Not (3): appending breaks sortedness.</td></tr>
+    <tr><th><code>remove</code> (shift left over the first match)</th><td>(2) only: it preserves no-duplicates. (1) and (3) can hold duplicates, so removing one occurrence may leave another copy in the set.</td></tr>
+  </table>
+  <div class="check" data-id="cse331-w5-s4-qc-bs" data-kind="quickcheck" data-type="set" data-answer="3">
+    <p>Quick check: for which representations does the <code>binarySearch</code> <code>contains</code> satisfy its spec? (Type the numbers, e.g. <code>1, 2</code>.)</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="e.g. 1, 2"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The same AF with different RIs: the RI decides which method bodies are correct, as in Lecture 11's "which method is wrong?".</li><li>The answers here were checked by brute force on every small array the RI allows.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="s4-loop" data-title="Section 4: removeUntil" data-unit="s4">
+  <p class="where">Section 4 · <span class="today-chip" data-date="2026-10-27">Tue Oct 27</span> · Task 3, Almond Joy</p>
+  <h1>Task 3: <code>removeUntil</code></h1>
+  <pre class="code"><code>// AF: AF(this) = this.snacks[0 .. size] and top = this.snacks[size - 1]
+// RI: 0 &lt;= this.size &lt;= this.snacks.length
+/** Removes snacks from the top of this until an "Almond Joy" is encountered.
+ *  The "Almond Joy" is not removed.
+ *  @modifies this
+ *  @effects removes all elements above the first occurrence of "Almond Joy"
+ *           (from the top); if no "Almond Joy" exists, removes all elements
+ *  @return true if an "Almond Joy" was encountered, false otherwise */
+public boolean removeUntil() {
+  {{ P0: 0 &lt;= size &lt;= snacks.length and size = size_0 }}
+  {{ Inv: this.snacks[size .. size_0] does not contain "Almond Joy"
+      and 0 &lt;= size &lt;= snacks.length and size &lt;= size_0 }}
+  while (size != 0) {
+    String top = this.snacks[size - 1];
+    if (top.equals("Almond Joy")) {
+      {{ P1: Inv and size != 0 and top = snacks[size - 1] and top = "Almond Joy" }}
+      return true;
+    }
+    size--;
+  }
+  {{ P3: Inv and size = 0 }}
+  return false;
+}</code></pre>
+  <div class="steps"><ol>
+    <li><strong>Check (1).</strong> With <code>size = size_0</code>, <code>snacks[size .. size_0]</code> is empty, so it contains no Almond Joy; the bounds come from P0.</li>
+    <li><strong>P1 implies the postcondition.</strong> <code>top = snacks[size - 1]</code> is an Almond Joy, and by Inv nothing in <code>snacks[size .. size_0]</code> is: it is the first from the top. By the AF, <code>AF(this_0) = snacks[0 .. size_0]</code> and <code>AF(this) = snacks[0 .. size]</code>: exactly the elements above it are gone. The RI holds by Inv.</li>
+    <li><strong>Check (2).</strong> After <code>size--</code>, <code>snacks[size .. size_0]</code> is <code>[top] ++ snacks[size_1 .. size_0]</code>, and <code>top</code> is not an Almond Joy; <code>0 &lt; size_1</code> gives <code>0 &lt;= size</code>.</li>
+    <li><strong>Check (3).</strong> With <code>size = 0</code>, Inv says <code>snacks[0 .. size_0]</code>, all of <code>AF(this_0)</code>, held no Almond Joy, and <code>AF(this)</code> is empty: all removed, return false.</li>
+  </ol></div>
+  <div class="check" data-id="cse331-w5-s4-qc-run" data-kind="quickcheck" data-type="int" data-answer="2">
+    <p>Quick check: <code>snacks = {"Kit Kat", "Almond Joy", "Twix", "Mars"}</code> and <code>size = 4</code>. What is <code>size</code> after <code>removeUntil()</code>?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The official write-up justifies the last fact, <code>size &lt;= size_0</code>, "from <code>size = size_0</code> in P2", but P2 has <code>size = size_1 - 1</code>; the fact follows from <code>size_1 &lt;= size_0</code>. Worth pointing out when you walk check (2).</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="s4-practice" data-title="Section 4: practice" data-unit="s4">
+  <p class="where">Section 4 · <span class="today-chip" data-date="2026-10-27">Tue Oct 27</span> · practice</p>
+  <h1>Section 4: practice</h1>
+  <div class="prose"><p>Four problems on the section's tasks. The representation grid and every <code>removeUntil</code> run were checked by running the code on every small array.</p></div>
+
+  <article class="task" data-id="cse331-w5-s4-task1">
+    <h2>1. Specs and forward reasoning</h2>
+    <p class="prompt"><code>T</code> is {1, 2, 3}.</p>
+    <div class="answer-spec" data-part="add3" data-type="yesno" data-answer="no" data-label="Does T.add(3) change T?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="remove-ret" data-type="yesno" data-answer="no" data-label="By the remove spec above, does T.remove(7) return true?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="after" data-type="int" data-answer="4" data-label="After T.add(4); T.remove(2); T.add(0), how many elements?" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="spec" data-type="self" data-long data-label="Your spec for remove" data-placeholder="@modifies this … @effects … @return …"></div>
+    <ol class="hints"><li>Track the abstract state as a set; <code>@modifies</code> is permission, not promise.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>add(3)</code>: 3 is in the set, so <code>this</code> is unchanged; allowed despite <code>@modifies this</code>.</li>
+      <li><code>remove(7)</code>: 7 is not in <code>this_0</code>, so <code>this = this_0</code> and the result is false.</li>
+      <li>{1, 2, 3} → {1, 2, 3, 4} → {1, 3, 4} → {0, 1, 3, 4}: four elements.</li>
+      <li class="answer">No; no; 4.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w5-s4-grid">
+    <h2>2. Which representations?</h2>
+    <p class="prompt">For each method body of Task 2, list the representations (1, 2, 3) with which it satisfies <code>MutableIntSet</code>'s spec and keeps the RI.</p>
+    <div class="answer-spec" data-part="bs" data-type="set" data-answer="3" data-label="contains by binarySearch" data-placeholder="e.g. 1, 2"></div>
+    <div class="answer-spec" data-part="loop" data-type="set" data-answer="1,2,3" data-label="contains by a loop" data-placeholder="e.g. 1, 2"></div>
+    <div class="answer-spec" data-part="add" data-type="set" data-answer="1,2" data-label="add (append)" data-placeholder="e.g. 1, 2"></div>
+    <div class="answer-spec" data-part="remove" data-type="set" data-answer="2" data-label="remove (shift over the first match)" data-placeholder="e.g. 1, 2"></div>
+    <ol class="hints"><li>For each, ask: which RI does the body need when called, and which does it keep?</li><li>Can representation (1) or (3) hold the same number twice?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Binary search needs sorted elements: (3).</li>
+      <li>The loop looks at every element: any representation.</li>
+      <li><code>add</code> appends: it never makes a duplicate, so (1) and (2), but it can break (3)'s order.</li>
+      <li><code>remove</code> takes out one occurrence: with no duplicates (2) that removes n from the set; (1) and (3) may hold another copy.</li>
+      <li class="answer">3; 1, 2, 3; 1, 2; 2.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w5-s4-almond">
+    <h2>3. Run <code>removeUntil</code></h2>
+    <p class="prompt">Run it by hand on each stack (bottom first), each with <code>size</code> equal to the number of snacks listed.</p>
+    <div class="answer-spec" data-part="a-ret" data-type="yesno" data-answer="yes" data-label="{Almond Joy, Twix, Almond Joy, Mars}: returns true?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="a-size" data-type="int" data-answer="3" data-label="… and size afterward" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="b-size" data-type="int" data-answer="0" data-label="{Twix, Mars}: size afterward" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="c-size" data-type="int" data-answer="1" data-label="{Almond Joy}: size afterward" data-placeholder="a whole number"></div>
+    <ol class="hints"><li>Start from the top, <code>snacks[size - 1]</code>, and stop at the first Almond Joy without removing it.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>First stack: the top is Mars, removed (size 3); then the top is the second Almond Joy: return true with size 3. The bottom Almond Joy is never reached.</li>
+      <li>Second: no Almond Joy, so everything is removed: size 0, false.</li>
+      <li>Third: the top is an Almond Joy at once: true, size stays 1.</li>
+      <li class="answer">Yes, 3; 0; 1.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w5-s4-check2">
+    <h2>4. Check (2), written out</h2>
+    <p class="prompt">From P2 (the state after <code>size--</code>, with <code>size_1</code> the old size), show that each fact of the invariant holds.</p>
+    <div class="answer-spec" data-part="why" data-type="self" data-long data-label="Your calculation" data-placeholder="snacks[size .. size_0] = [top] ++ snacks[size_1 .. size_0] …"></div>
+    <ol class="hints"><li><code>size = size_1 - 1</code>; <code>top = snacks[size_1 - 1]</code> and <code>top != "Almond Joy"</code>.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>snacks[size .. size_0] = snacks[size_1 - 1 .. size_0] = [top] ++ snacks[size_1 .. size_0]</code>; neither part contains an Almond Joy.</li>
+      <li><code>0 &lt;= size_1</code> and <code>size_1 != 0</code> give <code>0 &lt; size_1</code>, so <code>0 &lt;= size_1 - 1 = size</code>.</li>
+      <li><code>size = size_1 - 1 &lt; size_1 &lt;= snacks.length</code>, so <code>size &lt;= snacks.length</code>; and <code>size &lt; size_1 &lt;= size_0</code>, so <code>size &lt;= size_0</code>.</li>
+      <li class="answer">All three facts hold, so the body keeps the invariant.</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ LECTURE 13 -->
+<section class="page" id="l13-trace" data-title="Where does control go?" data-unit="l13">
+  <p class="where">Lecture 13 · Exceptions · <span class="today-chip" data-date="2026-10-28">Wed Oct 28</span> · notes: Where does control go from here?</p>
+  <h1>Where does control go from here?</h1>
+  <div class="prose">
+    <p>An exception is a second way for a call to end, and it changes where control goes, and so where a run can be when it reaches a line. In <code>Trace</code>, <code>main</code> calls <code>f</code> twice, <code>f</code> calls <code>g</code>, and <code>g</code> divides 12 by its argument, throwing when it is 0. Nothing catches. Write down what it prints, then step through it.</p>
+  </div>
+  <div class="panel stepper" data-program="Trace"></div>
+  <div class="rule">
+    <p><strong>Call stack.</strong> A <em>frame</em> is what Java keeps for one call while it runs: its variables and the line it is at. The call stack is the frames of the methods called and not yet returned, newest on top. A call pushes a frame; a return pops the top frame, and the method below continues after the line its frame recorded.</p>
+  </div>
+  <div class="prose">
+    <p>After the exception, most people expect <code>f: done</code> or <code>main: done</code> to print. Neither does. The trace <em>is</em> the stack: <code>g</code> at line 27, the throw; <code>f</code> at line 21, where it called <code>g</code>; <code>main</code> at line 15. Stand on line 21: control can go to line 22 (when <code>g</code> returns) or leave <code>f</code> (when <code>g</code> throws), and nothing on the line says which. Every call is a place control can come back to, and a place it can leave through.</p>
+  </div>
+  <div class="check" data-id="cse331-w5-l13-qc-lines" data-kind="quickcheck" data-type="int" data-answer="6">
+    <p>Quick check (the half sheet's question 1): how many lines does <code>Trace</code> print on standard output, before the exception's trace?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Half sheet, question 1 (3 minutes): <em>Write what <code>Trace</code> prints, one line of output per line. Two minutes alone, then one with a neighbor.</em></li><li>A stack trace is a message from the language to the programmer, never one a user should see. Now students can read it frame by frame.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l13-catch" data-title="How can control reach a catch?" data-unit="l13">
+  <p class="where">Lecture 13 · <span class="today-chip" data-date="2026-10-28">Wed Oct 28</span> · notes: How can control reach this point?</p>
+  <h1>How can control reach a catch?</h1>
+  <div class="prose"><p><code>TraceCatch</code> puts <code>main</code>'s two calls in a <code>try</code> with a <code>catch (ArithmeticException e)</code> that prints the message. While control is inside the <code>try</code>, <code>main</code>'s frame carries a <em>handler</em>, drawn as a tab. Predict the output, then step.</p></div>
+  <div class="panel stepper" data-program="TraceCatch"></div>
+  <div class="rule">
+    <p><strong>How a throw finds its catch.</strong> A throw looks for a handler frame by frame down the stack, starting with its own frame. If the line that frame is at sits inside a <code>try</code> with a <code>catch</code> for the exception's class, control goes to that catch block, and the method goes on after the <code>try</code> statement. Otherwise the method ends, its frame comes off, and the frame below is next. If no frame is left, Java prints the stack trace and the program stops.</p>
+  </div>
+  <div class="prose">
+    <p>So control can reach line 13 one way only: a throw of an <code>ArithmeticException</code> from somewhere inside <code>main</code>'s <code>try</code>: from <code>f</code>, from <code>g</code>, or anything they call. Where the catch sits on the page does not matter; the stack does. Two easy things to miss: a method can be ended by an exception it never mentions (<code>f</code> has no <code>throw</code> and no <code>catch</code>), and after the catch block, nothing after the <code>try</code> can tell whether the block finished or was cut short.</p>
+  </div>
+  <div class="check" data-id="cse331-w5-l13-qc-fdone" data-kind="quickcheck" data-type="yesno" data-answer="no">
+    <p>Quick check (the half sheet's question 2): in <code>TraceCatch</code>, does <code>f: done</code> print for the call <code>f(0)</code>?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Half sheet, question 2: <em>Does <code>f: done</code> print for <code>f(2)</code>? For <code>f(0)</code>? Does <code>main: done</code> print?</em> (Yes, no, yes.)</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l13-finally" data-title="A block that runs either way" data-unit="l13">
+  <p class="where">Lecture 13 · <span class="today-chip" data-date="2026-10-28">Wed Oct 28</span> · notes: A block that runs either way</p>
+  <h1>A block that runs either way</h1>
+  <div class="prose"><p><code>TraceFinally</code> puts <code>f</code>'s call to <code>g</code> in a <code>try</code> with no <code>catch</code>, only a <code>finally</code> that prints <code>f: finally</code>. <code>main</code> keeps its catch.</p></div>
+  <div class="panel stepper" data-program="TraceFinally"></div>
+  <div class="prose">
+    <p>On the first call, <code>g</code> returns, the <code>try</code> block ends, and the <code>finally</code> block runs: <code>f: finally</code> before <code>f: done</code>. On the second, <code>g</code> throws; <code>f</code> has no catch for it but has a <code>finally</code>, which runs on the way out, whichever way out it is: <code>f: finally</code> prints with the exception still in flight, then the exception goes on to <code>main</code>'s catch, and <code>f: done</code> never prints.</p>
+    <p>That is what a <code>finally</code> is for: work that has to happen whether the <code>try</code> block finished or threw, such as closing a file. A <code>try</code> with a resource in its parentheses (Lecture 3's <code>Sum</code>) is a <code>finally</code> that closes it, written for you. For reasoning, a <code>finally</code> block is a point with two ways in: a claim at its top holds only if it is true both ways.</p>
+  </div>
+  <div class="check" data-id="cse331-w5-l13-qc-finally" data-kind="quickcheck" data-type="int" data-answer="2">
+    <p>Quick check: how many times does <code>TraceFinally</code> print <code>f: finally</code>?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Ask how control can reach line 23: by <code>g</code> returning, or by <code>g</code> throwing.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l13-class" data-title="The class in a catch" data-unit="l13">
+  <p class="where">Lecture 13 · <span class="today-chip" data-date="2026-10-28">Wed Oct 28</span> · notes: The class in a catch</p>
+  <h1>The class in a catch</h1>
+  <div class="prose">
+    <p>A <code>catch</code> for a class takes an exception of that class or of any class that extends it. That one fact makes a catch a design decision.</p>
+    <p><strong>One catch for a family.</strong> The calculator is redone with every user-caused failure an exception: <code>CalcStack</code>'s specs name <code>StackEmptyException</code>, <code>TooFewOperandsException</code> and <code>DivideByZeroException</code>, all nested in the interface and all extending one class, <code>CalcException</code> (which extends <code>RuntimeException</code>). The specs and tests use the three subclasses; the app's <code>main</code> catches only <code>CalcException</code>, around one call per command, <code>step(stack, token)</code>: the one place a user's mistake becomes a message. Without that <code>try</code>, <code>6 0 /</code> ends in <code>Exception in thread "main" CalcStack$DivideByZeroException</code> (Java writes a nested class's name with <code>$</code>).</p>
+    <p><strong>The first catch that matches takes it.</strong> With several <code>catch</code> blocks, Java takes the first whose class matches, in written order. A catch for a subclass after one for its superclass can never run, and the compiler says so: <code>error: exception DivideByZeroException has already been caught</code>. Put the narrow class first.</p>
+    <p><strong>The widest catch takes everything.</strong> <code>TraceSwallow</code> catches <code>Exception</code> with an empty block. Step it: the division by zero is gone, with no message, no trace, exit status 0, and <code>main: done</code> at the end, as on a good run. The error is still there for the next person. Reading 3's paper on production failures (Yuan et al., OSDI 2014) found that in 35% of the catastrophic failures it studied, the handler was trivially wrong: empty, a log line and nothing else, a catch of everything followed by an exit, or a TODO.</p>
+  </div>
+  <div class="panel stepper" data-program="TraceSwallow"></div>
+  <div class="check" data-id="cse331-w5-l13-qc-status" data-kind="quickcheck" data-type="int" data-answer="0">
+    <p>Quick check: with what exit status does <code>TraceSwallow</code> end?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>A class of your own, like <code>CalcException</code>, takes the failures you planned for and lets a bug go by to the trace, where you can read it. A catch for <code>Exception</code> takes the bug too.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l13-claim" data-title="What is true at a catch?" data-unit="l13">
+  <p class="where">Lecture 13 · <span class="today-chip" data-date="2026-10-28">Wed Oct 28</span> · notes: What is true at a catch?</p>
+  <h1>What is true at a catch?</h1>
+  <div class="prose">
+    <p>A catch block is a point with many ways in: every throw of its class under its <code>try</code>, in the method and in every method it calls. So a claim at a catch holds only if it is true at every one of those throws.</p>
+    <p><code>divide</code>'s spec describes two exits: <code>@effects</code> for the normal one, and for each exceptional one a <code>@throws</code> clause ending "and leaves the stack unchanged": a postcondition for the exceptional exit. <code>ListStack</code> keeps it by checking before it changes anything: it asks <code>top()</code> before it pops. A first draft, <code>DraftStack</code>, pops both numbers and then checks the divisor:</p>
+  </div>
+  <div class="code-pair">
+    <div><p class="col-label"><code>ListStack.divide</code></p><pre class="code"><code>if (items.size() &lt; 2) {
+    throw new TooFewOperandsException(
+        "need two numbers to divide");
+}
+if (top() == 0) {
+    throw new DivideByZeroException("cannot divide by zero");
+}
+int b = pop(); int a = pop();
+push(a / b);</code></pre></div>
+    <div><p class="col-label"><code>DraftStack.divide</code></p><pre class="code"><code>if (items.size() &lt; 2) {
+    throw new TooFewOperandsException(
+        "need two numbers to divide");
+}
+int b = pop(); int a = pop();
+if (b == 0) {
+    throw new DivideByZeroException("cannot divide by zero");
+}
+push(a / b);</code></pre></div>
+  </div>
+  <div class="prose"><p>On a zero divisor the draft throws the right exception with the right message, and four of the five spec tests pass. <code>divideByZeroThrowsAndLeavesTheStack</code> fails: <code>expected: &lt;[6, 0]&gt; but was: &lt;[]&gt;</code>. The user types <code>6 0 /</code>, reads "cannot divide by zero", types <code>p</code>, and sees <code>[]</code>.</p></div>
+  <div class="rule">
+    <p><strong>A try with a catch.</strong> In <code>{{ P }} try { body {{ Q }} } catch (X e) { {{ E }} handler {{ Q }} } {{ Q }}</code>, E must be true at every throw of an X that can reach this catch, in <code>body</code> and every method it calls; Q must come out of both exits. So a method that throws owes its callers at the throw, as at a return, and its <code>@throws</code> clause says what it owes. Check first when you can: then there is nothing to undo.</p>
+  </div>
+  <div class="check" data-id="cse331-w5-l13-qc-draft" data-kind="quickcheck" data-type="output" data-answer="[]">
+    <p>Quick check: on <code>DraftStack</code>, the user types <code>6 0 /</code>, then <code>p</code>. What does <code>p</code> print?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="exactly as printed"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Half sheet, question 3: <em>The calculator prints the stack on <code>p</code>. A user types <code>6 0 /</code>, sees cannot divide by zero, then types <code>p</code>. What should it print?</em> (<code>[6, 0]</code>.)</li><li>Lecture 6's calculator kept the promise the other way, pushing both numbers back before throwing: that works, with more to get wrong.</li><li>The notes connect this to Homework 3's starter; this site does not reproduce the homework.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l13-quiz" data-title="Check your understanding: Lecture 13" data-unit="l13">
+  <p class="where">Lecture 13 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose"><p>Nine questions on Lecture 13. Your score counts first tries only.</p></div>
+  <div class="cyu-score" data-role="score" role="status"></div>
+  <ol class="cyu-list">
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l13-quiz-frame" data-type="choice" data-topic="l13-trace">
+      <p class="q">What does a frame on the call stack record?</p>
+      <div class="opts">
+        <label data-option="vars" data-correct><input type="radio" name="w5c1"> One call's variables and the line it is at<span class="why" hidden>Right.</span></label>
+        <label data-option="class"><input type="radio" name="w5c1"> A class's fields<span class="why" hidden>Fields live in objects, not frames.</span></label>
+        <label data-option="output"><input type="radio" name="w5c1"> What the method printed<span class="why" hidden>Output goes to the terminal.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l13-quiz-trace-top" data-type="int" data-answer="27" data-topic="l13-trace">
+      <p class="q">In <code>Trace</code>'s stack trace, at which line is <code>g</code>'s frame?</p>
+      <p class="why" hidden>Line 27, the <code>throw</code> itself: <code>at Trace.g(Trace.java:27)</code>.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l13-quiz-search" data-type="choice" data-topic="l13-catch">
+      <p class="q">How does a throw find its catch?</p>
+      <div class="opts">
+        <label data-option="stack" data-correct><input type="radio" name="w5c3"> Frame by frame down the stack, taking the first matching handler<span class="why" hidden>Right.</span></label>
+        <label data-option="page"><input type="radio" name="w5c3"> The nearest catch on the page<span class="why" hidden>Where it is written doesn't matter; the stack does.</span></label>
+        <label data-option="same"><input type="radio" name="w5c3"> Only in the method that throws<span class="why" hidden>It goes on to the callers' frames.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l13-quiz-main-done" data-type="yesno" data-answer="yes" data-topic="l13-catch">
+      <p class="q">Does <code>TraceCatch</code> print <code>main: done</code>?</p>
+      <p class="why" hidden>Yes: after the catch block, <code>main</code> goes on after the <code>try</code>, as on any run.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l13-quiz-finally" data-type="choice" data-topic="l13-finally">
+      <p class="q">When does a <code>finally</code> block run?</p>
+      <div class="opts">
+        <label data-option="both" data-correct><input type="radio" name="w5c5"> Whether the <code>try</code> block finishes or throws<span class="why" hidden>Right: on the way out, whichever way.</span></label>
+        <label data-option="throw"><input type="radio" name="w5c5"> Only when something throws<span class="why" hidden>It ran on <code>f(2)</code> too.</span></label>
+        <label data-option="catch"><input type="radio" name="w5c5"> Only after a matching catch<span class="why" hidden><code>f</code> had no catch at all.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l13-quiz-wide" data-type="choice" data-topic="l13-class">
+      <p class="q">A <code>catch (CalcException e)</code> takes a thrown <code>DivideByZeroException</code> because…</p>
+      <div class="opts">
+        <label data-option="extends" data-correct><input type="radio" name="w5c6"> <code>DivideByZeroException</code> extends <code>CalcException</code><span class="why" hidden>Right: a catch takes its class and every class that extends it.</span></label>
+        <label data-option="runtime"><input type="radio" name="w5c6"> both are unchecked<span class="why" hidden>Many unrelated classes are unchecked.</span></label>
+        <label data-option="message"><input type="radio" name="w5c6"> the messages match<span class="why" hidden>Messages play no part in matching.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l13-quiz-order" data-type="yesno" data-answer="no" data-topic="l13-class">
+      <p class="q">Does a <code>try</code> compile with <code>catch (CalcException e)</code> followed by <code>catch (DivideByZeroException e)</code>?</p>
+      <p class="why" hidden>No: the second can never run, and javac says it "has already been caught". Narrow first.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l13-quiz-swallow" data-type="choice" data-topic="l13-class">
+      <p class="q">What is wrong with <code>catch (Exception e) { }</code>?</p>
+      <div class="opts">
+        <label data-option="hides" data-correct><input type="radio" name="w5c8"> It takes every throw, bugs included, and drops it with no record<span class="why" hidden>Right: exit status 0, as if nothing happened.</span></label>
+        <label data-option="compile"><input type="radio" name="w5c8"> It does not compile<span class="why" hidden>It compiles.</span></label>
+        <label data-option="slow"><input type="radio" name="w5c8"> It is slow<span class="why" hidden>The problem is what it hides.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w5-l13-quiz-owes" data-type="choice" data-topic="l13-claim">
+      <p class="q">What does a method that throws owe its callers?</p>
+      <div class="opts">
+        <label data-option="throws" data-correct><input type="radio" name="w5c9"> What its <code>@throws</code> clause promises, true at the throw<span class="why" hidden>Right: a postcondition for the exceptional exit.</span></label>
+        <label data-option="nothing"><input type="radio" name="w5c9"> Nothing: the call failed<span class="why" hidden>A catch below stands on a claim; the throw must make it true.</span></label>
+        <label data-option="trace"><input type="radio" name="w5c9"> A stack trace<span class="why" hidden>Only an uncaught exception prints one.</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-role="summary" role="status"></div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Questions 3 and 9 are the lecture's two answers: how control reaches a catch, and what must be true when it does.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l13-problems" data-title="Lecture 13: problems" data-unit="l13">
+  <p class="where">Lecture 13 · <span class="today-chip" data-date="2026-10-28">Wed Oct 28</span> · problems</p>
+  <h1>Lecture 13: problems</h1>
+  <div class="prose"><p>The notes have no exercise section; these problems are the lecture's three half-sheet questions and its in-notes predictions, answered from the notes. Every output was checked against real Java runs.</p></div>
+
+  <article class="task" data-id="cse331-w5-l13-hs1">
+    <h2>1. What does <code>Trace</code> print?</h2>
+    <p class="prompt">Write <code>Trace</code>'s output, one line per line.</p>
+    <div class="answer-spec" data-part="fifth" data-type="output" data-answer="main: calling f(0)" data-label="The fifth line of standard output" data-placeholder="exactly as printed"></div>
+    <div class="answer-spec" data-part="last" data-type="output" data-answer="f: calling g(0)" data-label="The last line of standard output (leading spaces don't count)" data-placeholder="exactly as printed"></div>
+    <div class="answer-spec" data-part="status" data-type="int" data-answer="1" data-label="The exit status" data-placeholder="a whole number"></div>
+    <ol class="hints"><li>The first call goes all the way down and back. On the second, what happens to each frame when <code>g</code> throws?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>main: calling f(2)</code>, <code>  f: calling g(2)</code>, <code>    g: 12 / 2 = 6</code>, <code>  f: done</code>, <code>main: calling f(0)</code>, <code>  f: calling g(0)</code>.</li>
+      <li><code>g</code> throws; no frame has a handler; each ends in turn, and Java prints the exception and the three frames on standard error. The program ends with status 1.</li>
+      <li class="answer"><code>main: calling f(0)</code>; <code>  f: calling g(0)</code>; 1.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w5-l13-hs2">
+    <h2>2. What does <code>TraceCatch</code> print?</h2>
+    <p class="prompt">Does <code>f: done</code> print for <code>f(2)</code>? For <code>f(0)</code>? Does <code>main: done</code> print? What is the line just before <code>main: done</code>?</p>
+    <div class="answer-spec" data-part="f2" data-type="yesno" data-answer="yes" data-label="f: done for f(2)?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="f0" data-type="yesno" data-answer="no" data-label="f: done for f(0)?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="before" data-type="output" data-answer="main: caught: cannot divide by zero" data-label="The line before main: done" data-placeholder="exactly as printed"></div>
+    <ol class="hints"><li>The handler is on <code>main</code>'s frame; what happens to <code>f</code>'s frame on the way there?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>On <code>f(2)</code> nothing throws, so <code>f: done</code> prints.</li>
+      <li>On <code>f(0)</code>, <code>g</code> throws; <code>f</code> has no handler and ends at line 20, so line 21 never runs. <code>main</code>'s handler matches and prints <code>main: caught: cannot divide by zero</code>, then <code>main: done</code>.</li>
+      <li class="answer">Yes; no; <code>main: caught: cannot divide by zero</code>.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w5-l13-finally">
+    <h2>3. <code>TraceFinally</code>'s output</h2>
+    <p class="prompt">How many lines does <code>TraceFinally</code> print, and which line comes right after the second <code>  f: calling g(0)</code>?</p>
+    <div class="answer-spec" data-part="count" data-type="int" data-answer="10" data-label="Lines printed in all" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="after" data-type="output" data-answer="f: finally" data-label="The line after f: calling g(0) (leading spaces don't count)" data-placeholder="exactly as printed"></div>
+    <ol class="hints"><li>A <code>finally</code> block runs on the way out, whichever way.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>First call: <code>main: calling f(2)</code>, <code>  f: calling g(2)</code>, <code>    g: 12 / 2 = 6</code>, <code>  f: finally</code>, <code>  f: done</code>: five lines.</li>
+      <li>Second call: <code>main: calling f(0)</code>, <code>  f: calling g(0)</code>, <code>  f: finally</code> (with the exception in flight), <code>main: caught: cannot divide by zero</code>, <code>main: done</code>: five more.</li>
+      <li class="answer">10 lines; <code>  f: finally</code>.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w5-l13-catch-order">
+    <h2>4. Narrow first</h2>
+    <p class="prompt">A copy of the calculator's <code>main</code> catches <code>CalcStack.CalcException</code> and then, in a second <code>catch</code> on the same <code>try</code>, <code>CalcStack.DivideByZeroException</code>. Does it compile? If not, fix it so that a divide by zero gets its own message.</p>
+    <div class="answer-spec" data-part="compiles" data-type="yesno" data-answer="no" data-label="Does it compile?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="fix" data-type="self" data-long data-label="The fixed try" data-placeholder="try { … } catch (CalcStack.DivideByZeroException e) { … } catch (…"></div>
+    <ol class="hints"><li>Java takes the first catch whose class matches, in written order.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>No: <code>error: exception DivideByZeroException has already been caught</code>. Every <code>DivideByZeroException</code> is a <code>CalcException</code>, so the second catch could never run.</li>
+      <li>Swap them: <code>catch (CalcStack.DivideByZeroException e)</code> first, then <code>catch (CalcStack.CalcException e)</code>.</li>
+      <li class="answer">It does not compile; put the narrow class first.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w5-l13-hs3">
+    <h2>5. Half sheet: what should <code>p</code> print?</h2>
+    <p class="prompt">The user types <code>6 0 /</code>, sees <code>cannot divide by zero</code>, then types <code>p</code>. What should it print, what does <code>DraftStack</code> print, and how do you fix the draft?</p>
+    <div class="answer-spec" data-part="should" data-type="output" data-answer="[6, 0]" data-label="What it should print" data-placeholder="exactly as printed"></div>
+    <div class="answer-spec" data-part="draft" data-type="output" data-answer="[]" data-label="What DraftStack prints" data-placeholder="exactly as printed"></div>
+    <div class="answer-spec" data-part="fix" data-type="self" data-long data-label="The fix" data-placeholder="Check the divisor before popping: …"></div>
+    <ol class="hints"><li>Read <code>divide</code>'s <code>@throws</code> clause to the end.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The spec promises "leaves the stack unchanged" when it throws, so <code>[6, 0]</code>.</li>
+      <li>The draft popped both numbers before checking, so it prints <code>[]</code>: it threw as the spec said and left the stack as the spec forbade.</li>
+      <li>Fix: check <code>top() == 0</code> before popping, as <code>ListStack</code> does; then there is nothing to undo at the throw.</li>
+      <li class="answer"><code>[6, 0]</code>; <code>[]</code>; check first.</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ READINGS -->
+<section class="page" id="readings" data-title="Readings">
+  <p class="where">Reading 3 · due <span class="today-chip" data-date="2026-10-30">Fri Oct 30</span>, 11:59 pm · discussed Mon Nov 2</p>
+  <h1>Readings</h1>
+  <div class="prose">
+    <p>Reading 3 asks about the course motto: <strong>how much of that knowing happens before the first line of code, and how much of it is worth writing down?</strong> Choose one article, read it, and write a reflection. The three answer differently.</p>
+  </div>
+  <div class="reading-cards">
+    <article class="reading-card">
+      <p class="rc-meta">About 25 minutes</p>
+      <h3><a href="https://wstomv.win.tue.nl/edu/2ip30/references/criteria_for_modularization.pdf" target="_blank" rel="noopener">Parnas 1972, "On the Criteria To Be Used in Decomposing Systems into Modules"</a></h3>
+      <p>One small system, a KWIC index, built twice: once split by processing step (input, shift, sort, output), once by decision, each module hiding one design decision such as how the lines are stored. Of five likely changes, two touch every module of the first version; each touches one module of the second. Begin not with a flowchart but with "a list of difficult design decisions or design decisions which are likely to change", and hide each inside a module. (Lecture 11 cites it.)</p>
+    </article>
+    <article class="reading-card">
+      <p class="rc-meta">About 35 minutes</p>
+      <h3><a href="https://www.cs.unc.edu/techreports/86-020.pdf" target="_blank" rel="noopener">Brooks 1986, "No Silver Bullet: Essence and Accidents of Software Engineering"</a></h3>
+      <p>Accidental difficulties come from the tools of the day; the essential difficulty is the idea of the program itself, a "construct of interlocking concepts", with four properties: complexity, conformity, changeability, invisibility. Past gains removed accidents, so no tool can give a tenfold gain on what remains. Instead, grow software by prototypes and increments, since no client can specify a system completely before trying a version of it.</p>
+    </article>
+    <article class="reading-card">
+      <p class="rc-meta">About 15 minutes</p>
+      <h3><a href="https://cacm.acm.org/opinion/who-builds-a-house-without-drawing-blueprints/" target="_blank" rel="noopener">Lamport 2015, "Who Builds a House Without Drawing Blueprints?"</a></h3>
+      <p>A program's blueprint is its specification. Writing down what you are about to do shows how sloppy your thinking is. A spec need not be formal: about 95% of code can be specified by a couple of prose sentences. It should say everything one needs to know to use the code. Tests catch coding errors and miss design errors. "Thinking does not guarantee that you will not make mistakes. But not thinking guarantees that you will."</p>
+    </article>
+  </div>
+  <h3>Optional extras</h3>
+  <ul class="extras">
+    <li><a href="https://faculty.sites.iastate.edu/tesfatsi/archive/tesfatsi/ArchitectureOfComplexity.HSimon1962.pdf" target="_blank" rel="noopener">Simon 1962, "The Architecture of Complexity"</a></li>
+    <li><a href="https://www.developerdotstar.com/mag/articles/reeves_design.html" target="_blank" rel="noopener">Reeves 1992, "What Is Software Design?"</a></li>
+    <li><a href="https://www.joelonsoftware.com/2002/11/11/the-law-of-leaky-abstractions/" target="_blank" rel="noopener">Spolsky 2002, "The Law of Leaky Abstractions"</a></li>
+    <li><a href="https://www.usenix.org/conference/osdi14/technical-sessions/presentation/yuan" target="_blank" rel="noopener">Yuan 2014, "Simple Testing Can Prevent Most Critical Failures"</a> (Lecture 13 quotes it: 35% of catastrophic failures had trivially wrong handlers).</li>
+    <li><a href="https://spinroot.com/gerard/pdf/P10.pdf" target="_blank" rel="noopener">Holzmann 2006, "The Power of Ten: Rules for Developing Safety Critical Code"</a></li>
+    <li>The extras are optional; a reflection may bring one in if it connects it to the article you chose.</li>
+  </ul>
+  <div class="prose"><p>Submit on <a href="https://www.gradescope.com/courses/1390633/assignments/8818736" target="_blank" rel="noopener">Gradescope</a> by Fri Oct 30 at 11:59 pm. The reflection has the usual three parts (what the reading argues, your reaction, a question for Monday's group) and is graded on thoughtful completion. This site does not answer it.</p></div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>This week ties in directly: Parnas's hidden decisions are Lectures 10 and 11's representations; Lamport's "say everything one needs to know to use the code" is Lecture 12's manual that left the JSON's shape open.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CHEAT SHEET -->
+<section class="page" id="cheatsheet" data-title="Cheat sheet">
+  <p class="where">Print with <kbd>Ctrl</kbd>+<kbd>P</kbd>; only this page prints.</p>
+  <h1>Week 5 cheat sheet</h1>
+  <div class="cheat">
+    <section><h3>The page is a tree</h3><p>DOM: one node per tag; a program can read and change it, and the browser redraws. <code>getElementById</code>, <code>createElement</code>, <code>appendChild</code>. Set <code>textContent</code>, not <code>innerHTML</code>, for a user's text.</p></section>
+    <section><h3>fetch and JSON</h3><p><code>fetch(path)</code> returns a promise at once. <code>await</code> it for the response, and <code>await response.json()</code> for the value. <code>await</code> only inside <code>async</code> functions. Check the status.</p></section>
+    <section><h3>The event loop</h3><p>Wait for an event, run its callback, wait again. One callback at a time; a function gives up its turn only at an <code>await</code>. Each order of events is another run. Treat an <code>await</code> as a method boundary.</p></section>
+    <section><h3>Two programs</h3><p>The browser program is the client; the server is the implementation; the server's manual is the spec. Promise the JSON's shape (a schema).</p></section>
+    <section><h3>ADTs (Section 4)</h3><p><code>@modifies</code> is permission, not a promise. Same AF, different RIs: the RI decides which bodies are correct.</p></section>
+    <section><h3>Call stack</h3><p>A frame per call not yet returned: variables and current line. A stack trace lists the frames, top first.</p></section>
+    <section><h3>Throw → catch</h3><p>Down the stack frame by frame; first matching handler wins; else the method ends. Uncaught: trace, exit status 1. A <code>finally</code> runs either way.</p></section>
+    <section><h3>The class in a catch</h3><p>A catch takes its class and subclasses. Narrow first (else "has already been caught"). <code>catch (Exception e) {}</code> swallows bugs.</p></section>
+    <section><h3>At a catch</h3><p>True at every throw that can reach it. <code>@throws</code> is a postcondition for the exceptional exit. Check before you change anything.</p></section>
+    <section><h3>This week</h3><p>Mon Oct 26 Lecture 12 · Tue Oct 27 Section 4 · Wed Oct 28 Lecture 13 · Fri Oct 30 Lecture 14, Subtyping (not posted yet) · Reading 3 due Fri Oct 30.</p></section>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+</main>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+<script type="text/plain" id="src-Trace">
+
+
+
+
+
+
+
+
+
+public class Trace {
+    public static void main(String[] args) {
+        System.out.println("main: calling f(2)");
+        f(2);
+        System.out.println("main: calling f(0)");
+        f(0);
+        System.out.println("main: done");
+    }
+
+    static void f(int n) {
+        System.out.println("  f: calling g(" + n + ")");
+        g(n);
+        System.out.println("  f: done");
+    }
+
+    static void g(int n) {
+        if (n == 0) {
+            throw new ArithmeticException("cannot divide by zero");
+        }
+        System.out.println("    g: 12 / " + n + " = " + (12 / n));
+    }
+}
+
+</script>
+<script type="text/plain" id="src-TraceCatch">
+
+
+
+
+public class TraceCatch {
+    public static void main(String[] args) {
+        try {
+            System.out.println("main: calling f(2)");
+            f(2);
+            System.out.println("main: calling f(0)");
+            f(0);
+        } catch (ArithmeticException e) {
+            System.out.println("main: caught: " + e.getMessage());
+        }
+        System.out.println("main: done");
+    }
+
+    static void f(int n) {
+        System.out.println("  f: calling g(" + n + ")");
+        g(n);
+        System.out.println("  f: done");
+    }
+
+    static void g(int n) {
+        if (n == 0) {
+            throw new ArithmeticException("cannot divide by zero");
+        }
+        System.out.println("    g: 12 / " + n + " = " + (12 / n));
+    }
+}
+
+</script>
+<script type="text/plain" id="src-TraceFinally">
+
+
+
+
+public class TraceFinally {
+    public static void main(String[] args) {
+        try {
+            System.out.println("main: calling f(2)");
+            f(2);
+            System.out.println("main: calling f(0)");
+            f(0);
+        } catch (ArithmeticException e) {
+            System.out.println("main: caught: " + e.getMessage());
+        }
+        System.out.println("main: done");
+    }
+
+    static void f(int n) {
+        System.out.println("  f: calling g(" + n + ")");
+        try {
+            g(n);
+        } finally {
+            System.out.println("  f: finally");
+        }
+        System.out.println("  f: done");
+    }
+
+    static void g(int n) {
+        if (n == 0) {
+            throw new ArithmeticException("cannot divide by zero");
+        }
+        System.out.println("    g: 12 / " + n + " = " + (12 / n));
+    }
+}
+
+</script>
+<script type="text/plain" id="src-TraceSwallow">
+
+
+
+
+public class TraceSwallow {
+    public static void main(String[] args) {
+        try {
+            System.out.println("main: calling f(2)");
+            f(2);
+            System.out.println("main: calling f(0)");
+            f(0);
+        } catch (Exception e) {
+        }
+        System.out.println("main: done");
+    }
+
+    static void f(int n) {
+        System.out.println("  f: calling g(" + n + ")");
+        g(n);
+        System.out.println("  f: done");
+    }
+
+    static void g(int n) {
+        if (n == 0) {
+            throw new ArithmeticException("cannot divide by zero");
+        }
+        System.out.println("    g: 12 / " + n + " = " + (12 / n));
+    }
+}
+
+</script>
+
+<script src="../../courses.js"></script>
+<script src="../../core/grader.js"></script>
+<script src="../../core/store.js"></script>
+<script src="eventloop-sim.js"></script>
+<script src="trace-sim.js"></script>
+<script src="keys.js"></script>
+<script src="week.js"></script>
+<script src="../../core/app.js"></script>
+</body>
+</html>

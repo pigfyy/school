@@ -1,0 +1,155 @@
+{
+  "course": "CSE 331, University of Washington, Autumn 2026",
+  "week": "Week 5 (Mon Oct 26 - Fri Oct 30, 2026)",
+  "note": "Downloaded 2026-10-29 (Thu). Section 4's slides are Google Drive files linked from the Topics page. Reading 3 is graded and is not answered on the site.",
+  "sources": [
+    {
+      "file": "calendar.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/calendar/calendar.html",
+      "what": "Course calendar (Oct 26-30 sessions; Fri Oct 30 Subtyping; Reading 3 due Fri Oct 30)",
+      "fetchedAt": "2026-10-29T22:44:36-07:00",
+      "bytes": 41163,
+      "sha256": "aa8699ffce3186c8fd82cd0508a3f051e8503d5563e13631b5d2166c37fbaffb"
+    },
+    {
+      "file": "topics.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/topics/",
+      "what": "Topics page: links each topic's lectures, sections (with Google slides) and readings",
+      "fetchedAt": "2026-10-29T22:44:36-07:00",
+      "bytes": 10981,
+      "sha256": "c8af991df289fa316fcfcd93c10b5055d59434f8c1897d41f360421f6dcb1f46"
+    },
+    {
+      "file": "lectures-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/",
+      "what": "Directory listing of lectures/ (no folder for Friday's Subtyping lecture)",
+      "fetchedAt": "2026-10-29T22:44:36-07:00",
+      "bytes": 2519,
+      "sha256": "2eb2be20cce2d6f765a15e51263aef38198098a2ada655ff3742efd1e4ca93fa"
+    },
+    {
+      "file": "lecture12/lecture12-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture12-js/",
+      "what": "Lecture 12 (Mon Oct 26) landing page, JavaScript in the page",
+      "fetchedAt": "2026-10-29T22:44:36-07:00",
+      "bytes": 9871,
+      "sha256": "100dee94a7478ffc972c98bb434edad86204529499710fe0dba70494e9c4a46e"
+    },
+    {
+      "file": "lecture12/lecture12-notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture12-js/notes.html",
+      "what": "Lecture 12 notes: main source",
+      "fetchedAt": "2026-10-29T22:44:36-07:00",
+      "bytes": 72543,
+      "sha256": "5f7551b49ac9251b02ce8305b00e16d8d673742753eb2a5dd15a20335dc9dae4"
+    },
+    {
+      "file": "lecture12/lecture12-slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture12-js/slides.html",
+      "what": "Lecture 12 slides",
+      "fetchedAt": "2026-10-29T22:44:36-07:00",
+      "bytes": 84699,
+      "sha256": "8895d8d28281efd68ea568311446cf85731c8f7ec9880c4e1cf1386fba0a1242"
+    },
+    {
+      "file": "lecture12/lecture12-slides-pdf.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture12-js/slides.pdf",
+      "what": "Lecture 12 slides (PDF)",
+      "fetchedAt": "2026-10-29T22:44:36-07:00",
+      "bytes": 581427,
+      "sha256": "8d39dcc70d3ecd57c39340f9334f4ea396c4c35d314d14e06488b3827e8b808d"
+    },
+    {
+      "file": "section04/section04.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section04.html",
+      "what": "Section 4 (Tue Oct 27) worksheet, ADTs",
+      "fetchedAt": "2026-10-29T22:44:36-07:00",
+      "bytes": 23349,
+      "sha256": "e371e61749a367a728ece153adbe1de5d278deaf9985dde58344189dbf293337"
+    },
+    {
+      "file": "section04/section04-solution.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section04-solution.html",
+      "what": "Section 4 solution worksheet",
+      "fetchedAt": "2026-10-29T22:44:36-07:00",
+      "bytes": 40368,
+      "sha256": "9e40af35b4b46fa7d87dc2aa2dcea4e0bb56dca71f2f9dd1570f44e2d705b147"
+    },
+    {
+      "file": "section04/section04-slides.pptx",
+      "url": "https://drive.google.com/uc?export=download&id=16r-gI2NBcWb5hoKPvPGY3zBfgLfbn72T",
+      "what": "Section 4 slides (Google Drive, linked from the Topics page)",
+      "fetchedAt": "2026-10-29T22:44:38-07:00",
+      "bytes": 1033912,
+      "sha256": "b0e24306f7f8f45a7ffb4e49eb660823382aa1bd7154a0f54df2e8deb26148f3"
+    },
+    {
+      "file": "section04/section04-solution-slides.pptx",
+      "url": "https://drive.google.com/uc?export=download&id=1prjjrxgWUikiZKnv2UVpK966cwtmFKYY",
+      "what": "Section 4 solution slides (Google Drive, linked from the Topics page)",
+      "fetchedAt": "2026-10-29T22:44:40-07:00",
+      "bytes": 1327214,
+      "sha256": "a2cde6c54178f6fd4b446c1e0029e2636fdd5d317e8e30aba87beb10d5f15920"
+    },
+    {
+      "file": "lecture13/lecture13-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture13-exceptions/",
+      "what": "Lecture 13 (Wed Oct 28) landing page, Exceptions",
+      "fetchedAt": "2026-10-29T22:44:40-07:00",
+      "bytes": 9341,
+      "sha256": "e0c18916de4c5dc4996d28efa5c6b978d6b80fa29401883053d7f70d8d00a645"
+    },
+    {
+      "file": "lecture13/lecture13-notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture13-exceptions/notes.html",
+      "what": "Lecture 13 notes: main source",
+      "fetchedAt": "2026-10-29T22:44:40-07:00",
+      "bytes": 89431,
+      "sha256": "f54551774fc311d3fc3437705778fc421ad628a27be5ac1e0639a050fc53f5d8"
+    },
+    {
+      "file": "lecture13/lecture13-slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture13-exceptions/slides.html",
+      "what": "Lecture 13 slides",
+      "fetchedAt": "2026-10-29T22:44:40-07:00",
+      "bytes": 45202,
+      "sha256": "c4026032e68abc5b60353fc27c3e65ca4e969b05974c767af7d768dc0e08173f"
+    },
+    {
+      "file": "lecture13/lecture13-slides-pdf.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture13-exceptions/slides.pdf",
+      "what": "Lecture 13 slides (PDF)",
+      "fetchedAt": "2026-10-29T22:44:40-07:00",
+      "bytes": 258789,
+      "sha256": "dc5e361f049da49d21149be8fe67902b66631cad3332d4e272ac67a7665cb0cb"
+    },
+    {
+      "file": "readings/readings-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/readings/",
+      "what": "Readings page: schedule, reflection parts, grading",
+      "fetchedAt": "2026-10-29T22:44:40-07:00",
+      "bytes": 11807,
+      "sha256": "c4cf96d3e5e6316cfd61cff7ff4347b30dedfc82fc2cd2d31d0b9453b8cad7ec"
+    },
+    {
+      "file": "readings/reading3.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/readings/reading3.html",
+      "what": "Reading 3 (due Fri Oct 30, discussed Mon Nov 2): article choices and due date; the reflection is graded and not worked",
+      "fetchedAt": "2026-10-29T22:44:40-07:00",
+      "bytes": 21123,
+      "sha256": "0b85282de996e65232aba301a07475ab14e8b3b56072dad2cb788803011d21f8"
+    }
+  ],
+  "notPosted": [
+    {
+      "session": "Lecture 14, Fri Oct 30: Subtyping (calendar)",
+      "checkedAt": "2026-10-29T22:56:56-07:00",
+      "checked": [
+        "https://courses.cs.washington.edu/courses/cse331/26au/lectures/ (listing ends at lecture13-exceptions/)",
+        "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture14-subtyping/ (404)",
+        "https://courses.cs.washington.edu/courses/cse331/26au/topics/ (6. Exceptions and Subtyping lists Lecture 13 only)"
+      ],
+      "note": "No materials posted; shown on the site as upcoming, materials not posted yet."
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+CSE 331: Exceptions
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          CSE 331: Exceptions
+
+        CSE 331: Exceptions
+
+An exception is a second way for a call to end. This lecture asks,
+at a line of a program that throws, where control goes from here
+and how control could have reached this point. Both are read
+off the call stack: a frame for each call not yet
+returned, the newest on top, which a stack trace prints. A throw
+goes frame by frame down the stack, its own frame first: where
+the frame's line is in a try with a catch for the exception's
+class, that catch takes it; otherwise the method ends and the
+frame below is next. A finally block runs on the way out either
+way. The class in a
+catch decides which throws reach it, so a catch is a design
+decision. A catch is a point with many ways in, and a claim
+there holds only if it is true at every throw that can reach it:
+a method that throws owes its callers what its @throws clause
+says, at the throw as at a return.
+
+Notes
+
+Slides
+
+Slides (PDF)
+
+    UW Site Use Agreement

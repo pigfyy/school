@@ -1,0 +1,386 @@
+CSE 331: Section 4 — ADTs (Solutions)
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          Task 1 — Good News and Add News
+Task 2 — Rich AF
+Task 3 — Almond Joy
+
+        CSE 331: Section 4 — ADTs (Solutions)
+
+This section's questions concern the following ADT:
+
+ /**
+  * Represents a **mutable** integer set, or a collection of distinct integers.
+  */
+  public class MutableIntSet {
+    /**
+     * Determines whether n is in the set.
+     * @param n the number to look for in the set
+     * @return true if n is in the set, false otherwise
+     */
+    public boolean contains(int n);
+
+    /**
+     * Adds n to the set if not already present.
+     * @param n the number to add to the new set.
+     * @modifies this
+     * @effects this is unchanged if this_0 contains n
+     *          otherwise, this contains all of this_0 and n
+     */
+    public void add(int n);
+
+    /**
+     * Removes the desired int from the set.
+     * @param n The int to remove
+     * .... To complete in part d
+     */
+    public boolean remove(int n);
+  }
+
+Task 1 — Good News and Add News
+
+Answer the following questions about the specification of MutableIntSet. Assume that T is an instance of this class whose abstract state is {1, 2, 3}.
+
+Would T.add(3) actually change this? If not, why is that allowed when it says @modifies this?
+
+@modifies says that add may or can modify this but it is not a promise that it does so. For example, in this case we know this would not be modified (via its spec) since the set already contains 3.
+
+Consider the following static method.
+
+/**
+ * Adds n to the set if not already present.
+ * @param old the set to add to
+ * @param n the number to add to the new set.
+ * @requires old is not null
+ * @return a set with n and all of the elements of old.
+ * If old.contains(n), the new set has all the same elements as 'old'.
+ */
+public static MutableIntSet add(MutableIntSet old, int n);
+
+Now, consider a call T.add(4). Explain how the operation of MutableIntSet.add differs from that of a call to static add(T, 4) in terms of this.
+
+MutableIntSet.add actually changes the abstract state (this) to contain n, whereas the static (immutable) add method returns a new set and implicitly promises not to modify old by not having an @modifies clause.
+
+What is the abstract state of \(T\) after the following code (This is forward reasoning.):
+
+     T.add(4);
+     T.add(2);
+     T.add(0);
+
+The resulting state would be {\(0, 4, 1, 2, 3\)}.
+
+Write a specification for the method remove. You should have two cases - n is in the set, and n is not. Clearly explain how the abstract state changes after the method call and what is returned.
+
+This is one possible solution.
+
+    /**
+     * Removes the desired int from the set. Returns true if successful,
+     * false if the int isn't in this set.
+     * @param n The int to remove.
+     * @modifies this
+     * @effects if this_0 contains n, this = this_0 with n removed.
+     *          If this_0 does not contain n, this = this_0.
+     * @returns true if this_0 contains n, false otherwise.
+     */
+    public boolean remove(int n);
+
+Task 2 — Rich AF
+
+In this problem, we will return to the original specification of MutableIntSet, whose abstract state is a set of elements. We will consider three different concrete representations for it.
+
+Note the notation for this = this.elems[0 .. size] means that this is the set containing the first size elements from this.elems just like how an ArrayList would work!
+
+    public class MutableIntSetImpl implements MutableIntSet {
+
+(1)   // AF: this = this.elems[0 .. size]
+      private int[] elems;
+      private int size;
+
+(2)   // AF: this = this.elems[0 .. size]
+      // RI: this.elems[0..size] contains no dups
+      private int[] elems;
+      private int size;
+
+(3)   // AF: this = this.elems[0 .. size]
+      // RI: this.elems[0..size] is sorted by <=
+      private int[] elems;
+      private int size;
+
+      public MutableIntSetImpl() {
+        this.elems = new int[10];
+        this.size = 0;
+      }
+
+For each of the methods shown below, state the concrete representations (1--3) for which it would satisfy the specification of the method in MutableIntSet. In each case, briefly explain why.
+
+  public boolean contains(int n) {
+    return Arrays.binarySearch(this.elems, 0, this.size, n) >= 0;
+  }
+
+Note: Binary Search is an algorithm that finds the position of a target value within a sorted array.
+
+This implementation satisfies the specification only with concrete representation (3). When the array is not sorted, binarySearch is not guaranteed to find the element when present.
+
+  /**
+   * Determines whether n is in the set.
+   * @param n the number to look for in the set
+   * @return true if n is in the set, false otherwise
+   */
+  public boolean contains(int n) {
+    for (int i = 0; i < this.size; i++) {
+      if (this.elems[i] == n)
+        return true;
+    }
+    return false;
+  }
+
+This implementation satisfies the specification with any of the concrete representations because it does not require any representation invariant to hold.
+
+  /**
+   * Adds n to the set if not already present.
+   * @param n the number to add to the new set.
+   * @modifies this
+   * @effects this is unchanged if this_0 contains n
+   *          otherwise, this contains all of this_0 and n
+   */
+  public void add(int n) {
+    if (!this.contains(n)) {
+      if (size >= this.elems.length) {
+        int[] temp = new int[size * 2 + 1];
+        for (int i = 0; i < this.elems.length; i++) {
+          temp[i] = this.elems[i];
+        }
+        this.elems = temp;
+      }
+      this.elems[size] = n;
+      size++;
+    }
+  }
+
+This satisfies the specification of add with concrete representations (1--2). This holds trivially for (1) since it has no representation invariant, and it holds with (2) because this implementation ensures no duplicates. It would not satisfy the spec with concrete representation (3) because it does not ensure that the array is sorted.
+
+  /**
+   * Removes the desired int from the set.
+   * @param n The int to remove
+   * .... Based on your Task 1 part d solution
+   */
+  public boolean remove(int n) {
+    for (int i = 0; i < size; i++) {
+      if (this.elems[i] == n) {
+        size--;
+        for (int j = i; j < size; j++) {
+          this.elems[j] = this.elems[j + 1];
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+This satisfies the specification with concrete representations (2). It works with (2) because removing an element preserves the fact that there are no duplicates. It also preserves the sorting property required by (3), but representation (3) can still contain duplicates, so removing one occurrence may leave another copy. It therefore does not satisfy the specification for (3) or (1).
+
+Task 3 — Almond Joy
+
+Use forward reasoning and known facts to fill in the blank.
+
+// AF: AF(this) = this.snacks[0 .. size] and top = this.snacks[size - 1]
+// RI: 0 <= this.size <= this.snacks.length
+/**
+ * Removes snacks from the top of this until an "Almond Joy" is encountered.
+ * The "Almond Joy" is not removed.
+ * @modifies this
+ * @effects removes all elements above the first occurrence of "Almond Joy"
+ *          (from the top); if no "Almond Joy" exists, removes all elements
+ * @return true if an "Almond Joy" was encountered, false otherwise
+ */
+public boolean removeUntil() {
+  {{ P0: _____________________________________________________________ }}
+  {{ Inv: this.snacks[size .. size_0] does not contain "Almond Joy"
+    AND 0 <= size <= snacks.length AND size <= size_0 }}
+  while (size != 0) {
+    {{ _____________________________________________________________ }}
+    String top = this.snacks[size - 1];
+    if (top.equals("Almond Joy")) {
+      {{ P1: _____________________________________________________________ }}
+      return true;
+    }
+    {{ _____________________________________________________________ }}
+    size--;
+    {{ P2: _____________________________________________________________ }}
+  }
+  {{ P3: _____________________________________________________________ }}
+  return false;
+}
+
+// size_0 denotes the value of size at method entry
+public boolean removeUntil() {
+  {{ P0: 0 <= size <= snacks.length and size = size_0 }}
+  {{ Inv: this.snacks[size .. size_0] does not contain "Almond Joy"
+      and 0 <= size and size <= snacks.length and size <= size_0 }}
+  while (size != 0) {
+    {{ Inv AND size != 0 }}
+    String top = this.snacks[size - 1];
+    {{ Inv AND size != 0 AND top = this.snacks[size - 1] }}
+    if (top.equals("Almond Joy")) {
+      {{ P1: Inv AND size != 0 AND top = this.snacks[size - 1]
+        AND top = "Almond Joy" }}
+      return true;
+    }
+    {{ Inv AND size != 0 AND top = this.snacks[size - 1]
+      AND top != "Almond Joy" }}
+    size--;
+    {{ P2: this.snacks[size_1 .. size_0] does not contain "Almond Joy"
+    and 0 <= size_1 and size_1 <= snacks.length and size_1 <= size_0 
+    and size_1 != 0 and top = this.snacks[size_1 - 1] and top != "Almond Joy" 
+    and size = size_1 - 1 }}
+
+  }
+  {{ P3: Inv AND size = 0 }}
+  return false;
+}
+
+Loop check(1) - Explain how P0 implies Inv:
+
+{{ P0: _____________________________________________________________ }}
+
+{{ Inv: this.snacks[size .. size_0] does not contain "Almond Joy"
+  AND 0 <= size <= snacks.length AND size <= size_0 }}
+
+{{ P0: 0 <= size <= snacks.length and size = size_0 }}
+
+Inv(1):
+this.snacks[size .. size_0]
+          = this.snacks[size_0 .. size_0]    since size = size_0
+          = []                               array facts
+
+Since [] is an empty array, it cannot contain "Almond Joy".
+
+Inv(2):
+0 <= size <= snacks.length follows directly from P0
+
+Inv(3):
+size <= size_0 follows directly from size = size_0 in P0
+
+Explain how P1 implies the postcondition:
+
+{{ P1: _____________________________________________________________ }}
+
+// @effects removes all elements above the first occurrence of "Almond Joy"
+//          (from the top); if no "Almond Joy" exists, removes all elements
+// @return true if a "Almond Joy" was encountered, false otherwise
+
+{{ P1: (Inv: this.snacks[size .. size_0] does not contain "Almond Joy"
+and 0 <= size <= snacks.length and size <= size_0) and size != 0
+and top = this.snacks[size - 1] and top = "Almond Joy" }}
+
+*** Note that the RI holds at this return, due to Inv(2). ***
+
+(1) show that "Almond Joy" was found:
+top = "Almond Joy" = snacks[size - 1]
+Thus, "Almond Joy" was encountered since size - 1 < size.
+
+(2) Show all elements above the first "Almond Joy" were removed:
+
+By Inv, snacks[size .. size_0] contains no "Almond Joy".
+Since top = snacks[size - 1] = "Almond Joy", we know this is the first
+"Almond Joy" encountered from the top of the original abstract stack.
+
+By the AF, we see that AF(this_0) = snacks[0 .. size_0] and
+AF(this) = snacks[0 .. size].
+
+Thus, comparing these shows that the elements in snacks[size .. size_0]
+are no longer part of the abstract stack, and these are the elements that
+were above top.
+
+Loop check(2) - Explain how P2 implies the loop invariant:
+
+{{ P2: _____________________________________________________________ }}
+
+{{ Inv: this.snacks[size .. size_0] does not contain "Almond Joy"
+and 0 <= size and size <= snacks.length and size <= size_0 }}
+
+{{ P2: this.snacks[size_1 .. size_0] does not contain "Almond Joy"
+and 0 <= size_1 and size_1 <= snacks.length and size_1 <= size_0
+and size_1 != 0 and top = this.snacks[size_1 - 1] and top != "Almond Joy" 
+and size = size_1 - 1 }}
+
+Inv(1):
+snacks[size .. size_0]
+  = snacks[size_1 - 1 .. size_0]                      since size = size_1 - 1
+  = [snacks[size_1 - 1]] ++ snacks[size_1 .. size_0]  array facts
+  = [top] ++ snacks[size_1 .. size_0]                 since top = snacks[size_1 - 1]
+
+[top] ++ snacks[size_1 .. size_0] does not contain "Almond Joy",
+since top != "Almond Joy", and from P2, snacks[size_1 .. size_0]
+does not contain "Almond Joy".
+
+Thus, snacks[size .. size_0] does not contain "Almond Joy".
+
+Inv(2):
+Since 0 <= size_1 AND size_1 != 0,
+we know 0 < size_1, which gives us 0 <= size_1 - 1, so:
+0 <= size_1 - 1
+   = size
+
+Inv(3):
+size  = size_1 - 1       since size = size_1 - 1
+     <= snacks.length - 1  since size_1 <= snacks.length
+     <  snacks.length
+
+Inv(4):
+size <= size_0 follows directly from size = size_0 in  P2
+
+Loop check(3) - Explain how P3 implies the postcondition:
+
+{{ P3: _____________________________________________________________ }}
+
+// @effects removes all elements above the first occurrence of "Almond Joy"
+//          (from the top); if no "Almond Joy" exists, removes all elements
+// @return true if a "Almond Joy" was encountered, false otherwise
+
+{{ P3: (Inv: this.snacks[size .. size_0] does not contain "Almond Joy"
+and 0 <= size and size <= snacks.length and size <= size_0) AND size = 0 }}
+
+(1) Show "Almond Joy" was not encountered:
+By Inv, snacks[size .. size_0] does not contain "Almond Joy".
+Therefore, snacks[0 .. size_0] does not contain "Almond Joy" since size = 0.
+
+Since AF(this_0) = snacks[0 .. size_0], the original abstract stack contained
+no "Almond Joy". Thus, "Almond Joy" was not encountered.
+
+(2) Show all elements were removed:
+AF(this) = snacks[0 .. size]   by AF
+         = snacks[0 .. 0]      since size = 0
+         = []                  array facts
+
+Therefore, the abstract stack is empty, meaning all elements
+from the original abstract stack have been removed.
+
+    UW Site Use Agreement

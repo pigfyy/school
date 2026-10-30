@@ -1,0 +1,67 @@
+CSE 331: JavaScript in the page
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          CSE 331: JavaScript in the page
+
+        CSE 331: JavaScript in the page
+
+The guestbook's page now carries a program, written in JavaScript,
+which every visitor's browser runs. The server no longer builds
+the page: it sends the page and the program as files, and answers
+the program's requests with data. So the guestbook is two programs
+in two languages, one on the server and one in the browser, and
+what travels between them is text, JSON.
+
+The browser keeps the page as a tree, the DOM, and the program
+reads and changes that tree, so the page can change with no
+request sent. The program asks the server for the messages with
+fetch, which returns a promise, a stand-in for the response
+that will arrive, and await waits for it. Waiting is not
+running: the browser runs a loop, as the server does, waiting for
+an event (a click, a response arriving) and running its
+callback, and an await cuts a function in two, the part before
+running now and the part after running later, as a callback, when
+the promise's result arrives. So the browser does one thing at a
+time and is never stuck on the network, and the order the events
+come in is part of each run.
+
+The request the program sends is a call across the network: the
+program in the browser is the client, the server is the
+implementation, and the specification between them is written in
+prose, in the server's comment, with nothing but that comment to
+keep the two sides in step.
+
+Notes
+
+Slides
+
+Slides (PDF)
+
+    UW Site Use Agreement

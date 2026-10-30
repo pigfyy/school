@@ -1,0 +1,38 @@
+/* CSE 331 week 5: widget styles only. Loaded after base.css; uses only base tokens. */
+
+/* ---------------------------------------------------------------- the event loop */
+.eloop { padding: 0.9rem; }
+.eloop .controls { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0 0 0.5rem; }
+.el-actions .btn { font-size: 0.85rem; }
+.el-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem; margin-top: 0.4rem; }
+.el-grid > div { min-width: 0; }
+.el-boxes { margin: 0; padding-left: 1.3rem; }
+.el-boxes li { background: var(--accent-tint); border: 1px solid var(--accent); border-radius: var(--r); padding: 0.2rem 0.5rem; margin: 0 0 0.3rem; font-size: 0.88rem; }
+.el-page { margin: 0 0 0.5rem; padding: 0.4rem 0.6rem 0.4rem 1.6rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); min-height: 3rem; }
+.el-book { font-family: var(--mono); font-size: 0.78rem; color: var(--ink-soft); overflow-wrap: anywhere; margin: 0; }
+.el-log { margin: 0; padding-left: 1.3rem; font-size: 0.85rem; }
+@media (max-width: 860px) { .el-grid { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------------- the call-stack stepper */
+.stepper { padding: 0.9rem; }
+.stepper .controls { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0 0 0.6rem; }
+.stepper .count { font-family: var(--mono); font-size: 0.8rem; color: var(--ink-soft); }
+.st-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr) minmax(0, 1fr); gap: 0.8rem; }
+.st-grid > * { min-width: 0; }
+.st-code { margin: 0; max-height: 24rem; overflow: auto; font-size: 0.78rem; }
+.st-stack { display: flex; flex-direction: column; gap: 0.3rem; }
+.st-frame { display: flex; justify-content: space-between; gap: 0.4rem; flex-wrap: wrap; font-family: var(--mono); font-size: 0.82rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 0.35rem 0.5rem; }
+.st-frame.top { border-color: var(--accent); background: var(--accent-tint); }
+.st-tab { font-size: 0.72rem; background: var(--amber-tint); color: var(--amber-deep); border-radius: 3px; padding: 0 0.35rem; }
+.st-flight { margin: 0.5rem 0 0; font-family: var(--mono); font-size: 0.8rem; color: var(--wrong); background: var(--wrong-tint); border-radius: var(--r); padding: 0.3rem 0.5rem; overflow-wrap: anywhere; }
+.st-out { margin: 0; background: var(--night); color: var(--night-ink); border-radius: var(--r); padding: 0.5rem 0.7rem; font-family: var(--mono); font-size: 0.76rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; min-height: 10rem; }
+@media (max-width: 1000px) { .st-grid { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------------- shared */
+.code-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.75rem; }
+.code-pair > * { min-width: 0; }
+.code-pair pre.code { margin: 0; }
+.ans-rows { grid-template-columns: minmax(0, 1fr); }
+.ans-row select { width: 14rem; min-width: 0; max-width: 100%; }
+@media (max-width: 860px) { .ans-row select { flex: 1 1 100%; width: 100%; } }
+.cyu .q code, table.plain td code, table.plain th code, .prose code, .task .prompt code { overflow-wrap: anywhere; }

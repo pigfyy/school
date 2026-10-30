@@ -1,0 +1,329 @@
+--- slide 1 ---
+CSE 331Software Design &amp; Implementation
+
+Autumn 2026
+Section 4 – ADTs
+
+--- slide 2 ---
+Administrivia
+Reading 3 is due Friday @ 11:59 pm!
+Homework 3 releases Friday and will be due next Friday @ 11:59pm!
+
+‹#›
+
+--- slide 3 ---
+Review: Abstract data type
+
+An ADT is a type defined by specs for its operations.
+
+--- slide 4 ---
+Specifications for ADTs – Review
+Terminology for specifying ADTs:
+Abstract State
+How clients should think about the object
+Ex: A list of integers
+
+Concrete State (Code)
+Actual fields of the record and the data stored
+Ex:
+ 
+
+public class List {
+  final int hd;
+  final List tl;
+}
+
+--- slide 5 ---
+State Representations
+Term “this” will refer to abstract state
+this is the abstract value that the record represents
+(similar to a specific instance of a class)
+
+So if I say “this is not an object” is this still referring to an object?
+
+--- slide 6 ---
+Internally Documenting ADTs – Review
+Abstraction Function (AF)
+Defines what abstract state the field values represent
+Maps field values → the object they represent
+
+Representation Invariants (RI)
+Facts about the field values that must always be true
+Constructor must always make sure RI is true at runtime
+AF only needs to make sense when RI holds
+Must ensure that RI always holds outside any method
+
+--- slide 7 ---
+// A list of integers that can retrieve the last element in O(1) 
+interface FastList {
+ /**
+  * Returns the object as a regular list
+  * @returns this
+  */
+  List toList();
+}
+Documenting ADTs – Example
+class FastLastList implements FastList {
+  // RI: this.last = last(this.list);
+  // AF: AF(this) = this.list;
+  
+  // @returns last(this)
+  int getLast() {
+    return this.last;
+  };
+}
+Hide the representation details (i.e. real fields) from the client
+Talk about functions in terms of the abstract state (this)
+style.visibilitystyle.visibilitystyle.visibility
+
+--- slide 8 ---
+Externally Documenting ADTs - Review
+JavaDoc comments in interfaces use “tags” to describe what ADT methods do in terms of the abstract state
+ /**
+  * High level description of what function does
+  * @param a What &quot;a&quot; represents + any conditions
+  * @requires Rules about multiple params and Abstract State (this)
+  * @returns Detailed description of return value
+  * @throws Condition when errors will be thrown
+  * @modifies states what could be mutated by function (this)
+  * @effects Detailed description of guaranteed changes
+  */
+
+--- slide 9 ---
+MutableIntSet ADT
+/**
+ * Represents a **mutable** integer set, or a collection of distinct integers.
+ */
+ public class MutableIntSet {
+   /**
+    * Determines whether n is in the set.
+    * @param n the number to look for in the set
+    * @return true if n is in the set, false otherwise
+    */
+   public boolean contains(int n);
+
+   /**
+    * Adds n to the set if not already present.
+    * @param n the number to add to the new set.
+    * @modifies this
+    * @effects this is unchanged if this_0 contains n
+    *          otherwise, this contains all of this_0 and n
+    */
+   public void add(int n);
+
+   /**
+    * Removes the desired int from the set.
+    * @param n The int to remove
+    * .... To complete in Task 1d
+    */
+   public boolean remove(int n);
+}
+
+--- slide 10 ---
+Task 1 - Good News and Add News
+Would T.add(3) actually change this? If not, why is that allowed when it says @modifies this?
+MutableIntSet T = {1, 2, 3}
+
+--- slide 11 ---
+Task 1 - Good News and Add News
+b) Consider the following static method:
+/**
+ * Adds n to the set if not already present.
+ * @param old the set to add to
+ * @param n the number to add to the new set.
+ * @requires old is not null
+ * @return a set with n and all of the elements of old.
+ * If old.contains(n), the new set has all the same               *  elements as 'old'.
+ */
+public static MutableIntSet add(MutableIntSet old, int n);
+Now, consider a call T.add(4). Explain how the operation of MutableIntSet.add differs from that of a call to static add(T, 4) in terms of this.
+
+--- slide 12 ---
+Task 1 - Good News and Add News
+c) What is the abstract state of 𝑇 after the following code (This is forward reasoning.):
+T.add(4);
+T.add(2);
+T.add(0);
+
+MutableIntSet T = {1, 2, 3}
+
+--- slide 13 ---
+Task 1 - Good News and Add News
+d) Write a specification for the method remove. You should have two cases: n is in the set, and n is not. Clearly explain how the abstract state changes after the method call and what is returned.
+
+--- slide 14 ---
+Task 2 - Rich AF
+Consider three different concrete representations for MutableIntSet:
+   public class MutableIntSetImpl implements MutableIntSet {
+
+(1)   // AF: AF(this) = this.elems[0 .. size]
+      private int[] elems;
+      private int size;
+
+(2)   // AF: AF(this) = this.elems[0 .. size]
+      // RI: this.elems[0..size] contains no dupes
+      private int[] elems;
+      private int size;
+
+(3)   // AF: AF(this) = this.elems[0 .. size]
+      // RI: this.elems[0..size] is sorted by &lt;=
+      private int[] elems;
+      private int size;
+
+      public MutableIntSetImpl() {
+        this.elems = new int[10];
+       this.size = 0;
+ }
+Please update your worksheets with the highlighted changes!
+
+--- slide 15 ---
+State the concrete representations (1--3) for which it would satisfy the specification of the method in MutableIntSet. Why?
+
+Task 2 - Rich AF
+public boolean contains(int n) {
+return Arrays.binarySearch(this.elems, 0, this.size, n) &gt;= 0;
+}
+Please update your worksheets with the highlighted changes!
+
+--- slide 16 ---
+b) State the concrete representations (1--3) for which it would satisfy the specification of the method in MutableIntSet. Why?
+public boolean contains(int n) {
+    for (int i = 0; i &lt; this.size; i++) {
+      if (this.elems[i] == n)
+        return true;
+    }
+    return false;
+  }
+Task 2 - Rich AF
+
+--- slide 17 ---
+c) State the concrete representations (1--3) for which it would satisfy the specification of the method in MutableIntSet. Why?
+ public void add(int n) {
+    if (!this.contains(n)) {
+      if (size &gt;= this.elems.length) {
+        int[] temp = new int[size * 2 + 1];
+        for (int i = 0; i &lt; this.elems.length; i++) {
+          temp[i] = this.elems[i];
+        }
+        this.elems = temp;
+      }
+      this.elems[size++] = n;
+    }
+  }
+Task 2 - Rich AF
+
+--- slide 18 ---
+d) State the concrete representations (1--3) for which it would satisfy the specification of the method in MutableIntSet. Why?
+ public boolean remove(int n) {
+    for (int i = 0; i &lt; size; i++) {
+      if (this.elems[i] == n) {
+        size--;
+        for (int j = i; j &lt; size - 1; j++) {
+          this.elems[j] = this.elems[j + 1];
+        }
+        return true;
+      }
+    }
+    return false;
+ }
+Task 2 - Rich AF
+
+--- slide 19 ---
+Loop Invariant – Review
+Loop invariant must be true every time at the top of the loop 
+The first time (before any iterations) and for the beginning of each iteration
+Also true every time at the bottom of the loop
+Meaning it’s true immediately after the loop exits
+During the body of the loop (during S), it isn’t true
+
+Must use “Inv” notation to indicate that it’s not a standard assertion
+true!
+{{Inv: I}}
+while (cond) {
+    S
+}
+true!
+true!
+true!
+
+--- slide 20 ---
+Rule: while loop - Review
+{{ P }}
+{{ Inv: I }}
+while (b) {
+    {{ Inv: I and b }}
+    body
+    {{ Inv: I }}
+}
+{{ Inv: I and not b }}
+{{ Q }}
+The triple {{ P }} while ... {{ Q }} is valid if three checks pass:
+{{ P }} implies {{ Inv: I }}.
+The triple {{ Inv: I and b }} body {{ Inv: I }} is valid.
+{{ Inv: I and not b }} implies {{ Q }}.
+
+--- slide 21 ---
+Rule: method correctness of an ADT
+When the following Hoare Triple is valid:
+
+{{ RI and P(AF(this)) }}
+the method's body
+{{ RI and Q(AF(this_0), AF(this)) }}
+
+Then the method with precondition (P) and postcondition (Q) is correct.
+
+--- slide 22 ---
+Consider this method and spec for removeUntil which continues to remove snacks until an Almond Joy is found:
+// AF: AF(this) = this.snacks[0 .. size] and top = this.snacks[size - 1]
+// RI: 0 &lt;= this.size &lt;= this.snacks.length
+/**
+ * Removes snacks from the top of this until an &quot;Almond Joy&quot; is encountered.
+ * The &quot;Almond Joy&quot; is not removed.
+ * @modifies this
+ * @effects removes all elements above the first occurrence of &quot;Almond Joy&quot;
+ *          (from the top); if no &quot;Almond Joy&quot; exists, removes all elements
+ * @return true if a &quot;Almond Joy&quot; was encountered, false otherwise
+ */
+public boolean removeUntil() {
+  while (size != 0) {
+    String top = this.snacks[size - 1];
+    if (top.equals(&quot;Almond Joy&quot;)) {
+      return true;
+    }
+    size--;
+  }
+  return false;
+}
+Task 3 – Almond Floyds
+
+--- slide 23 ---
+a) Use forward reasoning and known facts to fill in the blanks
+// AF: AF(this) = this.snacks[0 .. size] and top = this.snacks[size - 1]
+// RI: 0 &lt;= this.size &lt;= this.snacks.length
+public boolean removeUntil() {
+  {{ P0: _____________________________________________________________ }}
+  {{ Inv: this.snacks[size .. size_0] does not contain &quot;Almond Joy&quot;
+and 0 &lt;= size &lt;= snacks.length and size &lt;= size_0 }}
+  while (size != 0) {
+    {{ _____________________________________________________________ }}
+    String top = this.snacks[size - 1];
+    {{ _____________________________________________________________ }}
+    if (top.equals(&quot;Almond Joy&quot;)) {
+      {{ P1: _____________________________________________________________ }}
+      return true;
+    }
+    {{ _____________________________________________________________ }}
+    size--;
+    {{ P2: _____________________________________________________________ }}
+  }
+  {{ P3: _____________________________________________________________ }}
+  return false;
+}
+
+Task 3 – Almond Floyds
+Please update your worksheets with the highlighted changes!
+
+--- slide 24 ---
+Fin
+Remember to submit your half-sheets!
+

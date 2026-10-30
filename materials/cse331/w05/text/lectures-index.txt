@@ -1,0 +1,51 @@
+Index of /courses/cse331/26au/lectures/
+
+    Index of /courses/cse331/26au/lectures/
+
+          Name
+          Size
+
+          Parent Directory
+          -
+
+          lecture01-assertions/
+          -
+
+          lecture02-specifications/
+          -
+
+          lecture03-batch/
+          -
+
+          lecture04-testing/
+          -
+
+          lecture05-coverage/
+          -
+
+          lecture06-errors/
+          -
+
+          lecture07-reasoning/
+          -
+
+          lecture08-loops/
+          -
+
+          lecture09-web/
+          -
+
+          lecture10-adts/
+          -
+
+          lecture11-reps/
+          -
+
+          lecture12-js/
+          -
+
+          lecture13-exceptions/
+          -
+
+          testing/
+          -

@@ -1,0 +1,1298 @@
+CSE 331: Exceptions
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          Where does control go from here?
+How can control reach this point?
+The class in a catch
+What is true at a catch?
+
+        CSE 331: Exceptions
+
+lecture
+
+Course motto: Your job is to deliver code that you know works.
+
+Every program in this course so far ran the way it reads: one
+method calls the next, the call comes back with an answer, and
+the next line runs. An exception is a second way for a call to
+end, and it changes where control goes, and so where a run can
+be when it reaches a line. This lecture asks one question at
+every line of a program that throws: where does control go from
+here, and how could control have reached this point? The answer
+is a picture, the call stack, and the course's definition of an
+assertion that holds comes back with it: a claim at a point holds
+only if it is true each time a run reaches the point, however the
+run got there.
+
+Where does control go from here?
+
+Here is a program of three methods. main calls f twice, and
+f calls g. main and f each print one line on the way in
+and one on the way out, two spaces deeper for each call. g
+divides 12 by its argument and prints the answer. When the
+argument is 0, g throws instead, with the throw statement from
+the lecture on errors.
+Nothing in the program catches.
+
+Read it, and write down what it prints before you step through
+it. Then press Step to run it one line at a time. The lit line is
+the one running. The call stack is drawn as a pile of boxes, one
+for each method that has been called and has not yet returned,
+the newest on top, each with the method's name, its n, and the
+line it is at. A terminal shows what has printed so far. At each
+step, ask where control goes next.
+
+Trace.java
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31public class Trace {
+    public static void main(String[] args) {
+        System.out.println("main: calling f(2)");
+        f(2);
+        System.out.println("main: calling f(0)");
+        f(0);
+        System.out.println("main: done");
+    }
+
+    static void f(int n) {
+        System.out.println("  f: calling g(" + n + ")");
+        g(n);
+        System.out.println("  f: done");
+    }
+
+    static void g(int n) {
+        if (n == 0) {
+            throw new ArithmeticException("cannot divide by zero");
+        }
+        System.out.println("    g: 12 / " + n + " = " + (12 / n));
+    }
+}
+
+$ java Trace
+main: calling f(2)
+  f: calling g(2)
+    g: 12 / 2 = 6
+  f: done
+main: calling f(0)
+  f: calling g(0)
+Exception in thread "main" java.lang.ArithmeticException: cannot divide by zero
+    at Trace.g(Trace.java:27)
+    at Trace.f(Trace.java:21)
+    at Trace.main(Trace.java:15)
+
+step
+the stack
+in flight
+what happens
+
+1
+main at 12
+
+Prints main: calling f(2). One frame.
+
+2
+main at 13
+
+main calls f(2). main's frame records line 13, the place to come back to. At the next step, a frame for f is on top of it, with n = 2.
+
+3
+f(2) at 20
+main at 13
+
+Prints f: calling g(2). Two frames, so two spaces in.
+
+4
+f(2) at 21
+main at 13
+
+f calls g(2). At the next step, a third frame is on top.
+
+5
+g(2) at 26
+f(2) at 21
+main at 13
+
+n is 2, so the if is false.
+
+6
+g(2) at 29
+f(2) at 21
+main at 13
+
+Prints g: 12 / 2 = 6, and g returns. At the next step its frame is gone, and f continues after line 21.
+
+7
+f(2) at 22
+main at 13
+
+Prints f: done, and f returns. main continues after line 13.
+
+8
+main at 14
+
+Prints main: calling f(0). One frame again.
+
+9
+main at 15
+
+main calls f(0). At the next step, a frame for f is on top, with n = 0.
+
+10
+f(0) at 20
+main at 15
+
+Prints f: calling g(0).
+
+11
+f(0) at 21
+main at 15
+
+f calls g(0), as at step 4.
+
+12
+g(0) at 26
+f(0) at 21
+main at 15
+
+Three frames, as at step 5. n is 0, so the if is true.
+
+13
+g(0) at 27
+f(0) at 21
+main at 15
+ArithmeticException: cannot divide by zero
+g throws. Nothing in g catches, so g ends here, with no return. At the next step its frame is gone.
+
+14
+f(0) at 21
+main at 15
+ArithmeticException: cannot divide by zero
+The exception reaches f at line 21. Nothing in f catches, so f ends too. Line 22 never runs.
+
+15
+main at 15
+ArithmeticException: cannot divide by zero
+The exception reaches main at line 15. Nothing catches, so main ends. Line 16 never runs.
+
+16
+empty
+ArithmeticException: cannot divide by zero
+No frame is left. Java prints the exception and the stack it came through, and the program stops.
+
+The first four lines of output are the easy half. After the
+exception, most people expect f: done to print, or at least
+main: done. Neither prints. The boxes drawn with the code
+show why.
+
+Definition: call stack
+
+A frame is what Java keeps for one call of a method while
+that call runs: the method's variables, and the line it is
+at. The call stack is the frames of the methods that have
+been called and have not yet returned, the newest on top. A
+call pushes a frame onto the stack. A return pops the top
+frame, and the method below it continues after the line its
+frame recorded.
+
+The trace is the stack. The three at lines of the run are
+the stack of step 13, frame for frame: g at line 27, the throw
+itself; f at line 21, where it had called g; main at line
+15. Above them, Java prints the exception's class and its
+message. The notes on
+the edge of the program
+called a stack trace a message from the language to the
+programmer, and one a user must never see. Now you can read the
+message: it says where control was when the program gave up,
+every frame of it.
+
+Where does control go from here? Stand on line 21, g(n);,
+and ask where control goes next. Until now the answer has been one
+place: line 22, once g returns. Now there are two. At step 6,
+g returns, and control goes to line 22. At step 13, g throws,
+and control leaves f at line 21, and no other line of f runs.
+The same two answers apply at lines 13 and 15 in main. Every
+call is a place control can come back to, and also a place
+control can leave through, and nothing on the line itself says
+which will happen.
+
+In Trace nothing catches, so the popping stops only when the
+stack is empty, and the program with it. The next section puts a
+catch in main and asks the other question: how did control
+get there?
+
+How can control reach this point?
+
+Now give main a catch. Here is the same program with one
+change: main's two calls to f sit in a try, with a catch
+for ArithmeticException that prints the exception's message. f
+and g are the lines you know. Predict the output first: which
+lines print this time, and which do not? Then step through it.
+While control is inside main's try, main's frame carries a
+handler, the class on its catch, drawn as a tab on
+the frame.
+
+TraceCatch.java
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30public class TraceCatch {
+    public static void main(String[] args) {
+        try {
+            System.out.println("main: calling f(2)");
+            f(2);
+            System.out.println("main: calling f(0)");
+            f(0);
+        } catch (ArithmeticException e) {
+            System.out.println("main: caught: " + e.getMessage());
+        }
+        System.out.println("main: done");
+    }
+
+    static void f(int n) {
+        System.out.println("  f: calling g(" + n + ")");
+        g(n);
+        System.out.println("  f: done");
+    }
+
+    static void g(int n) {
+        if (n == 0) {
+            throw new ArithmeticException("cannot divide by zero");
+        }
+        System.out.println("    g: 12 / " + n + " = " + (12 / n));
+    }
+}
+
+$ java TraceCatch
+main: calling f(2)
+  f: calling g(2)
+    g: 12 / 2 = 6
+  f: done
+main: calling f(0)
+  f: calling g(0)
+main: caught: cannot divide by zero
+main: done
+
+step
+the stack
+in flight
+what happens
+
+1
+main at 7
+
+main enters its try. From the next step until the try ends, main's frame carries a handler, drawn as a tab: the class on its catch.
+
+2
+main at 8 catch ArithmeticException
+
+Prints main: calling f(2).
+
+3
+main at 9 catch ArithmeticException
+
+main calls f(2), with the handler on its frame.
+
+4
+f(2) at 19
+main at 9 catch ArithmeticException
+
+Prints f: calling g(2).
+
+5
+f(2) at 20
+main at 9 catch ArithmeticException
+
+f calls g(2).
+
+6
+g(2) at 25
+f(2) at 20
+main at 9 catch ArithmeticException
+
+n is 2, so no throw.
+
+7
+g(2) at 28
+f(2) at 20
+main at 9 catch ArithmeticException
+
+Prints g: 12 / 2 = 6, and g returns.
+
+8
+f(2) at 21
+main at 9 catch ArithmeticException
+
+Prints f: done, and f returns. The handler went unused.
+
+9
+main at 10 catch ArithmeticException
+
+Prints main: calling f(0). The try has not ended, so the handler is still there.
+
+10
+main at 11 catch ArithmeticException
+
+main calls f(0).
+
+11
+f(0) at 19
+main at 11 catch ArithmeticException
+
+Prints f: calling g(0).
+
+12
+f(0) at 20
+main at 11 catch ArithmeticException
+
+f calls g(0).
+
+13
+g(0) at 25
+f(0) at 20
+main at 11 catch ArithmeticException
+
+n is 0, so the if is true.
+
+14
+g(0) at 26
+f(0) at 20
+main at 11 catch ArithmeticException
+ArithmeticException: cannot divide by zero
+g throws. Java looks at the top frame for a handler: g has none, so g ends. At the next step its frame is gone.
+
+15
+f(0) at 20
+main at 11 catch ArithmeticException
+ArithmeticException: cannot divide by zero
+The exception reaches f at line 20. f's frame has no handler, so f ends too. Line 21 never runs.
+
+16
+main at 11 catch ArithmeticException
+ArithmeticException: cannot divide by zero
+The exception reaches main at line 11, and main's frame has a handler for ArithmeticException: a match. Control goes to the catch block.
+
+17
+main at 13
+
+Prints main: caught: cannot divide by zero. The exception is caught. The try is over, so the handler is gone.
+
+18
+main at 15
+
+Prints main: done, as on any other run.
+
+19
+empty
+
+main returns, and the program ends.
+
+The first call runs as before, with the handler on main's frame
+the whole time and never used. The second call is the one to
+watch. At step 14, g throws, and Java does what it did in the
+first program: g has no handler, so g ends and its frame
+comes off. f has none either, so f ends, and line 21 never
+runs. Then the exception reaches main's frame, which has a
+handler for exactly this class. Control goes to the catch
+block, line 13, and from there main goes on to line 15 as if
+f had returned.
+
+So here is the answer to the section's question. How can control
+reach line 13? In one way only: by a throw of an
+ArithmeticException from somewhere inside main's try, which
+means from f, from g, or from any method they call while
+main waits at line 9 or line 11. The catch is found by walking
+down the stack from the throw, frame by frame, and taking the
+first handler that matches. Where the catch sits on the page
+does not come into it. f and g are written below main, they
+mention no exception at all, and the throw passed through
+both of them.
+
+Rule: how a throw finds its catch
+
+A throw looks for a handler frame by frame down the stack,
+starting with the frame it is in. If the line that frame is
+at sits inside a try with a catch for the exception's
+class, control goes to that catch block, and the method
+goes on after the try statement. Otherwise the method ends,
+its frame comes off, and the frame below is next. If no frame
+is left, Java prints the stack trace, and the program stops.
+
+Two things in this rule are easy to miss. First, a method can be
+ended by an exception it never mentions: f has no throw and
+no catch, and still ended at line 20 with line 21 unrun. Any
+call is a place control can leave through. Second, after the
+catch block, main continued at line 15 as on any other run.
+Nothing after the try statement can tell whether the try block
+finished or was cut short, unless the handler left a record.
+
+A block that runs either way. One more kind of block can sit
+on a frame. Here is f with its call to g inside a try that
+has no catch, only a finally, which prints a line. main
+keeps its catch.
+
+TraceFinally.java
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34public class TraceFinally {
+    public static void main(String[] args) {
+        try {
+            System.out.println("main: calling f(2)");
+            f(2);
+            System.out.println("main: calling f(0)");
+            f(0);
+        } catch (ArithmeticException e) {
+            System.out.println("main: caught: " + e.getMessage());
+        }
+        System.out.println("main: done");
+    }
+
+    static void f(int n) {
+        System.out.println("  f: calling g(" + n + ")");
+        try {
+            g(n);
+        } finally {
+            System.out.println("  f: finally");
+        }
+        System.out.println("  f: done");
+    }
+
+    static void g(int n) {
+        if (n == 0) {
+            throw new ArithmeticException("cannot divide by zero");
+        }
+        System.out.println("    g: 12 / " + n + " = " + (12 / n));
+    }
+}
+
+$ java TraceFinally
+main: calling f(2)
+  f: calling g(2)
+    g: 12 / 2 = 6
+  f: finally
+  f: done
+main: calling f(0)
+  f: calling g(0)
+  f: finally
+main: caught: cannot divide by zero
+main: done
+
+step
+the stack
+in flight
+what happens
+
+1
+main at 7
+
+main enters its try: the handler tab, as before.
+
+2
+main at 8 catch ArithmeticException
+
+Prints main: calling f(2).
+
+3
+main at 9 catch ArithmeticException
+
+main calls f(2).
+
+4
+f(2) at 19
+main at 9 catch ArithmeticException
+
+Prints f: calling g(2).
+
+5
+f(2) at 20
+main at 9 catch ArithmeticException
+
+f enters a try with no catch, only a finally. Its frame carries that too.
+
+6
+f(2) at 21 finally
+main at 9 catch ArithmeticException
+
+f calls g(2).
+
+7
+g(2) at 29
+f(2) at 21 finally
+main at 9 catch ArithmeticException
+
+n is 2, so no throw.
+
+8
+g(2) at 32
+f(2) at 21 finally
+main at 9 catch ArithmeticException
+
+Prints g: 12 / 2 = 6, and g returns.
+
+9
+f(2) at 23
+main at 9 catch ArithmeticException
+
+The try block ended normally, and the finally block runs anyway. Prints f: finally.
+
+10
+f(2) at 25
+main at 9 catch ArithmeticException
+
+Prints f: done, and f returns.
+
+11
+main at 10 catch ArithmeticException
+
+Prints main: calling f(0).
+
+12
+main at 11 catch ArithmeticException
+
+main calls f(0).
+
+13
+f(0) at 19
+main at 11 catch ArithmeticException
+
+Prints f: calling g(0).
+
+14
+f(0) at 20
+main at 11 catch ArithmeticException
+
+f enters its try: the finally goes on its frame.
+
+15
+f(0) at 21 finally
+main at 11 catch ArithmeticException
+
+f calls g(0).
+
+16
+g(0) at 29
+f(0) at 21 finally
+main at 11 catch ArithmeticException
+
+n is 0, so the if is true.
+
+17
+g(0) at 30
+f(0) at 21 finally
+main at 11 catch ArithmeticException
+ArithmeticException: cannot divide by zero
+g throws. g has no handler, so g ends.
+
+18
+f(0) at 21 finally
+main at 11 catch ArithmeticException
+ArithmeticException: cannot divide by zero
+The exception reaches f at line 21. f has no catch for it, but it has a finally, and a finally block runs on the way out, whichever way out it is.
+
+19
+f(0) at 23
+main at 11 catch ArithmeticException
+ArithmeticException: cannot divide by zero
+Prints f: finally, with the exception still in flight. After the finally block, it goes on: f ends, and line 25 never runs.
+
+20
+main at 11 catch ArithmeticException
+ArithmeticException: cannot divide by zero
+The exception reaches main at line 11, and main's handler matches. Control goes to the catch block.
+
+21
+main at 13
+
+Prints main: caught: cannot divide by zero. Caught.
+
+22
+main at 15
+
+Prints main: done.
+
+23
+empty
+
+main returns, and the program ends.
+
+On the first call, g returns, the try block ends, and the
+finally block runs: f: finally prints before f: done. On
+the second call, g throws, and the exception reaches f's
+frame at step 18. f has no catch to take it, but it has a
+finally, and a finally block runs on the way out, whichever
+way out it is. So f: finally prints with the exception still
+in flight, and then the exception goes on down to main, where
+it is caught. Line 25, f: done, never runs on that call.
+
+That is what a finally is for: work that has to happen whether
+the try block finished or threw, such as closing a file the
+try block opened. A try with a resource in its parentheses,
+like the one that opens the file in
+the lecture on batch programs,
+is a finally that closes the resource, written for you.
+
+For the course's question, a finally block is a point with two
+ways in. Ask how control can reach line 23: by g returning, or
+by g throwing. A claim at the top of a finally block holds
+only if it is true both ways.
+
+main's handler took the exception because its catch was for
+the exception's class. What that class means, and what a catch
+of a wider class takes, is next.
+
+The class in a catch
+
+Every catch so far was for ArithmeticException, and every
+throw was one. A catch does not have to be that exact. Java's
+exception classes extend one another, as
+the lecture on errors
+showed when it wrote extends Exception and
+extends RuntimeException, and a catch for a class takes an
+exception of that class or of any class that extends it. That
+one fact is what makes a catch a design decision, so here is a
+program that uses it on purpose, and then one that uses it
+by accident.
+
+One catch for a family. The calculator from
+the lecture on errors
+said no six different ways, one per method, so that you could
+see them all. Here it is done one way: every failure a user can
+cause is an exception, and its stack is an ADT in the shape of
+HW3's starter, an interface, an implementation, and the app. All
+of it, with Trace and its three copies, is in
+the course's public repo,
+to download and run. The interface, CalcStack, specifies divide
+like this:
+
+CalcStack.java
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69    /**
+     * @modifies this
+     * @effects pops the top two numbers (first and second) and pushes
+     *     second / first, rounded toward zero
+     * @throws TooFewOperandsException if the stack has fewer than two
+     *     numbers, and leaves the stack unchanged
+     * @throws DivideByZeroException if the top number is zero, and
+     *     leaves the stack unchanged
+     */
+    void divide();
+
+The two exceptions it names, and the one pop and top throw,
+are classes nested in the interface, as HW3's Inventory nests
+NotEnoughQuantityException, and all three extend one class made
+for them, CalcException:
+
+CalcStack.java
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100    /**
+     * A command the calculator cannot carry out. The message says
+     * why, in words for the user.
+     */
+    public class CalcException extends RuntimeException {
+        public CalcException(String message) {
+            super(message);
+        }
+    }
+
+    /** A pop or top on an empty stack. */
+    public class StackEmptyException extends CalcException {
+        public StackEmptyException(String message) {
+            super(message);
+        }
+    }
+
+    /** An operation on a stack with fewer than two numbers. */
+    public class TooFewOperandsException extends CalcException {
+        public TooFewOperandsException(String message) {
+            super(message);
+        }
+    }
+
+    /** A divide whose divisor, the top number, is zero. */
+    public class DivideByZeroException extends CalcException {
+        public DivideByZeroException(String message) {
+            super(message);
+        }
+    }
+
+The specifications and the tests use the three subclasses, so a
+test can ask for exactly the failure it means. The app's main
+catches only the class above them. Each command goes through one
+call, inside one try:
+
+Calculator.java
+57
+58
+59
+60
+61                try {
+                    step(stack, token);
+                } catch (CalcStack.CalcException e) {
+                    System.out.println("error: " + e.getMessage());
+                }
+
+step carries out one command and handles nothing. It calls the
+stack, and the stack's methods throw. So this catch is the one
+place in the program where a user's mistake becomes a message,
+and it is reached from every throw in the stack, through step,
+whichever subclass was thrown:
+
+$ java Calculator
+> 6 0 /
+error: cannot divide by zero
+> p
+[6, 0]
+> .
+0
+> /
+error: need two numbers to divide
+> p
+[6]
+> q
+
+Take the try away, and a divide by zero is a throw that
+nothing catches. The stack it came through has three frames of
+your own code, and the trace reads them as the steppers drew
+them, top frame first:
+
+$ java Calculator
+> 6 0 /
+Exception in thread "main" CalcStack$DivideByZeroException: cannot divide by zero
+    at ListStack.divide(ListStack.java:71)
+    at Calculator.step(Calculator.java:89)
+    at Calculator.main(Calculator.java:58)
+
+Java writes a nested class's name with a dollar sign, so the
+class is CalcStack.DivideByZeroException, and HW3's traces will
+read Inventory$NotEnoughQuantityException the same way.
+
+The first catch that matches takes it. A try can have
+several catch blocks, as the old calculator had two on
+divide. Java takes the first one whose class matches, in the
+order they are written. So a catch for a subclass after a
+catch for its superclass can never run, and the compiler says
+so. Here is what javac prints for a copy of the program whose
+catch of CalcException is followed by a catch
+of DivideByZeroException:
+
+$ javac CalcStack.java ListStack.java Calculator.java
+Calculator.java:61: error: exception DivideByZeroException has already been caught
+                } catch (CalcStack.DivideByZeroException e) { System.out.println("error: " + e.getMessage()); }
+                  ^
+1 error
+
+The order that works is the narrow class first and the wide one
+after it.
+
+The widest catch takes everything. The class every exception
+extends is Exception, and a catch for it takes every throw
+that reaches its frame, a bug's as much as a user's. Here is
+Trace with main's catch written that way, and with nothing in
+the catch block. Step to the throw and watch where it goes.
+
+TraceSwallow.java
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29public class TraceSwallow {
+    public static void main(String[] args) {
+        try {
+            System.out.println("main: calling f(2)");
+            f(2);
+            System.out.println("main: calling f(0)");
+            f(0);
+        } catch (Exception e) {
+        }
+        System.out.println("main: done");
+    }
+
+    static void f(int n) {
+        System.out.println("  f: calling g(" + n + ")");
+        g(n);
+        System.out.println("  f: done");
+    }
+
+    static void g(int n) {
+        if (n == 0) {
+            throw new ArithmeticException("cannot divide by zero");
+        }
+        System.out.println("    g: 12 / " + n + " = " + (12 / n));
+    }
+}
+
+$ java TraceSwallow
+main: calling f(2)
+  f: calling g(2)
+    g: 12 / 2 = 6
+  f: done
+main: calling f(0)
+  f: calling g(0)
+main: done
+
+step
+the stack
+in flight
+what happens
+
+1
+main at 7
+
+main enters its try. Its catch is for Exception, so the tab reads catch Exception.
+
+2
+main at 8 catch Exception
+
+Prints main: calling f(2).
+
+3
+main at 9 catch Exception
+
+main calls f(2).
+
+4
+f(2) at 18
+main at 9 catch Exception
+
+Prints f: calling g(2).
+
+5
+f(2) at 19
+main at 9 catch Exception
+
+f calls g(2).
+
+6
+g(2) at 24
+f(2) at 19
+main at 9 catch Exception
+
+n is 2, so no throw.
+
+7
+g(2) at 27
+f(2) at 19
+main at 9 catch Exception
+
+Prints g: 12 / 2 = 6, and g returns.
+
+8
+f(2) at 20
+main at 9 catch Exception
+
+Prints f: done, and f returns.
+
+9
+main at 10 catch Exception
+
+Prints main: calling f(0).
+
+10
+main at 11 catch Exception
+
+main calls f(0).
+
+11
+f(0) at 18
+main at 11 catch Exception
+
+Prints f: calling g(0).
+
+12
+f(0) at 19
+main at 11 catch Exception
+
+f calls g(0).
+
+13
+g(0) at 24
+f(0) at 19
+main at 11 catch Exception
+
+n is 0, so the if is true.
+
+14
+g(0) at 25
+f(0) at 19
+main at 11 catch Exception
+ArithmeticException: cannot divide by zero
+g throws. g has no handler, so g ends.
+
+15
+f(0) at 19
+main at 11 catch Exception
+ArithmeticException: cannot divide by zero
+The exception reaches f. No handler, so f ends, and line 20 never runs.
+
+16
+main at 11 catch Exception
+ArithmeticException: cannot divide by zero
+The exception reaches main, whose handler is for Exception. An ArithmeticException is an Exception, so it matches. Control goes to the catch block.
+
+17
+main at 13
+
+The catch block is empty. The exception is caught and dropped: nothing is printed, nothing is recorded.
+
+18
+main at 14
+
+Prints main: done. To the user, the program ran to the end.
+
+19
+empty
+
+main returns, and the program ends with exit status 0, as if nothing had happened.
+
+The division by zero is gone. No message, no trace, exit status
+0, and main: done at the end as on a good run. A catch like
+this one is written to make an error go away, and it does, for
+the person who wrote it. The error is still there for the next
+person: f: done never printed, and whatever g was supposed to
+do with the 12 never happened. Reading 3's paper on production
+failures counts the cost. In 35% of the catastrophic failures it
+studied, the handler was trivially wrong: empty, a log line and
+nothing else, a catch of every exception followed by an exit,
+or a comment saying TODO.1
+
+So the class in a catch decides which throws reach it. A class
+of your own, like CalcException, takes the failures you planned
+for and lets a bug go by to the trace, where you can read it. A
+catch for Exception takes the bug too, and the only trace of
+it is in what the program fails to do later.
+
+What is true at a catch?
+
+The lecture on reasoning defined when a claim at a point holds:
+an assertion holds if its claim is true
+each time a run reaches its point.
+The point after an if had two ways in, one per branch, and the
+rule for a conditional joined their claims with or. A catch
+block is a point with many ways in: every throw of its class
+under its try, in the method and in every method called from
+there. So a claim at a catch holds only if it is true at every
+one of those throws, and the question of this section is what a
+method that throws owes the frames below it.
+
+A method with two exits. Look again at divide's
+specification in CalcStack, from the last section. It describes
+two ways for the call to end. On the normal exit, @effects
+says what the stack holds. On each exceptional exit, the
+@throws clause says which exception, when, and what the stack
+holds then: "and leaves the stack unchanged". That last phrase is
+a postcondition for the exceptional exit, the same kind of
+promise as @effects, and HelpQueue's join made the same
+promise in the same words when it threw on a repeated NetID. Here
+is ListStack's divide, which keeps it:
+
+ListStack.java
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75    public void divide() {
+        if (items.size() < 2) {
+            throw new TooFewOperandsException(
+                "need two numbers to divide");
+        }
+        if (top() == 0) {
+            throw new DivideByZeroException("cannot divide by zero");
+        }
+        int b = pop(); int a = pop();
+        push(a / b);
+    }
+
+ListStack keeps the stack's numbers in a list, bottom first, and
+every method checks before it changes anything. divide asks
+top() on line 70 before it pops, so when it throws, nothing
+has moved. The specification test that checks the promise is
+the one you would write for join:
+
+CalcStackTest.java
+46
+47
+48
+49
+50
+51
+52
+53
+54    @Test
+    void divideByZeroThrowsAndLeavesTheStack() {
+        CalcStack stack = emptyStack();
+        stack.push(6);
+        stack.push(0);
+        assertThrows(CalcStack.DivideByZeroException.class,
+            () -> stack.divide());
+        assertEquals(List.of(6, 0), stack.numbers());
+    }
+
+assertThrows checks the exit, as in the lecture on errors, and
+line 53 checks what the exit left behind. CalcStackTest has
+five such tests, and a subclass runs them on an implementation,
+as the help queue's tests ran on each queue.
+
+The draft everyone writes first. Here is divide as it
+usually comes out the first time, in DraftStack, an
+implementation that differs from ListStack in this one method:
+
+DraftStack.java
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77    public void divide() {
+        if (items.size() < 2) {
+            throw new TooFewOperandsException(
+                "need two numbers to divide");
+        }
+        int b = pop(); int a = pop();
+        if (b == 0) {
+            throw new DivideByZeroException("cannot divide by zero");
+        }
+        push(a / b);
+    }
+
+It pops both numbers on line 72, and only then checks the
+divisor on line 73. On a divisor of zero it throws the right
+exception with the right message, and four of the five tests
+pass. The fifth fails:
+
+divideByZeroThrowsAndLeavesTheStack() ✘ expected: <[6, 0]> but was: <[]>
+
+The stack was [6, 0] before the call and is empty after it.
+divide threw as its specification said and left the stack as
+its specification forbade. Run the calculator on DraftStack and
+the user sees it:
+
+$ java Calculator
+> 6 0 /
+error: cannot divide by zero
+> p
+[]
+> q
+
+The claim at the catch. Now stand at main's catch, line
+59, and ask what is true there. The handler prints a message
+and goes on to the next token, so it stands on a claim: the
+stack is as it was before this command. On ListStack that claim
+holds, because every throw that can reach this catch leaves
+the stack unchanged: the stack's methods promise it, and parse
+throws before it pushes. On DraftStack the claim is false on the
+run above, and nothing in main can tell. The user typed 6 0 /,
+read "cannot divide by zero", and reasonably expects the 6 and
+the 0 to still be there. They are gone, and the next command
+works on a stack the user does not have.
+
+Rule: a try with a catch
+
+{{ P }}
+try {
+    body
+    {{ Q }}
+} catch (X e) {
+    {{ E }}
+    handler
+    {{ Q }}
+}
+{{ Q }}
+
+E must be true at every throw of an X that can reach this
+catch: in body, and in every method body calls while a
+throw from it would land here. Q must come out of both
+exits, body's normal end and the handler's. So a method that
+throws is obliged to its callers at the throw, as it is at a
+return, and its @throws clause says what it owes.
+
+This is why ListStack checks before it changes anything. A
+method that finds its condition false before it has touched the
+stack has nothing to undo, so "leaves the stack unchanged" is
+true at the throw for free. The old calculator kept the promise
+the other way, by pushing both numbers back before it threw, and
+that works too, with more to get wrong: every path to the throw
+has to undo exactly what was done before it. Check first when
+you can.
+
+HW3's Inventory asks for the same care. addPurchase throws
+NotEnoughQuantityException when the quantity exceeds what is in
+stock, and the interface's comment makes it an invariant that no
+item's quantity is ever negative at any point in the history. A
+draft that appends the purchase and then checks has broken that
+invariant at the throw: the DraftStack mistake again. Your
+specification tests should ask what the inventory holds after
+the throw, as the test above asks what the stack holds.
+
+So the course's question, how can control reach this point, has
+a new kind of answer at a catch: from every throw under the
+try, in frames above it that may not be yours. The claim at the
+catch has to be true however control got there, and the way to
+make it true is to make it true at each throw, in the method
+that throws.
+
+Ding Yuan and others, "Simple Testing Can Prevent Most
+Critical Failures", OSDI 2014, the paper
+Reading 3 offers. ↩
+
+    UW Site Use Agreement
