@@ -9,7 +9,7 @@ window.COURSES = {
       weeks: [
         { id: "w01", title: "Assertions and specifications", dates: "Sep 30 – Oct 2", posted: true },
         { id: "w02", title: "Batch programs and their users", dates: "Oct 5 – Oct 9", posted: true },
-        { id: "w03", dates: "Oct 12 – Oct 16" },
+        { id: "w03", title: "Error handling and Floyd-Hoare logic", dates: "Oct 12 – Oct 16", posted: true },
         { id: "w04", dates: "Oct 19 – Oct 23" },
         { id: "w05", dates: "Oct 26 – Oct 30" },
         { id: "w06", dates: "Nov 2 – Nov 6" },

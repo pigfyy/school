@@ -1,0 +1,344 @@
+--- slide 1 ---
+CSE 331Software Design &amp; Implementation
+
+Fall 2026
+Section 2 – Testing
+
+--- slide 2 ---
+Administrivia
+Reading 2 is due Friday @ 11:59 pm!
+HW2 releases Friday and will be due next Friday 
+@ 11:59pm!
+
+‹#›
+
+--- slide 3 ---
+Testing Heuristics
+• Black-Box Testing: 
+• Looking at the spec to test all expected behaviors
+• Clear-Box Testing:
+• Looking at the code to test all paths
+• Boundary Cases:
+• Look for inputs on the edge of specific behaviors (i.e. null)
+• Exhaustive Testing:
+• If there are only a few inputs (&lt;= 10) just test them all!
+Notes on Testing Heuristics
+
+--- slide 4 ---
+Code Coverage
+• Statement coverage: 
+• Percentage of statements executed at least once
+• Branch Coverage:
+• Percentage of branches executed at least once
+• Loop Coverage:
+•  Every loop/recursive call must be tested 0, 1, and 2+ times
+• Path Coverage:
+• Percentage of paths through the program executed at least once
+Handout on Code Coverage
+
+--- slide 5 ---
+JUnit Testing
+What is JUnit?
+JUnit is a framework for easily developing tests in Java!
+JUnit Testing Structure
+JUnit tests are split into multiple methods
+Each has the @Test annotation at the top
+There are other annotations (@Before, @BeforeEach, etc)
+Each test method is made up of assertions
+
+--- slide 6 ---
+JUnit Testing
+{C294AC2D-6407-44CA-B234-E240AC34BB18}Method Name
+Method Description
+assertTrue / assertFalse
+Takes in a boolean and asserts that it is true / false
+assertEquals / assertNotEquals
+Takes in two objects and asserts that they are equal (using the .equals() method) / not equal
+assertNull / assertNotNull
+Takes in an object and asserts that it is null / not null
+assertThrows / assertNotThrows
+Given a method, assert that it will throw a certain exception / won’t throw one (Note: this requires a lambda to work)
+For more information, check out the official documentation! https://docs.junit.org/6.0.3/overview.html
+
+--- slide 7 ---
+Use the testing heuristics from lecture to write a test suite for the following method:
+/** 
+ * Returns the sum of the array
+ * @param arr an array of integers
+ * @requires arr is not null
+ * @returns the sum of the elements 
+ * in arr or 0 if arr is empty
+ */
+public static int arraySum(int[] arr) {
+ 
+
+}
+
+Task 1 - Spec Based Testing
+Come up with some allowed input. 
+Figure out the expected behavior on that input.
+Run the method on the input to observe its actual behavior.
+Compare actual behavior to expected behavior. The test passes if they match, and fails if they do not.
+What does it mean to test this method?
+???
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 8 ---
+Use the testing heuristics from lecture to write a test suite for the following method:
+/** 
+ * Returns the sum of the array
+ * @param arr an array of integers
+ * @requires arr is not null
+ * @returns the sum of the elements 
+ * in arr or 0 if arr is empty
+ */
+public static int arraySum(int[] arr) {
+ 
+
+}
+
+Task 1 - Spec Based Testing
+???
+@Test
+public void testArraySum() {
+  
+
+ 
+
+}
+
+--- slide 9 ---
+Testing w/ Mutation
+@modifies
+@effects
+In addition to testing the return values, we must also check our modified variables and assert that they were changed as we expected!!!
+What’s different about testing with mutation?
+style.visibility
+
+--- slide 10 ---
+Task 2 - Code Coverage
+Consider the following method spec and impl:
+public static int removeValue(int[] a, int n, int x) {
+  int w = 0;
+  for (int r = 0; r &lt; n; r++) {
+      if (a[r] != x) {
+          a[w] = a[r];
+          w++;
+      }
+  }
+  return w;
+}
+// Removes x from the prefix a[0..n]
+// @param a the non-null array to remove from
+// @param n the length of the prefix
+// @param x the value to remove
+// @requires 0 &lt;= n &lt;= a.length
+// @modifies a
+// @effects if x does not occur in a[0..n], leaves a
+// unchanged; otherwise, if x occurs k &gt; 0 times in
+// a[0..n], then remove all k occurrences of x,
+// leaving remaining elements in the same relative
+// order as before; the new value of elements in 
+// a[n-k..n] is unspecified
+// @return n - k
+
+--- slide 11 ---
+Task 2 - Code Coverage
+public static int removeValue(int[] a, int n, int x) {
+  int w = 0;
+  for (int r = 0; r &lt; n; r++) {
+      if (a[r] != x) {
+          a[w] = a[r];
+          w++;
+      }
+  }
+  return w;
+}
+
+Code Coverage
+Statement coverage
+Branch coverage
+Path coverage
+Loop/recursion coverage (0/1/2+)
+Remember, only test inputs allowed by the spec
+Write JUnit tests that test the code coverage. Use our testing heuristics:
+
+style.visibilitystyle.visibilitystyle.visibility
+
+--- slide 12 ---
+Task 2 - Code Coverage
+@Test
+public void testRemoveValue() {
+
+}
+public static int removeValue(int[] a, int n, int x) {
+  int w = 0;
+  for (int r = 0; r &lt; n; r++) {
+      if (a[r] != x) {
+          a[w] = a[r];
+          w++;
+      }
+
+  }
+  return w;
+}
+
+--- slide 13 ---
+Full Code Coverage Achieved!
+Great work! We have met 100% code coverage for statements, branches, paths, and loops. 👏 👏 👏
+
+Are we done testing removeValue()?
+
+--- slide 14 ---
+Below the floor
+
+We are here
+
+How do we get to here?
+style.visibilitystyle.visibilitystyle.visibility
+
+--- slide 15 ---
+Reaching the floor
+To reach the floor, we need to utilize:
+
+Code coverage (completed)
+Follow code coverage guidelines
+
+Deriving tests from the spec
+Cover each case and boundary described by the spec
+
+--- slide 16 ---
+Reaching the floor
+Suppose we added tests derived from the spec to our test suite?
+
+We’ve reached the floor. Congratulations!!!
+Now we are done testing removeValue(), right?
+
+--- slide 17 ---
+Above the floor
+
+We are here
+
+We should aim above the floor!
+⭐️
+style.visibilitystyle.visibilitystyle.visibility
+
+--- slide 18 ---
+Above the floor
+Testing up to the floor satisfies the minimum requirements, but it does not guarantee that our code is bug-free.
+
+Testing is more than checking boxes. It's about identifying and reducing the risk of undiscovered bugs.
+
+That's why testing beyond the floor requires engineering judgment.
+
+--- slide 19 ---
+Engineering judgement
+We must consider:
+Where are bugs most likely to be hiding?
+What are the consequences if those bugs go undetected?
+How much additional testing is worth the time and effort?
+
+The goal isn't to test everything.
+It's to reduce the risk of undiscovered bugs to an acceptable level.
+
+--- slide 20 ---
+Testing mindset
+“Program testing can be used to show the presence of bugs, but never to show their absence.”
+
+Edsger W. Dijkstra
+
+--- slide 21 ---
+Quirks of removeValue()
+@Test
+public void testRemoveValueQuirks() {
+ 
+
+}
+
+Bonus: there are additional interesting cases in this implementation if you want to explore!
+style.visibility
+
+--- slide 22 ---
+Task 3 - Designing for Testability
+public static void main(String[] args) {
+   boolean average = false;
+   if (args.length &gt; 0 &amp;&amp; args[0].equals(&quot;-a&quot;)) {
+       average = true;
+   }
+   Scanner scan = new Scanner(System.in);
+   int sum = 0;
+   int count = 0;
+
+   while (scan.hasNextInt()) {
+       sum += scan.nextInt();
+       count++;
+   }
+   if (average) {
+       System.out.println((double) sum / count);
+   } else {
+       System.out.println(sum);
+   }
+}
+
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 23 ---
+Task 3 - Refactoring
+public static void main(String[] args) {
+	|
+	|------?
+	|
+
+	|
+	|------?
+	|
+
+	|
+	|   
+	|______?
+Suppose you are allowed to create a few helper methods for our original program. What would you extract?
+
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 24 ---
+Task 3 - Testing Our Methods
+Now that we've extracted a helper, what's the first thing we need before writing tests?
+/**
+ * Returns the sum of the array.
+ *
+ * @param arr an array of integers
+ * @requires arr is not null
+ * @returns the sum of the elements in arr,
+ *          or 0 if arr is empty
+ */
+
+public static int computeSum(int[] arr)
+
+style.visibility
+
+--- slide 25 ---
+Task 3 - JUnit Tests
+Since the computation has been isolated, writing tests becomes much more straightforward!
+@Test
+public void testComputeSum() {
+  
+
+}
+
+public static int computeSum(int[] arr) {
+  if (arr == null) {
+    throw new IllegalArgumentException(&quot;&quot;);
+  }
+  int sum = 0;
+  for (int i = 0; i &lt; arr.length; i++) {
+    sum += arr[i];
+  }
+  return sum;
+}
+
+style.visibilitystyle.visibility
+
+--- slide 26 ---
+Please Fill Out Your Half Sheets
+Have a wonderful 13th of October!
+

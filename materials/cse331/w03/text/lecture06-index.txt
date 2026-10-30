@@ -1,0 +1,85 @@
+CSE 331: Error handling and interactive programs
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          CSE 331: Error handling and interactive programs
+
+        CSE 331: Error handling and interactive programs
+
+This lecture studies a calculator, an interactive program: one
+that responds to each input as it arrives, and keeps running until
+the user tells it to stop. Lecture 3's Sum, a batch program,
+stopped at the user's first mistake. The calculator must not: each
+mistake gets a message, and the loop goes on. So main has to
+learn of every operation that could not be done. The program keeps
+two concerns apart, a separation of concerns: main talks to
+the user, and CalcStack does the arithmetic and knows nothing of
+users. So a user's mistake arrives inside the program as a request
+that a method cannot carry out, such as popping an empty stack, and
+the method has to say no to its client, through its specification.
+
+The calculator's stack tells main six different ways, one for each
+operation that can fail. A precondition makes checking the
+client's job. A special value, such as null, is returned only
+on failure, and must be a value the method never returns otherwise.
+A flag turns void into boolean. A wrapper, such as an
+OptionalInt, either holds the answer or is empty. An
+unchecked exception ends the method and is caught by a try in
+the client, or else ends the program with a stack trace. A
+checked exception must be caught or declared by every client,
+and the compiler checks that it is.
+
+All six work when the client checks. They differ when the client
+forgets: a forgotten flag fails silently, a broken precondition
+allows anything, here a confusing exception, a forgotten null is
+printed to the user or stops the program at a conversion, a
+forgotten exception ends the program with a stack trace, a wrapper
+asked without a check stops the program at the ask, a wrapper used
+as an int does not compile, and a forgotten checked exception does
+not compile at all. A mistake the compiler catches never reaches a
+run, so when you can, let the compiler find it.
+
+A seventh way, making up an answer, is a bad one. JavaScript's
+undefined, an unchecked NaN from floating point division, and a
+null the specification does not allow are made-up answers: each
+travels on into later results, so the mistake shows far from its
+cause, or never.
+
+Interactive programs are harder to get right than batch ones: their
+state lasts across inputs and is hidden from the user, who chooses
+the order. Keeping that state apart from the loop that talks to the
+user keeps it testable.
+
+Notes
+
+Slides
+
+Slides (PDF)
+
+    UW Site Use Agreement

@@ -1,0 +1,167 @@
+{
+  "course": "CSE 331, University of Washington, Autumn 2026",
+  "week": "Week 3 (Mon Oct 12 - Fri Oct 16, 2026)",
+  "note": "Downloaded 2026-10-29. Section 2's slides are Google Drive files linked from the Topics page. Homework 2 (released Fri Oct 16, due Fri Oct 23) is recorded on week 4 for its due date only. The Reading 2 reflection is graded and is not answered on the site.",
+  "sources": [
+    {
+      "file": "calendar.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/calendar/calendar.html",
+      "what": "Course calendar (Oct 12-16 sessions, Reading 2 due Fri Oct 16)",
+      "fetchedAt": "2026-10-29T22:05:32-07:00",
+      "bytes": 41163,
+      "sha256": "aa8699ffce3186c8fd82cd0508a3f051e8503d5563e13631b5d2166c37fbaffb"
+    },
+    {
+      "file": "topics.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/topics/",
+      "what": "Topics page: links each topic's lectures, sections (with Google slides) and readings",
+      "fetchedAt": "2026-10-29T22:05:32-07:00",
+      "bytes": 10981,
+      "sha256": "c8af991df289fa316fcfcd93c10b5055d59434f8c1897d41f360421f6dcb1f46"
+    },
+    {
+      "file": "lecture06/lecture06-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture06-errors/",
+      "what": "Lecture 6 (Mon Oct 12) landing page, Error handling and interactive programs",
+      "fetchedAt": "2026-10-29T22:05:32-07:00",
+      "bytes": 11198,
+      "sha256": "86d5217186919504bdb07b8de50ae572c4cb29dce3fc43b1d0f95b0a3ad05d08"
+    },
+    {
+      "file": "lecture06/lecture06-notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture06-errors/notes.html",
+      "what": "Lecture 6 notes: main source",
+      "fetchedAt": "2026-10-29T22:05:32-07:00",
+      "bytes": 110768,
+      "sha256": "65a81bbdce24fe93706ed856b2ff2077b427933493eed055108a0b96de65c676"
+    },
+    {
+      "file": "lecture06/lecture06-slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture06-errors/slides.html",
+      "what": "Lecture 6 slides",
+      "fetchedAt": "2026-10-29T22:05:32-07:00",
+      "bytes": 112716,
+      "sha256": "2df8e037d613a10e646cbad8adf4ae4113408350599d8f4f656f7e03560eda2d"
+    },
+    {
+      "file": "lecture06/lecture06-slides-pdf.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture06-errors/slides.pdf",
+      "what": "Lecture 6 slides (PDF)",
+      "fetchedAt": "2026-10-29T22:05:33-07:00",
+      "bytes": 1019774,
+      "sha256": "5d14d2657edd07578a3e78fae4d8171f2d232ad6264b5058974fbf1b536da5b7"
+    },
+    {
+      "file": "section02/section02.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section02.html",
+      "what": "Section 2 (Tue Oct 13) worksheet, Testing",
+      "fetchedAt": "2026-10-29T22:05:33-07:00",
+      "bytes": 19430,
+      "sha256": "2e0842e290e5330355ad88e5c87129c00eab9092f862d4f7b0302e8212b8a10b"
+    },
+    {
+      "file": "section02/section02-solution.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/section/section02-solution.html",
+      "what": "Section 2 solution worksheet",
+      "fetchedAt": "2026-10-29T22:05:33-07:00",
+      "bytes": 27038,
+      "sha256": "380d6526f7831c4a234ff0a7f73e6fef6587c054f54807e0572d9872a3599a3f"
+    },
+    {
+      "file": "section02/section02-slides.pptx",
+      "url": "https://drive.google.com/uc?export=download&id=1-5tpsY9ZA3lLKRLlc6gIfIsgwZq8qLcr",
+      "what": "Section 2 slides (Google Drive, linked from the Topics page)",
+      "fetchedAt": "2026-10-29T22:05:35-07:00",
+      "bytes": 2164746,
+      "sha256": "b336da93169d45d345371a8b8bfbd6e03703db5ff6d278034e6d0fd3e567bf4d"
+    },
+    {
+      "file": "section02/section02-solution-slides.pptx",
+      "url": "https://drive.google.com/uc?export=download&id=16enyvwwR3eD8p4qAyZsZpBrisNrjIEKD",
+      "what": "Section 2 solution slides (Google Drive, linked from the Topics page)",
+      "fetchedAt": "2026-10-29T22:05:37-07:00",
+      "bytes": 2191608,
+      "sha256": "dffd875d0b4bfba422b520a90f032533c33997d25b1c2e051ee039b8992042e9"
+    },
+    {
+      "file": "lecture07/lecture07-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture07-reasoning/",
+      "what": "Lecture 7 (Wed Oct 14) landing page, Reasoning and Floyd-Hoare logic",
+      "fetchedAt": "2026-10-29T22:05:37-07:00",
+      "bytes": 11142,
+      "sha256": "d3110549f9463653b4f0bc20b9ce7daa8bbc084466496ce7334198d0e1be6f10"
+    },
+    {
+      "file": "lecture07/lecture07-notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture07-reasoning/notes.html",
+      "what": "Lecture 7 notes: main source",
+      "fetchedAt": "2026-10-29T22:05:37-07:00",
+      "bytes": 146627,
+      "sha256": "9b5769fee1919860553c408fa8c57d270847d0c1113b38fa83f1f7a4d8b667f9"
+    },
+    {
+      "file": "lecture07/lecture07-slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture07-reasoning/slides.html",
+      "what": "Lecture 7 slides",
+      "fetchedAt": "2026-10-29T22:05:37-07:00",
+      "bytes": 103828,
+      "sha256": "d93ac0dbf2c1904cdbc4479584b842a0233def834e8972bb95782dda8870bf91"
+    },
+    {
+      "file": "lecture07/lecture07-slides-pdf.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture07-reasoning/slides.pdf",
+      "what": "Lecture 7 slides (PDF)",
+      "fetchedAt": "2026-10-29T22:05:37-07:00",
+      "bytes": 809380,
+      "sha256": "da889a70e36863b7dc676b8f7cf13338cfec9304426f2704d82fc62e9176b093"
+    },
+    {
+      "file": "lecture08/lecture08-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture08-loops/",
+      "what": "Lecture 8 (Fri Oct 16) landing page, Loops and loop invariants",
+      "fetchedAt": "2026-10-29T22:05:37-07:00",
+      "bytes": 10304,
+      "sha256": "ad5bb78e596cada0bb727cbd89c2fa9722365d192d19d40f58beb79c752f9ba5"
+    },
+    {
+      "file": "lecture08/lecture08-notes.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture08-loops/notes.html",
+      "what": "Lecture 8 notes: main source",
+      "fetchedAt": "2026-10-29T22:05:37-07:00",
+      "bytes": 129226,
+      "sha256": "5ca65f5f02885362e12f4e7e6aafc5dada4146abd0930f5c5cdaee299b8ea8ce"
+    },
+    {
+      "file": "lecture08/lecture08-slides.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture08-loops/slides.html",
+      "what": "Lecture 8 slides",
+      "fetchedAt": "2026-10-29T22:05:37-07:00",
+      "bytes": 76372,
+      "sha256": "65ace456c4dc632c8ecc1f7f9b3a57385e6887af414cfc41c0bf33ab6acf48a2"
+    },
+    {
+      "file": "lecture08/lecture08-slides-pdf.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture08-loops/slides.pdf",
+      "what": "Lecture 8 slides (PDF)",
+      "fetchedAt": "2026-10-29T22:05:37-07:00",
+      "bytes": 627150,
+      "sha256": "683a3ba0b56360cd593331516afbd6bf8fae0b8a8ba9aa84f0cca82379ea3738"
+    },
+    {
+      "file": "readings/readings-index.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/readings/",
+      "what": "Readings page: schedule, reflection parts, grading",
+      "fetchedAt": "2026-10-29T22:05:37-07:00",
+      "bytes": 11807,
+      "sha256": "c4cf96d3e5e6316cfd61cff7ff4347b30dedfc82fc2cd2d31d0b9453b8cad7ec"
+    },
+    {
+      "file": "readings/reading2.html",
+      "url": "https://courses.cs.washington.edu/courses/cse331/26au/readings/reading2.html",
+      "what": "Reading 2 (due Fri Oct 16, discussed Mon Oct 19): article choices and due date; the reflection is graded and not worked",
+      "fetchedAt": "2026-10-29T22:05:37-07:00",
+      "bytes": 18377,
+      "sha256": "826d086c658b921cbb750d5efb706c82c6b3cd43da2948f12354b3c5d27888f0"
+    }
+  ]
+}

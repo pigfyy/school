@@ -1,0 +1,1549 @@
+CSE 331: Reasoning and Floyd-Hoare logic
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          From three tests to every run
+What is true after each line
+A claim at a point
+A triple
+Stronger claims say more
+Two directions
+The rules for an assignment
+The rule for a sequence
+The rule of consequence
+Stronger for whom
+Across a call
+The rule for a conditional
+Reasoning finds the mistake
+Backward through a conditional
+A proof
+What reasoning tells us
+Exercises
+Further reading
+
+        CSE 331: Reasoning and Floyd-Hoare logic
+
+lecture
+
+Course motto: Your job is to deliver code that you know works.
+
+From three tests to every run
+
+Here is a short method with its specification, and three tests:
+
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21/**
+ * Converts a duration in hours, minutes, and seconds to seconds.
+ * The result could overflow an int, so it is returned as a long.
+ *
+ * @param h the hours
+ * @param m the minutes
+ * @param s the seconds
+ * @requires 0 <= h, 0 <= m, and 0 <= s
+ * @return 3600 * h + 60 * m + s
+ */
+static long seconds(int h, int m, int s) {
+    long t = h;
+    t = t * 60 + m;
+    t = t * 60 + s;
+    return t;
+}
+
+@Test
+void allZero() {
+    assertEquals(0, Seconds.seconds(0, 0, 0));
+}
+
+@Test
+void oneOfEach() {
+    assertEquals(3661, Seconds.seconds(1, 1, 1));
+}
+
+@Test
+void ninetyMinutes() {
+    assertEquals(5400, Seconds.seconds(0, 90, 0));
+}
+
+All three pass. With no if and no loop, every test runs every
+line, so by
+our list for when to stop testing
+these three tests are enough: the list asks for at least two that
+between them run every statement. So are we done? Is seconds
+right?
+
+Think about what the specification promises: an answer for every
+allowed input, every choice of non-negative h, m, and s.
+That is far more inputs than we could ever run, and so far we
+have tested just three of them. A passing test tells you only
+about its own run. Testing can never confirm a claim about every
+run when there are too many inputs to test. To know that
+seconds satisfies its specification, we need
+the third of our three ways
+of gaining knowledge, reasoning: we argue from the code itself
+that the method satisfies its specification on every run.
+
+We start with code that has no loops. The idea is simple: write
+down what is true after each line, and name the rule that
+justifies each step, so that anyone can check the argument
+without trusting you.
+
+What is true after each line
+
+Let's reason about seconds by asking, at each point, what we
+know about the variables. When the program runs, a line changes
+the values of the variables. When we reason, a line changes what
+we know about those values, and the claims record what we know.
+
+A client must make the precondition true, so we may assume it at
+the top.
+
+A claim sits in double braces beside the code it is about. The
+braces are not Java (the program never executes them), and what
+they hold is math, not code. In a claim, = means equals, !=
+means not equal, and we combine facts with and, or, and
+not. A Java condition goes into a claim in this notation, so
+a == b in the code is a = b in a claim. Here is the method
+again, with a claim after each line.
+
+static long seconds(int h, int m, int s) {
+    {{ 0 <= h and 0 <= m and 0 <= s }}
+    long t = h;
+    {{ 0 <= h and 0 <= m and 0 <= s and t = h }}
+    t = t * 60 + m;
+    {{ 0 <= h and 0 <= m and 0 <= s and t = 60 * h + m }}
+    t = t * 60 + s;
+    {{ 0 <= h and 0 <= m and 0 <= s and
+       t = 3600 * h + 60 * m + s }}
+    return t;
+}
+
+Read the claims in order, each against the line above it. The
+line numbers are the first listing's.
+
+Line 17 sets t to h. A declaration that gives a value is an
+  assignment. Nothing about h, m, or s changed, so the
+  precondition is still true, and now t = h is true too.
+
+Line 18 changes t, so t = h is no longer true after it. The
+  new value of t is the old value times 60, plus m, and the
+  old value was h. So after line 18, t = 60 * h + m.
+
+Line 19 does the same with s. The old value was 60 * h + m,
+  so after line 19, t = 3600 * h + 60 * m + s.
+
+The @return clause says which value is returned, and line 20
+returns t, so at the return the postcondition is a claim
+about t. The last claim says that t is exactly what the
+postcondition promises. So every run that starts with the
+precondition true returns 3600 * h + 60 * m + s, and we showed
+that for every allowed input without running the method once:
+seconds satisfies its specification.
+
+The claims treat * and + as the operations on the integers,
+the whole numbers you learned in school, positive, negative, and
+zero. Java's int is not quite that: it
+wraps around at
+the top of its range, and the seconds in 596524 hours already
+pass it, so seconds returns a long. Its inputs are int
+values, so every value computed on the way stays far below a
+long's top, no line wraps, and the claims may use integer
+arithmetic. Exercise 5 returns an int instead, with the clause
+its specification then needs.
+
+Going from a claim before a line, through the line, to a claim
+after it is forward reasoning. Each step used a rule. With
+the rules written down, anyone can check each step of an argument
+against them, and a step that breaks a rule is a mistake in the
+argument. Such an argument is a proof.
+
+A claim at a point
+
+The claims above are
+assertions,
+an idea from the first week of the course. Here is a refined
+version of the definition: its second paragraph now says exactly
+when the claim has to be true.
+
+Definition: assertion
+
+An assertion is a true or false claim about the program's
+state (the values of variables and memory) at a particular point
+in the program.
+
+An assertion holds if the claim is true each time a run
+reaches its point. If a run ever reaches the point with the
+claim false, the assertion does not hold.
+
+Each time a run reaches its point says when the claim has to be
+true. In seconds, every assertion sits at a point that every
+run reaches exactly once, so the clause makes no difference
+there. A point inside a branch is different: only the runs that
+take the branch reach it, so a claim there is about only those
+runs. A point inside a loop can be reached many times on one run,
+and a claim there has to be true every time.
+
+A specification
+promises nothing
+on a call that breaks its precondition. The assertions in a
+method's body follow the same rule: an assertion there is about
+the calls that begin with the precondition true, and a call that
+breaks the precondition does not count against it. This is also
+why forward reasoning can take the precondition as its first
+claim, for free: every call we reason about begins with it true.
+
+A triple
+
+Each step of the argument had the
+same shape:
+a claim before a piece of code, the code, and a claim after.
+
+Definition: Hoare triple
+
+A Hoare triple {{ P }} code {{ Q }} is a claim P, called
+its precondition, a piece of code, and a claim Q, called
+its postcondition.
+
+The triple is valid if every terminating run of the
+code from a state in which P is true ends in a state
+in which Q is true.
+
+A run terminates when it ends, and the definition asks nothing
+of a run that never does. For code with loops, whether it
+terminates is a separate question.
+
+Our rule from the first week was about this shape: if P holds at
+its point and the triple is valid, then Q holds at its point.
+Robert Floyd and Tony Hoare worked out how to reason this way in
+the late 1960s, so the triple, the rules below, and the arguments
+built from them are Floyd-Hoare logic.1
+
+A method
+satisfies its specification
+if every call that begins with the precondition true ends with
+the postcondition true. Read the method's body as a triple, with
+the precondition before the body and the postcondition after it,
+and this becomes: a method satisfies its specification exactly
+when that triple is valid and every call that begins with the
+precondition true terminates. Every method in this lecture
+terminates, so the question is only whether the triple is valid,
+and for seconds the argument above showed that it is.
+
+A triple can be about any piece of code, even a single line. Here
+are six triples about one line each, with their verdicts and the
+reasons for them:
+
+{{ true }} x = 5; {{ x = 5 }}
+Whatever the state was, the line makes x 5. Valid.
+
+{{ x = 3 }} y = x + 1; {{ y = 4 }}
+From any state where x is 3, the line makes y 4. Valid.
+
+{{ x = 3 }} y = x + 1; {{ 0 < y }}
+The line makes y 4, and 4 is positive. Valid too: a
+  postcondition may say less than all that is true afterward.
+
+{{ true }} y = x + 1; {{ y = 4 }}
+true allows the state where x is 0, and from that state
+  the line makes y 1. A run from that state is a
+  counterexample, so the triple is not valid.
+
+{{ 0 < x }} x = x - 1; {{ 0 < x }}
+The precondition allows the state where x is 1, and from
+  that state the line makes x 0. Not valid: a valid triple
+  needs the postcondition true after a run from every state
+  the precondition allows.
+
+{{ false }} x = 0; {{ x = 1 }}
+No state makes false true, so the definition asks nothing
+  of the postcondition. Valid. A valid triple says nothing
+  about the runs the precondition rules out, as a specification
+  says nothing about a call that breaks its precondition.
+
+A triple's code may also be empty: {{ P }} {{ Q }}, two claims at
+the same point. Running no code leaves the state as it was, so this
+triple is valid exactly when Q is true in every state where P is
+true: P implies Q, or in
+the words we used for specifications,
+P is stronger than Q and Q is weaker than P. The last
+step of the argument about seconds was an empty triple: the
+claim after line 19 contains t = 3600 * h + 60 * m + s, and
+that is the postcondition, so the claim implies it.
+
+Claims written one under another at a point are empty triples,
+one after another, so they read as a chain of implications: each
+claim implies the claim below it. For example, after line 17:
+
+{{ 0 <= h and 0 <= m and 0 <= s and t = h }}
+{{ 0 <= h and t = h }}
+{{ 0 <= t }}
+
+The second claim keeps two facts of the first, and the third
+follows from the second. A rule below, the rule of consequence,
+lets us write such a pair at any point.
+
+Stronger claims say more
+
+Many claims hold at the same point. After line 17, t = h holds.
+So do 0 <= t and true, the claim that is true in every state
+and so holds at every point. In the argument above, each claim
+said all we knew about the variables.
+
+Think of a claim as the set of states in which it is true. Then P
+implies Q means that P's set is inside Q's, as in the figure.
+
+For example, 0 <= h and t = h implies 0 <= t: in every state
+where the first claim is true, t equals a non-negative h, so
+the stronger claim has the smaller set. "Stronger" sounds bigger,
+so this is easy to get backward. A claim with a smaller set rules
+out more states, so that claim says more about the state the
+program is in. The weakest claim of all is true, which is true
+in every state and says nothing. The strongest is false, which
+is true in no state.
+
+Among the claims that hold at a point, one implies all the
+others: it describes exactly the states that runs reaching the
+point can be in, and it is the strongest claim at that point.
+
+Why insist on the strongest? Because a weaker claim may not be
+enough to reach the postcondition. Suppose that after line 18 we
+had written 0 <= t. It holds there, but it tells us nothing
+more about t, so after line 19 we could not say what t is in
+terms of h, m, and s, and the postcondition needs exactly
+that. The claim after line 18 dropped the fact t = 60 * h + m,
+so this argument fails even though the method satisfies its
+specification. Forward reasoning keeps the strongest claim at
+every step, and weakens a claim only where it is checked against
+a claim someone wrote, such as the postcondition, which may say
+less.
+
+Two directions
+
+Forward reasoning fills in the claim after some code, given the
+claim before it:
+
+{{ P }}
+code
+{{ ? }}
+
+Forward reasoning finds the strongest claim that makes the triple
+valid, the strongest postcondition of the code from P.
+
+Backward reasoning fills in the claim before some code, given
+the claim after it:
+
+{{ ? }}
+code
+{{ Q }}
+
+Backward reasoning finds the weakest claim that makes the triple
+valid, the least that has to be true beforehand for Q to be true
+afterward: the weakest precondition of the code for Q. Why
+the weakest? A stronger claim would rule out some states from
+which the code reaches Q, and an argument that asks more of the
+precondition than the code needs may then fail on a method that
+satisfies its specification. The weakest claim is the right
+choice here for the same reason the strongest was the right
+choice going forward.
+
+Either direction turns the question "is this triple valid?" into
+an implication. Given {{ P }} code {{ Q }}:
+
+Reason forward from P to the strongest claim R after the code.
+  The triple {{ P }} code {{ R }} is valid because we found R
+  that way, and every state R allows is a state some run from P
+  ends in. So the original triple is valid exactly when R
+  implies Q.
+
+Or reason backward from Q to the weakest claim R before the
+  code. The triple {{ R }} code {{ Q }} is valid because we
+  found R that way, and every state outside R is a state from
+  which some run misses Q. So the original triple is valid exactly
+  when P implies R.
+
+The rules below say how a claim moves through an assignment, a
+sequence of lines, and an if. The first is the rule for an
+assignment, the only kind of line seconds has before its return.
+
+The rules for an assignment
+
+Each rule below is a schematic: a triple laid out as it would sit
+in a program, with letters for the parts that change from one use
+to the next. Here is the forward rule for an assignment:
+
+Rule: assignment, forward
+
+{{ P }}
+x = e;
+{{ P[x ↦ x0] and x = e[x ↦ x0] }}
+
+x is any variable, and e is any expression that changes
+no variable. P[x ↦ x0] is P with every x replaced by
+x0, a fresh name for the value x had before the line: a
+name that neither the program nor any claim uses. The claim after
+the line is the strongest that makes the triple valid.
+
+The rule says two things. First, everything P said is still
+true, once we write x0 for the old value of x. That includes
+a fact about another variable: if P says w = x + 1, the claim
+after the line says w = x0 + 1. Second, the new value of x
+is e, computed from the old values. Here is the rule on lines
+18 and 19 of seconds, starting from t = h, the one fact in
+the claim after line 17 that mentions t. The rule leaves the
+other facts as they are:
+
+{{ t = h }}
+t = t * 60 + m;
+{{ t0 = h and t = t0 * 60 + m }}
+t = t * 60 + s;
+{{ t0 = h and t1 = t0 * 60 + m and t = t1 * 60 + s }}
+
+At line 19 the rule renames t again. Since t0 is taken, the
+fresh name is t1. Each use of the rule picks a fresh name,
+t0, then t1, then t2, so no two old values share a name.
+The facts chain back to h: since t0 is h, t1 is
+h * 60 + m, so t is (h * 60 + m) * 60 + s, which multiplies
+out to the 3600 * h + 60 * m + s we wrote after line 19.
+
+Two habits keep the fresh names out of the claims we write:
+
+If P and e never mention x, nothing has to be renamed. The
+  claim after the line is P and x = e. Line 17 was this case:
+  t = h joined the precondition.
+
+If we can write the old value of x without x0, put that
+  expression for x0 in every other fact. Then only the fact we
+  read the expression from still mentions x0. That fact says
+  nothing about the state, so we drop it. Line 18 was this case,
+  with h for t0, which gives t = h * 60 + m, the
+  t = 60 * h + m we wrote. After x = x + 1, the old value is
+  x - 1. Exercise 1 works such a case.
+
+The backward rule for an assignment is simpler:
+
+Rule: assignment, backward
+
+{{ Q[x ↦ e] }}
+x = e;
+{{ Q }}
+
+x is any variable, and e is any expression that changes
+no variable. Q[x ↦ e] is Q with every x replaced by
+e. The claim before the line is the weakest that makes the
+triple valid.
+
+We build the claim before the line from the claim after it, so
+read this rule from the bottom up. e is what x is about to
+become, so whatever Q claims about x after the line had better
+be true of e before it. Before the line, x still has its old
+value, so the claim before the line can call that value x, and
+the rule needs no new name: it is just a substitution.
+
+Let's reason backward through seconds from its postcondition.
+Before line 19, replacing t by t * 60 + s:
+
+{{ t * 60 + s = 3600 * h + 60 * m + s }}
+t = t * 60 + s;
+{{ t = 3600 * h + 60 * m + s }}
+
+Before line 18, replacing t by t * 60 + m in that claim:
+
+{{ (t * 60 + m) * 60 + s = 3600 * h + 60 * m + s }}
+t = t * 60 + m;
+{{ t * 60 + s = 3600 * h + 60 * m + s }}
+
+And before line 17, replacing t by h:
+
+{{ (h * 60 + m) * 60 + s = 3600 * h + 60 * m + s }}
+long t = h;
+{{ (t * 60 + m) * 60 + s = 3600 * h + 60 * m + s }}
+
+Both sides of the claim at the top are the same number, so that
+claim is true in every state. In particular the precondition
+implies it, and the method's triple is valid.
+
+Forward reasoning gave the same verdict by a different route.
+Backward reasoning took less work: three substitutions and one
+check, with no thought about which facts stay true across a line.
+On the other hand, the claims grew with each substitution, and we
+simplified them only at the end.
+
+Neither argument used the precondition's three facts about h,
+m, and s. They say what a duration is, and nothing in the body
+depends on them. A precondition can carry a fact that no argument
+about the body uses. Exercises 2 and 5 use these three facts.
+
+The two directions can also meet in the middle. Reason forward
+through the first lines and backward through the rest. The
+triple is valid exactly when the claim forward reasoning gives at
+the meeting point implies the claim backward reasoning gives
+there. On seconds, forward through line 17 gives the
+precondition and t = h. Backward through lines 18 and 19 gives
+the claim before line 18 above, and the first implies the second.
+We write such a check as a calculation, one step to a line, with
+the fact a step uses beside it:
+
+(t * 60 + m) * 60 + s = (h * 60 + m) * 60 + s     since t = h
+                      = 3600 * h + 60 * m + s
+
+The backward claim's left side comes out as its right side, so
+the claim is true wherever t = h.
+
+The rule for a sequence
+
+We reason about two pieces of code in a row one at a time,
+through a claim at the point between them:
+
+Rule: sequence
+
+{{ P }}
+first
+{{ R }}
+second
+{{ Q }}
+
+The triple around both pieces of code is valid exactly when
+some claim R at the point between them makes both halves
+valid: {{ P }} first {{ R }} and {{ R }} second {{ Q }}.
+
+The schematic does not say what R is. Forward reasoning chooses R
+as the strongest claim after the first piece of code. When we
+reasoned forward through seconds, R for lines 18 and 19 was the
+claim after line 18,
+0 <= h and 0 <= m and 0 <= s and t = 60 * h + m, and each half
+was valid by the forward rule for an assignment.
+
+Backward reasoning chooses R as the weakest claim before the
+second piece of code. Here are the same two lines backward from
+the postcondition, where R is the claim between them and each
+half is valid by the backward rule:
+
+{{ (t * 60 + m) * 60 + s = 3600 * h + 60 * m + s }}
+t = t * 60 + m;
+{{ t * 60 + s = 3600 * h + 60 * m + s }}
+t = t * 60 + s;
+{{ t = 3600 * h + 60 * m + s }}
+
+The two Rs are different claims, because forward reasoning keeps
+all that is true at the point and backward reasoning keeps only
+what has to be true there. Either one works: the rule asks only
+for some R that makes both halves valid.
+
+Each argument about seconds, forward and backward, used this
+rule twice: at the two points between its three assignments.
+
+The rule of consequence
+
+Forward through seconds, the rules gave the claim after
+line 19, but the claim we had to reach was the postcondition.
+Backward, they gave the claim at the top, but we had to start
+from the precondition. In general, each rule for an assignment
+gives one claim, the strongest after the line or the weakest
+before it. A specification may promise less than the strongest
+claim, or ask more than the weakest, so the claim we have to
+reach is often a different claim.
+
+To connect the two claims, the rule of consequence uses the empty
+triple: two claims at one point with no code between them, valid
+exactly when the upper implies the lower. We may write such a
+pair at any point, so we can check a triple by writing claims of
+our own beside the claims we were given:
+
+Rule: consequence
+
+{{ P }}
+{{ A }}
+code
+{{ B }}
+{{ Q }}
+
+The triple {{ P }} code {{ Q }} is valid if P implies A,
+{{ A }} code {{ B }} is valid, and B implies Q.
+
+To see which way the implications point, follow a run down the
+schematic, as the figure does:
+
+The run starts in a state where P is true, so A is true there
+too. The code takes the run to a state where B is true, so Q is
+true there too. To show a triple valid, then, it is enough to show
+that a triple with a weaker precondition and a stronger
+postcondition is valid: a triple that assumes less and promises more.
+
+We have used this rule already. The forward argument about
+seconds ended with it: the postcondition is one of the facts in
+the claim after line 19, so that implication only drops facts.
+The check where the two directions met used it too,
+and that implication took arithmetic: the calculation
+that substituted h for t.
+
+The rules for an assignment and a sequence produce claims
+mechanically: a substitution, a fact added, a claim carried
+through. This rule's two implications are not mechanical: they
+involve no code, and we check them with arithmetic and logic.
+They are where an argument can go wrong, if we believe an
+implication that is false.
+
+Stronger for whom
+
+The rule of consequence lets a triple that assumes less and
+promises more stand in for the one we need. For a method call,
+that means we can swap in a
+stronger specification,
+one with a weaker precondition and a stronger postcondition. But
+then who wants a stronger claim? The precondition and the
+postcondition are promises made by different parties, so the
+answer depends on where the claim sits:
+
+The precondition is the client's promise. The client must
+  make it true before every call, and the implementer may assume
+  it. A stronger precondition gives the client more to make true
+  and the implementer fewer states to handle.
+
+The postcondition is the implementer's promise. The
+  implementer must make it true at every return, and the client
+  may rely on it. A stronger postcondition gives the implementer
+  more to deliver and the client more to rely on.
+
+A weaker claim does the reverse, so each party wants its own
+promise weak and the other party's strong:
+
+precondition
+postcondition
+
+stronger,
+the smaller set
+🙁 the client
+🙂 the implementer
+🙂 the client
+🙁 the implementer
+
+weaker,
+the bigger set
+🙂 the client
+🙁 the implementer
+🙁 the client
+🙂 the implementer
+
+So a stronger specification favors the client on both sides: the
+client smiles at its weaker precondition and at its stronger
+postcondition. Which strength is right is still a design choice.
+As we said when
+choosing between specifications,
+a good specification rules out exactly the implementations its
+clients cannot use.
+
+Across a call
+
+The rule of consequence also checks what a method's specification
+asks of the code that calls it. We have
+reasoned across a call
+before, with the method's specification as the call's triple: the
+precondition before the call, the call, and the postcondition
+after. When the method satisfies its specification, that triple
+is valid, so the argument never reads a line of the method's
+body. To use the triple, we show that the claim before the call
+implies the method's precondition: that implication is how an
+argument checks that the client keeps its promise. After the
+call, the postcondition is part of what we know, and the rule
+for a sequence carries it on, for example to the precondition
+of the next call.
+
+Swap in a method with a stronger specification, and the
+argument about the calling code still holds. Its precondition is
+weaker, so the claim before the call still implies it. Its
+postcondition is stronger, so it still implies what the argument
+after the call needs.
+
+The rule for a conditional
+
+Now let's reason about code with an if. Here is abs, which
+returns the absolute value of its argument. (The precondition
+rules out -2147483648, whose negation is too big for an int.)
+
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21/**
+ * Gives the absolute value of a number.
+ *
+ * @param n the number
+ * @requires -2147483647 <= n
+ * @return n if 0 <= n, and -n if n < 0
+ */
+static int abs(int n) {
+    if (n < 0) {
+        n = -n;
+    }
+    return n;
+}
+
+What is true after the if? A run takes one branch or the other,
+and we reason without running the code, so we cannot know which.
+The claim after the if has to cover both branches. If the true
+branch ran, n was negative and n = -n made it positive. If
+the false branch ran, n was already at least 0. So after the
+if we know 0 < n or 0 <= n, which is just 0 <= n.
+The rule for a conditional works the same way for any if:
+
+Rule: conditional
+
+{{ P }}
+if (b) {
+    {{ P and b }}
+    first
+    {{ A }}
+} else {
+    {{ P and not b }}
+    second
+    {{ B }}
+}
+{{ A or B }}
+{{ Q }}
+
+b is the if's condition. A is the strongest claim after
+the true branch, and B after the false branch, so A or B is
+the strongest claim after the if. The triple
+{{ P }} if ... {{ Q }} is valid exactly when A or B implies
+Q, that is, when both A and B imply Q.
+
+Every run that enters the true branch found b true, and every
+run that enters the false branch found b false. So those facts
+hold at the top of their branches, and the argument often needs
+them. An if with no else still has a false branch, as we saw
+with branch coverage,
+and that branch is empty, so B is P and not b in those cases.
+
+Is 0 <= n enough to show the postcondition? No. It says only
+that the returned number is non-negative, and a method that
+always returned 0 would make that claim true as well. The
+specification promises more: the number returned is the number
+given, or its negation.
+
+Saying that in a claim runs into a problem with names. In the
+specification, n means the number the caller passed in. In a
+claim after line 18, n means the value n has after that line.
+On the call abs(-5), the number given is -5, and after line 18,
+n is 5. The specification promises 5, the negation of -5, but
+once line 18 has run, a claim written with n alone can no
+longer say anything about the -5.
+
+So we name the caller's number n0. n0 is a ghost variable:
+a name used only in the claims, never in the program, for a value
+the method started with.2 No line can change it, so at every
+point of the argument, n0 is the number the caller passed in.
+The argument starts from the claim n = n0. Read with n0 for
+its n, the specification promises n0 if 0 <= n0, and -n0
+if n0 < 0. The same move works whenever code changes a parameter
+the specification mentions: name its value at the call.
+
+This time the claim at the top leaves the precondition out. Its
+only job is to keep n = -n from wrapping, so that the claims may
+use integer arithmetic, and no claim needs it beyond that.
+
+At line 18 the forward rule needs a name for the old value of
+n. The claim before the line already says that value is n0,
+so we write n0 for it and need no fresh name, just as we wrote
+h for t0 in seconds. In seconds we then removed the fresh
+names from the claims we wrote, but here n0 stays in every
+claim, since the postcondition we have to reach mentions it.
+Here is the whole argument:
+
+static int abs(int n) {
+    {{ n = n0 }}
+    if (n < 0) {
+        {{ n = n0 and n < 0 }}
+        n = -n;
+        {{ n0 < 0 and n = -n0 }}
+    }
+    {{ (n0 < 0 and n = -n0) or (0 <= n0 and n = n0) }}
+    {{ 0 <= n and (n = n0 or n = -n0) }}
+    return n;
+}
+
+The last claim is the postcondition in other words: the number
+returned is non-negative, and it is the number given or its
+negation. Of n0 and -n0, only one is non-negative, unless both
+are 0, so together the two facts say exactly what the @return
+clause says. The claim after the if implies the last claim by
+the rule of consequence. In each of its cases, both facts hold:
+
+When n0 < 0, n = -n0, which is positive.
+
+When 0 <= n0, n = n0, which is non-negative.
+
+So abs satisfies its specification.
+
+In abs, every run comes out of the if, by one branch or the
+other, and goes on to the return after it. Often a branch returns
+from the method instead, and then no run comes out of that branch
+at all. compare has two ifs like that:
+
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21/**
+ * Compares two numbers.
+ *
+ * @param a one number
+ * @param b the other number
+ * @return -1 if a < b, 0 if a == b, and 1 if b < a
+ */
+static int compare(int a, int b) {
+    if (a < b) {
+        return -1;
+    }
+    if (a == b) {
+        return 0;
+    }
+    return 1;
+}
+
+No run comes out of line 15, so only the false branch leads to
+the point after the first if, and the claim there should be the
+false branch's claim, P and not b. The rule for a conditional
+agrees. A is the strongest claim at the end of the true branch,
+and no run reaches that point. A claim holds at a point if it is
+true each time a run reaches the point. At a point no run
+reaches, then, every claim holds, even false, the strongest
+claim of all. So A is false, and A or B is
+false or (P and not b), which is P and not b.
+
+false works the other way too. When the claim at a point implies
+false, no state makes that claim true, so no run reaches the
+point: reasoning has found code that never runs. Exercise 3 finds
+such a point.
+
+At each return, we check the postcondition: the claim there must
+imply that the returned value is what the @return clause
+promises in that case.
+
+static int compare(int a, int b) {
+    {{ true }}
+    if (a < b) {
+        {{ a < b }}
+        return -1;
+    }
+    {{ b <= a }}
+    if (a == b) {
+        {{ b <= a and a = b }}
+        return 0;
+    }
+    {{ b <= a and a != b }}
+    return 1;
+}
+
+At line 15, return -1: a < b, and the specification
+  promises -1.
+
+At line 18, return 0: a = b, and the specification
+  promises 0.
+
+At line 20, return 1: b <= a and a != b together say
+  b < a, and the specification promises 1.
+
+So compare satisfies its specification: all three
+implications are true.
+
+Reasoning finds the mistake
+
+When we
+measured coverage,
+we met methods whose tests passed while the method was wrong.
+min is one of them. Here it is, with a passing test that runs
+every statement:
+
+/**
+ * Picks the smaller of two numbers.
+ *
+ * @param a one number
+ * @param b the other number
+ * @return the smaller of a and b
+ */
+static int min(int a, int b) {
+    int r = a;
+    if (a <= b) {
+        r = a;
+    }
+    return r;
+}
+
+@Test
+void firstIsSmaller() {
+    assertEquals(1, Min.min(1, 2));
+}
+
+A second test, min(2, 1), the one branch coverage asks for,
+found the mistake. Let's find it by reasoning instead. The
+specification has no precondition, so we start from true, and
+reason forward:
+
+static int min(int a, int b) {
+    {{ true }}
+    int r = a;
+    {{ r = a }}
+    if (a <= b) {
+        {{ r = a and a <= b }}
+        r = a;
+        {{ r = a and a <= b }}
+    }
+    {{ (r = a and a <= b) or (r = a and b < a) }}
+    {{ r = a and (a <= b or b < a) }}
+    {{ r = a }}
+    return r;
+}
+
+The claim after the if has two cases, and both say r = a, so
+it implies the claim below, r = a and (a <= b or b < a). The
+fact a <= b or b < a is true of any two numbers, so it says
+nothing, and the rule of consequence lets us drop it. That leaves
+r = a: on every run, the method returns a.
+
+Now check r = a against the postcondition. The postcondition
+promises the smaller number: a when a <= b, and b when
+b < a. When b < a, it promises b, but r = a. So the
+implication is false, and the states with b < a are exactly
+where it fails. A run from any such state is a counterexample, and
+min(2, 1) is such a run.
+
+quadrant, another method from when we measured coverage, has
+two ifs in a row. Its two tests run both branches of both ifs,
+which completes our list for when to stop testing, and both pass:
+
+/**
+ * Gives the quadrant of a point that is on neither axis.
+ *
+ *          y
+ *      2   |   1
+ *  --------+-------- x
+ *      3   |   4
+ *
+ * @param x the point's x coordinate
+ * @param y the point's y coordinate
+ * @requires x != 0 and y != 0
+ * @return 1 if x > 0 and y > 0,
+ *         2 if x < 0 and y > 0,
+ *         3 if x < 0 and y < 0, and
+ *         4 if x > 0 and y < 0
+ */
+static int quadrant(int x, int y) {
+    int q = 1;
+    if (x < 0) {
+        q = 2;
+    }
+    if (y < 0) {
+        q = q + 1;
+    }
+    return q;
+}
+
+@Test
+void upperRight() {
+    assertEquals(1, Quadrant.quadrant(1, 1));
+}
+
+@Test
+void lowerLeft() {
+    assertEquals(3, Quadrant.quadrant(-1, -1));
+}
+
+Let's reason forward from the precondition. After the first if,
+a run has taken one branch or the other, so the claim has two
+cases. At the top of the second if's true branch, y < 0 joins
+each of those cases, and q = q + 1 changes q in each. After
+the second if, each case has split in two, so there are four.
+Since x != 0, not (x < 0) is 0 < x, and likewise for y:
+
+static int quadrant(int x, int y) {
+    {{ x != 0 and y != 0 }}
+    int q = 1;
+    {{ x != 0 and y != 0 and q = 1 }}
+    if (x < 0) {
+        {{ x < 0 and y != 0 and q = 1 }}
+        q = 2;
+        {{ x < 0 and y != 0 and q = 2 }}
+    }
+    {{ (x < 0 and y != 0 and q = 2) or
+       (0 < x and y != 0 and q = 1) }}
+    if (y < 0) {
+        {{ (x < 0 and y < 0 and q = 2) or
+           (0 < x and y < 0 and q = 1) }}
+        q = q + 1;
+        {{ (x < 0 and y < 0 and q = 3) or
+           (0 < x and y < 0 and q = 2) }}
+    }
+    {{ (0 < x and 0 < y and q = 1) or
+       (x < 0 and 0 < y and q = 2) or
+       (x < 0 and y < 0 and q = 3) or
+       (0 < x and y < 0 and q = 2) }}
+    return q;
+}
+
+Now take the cases of the last claim in order, and check each
+against the line of the @return clause for its quadrant:
+
+✅ 0 < x and 0 < y: quadrant 1 is promised, and q = 1.
+
+✅ x < 0 and 0 < y: quadrant 2 is promised, and q = 2.
+
+✅ x < 0 and y < 0: quadrant 3 is promised, and q = 3.
+
+❌ 0 < x and y < 0: quadrant 4 is promised, and q = 2.
+
+The implication for quadrant 4 is false: it fails exactly on
+the lower right quadrant. The third test we tried then,
+quadrant(1, -1), is a point there, and the method
+returns 2 on it. Our list never asked for that test, so we
+had to think of it ourselves.
+
+The four cases are the four
+paths through
+quadrant. The two passing tests ran two of them, each on one
+input. The argument checked all four, each on every input that
+takes it, and so it found the mistake on a path neither passing
+test ran.
+
+Backward through a conditional
+
+Forward reasoning through quadrant found the case that fails.
+Reasoning backward from the postcondition asks a different
+question: on which inputs does quadrant return what its
+postcondition says? That is the weakest precondition of the body
+for the postcondition. To reason backward through an if, we need
+the conditional rule the other way around:
+
+Rule: conditional, backward
+
+{{ P }}
+{{ (b and A) or (not b and B) }}
+if (b) {
+    {{ A }}
+    first
+    {{ Q }}
+} else {
+    {{ B }}
+    second
+    {{ Q }}
+}
+{{ Q }}
+
+b is the if's condition. A is the weakest claim before the
+true branch for Q, and B the weakest before the false branch.
+A run that takes the true branch needs A, and a run that takes
+the false branch needs B, so (b and A) or (not b and B) is
+the weakest claim before the if. The triple
+{{ P }} if ... {{ Q }} is valid exactly when P implies that
+claim, that is, when P and b implies A and P and not b
+implies B.
+
+An if with no else has an empty false branch, so B is Q.
+
+Here is quadrant backward from its postcondition, the four cases
+of its @return clause written as one claim, one row per
+quadrant. Each claim keeps a row for every quadrant it allows, in
+the same order, so a quadrant's row can be followed from claim to
+claim. Read it from the bottom up:
+
+static int quadrant(int x, int y) {
+    {{ (0 < x and 0 < y) or
+       (x < 0 and 0 < y) or
+       (x < 0 and y < 0) }}
+    int q = 1;
+    {{ (0 < x and 0 < y and q = 1) or
+       (x < 0 and 0 < y) or
+       (x < 0 and y < 0) or
+       (0 < x and y < 0 and q = 3) }}
+    if (x < 0) {
+        {{ (x < 0 and 0 < y) or
+           (x < 0 and y < 0) }}
+        q = 2;
+        {{ (0 < x and 0 < y and q = 1) or
+           (x < 0 and 0 < y and q = 2) or
+           (x < 0 and y < 0 and q = 2) or
+           (0 < x and y < 0 and q = 3) }}
+    }
+    {{ (0 < x and 0 < y and q = 1) or
+       (x < 0 and 0 < y and q = 2) or
+       (x < 0 and y < 0 and q = 2) or
+       (0 < x and y < 0 and q = 3) }}
+    if (y < 0) {
+        {{ (0 < x and 0 < y and q = 0) or
+           (x < 0 and 0 < y and q = 1) or
+           (x < 0 and y < 0 and q = 2) or
+           (0 < x and y < 0 and q = 3) }}
+        q = q + 1;
+        {{ (0 < x and 0 < y and q = 1) or
+           (x < 0 and 0 < y and q = 2) or
+           (x < 0 and y < 0 and q = 3) or
+           (0 < x and y < 0 and q = 4) }}
+    }
+    {{ (0 < x and 0 < y and q = 1) or
+       (x < 0 and 0 < y and q = 2) or
+       (x < 0 and y < 0 and q = 3) or
+       (0 < x and y < 0 and q = 4) }}
+    return q;
+}
+
+The second if's true branch ends where the if ends, so the
+   claim there is the claim after the if: the postcondition.
+
+Before q = q + 1, put q + 1 for q: the rows ask for
+   q = 0, 1, 2, or 3, one less than each quadrant's answer. From
+   here up, a row's q is the value q needs at that point, not
+   the quadrant's number.
+
+Before the second if, the rule combines the branches as
+   (b and A) or (not b and B). Quadrants 3 and 4 have y < 0,
+   so they take the true branch, and their rows come from A, the
+   claim just found. Quadrants 1 and 2 take the false branch,
+   which is empty, so their rows come from B, the postcondition.
+
+The first if's true branch ends where the if ends, so
+   the claim there is the claim after the if: the claim
+   before the second if.
+
+Before q = 2, put 2 for q. The rows for quadrants 1 and 4
+   now ask for 2 = 1 and 2 = 3, which are false, so they drop.
+   That costs nothing: inputs in quadrants 1 and 4 skip this
+   branch, and the next step takes their rows from the other one.
+   The rows for quadrants 2 and 3 ask for 2 = 2, which is true,
+   so only their facts about x and y remain.
+
+Before the first if, the rule combines the branches again.
+   Quadrants 2 and 3 have x < 0, so they take the true branch,
+   and their rows come from A, the claim just found. Quadrants 1
+   and 4 take the false branch, which is empty, so their rows come
+   from B, the claim after the if.
+
+Before int q = 1, put 1 for q. Quadrant 1's row asks for
+   1 = 1, which is true, so only its facts about x and y
+   remain. Quadrant 4's row asks for 1 = 3, which is false: an
+   input in quadrant 4 needs q to be 3 after this line, and the
+   line makes it 1. Every input runs this line, so unlike the drops
+   at step 5, this one loses inputs. What remains is the claim at
+   the top, with rows for quadrants 1, 2, and 3.
+
+Step 3 is delicate. Each row of the claim before an if describes
+a state that has not yet taken a branch, and b decides which
+branch it takes. So each quadrant's row comes from the claim of
+the branch its inputs take, and the rule leaves out its row in the
+other claim, even where that row looks right. A's row for
+quadrant 1 asks for q = 0, which q = q + 1 would make 1, but a
+state with 0 < y skips that branch and returns 0. A state in
+quadrant 3 with q = 3 already makes the postcondition's row
+true, but with y < 0 it runs q = q + 1 and returns 4. Every
+row here fixes the signs of x and y, so the rule keeps or
+leaves out whole rows. In general, b and A adds b to each case
+of A that does not already say it.
+
+The claim at the top is the weakest precondition of the body for the
+postcondition: exactly the inputs on which quadrant returns what
+its postcondition says. Its rows are for quadrants 1, 2, and 3. A
+row that drops says that from that point, no state in its quadrant
+reaches the postcondition. That matters only when runs in that
+quadrant get there. Every input reaches the first line, so
+quadrant 4, whose row dropped there, is a quadrant the method gets
+wrong. Backward reasoning finds the inputs that get the right
+answer. Any other input the precondition allows fails. The argument
+does not say which lines to change to fix the method.
+
+The triple is valid exactly when the precondition implies the
+claim at the top. Here it does not. The precondition,
+x != 0 and y != 0, allows quadrant 4, where every row of the
+claim is false: on quadrant(1, -1), the precondition is true,
+the claim is false, and the method returns 2. So the triple is not
+valid. Forward reasoning found the same inputs from the other end:
+it followed each path to the return and found the one that gives
+the wrong answer. Backward reasoning started from the
+postcondition and found the inputs that get the right answer. So,
+again, the inputs that fail are the ones the precondition allows
+but the claim at the top does not: here, quadrant 4.
+
+A proof
+
+If you took CSE 311, you wrote proofs there, about numbers and
+sets. An argument that goes from what is given to what is claimed
+in steps, each step justified by a rule, so that anyone can check
+it without trusting its author, is a proof. The arguments for
+seconds, abs, and compare are proofs. In each, what is given
+is the precondition, what is claimed is the postcondition, and the
+steps use the rules above. A proof that a method satisfies its
+specification is a proof about every run at once. Unlike an
+argument in prose, an argument built from the rules says where it
+fails. Going forward, with every claim the strongest, the
+implication that is false says on which inputs the method is
+wrong, as it did for min and for quadrant. Going backward,
+with every claim the weakest, the check against the precondition
+says the same, as it did for quadrant.
+
+Leslie Lamport says, in one of
+Reading 2's articles, that proving
+a whole program correct this way turned out to be very hard in
+practice and is rarely done.3 Floyd and Hoare, Lamport
+says, taught us that a program is a mathematical object. So a
+programmer can ask what a program is supposed to do, and whether
+they could prove that it does that.
+
+What reasoning tells us
+
+When we measured coverage,
+we said that a method whose tests complete our list, all passing,
+has been tested enough, and that this is still less than knowing
+it is correct. A test confirms a claim about its own run. The
+claim that the method's triple is valid, with its specification
+around its body, is about every run, and the rules can confirm it.
+So a proof that the triple is valid is the knowledge that tests
+fall short of. Reasoning confirms a claim about every run, though,
+only if the argument is right. Two things can still go wrong, and
+one thing the rules cannot yet do:
+
+A false implication. A slip in applying a mechanical
+  rule, such as a missed substitution, shows on the page to
+  anyone who checks the step against the rule. We check an
+  implication with arithmetic and logic instead, and a person
+  can believe an implication that is false. What catches such a
+  mistake is a test: one that refutes the claim refutes the
+  argument too. So we still test.
+
+Arithmetic that is not Java's. The claims are about the
+  integers. Java's int wraps, so a claim that is true of the
+  integers can be false of the program. abs without its
+  precondition is the example. The argument says that n = -n
+  makes a negative n positive. But 2147483648 does not fit in
+  an int, so when n is -2147483648, n = -n leaves n at
+  -2147483648: abs(-2147483648) returns -2147483648! The
+  precondition keeps that one input out, so on every input it
+  allows, Java's arithmetic agrees with the integers. Every
+  method in this lecture either has such a clause, as abs does,
+  or does no arithmetic that could wrap, as seconds does by
+  computing in a long.
+
+A loop. On every run of the methods above, each line ran at
+  most once. Sum's loops run their lines once for each number
+  typed, and the rules above cannot carry a claim through a loop
+  that may run any number of times.
+
+Exercises
+
+Each answer is folded under its question. Write yours first.
+
+1. Here is a precondition, one line, and a postcondition:
+
+{{ 1 <= n and n <= 100 }}
+n = n + 3;
+{{ 10 <= n * n }}
+
+Reason forward from the precondition by the rule, then write the
+claim without the fresh name, and check that claim against the
+postcondition. Then reason backward from the postcondition, and
+check the precondition against the claim that the backward
+rule gives.
+
+Answer
+
+Forward, the claim after the line implies the postcondition.
+  The forward rule gives the first claim after the line. Each
+  claim implies the claim below it:
+
+{{ 1 <= n and n <= 100 }}
+n = n + 3;
+{{ 1 <= n0 and n0 <= 100 and n = n0 + 3 }}
+{{ 1 <= n - 3 and n - 3 <= 100 }}
+{{ 4 <= n and n <= 103 }}
+{{ 4 <= n }}
+{{ 16 <= n * n }}
+{{ 10 <= n * n }}
+
+Counting from the top: the old value of n is the new value
+minus 3, so the third claim puts n - 3 for n0 and drops
+n = n0 + 3, the fact that gave n - 3. The fourth adds 3
+to each side of both facts. The fifth drops a fact. The sixth
+squares both sides, since 4 <= n makes n * n at least
+4 * 4. The last is the postcondition, since 10 is at
+most 16.
+
+Backward, the precondition implies the claim before the line.
+  Putting n + 3 for n in the postcondition gives the claim
+  just above the line. Above that claim, a chain from the
+  precondition reaches it:
+
+{{ 1 <= n and n <= 100 }}
+{{ 1 <= n }}
+{{ 4 <= n + 3 }}
+{{ 16 <= (n + 3) * (n + 3) }}
+{{ 10 <= (n + 3) * (n + 3) }}
+n = n + 3;
+{{ 10 <= n * n }}
+
+The second claim drops a fact. The third adds 3 to both
+sides. The fourth squares both sides. The last follows, since
+10 is at most 16.
+
+The triple is valid. Both implications are true. Neither
+  check used n <= 100. That bound keeps n + 3 within an
+  int, so the line does not wrap.
+
+2. When does seconds return a number less than 3600? Reason
+backward from the claim t < 3600 after line 19, and read the
+answer off the claim at the top.
+
+Answer
+
+Three substitutions reach the top.
+
+{{ (h * 60 + m) * 60 + s < 3600 }}
+long t = h;
+{{ (t * 60 + m) * 60 + s < 3600 }}
+t = t * 60 + m;
+{{ t * 60 + s < 3600 }}
+t = t * 60 + s;
+{{ t < 3600 }}
+
+seconds returns less than 3600 exactly when h = 0 and
+  60 * m + s < 3600. The claim at the top simplifies to
+  3600 * h + 60 * m + s < 3600. Under the precondition, h and
+  60 * m + s are both at least 0, so h must be 0, and then the
+  minutes and seconds together must come to less than an hour.
+  Backward reasoning found the exact condition, which is more
+  than "the hours are zero": seconds(0, 90, 0) returns 5400.
+
+3. Here is compare with its first condition changed from
+a < b to a <= b. Reason forward through it and say whether it
+still satisfies its specification. If not, which inputs show that
+it does not?
+
+/**
+ * Compares two numbers.
+ *
+ * @param a one number
+ * @param b the other number
+ * @return -1 if a < b, 0 if a == b, and 1 if b < a
+ */
+static int compare(int a, int b) {
+    if (a <= b) {
+        return -1;
+    }
+    if (a == b) {
+        return 0;
+    }
+    return 1;
+}
+
+Answer
+
+Forward reasoning gives these claims for the changed method.
+
+static int compare(int a, int b) {
+    {{ true }}
+    if (a <= b) {
+        {{ a <= b }}
+        return -1;
+    }
+    {{ b < a }}
+    if (a == b) {
+        {{ b < a and a = b }}
+        {{ false }}
+        return 0;
+    }
+    {{ b < a }}
+    return 1;
+}
+
+The changed method fails on equal numbers. At the first
+  return, the claim is a <= b. The specification promises -1
+  when a < b and 0 when a = b. Every call with a = b reaches
+  this return and returns -1, where the specification promises 0.
+  So the changed method does not satisfy its specification, and
+  every input with a = b, such as compare(3, 3), shows that.
+
+No run reaches the second if's body. After the first if,
+  the claim is b < a. The body of the second if needs a = b
+  as well, and no state makes both true, so b < a and a = b
+  implies false, the claim written under it. No run reaches a
+  point where false holds, so the body runs on no input at all.
+
+4. Repair min by giving its if an else that sets r to
+b. Reason forward through the repaired method, with a claim at
+the top and the bottom of each branch, and show that it satisfies
+its specification.
+
+Answer
+
+Forward reasoning gives these claims for the repaired method.
+
+static int min(int a, int b) {
+    {{ true }}
+    int r = a;
+    {{ r = a }}
+    if (a <= b) {
+        {{ r = a and a <= b }}
+        r = a;
+        {{ r = a and a <= b }}
+    } else {
+        {{ r = a and b < a }}
+        r = b;
+        {{ r = b and b < a }}
+    }
+    {{ (r = a and a <= b) or (r = b and b < a) }}
+    return r;
+}
+
+In both cases, r is the smaller of a and b. In the
+  first case a <= b and r = a, the smaller. In the second case
+  b < a and r = b, the smaller. Both implications are true, so
+  the repaired method satisfies its specification. The same
+  argument on the original min failed in the case b < a,
+  because nothing set r to b.
+
+5. Here is seconds again, returning an int, with the
+clause its specification then needs:
+
+/**
+ * Converts a duration in hours, minutes, and seconds to seconds.
+ *
+ * @param h the hours
+ * @param m the minutes
+ * @param s the seconds
+ * @requires 0 <= h, 0 <= m, and 0 <= s
+ * @requires 3600 * h + 60 * m + s <= 2147483647 (fits in an int)
+ * @return 3600 * h + 60 * m + s
+ */
+static int seconds(int h, int m, int s) {
+    int t = h;
+    t = t * 60 + m;
+    t = t * 60 + s;
+    return t;
+}
+
+The three tests pass on this version too. Reason forward through
+it. Does the argument use the new clause? What would go wrong
+without the clause? Then say how a client could check the clause
+before a call, and what else the method could do instead of
+asking for the clause.
+
+Answer
+
+The argument never uses the clause. The four claims are the
+  claims in What is true after each line, and the check at the
+  return is the same implication. The claims use integer
+  arithmetic, but Java's int wraps. So without the clause, a
+  claim could be true of the integers and false of the program, as
+  for abs without its bound. The clause and the precondition's
+  three facts 0 <= h, 0 <= m, and 0 <= s keep every value
+  computed on the way at most the answer, and the answer fits, so
+  no line wraps.
+
+A client checks the clause in long. In int arithmetic
+  the check itself could wrap. In long it cannot. The client
+  can also compute the total with Math.multiplyExact and
+  Math.addExact, which throw instead of wrapping. An exercise in
+  Lecture 6 used the
+  second of them.
+
+Two other designs. Return a long, as the version at the top
+  does, and the clause goes away. Or keep the int, compute with
+  Math.multiplyExact and Math.addExact, and promise an
+  ArithmeticException when the answer does not fit, one of
+  Lecture 6's six ways. The argument for that design needs a case
+  the rules above do not cover: a line that throws ends the run
+  early, and the argument has to show the @throws promise on
+  that run.
+
+Further reading
+
+The rules. C. A. R. Hoare, "An Axiomatic Basis for Computer
+  Programming" (Communications of the ACM, 1969), a short paper
+  and the source of the triple, the backward rule for an
+  assignment, the rule for a sequence, and the rule of consequence.
+
+Weakest preconditions. Edsger W. Dijkstra, "Guarded Commands,
+  Nondeterminacy and Formal Derivation of Programs"
+  (Communications of the ACM, 1975), which treats a statement as
+  a function from a postcondition to the weakest precondition from
+  which the statement reaches it: the view behind backward reasoning.
+
+A textbook. David Gries, The Science of Programming
+  (1981), which develops programs together with their proofs, by
+  weakest preconditions.
+
+C. A. R. Hoare, "An Axiomatic Basis for Computer
+Programming" (Communications of the ACM, 1969), says its
+treatment is essentially Robert Floyd's, applied to program
+texts instead of flowcharts. Floyd's "Assigning Meanings to
+Programs" (1967) attached a claim to each arrow of a flowchart,
+to hold whenever that arrow is taken, and gave the forward rule
+for an assignment, with x0 for the old value. ↩
+
+Christopher Pulte,
+Hoare Logic and Model Checking, lecture 1
+(University of Cambridge, 2024/2025), slides 16 to 18, shows
+that a postcondition for the maximum of two variables, written
+without their initial values, is met by a program that sets
+every variable to 0. Its fix is to refer to the initial values
+by names that never occur in the program, which it calls
+auxiliary variables, also ghost or logical variables. ↩
+
+Leslie Lamport, "The Future of Computing: Logic or
+Biology" (2003), the text of a talk, and one of Reading 2's
+three articles. ↩
+
+    UW Site Use Agreement

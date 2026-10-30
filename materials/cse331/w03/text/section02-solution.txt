@@ -1,0 +1,220 @@
+CSE 331: Section 2 — Testing (Solutions)
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          Task 1 - Spec Based Testing
+Task 2 - Code Coverage
+Task 3 - Interactive Programming: Designing for TestabilityPart A - Decomposition
+Part B - Refactoring
+Part C - Testing
+
+        CSE 331: Section 2 — Testing (Solutions)
+
+Task 1 - Spec Based Testing
+
+Use the testing heuristics from lecture to write a test suite for the following method:
+
+/**
+ * Returns the sum of the array
+ * @param arr an array of integers
+ * @requires arr is not null
+ * @returns the sum of the elements
+ * in arr or 0 if arr is empty
+ */
+ public static int arraySum(int[] arr) {...}
+
+@Test
+public void testArraySum() {
+    // empty array
+    int[] arr1 = new int[0];
+    assertEquals(0, arraySum(arr1)); 
+    // single element array
+    int[] arr2 = {5};
+    assertEquals(5, arraySum(arr2)); 
+    // multi-element array
+    int[] arr3 = {0, 3, 3, -1, 0};
+    assertEquals(5, arraySum(arr3));
+}
+
+Task 2 - Code Coverage
+
+Write JUnit tests for code coverage for the method spec and impl below.
+
+/**
+ * Removes x from the prefix a[0..n]
+ * @param a the non-null array to remove from
+ * @param n the length of the prefix
+ * @param x the value to remove
+ * @requires 0 <= n <= a.length
+ * @modifies a
+ * @effects if x does not occur in a[0..n], leaves a unchanged;  otherwise, if x
+ *     occurs k > 0 times in a[0..n], then remove all k occurrences of x,
+ *     leaving remaining elements in the same relative order as before;
+ *     the new value of elements in a[n-k..n] is unspecified.
+ * @return n - k
+ */
+public static int removeValue(int[] a, int n, int x) {
+    int w = 0;
+    for (int r = 0; r < n; r++) {
+        if (a[r] != x) {
+            a[w] = a[r];
+            w++;
+        }
+    }
+    return w;
+}
+
+We have given you a template for the first test. Feel free to use a similar
+format for additional tests as well. Include a comment in the space provided
+above each assertion stating which testing heuristic(s) is being covered. Make
+sure your tests cover all statements, branches, and 0/1/2+ loops.
+
+@Test public void testRemoveValue() {
+
+  int[] arr = {__________________________________________________________________};
+
+  // _____________________________________________________________________________
+
+  assertEquals(__________________________________________________________________);
+
+  assertArrayEquals(_____________________________________________________________);
+
+}
+
+@Test
+public void testRemoveValue() {
+    int[] arr = {1, 2, 3};
+
+    // 0 loop iterations
+    assertEquals(0, removeValue(arr, 0, 1));
+    assertArrayEquals(arr, new int[] {1,2,3});
+
+    // 1 loop iterations & implicit else branch
+    assertEquals(0, removeValue(arr, 1, 1));
+    assertArrayEquals(arr, new int[] {1,2,3});
+
+    // 2+ loop iterations & if branch
+    assertEquals(1, removeValue(arr, 2, 1));
+    assertArrayEquals(arr, new int[] {2,2,3});
+}
+
+Task 3 - Interactive Programming: Designing for Testability
+
+Recall this simplified version of the Sum.java program from lecture.
+
+/**
+ * Reads whitespace-separated integers from standard input and prints
+ * either their sum (default) or their average.
+ *
+ * Usage:
+ *   java Sum [options]
+ *
+ * Options:
+ *   -a      print the average instead of the sum
+ *
+ * Input is read from standard input until end of file.
+ */
+public static void main(String[] args) {
+    boolean average = false;
+    if (args.length > 0 && args[0].equals("-a")) {
+        average = true;
+    }
+
+    Scanner scan = new Scanner(System.in);
+    int sum = 0;
+    int count = 0;
+
+    while (scan.hasNextInt()) {
+        sum += scan.nextInt();
+        count++;
+    }
+
+    if (average) {
+        System.out.println((double) sum / count);
+    } else {
+        System.out.println(sum);
+    }
+}
+
+This main method is responsible for several different tasks.
+
+Part A - Decomposition
+
+Identify at least three distinct jobs that main is performing.
+
+Some reasonable jobs include:
+
+Parsing the command-line arguments to determine whether to compute a sum or average.
+
+Reading integers from standard input.
+
+Computing the running sum (and count) of the input values.
+
+Computing the average when requested.
+
+Printing the final result.
+
+There is not one correct answer. The important observation is that main
+is performing several distinct jobs, making it difficult to understand and
+to test.
+
+Part B - Refactoring
+
+Rewrite the main method by "wishful thinking". Which 2 or 3 helper methods might you create?
+
+public static void main(String[] args) {
+
+}
+
+Some reasonable answers include:
+
+parseArguments(...)
+readNumbers(...)
+computeSum(...)
+computeAverage(...)
+printResult(...)
+
+There is not one correct decomposition. The goal is to separate the different
+responsibilities of the program into helpers with clear purposes.
+
+Part C - Testing
+
+Of the helper methods you listed above, which one would be most valuable to
+extract if your goal is to make the program easier to unit test? Briefly explain.
+
+A helper method such as computeSum(...) (or computeAverage(...)) is the best
+candidate because it isolates the program's core computation. Once extracted, it
+can have a clear specification and can be unit tested independently of command-line
+arguments, user input, and console output.
+
+Helpers like printResult(...) may improve organization, but they do not
+significantly improve testability since printing is typically not a behavior
+we care about unit testing.
+
+    UW Site Use Agreement

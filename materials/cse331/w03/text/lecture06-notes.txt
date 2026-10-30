@@ -1,0 +1,1365 @@
+CSE 331: Error handling and interactive programs
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          A calculator
+Interactive programs
+When a method cannot do its job
+A precondition
+A special value
+A flag or a wrapper
+An exception
+When the client forgets
+A checked exception
+Choosing a way
+Interactive programs are harder
+Exercises
+Further reading
+
+        CSE 331: Error handling and interactive programs
+
+lecture
+
+Course motto: Your job is to deliver code that you know works.
+
+A calculator
+
+Today's program is a calculator, in two halves: main, which talks
+to the user, and CalcStack, which does the arithmetic. Read both
+before you read on. Here is main:
+
+  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111import java.util.*;
+
+/**
+ * An interactive stack-based integer calculator.
+ *
+ * Numbers and operations are separated by spaces. Numbers get pushed
+ * onto the stack. An operation like + pops the top two numbers,
+ * combines them, and pushes the answer back onto the stack.
+ *
+ *   > 1 2 +
+ *   > .
+ *   3
+ *
+ * This computes 1 + 2 = 3 using the stack. It pushes 1 and 2, then
+ * pops them, adds them, and pushes the result.
+ *
+ *   > 1 2 -
+ *   > .
+ *   -1
+ *
+ * For operations where the order of the arguments matters, the
+ * number that was second-from-the-top is on the left of the
+ * operator, which is why the above program computes 1 - 2 = -1
+ * rather than 2 - 1 = 1.
+ *
+ * Commands:
+ *   a number   push it onto the stack
+ *   +          pop two numbers, push their sum
+ *   -          pop two numbers, push (second - first)
+ *   *          pop two numbers, push their product
+ *   /          pop two numbers, push (second / first), int div
+ *   p          print the whole stack
+ *   .          pop the top number and print it
+ *   t          print the top number without removing it
+ *   q          quit
+ */
+public class Calculator {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        CalcStack stack = new CalcStack();
+        while (true) {
+            System.out.print("> ");
+            if (!in.hasNextLine()) {
+                break;
+            }
+            String line = in.nextLine();
+            String[] tokens = line.split("\\s+");
+            for (String token : tokens) {
+                if (token.equals("")) {
+                    continue;
+                } else if (token.equals("q")) {
+                    return;
+                } else if (token.equals("p")) {
+                    System.out.println(stack);
+                } else if (token.equals(".")) {
+                    Integer top = stack.pop();
+                    if (top == null) {
+                        System.out.println("error: stack is empty");
+                    } else {
+                        System.out.println(top);
+                    }
+                } else if (token.equals("t")) {
+                    OptionalInt top = stack.top();
+                    if (top.isEmpty()) {
+                        System.out.println("error: stack is empty");
+                    } else {
+                        System.out.println(top.getAsInt());
+                    }
+                } else if (token.equals("+")) {
+                    boolean ok = stack.add();
+                    if (!ok) {
+                        System.out.println(
+                            "error: need two numbers to add");
+                    }
+                } else if (token.equals("-")) {
+                    try {
+                        stack.subtract();
+                    } catch (StackException e) {
+                        System.out.println(
+                            "error: " + e.getMessage());
+                    }
+                } else if (token.equals("*")) {
+                    if (stack.size() < 2) {
+                        System.out.println(
+                            "error: need two numbers to multiply");
+                    } else {
+                        stack.multiply();
+                    }
+                } else if (token.equals("/")) {
+                    try {
+                        stack.divide();
+                    } catch (TooFewOperandsException e) {
+                        System.out.println(
+                            "error: " + e.getMessage());
+                    } catch (DivideByZeroException e) {
+                        System.out.println(
+                            "error: " + e.getMessage());
+                    }
+                } else {
+                    try {
+                        int value = Integer.parseInt(token);
+                        stack.push(value);
+                    } catch (NumberFormatException e) {
+                        System.out.println("error: don't understand '"
+                            + token + "'");
+                    }
+                }
+            }
+        }
+    }
+}
+
+The calculator keeps a stack, a list of numbers that grows and
+shrinks at one end, its top. Typing a number pushes it onto the
+top. An arithmetic operation, such as +, pops the top two numbers,
+combines them, and pushes the answer. Writing the operation after
+its numbers, as in 1 2 +, is called
+reverse Polish notation.
+In each run below, a line after a > prompt is what the user typed:
+
+$ javac Calculator.java
+$ java Calculator
+> 1 2 + .
+3
+> q
+
+1 and 2 go onto the stack, + replaces them with 3, and .
+pops the 3 and prints it. Here is a longer run, with p printing
+the whole stack, bottom first, after each step:
+
+$ java Calculator
+> 42
+> 1 3 10 17
+> p
+[42 1 3 10 17]
+> + p
+[42 1 3 27]
+> - p
+[42 1 -24]
+> .
+-24
+> q
+
+42 went onto the stack with no output: the calculator shows its
+stack only when asked. + added the top two numbers, 10 and 17.
+- then subtracted the top number from the one below it: 3 minus
+27, not 27 minus 3, as the class comment says.
+
+Interactive programs
+
+The stack is not why we are looking at the calculator. We are
+looking at it because it is interactive.
+Lecture 3's Sum
+read all its input, computed, wrote its output, and exited: a batch
+program.
+Lecture 3 promised
+a later lecture on programs of the other kind. The calculator is
+such a program:
+
+Definition: interactive program
+
+An interactive program responds to each input as it
+arrives, and keeps running until the user tells it to stop.
+
+main's loop, on lines 41 to 109, never ends on its own. Each time
+around, the loop prints the prompt >, reads one line, and
+responds to each word on the line. Each such word is a token.
+The loop ends in only two ways. q returns from main, on line 52.
+Ending the input (Control-D on macOS and Linux, or Control-Z and
+Enter on Windows) makes hasNextLine on line 43 false, and break
+leaves the loop.
+
+The difference shows when the user makes a mistake. Sum stopped
+at the first mistake: it printed a message on standard error and
+exited with status 1. A user who types + with one number on the
+stack expects to keep the stack and fix the mistake. So the
+calculator prints a message and keeps going:
+
+$ java Calculator
+> 1 +
+error: need two numbers to add
+> p
+[1]
+> x
+error: don't understand 'x'
+> 2 + p
+[3]
+> q
+
+Each mistake gets a message. The operation that failed leaves the
+stack alone. For that to work, main has to learn of every
+operation that could not be done, so that it can tell the user and
+go around the loop again.
+
+When a method cannot do its job
+
+That run has two mistakes in it, + on one number and x, both
+the user's. Three kinds of trouble matter here:
+
+A user's mistake. The user typed something the program cannot
+  use, such as x.
+  Lecture 3
+  met these with checks and messages at the edge of the program,
+  where the user's input arrives, and never with a stack trace: that
+  is one of this course's rules.
+
+A programmer's mistake. Some code breaks a promise, such as a
+  precondition. The code may be ours, a coworker's, or a library's.
+  Either way, the specification promises nothing about what happens
+  next.
+
+A request that cannot be carried out. A client asks a method
+  for something the method cannot do. Popping a number off an empty
+  stack is such a request. So is asking
+  Lecture 2's indexOf
+  for a value that is not in the array: there is no index to return.
+
+In the calculator, the first leads to the third. The design is why:
+the program keeps two concerns apart. main owns the conversation
+with the user: the prompt, the tokens, the messages. CalcStack
+owns the stack and its arithmetic, and knows nothing of users.
+Giving each concern one home is called separation of concerns.
+Its price is paid at the boundary. The user's + on a stack of one
+number crosses into CalcStack as a request it cannot carry out,
+and CalcStack cannot print a message, since its client is main,
+not a person. So CalcStack has to tell main that the operation
+failed, and main, at the edge, tells the user. The only words the
+two halves share are CalcStack's specifications, so every way of
+saying no is a clause in one. The question for the rest of this
+lecture is this: when a method cannot do its job, how does it say
+no to its client?
+
+CalcStack answers that question six different ways, one for each
+of its operations that can fail. It does so on purpose, to show all
+six side by side. If each method had its own way, a class's clients
+would have to learn each way separately. So a real class picks one
+way and uses it everywhere. Here is CalcStack, the rest of the
+program:
+
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238class CalcStack {
+    private List<Integer> items = new ArrayList<Integer>();
+
+    /** @return the number of numbers on the stack */
+    public int size() { return items.size(); }
+
+    /**
+     * @modifies this
+     * @effects pushes value onto the top of the stack
+     */
+    public void push(int value) { items.add(value); }
+
+    /**
+     * @modifies this
+     * @effects removes the top number from the stack, if the stack is
+     *     non-empty
+     * @return the number removed, or null if the stack was empty
+     */
+    public Integer pop() {
+        if (items.size() == 0) { return null; }
+        int last = items.remove(items.size() - 1);
+        return last;
+    }
+
+    /**
+     * @return an OptionalInt holding the top number of the stack, or
+     *     an empty OptionalInt if the stack is empty
+     */
+    public OptionalInt top() {
+        if (items.size() == 0) { return OptionalInt.empty(); }
+        return OptionalInt.of(items.get(items.size() - 1));
+    }
+
+    /**
+     * @modifies this
+     * @effects if the stack has at least two numbers, pops the top
+     *     two and pushes their sum; otherwise leaves the stack
+     *     unchanged
+     * @return true if the top two numbers were replaced with their
+     *     sum, or false if the stack had fewer than two numbers
+     */
+    public boolean add() {
+        if (items.size() < 2) { return false; }
+        int b = pop(); int a = pop();
+        push(a + b);
+        return true;
+    }
+
+    /**
+     * @modifies this
+     * @effects if the stack has at least two numbers, pops the top
+     *     two (first and second) and pushes second - first; otherwise
+     *     does nothing
+     * @throws StackException if the stack had fewer than two numbers
+     */
+    public void subtract() throws StackException {
+        if (items.size() < 2) {
+            throw new StackException("need two numbers to subtract");
+        }
+        int b = pop(); int a = pop();
+        push(a - b);
+    }
+
+    /**
+     * @requires 2 <= size()
+     * @modifies this
+     * @effects pops the top two numbers and pushes their product
+     */
+    public void multiply() {
+        int b = pop(); int a = pop();
+        push(a * b);
+    }
+
+    /**
+     * @modifies this
+     * @effects if the stack has at least two numbers and the top
+     *     number is non-zero, pops the top two (first and second) and
+     *     pushes second / first; otherwise leaves the stack unchanged
+     * @throws TooFewOperandsException if the stack had fewer than two
+     *     numbers
+     * @throws DivideByZeroException if the divisor (the top number)
+     *     was zero
+     */
+    public void divide() {
+        if (items.size() < 2) {
+            throw new TooFewOperandsException(
+                "need two numbers to divide");
+        }
+        int b = pop(); int a = pop();
+        if (b == 0) {
+            push(a); push(b);
+            throw new DivideByZeroException("cannot divide by zero");
+        }
+        push(a / b);
+    }
+
+    /**
+     * @return a string showing the stack's numbers from bottom to top
+     */
+    public String toString() {
+        String result = "[";
+        for (int i = 0; i < items.size(); i++) {
+            if (i > 0) { result = result + " "; }
+            result = result + items.get(i);
+        }
+        return result + "]";
+    }
+}
+
+class StackException extends Exception {
+    public StackException(String message) {
+        super(message);
+    }
+}
+
+class TooFewOperandsException extends RuntimeException {
+    public TooFewOperandsException(String message) {
+        super(message);
+    }
+}
+
+class DivideByZeroException extends RuntimeException {
+    public DivideByZeroException(String message) {
+        super(message);
+    }
+}
+
+Most of CalcStack's methods change the stack they are called on.
+In a specification, this names that stack. So @modifies this
+says that the method may change the stack, and @effects says how.
+A later lecture, on data abstraction, gives such specifications
+their full form. Here is how each operation says no, and how main
+responds:
+
+*, a precondition. multiply requires 2 <= size(), and
+  main checks size() before the call (line 83).
+
+., a special value. pop returns null, and main checks
+  for null (line 57).
+
++, a flag. add returns false, and main checks the flag
+  (line 71).
+
+t, a wrapper. top returns an empty OptionalInt, and
+  main asks whether it is empty (line 64).
+
+/, an exception. divide throws one, and main catches it
+  (lines 92 and 95).
+
+-, a checked exception. subtract throws one, and main
+  catches it (line 78).
+
+The run below starts from an empty stack. Each of the six
+operations fails in turn, and main reports each failure:
+
+$ java Calculator
+> .
+error: stack is empty
+> t
+error: stack is empty
+> +
+error: need two numbers to add
+> -
+error: need two numbers to subtract
+> *
+error: need two numbers to multiply
+> /
+error: need two numbers to divide
+> 1 0 /
+error: cannot divide by zero
+> p
+[1 0]
+> q
+
+To the user, the six look alike. In the code, they are six different
+contracts between CalcStack and main. A precondition is the
+simplest of the six, so it comes first.
+
+A precondition
+
+multiply's specification requires 2 <= size().
+As Lecture 2 said,
+a precondition is the client's promise, and the method may assume
+it. If the client breaks the promise, the method may do anything at
+all and still satisfy its specification. So multiply checks
+nothing. Checking is main's job, and main does check, on
+line 83.
+
+This is
+Lecture 3's arrangement.
+Lecture 2 gave the reason:
+the user owes the program nothing, so the check stays at the edge,
+in main, where the user's input arrives. The method's client,
+though, is code that can be held to a promise, so the method may
+have a precondition.
+
+With a precondition, the method itself never says no: the client
+checks before the call. That suits a client that can check cheaply.
+Here size() makes the check one comparison.
+
+Checking a precondition anyway, inside the method, is called
+defensive programming:
+multiply could test size() itself and throw an exception when the
+promise is broken. A broken precondition allows anything, so the
+specification would be the same either way.
+multiply does not check, on
+purpose, so that the section
+When the client forgets
+can show what happens when nobody checks.
+
+Some clients cannot check cheaply. Before calling Integer.parseInt
+on line 101, main would have to scan the token for digits and work
+out whether the number fits in an int. That is as much work as
+parsing it. For such a client, the method itself has to check, and
+tell the client what the check found. The other five ways do that.
+
+A special value
+
+pop returns the number it removed. When the stack is empty, there
+is no number to return, so it returns null instead. A value that a
+method returns only when it could not do its job is a
+special value.
+Lecture 2's indexOf
+used one too, -1 for a value that is not in the array, and left
+its downsides for later.
+
+pop's return type is Integer, not int. Java has two kinds of
+types. A primitive type, such as int or boolean, holds a
+plain value. Every other type, such as String, Integer, or an
+array, is a reference type. A variable of a reference type may
+hold null, which refers to nothing. int has no null, so
+pop uses Integer, a reference type whose values are ints, plus
+null. Java converts between the two by itself. On line 134, pop
+returns the int last, and Java turns it into an Integer. That
+direction always works. The other direction fails on null, as
+the section
+When the client forgets shows.
+
+A special value has to be a value the method never returns
+otherwise. An index is never negative, so -1 works for indexOf.
+Suppose top returned -1 for an empty stack. A client that got
+-1 could not tell an empty stack from a stack whose top number is
+-1, so -1 does not work for a stack of numbers.
+
+A flag or a wrapper
+
+add has no answer to give. Its job is to change the stack, so its
+return type could have been void. Instead it returns a boolean,
+a flag: true if it replaced the top two numbers with their sum,
+and false if the stack had fewer than two numbers. main checks
+the flag on line 71. Java's own List.remove(Object) works the same
+way: it returns false when the list did not hold the object.
+
+top has an answer to give, the top number, and also needs a way to
+say there is none. A flag alone cannot carry both: a method returns
+one value, and Java gives it no other channel for an int.1 So
+top returns an OptionalInt, a wrapper: a value that either
+holds one int or is empty. Think of it as a list of length zero
+or one. OptionalInt.of makes a wrapper that holds a number, and
+OptionalInt.empty makes an empty wrapper. The client asks
+isEmpty, as main does on line 64. If the wrapper is not empty,
+getAsInt gives the number.
+
+The flag and the wrapper both widen the return type to make room for
+a "no." Integer widened int the same way, with null. The flag
+and the wrapper differ in what Java does when the client forgets to
+check, the subject of
+When the client forgets.
+
+An exception
+
+divide does not return at all when it cannot do its job. Instead,
+on line 198 or line 204, it throws an exception. An exception is
+not a crash, though a crash is how one usually first appears: a
+NullPointerException, and the stack trace a program prints when
+nothing catches it. Throwing an exception ends the method at once.
+Java then looks for code that has said it will catch that kind
+of exception. Only if there is none does the program stop with a
+stack trace.
+
+main catches divide's exceptions with a try statement, on
+lines 90 to 98:
+
+90
+91
+92
+93
+94
+95
+96
+97
+98try {
+    stack.divide();
+} catch (TooFewOperandsException e) {
+    System.out.println(
+        "error: " + e.getMessage());
+} catch (DivideByZeroException e) {
+    System.out.println(
+        "error: " + e.getMessage());
+}
+
+A try statement has two parts. The try block comes first, here
+the one statement on line 91. Then come catch blocks, here two,
+on lines 92 and 95, each naming a kind of exception. Java runs the
+try block. If no line in it throws, the catch blocks are
+skipped. If a line in it throws, Java leaves the block at that line
+and runs the first catch block whose kind matches, with the
+exception in that block's variable, e. e.getMessage() is the
+message divide gave when it threw. Either way, the program goes
+on after the statement instead of stopping. Think of a try as an
+if whose condition is whether the block threw, with the catch
+as its else. To a reader, a try also marks the code inside as
+code that can fail.
+
+divide can fail two ways. Each has its own exception, so the
+client can tell them apart, though main treats them alike. The
+three exception classes after CalcStack are each a few lines that
+give a kind of exception a name. divide's specification lists its
+two with @throws.
+As Lecture 2 said,
+the method promises to throw each exception in its case, so
+@throws is part of the postcondition.
+
+subtract throws the third class, StackException, and main
+catches it the same way, on line 78. Two lines set subtract
+apart. Line 168 says throws StackException after the method's
+signature, and line 222 extends Exception where divide's two
+classes extend RuntimeException. The section
+A checked exception says what those two
+lines buy.
+
+Integer.parseInt, a library method, says no the same way. On
+line 101, it throws a NumberFormatException when the token is not
+a whole number that fits in an int, and main catches the
+exception on line 103. That is where error: don't understand 'x'
+came from.
+
+When the client forgets
+
+All six ways work when the client checks. But a programmer can
+forget. So a second question tells the six apart: what happens when
+the client forgets to check? Before reading on, decide what you
+would want to happen. For each way, we took main's check out of a
+copy of the calculator, leaving blank lines so that every other
+line keeps its number. Two copies also store the answer in an
+int. Here is what each copy did.
+
+The flag. Without the check on lines 71 to 74, main ignores
+add's answer:
+
+$ java Calculator
+> 1 +
+> p
+[1]
+> q
+
+Nothing happens. add left the stack unchanged, as its
+specification says, but main ignored the flag, so nobody told the
+user. To the user, + on one number acted as if the missing number
+were 0.
+
+The precondition. Without the if on lines 83 to 88, which
+leaves only the call on line 87, main calls multiply on a stack
+of one number:
+
+$ java Calculator
+> 1 *
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "CalcStack.pop()" is null
+    at CalcStack.multiply(Calculator.java:182)
+    at Calculator.main(Calculator.java:87)
+
+multiply assumed its precondition, so it popped twice. The second
+pop found the stack empty and returned null. Line 182 stores that
+null in the int a. Java cannot turn null into an int, so
+the program stopped with a NullPointerException. Java turns an
+Integer into an int by calling its intValue method, the call
+the message names. The message's second half does help: it says
+that pop returned the null. Still, it is a confusing message,
+about a null the client never saw, and it says nothing about two
+numbers. The client broke the precondition, so multiply's
+specification promised nothing about this call.
+
+The special value. With Integer kept and only the check
+dropped, . on an empty stack prints null to the user, and the
+run goes on. In this copy, line 56 also stores pop's answer in an
+int instead of an Integer, and lines 57 to 59 and 61 are blank,
+leaving only the println on line 60. It compiles, and then:
+
+$ java Calculator
+> .
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "CalcStack.pop()" is null
+    at Calculator.main(Calculator.java:56)
+
+The null met the same conversion, this time in main. Java
+converted Integer to int silently, so nothing warned the
+programmer before the run. An Integer in a return type does not
+say "may be null" to most readers, either. Integer also appears
+for another reason. A list cannot hold a primitive type, so a list
+of numbers has to be a List<Integer>.
+
+The exception. Without the try on lines 90 to 98, nothing
+catches divide's exception:
+
+$ java Calculator
+> 1 /
+Exception in thread "main" TooFewOperandsException: need two numbers to divide
+    at CalcStack.divide(Calculator.java:198)
+    at Calculator.main(Calculator.java:91)
+
+The program stops, and the user sees a stack trace, which this
+course's rule forbids. Still, the stack trace gives divide's own
+message, and the line that threw the exception.
+
+The wrapper. A client can forget a wrapper's check two ways. In
+this copy, lines 64 to 66 and 68 are blank, so line 67 asks
+getAsInt without asking isEmpty first. It compiles, and then:
+
+$ java Calculator
+> t
+Exception in thread "main" java.util.NoSuchElementException: No value present
+    at java.base/java.util.OptionalInt.getAsInt(OptionalInt.java:130)
+    at Calculator.main(Calculator.java:67)
+
+getAsInt on an empty OptionalInt throws a
+NoSuchElementException, and its message says what was missing. So
+a wrapper does not stop a client from forgetting the check. It does
+stop the mistake the special value's copy made on line 56. Storing
+top's answer in an int on line 63, and printing it without the
+check, does not compile:
+
+$ javac Calculator.java
+Calculator.java:63: error: incompatible types: OptionalInt cannot be converted to int
+                    int top = stack.top();
+                                       ^
+1 error
+
+Java does not convert an OptionalInt to an int by itself. The
+client has to ask for the number with getAsInt, and asking is a
+reminder that there may be none.
+
+Of the six copies so far, five reached a run: the flag's silence,
+the precondition's confusing crash, the special value's null, the
+exception's stack trace, the wrapper's crash at the ask. The sixth,
+the wrapper stored in an int, was caught by the compiler, and
+only because an OptionalInt is not an int. What would you want
+to happen when a client forgets? The best answer is to be told
+before the program runs at all. Java can do that for an exception,
+if the method's author asks for it.
+
+A checked exception
+
+StackException, on line 222, extends Exception. divide's two
+exceptions, on lines 228 and 234, extend RuntimeException
+instead. Java has two kinds of exceptions:
+
+An unchecked exception extends RuntimeException. A method
+  may throw one without saying so in its code, and its client may
+  catch it or not.
+
+A checked exception extends Exception but not
+  RuntimeException. A method that may throw one has to say so in a
+  throws clause, as subtract does on line 168. The clause repeats
+  the @throws tag on line 166 in code rather than in a comment, so
+  the compiler reads it. Every client then has to catch the
+  exception or declare it in its own throws clause.
+
+The names do not help: RuntimeException is itself a kind of
+Exception. You may have met a checked exception already. Lecture
+3's Sum caught a FileNotFoundException, which is checked.
+
+Now the sixth copy. Without the try on lines 76 to 81, it does
+not compile:
+
+$ javac Calculator.java
+Calculator.java:77: error: unreported exception StackException; must be caught or declared to be thrown
+                        stack.subtract();
+                                      ^
+1 error
+
+The compiler found the forgotten check before anyone ran the
+program. main could instead declare throws StackException
+itself, on line 38. In a copy that does, with the try still
+blank, the compiler is satisfied: main has passed the exception
+on, as its clause says. No method called main, so nothing
+catches it, and - on too few numbers ends the run with a stack
+trace:
+
+$ java Calculator
+> 1 -
+Exception in thread "main" StackException: need two numbers to subtract
+    at CalcStack.subtract(Calculator.java:170)
+    at Calculator.main(Calculator.java:77)
+
+Either way, the compiler held main to the check: catch the
+exception, or say that main may throw it.
+
+When the client forgets the check:
+
+a flag, nothing happens, silently;
+
+a precondition, anything may happen, here a confusing
+  NullPointerException about a null the client never saw;
+
+a special value, the null is printed to the user, or meets a
+  conversion to int and stops the program;
+
+an exception, the program stops, with a stack trace that gives
+  the method's own message;
+
+a wrapper, asking without checking stops the program at the
+  ask, and using the wrapper as an int does not compile;
+
+a checked exception, the compiler refuses the program.
+
+Lecture 4 named three ways
+to know that code works: testing, tools, and reasoning. A tool can
+confirm a claim about every run, but only the one claim it was
+built to check. The Java compiler is such a tool. A checked
+exception gives the compiler one more claim to check: every caller
+of subtract either catches StackException or declares it in its
+own throws clause. The author of subtract chose a checked
+exception, so the compiler holds every client to the check, however
+careless. A mistake the compiler catches never reaches a run, a
+user, or a test. So when you can, let the compiler find the
+mistake.
+
+Choosing a way
+
+None of the six is best everywhere. The designer of a method has to
+decide which problems are serious, and which a client can work
+around. Three questions help:
+
+Can the client check first, cheaply? Then a precondition is
+  simplest, as for multiply. A check before the call also puts the
+  condition in front of whoever reads main. With a flag or an
+  exception, that reader has to look up the specification. When
+  checking would cost as much as the work, as for parseInt, the
+  method should check and say what it found.
+
+How convenient is the answer to use? A flag or a special value
+  is checked with a plain if. An exception needs a try. A
+  checked exception makes every client catch it or declare it, even
+  a client that knows the failure cannot happen. That is the tension
+  in a checked exception: every client pays, with a try or a
+  clause, and in return the compiler checks every client before any
+  run.
+
+What happens when a client forgets? Silence, a confusing
+  crash, a stack trace with the method's own message, or a
+  compile-time error. Of these, only the compile-time error comes
+  before any run.
+
+Bloch gives a rule of thumb for choosing between the two kinds of
+exception.2 A problem a careful client should expect and
+recover from, such as a file that is not there, suits a checked
+exception. A problem that only a programmer's mistake can cause
+suits an unchecked exception. The other two ways sort beside them:
+a wrapper beside the checked exception, since both make the client
+ask, and a precondition beside the unchecked exception, since both
+leave a careless client to a crash.
+The choice also sets the specification's strength, in
+Lecture 2's sense.
+A method that promises an exception on a bad call has a stronger
+specification than a method that requires a good call.
+As Lecture 2 said,
+a library method's specification can only grow stronger. So once a
+library publishes a @throws clause, it cannot replace the clause
+with a precondition. A later lecture returns to exceptions in depth.
+
+There is a seventh way, a bad one: say nothing, and make up an
+answer. add could treat a missing number as 0, and that is how
+the forgotten flag looked to the user. The program then keeps
+running, and the made-up answer travels on into later results. The
+mistake may show much later, far from its cause, or never. Three
+values are common made-up answers:
+
+undefined. JavaScript often takes the seventh way. Reading
+  an array past its end there gives undefined, instead of an
+  error, and undefined + 1 gives NaN.
+
+NaN and Infinity. In Java's rules for doubles, these are
+  special values: 0.0 / 0.0 gives NaN, short for "not a number,"
+  and 1.0 / 0.0 gives Infinity. Neither throws, and a client
+  that never checks for them gets the seventh way: NaN + 1 is
+  NaN again.
+  Lecture 3's notes
+  ran a copy of Sum without its count check: it printed NaN,
+  and reported success.
+
+null. A method whose specification does not allow null,
+  but which returns null anyway, has made up an answer. The null
+  is passed along until a line converts it to an int or calls a
+  method on it, and the program stops there, far from where the
+  null came from.
+
+Lecture 3's notes
+quote Kernighan and Pike: "the one guaranteed wrong answer is to
+ignore the problem." The calculator itself ignores one problem,
+Lecture 1's overflow:
+
+$ java Calculator
+> 2147483647 1 + p
+[-2147483648]
+> q
+
+The sum is past the largest int, so the addition on line 157 wraps
+around to the most negative int. This is a bug, not a way of
+saying no. add's specification promises their sum, and on this
+run the stack holds something else. Nobody decided what add
+should do when the sum does not fit, so Java's arithmetic decided:
+the seventh way, by omission. The fix is a decision. add can say
+no in one of the six ways, which exercise 2 asks you to choose. Or
+its specification can promise less, and say that the sum wraps
+around: add is then correct, and a client who wanted the sum
+is left without it. Many programmers leave overflow undecided, as
+this course leaves running out of memory undecided. The difference
+is that a user reaches overflow from the keyboard, in one line.
+
+Interactive programs are harder
+
+Back to the calculator as a whole. Most of the programs you use
+every day are interactive: an editor, a browser, an app on your
+phone. Three things make an interactive program harder to get right
+than a batch program:
+
+State that lasts. The stack outlives each line the user types.
+  What a line does can depend on every line before it, so a bug may
+  show only after one particular sequence of inputs. Think of a
+  program that crashes on the eleventh click, but only after a
+  certain file was opened.
+
+A user who chooses the order. A batch program reads its input
+  in one fixed order. An interactive program must respond sensibly
+  to any input at any moment, and keep running afterward.
+
+State the user cannot see. The calculator shows its stack only
+  when asked, with p. A user who forgets what is on it, or a
+  tester who wants to reproduce a bug, has to reconstruct the stack.
+
+The same separation of concerns makes the calculator's state easy
+to test on its own. main keeps the conversation with the user:
+the prompt, the tokens, the messages. CalcStack keeps the state
+and the arithmetic. Lecture 5 said that a method that does one job
+is easier to test. Its section
+Testable by design
+says why the keyboard matters: a method that reads it is hard to
+test, and a method that takes values and returns one is easy. A
+test of add needs no keyboard: build a CalcStack, push two
+numbers, call add, and check the flag and the stack. Here is that
+test, and a test of divide, written as
+Lecture 4 wrote its tests:
+
+    @Test
+    void addReplacesTwoNumbersWithTheirSum() {
+        CalcStack stack = new CalcStack();
+        stack.push(2);
+        stack.push(3);
+        assertTrue(stack.add());
+        assertEquals("[5]", stack.toString());
+    }
+
+    @Test
+    void divideOnOneNumberThrows() {
+        CalcStack stack = new CalcStack();
+        stack.push(1);
+        assertThrows(TooFewOperandsException.class,
+            () -> stack.divide());
+        assertEquals("[1]", stack.toString());
+    }
+
+The second test checks divide's @throws clause, which
+assertEquals cannot check: a call that throws returns nothing to
+compare. assertThrows takes the class of the exception expected,
+then the code to run, written as () -> stack.divide(). That form
+is a lambda: a piece of code handed over to be run later, here
+by assertThrows itself. The test passes if the code throws an
+exception of the class named, and fails if it throws nothing, or
+something else. The last line checks that the failed divide left
+the stack alone, as its specification says. Both tests pass. Blank
+divide's check on lines 197 to 200, and the second test fails:
+the code threw a NullPointerException, not a
+TooFewOperandsException. Later this quarter, the lectures on web
+apps return to interactive programs.
+
+Exercises
+
+Each answer is folded under its question. Write yours first.
+
+1. Change pop to report an empty stack with an unchecked
+exception, as divide does, instead of with null. Give its new
+specification and code, and the new code for the . command in
+main.
+
+Answer
+
+The method. The return type becomes int, since null no
+  longer has a job. The @return clause loses its second half, and
+  a @throws clause takes it over:
+
+/**
+ * @modifies this
+ * @effects removes the top number from the stack, if the stack is
+ *     non-empty
+ * @return the number removed
+ * @throws StackEmptyException if the stack was empty
+ */
+public int pop() {
+    if (items.size() == 0) {
+        throw new StackEmptyException("stack is empty");
+    }
+    return items.remove(items.size() - 1);
+}
+
+StackEmptyException is a new class that extends
+RuntimeException, in a few lines like those of divide's
+two exceptions.
+
+The client. main catches it:
+
+} else if (token.equals(".")) {
+    try {
+        System.out.println(stack.pop());
+    } catch (StackEmptyException e) {
+        System.out.println(
+            "error: " + e.getMessage());
+    }
+
+The other clients. add, subtract, multiply, and divide
+  call pop too. Each pops only after checking items.size(), or,
+  for multiply, under its precondition, so none needs a try. A
+  forgotten try in main now stops the program with a stack trace
+  whose message is stack is empty, instead of a
+  NullPointerException.
+
+2. The run on 2147483647 1 + p shows that add wraps around
+past the largest int. Java's Math.addExact(a, b) returns a + b,
+or throws an unchecked ArithmeticException when the sum does not
+fit in an int. Which of the six ways should add use to report an
+overflow, given that it already reports too few numbers with a flag?
+
+Answer
+
+The trouble with the flag. A boolean has room for one "no,"
+  and add already uses it for too few numbers. A second failure
+  needs a second answer, so the flag runs out of room.
+
+An exception can report the overflow. Let ArithmeticException
+  pass to main, and keep the flag for too few numbers:
+
+public boolean add() {
+    if (items.size() < 2) { return false; }
+    int b = pop(); int a = pop();
+    push(Math.addExact(a, b));
+    return true;
+}
+
+main then catches ArithmeticException around the call. The
+specification gains a clause,
+@throws ArithmeticException if the sum does not fit in an int,
+and has to say what is left on the stack. As written, the two
+numbers are already popped when addExact throws, so they are
+lost. divide keeps its stack unchanged by pushing both numbers
+back on line 203 before it throws. add could do the same with
+a try inside add: catch the ArithmeticException, push a
+and b back, and throw it again.
+- One way for both would serve the client better. Two ways of
+  saying no in one method are a sign to pick one, here an exception
+  for both. That is one reason a real class picks one way and keeps
+  to it.
+
+3. The calculator prints its error messages on standard output.
+Lecture 3's Sum
+printed its messages on standard error. Which is right for the
+calculator?
+
+Answer
+
+For a person at the terminal, it makes no difference. Both
+  streams show up on the screen.
+
+For a script, it does. A script could feed the calculator its
+  input through a pipe and read the answers from its output. With
+  the messages on standard output, the script finds
+  error: need two numbers to add where it expected a number. That
+  is the clutter the
+  Unix maxim in Lecture 3
+  warns against. With the messages on standard error, the answers
+  stay clean.
+
+A choice the manual should state. Either way, the class
+  comment says nothing about errors.
+  As Lecture 3 asked of Sum,
+  the calculator's manual should say what each mistake prints, and
+  where.
+
+Further reading
+
+The six ways, and more. Barbara Liskov and John Guttag,
+  Program Development in Java (2001), chapter 4, "Exceptions." It
+  sets out how a specification states the exceptions a procedure
+  throws, and, in section 4.4, when to choose checked or unchecked
+  ones.
+
+Rules from practice. Joshua Bloch, Effective Java, third
+  edition (2018), chapter 10. Item 69: use exceptions only for
+  exceptional conditions. Item 70: use checked exceptions for
+  recoverable conditions and runtime exceptions for programming
+  errors. Item 71: avoid unnecessary use of checked exceptions.
+  Item 77: don't ignore exceptions.
+
+The phrase. Edsger Dijkstra coined "separation of concerns" in
+  On the role of scientific thought
+  (1974), a short essay: study one aspect of a program at a time,
+  knowing the others are there and setting them aside for the
+  moment.
+
+The cost of null. Tony Hoare added the null reference to the
+  language ALGOL W in 1965. In a 2009 talk at QCon London, he called
+  it his "billion-dollar mistake," for the errors, security holes,
+  and crashes it has led to since. OptionalInt and its relatives
+  are one answer to that mistake.
+
+C gives it one. A C function often returns a flag and writes
+its real answers through pointers the client passed in, "by
+reference". scanf works that way: it returns how many of its
+arguments it filled. The client has to check that count before
+using what it passed, since a failed call leaves the variable
+holding whatever it held before. A check forgotten there reads
+a value that was never written, a classic source of bugs and
+security holes. ↩
+
+Joshua Bloch gives this rule for exceptions in
+Effective Java, third edition (2018), item 70. ↩
+
+    UW Site Use Agreement

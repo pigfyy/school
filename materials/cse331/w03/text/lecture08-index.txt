@@ -1,0 +1,76 @@
+CSE 331: Loops and loop invariants
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          CSE 331: Loops and loop invariants
+
+        CSE 331: Loops and loop invariants
+
+In the previous lecture, we saw how to use Floyd-Hoare logic to
+reason about combinations of assignment statements and if statements.
+Forward reasoning gave us strongest postconditions and backwards
+reasoning gave us weakest preconditions, which exactly capture the
+meaning of a piece of code by how it transforms assertions. Forward
+and backward reasoning have the advantage that they are fully
+mechanical: given a precondition and a piece of code, one can compute
+the strongest postcondition.
+
+In this lecture, we turn to loops. Loops may run an unknown and
+unbounded number of times, which makes it hard to capture their
+meaning precisely as an assertion transformer. In general, it is not
+possible to mechanically compute the strongest postcondition or
+weakest precondition of a loop. Instead, we annotate the loop
+manually with a loop invariant, which is a claim that holds each
+time the program checks the loop condition.
+
+We can then check Hoare triple validity involving loops by checking
+three things: (1) the precondition implies the invariant; (2) if we
+enter the loop body with the invariant true, then it will still be
+true after executing the body; and (3) if we exit the loop and the
+invariant holds, then the postcondition holds.
+
+Coming up with loop invariants requires some amount of creativity,
+but in simple cases, the invariant can be derived from the
+postcondition by describing how the loop is making progress towards
+that postcondition.
+
+Hoare triples only make claims about executions that terminate. If a
+loop runs forever, then even the postcondition false can be proved.
+To prove loop termination, we can use a "variant", which measures an
+upper bound on the number of iterations remaining. If the variant is
+an integer quantity that is bounded below and strictly decreasing,
+then the loop is guaranteed to terminate.
+
+Notes
+
+Slides
+
+Slides (PDF)
+
+    UW Site Use Agreement

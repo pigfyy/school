@@ -1,0 +1,84 @@
+CSE 331: Reasoning and Floyd-Hoare logic
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          CSE 331: Reasoning and Floyd-Hoare logic
+
+        CSE 331: Reasoning and Floyd-Hoare logic
+
+Three tests of a short method pass, and its specification promises
+an answer for every allowed input, far more than tests could try.
+To know that the method satisfies its specification, we reason:
+we argue from the code itself about every run at once. Lecture 1
+argued about Sum in prose. This lecture begins making such
+arguments precise, on code with no loops. Write down what is true
+after each line, as a claim about the program's state at a point,
+an assertion, which holds if it is true each time a run
+reaches that point. Then name the rule that justifies each step,
+so that anyone can check the argument.
+
+A Hoare triple is a claim before a piece of code and a claim
+after it, its precondition and its postcondition. The triple is
+valid if every terminating run of the code from a state in which
+the precondition is true ends in a state in which the postcondition
+is true. A method satisfies its specification exactly when the triple
+of its specification around its body is valid and every allowed call
+terminates. An empty triple, two claims at one point, is valid
+exactly when the first implies the second: the first is the
+stronger claim, true in fewer states. Who wants a stronger claim
+depends on where the claim sits in a specification: each party
+wants its own promise weak and the other party's strong. Forward
+reasoning fills in the strongest claim after some code, its
+strongest postcondition, and backward reasoning fills in the
+weakest claim before it, its weakest precondition. Either way,
+whether a triple is valid comes down to an implication, checked by a
+calculation.
+
+The lecture gives six rules: for an assignment, forward and
+backward; for a sequence; the rule of consequence, which checks a
+claim a rule produced against a claim someone wrote, and is where an
+argument can go wrong; and for a conditional, forward, which writes
+a claim inside each branch and joins the two after the if, and
+backward, which finds the states from which the if reaches its
+postcondition. An argument built from the rules is a proof,
+which anyone can check, and it says where it fails: for Lecture 5's
+min and quadrant, whose tests passed, the implication that is
+false says on which inputs the method is wrong. The claims are about
+the integers, and each method today either has a precondition that
+keeps its arithmetic from wrapping or does no arithmetic that could
+wrap; a test can catch a false implication we believe; and loops
+wait for Friday's lecture.
+
+Notes
+
+Slides
+
+Slides (PDF)
+
+    UW Site Use Agreement

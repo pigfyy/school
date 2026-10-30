@@ -1,0 +1,88 @@
+/* CSE 331 week 3: widget styles only. Loaded after base.css; uses only base tokens. */
+
+/* ---------------------------------------------------------------- terminal (the calculator) */
+.term { background: var(--night); color: var(--night-ink); border-radius: var(--r-lg); overflow: hidden; margin: 0.75rem 0 1rem; min-width: 0; box-shadow: 0 8px 24px -12px rgba(19,21,26,0.45); }
+.term-head { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.75rem; background: var(--night-2); border-bottom: 1px solid #000; }
+.term-head .dots { display: inline-flex; gap: 0.3rem; }
+.term-head .dots i { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--night-3); display: block; }
+.term-title { font-family: var(--mono); font-size: 0.76rem; color: var(--night-soft); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.term-body { margin: 0; padding: 0.75rem 0.95rem 0.9rem; font-family: var(--mono); font-size: 0.86rem; line-height: 1.55; overflow-x: auto; white-space: pre; max-height: 24rem; overflow-y: auto; tab-size: 4; }
+.term-body .tl { display: block; min-width: 100%; }
+.tl.cmd { color: #fff; }
+.tl.cmd .ps1, .tl .pr { color: var(--out-term); }
+.tl .typed { color: #f3e7a6; }
+.tl.out { color: var(--night-ink); }
+.tl.err { color: var(--err-term); }
+.tl.note { color: var(--night-soft); font-family: var(--font); font-style: italic; white-space: pre-wrap; font-size: 0.82rem; }
+.term-input { display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.75rem; background: var(--night-2); border-top: 1px solid #000; font-family: var(--mono); }
+.term-input .pr { color: var(--out-term); }
+.term-input input { flex: 1; min-width: 4rem; background: var(--night); color: #fff; border: 1px solid var(--night-3); font-family: var(--mono); font-size: 0.92rem; padding: 0.2rem 0.45rem; border-radius: 4px; }
+.term-input input:focus { border-color: var(--out-term); box-shadow: none; }
+.term-input input:disabled { opacity: 0.5; }
+.term-input button { font: inherit; font-size: 0.78rem; color: var(--night-ink); background: transparent; border: 1px solid var(--night-3); border-radius: 999px; padding: 0.1rem 0.6rem; cursor: pointer; white-space: nowrap; }
+.term-input button:hover { border-color: var(--night-soft); }
+.calc-stack { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 0.4rem 0.75rem 0.5rem; background: var(--night-2); font-family: var(--mono); font-size: 0.78rem; color: var(--night-soft); }
+.calc-stack .cells-row { display: inline-flex; gap: 0.25rem; flex-wrap: wrap; }
+.calc-stack .cell-n { background: var(--night-3); color: #fff; padding: 0.05rem 0.45rem; border-radius: 3px; }
+.calc-stack .cell-n:last-child { outline: 2px solid var(--out-term); }
+.calc-controls { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0.5rem 0; }
+.calc-controls select { max-width: 100%; }
+.calc-note { font-size: 0.92rem; background: var(--paper); border-left: 3px solid var(--accent); border-radius: var(--r); padding: 0.5rem 0.75rem; margin: 0.4rem 0 0.75rem; min-height: 2.6em; }
+
+/* ---------------------------------------------------------------- code with highlighted lines */
+.code-panel { padding: 0.9rem; }
+.map-bar { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.6rem; }
+.map-note { font-size: 0.95rem; margin: 0 0 0.75rem; min-height: 3em; background: var(--paper); border-radius: var(--r); padding: 0.5rem 0.75rem; }
+.code-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.75rem; }
+.code-pair pre.code { margin: 0; max-height: 22rem; overflow: auto; }
+.code-pair .col-label { margin: 0 0 0.3rem; }
+.way-table td:first-child { font-family: var(--mono); font-weight: 600; text-align: center; }
+
+/* ---------------------------------------------------------------- triple explorer */
+.tx-pick { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem; }
+.tx-triple { font-family: var(--mono); font-size: 1rem; background: var(--paper); border-radius: var(--r); padding: 0.55rem 0.8rem; margin: 0 0 0.75rem; overflow-x: auto; white-space: nowrap; }
+.tx-triple .p { color: var(--s1); font-weight: 600; }
+.tx-triple .q { color: var(--s2); font-weight: 600; }
+.tx-rows { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 0.35rem 0.6rem; align-items: center; font-size: 0.85rem; }
+.tx-rows > b { font-family: var(--mono); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); font-weight: 600; }
+.tx-states { display: flex; gap: 3px; flex-wrap: wrap; }
+.tx-s { font-family: var(--mono); font-size: 0.78rem; min-width: 2.2rem; text-align: center; padding: 0.15rem 0.2rem; border-radius: 3px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-faint); }
+.tx-s.inP { border-color: var(--s1); color: var(--ink); background: var(--s1-tint); }
+.tx-s.good { border-color: var(--right); background: var(--right-tint); color: var(--ink); }
+.tx-s.bad { border-color: var(--wrong); background: var(--wrong-tint); color: var(--wrong); font-weight: 700; }
+.tx-s.skip { opacity: 0.35; }
+
+/* ---------------------------------------------------------------- quadrant grid */
+.quad-wrap { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: 1rem; align-items: start; }
+.quad { display: grid; grid-template-columns: repeat(9, 2rem); grid-template-rows: repeat(9, 2rem); gap: 2px; font-family: var(--mono); font-size: 0.78rem; }
+.quad span { display: flex; align-items: center; justify-content: center; border-radius: 3px; background: var(--surface); border: 1px solid var(--line); }
+.quad span.axis { background: var(--paper-2); border-color: transparent; color: var(--ink-faint); }
+.quad span.ok { background: var(--right-tint); border-color: var(--right); color: var(--right); font-weight: 700; }
+.quad span.no { background: var(--wrong-tint); border-color: var(--wrong); color: var(--wrong); font-weight: 700; }
+.quad span.tested { box-shadow: inset 0 0 0 2px var(--accent); }
+@media (max-width: 640px) { .quad-wrap { grid-template-columns: 1fr; } .quad { grid-template-columns: repeat(9, 1.85rem); grid-template-rows: repeat(9, 1.85rem); } }
+
+/* ---------------------------------------------------------------- loop tracer */
+.tr-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.6rem; }
+.tr-controls input { font-family: var(--mono); width: 10rem; }
+.tr-code { margin: 0 0 0.75rem; }
+.tr-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+.tr-table th, .tr-table td { border-bottom: 1px solid var(--line); padding: 0.3rem 0.45rem; text-align: left; vertical-align: top; }
+.tr-table th { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-soft); font-weight: 600; }
+.tr-table td.mono { font-family: var(--mono); }
+.tr-table td.yes { color: var(--right); font-weight: 600; }
+.tr-table td.no { color: var(--wrong); font-weight: 700; }
+.tr-table tr.exit td { background: var(--paper); }
+.tr-verdict { margin: 0.6rem 0 0; }
+
+/* ---------------------------------------------------------------- narrow screens */
+.calc-controls label.grow { flex: 1 1 100%; min-width: 0; display: flex; gap: 0.4rem; align-items: center; }
+.calc-controls select { flex: 1; min-width: 0; width: 100%; }
+.term-input { flex-wrap: wrap; }
+.ans-rows { grid-template-columns: minmax(0, 1fr); }
+.ans-row select { width: 14rem; min-width: 0; max-width: 100%; }
+@media (max-width: 860px) { .ans-row select { flex: 1 1 100%; width: 100%; } }
+.cyu .q code, table.plain td code, .prose code, .task .prompt code { overflow-wrap: anywhere; }
+.tracer { min-width: 0; }
+.tracer .tr-code { overflow-x: auto; max-width: 100%; }
+.tracer .table-scroll { overflow-x: auto; max-width: 100%; }

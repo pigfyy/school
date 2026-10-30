@@ -1,0 +1,131 @@
+CSE 331: Readings
+
+    Skip to main content
+
+        Toggle navigation
+
+        CSE 331: Software Design & Implementation
+
+            Home
+
+            Course Info
+
+            Staff
+
+            Topics
+
+            Resources
+
+            Calendar
+
+        26au
+
+          ) is generated at
+               build time by script/toc.py and injected as this nav's last child;
+               Bootstrap's scrollspy then highlights it. `data-toggle="toc"` is now
+               only a CSS styling hook (see nav[data-toggle=toc] rules in main.css).
+               `data-toc-skip` keeps the "Contents" label out of the generated TOC. -->
+
+            Contents
+
+          Schedule
+Reflection Content
+AI use
+In-class discussion
+Grading
+
+        CSE 331: Readings
+
+We will do four readings this quarter. For each one, you should choose one of the three
+article options we present, read it, and write a short reflection. Reflections are due
+on a Friday, and we will then discuss the readings the following Monday. 
+
+Schedule
+
+Each reading asks a question about our motto for this course:
+Your job is to deliver code that you know works. The three
+articles for a reading answer its question differently.
+
+Reading 1: due Friday, October 2; discussed
+  Monday, October 5. When you say you know your code works, what do
+  you actually know, and how did you come to know it?
+
+Reading 2: due Friday, October 16; discussed
+  Monday, October 19. Knowing takes work: saying exactly what a
+  method must do, testing it, and reasoning about whether it does
+  that. Is that work the job itself, or a tax on the job?
+
+Reading 3: due Friday, October 30; discussed
+  Monday, November 2. How much of that knowing happens before the
+  first line of code, and how much of it is worth writing down?
+
+Reading 4: due Friday, November 20; discussed Monday, November 23.
+  Sooner or later you will change a program you did not write,
+  whether a person wrote it or a machine did. What do you need
+  besides the code, and can you get it?
+
+Reflection Content
+
+After reading your article, write a reflection with these three parts:
+
+What does the reading argue? Explain the author's main claim
+   and how they support it, in your own words. Reconstruct the
+   argument, not just the conclusion. Be specific enough that a
+   classmate who read a different article could follow. (About 5 sentences.)
+
+What is your reaction? Which parts did you agree with?
+   Disagree with? Are you unconvinced or unsure about any parts?
+   Connect the article to your own experience as a programmer: a bug
+   you chased, a project that got away from you, a test that saved
+   you, code someone else wrote. (About 5 sentences.)
+
+What do you want to discuss in class? Bring a question for
+   your group on Monday, one your classmates might answer
+   differently. Point to what in the reading raises it: something
+   left unresolved, or a claim you would challenge. Give a concrete
+   case that sharpens the question. Then sketch two answers: yours,
+   and one a classmate might give. (About 5 sentences.)
+
+AI use
+
+A reflection is practice at reading an argument and deciding what
+you think of it. You only get that practice by doing it, so read
+the article and write the reflection yourself. You may ask AI to
+explain a term or an idea in the article, but not to summarize the
+article or tell you what it argues.
+
+You may use AI for light editing: grammar, spelling, and trimming.
+If you do, say so on the submission form. Submitting AI-written
+text as your reflection is academic misconduct. The
+syllabus has the course's full AI policy.
+
+In-class discussion
+
+We discuss each reading in lecture the Monday after it is due. You
+will talk about your article in a small group. Others in your group
+may have read a different article, so be ready to explain yours. Be
+ready to discuss and debate your thoughts on the topic too.
+
+We will take 15 to 20 minutes of lecture time to discuss the readings
+in small groups. After the discussion, you will each write a brief
+response on paper: what the discussion changed in your thinking, or
+one new thing you learned. It counts as an in-class activity (see
+Grading).
+
+Grading
+
+We grade reflections on thoughtful completion. Each of the three
+parts is marked Complete, Partial, or No credit. A part is
+Complete when it does what its prompt above asks, in your own
+thinking. A part is Partial when it is a real attempt that misses
+some of what the prompt asks, such as a summary that never reaches
+the author's main claim, or a reaction that only restates the
+article. If a part is empty, or if we judge that it shows no real
+effort, it gets No credit. The "About 5 sentences" in each prompt
+is a rough guide: a part that does its job in four sentences or in
+seven is Complete.
+
+The late policy applies to reflections as it
+does to homework.
+
+    UW Site Use Agreement

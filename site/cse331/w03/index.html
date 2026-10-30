@@ -1,0 +1,2162 @@
+<!doctype html>
+<!--
+  CSE 331 (Autumn 2026) · Week 3 teaching site (Mon Oct 12 to Fri Oct 16), built with the course-teaching-site skill.
+  Sources (raw copies, URLs, fetch times and hashes in materials/cse331/w03/sources.json): Lecture 6 notes, slides and
+  index (Error handling and interactive programs, Mon Oct 12); Section 2 worksheet, solution and slides (Testing, Tue
+  Oct 13); Lecture 7 notes and slides (Reasoning and Floyd-Hoare logic, Wed Oct 14); Lecture 8 notes and slides (Loops
+  and loop invariants, Fri Oct 16); Reading 2 and the readings page; the calendar and Topics page.
+
+  Where each component lives:
+    Week overview + hero ............ #home (hero: the Lecture 6 calculator, a simulator of Calculator.java)
+    Lecture 6 ....................... #l6-calc … #l6-test, #l6-quiz, #l6-problems
+    Section 2 ....................... #s2-review, #s2-spec, #s2-coverage, #s2-testable, #s2-practice
+    Lecture 7 ....................... #l7-why … #l7-mistake, #l7-quiz, #l7-problems
+    Lecture 8 ....................... #l8-loop … #l8-mistakes, #l8-quiz, #l8-problems
+    Widgets (week.js) ............... .calc (calc-sim.js), pre.code[data-src] + .map-bar, #triples, #quad, .tracer
+    Readings / cheat sheet .......... #readings, #cheatsheet
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE 331 week 3</title>
+<link rel="stylesheet" href="../../core/fonts.css">
+<link rel="stylesheet" href="../../core/base.css">
+<link rel="stylesheet" href="week.css">
+</head>
+<body data-course="cse331" data-week="w03">
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+
+<nav class="rail" aria-label="Week 3 modules">
+  <div class="rail-top">
+    <a class="brand" href="#home"><span class="brand-kicker">CSE 331 · week 3</span>Error handling and Floyd-Hoare logic</a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="rail-body">Menu</button>
+  </div>
+  <div class="rail-body" id="rail-body">
+    <div>
+      <h2>Lecture 6 <span class="today" data-date="2026-10-12">Mon Oct 12</span></h2>
+      <ol class="modules">
+        <li><a href="#l6-calc">A calculator</a></li>
+        <li><a href="#l6-interactive">Interactive programs</a></li>
+        <li><a href="#l6-trouble">When a method cannot do its job</a></li>
+        <li><a href="#l6-six">Six ways to say no</a></li>
+        <li><a href="#l6-forget">When the client forgets</a></li>
+        <li><a href="#l6-choose">Choosing a way</a></li>
+        <li><a href="#l6-test">Interactive programs are harder</a></li>
+        <li><a href="#l6-quiz">Check your understanding</a></li>
+        <li><a href="#l6-problems">Problems</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Section 2 <span class="today" data-date="2026-10-13">Tue Oct 13</span></h2>
+      <ol class="modules">
+        <li><a href="#s2-review">Heuristics, coverage, JUnit</a></li>
+        <li><a href="#s2-spec">Task 1: arraySum</a></li>
+        <li><a href="#s2-coverage">Task 2: covering removeValue</a></li>
+        <li><a href="#s2-testable">Task 3: designing for testability</a></li>
+        <li><a href="#s2-practice">Practice</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 7 <span class="today" data-date="2026-10-14">Wed Oct 14</span></h2>
+      <ol class="modules">
+        <li><a href="#l7-why">From three tests to every run</a></li>
+        <li><a href="#l7-claims">What is true after each line</a></li>
+        <li><a href="#l7-triples">Hoare triples</a></li>
+        <li><a href="#l7-strength">Stronger claims, two directions</a></li>
+        <li><a href="#l7-rules">Assignment, sequence, consequence</a></li>
+        <li><a href="#l7-if">Conditionals</a></li>
+        <li><a href="#l7-mistake">Reasoning finds the mistake</a></li>
+        <li><a href="#l7-quiz">Check your understanding</a></li>
+        <li><a href="#l7-problems">Problems</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 8 <span class="today" data-date="2026-10-16">Fri Oct 16</span></h2>
+      <ol class="modules">
+        <li><a href="#l8-loop">A loop</a></li>
+        <li><a href="#l8-rule">The rule for a while loop</a></li>
+        <li><a href="#l8-check">Checking sum; does it end?</a></li>
+        <li><a href="#l8-find">Finding the invariant</a></li>
+        <li><a href="#l8-mistakes">The checks find the mistake</a></li>
+        <li><a href="#l8-quiz">Check your understanding</a></li>
+        <li><a href="#l8-problems">Problems</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Due</h2>
+      <ul class="later-list">
+        <li><span>Fri Oct 16, 11:59 pm · Reading 2 reflection</span><em><a href="#readings">readings</a></em></li>
+        <li><span>Fri Oct 23, 11:59 pm · Homework 2 (released Fri Oct 16)</span><em><a href="https://courses.cs.washington.edu/courses/cse331/26au/homework/hw2.html" target="_blank" rel="noopener">assignment page</a></em></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Reference</h2>
+      <ul class="plain-links">
+        <li><a href="#home">Week overview</a></li>
+        <li><a href="#readings">Readings</a></li>
+        <li><a href="#cheatsheet">Cheat sheet</a></li>
+      </ul>
+    </div>
+    <p class="rail-foot"><kbd>←</kbd> <kbd>→</kbd> modules · <kbd>N</kbd> next step · <kbd>H</kbd> next hint</p>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ================================================================ HOME -->
+<section class="page" id="home" data-title="Week overview">
+  <div class="hero">
+    <p class="kicker">Week 3 · <span data-date="2026-10-12" data-plain>Mon Oct 12</span> to <span data-date="2026-10-16" data-plain>Fri Oct 16</span></p>
+    <h1>When a method <em>can't</em>, and how we <em>know</em> it does</h1>
+    <p class="lede">Monday's calculator says no six different ways. Wednesday and Friday trade tests for proofs: claims written beside the code, and rules that carry them line by line, through an <code>if</code>, and around a loop. Type into the calculator below: numbers, <code>+ - * /</code>, <code>p</code> to print the stack, <code>.</code> to pop, <code>t</code> for the top, <code>q</code> to quit.</p>
+    <div class="calc" data-presets='[["the notes&apos; first run","1 2 + .","start"],["a longer run","42\n1 3 10 17\np\n+ p\n- p\n."],["two mistakes","1 +\np\nx\n2 + p"],["all six fail",".\nt\n+\n-\n*\n/\n1 0 /\np"],["overflow","2147483647 1 + p"]]'></div>
+  </div>
+
+  <h2>This week</h2>
+  <div class="week">
+    <a class="day" href="#l6-calc"><strong>Mon, Oct 12</strong><span class="tag-today" data-date="2026-10-12">Today</span><span>Lecture 6: Error handling and interactive programs</span><span>Six ways a method says no; what happens when the client forgets to check.</span></a>
+    <a class="day" href="#s2-review"><strong>Tue, Oct 13</strong><span class="tag-today" data-date="2026-10-13">Today</span><span>Section 2: Testing</span><span>A spec-based suite for <code>arraySum</code>, covering <code>removeValue</code>, and pulling a testable method out of <code>main</code>.</span></a>
+    <a class="day" href="#l7-why"><strong>Wed, Oct 14</strong><span class="tag-today" data-date="2026-10-14">Today</span><span>Lecture 7: Reasoning, Floyd-Hoare logic</span><span>Hoare triples; forward and backward rules for assignment, sequence, consequence and <code>if</code>.</span></a>
+    <a class="day" href="#l8-loop"><strong>Fri, Oct 16</strong><span class="tag-today" data-date="2026-10-16">Today</span><span>Lecture 8: Loop invariants</span><span>The rule for a <code>while</code> loop, variants, and finding invariants. <b>Reading 2 due 11:59 pm.</b></span></a>
+  </div>
+
+  <h2>How to use this site</h2>
+  <div class="prose">
+    <ul>
+      <li>Modules follow each lecture's notes in order and end with a quick check. Each lecture then has a ten-question <strong>Check your understanding</strong> and a page of <strong>Problems</strong>; Section 2 has its own practice page.</li>
+      <li><strong>Teaching notes</strong> (open by default; click the heading to fold them) hold talking points, the half-sheet questions and common mistakes.</li>
+      <li>The calculator on this page and in Lecture 6 runs a simulator of the lecture's <code>Calculator.java</code>, checked against real Java on thousands of sessions, including each of the notes' copies with a check taken out (<code>checks/cse331/w03/verify.mjs</code>). Every computed answer on the problem pages was checked against the lectures' code too.</li>
+      <li>Problems save as you type. Hints and solutions stay hidden until you ask; solutions reveal one step at a time.</li>
+    </ul>
+  </div>
+
+  <h2>Course essentials</h2>
+  <table class="plain">
+    <tr><th>Lectures</th><td>MWF in SAV 260: lecture A 12:30–1:20, lecture B 1:30–2:20 (attend either). Each lecture ends with a half sheet handed in at the door.</td></tr>
+    <tr><th>Sections</th><td>Tuesdays, TA-led. Section 2 (Tue Oct 13) is on testing.</td></tr>
+    <tr><th>Due this week</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/readings/reading2.html" target="_blank" rel="noopener">Reading 2</a> reflection, Fri Oct 16 at 11:59 pm; discussed Mon Oct 19.</td></tr>
+    <tr><th>Next</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/homework/hw2.html" target="_blank" rel="noopener">Homework 2</a> is released Fri Oct 16 and due Fri Oct 23 at 11:59 pm. Not reproduced here.</td></tr>
+    <tr><th>Links</th><td><a href="https://courses.cs.washington.edu/courses/cse331/26au/calendar/calendar.html" target="_blank" rel="noopener">Calendar</a> · <a href="https://courses.cs.washington.edu/courses/cse331/26au/topics/" target="_blank" rel="noopener">Topics</a> · notes: <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture06-errors/notes.html" target="_blank" rel="noopener">Lecture 6</a>, <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture07-reasoning/notes.html" target="_blank" rel="noopener">Lecture 7</a>, <a href="https://courses.cs.washington.edu/courses/cse331/26au/lectures/lecture08-loops/notes.html" target="_blank" rel="noopener">Lecture 8</a></td></tr>
+  </table>
+
+  <details class="notes" open>
+    <summary>Teaching notes: the week</summary>
+    <ul>
+      <li>The week's arc follows Lecture 4's three ways to know code works: testing (Section 2), tools (the compiler holding clients to a checked exception, Lecture 6) and reasoning (Lectures 7 and 8).</li>
+      <li>Lecture 6 is the promised lecture on interactive programs, and also a lecture on specifications: every way of saying no is a clause in one.</li>
+      <li>Lectures 7 and 8 build one argument style. Write a claim beside each line, justify each step by a named rule, and the argument either proves the method or says on which inputs it fails.</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ================================================================ LECTURE 6 -->
+<section class="page" id="l6-calc" data-title="A calculator" data-unit="l6">
+  <p class="where">Lecture 6 · Error handling and interactive programs · <span class="today-chip" data-date="2026-10-12">Mon Oct 12</span></p>
+  <h1>A calculator</h1>
+  <div class="prose">
+    <p>Today's program is a calculator, in two halves: <code>main</code>, which talks to the user, and <code>CalcStack</code>, which does the arithmetic. The calculator keeps a <strong>stack</strong>, a list of numbers that grows and shrinks at one end, its top. Typing a number pushes it onto the top. An operation such as <code>+</code> pops the top two numbers, combines them, and pushes the answer. Writing the operation after its numbers, as in <code>1 2 +</code>, is called <em>reverse Polish notation</em>.</p>
+    <p>For <code>-</code> and <code>/</code> the order matters: the number second from the top goes on the left. So <code>1 2 -</code> computes 1 − 2 = −1. <code>p</code> prints the whole stack, bottom first; <code>.</code> pops the top number and prints it; <code>t</code> prints the top without removing it; <code>q</code> quits.</p>
+  </div>
+  <div class="calc" data-presets='[["the notes&apos; longer run","42\n1 3 10 17\np\n+ p\n- p\n.","start"],["1 2 + .","1 2 + ."],["1 2 -","1 2 - ."],["7 2 /","7 2 / ."]]'></div>
+  <div class="prose">
+    <p>In the longer run, <code>42</code> went onto the stack with no output: the calculator shows its stack only when asked. <code>+</code> added the top two numbers, 10 and 17. <code>-</code> then subtracted the top number from the one below it: 3 minus 27, not 27 minus 3. The bar under the terminal shows the stack, which the user never sees unless they type <code>p</code>.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w3-l6-qc-rpn" data-kind="quickcheck" data-type="output" data-answer="15">
+    <p>Quick check: on an empty stack you type <code>5 1 2 + * .</code>. What exactly does the calculator print?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="exactly as printed"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Ask the room to read both halves before anything runs (the full listing is on <a href="#l6-six">Six ways to say no</a>). The stack is not the point of the lecture; it is a small program with state that lasts and several operations that can fail.</li>
+      <li>Have someone predict <code>1 2 -</code> before running it. The class comment says the second-from-top number is on the left, which is why it prints −1 and not 1.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l6-interactive" data-title="Interactive programs" data-unit="l6">
+  <p class="where">Lecture 6 · <span class="today-chip" data-date="2026-10-12">Mon Oct 12</span> · notes: Interactive programs</p>
+  <h1>Interactive programs</h1>
+  <div class="prose">
+    <p>Lecture 3's <code>Sum</code> read all its input, computed, wrote its output, and exited: a batch program. The calculator is the other kind.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Interactive program.</strong> An interactive program responds to each input as it arrives, and keeps running until the user tells it to stop.</p>
+  </div>
+  <div class="prose">
+    <p><code>main</code>'s loop, on lines 41 to 109, never ends on its own. Each time around, it prints the prompt <code>&gt;</code>, reads one line, and responds to each word on the line, each <em>token</em>. The loop ends in only two ways: <code>q</code> returns from <code>main</code> (line 52), or the user ends the input (Control-D on macOS and Linux, Control-Z then Enter on Windows), which makes <code>hasNextLine</code> on line 43 false, and <code>break</code> leaves the loop.</p>
+    <p>The difference shows when the user makes a mistake. <code>Sum</code> stopped at the first mistake, with a message on standard error and exit status 1. A user who types <code>+</code> with one number on the stack expects to keep the stack and fix the mistake. So the calculator prints a message and keeps going. The operation that failed leaves the stack alone.</p>
+  </div>
+  <div class="calc" data-presets='[["two mistakes","1 +\np\nx\n2 + p","start"],["end the input",""]]'></div>
+  <div class="prose">
+    <p>For that to work, <code>main</code> has to learn of every operation that could not be done, so that it can tell the user and go around the loop again.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w3-l6-qc-div-zero-stack" data-kind="quickcheck" data-type="output" data-answer="[4 0]">
+    <p>Quick check: on an empty stack you type <code>4 0 /</code>, then <code>p</code>. What does <code>p</code> print?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="exactly as printed"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Press <em>end input</em> on the terminal to show the second way out: the last prompt prints, then the program ends with status 0.</li>
+      <li>The quick check is the point of the section: the failed <code>/</code> leaves both numbers on the stack (line 203 pushes them back before throwing).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l6-trouble" data-title="When a method cannot do its job" data-unit="l6">
+  <p class="where">Lecture 6 · <span class="today-chip" data-date="2026-10-12">Mon Oct 12</span> · notes: When a method cannot do its job</p>
+  <h1>When a method cannot do its job</h1>
+  <div class="prose"><p>Three kinds of trouble matter here:</p></div>
+  <table class="plain">
+    <tr><th>A user's mistake</th><td>The user typed something the program cannot use, such as <code>x</code>. Lecture 3 met these with checks and messages at the edge of the program, and never with a stack trace: one of this course's rules.</td></tr>
+    <tr><th>A programmer's mistake</th><td>Some code breaks a promise, such as a precondition. The code may be ours, a coworker's or a library's. The specification promises nothing about what happens next.</td></tr>
+    <tr><th>A request that cannot be carried out</th><td>A client asks a method for something it cannot do: popping a number off an empty stack, or asking Lecture 2's <code>indexOf</code> for a value that is not in the array.</td></tr>
+  </table>
+  <div class="rule">
+    <p><strong>Separation of concerns.</strong> Giving each concern one home. <code>main</code> owns the conversation with the user: the prompt, the tokens, the messages. <code>CalcStack</code> owns the stack and its arithmetic, and knows nothing of users.</p>
+  </div>
+  <div class="prose">
+    <p>The price is paid at the boundary. The user's <code>+</code> on a stack of one number (a user's mistake) crosses into <code>CalcStack</code> as a request it cannot carry out. <code>CalcStack</code> cannot print a message, since its client is <code>main</code>, not a person. So it has to tell <code>main</code> that the operation failed, and <code>main</code>, at the edge, tells the user. The only words the two halves share are <code>CalcStack</code>'s specifications, so every way of saying no is a clause in one.</p>
+    <p>The question for the rest of the lecture: <strong>when a method cannot do its job, how does it say no to its client?</strong></p>
+  </div>
+
+  <div class="check" data-id="cse331-w3-l6-qc-kind" data-kind="quickcheck">
+    <p>Quick check: the user's <code>+</code> on one number reaches <code>CalcStack.add</code>. From <code>add</code>'s point of view, what kind of trouble is it?</p>
+    <div class="opts">
+      <label data-option="user"><input type="radio" name="l6qk"> A user's mistake<span class="why" hidden>It started as one, but <code>add</code> knows nothing of users: its client is <code>main</code>.</span></label>
+      <label data-option="programmer"><input type="radio" name="l6qk"> A programmer's mistake<span class="why" hidden><code>add</code> has no precondition about the size, so <code>main</code> broke no promise by calling it.</span></label>
+      <label data-option="request" data-correct><input type="radio" name="l6qk"> A request that cannot be carried out<span class="why" hidden>Right: there are not two numbers to add, so <code>add</code> has to say no to <code>main</code>.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Half sheet, question 1 (4 minutes): <em>The user types <code>1 +</code>. Which method first decides that the operation cannot be done? How does it say so, and who tells the user? Now <code>1 *</code>: does it go the same way? Why might it not?</em> (It is problem 6 on the Problems page.)</li>
+      <li>"In the calculator, the first leads to the third": a user's mistake at the edge becomes a request that cannot be carried out inside.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l6-six" data-title="Six ways to say no" data-unit="l6">
+  <p class="where">Lecture 6 · <span class="today-chip" data-date="2026-10-12">Mon Oct 12</span> · notes: the six ways, from A precondition to An exception</p>
+  <h1>Six ways to say no</h1>
+  <div class="prose">
+    <p><code>CalcStack</code> answers the question six different ways, one for each operation that can fail, on purpose, to show all six side by side. A real class picks one way and uses it everywhere, so its clients learn one way. Click an operation to see its method and <code>main</code>'s check.</p>
+  </div>
+  <div class="panel code-panel">
+    <div class="map-bar" role="group" aria-label="The six ways">
+      <button class="chip" data-target="code-main code-stack" data-range="82-88,176-184" data-note="&lt;b&gt;*, a precondition.&lt;/b&gt; &lt;code&gt;multiply&lt;/code&gt; requires &lt;code&gt;2 &amp;lt;= size()&lt;/code&gt; and checks nothing. &lt;code&gt;main&lt;/code&gt; checks &lt;code&gt;size()&lt;/code&gt; before the call (line 83).">* precondition</button>
+      <button class="chip" data-target="code-main code-stack" data-range="55-61,125-135" data-note="&lt;b&gt;., a special value.&lt;/b&gt; &lt;code&gt;pop&lt;/code&gt; returns &lt;code&gt;null&lt;/code&gt; on an empty stack, so its return type is &lt;code&gt;Integer&lt;/code&gt;. &lt;code&gt;main&lt;/code&gt; checks for null (line 57).">. special value</button>
+      <button class="chip" data-target="code-main code-stack" data-range="69-74,146-159" data-note="&lt;b&gt;+, a flag.&lt;/b&gt; &lt;code&gt;add&lt;/code&gt; returns &lt;code&gt;false&lt;/code&gt; if the stack had fewer than two numbers. &lt;code&gt;main&lt;/code&gt; checks the flag (line 71).">+ flag</button>
+      <button class="chip" data-target="code-main code-stack" data-range="62-68,137-144" data-note="&lt;b&gt;t, a wrapper.&lt;/b&gt; &lt;code&gt;top&lt;/code&gt; returns an &lt;code&gt;OptionalInt&lt;/code&gt;, empty when there is no top. &lt;code&gt;main&lt;/code&gt; asks &lt;code&gt;isEmpty&lt;/code&gt; (line 64), then &lt;code&gt;getAsInt&lt;/code&gt;.">t wrapper</button>
+      <button class="chip" data-target="code-main code-stack" data-range="89-98,186-207,228-238" data-note="&lt;b&gt;/, an exception.&lt;/b&gt; &lt;code&gt;divide&lt;/code&gt; throws &lt;code&gt;TooFewOperandsException&lt;/code&gt; (line 198) or &lt;code&gt;DivideByZeroException&lt;/code&gt; (line 204), both unchecked. &lt;code&gt;main&lt;/code&gt; catches them (lines 92 and 95).">/ exception</button>
+      <button class="chip" data-target="code-main code-stack" data-range="75-81,161-174,222-226" data-note="&lt;b&gt;-, a checked exception.&lt;/b&gt; &lt;code&gt;subtract&lt;/code&gt; says &lt;code&gt;throws StackException&lt;/code&gt; (line 168), and &lt;code&gt;StackException&lt;/code&gt; extends &lt;code&gt;Exception&lt;/code&gt; (line 222). &lt;code&gt;main&lt;/code&gt; catches it (line 78).">- checked exception</button>
+      <button class="chip" data-target="code-main code-stack" data-range="99-106" data-note="&lt;b&gt;A number: a library's exception.&lt;/b&gt; &lt;code&gt;Integer.parseInt&lt;/code&gt; throws &lt;code&gt;NumberFormatException&lt;/code&gt; when the token is not a whole number that fits in an &lt;code&gt;int&lt;/code&gt;; &lt;code&gt;main&lt;/code&gt; catches it (line 103).">a number: parseInt</button>
+    </div>
+    <p class="map-note" role="status">Click an operation above.</p>
+    <div class="code-pair">
+      <div><p class="col-label"><code>main</code> (lines 38–111)</p><pre class="code" id="code-main" data-src="calc" data-from="38" data-to="111"></pre></div>
+      <div><p class="col-label"><code>CalcStack</code> and the exceptions (lines 113–238)</p><pre class="code" id="code-stack" data-src="calc" data-from="113" data-to="238"></pre></div>
+    </div>
+  </div>
+
+  <h2>The six, one at a time</h2>
+  <table class="plain way-table">
+    <tr><th>op</th><th>way</th><th>what the method does</th></tr>
+    <tr><td>*</td><td>precondition</td><td>The method itself never says no: the client checks before the call. Suits a client that can check cheaply; here <code>size()</code> makes it one comparison. Checking a precondition anyway, inside the method, is <em>defensive programming</em>; <code>multiply</code> doesn't, on purpose.</td></tr>
+    <tr><td>.</td><td>special value</td><td>A value the method returns only when it could not do its job. It must be a value never returned otherwise: −1 works for <code>indexOf</code> (an index is never negative), but not for a stack of numbers, whose top could be −1. <code>pop</code> returns <code>Integer</code>, a reference type that can hold <code>null</code>; <code>int</code> is a primitive type and cannot.</td></tr>
+    <tr><td>+</td><td>flag</td><td><code>add</code> has no answer to give, so a <code>boolean</code> says whether it worked. Java's <code>List.remove(Object)</code> works the same way.</td></tr>
+    <tr><td>t</td><td>wrapper</td><td><code>top</code> has an answer and also needs a way to say there is none. An <code>OptionalInt</code> either holds one <code>int</code> or is empty: a list of length zero or one.</td></tr>
+    <tr><td>/</td><td>exception</td><td>The method does not return at all. Throwing ends it at once; Java looks for code that catches that kind. Only if there is none does the program stop with a stack trace. Each failure has its own exception, so a client can tell them apart. <code>@throws</code> is part of the postcondition.</td></tr>
+    <tr><td>-</td><td>checked exception</td><td>Like <code>/</code>, plus two lines: <code>throws StackException</code> on the signature, and <code>extends Exception</code> instead of <code>RuntimeException</code>. See <a href="#l6-forget">When the client forgets</a>.</td></tr>
+  </table>
+  <div class="rule">
+    <p><strong>A <code>try</code> statement.</strong> Java runs the <code>try</code> block. If no line in it throws, the <code>catch</code> blocks are skipped. If a line throws, Java leaves the block at that line and runs the first <code>catch</code> whose kind matches, with the exception in its variable <code>e</code>; <code>e.getMessage()</code> is the message given when it was thrown. Either way the program goes on after the statement. Think of a <code>try</code> as an <code>if</code> whose condition is whether the block threw.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w3-l6-qc-special-minus-one" data-kind="quickcheck" data-type="yesno" data-answer="no">
+    <p>Quick check: could <code>top</code> return −1 to mean "the stack is empty", the way <code>indexOf</code> does?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Run the notes' "all six fail" session on the overview's terminal: to the user the six look alike; in the code they are six different contracts between <code>CalcStack</code> and <code>main</code>.</li>
+      <li>On <code>Integer</code>: Java converts <code>int</code> to <code>Integer</code> by itself (line 134). The other direction fails on <code>null</code>, which is the next page.</li>
+      <li>The flag and the wrapper both widen the return type to make room for a "no"; <code>Integer</code> widened <code>int</code> the same way, with <code>null</code>.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l6-forget" data-title="When the client forgets" data-unit="l6">
+  <p class="where">Lecture 6 · <span class="today-chip" data-date="2026-10-12">Mon Oct 12</span> · notes: When the client forgets, A checked exception</p>
+  <h1>When the client forgets</h1>
+  <div class="prose">
+    <p>All six ways work when the client checks. A second question tells them apart: <strong>what happens when the client forgets to check?</strong> Decide what you would want to happen. The notes took <code>main</code>'s check out of copies of the calculator, leaving blank lines so every other line keeps its number. Pick a copy and try the operation.</p>
+  </div>
+  <div class="calc" data-select data-variant="flag" data-presets='[["1 + then p","1 +\np"],["1 *","1 *"],[". on empty","."],["1 /","1 /"],["5 0 /","5 0 /"],["t on empty","t"],["1 -","1 -"]]'></div>
+
+  <table class="plain">
+    <tr><th>flag</th><td>Nothing happens, silently. <code>add</code> left the stack unchanged, as its spec says, but nobody told the user; to the user, the missing number acted like 0.</td></tr>
+    <tr><th>precondition</th><td>Anything may happen; here a confusing <code>NullPointerException</code> about a <code>null</code> the client never saw (the second <code>pop</code> returned it, and line 182 stored it in an <code>int</code>). The spec promised nothing about this call.</td></tr>
+    <tr><th>special value</th><td>With <code>Integer</code> kept, <code>null</code> is printed to the user. Stored in an <code>int</code> (line 56), it meets the same conversion and stops the program. Java converted silently, so nothing warned the programmer.</td></tr>
+    <tr><th>exception</th><td>The program stops with a stack trace, which the course's rule forbids, but the trace gives <code>divide</code>'s own message and the line that threw.</td></tr>
+    <tr><th>wrapper</th><td>Asking <code>getAsInt</code> without <code>isEmpty</code> throws <code>NoSuchElementException: No value present</code> at the ask. Storing the wrapper in an <code>int</code> does not compile.</td></tr>
+    <tr><th>checked exception</th><td>The compiler refuses the program: <code>unreported exception StackException; must be caught or declared to be thrown</code>. Declaring <code>throws StackException</code> on <code>main</code> satisfies it, and then <code>1 -</code> ends in a stack trace.</td></tr>
+  </table>
+
+  <h2>Checked and unchecked</h2>
+  <div class="rule">
+    <p>An <strong>unchecked exception</strong> extends <code>RuntimeException</code>. A method may throw one without saying so in its code, and its client may catch it or not. A <strong>checked exception</strong> extends <code>Exception</code> but not <code>RuntimeException</code>. A method that may throw one must say so in a <code>throws</code> clause, and every client must catch it or declare it in its own <code>throws</code> clause.</p>
+  </div>
+  <div class="prose">
+    <p>The names do not help: <code>RuntimeException</code> is itself a kind of <code>Exception</code>. Lecture 3's <code>Sum</code> caught a <code>FileNotFoundException</code>, which is checked. Lecture 4 named three ways to know code works: testing, tools and reasoning. The compiler is a tool that confirms a claim about every run, but only the claims it was built to check. A checked exception gives it one more: every caller of <code>subtract</code> catches <code>StackException</code> or declares it. A mistake the compiler catches never reaches a run, a user or a test. <strong>When you can, let the compiler find the mistake.</strong></p>
+  </div>
+
+  <div class="check" data-id="cse331-w3-l6-qc-compiler-catches" data-kind="quickcheck">
+    <p>Quick check: for which way does a forgotten check fail before the program ever runs, on every client?</p>
+    <div class="opts">
+      <label data-option="flag"><input type="radio" name="l6qf"> The flag<span class="why" hidden>Ignoring a <code>boolean</code> compiles fine and runs silently.</span></label>
+      <label data-option="wrapper"><input type="radio" name="l6qf"> The wrapper<span class="why" hidden>Only the copy that stored it in an <code>int</code> failed to compile; <code>getAsInt</code> without <code>isEmpty</code> compiles and fails at the ask.</span></label>
+      <label data-option="checked" data-correct><input type="radio" name="l6qf"> The checked exception<span class="why" hidden>Right: every client must catch it or declare it, or the program does not compile.</span></label>
+      <label data-option="exception"><input type="radio" name="l6qf"> The unchecked exception<span class="why" hidden>Nothing forces a client to catch it; it surfaces as a stack trace at run time.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Every terminal transcript here matches the notes and was checked against real Java runs of each copy. The two compile errors are the notes' own.</li>
+      <li>Ask the room to rank the six outcomes from best to worst before showing the summary. The notes' answer: best is to be told before the program runs at all.</li>
+      <li>Common confusion: the special value's crash and the precondition's crash print the same <code>NullPointerException</code> message, at different lines (<code>CalcStack.multiply</code> vs <code>Calculator.main</code>).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l6-choose" data-title="Choosing a way" data-unit="l6">
+  <p class="where">Lecture 6 · <span class="today-chip" data-date="2026-10-12">Mon Oct 12</span> · notes: Choosing a way</p>
+  <h1>Choosing a way</h1>
+  <div class="prose"><p>None of the six is best everywhere. Three questions help:</p></div>
+  <ol class="prose">
+    <li><strong>Can the client check first, cheaply?</strong> Then a precondition is simplest, as for <code>multiply</code>, and the check puts the condition in front of whoever reads <code>main</code>. When checking costs as much as the work, as for <code>parseInt</code> (scan the digits, work out whether it fits), the method should check and say what it found.</li>
+    <li><strong>How convenient is the answer to use?</strong> A flag or special value is checked with a plain <code>if</code>; an exception needs a <code>try</code>. A checked exception makes every client catch or declare it, even one that knows the failure cannot happen: every client pays, and in return the compiler checks every client before any run.</li>
+    <li><strong>What happens when a client forgets?</strong> Silence, a confusing crash, a stack trace with the method's own message, or a compile-time error. Only the last comes before any run.</li>
+  </ol>
+  <div class="rule">
+    <p><strong>Bloch's rule of thumb</strong> (<em>Effective Java</em>, item 70). A problem a careful client should expect and recover from, such as a missing file, suits a checked exception. A problem only a programmer's mistake can cause suits an unchecked exception. A wrapper sorts beside the checked exception (both make the client ask); a precondition beside the unchecked one (both leave a careless client to a crash).</p>
+  </div>
+  <div class="prose">
+    <p><strong>Strength.</strong> A method that promises an exception on a bad call has a stronger specification than one that requires a good call. A library's specifications can only grow stronger, so once it publishes a <code>@throws</code> clause it cannot replace it with a precondition.</p>
+  </div>
+
+  <h2>The seventh way</h2>
+  <div class="prose">
+    <p>A bad one: say nothing, and make up an answer. The program keeps running and the made-up answer travels on, so the mistake may show far from its cause, or never. Common made-up answers: JavaScript's <code>undefined</code> (reading past an array's end; <code>undefined + 1</code> is <code>NaN</code>); Java's <code>NaN</code> and <code>Infinity</code> for doubles (<code>0.0 / 0.0</code>, <code>1.0 / 0.0</code>); and a <code>null</code> the spec does not allow. "The one guaranteed wrong answer is to ignore the problem" (Kernighan and Pike).</p>
+    <p>The calculator ignores one problem itself: <code>2147483647 1 + p</code> prints <code>[-2147483648]</code>. That is a bug, not a way of saying no: <code>add</code> promises the sum, and nobody decided what to do when it does not fit, so Java's arithmetic decided. The fix is a decision: say no in one of the six ways (problem 2), or promise less and say the sum wraps.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w3-l6-qc-throws-stronger" data-kind="quickcheck" data-type="strength" data-answer="stronger">
+    <p>Quick check: spec X says <code>@throws StackEmptyException if the stack is empty</code>; spec Y says <code>@requires the stack is non-empty</code>; otherwise they are the same. X is ___ than Y.</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="stronger, weaker or incomparable"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Half sheet, question 2 (5 minutes): <em>CalcStack says no six different ways. A real class picks one way and uses it everywhere. Which way would you pick for CalcStack, and why?</em> (Problem 7.) The slide that follows names the tension: a checked exception costs every client, and every method between <code>main</code> and <code>subtract</code>, a <code>try</code> or a clause.</li>
+      <li>Overflow is left undecided by many programmers, as the course leaves running out of memory undecided. The difference: a user reaches overflow from the keyboard, in one line.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l6-test" data-title="Interactive programs are harder" data-unit="l6">
+  <p class="where">Lecture 6 · <span class="today-chip" data-date="2026-10-12">Mon Oct 12</span> · notes: Interactive programs are harder</p>
+  <h1>Interactive programs are harder</h1>
+  <div class="prose"><p>Most programs you use every day are interactive: an editor, a browser, a phone app. Three things make them harder to get right than a batch program:</p></div>
+  <ul class="prose">
+    <li><strong>State that lasts.</strong> The stack outlives each line. A bug may show only after one particular sequence of inputs: the crash on the eleventh click, but only after a certain file was opened.</li>
+    <li><strong>A user who chooses the order.</strong> The program must respond sensibly to any input at any moment, and keep running afterward.</li>
+    <li><strong>State the user cannot see.</strong> The calculator shows its stack only on <code>p</code>. A user who forgets, or a tester reproducing a bug, has to reconstruct it.</li>
+  </ul>
+  <div class="prose">
+    <p>Separation of concerns makes the state easy to test on its own. Lecture 5's <em>Testable by design</em>: a method that reads the keyboard is hard to test; one that takes values and returns one is easy. A test of <code>add</code> needs no keyboard:</p>
+  </div>
+  <pre class="code"><code>@Test
+void addReplacesTwoNumbersWithTheirSum() {
+    CalcStack stack = new CalcStack();
+    stack.push(2);
+    stack.push(3);
+    assertTrue(stack.add());
+    assertEquals("[5]", stack.toString());
+}
+
+@Test
+void divideOnOneNumberThrows() {
+    CalcStack stack = new CalcStack();
+    stack.push(1);
+    assertThrows(TooFewOperandsException.class,
+        () -&gt; stack.divide());
+    assertEquals("[1]", stack.toString());
+}</code></pre>
+  <div class="prose">
+    <p>The second test checks <code>divide</code>'s <code>@throws</code> clause, which <code>assertEquals</code> cannot: a call that throws returns nothing to compare. <code>assertThrows</code> takes the exception's class, then the code to run, written as a <strong>lambda</strong>, <code>() -&gt; stack.divide()</code>: a piece of code handed over to be run later. It passes if that code throws an exception of the class named. The last line checks the failed <code>divide</code> left the stack alone.</p>
+  </div>
+
+  <div class="check" data-id="cse331-w3-l6-qc-blank-check" data-kind="quickcheck" data-type="yesno" data-answer="no">
+    <p>Quick check: blank <code>divide</code>'s size check on lines 197 to 200. Does <code>divideOnOneNumberThrows</code> still pass?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Without the check, line 201's second <code>pop</code> returns <code>null</code>, so the code throws a <code>NullPointerException</code>, not a <code>TooFewOperandsException</code>, and <code>assertThrows</code> fails: it requires the class named.</li>
+      <li>Later this quarter, the lectures on web apps return to interactive programs.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l6-quiz" data-title="Check your understanding: Lecture 6" data-unit="l6">
+  <p class="where">Lecture 6 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose"><p>Eleven questions on Lecture 6. Answer without looking back, then use the review links for anything you missed. Your score counts first tries only. Every question starts from an empty stack.</p></div>
+  <div class="cyu-score" data-role="score" role="status"></div>
+  <ol class="cyu-list">
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l6-quiz-interactive" data-type="choice" data-topic="l6-interactive">
+      <p class="q">Which of these is an interactive program?</p>
+      <div class="opts">
+        <label data-option="sum"><input type="radio" name="w3a1"> Lecture 3's <code>Sum</code>, reading numbers from the keyboard<span class="why" hidden>It reads all its input, then computes and exits: a batch program, even when a person types the input.</span></label>
+        <label data-option="calc" data-correct><input type="radio" name="w3a1"> The calculator<span class="why" hidden>Right: it responds to each line as it arrives and runs until the user says <code>q</code> or ends the input.</span></label>
+        <label data-option="sort"><input type="radio" name="w3a1"> A program that sorts a file's lines<span class="why" hidden>Reads, computes, writes, exits: batch.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l6-quiz-loop-ends" data-type="choice" data-topic="l6-interactive">
+      <p class="q">How can <code>main</code>'s <code>while (true)</code> loop end?</p>
+      <div class="opts">
+        <label data-option="mistake"><input type="radio" name="w3a2"> On the user's first mistake<span class="why" hidden>That was <code>Sum</code>. The calculator prints a message and keeps going.</span></label>
+        <label data-option="two" data-correct><input type="radio" name="w3a2"> <code>q</code> returns from <code>main</code>, or the end of the input makes <code>hasNextLine</code> false<span class="why" hidden>Right: line 52's <code>return</code>, or line 44's <code>break</code>.</span></label>
+        <label data-option="never"><input type="radio" name="w3a2"> Never; the user has to kill the program<span class="why" hidden>There are two ways out written in the code.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l6-quiz-integer" data-type="choice" data-topic="l6-six">
+      <p class="q">Why is <code>pop</code>'s return type <code>Integer</code> rather than <code>int</code>?</p>
+      <div class="opts">
+        <label data-option="big"><input type="radio" name="w3a3"> <code>Integer</code> holds bigger numbers<span class="why" hidden>Its values are <code>int</code>s, plus <code>null</code>.</span></label>
+        <label data-option="null" data-correct><input type="radio" name="w3a3"> <code>int</code> is a primitive type and cannot hold <code>null</code>, the special value<span class="why" hidden>Right. <code>Integer</code> is a reference type whose values are <code>int</code>s, plus <code>null</code>.</span></label>
+        <label data-option="list"><input type="radio" name="w3a3"> Lists can only return <code>Integer</code><span class="why" hidden>A list of numbers is a <code>List&lt;Integer&gt;</code>, true, but <code>pop</code> could unbox it. The reason is the special value.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l6-quiz-never-says-no" data-type="choice" data-topic="l6-six">
+      <p class="q">With which way does the method itself never say no?</p>
+      <div class="opts">
+        <label data-option="pre" data-correct><input type="radio" name="w3a4"> A precondition<span class="why" hidden>Right: the client checks before the call, and the method may assume the promise.</span></label>
+        <label data-option="flag"><input type="radio" name="w3a4"> A flag<span class="why" hidden>A <code>false</code> flag is the method saying no.</span></label>
+        <label data-option="exc"><input type="radio" name="w3a4"> An unchecked exception<span class="why" hidden>Throwing is a way of saying no.</span></label>
+        <label data-option="wrap"><input type="radio" name="w3a4"> A wrapper<span class="why" hidden>An empty wrapper says no.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l6-quiz-flag-copy" data-type="output" data-answer="[1]" data-topic="l6-forget">
+      <p class="q">In the copy without the check of <code>add</code>'s answer, you type <code>1 +</code> and then <code>p</code>. What does <code>p</code> print?</p>
+      <p class="why" hidden><code>add</code> left the stack unchanged and returned <code>false</code>; nobody looked. Silence, then <code>[1]</code>.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l6-quiz-checked" data-type="choice" data-topic="l6-forget">
+      <p class="q">Which exception must every client either catch or declare in its own <code>throws</code> clause?</p>
+      <div class="opts">
+        <label data-option="runtime"><input type="radio" name="w3a6"> One that extends <code>RuntimeException</code><span class="why" hidden>That is an unchecked exception: the client may catch it or not.</span></label>
+        <label data-option="checked" data-correct><input type="radio" name="w3a6"> One that extends <code>Exception</code> but not <code>RuntimeException</code><span class="why" hidden>Right: a checked exception, like <code>StackException</code>.</span></label>
+        <label data-option="any"><input type="radio" name="w3a6"> Any exception a method's <code>@throws</code> tag mentions<span class="why" hidden>A tag is a comment. The compiler reads the <code>throws</code> clause, and only checked exceptions require one.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l6-quiz-bloch" data-type="choice" data-topic="l6-choose">
+      <p class="q">By Bloch's rule of thumb, a file that is not there suits…</p>
+      <div class="opts">
+        <label data-option="checked" data-correct><input type="radio" name="w3a7"> a checked exception<span class="why" hidden>Right: a careful client should expect it and recover. <code>FileNotFoundException</code> is checked.</span></label>
+        <label data-option="unchecked"><input type="radio" name="w3a7"> an unchecked exception<span class="why" hidden>Those suit problems only a programmer's mistake can cause.</span></label>
+        <label data-option="pre"><input type="radio" name="w3a7"> a precondition<span class="why" hidden>The client cannot cheaply check that a file will still be there when it is opened.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l6-quiz-seventh" data-type="choice" data-topic="l6-choose">
+      <p class="q">Why is <code>0.0 / 0.0</code> giving <code>NaN</code> an example of "the seventh way"?</p>
+      <div class="opts">
+        <label data-option="crash"><input type="radio" name="w3a8"> It crashes the program<span class="why" hidden>It doesn't throw at all.</span></label>
+        <label data-option="madeup" data-correct><input type="radio" name="w3a8"> It is a made-up answer that travels on (<code>NaN + 1</code> is <code>NaN</code>), far from its cause<span class="why" hidden>Right. Lecture 3's <code>Sum</code> without its count check printed <code>NaN</code> and reported success.</span></label>
+        <label data-option="checked"><input type="radio" name="w3a8"> The compiler warns about it<span class="why" hidden>No warning: it is a legal <code>double</code> value.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l6-quiz-overflow" data-type="output" data-answer="[-2147483648]" data-topic="l6-choose">
+      <p class="q">You type <code>2147483647 1 + p</code>. What does <code>p</code> print?</p>
+      <p class="why" hidden>The sum passes the largest <code>int</code>, so line 157 wraps to the most negative <code>int</code>: a bug nobody decided, not a way of saying no.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l6-quiz-testable" data-type="choice" data-topic="l6-test">
+      <p class="q">Why can <code>add</code> be tested without a keyboard?</p>
+      <div class="opts">
+        <label data-option="soc" data-correct><input type="radio" name="w3a10"> <code>CalcStack</code> keeps the state and arithmetic apart from the conversation with the user<span class="why" hidden>Right: separation of concerns. Build a stack, push, call, check.</span></label>
+        <label data-option="junit"><input type="radio" name="w3a10"> JUnit can type into <code>System.in</code><span class="why" hidden>The test never touches standard input.</span></label>
+        <label data-option="small"><input type="radio" name="w3a10"> It is a short method<span class="why" hidden>Short helps, but a short method that read the keyboard would still be hard to test.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l6-quiz-lambda" data-type="choice" data-topic="l6-test">
+      <p class="q">Why does the test write <code>assertThrows(TooFewOperandsException.class, () -&gt; stack.divide())</code> instead of calling <code>stack.divide()</code> itself?</p>
+      <div class="opts">
+        <label data-option="run" data-correct><input type="radio" name="w3a11"> So <code>assertThrows</code> runs the code and watches for the exception; a direct call would throw before any assert ran<span class="why" hidden>Right: the lambda is code handed over to be run later, by <code>assertThrows</code>.</span></label>
+        <label data-option="faster"><input type="radio" name="w3a11"> Lambdas run faster<span class="why" hidden>Speed isn't the point.</span></label>
+        <label data-option="checked"><input type="radio" name="w3a11"> Because <code>TooFewOperandsException</code> is checked<span class="why" hidden>It extends <code>RuntimeException</code>: unchecked.</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-role="summary" role="status"></div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Questions 4 to 7 are the core: the six ways, and what each costs when a client forgets. The two output answers come from the simulator, checked against real Java.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l6-problems" data-title="Lecture 6: problems" data-unit="l6">
+  <p class="where">Lecture 6 · <span class="today-chip" data-date="2026-10-12">Mon Oct 12</span> · problems</p>
+  <h1>Lecture 6: problems</h1>
+  <div class="prose">
+    <p>Problems 1 to 3 are the notes' exercises 1 to 3; solutions follow the course's answers, lightly condensed. Problems 4 and 5 are predictions on the calculator and its copies; problems 6 and 7 are the half-sheet questions. Every output was checked against real runs of <code>Calculator.java</code>. Each run starts from an empty stack.</p>
+  </div>
+
+  <article class="task" data-id="cse331-w3-l6-pop-exception">
+    <h2>1. <code>pop</code> with an exception</h2>
+    <p class="prompt">Change <code>pop</code> to report an empty stack with an unchecked exception, as <code>divide</code> does, instead of with <code>null</code>. Give its new specification and code, and the new code for the <code>.</code> command in <code>main</code>.</p>
+    <div class="answer-spec" data-part="return-type" data-type="text" data-answer="int" data-label="pop's new return type" data-placeholder="a Java type"></div>
+    <div class="answer-spec" data-part="others-need-try" data-type="yesno" data-answer="no" data-label="Do add, subtract, multiply and divide now need a try around their pops?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="code" data-type="self" data-long data-label="The new spec and code, and main's new . branch" data-placeholder="/** … @throws … */ public int pop() { … }"></div>
+    <ol class="hints">
+      <li>Once <code>pop</code> throws, does <code>null</code> still have a job? Then what does the return type need to hold?</li>
+      <li>Look at when the other methods call <code>pop</code>: after what check, or under what precondition?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The return type becomes <code>int</code>, since <code>null</code> no longer has a job. The <code>@return</code> clause loses its second half, and <code>@throws StackEmptyException if the stack was empty</code> takes it over. The body throws <code>new StackEmptyException("stack is empty")</code> when <code>items.size() == 0</code>, else returns <code>items.remove(items.size() - 1)</code>. <code>StackEmptyException</code> extends <code>RuntimeException</code>.</li>
+      <li><code>main</code>'s <code>.</code> branch: <code>try { System.out.println(stack.pop()); } catch (StackEmptyException e) { System.out.println("error: " + e.getMessage()); }</code></li>
+      <li>The other clients pop only after checking <code>items.size()</code>, or, for <code>multiply</code>, under its precondition, so none needs a <code>try</code>. A forgotten <code>try</code> in <code>main</code> now stops with a stack trace whose message is <code>stack is empty</code>, instead of a <code>NullPointerException</code>.</li>
+      <li class="answer">Return type <code>int</code>; no other method needs a <code>try</code>; <code>main</code> catches <code>StackEmptyException</code> around the print.</li>
+    </ol></div></div>
+    <details class="notes" open><summary>Teaching notes</summary><ul><li>Compare the forgotten-check story before and after: a confusing <code>NullPointerException</code> becomes a stack trace with the method's own message.</li></ul></details>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l6-overflow">
+    <h2>2. Saying no to overflow</h2>
+    <p class="prompt"><code>2147483647 1 + p</code> shows that <code>add</code> wraps past the largest <code>int</code>. <code>Math.addExact(a, b)</code> returns <code>a + b</code>, or throws an unchecked <code>ArithmeticException</code> when the sum does not fit. Which of the six ways should <code>add</code> use to report an overflow, given that it already reports too few numbers with a flag?</p>
+    <div class="answer-spec" data-part="way" data-type="choice" data-answer="exception" data-options="flag:the same flag|special:a special value|exception:an exception|precondition:a precondition" data-label="The way to report the overflow"></div>
+    <div class="answer-spec" data-part="kept" data-type="yesno" data-answer="no" data-label="With add calling push(Math.addExact(a, b)) after its two pops, are both numbers still on the stack when addExact throws?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="why" data-type="self" data-long data-label="Why that way, and what the spec gains" data-placeholder="A boolean has room for …"></div>
+    <ol class="hints">
+      <li>How many different "no"s can one <code>boolean</code> say?</li>
+      <li>Read <code>add</code>'s line 156: what happened to the two numbers before the <code>push</code>? How does <code>divide</code> keep its stack unchanged (line 203)?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>A <code>boolean</code> has room for one "no," and <code>add</code> already uses it for too few numbers. A second failure needs a second answer, so the flag runs out of room.</li>
+      <li>An exception can report the overflow: let <code>ArithmeticException</code> pass to <code>main</code>, which catches it around the call. The spec gains <code>@throws ArithmeticException if the sum does not fit in an int</code>, and has to say what is left on the stack.</li>
+      <li>As written, the two numbers are already popped when <code>addExact</code> throws, so they are lost. <code>add</code> could push <code>a</code> and <code>b</code> back in a <code>try</code> inside <code>add</code>, then throw again, as <code>divide</code> does on line 203.</li>
+      <li>Better still, one way for both failures: two ways of saying no in one method are a sign to pick one, here an exception for both.</li>
+      <li class="answer">An exception; and no, the numbers are lost unless <code>add</code> pushes them back before rethrowing.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l6-messages-stream">
+    <h2>3. Which stream for the messages?</h2>
+    <p class="prompt">The calculator prints its error messages on standard output. Lecture 3's <code>Sum</code> printed its messages on standard error. Which is right for the calculator?</p>
+    <div class="answer-spec" data-part="stream" data-type="stream" data-answer="stderr" data-label="Where the messages should go" data-placeholder="standard output or standard error"></div>
+    <div class="answer-spec" data-part="why" data-type="self" data-long data-label="Who can tell the difference, and why it matters" data-placeholder="A person at the terminal …"></div>
+    <ol class="hints"><li>Who can tell the two streams apart: a person at the terminal, or a script reading the calculator's output through a pipe?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>For a person at the terminal, it makes no difference: both streams show up on the screen.</li>
+      <li>For a script, it does. A script could feed the calculator its input through a pipe and read the answers. With messages on standard output, it finds <code>error: need two numbers to add</code> where it expected a number: the clutter Lecture 3's Unix maxim warns against.</li>
+      <li>Either way, the manual (the class comment) should say what each mistake prints, and where. It says nothing about errors.</li>
+      <li class="answer">Standard error, so the answers on standard output stay clean; and the manual should say so.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l6-predict">
+    <h2>4. Predict the calculator</h2>
+    <p class="prompt">Each line is typed into a fresh calculator. What does the last command print? Type it exactly.</p>
+    <div class="answer-spec" data-part="minus" data-type="output" data-answer="-1" data-label="3 4 - ." data-placeholder="exactly as printed"></div>
+    <div class="answer-spec" data-part="div" data-type="output" data-answer="3" data-label="10 3 / ." data-placeholder="exactly as printed"></div>
+    <div class="answer-spec" data-part="negdiv" data-type="output" data-answer="-3" data-label="-7 2 / ." data-placeholder="exactly as printed"></div>
+    <div class="answer-spec" data-part="stack" data-type="output" data-answer="[1 5]" data-label="1 2 3 + p" data-placeholder="exactly as printed"></div>
+    <div class="answer-spec" data-part="word" data-type="output" data-answer="error: don't understand '1x'" data-label="1x" data-placeholder="exactly as printed"></div>
+    <ol class="hints">
+      <li>For <code>-</code> and <code>/</code>, the number second from the top is on the left. Java's <code>int</code> division rounds toward zero.</li>
+      <li>A token that is not <code>q p . t + - * /</code> goes to <code>Integer.parseInt</code> (line 101). What does line 104 print when it throws?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>3 4 -</code> pushes 3 − 4 = −1; <code>.</code> prints <code>-1</code>. <code>10 3 /</code> pushes 10 / 3 = 3.</li>
+      <li><code>-7 2 /</code>: −7 / 2 is −3.5, and Java's <code>int</code> division rounds toward zero, so −3 (not −4).</li>
+      <li><code>1 2 3 +</code> replaces 2 and 3 with 5; <code>p</code> prints the stack bottom first: <code>[1 5]</code>.</li>
+      <li><code>1x</code> is not a whole number, so <code>parseInt</code> throws and <code>main</code> prints <code>error: don't understand '1x'</code>.</li>
+      <li class="answer"><code>-1</code>, <code>3</code>, <code>-3</code>, <code>[1 5]</code>, <code>error: don't understand '1x'</code>.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l6-forgotten">
+    <h2>5. What happens when the check is forgotten?</h2>
+    <p class="prompt">For each of the notes' copies, the run (or compile) that tests the missing check: what happens?</p>
+    <div class="answer-spec" data-part="flag" data-type="choice" data-answer="silent" data-options="silent:nothing happens, silently|null:it prints null|npe:NullPointerException|trace:a stack trace with the method's own message|nse:NoSuchElementException|compile:it does not compile" data-label="flag copy, typing 1 +"></div>
+    <div class="answer-spec" data-part="pre" data-type="choice" data-answer="npe" data-options="silent:nothing happens, silently|null:it prints null|npe:NullPointerException|trace:a stack trace with the method's own message|nse:NoSuchElementException|compile:it does not compile" data-label="precondition copy, typing 1 *"></div>
+    <div class="answer-spec" data-part="special" data-type="choice" data-answer="null" data-options="silent:nothing happens, silently|null:it prints null|npe:NullPointerException|trace:a stack trace with the method's own message|nse:NoSuchElementException|compile:it does not compile" data-label="special-value copy, Integer kept, typing ."></div>
+    <div class="answer-spec" data-part="exception" data-type="choice" data-answer="trace" data-options="silent:nothing happens, silently|null:it prints null|npe:NullPointerException|trace:a stack trace with the method's own message|nse:NoSuchElementException|compile:it does not compile" data-label="exception copy, typing 1 /"></div>
+    <div class="answer-spec" data-part="wrapper" data-type="choice" data-answer="nse" data-options="silent:nothing happens, silently|null:it prints null|npe:NullPointerException|trace:a stack trace with the method's own message|nse:NoSuchElementException|compile:it does not compile" data-label="wrapper copy, typing t"></div>
+    <div class="answer-spec" data-part="checked" data-type="choice" data-answer="compile" data-options="silent:nothing happens, silently|null:it prints null|npe:NullPointerException|trace:a stack trace with the method's own message|nse:NoSuchElementException|compile:it does not compile" data-label="checked-exception copy (no try around subtract)"></div>
+    <div class="answer-spec" data-part="line" data-type="int" data-answer="182" data-label="In the precondition copy, the line of Calculator.java where the NullPointerException happens" data-placeholder="a line number"></div>
+    <ol class="hints">
+      <li>Ask what the method does on its own when it cannot do its job, and then what <code>main</code> does with that if it does not look.</li>
+      <li>For the precondition copy: <code>multiply</code> pops twice on line 182 and stores each result in an <code>int</code>. What does <code>pop</code> return on an empty stack?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Flag: <code>add</code> returns <code>false</code> and changes nothing; <code>main</code> ignores it. Silence.</li>
+      <li>Precondition: <code>multiply</code> assumes two numbers and pops twice; the second <code>pop</code> returns <code>null</code>, and line 182 converts it to an <code>int</code>: <code>NullPointerException</code> at <code>CalcStack.multiply(Calculator.java:182)</code>.</li>
+      <li>Special value, <code>Integer</code> kept: <code>println(null)</code> prints <code>null</code> and the run goes on.</li>
+      <li>Exception: nothing catches <code>TooFewOperandsException</code>; the program stops with a stack trace naming <code>need two numbers to divide</code> and line 198.</li>
+      <li>Wrapper: <code>getAsInt</code> on an empty <code>OptionalInt</code> throws <code>NoSuchElementException: No value present</code>.</li>
+      <li>Checked exception: <code>error: unreported exception StackException; must be caught or declared to be thrown</code>. It never runs.</li>
+      <li class="answer">silent; NullPointerException (line 182); prints null; stack trace with divide's message; NoSuchElementException; does not compile.</li>
+    </ol></div></div>
+    <details class="notes" open><summary>Teaching notes</summary><ul><li>Students can check each answer on <a href="#l6-forget">When the client forgets</a> by picking the copy.</li></ul></details>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l6-half-sheet-1">
+    <h2>6. Half sheet: who decides, who tells the user?</h2>
+    <p class="prompt">The user types <code>1 +</code>. Which method first decides that the operation cannot be done? How does it say so, and who tells the user? Now <code>1 *</code>: does it go the same way? Why might it not?</p>
+    <div class="answer-spec" data-part="decides-add" data-type="text" data-answer="add|calcstack.add|stack.add|add()" data-label="1 +: the method that first decides" data-placeholder="a method name"></div>
+    <div class="answer-spec" data-part="how" data-type="choice" data-answer="flag" data-options="pre:a precondition|special:a special value|flag:a flag|wrapper:a wrapper|exception:an exception" data-label="How it says so"></div>
+    <div class="answer-spec" data-part="tells" data-type="text" data-answer="main|calculator.main|main()" data-label="Who tells the user" data-placeholder="a method name"></div>
+    <div class="answer-spec" data-part="decides-mul" data-type="text" data-answer="main|calculator.main|main()" data-label="1 *: the method that first decides" data-placeholder="a method name"></div>
+    <div class="answer-spec" data-part="why" data-type="self" data-long data-label="Why 1 * goes differently" data-placeholder="multiply has a precondition, so …"></div>
+    <ol class="hints"><li>Read lines 69 to 74 and 82 to 88. Who calls what, and who checks first?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>1 +</code>: <code>main</code> calls <code>add</code> (line 70). <code>add</code> finds fewer than two numbers (line 155) and returns <code>false</code>, a flag. <code>main</code> checks the flag (line 71) and prints <code>error: need two numbers to add</code>.</li>
+      <li><code>1 *</code>: <code>multiply</code> has a precondition, <code>2 &lt;= size()</code>, and checks nothing. So <code>main</code> checks <code>size()</code> first (line 83) and never calls <code>multiply</code>.</li>
+      <li class="answer"><code>add</code> decides and says so with a flag; <code>main</code> tells the user. For <code>1 *</code>, <code>main</code> decides itself, because <code>multiply</code>'s way is a precondition.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l6-half-sheet-2">
+    <h2>7. Half sheet: one way for <code>CalcStack</code></h2>
+    <p class="prompt"><code>CalcStack</code> says no six different ways, one per operation. A real class picks one way and uses it everywhere. Which way would you pick for <code>CalcStack</code>, and why?</p>
+    <div class="answer-spec" data-part="pick" data-type="self" data-long data-label="Your choice and your reasons" data-placeholder="I'd pick … because …"></div>
+    <ol class="hints">
+      <li>Use the three questions: can <code>main</code> check first, cheaply? How convenient is the answer? What happens when a client forgets?</li>
+      <li>Is an empty stack something a careful client should expect and recover from, or a programmer's mistake?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>There is no single right answer; the lecture asks for reasons. Every client here can check cheaply: <code>size()</code> is one comparison. That argues for a precondition, as <code>multiply</code> has, with <code>main</code> checking at the edge.</li>
+      <li>An exception for every operation (as in problem 1) gives a forgotten check a stack trace with the method's own message instead of a confusing crash. A checked exception goes further: the compiler holds every client to the check, at the cost of a <code>try</code> or a clause even in a client that knows the stack has two numbers, and in every method between <code>main</code> and the call.</li>
+      <li>By Bloch's rule, an empty stack in a well-written client is a programmer's mistake, which suits an unchecked exception (or a precondition).</li>
+      <li class="answer">A good answer picks one way, applies it to all six operations, and justifies it with what it costs clients and what happens when one forgets.</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ SECTION 2 -->
+<section class="page" id="s2-review" data-title="Section 2: heuristics, coverage, JUnit" data-unit="s2">
+  <p class="where">Section 2 · Testing · <span class="today-chip" data-date="2026-10-13">Tue Oct 13</span> · review, from the section slides</p>
+  <h1>Heuristics, coverage, JUnit</h1>
+  <div class="prose"><p>Section 2 practiced Lectures 4 and 5. Its handout, solution and slides are the source for these pages, lightly condensed.</p></div>
+  <h2>Testing heuristics</h2>
+  <table class="plain">
+    <tr><th>Black-box testing</th><td>Look at the spec, and test all expected behaviors.</td></tr>
+    <tr><th>Clear-box testing</th><td>Look at the code, and test all paths.</td></tr>
+    <tr><th>Boundary cases</th><td>Inputs on the edge of a behavior (an empty array, a value at an end of a range).</td></tr>
+    <tr><th>Exhaustive testing</th><td>If there are only a few inputs (10 or fewer), test them all.</td></tr>
+  </table>
+  <h2>Coverage</h2>
+  <table class="plain">
+    <tr><th>Statement</th><td>Every statement executed at least once.</td></tr>
+    <tr><th>Branch</th><td>Every branch (both sides of every <code>if</code>, including an implicit else) executed at least once.</td></tr>
+    <tr><th>Loop</th><td>Every loop (and recursive call) run 0, 1, and 2 or more times.</td></tr>
+    <tr><th>Path</th><td>Every path through the code executed at least once.</td></tr>
+  </table>
+  <h2>JUnit</h2>
+  <div class="prose"><p>A test class has methods marked <code>@Test</code>; each is made of assertions. <code>assertTrue</code> / <code>assertFalse</code>; <code>assertEquals</code> / <code>assertNotEquals</code> (compared with <code>.equals</code>); <code>assertNull</code> / <code>assertNotNull</code>; <code>assertThrows</code>, which takes the code to run as a lambda. For a method that mutates (<code>@modifies</code>, <code>@effects</code>), check the modified variables too, not just the return value: <code>assertArrayEquals</code> compares arrays element by element.</p></div>
+
+  <div class="check" data-id="cse331-w3-s2-qc-exhaustive" data-kind="quickcheck" data-type="int" data-answer="10">
+    <p>Quick check: the slides' rule of thumb tests every input exhaustively when there are at most how many?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <details class="notes" open><summary>Teaching notes</summary><ul>
+    <li>Administrivia from the slides: Reading 2 due Friday at 11:59 pm; Homework 2 released Friday, due the next Friday.</li>
+    <li>The coverage slide adds <em>path coverage</em>, which Lecture 5 did not list. Lecture 7's forward argument through <code>quadrant</code> follows all four of its paths.</li>
+  </ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="s2-spec" data-title="Task 1: arraySum" data-unit="s2">
+  <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-13">Tue Oct 13</span> · Task 1, spec-based testing</p>
+  <h1>Task 1: a suite for <code>arraySum</code></h1>
+  <pre class="code"><code>/**
+ * Returns the sum of the array
+ * @param arr an array of integers
+ * @requires arr is not null
+ * @returns the sum of the elements
+ * in arr or 0 if arr is empty
+ */
+public static int arraySum(int[] arr) {...}</code></pre>
+  <div class="prose"><p>Lecture 4's four steps: choose an allowed input, find the expected behavior from the spec, run the method, compare. There is no code to look at, so this is black-box. The section's suite covers the cases the spec names, and the boundary of the empty array:</p></div>
+  <pre class="code"><code>@Test
+public void testArraySum() {
+    // empty array
+    int[] arr1 = new int[0];
+    assertEquals(0, arraySum(arr1));
+    // single element array
+    int[] arr2 = {5};
+    assertEquals(5, arraySum(arr2));
+    // multi-element array
+    int[] arr3 = {0, 3, 3, -1, 0};
+    assertEquals(5, arraySum(arr3));
+}</code></pre>
+  <div class="check" data-id="cse331-w3-s2-qc-arraysum" data-kind="quickcheck" data-type="int" data-answer="5">
+    <p>Quick check: what does the spec say <code>arraySum(new int[] {0, 3, 3, -1, 0})</code> returns?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul>
+    <li><code>arr = null</code> is not a test: the precondition rules it out, so the spec promises nothing.</li>
+    <li>The three arrays give a loop over the array 0, 1 and several passes, so the suite also gets loop coverage on the usual implementation. The multi-element array has zeros at both ends and a negative number: boundary values inside the array.</li>
+  </ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="s2-coverage" data-title="Task 2: covering removeValue" data-unit="s2">
+  <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-13">Tue Oct 13</span> · Task 2, code coverage</p>
+  <h1>Task 2: covering <code>removeValue</code></h1>
+  <div class="prose"><p>Section 1's spec C, with implementation 1:</p></div>
+  <div class="code-pair">
+    <pre class="code"><code>// @requires 0 &lt;= n &lt;= a.length
+// @modifies a
+// @effects if x does not occur in a[0..n], leaves a
+//   unchanged; otherwise, if x occurs k &gt; 0 times in
+//   a[0..n], then remove all k occurrences of x,
+//   leaving remaining elements in the same relative
+//   order as before; the new value of elements in
+//   a[n-k..n] is unspecified
+// @return n - k</code></pre>
+    <pre class="code"><code>public static int removeValue(int[] a, int n, int x) {
+    int w = 0;
+    for (int r = 0; r &lt; n; r++) {
+        if (a[r] != x) {
+            a[w] = a[r];
+            w++;
+        }
+        // implicit else
+    }
+    return w;
+}</code></pre>
+  </div>
+  <div class="prose"><p>The section's test, one comment per assertion naming what it covers:</p></div>
+  <pre class="code"><code>@Test
+public void testRemoveValue() {
+    int[] arr = {1, 2, 3};
+    // 0 loop iterations
+    assertEquals(0, removeValue(arr, 0, 1));
+    assertArrayEquals(arr, new int[] {1,2,3});
+    // 1 loop iteration &amp; implicit else branch
+    assertEquals(0, removeValue(arr, 1, 1));
+    assertArrayEquals(arr, new int[] {1,2,3});
+    // 2+ loop iterations &amp; if branch
+    assertEquals(1, removeValue(arr, 2, 1));
+    assertArrayEquals(arr, new int[] {2,2,3});
+}</code></pre>
+  <div class="rule"><p><strong>Full coverage is the floor, not the ceiling.</strong> These calls cover every statement, both branches, every path and 0/1/2+ loop passes. Are we done testing <code>removeValue</code>? No. To reach the floor we also need tests derived from the spec: each case and boundary it describes. Above the floor, engineering judgment: where are bugs most likely, what do they cost if undetected, and how much more testing is worth it. "Program testing can be used to show the presence of bugs, but never to show their absence" (Dijkstra).</p></div>
+  <h2>Quirks</h2>
+  <pre class="code"><code>int[] arr1 = {9, 9, 9};
+assertEquals(0, removeValue(arr1, 3, 9));
+assertArrayEquals(new int[] {9, 9, 9}, arr1);      // all 9s logically removed, array unchanged
+int[] arr2 = {1, 9, 2, 9, 3};
+assertEquals(3, removeValue(arr2, 5, 9));
+assertArrayEquals(new int[] {1, 2, 3, 9, 3}, arr2); // removed values can remain in the array</code></pre>
+
+  <div class="check" data-id="cse331-w3-s2-qc-third-call" data-kind="quickcheck" data-type="int" data-answer="1">
+    <p>Quick check: in the section's test, what does the third call, <code>removeValue(arr, 2, 1)</code> on <code>{1, 2, 3}</code>, return?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul>
+    <li>The section's <code>assertArrayEquals(arr, new int[] {...})</code> puts the actual value first. JUnit's convention is expected first (as in the quirks test); the order only matters for the failure message.</li>
+    <li>Ask: is every assertion here specification-based? After the third call, <code>n − k</code> is 1, so the spec leaves <code>a[1..2]</code> unspecified, yet the test checks <code>a[1] == 2</code>. That is practice problem 4.</li>
+  </ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="s2-testable" data-title="Task 3: designing for testability" data-unit="s2">
+  <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-13">Tue Oct 13</span> · Task 3, interactive programming</p>
+  <h1>Task 3: designing for testability</h1>
+  <div class="prose"><p>A simplified <code>Sum</code> from lecture, all in <code>main</code>:</p></div>
+  <pre class="code"><code>public static void main(String[] args) {
+    boolean average = false;
+    if (args.length &gt; 0 &amp;&amp; args[0].equals("-a")) {
+        average = true;
+    }
+    Scanner scan = new Scanner(System.in);
+    int sum = 0;
+    int count = 0;
+    while (scan.hasNextInt()) {
+        sum += scan.nextInt();
+        count++;
+    }
+    if (average) {
+        System.out.println((double) sum / count);
+    } else {
+        System.out.println(sum);
+    }
+}</code></pre>
+  <ol class="prose">
+    <li><strong>Decomposition.</strong> <code>main</code> does several jobs: parse the command-line arguments, read integers from standard input, compute the sum (and count), compute the average, print the result. That makes it hard to understand and to test.</li>
+    <li><strong>Refactoring by "wishful thinking".</strong> Write <code>main</code> as calls to helpers you wish existed: <code>parseArguments</code>, <code>readNumbers</code>, <code>computeSum</code>, <code>computeAverage</code>, <code>printResult</code>. There is no one correct decomposition.</li>
+    <li><strong>Testing.</strong> The most valuable helper to extract for unit testing is <code>computeSum</code> (or <code>computeAverage</code>): it isolates the core computation, so it can have a clear spec and be tested apart from arguments, input and output. <code>printResult</code> improves organization but not testability.</li>
+  </ol>
+  <div class="prose"><p>The first thing a new helper needs before tests: <strong>a specification</strong>. The slides give <code>computeSum</code> the spec of Task 1's <code>arraySum</code>, so Task 1's tests apply unchanged.</p></div>
+  <div class="check" data-id="cse331-w3-s2-qc-helper" data-kind="quickcheck">
+    <p>Quick check: which helper does most to make this program easier to unit test?</p>
+    <div class="opts">
+      <label data-option="print"><input type="radio" name="s2qh"> <code>printResult</code><span class="why" hidden>It tidies <code>main</code>, but printing is not the behavior unit tests usually check.</span></label>
+      <label data-option="read"><input type="radio" name="s2qh"> <code>readNumbers</code><span class="why" hidden>It still reads standard input, which is what makes a method hard to test.</span></label>
+      <label data-option="sum" data-correct><input type="radio" name="s2qh"> <code>computeSum</code><span class="why" hidden>Right: values in, value out, no keyboard and no screen.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Connects to Lecture 6: separating <code>CalcStack</code> from the conversation is what made <code>add</code> testable without a keyboard.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="s2-practice" data-title="Section 2: practice" data-unit="s2">
+  <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-13">Tue Oct 13</span> · practice</p>
+  <h1>Section 2: practice</h1>
+  <div class="prose"><p>Five problems on the section's three tasks. Problems 1 and 4 go a step past the handout; every computed answer was checked by running the code.</p></div>
+
+  <article class="task" data-id="cse331-w3-s2-buggy-arraysum">
+    <h2>1. Does the suite catch this bug?</h2>
+    <p class="prompt">A buggy <code>arraySum</code> starts with <code>int sum = arr[0];</code> and then adds every element from index 0, so it counts the first element twice. The section's suite has three assertions: <b>A</b> the empty array, expects 0; <b>B</b> <code>{5}</code>, expects 5; <b>C</b> <code>{0, 3, 3, -1, 0}</code>, expects 5. Which fail (by a wrong answer or an exception)?</p>
+    <div class="answer-spec" data-part="fail" data-type="letters" data-allowed="ABC" data-answer="AB" data-label="Assertions that fail" data-placeholder="letters, e.g. AB"></div>
+    <div class="answer-spec" data-part="b-gets" data-type="int" data-answer="10" data-label="What the buggy version returns on {5}" data-placeholder="a whole number"></div>
+    <ol class="hints"><li>What is <code>arr[0]</code> on an empty array? And what is the first element of C?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>A: <code>arr[0]</code> on an empty array throws <code>ArrayIndexOutOfBoundsException</code>; the test fails.</li>
+      <li>B: 5 + 5 = 10, expected 5: fails.</li>
+      <li>C: the first element is 0, so counting it twice changes nothing: 5. Passes.</li>
+      <li class="answer">A and B fail; on <code>{5}</code> it returns 10. C alone would miss the bug, which is why the suite has one test per case.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-s2-trace-test">
+    <h2>2. Trace the section's test</h2>
+    <p class="prompt">Run the section's <code>testRemoveValue</code> by hand on <code>arr = {1, 2, 3}</code>. The three calls share one array.</p>
+    <div class="answer-spec" data-part="r1" data-type="int" data-answer="0" data-label="removeValue(arr, 0, 1) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="r2" data-type="int" data-answer="0" data-label="removeValue(arr, 1, 1) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="r3" data-type="int" data-answer="1" data-label="removeValue(arr, 2, 1) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="a0" data-type="int" data-answer="2" data-label="arr[0] after the third call" data-placeholder="a whole number"></div>
+    <ol class="hints"><li><code>w</code> counts the elements kept so far; each kept element is copied to index <code>w</code>.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>n = 0: the loop never runs; returns 0, array unchanged.</li>
+      <li>n = 1: <code>a[0] = 1 == x</code>, the implicit else; returns 0, array unchanged.</li>
+      <li>n = 2: index 0 is skipped; <code>a[1] = 2</code> is kept and copied to <code>a[0]</code>; returns 1. The array is <code>{2, 2, 3}</code>.</li>
+      <li class="answer">0, 0, 1; <code>arr[0]</code> is 2.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-s2-quirks">
+    <h2>3. The quirks</h2>
+    <p class="prompt">Predict the slides' two quirky calls.</p>
+    <div class="answer-spec" data-part="r9" data-type="int" data-answer="0" data-label="removeValue({9, 9, 9}, 3, 9) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="first9" data-type="int" data-answer="9" data-label="… and leaves a[0] at" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="r5" data-type="int" data-answer="3" data-label="removeValue({1, 9, 2, 9, 3}, 5, 9) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="a3" data-type="int" data-answer="9" data-label="… and leaves a[3] at" data-placeholder="a whole number"></div>
+    <ol class="hints"><li>Only the first <code>w</code> slots are written. What is in the slots after them?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>{9, 9, 9}</code>: every element equals 9, so nothing is copied and <code>w</code> stays 0. The array is unchanged: all three 9s are logically removed but still there.</li>
+      <li><code>{1, 9, 2, 9, 3}</code>: 1, 2, 3 are copied to indices 0 to 2; returns 3. Indices 3 and 4 are never written: <code>{1, 2, 3, 9, 3}</code>.</li>
+      <li class="answer">0, with <code>a[0]</code> still 9; then 3, with <code>a[3]</code> still 9. The spec allows both: those slots are unspecified.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-s2-spec-based">
+    <h2>4. Is the section's last assertion specification-based?</h2>
+    <p class="prompt">After <code>removeValue(arr, 2, 1)</code> on <code>{1, 2, 3}</code>, the section's test asserts the whole array is <code>{2, 2, 3}</code>. By Lecture 4's definition, a specification-based test checks only what the spec promises.</p>
+    <div class="answer-spec" data-part="first-unspec" data-type="int" data-answer="1" data-label="The first index of a whose new value the spec leaves unspecified" data-placeholder="an index"></div>
+    <div class="answer-spec" data-part="spec-based" data-type="yesno" data-answer="no" data-label="Is assertArrayEquals(arr, new int[] {2,2,3}) specification-based?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="fix" data-type="self" data-long data-label="An assertion that checks only what the spec promises" data-placeholder="assertEquals(…)"></div>
+    <ol class="hints"><li>The spec leaves <code>a[n-k..n]</code> unspecified. What are <code>n</code> and <code>k</code> for this call?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><code>n = 2</code> and 1 occurs once in <code>a[0..2]</code>, so <code>k = 1</code>. The unspecified slots are <code>a[1..2]</code>: index 1 only.</li>
+      <li>The assertion checks <code>a[1] == 2</code>, which the spec does not promise. A correct implementation that left <code>a[1]</code> at anything else would fail it: implementation-based.</li>
+      <li>A specification-based version checks the return value and the prefix: <code>assertEquals(1, removeValue(arr, 2, 1)); assertEquals(2, arr[0]);</code></li>
+      <li class="answer">Index 1; no, it is implementation-based.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-s2-computesum">
+    <h2>5. A spec for the extracted helper</h2>
+    <p class="prompt">The slides' <code>computeSum(int[] arr)</code> has Task 1's spec, including <code>@requires arr is not null</code>, and its code starts with <code>if (arr == null) { throw new IllegalArgumentException(""); }</code>.</p>
+    <div class="answer-spec" data-part="breaks" data-type="yesno" data-answer="no" data-label="Does throwing on null break computeSum's specification?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="name" data-type="text" data-answer="defensive programming|defensive" data-label="Lecture 6's name for checking a precondition anyway" data-placeholder="two words"></div>
+    <div class="answer-spec" data-part="why" data-type="self" data-long data-label="Why extract computeSum rather than printResult" data-placeholder="computeSum takes …"></div>
+    <ol class="hints"><li>What does a specification promise on a call that breaks its precondition?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>A call with <code>null</code> breaks the precondition, so the spec promises nothing: throwing is allowed, as is anything else.</li>
+      <li>Checking it anyway is defensive programming (Lecture 6). The spec is the same either way.</li>
+      <li><code>computeSum</code> takes values and returns a value, so it can be tested with no keyboard and no screen; <code>printResult</code> only tidies <code>main</code>.</li>
+      <li class="answer">No; defensive programming.</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ LECTURE 7 -->
+<section class="page" id="l7-why" data-title="From three tests to every run" data-unit="l7">
+  <p class="where">Lecture 7 · Reasoning, Floyd-Hoare logic · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span></p>
+  <h1>From three tests to every run</h1>
+  <pre class="code"><code>/**
+ * Converts a duration in hours, minutes, and seconds to seconds.
+ * The result could overflow an int, so it is returned as a long.
+ *
+ * @requires 0 &lt;= h, 0 &lt;= m, and 0 &lt;= s
+ * @return 3600 * h + 60 * m + s
+ */
+static long seconds(int h, int m, int s) {
+    long t = h;          // line 17
+    t = t * 60 + m;      // line 18
+    t = t * 60 + s;      // line 19
+    return t;            // line 20
+}</code></pre>
+  <div class="prose">
+    <p>Three tests pass: <code>seconds(0, 0, 0)</code> is 0, <code>seconds(1, 1, 1)</code> is 3661, <code>seconds(0, 90, 0)</code> is 5400. With no <code>if</code> and no loop, every test runs every line, so by Lecture 5's list these are enough. So is <code>seconds</code> right?</p>
+    <p>The spec promises an answer for every choice of non-negative <code>h</code>, <code>m</code> and <code>s</code>: far more inputs than we could ever run. A passing test tells you only about its own run. To know <code>seconds</code> satisfies its spec we need the third way of gaining knowledge, <strong>reasoning</strong>: argue from the code itself that the method satisfies its spec on every run.</p>
+    <p>The idea: write down what is true after each line, and name the rule that justifies each step, so anyone can check the argument without trusting you.</p>
+  </div>
+  <div class="check" data-id="cse331-w3-l7-qc-tests-enough" data-kind="quickcheck" data-type="yesno" data-answer="no">
+    <p>Quick check: the three tests pass and run every statement. Do they show that <code>seconds</code> meets its spec on every allowed input?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>"Enough tests" (Lecture 5's floor) and "knowing it is correct" are different claims. Today's tool closes the gap for code without loops; Friday adds loops.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l7-claims" data-title="What is true after each line" data-unit="l7">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span> · notes: What is true after each line, A claim at a point</p>
+  <h1>What is true after each line</h1>
+  <div class="prose">
+    <p>When the program runs, a line changes the values of the variables. When we reason, a line changes what we <em>know</em> about those values. A claim sits in double braces beside the code. The braces are not Java, and what they hold is math: <code>=</code> means equals, <code>!=</code> not equal, combined with <code>and</code>, <code>or</code>, <code>not</code>. A client must make the precondition true, so we may assume it at the top.</p>
+  </div>
+  <pre class="code"><code>static long seconds(int h, int m, int s) {
+    {{ 0 &lt;= h and 0 &lt;= m and 0 &lt;= s }}
+    long t = h;
+    {{ 0 &lt;= h and 0 &lt;= m and 0 &lt;= s and t = h }}
+    t = t * 60 + m;
+    {{ 0 &lt;= h and 0 &lt;= m and 0 &lt;= s and t = 60 * h + m }}
+    t = t * 60 + s;
+    {{ 0 &lt;= h and 0 &lt;= m and 0 &lt;= s and
+       t = 3600 * h + 60 * m + s }}
+    return t;
+}</code></pre>
+  <div class="steps"><ol>
+    <li>Line 17 sets <code>t</code> to <code>h</code>. Nothing about <code>h</code>, <code>m</code>, <code>s</code> changed, so the precondition is still true, and now <code>t = h</code> too.</li>
+    <li>Line 18 changes <code>t</code>, so <code>t = h</code> is no longer true. The new value is the old value times 60, plus <code>m</code>, and the old value was <code>h</code>: <code>t = 60 * h + m</code>.</li>
+    <li>Line 19 does the same with <code>s</code>: <code>t = 3600 * h + 60 * m + s</code>.</li>
+    <li>Line 20 returns <code>t</code>, and the last claim says <code>t</code> is exactly what the postcondition promises. So every run that starts with the precondition true returns the right value, shown without running the method once.</li>
+  </ol></div>
+  <div class="rule">
+    <p><strong>Assertion.</strong> A true or false claim about the program's state (the values of variables and memory) at a particular point in the program. It <em>holds</em> if the claim is true each time a run reaches its point. A point in a branch is reached only by runs that take the branch; a point in a loop may be reached many times on one run.</p>
+  </div>
+  <div class="prose">
+    <p>The claims treat <code>*</code> and <code>+</code> as integer arithmetic. Java's <code>int</code> wraps at the top of its range, and the seconds in 596524 hours already pass it, so <code>seconds</code> computes in a <code>long</code>: no line wraps, and the claims may use integer arithmetic. Going from a claim before a line to a claim after it is <strong>forward reasoning</strong>. With the rules written down, an argument whose every step follows a rule is a <strong>proof</strong>.</p>
+  </div>
+  <div class="check" data-id="cse331-w3-l7-qc-after-18" data-kind="quickcheck" data-type="formula" data-answer="60*h+m" data-points='{"h":["0","1","7","40"],"m":["0","2","59","90"]}'>
+    <p>Quick check: after line 18, <code>t</code> equals what, in terms of <code>h</code> and <code>m</code>?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a formula in h and m"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The refined definition of <em>holds</em> ("each time a run reaches its point") matters on the next pages: inside a branch, and later inside a loop.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l7-triples" data-title="Hoare triples" data-unit="l7">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span> · notes: A triple</p>
+  <h1>Hoare triples</h1>
+  <div class="rule">
+    <p><strong>Hoare triple.</strong> <code>{{ P }} code {{ Q }}</code>: a claim P (its precondition), a piece of code, and a claim Q (its postcondition). The triple is <em>valid</em> if every terminating run of the code from a state in which P is true ends in a state in which Q is true.</p>
+  </div>
+  <div class="prose">
+    <p>Floyd and Hoare worked this out in the late 1960s: Floyd-Hoare logic. A method satisfies its specification exactly when the triple of its precondition, body and postcondition is valid and every call that begins with the precondition true terminates. Pick a triple below: each square is a starting state; blue ones make P true. The second row shows the variable after the line, green where Q holds and red where it does not.</p>
+  </div>
+  <div class="panel" id="triples"><p class="panel-label">One-line triples, checked on every state from −3 to 8</p></div>
+  <table class="plain">
+    <tr><td><code>{{ true }} x = 5; {{ x = 5 }}</code></td><td>Valid: whatever the state, the line makes <code>x</code> 5.</td></tr>
+    <tr><td><code>{{ x = 3 }} y = x + 1; {{ y = 4 }}</code></td><td>Valid.</td></tr>
+    <tr><td><code>{{ x = 3 }} y = x + 1; {{ 0 &lt; y }}</code></td><td>Valid too: a postcondition may say less than all that is true afterward.</td></tr>
+    <tr><td><code>{{ true }} y = x + 1; {{ y = 4 }}</code></td><td>Not valid: from <code>x = 0</code> the line makes <code>y</code> 1.</td></tr>
+    <tr><td><code>{{ 0 &lt; x }} x = x - 1; {{ 0 &lt; x }}</code></td><td>Not valid: from <code>x = 1</code> the line makes <code>x</code> 0.</td></tr>
+    <tr><td><code>{{ false }} x = 0; {{ x = 1 }}</code></td><td>Valid: no state makes <code>false</code> true, so the triple asks nothing, as a spec says nothing about a call that breaks its precondition.</td></tr>
+  </table>
+  <div class="prose">
+    <p>A triple's code may be empty: <code>{{ P }} {{ Q }}</code>, two claims at one point. It is valid exactly when P implies Q, that is, P is stronger than Q. Claims written one under another read as a chain of implications.</p>
+  </div>
+  <div class="check" data-id="cse331-w3-l7-qc-triple" data-kind="quickcheck" data-type="yesno" data-answer="yes">
+    <p>Quick check: is <code>{{ x = 3 }} x = x + 1; {{ x = 4 }}</code> valid?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="yes or no"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The widget only shows a dozen states; a valid verdict there is evidence, not a proof. The point is the shape of the definition: every P-state, run, check Q.</li><li><code>{{ false }}</code> surprises people. Tie it to Lecture 2: a spec promises nothing on a call that breaks its precondition.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l7-strength" data-title="Stronger claims, two directions" data-unit="l7">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span> · notes: Stronger claims say more, Two directions</p>
+  <h1>Stronger claims, two directions</h1>
+  <div class="prose">
+    <p>Think of a claim as the set of states in which it is true. P implies Q means P's set is inside Q's. "Stronger" sounds bigger, so it is easy to get backward: <strong>the stronger claim has the smaller set</strong>, rules out more states, and so says more. The weakest claim is <code>true</code> (every state); the strongest is <code>false</code> (no state).</p>
+    <p>Among the claims that hold at a point, one implies all the others: the strongest. Forward reasoning keeps it, because a weaker claim may not be enough. Had we written only <code>0 &lt;= t</code> after line 18, we could not say what <code>t</code> is after line 19, and the argument about <code>seconds</code> would fail though the method is right.</p>
+  </div>
+  <table class="plain">
+    <tr><th>Forward</th><td><code>{{ P }} code {{ ? }}</code>: the strongest claim that makes the triple valid, the <strong>strongest postcondition</strong>. The triple <code>{{ P }} code {{ Q }}</code> is valid exactly when it implies Q.</td></tr>
+    <tr><th>Backward</th><td><code>{{ ? }} code {{ Q }}</code>: the weakest claim that makes it valid, the <strong>weakest precondition</strong>: the least that must be true beforehand. The triple is valid exactly when P implies it.</td></tr>
+  </table>
+  <div class="check" data-id="cse331-w3-l7-qc-stronger" data-kind="quickcheck">
+    <p>Quick check: which claim is stronger?</p>
+    <div class="opts">
+      <label data-option="a"><input type="radio" name="l7qs"> <code>0 &lt;= t</code><span class="why" hidden>It allows more states, so it is the weaker one.</span></label>
+      <label data-option="b" data-correct><input type="radio" name="l7qs"> <code>0 &lt;= h and t = h</code><span class="why" hidden>Right: it implies <code>0 &lt;= t</code>, and rules out more states.</span></label>
+      <label data-option="same"><input type="radio" name="l7qs"> Neither; they are the same<span class="why" hidden><code>t = 5, h = 2</code> makes the first true and the second false.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Same word as Lecture 2's "stronger specification", same meaning: fewer states (or fewer implementations) satisfy it.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l7-rules" data-title="Assignment, sequence, consequence" data-unit="l7">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span> · notes: The rules for an assignment, a sequence, consequence</p>
+  <h1>Assignment, sequence, consequence</h1>
+  <div class="code-pair">
+    <div class="rule"><p><strong>Assignment, forward.</strong></p><pre class="code"><code>{{ P }}
+x = e;
+{{ P[x ↦ x0] and x = e[x ↦ x0] }}</code></pre><p>Everything P said is still true once we write <code>x0</code>, a fresh name, for the old value of <code>x</code>; and the new <code>x</code> is <code>e</code> computed from the old values. The strongest claim after the line.</p></div>
+    <div class="rule"><p><strong>Assignment, backward.</strong></p><pre class="code"><code>{{ Q[x ↦ e] }}
+x = e;
+{{ Q }}</code></pre><p>Read from the bottom up: whatever Q claims about <code>x</code> after the line had better be true of <code>e</code> before it. Just a substitution. The weakest claim before the line.</p></div>
+  </div>
+  <div class="prose">
+    <p>Two habits keep fresh names out of the claims: if P and <code>e</code> never mention <code>x</code>, the claim after is just <code>P and x = e</code>; and if the old value can be written without <code>x0</code> (after <code>x = x + 1</code> it is <code>x - 1</code>), substitute it and drop the fact it came from.</p>
+  </div>
+  <h2>Backward through <code>seconds</code></h2>
+  <div class="steps"><ol>
+    <li>Before line 19, replace <code>t</code> by <code>t * 60 + s</code>: <code>{{ t * 60 + s = 3600 * h + 60 * m + s }}</code>.</li>
+    <li>Before line 18, replace <code>t</code> by <code>t * 60 + m</code>: <code>{{ (t * 60 + m) * 60 + s = 3600 * h + 60 * m + s }}</code>.</li>
+    <li>Before line 17, replace <code>t</code> by <code>h</code>: <code>{{ (h * 60 + m) * 60 + s = 3600 * h + 60 * m + s }}</code>.</li>
+    <li>Both sides are the same number, so the claim at the top is true in every state, and the precondition implies it: the triple is valid. Three substitutions and one check. (Neither argument used the precondition's three facts.)</li>
+  </ol></div>
+  <div class="rule"><p><strong>Sequence.</strong> <code>{{ P }} first; second {{ Q }}</code> is valid exactly when some claim R between them makes <code>{{ P }} first {{ R }}</code> and <code>{{ R }} second {{ Q }}</code> valid. Forward picks the strongest R; backward the weakest.</p></div>
+  <div class="rule"><p><strong>Consequence.</strong> <code>{{ P }} code {{ Q }}</code> is valid if P implies A, <code>{{ A }} code {{ B }}</code> is valid, and B implies Q. To show a triple valid, it is enough to show one that assumes less and promises more. These two implications involve no code: we check them with arithmetic and logic, and they are where an argument can go wrong.</p></div>
+  <h2>Stronger for whom</h2>
+  <table class="plain">
+    <tr><th></th><th>precondition (the client's promise)</th><th>postcondition (the implementer's promise)</th></tr>
+    <tr><th>stronger</th><td>the implementer is happier</td><td>the client is happier</td></tr>
+    <tr><th>weaker</th><td>the client is happier</td><td>the implementer is happier</td></tr>
+  </table>
+  <div class="prose"><p>Across a call, the method's spec is the call's triple: show the claim before the call implies the precondition, then carry the postcondition on. Swap in a method with a stronger spec and the argument still holds.</p></div>
+  <div class="check" data-id="cse331-w3-l7-qc-wp" data-kind="quickcheck" data-type="int" data-answer="3">
+    <p>Quick check (the half sheet's question): fill in the weakest claim in <code>{{ ? }} x = x + 1; {{ x = 4 }}</code>. It is <code>x = </code>___.</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Half sheet, question 2 (3 minutes): <em>Fill in the weakest claim: <code>{{ ? }} x = x + 1; {{ x = 4 }}</code>. Then: why is backward reasoning sometimes simpler than forward?</em> Backward is one substitution per line with no decisions about which facts survive; the price is claims that grow until simplified at the end.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l7-if" data-title="Conditionals" data-unit="l7">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span> · notes: The rule for a conditional</p>
+  <h1>Conditionals</h1>
+  <div class="code-pair">
+    <pre class="code"><code>{{ P }}
+if (b) {
+    {{ P and b }}
+    first
+    {{ A }}
+} else {
+    {{ P and not b }}
+    second
+    {{ B }}
+}
+{{ A or B }}
+{{ Q }}</code></pre>
+    <div class="prose"><p>A run takes one branch or the other, and we reason without knowing which, so the claim after the <code>if</code> covers both: <code>A or B</code>, the strongest claim there. The triple is valid exactly when both A and B imply Q. An <code>if</code> with no <code>else</code> still has a false branch; it is empty, so B is <code>P and not b</code>.</p></div>
+  </div>
+  <h2><code>abs</code>, with a ghost variable</h2>
+  <pre class="code"><code>/** @requires -2147483647 &lt;= n
+ *  @return n if 0 &lt;= n, and -n if n &lt; 0 */
+static int abs(int n) {
+    {{ n = n0 }}
+    if (n &lt; 0) {
+        {{ n = n0 and n &lt; 0 }}
+        n = -n;
+        {{ n0 &lt; 0 and n = -n0 }}
+    }
+    {{ (n0 &lt; 0 and n = -n0) or (0 &lt;= n0 and n = n0) }}
+    {{ 0 &lt;= n and (n = n0 or n = -n0) }}
+    return n;
+}</code></pre>
+  <div class="prose">
+    <p>In the spec, <code>n</code> means the number the caller passed; after line 18 overwrites it, a claim about <code>n</code> alone can no longer say anything about that number. So we name it <code>n0</code>, a <strong>ghost variable</strong>: a name used only in the claims, for a value the method started with. (Just <code>0 &lt;= n</code> would not be enough: a method that always returned 0 would make that true.)</p>
+  </div>
+  <h2>Branches that return</h2>
+  <pre class="code"><code>static int compare(int a, int b) {
+    {{ true }}
+    if (a &lt; b) {
+        {{ a &lt; b }}
+        return -1;
+    }
+    {{ b &lt;= a }}
+    if (a == b) {
+        {{ b &lt;= a and a = b }}
+        return 0;
+    }
+    {{ b &lt;= a and a != b }}
+    return 1;
+}</code></pre>
+  <div class="prose">
+    <p>No run comes out of a branch that returns. A claim holds at a point if it is true each time a run reaches it; at a point no run reaches, every claim holds, even <code>false</code>. So that branch's A is <code>false</code>, and <code>A or B</code> is just B: <code>b &lt;= a</code>. At each <code>return</code>, check the claim against what the <code>@return</code> clause promises in that case. And when a claim implies <code>false</code>, reasoning has found code that never runs.</p>
+  </div>
+  <div class="check" data-id="cse331-w3-l7-qc-abs-min" data-kind="quickcheck" data-type="int" data-answer="-2147483648">
+    <p>Quick check: the precondition rules out one input. What does <code>abs(-2147483648)</code> return in Java?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The claims use integer arithmetic, and Java's <code>int</code> does not: 2147483648 does not fit, so <code>n = -n</code> leaves −2147483648 alone. The precondition keeps that input out so the two arithmetics agree. Lecture 8's first half-sheet question asks for the claim after line 18 of <code>abs</code>.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l7-mistake" data-title="Reasoning finds the mistake" data-unit="l7">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span> · notes: Reasoning finds the mistake, Backward through a conditional, A proof</p>
+  <h1>Reasoning finds the mistake</h1>
+  <div class="prose">
+    <p>Lecture 5's <code>min</code> (<code>int r = a; if (a &lt;= b) { r = a; } return r;</code>) passed <code>min(1, 2)</code>. Reason forward: after the <code>if</code>, both cases say <code>r = a</code>, so on every run the method returns <code>a</code>. Check against the postcondition: when <code>b &lt; a</code> it promises <code>b</code>. The implication is false exactly on those states, and <code>min(2, 1)</code> is one.</p>
+    <p><code>quadrant</code> passed two tests that ran both branches of both <code>if</code>s:</p>
+  </div>
+  <pre class="code"><code>/** @requires x != 0 and y != 0
+ *  @return 1 if x &gt; 0 and y &gt; 0, 2 if x &lt; 0 and y &gt; 0,
+ *          3 if x &lt; 0 and y &lt; 0, and 4 if x &gt; 0 and y &lt; 0 */
+static int quadrant(int x, int y) {
+    int q = 1;
+    if (x &lt; 0) { q = 2; }
+    if (y &lt; 0) { q = q + 1; }
+    return q;
+}</code></pre>
+  <div class="prose"><p>Forward, after the second <code>if</code> the claim has four cases, the four paths. Three match the spec; the fourth, <code>0 &lt; x and y &lt; 0 and q = 2</code>, promises 4: the implication fails exactly on the lower right quadrant.</p></div>
+  <div class="panel" id="quad"><p class="panel-label"><code>quadrant(x, y)</code> on every point from −4 to 4</p></div>
+  <div class="prose">
+    <p><strong>Backward</strong> through a conditional, the claim before the <code>if</code> is <code>(b and A) or (not b and B)</code>, where A and B are the weakest claims before the branches. Backward from <code>quadrant</code>'s postcondition, quadrant 4's row asks for <code>1 = 3</code> before <code>int q = 1</code>, which is false, so it drops. The claim at the top keeps quadrants 1, 2 and 3: exactly the inputs that get the right answer. The precondition allows quadrant 4, so the triple is not valid.</p>
+    <p>An argument built from the rules is a <strong>proof</strong>, and unlike prose it says where it fails: with the strongest claims forward (or the weakest backward), the false implication names the inputs on which the method is wrong.</p>
+  </div>
+  <div class="rule warn">
+    <p><strong>What can still go wrong.</strong> A false implication (a person can believe one, so we still test: a test that refutes the claim refutes the argument too). Arithmetic that is not Java's (claims are about integers; <code>int</code> wraps). And a loop: these rules cannot carry a claim through a loop that may run any number of times. That is Friday.</p>
+  </div>
+  <div class="check" data-id="cse331-w3-l7-qc-quadrant" data-kind="quickcheck" data-type="int" data-answer="2">
+    <p>Quick check: what does <code>quadrant(1, -1)</code> return?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Lamport, in one of Reading 2's articles, says proving whole programs this way turned out to be very hard and is rarely done; what Floyd and Hoare taught is that a program is a mathematical object, so you can ask what it should do and whether you could prove it does.</li><li>The backward argument's step 3 is delicate: each row comes from the branch its inputs take. Walk it slowly if there is time.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l7-quiz" data-title="Check your understanding: Lecture 7" data-unit="l7">
+  <p class="where">Lecture 7 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose"><p>Ten questions on Lecture 7. Your score counts first tries only.</p></div>
+  <div class="cyu-score" data-role="score" role="status"></div>
+  <ol class="cyu-list">
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l7-quiz-why-reason" data-type="choice" data-topic="l7-why">
+      <p class="q">Why can't testing alone confirm that <code>seconds</code> meets its spec?</p>
+      <div class="opts">
+        <label data-option="many" data-correct><input type="radio" name="w3b1"> The spec covers far more inputs than we could ever run, and a test tells you only about its own run<span class="why" hidden>Right. Reasoning makes a claim about every run.</span></label>
+        <label data-option="coverage"><input type="radio" name="w3b1"> The tests don't reach statement coverage<span class="why" hidden>They do: with no <code>if</code> or loop, every test runs every line.</span></label>
+        <label data-option="long"><input type="radio" name="w3b1"> It returns a <code>long</code><span class="why" hidden>The return type isn't the issue.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l7-quiz-holds" data-type="choice" data-topic="l7-claims">
+      <p class="q">An assertion inside a loop <em>holds</em> when…</p>
+      <div class="opts">
+        <label data-option="once"><input type="radio" name="w3b2"> it is true the first time a run reaches it<span class="why" hidden>It has to be true every time.</span></label>
+        <label data-option="every" data-correct><input type="radio" name="w3b2"> it is true each time any run reaches its point<span class="why" hidden>Right: that is the refined definition.</span></label>
+        <label data-option="end"><input type="radio" name="w3b2"> it is true when the method returns<span class="why" hidden>That's a claim at a different point.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l7-quiz-says-less" data-type="yesno" data-answer="yes" data-topic="l7-triples">
+      <p class="q">Is <code>{{ x = 3 }} y = x + 1; {{ 0 &lt; y }}</code> valid?</p>
+      <p class="why" hidden>Yes. The line makes <code>y</code> 4, and 4 is positive. A postcondition may say less than all that is true afterward.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l7-quiz-counterexample" data-type="int" data-answer="1" data-topic="l7-triples">
+      <p class="q"><code>{{ 0 &lt; x }} x = x - 1; {{ 0 &lt; x }}</code> is not valid. Give the one starting value of <code>x</code> that is a counterexample.</p>
+      <p class="why" hidden><code>x = 1</code> makes P true, and the line makes <code>x</code> 0, where Q is false. Every larger <code>x</code> stays positive.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l7-quiz-empty-triple" data-type="choice" data-topic="l7-triples">
+      <p class="q">The empty triple <code>{{ P }} {{ Q }}</code> is valid exactly when…</p>
+      <div class="opts">
+        <label data-option="imp" data-correct><input type="radio" name="w3b5"> P implies Q<span class="why" hidden>Right: running no code leaves the state as it was.</span></label>
+        <label data-option="rev"><input type="radio" name="w3b5"> Q implies P<span class="why" hidden>Backward: every P-state must be a Q-state.</span></label>
+        <label data-option="eq"><input type="radio" name="w3b5"> P and Q are the same claim<span class="why" hidden>Q may say less than P.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l7-quiz-forward-gives" data-type="choice" data-topic="l7-strength">
+      <p class="q">Reasoning forward from P through some code gives…</p>
+      <div class="opts">
+        <label data-option="sp" data-correct><input type="radio" name="w3b6"> the strongest postcondition<span class="why" hidden>Right. Backward gives the weakest precondition.</span></label>
+        <label data-option="wp"><input type="radio" name="w3b6"> the weakest precondition<span class="why" hidden>That is what backward reasoning gives.</span></label>
+        <label data-option="weak"><input type="radio" name="w3b6"> the weakest postcondition, <code>true</code><span class="why" hidden><code>true</code> holds everywhere and says nothing; it would not reach the postcondition.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l7-quiz-wp-double" data-type="int" data-answer="5" data-topic="l7-rules">
+      <p class="q">By the backward rule, <code>{{ ? }} x = x * 2; {{ x = 10 }}</code> has the weakest claim <code>x * 2 = 10</code>, that is, <code>x = </code>___.</p>
+      <p class="why" hidden>Substitute <code>x * 2</code> for <code>x</code> in the postcondition: <code>x * 2 = 10</code>, so <code>x = 5</code>.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l7-quiz-consequence" data-type="choice" data-topic="l7-rules">
+      <p class="q">By the rule of consequence, to show <code>{{ P }} code {{ Q }}</code> valid it is enough to show a valid triple that…</p>
+      <div class="opts">
+        <label data-option="less-more" data-correct><input type="radio" name="w3b8"> assumes less (weaker precondition) and promises more (stronger postcondition)<span class="why" hidden>Right: P implies A, and B implies Q.</span></label>
+        <label data-option="more-less"><input type="radio" name="w3b8"> assumes more and promises less<span class="why" hidden>That triple could be valid while the original is not.</span></label>
+        <label data-option="same"><input type="radio" name="w3b8"> has exactly P and Q<span class="why" hidden>Then the rule would add nothing.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l7-quiz-ghost" data-type="choice" data-topic="l7-if">
+      <p class="q">Why does the argument for <code>abs</code> use a ghost variable <code>n0</code>?</p>
+      <div class="opts">
+        <label data-option="name" data-correct><input type="radio" name="w3b9"> Line 18 overwrites <code>n</code>, and the postcondition is about the number the caller passed<span class="why" hidden>Right: <code>n0</code> names that value, and no line can change it.</span></label>
+        <label data-option="wrap"><input type="radio" name="w3b9"> To avoid overflow<span class="why" hidden>The precondition handles overflow.</span></label>
+        <label data-option="java"><input type="radio" name="w3b9"> Java requires a copy of each parameter<span class="why" hidden><code>n0</code> never appears in the program.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l7-quiz-whom" data-type="choice" data-topic="l7-rules">
+      <p class="q">A stronger precondition favors…</p>
+      <div class="opts">
+        <label data-option="impl" data-correct><input type="radio" name="w3b10"> the implementer, who has fewer states to handle<span class="why" hidden>Right. The client has more to make true.</span></label>
+        <label data-option="client"><input type="radio" name="w3b10"> the client<span class="why" hidden>The precondition is the client's promise; a stronger one asks more of the client.</span></label>
+        <label data-option="both"><input type="radio" name="w3b10"> both<span class="why" hidden>Each party wants its own promise weak.</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-role="summary" role="status"></div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Questions 3 to 5 check the definition of validity; 6 to 8 the two directions and the consequence rule. Numeric answers were checked by brute force over small ranges.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l7-problems" data-title="Lecture 7: problems" data-unit="l7">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span> · problems</p>
+  <h1>Lecture 7: problems</h1>
+  <div class="prose"><p>Problems 1 to 5 are the notes' exercises 1 to 5, with their official answers in the solutions, lightly condensed. Problems 6 and 7 practice backward reasoning and the conditional rule on the lecture's own methods. Write your claims in the work box; every number was checked by running the code or by brute force.</p></div>
+
+  <article class="task" data-id="cse331-w3-l7-ex1">
+    <h2>1. Forward and backward through one line</h2>
+    <p class="prompt"><code>{{ 1 &lt;= n and n &lt;= 100 }} n = n + 3; {{ 10 &lt;= n * n }}</code>. Reason forward from the precondition by the rule, write the claim without the fresh name, and check it against the postcondition. Then reason backward, and check the precondition against the result.</p>
+    <div class="answer-spec" data-part="low" data-type="int" data-answer="4" data-label="Forward, after the line: the smallest value n can have" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="high" data-type="int" data-answer="103" data-label="… and the largest" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="valid" data-type="yesno" data-answer="yes" data-label="Is the triple valid?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="uses-100" data-type="yesno" data-answer="no" data-label="Does either check use n &lt;= 100?" data-placeholder="yes or no"></div>
+    <ol class="hints">
+      <li>The forward rule gives <code>1 &lt;= n0 and n0 &lt;= 100 and n = n0 + 3</code>. The old value is <code>n - 3</code>; put it in for <code>n0</code>.</li>
+      <li>Backward, substitute <code>n + 3</code> for <code>n</code> in the postcondition.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Forward: <code>{{ 1 &lt;= n - 3 and n - 3 &lt;= 100 }}</code>, so <code>{{ 4 &lt;= n and n &lt;= 103 }}</code>, so <code>{{ 4 &lt;= n }}</code>, so <code>{{ 16 &lt;= n * n }}</code> (squaring, since 4 ≤ n), which implies <code>{{ 10 &lt;= n * n }}</code>.</li>
+      <li>Backward: <code>{{ 10 &lt;= (n + 3) * (n + 3) }}</code>. From the precondition, <code>1 &lt;= n</code>, so <code>4 &lt;= n + 3</code>, so <code>16 &lt;= (n + 3) * (n + 3)</code>, which implies it.</li>
+      <li>Both implications are true. Neither used <code>n &lt;= 100</code>; that bound keeps <code>n + 3</code> within an <code>int</code>, so the line does not wrap.</li>
+      <li class="answer">After the line, 4 ≤ n ≤ 103; the triple is valid; neither check uses n ≤ 100.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l7-ex2">
+    <h2>2. When is the answer under an hour?</h2>
+    <p class="prompt">When does <code>seconds</code> return a number less than 3600? Reason backward from <code>t &lt; 3600</code> after line 19, and read the answer off the claim at the top.</p>
+    <div class="answer-spec" data-part="h" data-type="int" data-answer="0" data-label="h must be" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="most-ms" data-type="int" data-answer="3599" data-label="… and 60 * m + s can be at most" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="ninety" data-type="int" data-answer="5400" data-label="seconds(0, 90, 0) returns" data-placeholder="a whole number"></div>
+    <ol class="hints"><li>Three substitutions: <code>t * 60 + s</code>, then <code>t * 60 + m</code>, then <code>h</code>.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The claim at the top is <code>(h * 60 + m) * 60 + s &lt; 3600</code>, that is, <code>3600 * h + 60 * m + s &lt; 3600</code>.</li>
+      <li>Under the precondition, <code>h</code> and <code>60 * m + s</code> are both at least 0, so <code>h</code> must be 0, and then <code>60 * m + s &lt; 3600</code>: at most 3599.</li>
+      <li class="answer"><code>h = 0</code> and <code>60 * m + s &lt; 3600</code>. More than "the hours are zero": <code>seconds(0, 90, 0)</code> returns 5400.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l7-ex3">
+    <h2>3. <code>compare</code> with <code>&lt;=</code></h2>
+    <p class="prompt"><code>compare</code>'s first condition is changed from <code>a &lt; b</code> to <code>a &lt;= b</code>. Reason forward. Does it still satisfy its spec? If not, which inputs show it?</p>
+    <div class="answer-spec" data-part="ok" data-type="yesno" data-answer="no" data-label="Does it still satisfy its specification?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="three" data-type="int" data-answer="-1" data-label="compare(3, 3) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="claim" data-type="text" data-answer="false" data-label="The claim inside the second if's body simplifies to" data-placeholder="a claim"></div>
+    <div class="answer-spec" data-part="wrong-pairs" data-type="int" data-answer="3" data-label="Of the 9 calls with a and b each in {1, 2, 3}, how many get a wrong answer?" data-placeholder="a whole number"></div>
+    <ol class="hints"><li>After the first <code>if</code>, the claim is <code>b &lt; a</code>. What does adding <code>a = b</code> to that give?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>At the first return, the claim is <code>a &lt;= b</code>. Every call with <code>a = b</code> returns −1 there, where the spec promises 0.</li>
+      <li>After the first <code>if</code>, <code>b &lt; a</code>. The second body needs <code>a = b</code> as well; no state makes both true, so the claim is <code>false</code>: no run reaches that <code>return 0</code>.</li>
+      <li>Of the nine pairs, the three with <code>a = b</code> are wrong.</li>
+      <li class="answer">No; <code>compare(3, 3)</code> returns −1; the second body's claim is <code>false</code>; 3 of 9 pairs are wrong.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l7-ex4">
+    <h2>4. Repair <code>min</code></h2>
+    <p class="prompt">Give <code>min</code>'s <code>if</code> an <code>else</code> that sets <code>r</code> to <code>b</code>. Reason forward with a claim at the top and bottom of each branch, and show it satisfies its spec.</p>
+    <div class="answer-spec" data-part="else-top" data-type="choice" data-answer="b" data-options="a:r = a and a &lt;= b|b:r = a and b &lt; a|c:r = b and b &lt; a|d:true" data-label="The claim at the top of the else branch"></div>
+    <div class="answer-spec" data-part="min21" data-type="int" data-answer="1" data-label="The repaired min(2, 1) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="proof" data-type="self" data-long data-label="The claim after the if, and why it implies the postcondition" data-placeholder="{{ (r = a and a &lt;= b) or … }}"></div>
+    <ol class="hints"><li>The false branch starts from the claim before the <code>if</code> with <code>not (a &lt;= b)</code> added.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Before the <code>if</code>: <code>r = a</code>. True branch: <code>r = a and a &lt;= b</code>, unchanged by <code>r = a</code>. Else branch: <code>r = a and b &lt; a</code>, then <code>r = b</code> gives <code>r = b and b &lt; a</code>.</li>
+      <li>After the <code>if</code>: <code>(r = a and a &lt;= b) or (r = b and b &lt; a)</code>. In each case <code>r</code> is the smaller, so both implications are true.</li>
+      <li class="answer">The else branch starts from <code>r = a and b &lt; a</code>; the repaired <code>min(2, 1)</code> returns 1.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l7-ex5">
+    <h2>5. <code>seconds</code> returning an <code>int</code></h2>
+    <p class="prompt">This version returns an <code>int</code> and adds <code>@requires 3600 * h + 60 * m + s &lt;= 2147483647</code>. Reason forward. Does the argument use the new clause? What goes wrong without it? How could a client check it, and what else could the method do?</p>
+    <div class="answer-spec" data-part="uses" data-type="yesno" data-answer="no" data-label="Does the forward argument use the new clause?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="first-h" data-type="int" data-answer="596524" data-label="With m = s = 0, the smallest h that breaks the clause" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="design" data-type="self" data-long data-label="How a client checks it, and the other designs" data-placeholder="In long arithmetic, …"></div>
+    <ol class="hints"><li>The claims use integer arithmetic. When is that a promise about Java's <code>int</code>?</li><li>2147483647 / 3600 is about 596523.2.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The argument never uses the clause: the claims and the final check are the same as before. But the claims are about integers and <code>int</code> wraps; the clause and the three non-negativity facts keep every value computed on the way at most the answer, and the answer fits, so no line wraps.</li>
+      <li>3600 × 596523 = 2147482800 fits; 3600 × 596524 = 2147486400 does not.</li>
+      <li>A client checks the clause in <code>long</code>, where the check itself cannot wrap, or computes with <code>Math.multiplyExact</code> and <code>Math.addExact</code>. The method could instead return a <code>long</code> (the clause goes away), or compute with those methods and promise an <code>ArithmeticException</code>, one of Lecture 6's six ways.</li>
+      <li class="answer">No; h = 596524; check in <code>long</code>, or change the design.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l7-backward">
+    <h2>6. Backward through two lines</h2>
+    <p class="prompt">Find the weakest claim: <code>{{ ? }} x = x + 1; y = 2 * x; {{ y = 10 }}</code>. Then: is <code>{{ x = 4 }} x = x + 1; y = 2 * x; {{ 8 &lt; y }}</code> valid?</p>
+    <div class="answer-spec" data-part="x" data-type="int" data-answer="4" data-label="The weakest claim is x = " data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="valid" data-type="yesno" data-answer="yes" data-label="Is the second triple valid?" data-placeholder="yes or no"></div>
+    <ol class="hints"><li>Work from the bottom: substitute <code>2 * x</code> for <code>y</code>, then <code>x + 1</code> for <code>x</code>.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Before <code>y = 2 * x</code>: <code>2 * x = 10</code>. Before <code>x = x + 1</code>: <code>2 * (x + 1) = 10</code>, so <code>x = 4</code>.</li>
+      <li>For the second, the weakest claim is <code>8 &lt; 2 * (x + 1)</code>, that is, <code>3 &lt; x</code>; <code>x = 4</code> implies it.</li>
+      <li class="answer"><code>x = 4</code>; yes, valid.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l7-quadrant">
+    <h2>7. Four paths through <code>quadrant</code></h2>
+    <p class="prompt">Reason forward through <code>quadrant</code> as the lecture did.</p>
+    <div class="answer-spec" data-part="paths" data-type="int" data-answer="4" data-label="How many cases does the claim after the second if have?" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="bad-quad" data-type="int" data-answer="4" data-label="The quadrant on which the implication fails" data-placeholder="1, 2, 3 or 4"></div>
+    <div class="answer-spec" data-part="call" data-type="int" data-answer="2" data-label="quadrant(5, -2) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="fix" data-type="self" data-long data-label="A change that fixes the method" data-placeholder="if (y &lt; 0) { … }"></div>
+    <ol class="hints"><li>Each <code>if</code> splits each case in two. In the case <code>0 &lt; x and y &lt; 0</code>, what is <code>q</code> before <code>q = q + 1</code>?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>After the first <code>if</code>: two cases (<code>q = 2</code> with <code>x &lt; 0</code>; <code>q = 1</code> with <code>0 &lt; x</code>). After the second: four.</li>
+      <li>Case <code>0 &lt; x and y &lt; 0</code>: <code>q</code> was 1, becomes 2, but the spec promises 4.</li>
+      <li>One fix: in the second <code>if</code>, set <code>q = (x &lt; 0) ? 3 : 4</code>; or reason out a formula such as <code>q = 5 - q</code> (2 → 3, 1 → 4). Then the four cases match.</li>
+      <li class="answer">4 cases; quadrant 4 fails; <code>quadrant(5, -2)</code> returns 2.</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ LECTURE 8 -->
+<section class="page" id="l8-loop" data-title="A loop" data-unit="l8">
+  <p class="where">Lecture 8 · Loops and loop invariants · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span> · notes: Last time, A loop, A loop invariant</p>
+  <h1>A loop</h1>
+  <div class="prose">
+    <p>Lecture 7's rules are mechanical: given the claim on one side of a line, a rule writes the claim on the other side, with no decision to make ("turning the crank"). The one step that is not mechanical is the rule of consequence's implications. A loop adds a second question: <em>does the code terminate?</em></p>
+  </div>
+  <pre class="code"><code>/** @return a[0] + ... + a[a.length - 1], the sum of the elements */
+static long sum(int[] a) {
+    long s = 0;              // line 14
+    int i = 0;               // line 15
+    while (i &lt; a.length) {   // line 16
+        s = s + a[i];        // line 17
+        i = i + 1;           // line 18
+    }
+    return s;                // line 20
+}</code></pre>
+  <div class="prose">
+    <p>Forward through one pass, the rules give <code>i = 1 and s = a[0]</code>; through two, <code>i = 2 and s = a[0] + a[1]</code>. A run may make any number of passes, so a claim at line 20 built pass by pass would need one case for each number of passes, and no finite list has one for every number. In general, no rule can compute the strongest postcondition or weakest precondition of a loop (it would decide the halting problem). So we write a claim at the loop by hand.</p>
+    <p>Watch one run, on <code>{3, 4, 5}</code>, one row per condition check. Two facts are true at every check: <code>0 &lt;= i and i &lt;= a.length</code>, and <code>s = a[0] + ... + a[i - 1]</code> (the sum of no terms is 0).</p>
+  </div>
+  <div class="panel tracer" data-loops="sum" data-array="3, 4, 5"><p class="panel-label">Each condition check of <code>sum</code>, with the invariant checked there</p></div>
+  <div class="rule">
+    <p><strong>Loop invariant.</strong> A claim that holds at the point where <code>while (b)</code> checks its condition: before the first pass, between passes, and after the last pass. Written <code>{{ Inv: I }}</code> on the line above the <code>while</code>.</p>
+  </div>
+  <div class="check" data-id="cse331-w3-l8-qc-checks" data-kind="quickcheck" data-type="int" data-answer="4">
+    <p>Quick check: on <code>{3, 4, 5}</code>, how many times does <code>sum</code> check its loop condition?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Half sheet, question 1 (3 minutes): <em>Reason forward through <code>abs</code>: what assertion holds just after line 18?</em> Answer: <code>n0 &lt; 0 and n = -n0</code> (Lecture 7's argument).</li><li>No line of <code>sum</code> wraps: <code>s</code> is a <code>long</code>, and a sum of at most 2147483647 <code>int</code>s stays below 4611686018427387904.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l8-rule" data-title="The rule for a while loop" data-unit="l8">
+  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span> · notes: The rule for a while loop</p>
+  <h1>The rule for a <code>while</code> loop</h1>
+  <div class="code-pair">
+    <pre class="code"><code>{{ P }}
+{{ Inv: I }}
+while (b) {
+    {{ I and b }}
+    body
+    {{ I }}
+}
+{{ I and not b }}
+{{ Q }}</code></pre>
+    <div class="prose">
+      <p><code>{{ P }} while ... {{ Q }}</code> is valid if three checks pass:</p>
+      <ol>
+        <li><strong>(1)</strong> P implies I.</li>
+        <li><strong>(2)</strong> <code>{{ I and b }} body {{ I }}</code> is valid.</li>
+        <li><strong>(3)</strong> <code>I and not b</code> implies Q.</li>
+      </ol>
+      <p>I is a claim the programmer supplies.</p>
+    </div>
+  </div>
+  <div class="prose">
+    <p><strong>Why they suffice.</strong> A run reaches the first condition check with P true, so (1) makes I true there. Every later check comes at the end of a pass that began at the check before with b true; if I was true then, (2) makes it true again. So I is true at every check. The last check finds b false, so <code>I and not b</code> holds after the loop, and (3) gives Q.</p>
+    <p>Checks (1) and (3) are uses of the rule of consequence. Check (2) is a triple about the body, which Lecture 7's rules settle when the body has no loop. What is new is I.</p>
+  </div>
+  <div class="check" data-id="cse331-w3-l8-qc-which-check" data-kind="quickcheck">
+    <p>Quick check: which check is a triple about the loop's body?</p>
+    <div class="opts">
+      <label data-option="1"><input type="radio" name="l8qr"> (1)<span class="why" hidden>(1) is an implication before the loop: P implies I.</span></label>
+      <label data-option="2" data-correct><input type="radio" name="l8qr"> (2)<span class="why" hidden>Right: <code>{{ I and b }} body {{ I }}</code>.</span></label>
+      <label data-option="3"><input type="radio" name="l8qr"> (3)<span class="why" hidden>(3) is an implication after the loop.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The figure in the notes: every way into the condition diamond crosses an arrow labelled I. Draw it on the board.</li><li>Same reason the conditional rule adds <code>b</code> and <code>not b</code>: a run enters the body having found b true and leaves the loop having found it false.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l8-check" data-title="Checking sum; does it end?" data-unit="l8">
+  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span> · notes: Checking a loop against its invariant, Does the loop end?</p>
+  <h1>Checking <code>sum</code>; does it end?</h1>
+  <div class="prose"><p>I is <code>0 &lt;= i and i &lt;= a.length and s = a[0] + ... + a[i - 1]</code>; P is <code>true</code>.</p></div>
+  <div class="steps"><ol>
+    <li><strong>Check (1).</strong> After lines 14 and 15, <code>s = 0 and i = 0</code>. Then <code>0 &lt;= i</code>; <code>i &lt;= a.length</code> since no array has a negative length; and <code>a[0] + ... + a[i - 1]</code> is the sum of no terms, 0, which is <code>s</code>.</li>
+    <li><strong>Check (2), line 17.</strong> From <code>I and i &lt; a.length</code>, the forward rule writes <code>s0</code> for the old <code>s</code>, which I says is <code>a[0] + ... + a[i - 1]</code>: so <code>s = a[0] + ... + a[i]</code>, and <code>0 &lt;= i and i &lt; a.length</code>.</li>
+    <li><strong>Check (2), line 18.</strong> The old <code>i</code> is <code>i - 1</code>: <code>1 &lt;= i</code>, <code>i &lt;= a.length</code> (from <code>i - 1 &lt; a.length</code>, integers), <code>s = a[0] + ... + a[i - 1]</code>. That implies I.</li>
+    <li><strong>Check (3).</strong> <code>not (i &lt; a.length)</code> gives <code>a.length &lt;= i</code>; with <code>i &lt;= a.length</code>, <code>i = a.length</code>; so <code>s = a[0] + ... + a[a.length - 1]</code>, the postcondition.</li>
+  </ol></div>
+  <div class="prose"><p>Check (3) used the bound <code>i &lt;= a.length</code>. Without it, (1) and (2) still pass, but after the loop we would know only <code>a.length &lt;= i</code>, not <code>i = a.length</code>: the claim would be too weak.</p></div>
+  <h2>Does the loop end?</h2>
+  <div class="rule">
+    <p><strong>Variant.</strong> An integer quantity that is at least 0 at each condition check and that each pass makes smaller. It bounds the passes left, so the loop makes at most as many passes as its value at the first check. For <code>sum</code>: <code>a.length - i</code>.</p>
+  </div>
+  <div class="prose"><p>Why a separate argument? Take <code>while (true) { }</code> with I = <code>true</code>. (1) and (2) pass, and (3) asks that <code>true and not true</code>, which is <code>false</code>, imply Q: it does, for every Q, even <code>false</code>. The three checks would "prove" anything about a loop that never ends.</p></div>
+  <div class="check" data-id="cse331-w3-l8-qc-variant" data-kind="quickcheck" data-type="int" data-answer="3">
+    <p>Quick check: on <code>{3, 4, 5}</code>, what is <code>sum</code>'s variant <code>a.length - i</code> at the first condition check?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="a whole number"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Backward works for check (2) too: two substitutions into I give <code>0 &lt;= i + 1</code>, <code>i + 1 &lt;= a.length</code>, <code>s + a[i] = a[0] + ... + a[i]</code>, all implied by <code>I and i &lt; a.length</code>.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l8-find" data-title="Finding the invariant" data-unit="l8">
+  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span> · notes: Finding the invariant</p>
+  <h1>Finding the invariant</h1>
+  <div class="prose">
+    <p>In general, finding an invariant takes creativity. In simple cases, read it off the postcondition: the postcondition says what is true when the loop is done; the invariant says what is true when it is part way done. For <code>sum</code>, put <code>i</code> for <code>a.length</code> in Q. An invariant has two kinds of facts:</p>
+    <ul><li><strong>What has been done so far:</strong> <code>s = a[0] + ... + a[i - 1]</code>.</li><li><strong>How far along the loop is:</strong> <code>0 &lt;= i and i &lt;= a.length</code>, from where <code>i</code> starts and where it stops.</li></ul>
+  </div>
+  <h2><code>max</code></h2>
+  <pre class="code"><code>/** @requires 0 &lt; a.length
+ *  @return the largest element of a */
+static int max(int[] a) {
+    int m = a[0];
+    int i = 1;
+    {{ Inv: 1 &lt;= i and i &lt;= a.length and
+            m is the largest of a[0], ..., a[i - 1] }}
+    while (i &lt; a.length) {
+        if (m &lt; a[i]) { m = a[i]; }
+        i = i + 1;
+    }
+    return m;
+}</code></pre>
+  <div class="prose"><p>A claim may be in words, as long as it is true or false in each state. Check (2) goes through the <code>if</code> with Lecture 7's conditional rule: in both branches <code>m</code> becomes the largest of <code>a[0], ..., a[i]</code>, then <code>i = i + 1</code> restores I.</p></div>
+  <h2><code>sumTo</code></h2>
+  <pre class="code"><code>/** @requires 0 &lt;= n
+ *  @return 1 + ... + n */
+static long sumTo(int n) {
+    long s = 0;
+    int i = 0;
+    while (i &lt; n) {
+        i = i + 1;
+        s = s + i;
+    }
+    return s;
+}</code></pre>
+  <div class="prose"><p>Invariant: <code>0 &lt;= i and i &lt;= n and s = 1 + ... + i</code> (or, equally, <code>s = i * (i + 1) / 2</code>). Not every invariant comes from putting <code>i</code> for a bound: <code>quotient</code>'s says what the loop keeps equal (problem 1).</p></div>
+  <table class="plain">
+    <tr><th>Too weak</th><td>Drop <code>i &lt;= a.length</code> from <code>sum</code>'s I. It still holds at every check (it is an invariant), but check (3) cannot conclude <code>i = a.length</code>.</td></tr>
+    <tr><th>Too strong</th><td>Add <code>0 &lt; a.length</code>. Checks (2) and (3) pass, but on the empty array check (1) fails: the claim is not an invariant at all.</td></tr>
+  </table>
+  <div class="check" data-id="cse331-w3-l8-qc-sumto-inv" data-kind="quickcheck">
+    <p>Quick check (the half sheet's question 3): which is the main fact of <code>sumTo</code>'s invariant?</p>
+    <div class="opts">
+      <label data-option="n"><input type="radio" name="l8qf"> <code>s = 1 + ... + n</code><span class="why" hidden>That is the postcondition: only true when the loop is done.</span></label>
+      <label data-option="i" data-correct><input type="radio" name="l8qf"> <code>s = 1 + ... + i</code><span class="why" hidden>Right: put <code>i</code> for <code>n</code> in Q.</span></label>
+      <label data-option="im1"><input type="radio" name="l8qf"> <code>s = 1 + ... + (i - 1)</code><span class="why" hidden>The body raises <code>i</code> first, then adds it, so at each check <code>s</code> includes <code>i</code>.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Half sheet, question 3 (3 minutes): <em>Find an invariant for the loop in <code>sumTo</code>.</em> Then the slide "Too weak, too strong".</li><li>A failed check means the code is wrong, or the claim chosen for I is. For <code>sum</code> the code is right, so both times the claim must change.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l8-mistakes" data-title="The checks find the mistake" data-unit="l8">
+  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span> · notes: The checks find the mistake, What reasoning tells us</p>
+  <h1>The checks find the mistake</h1>
+  <div class="prose"><p>Three copies of <code>sum</code>, each with one change, checked against the same I. Predict which check fails for each, then pick it below and try arrays.</p></div>
+  <table class="plain">
+    <tr><th>Wrong start</th><td>Line 15 becomes <code>int i = 1;</code>. Check (1) fails: on the empty array I's bound says <code>1 &lt;= 0</code>; on a nonempty array I says <code>s = a[0]</code> but <code>s = 0</code>. <code>{3, 4, 5}</code> returns 9.</td></tr>
+    <tr><th>Swapped body</th><td><code>i = i + 1;</code> then <code>s = s + a[i];</code>. Check (2) fails: the body leaves <code>a[i]</code> where I needs <code>a[i - 1]</code>. <code>{3, 4, 5}</code> reads <code>a[3]</code> and throws <code>ArrayIndexOutOfBoundsException</code>.</td></tr>
+    <tr><th>Wrong exit</th><td><code>while (i &lt; a.length - 1)</code>. Check (3) fails: at exit <code>i</code> may be <code>a.length - 1</code>, and the sum misses the last element. <code>{3, 4, 5}</code> returns 7.</td></tr>
+  </table>
+  <div class="panel tracer" data-loops="sum start swapped exit sumTo sumToSwapped" data-start="swapped" data-array="3, 4, 5" data-n="4"><p class="panel-label">Pick a copy and an input; one row per condition check</p></div>
+  <div class="prose">
+    <p>Would tests have found these? The tests beside <code>sum</code> use <code>{}</code>, <code>{7}</code> and <code>{3, 4, 5}</code>. Each copy returns 0 on <code>{}</code>, the right sum, so the empty array alone misses all three. On <code>{7}</code> the wrong start and wrong exit return 0 and the swapped body throws, so the tests on <code>{7}</code> and on <code>{3, 4, 5}</code> each catch all three.</p>
+    <p>A state on which a check fails need not be a run that goes wrong: the wrong start fails check (1) on the empty array, where it returns the right 0. We choose I, so it need not be the strongest claim.</p>
+  </div>
+  <div class="rule warn"><p><strong>What reasoning tells us, for loops.</strong> A false implication can still slip in, so we still test. Claims are about integers, so each method bounds its inputs or computes in a <code>long</code>. And the rules do not produce I: finding the invariant is the programmer's work.</p></div>
+  <div class="check" data-id="cse331-w3-l8-qc-swapped" data-kind="quickcheck" data-type="int" data-answer="2">
+    <p>Quick check (the half sheet's question 2): for the swapped body, which check fails: 1, 2 or 3?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="1, 2 or 3"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>Half sheet, question 2 (3 minutes): <em>Where does the proof break for the swapped body?</em></li><li>Monday discusses Reading 2; Tuesday's section is on Floyd-Hoare logic; Homework 2 is due Friday Oct 23.</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l8-quiz" data-title="Check your understanding: Lecture 8" data-unit="l8">
+  <p class="where">Lecture 8 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding</h1>
+  <div class="prose"><p>Ten questions on Lecture 8. Your score counts first tries only.</p></div>
+  <div class="cyu-score" data-role="score" role="status"></div>
+  <ol class="cyu-list">
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l8-quiz-no-rule" data-type="choice" data-topic="l8-loop">
+      <p class="q">Why can't Lecture 7's rules give the claim after a loop?</p>
+      <div class="opts">
+        <label data-option="cases" data-correct><input type="radio" name="w3c1"> A run may make any number of passes, so the claim would need one case for each number<span class="why" hidden>Right. So we supply one claim, the invariant.</span></label>
+        <label data-option="java"><input type="radio" name="w3c1"> Java's loops wrap around<span class="why" hidden>Wrapping is about arithmetic, not loops.</span></label>
+        <label data-option="if"><input type="radio" name="w3c1"> Loops contain <code>if</code>s<span class="why" hidden>Lecture 7 already handles <code>if</code>.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l8-quiz-where" data-type="choice" data-topic="l8-loop">
+      <p class="q">Where must a loop invariant hold?</p>
+      <div class="opts">
+        <label data-option="every-line"><input type="radio" name="w3c2"> After every line of the body<span class="why" hidden>In the middle of the body it may be false (after line 17 of <code>sum</code>, <code>s</code> is a term ahead).</span></label>
+        <label data-option="check" data-correct><input type="radio" name="w3c2"> At the condition check, every time: before the first pass, between passes, after the last<span class="why" hidden>Right.</span></label>
+        <label data-option="end"><input type="radio" name="w3c2"> Only after the loop<span class="why" hidden>After the loop, I holds along with not b, but it must hold at every check.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l8-quiz-uses-pre" data-type="int" data-answer="1" data-topic="l8-rule">
+      <p class="q">Which of the three checks starts from the precondition P? (1, 2 or 3)</p>
+      <p class="why" hidden>Check (1): P implies I.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l8-quiz-too-weak" data-type="choice" data-topic="l8-check">
+      <p class="q">Drop <code>i &lt;= a.length</code> from <code>sum</code>'s invariant. What goes wrong?</p>
+      <div class="opts">
+        <label data-option="c3" data-correct><input type="radio" name="w3c4"> Check (3): the claim after the loop gives only <code>a.length &lt;= i</code>, not <code>i = a.length</code><span class="why" hidden>Right: too weak.</span></label>
+        <label data-option="c1"><input type="radio" name="w3c4"> Check (1) fails<span class="why" hidden>A weaker claim is easier to reach from P.</span></label>
+        <label data-option="none"><input type="radio" name="w3c4"> Nothing: it is still an invariant<span class="why" hidden>It is still an invariant, but not enough to reach Q.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l8-quiz-too-strong" data-type="choice" data-topic="l8-find">
+      <p class="q">Add <code>0 &lt; a.length</code> to <code>sum</code>'s invariant. Which check fails, and on what input?</p>
+      <div class="opts">
+        <label data-option="c1-empty" data-correct><input type="radio" name="w3c5"> Check (1), on the empty array<span class="why" hidden>Right: <code>s = 0 and i = 0</code> is true there and <code>0 &lt; a.length</code> is false.</span></label>
+        <label data-option="c2"><input type="radio" name="w3c5"> Check (2), on every array<span class="why" hidden>No line changes <code>a.length</code>, so (2) still passes.</span></label>
+        <label data-option="c3"><input type="radio" name="w3c5"> Check (3), on <code>{3, 4, 5}</code><span class="why" hidden>(3) only gains a fact.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l8-quiz-variant" data-type="choice" data-topic="l8-check">
+      <p class="q">Which is <em>not</em> required of a variant?</p>
+      <div class="opts">
+        <label data-option="int"><input type="radio" name="w3c6"> It is an integer<span class="why" hidden>Required: so each pass lowers it by at least 1.</span></label>
+        <label data-option="nonneg"><input type="radio" name="w3c6"> It is at least 0 at each condition check<span class="why" hidden>Required.</span></label>
+        <label data-option="dec"><input type="radio" name="w3c6"> Each pass makes it smaller<span class="why" hidden>Required.</span></label>
+        <label data-option="zero" data-correct><input type="radio" name="w3c6"> It is 0 when the loop exits<span class="why" hidden>Right: not required. <code>quotient</code>'s variant <code>r</code> usually exits above 0.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l8-quiz-true-loop" data-type="choice" data-topic="l8-check">
+      <p class="q">For <code>while (true) { }</code> with I = <code>true</code>, which checks pass?</p>
+      <div class="opts">
+        <label data-option="all" data-correct><input type="radio" name="w3c7"> All three, whatever Q is<span class="why" hidden>Right: <code>true and not true</code> is <code>false</code>, which implies every Q. That is why termination needs its own argument.</span></label>
+        <label data-option="none"><input type="radio" name="w3c7"> None<span class="why" hidden>Every claim implies <code>true</code>, so (1) and (2) pass.</span></label>
+        <label data-option="12"><input type="radio" name="w3c7"> (1) and (2) only<span class="why" hidden>(3) starts from <code>false</code>, which implies anything.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l8-quiz-exit" data-type="int" data-answer="7" data-topic="l8-mistakes">
+      <p class="q">The wrong-exit copy (<code>while (i &lt; a.length - 1)</code>) returns what on <code>{3, 4, 5}</code>?</p>
+      <p class="why" hidden>It stops at <code>i = 2</code> and misses the last element: 3 + 4 = 7.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l8-quiz-start" data-type="int" data-answer="9" data-topic="l8-mistakes">
+      <p class="q">The wrong-start copy (<code>int i = 1;</code>) returns what on <code>{3, 4, 5}</code>?</p>
+      <p class="why" hidden>It never adds <code>a[0]</code>: 4 + 5 = 9.</p>
+    </li>
+    <li class="cyu" data-kind="quiz" data-id="cse331-w3-l8-quiz-sumto-swapped" data-type="int" data-answer="6" data-topic="l8-find">
+      <p class="q"><code>sumTo</code> with its body lines swapped (<code>s = s + i;</code> then <code>i = i + 1;</code>) returns what for <code>n = 4</code>?</p>
+      <p class="why" hidden>It adds 0, 1, 2 and 3 and misses 4: 6, where the spec promises 10.</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-role="summary" role="status"></div>
+  <details class="notes" open><summary>Teaching notes</summary><ul><li>The numeric answers were checked by running the lecture's code (<code>checks/cse331/w03/java/W03.java</code>).</li></ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<section class="page" id="l8-problems" data-title="Lecture 8: problems" data-unit="l8">
+  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span> · problems</p>
+  <h1>Lecture 8: problems</h1>
+  <div class="prose"><p>Problems 1 to 5 are the notes' exercises 1 to 5, with their official answers, lightly condensed. Problem 6 is the half sheet's question 2, and problem 7 combines the three copies of <code>sum</code> with the lecture's tests. Write your checks as calculations in the work box.</p></div>
+
+  <article class="task" data-id="cse331-w3-l8-quotient">
+    <h2>1. <code>quotient</code></h2>
+    <pre class="code"><code>/** @requires 0 &lt;= x and 0 &lt; y
+ *  @return the quotient of x divided by y, rounded down */
+static int quotient(int x, int y) {
+    int q = 0;
+    int r = x;
+    while (y &lt;= r) {
+        q = q + 1;
+        r = r - y;
+    }
+    return q;
+}</code></pre>
+    <p class="prompt">The postcondition is <code>q * y &lt;= x and x &lt; (q + 1) * y</code>; the invariant is <code>q * y + r = x and 0 &lt;= r</code>. Do the three checks, then give a variant.</p>
+    <div class="answer-spec" data-part="q" data-type="int" data-answer="3" data-label="quotient(17, 5) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="r" data-type="int" data-answer="2" data-label="… with r at the exit equal to" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="variant" data-type="choice" data-answer="r" data-options="q:q|r:r|y:y|x:x - q" data-label="A variant for the loop"></div>
+    <div class="answer-spec" data-part="checks" data-type="self" data-long data-label="The three checks" data-placeholder="(1) q * y + r = 0 * y + x = x …"></div>
+    <ol class="hints"><li>In check (2), the old value of <code>q</code> after line 21 is <code>q - 1</code>, and the old <code>r</code> after line 22 is <code>r + y</code>.</li><li>Check (3) starts from <code>r &lt; y</code>.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>(1) With <code>q = 0</code>, <code>r = x</code>: <code>q * y + r = x</code>, and <code>0 &lt;= r</code> since <code>0 &lt;= x</code>.</li>
+      <li>(2) From <code>I and y &lt;= r</code>: after line 21, <code>(q - 1) * y + r = x</code>; after line 22, <code>(q - 1) * y + r + y = x</code>, i.e. <code>q * y + r = x</code>; and <code>y &lt;= r + y</code> gives <code>0 &lt;= r</code>.</li>
+      <li>(3) <code>r &lt; y</code>; <code>q * y = x - r &lt;= x</code>; <code>x = q * y + r &lt; q * y + y = (q + 1) * y</code>.</li>
+      <li>Variant <code>r</code>: an integer, at least 0 by I, and each pass subtracts <code>y &gt;= 1</code>. At most <code>x</code> passes. No line wraps.</li>
+      <li class="answer">17 = 3 · 5 + 2: <code>quotient(17, 5)</code> is 3 with <code>r = 2</code>; the variant is <code>r</code>.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l8-factorial">
+    <h2>2. <code>factorial</code></h2>
+    <pre class="code"><code>/** @requires 0 &lt;= n and n &lt;= 20
+ *  @return n!, the product 1 * 2 * ... * n */
+static long factorial(int n) {
+    long f = 1;
+    int i = 0;
+    while (i != n) {
+        i = i + 1;
+        f = f * i;
+    }
+    return f;
+}</code></pre>
+    <p class="prompt">Find an invariant, do the checks, and say why the precondition says <code>n &lt;= 20</code>.</p>
+    <div class="answer-spec" data-part="inv" data-type="choice" data-answer="b" data-options="a:f = 1 * 2 * ... * n|b:0 &lt;= i and i &lt;= n and f = 1 * 2 * ... * i|c:0 &lt;= i and f = 1 * 2 * ... * (i - 1)|d:i != n" data-label="The invariant"></div>
+    <div class="answer-spec" data-part="five" data-type="int" data-answer="120" data-label="factorial(5) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="twenty-one" data-type="yesno" data-answer="no" data-label="Without the bound, would factorial(21) return 21!?" data-placeholder="yes or no"></div>
+    <div class="answer-spec" data-part="bound-why" data-type="self" data-long data-label="Why the invariant needs i &lt;= n even though check (3) does not" data-placeholder="With !=, …"></div>
+    <ol class="hints"><li>Put <code>i</code> for <code>n</code> in the postcondition. The product of no factors is 1.</li><li>What does the largest <code>long</code> hold? 20! is 2432902008176640000.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>I: <code>0 &lt;= i and i &lt;= n and f = 1 * 2 * ... * i</code>. With <code>!=</code>, the condition alone does not give <code>i &lt;= n</code>; in the body, <code>i != n</code> and <code>i &lt;= n</code> give <code>i &lt; n</code>, so <code>i + 1 &lt;= n</code>. Check (2) and the variant <code>n - i</code> need the bound; check (3) does not, since <code>not (i != n)</code> gives <code>i = n</code>.</li>
+      <li>(1) <code>i = 0</code>, <code>f = 1</code>, the empty product. (2) After line 19, <code>f = 1 * ... * (i - 1)</code>; after line 20, <code>f = 1 * ... * i</code>. (3) <code>i = n</code> gives the postcondition.</li>
+      <li>20! = 2432902008176640000 fits in a <code>long</code> (largest 9223372036854775807); 21! = 51090942171709440000 does not, so line 20 would wrap on the last pass.</li>
+      <li class="answer">I as above; <code>factorial(5)</code> = 120; <code>factorial(21)</code> would wrap, not return 21!.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l8-count">
+    <h2>3. <code>count</code></h2>
+    <pre class="code"><code>/** @return the number of indices k with a[k] == x */
+static int count(int[] a, int x) {
+    int c = 0;
+    int i = 0;
+    while (i &lt; a.length) {
+        if (a[i] == x) { c = c + 1; }
+        i = i + 1;
+    }
+    return c;
+}</code></pre>
+    <p class="prompt">The invariant is <code>0 &lt;= i and i &lt;= a.length and c = the number of indices k &lt; i with a[k] = x</code>. Do check (2) through both branches of the <code>if</code>, then checks (1) and (3).</p>
+    <div class="answer-spec" data-part="run" data-type="int" data-answer="3" data-label="count({5, 1, 5, 2, 5}, 5) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="after-if" data-type="choice" data-answer="b" data-options="a:c counts the indices k &lt; i|b:c counts the indices k &lt; i + 1|c:c = c0 + 1 in both branches" data-label="After the if (before i = i + 1), in both cases"></div>
+    <div class="answer-spec" data-part="check2" data-type="self" data-long data-label="Check (2), both branches" data-placeholder="True branch: c = c0 + 1 = …"></div>
+    <ol class="hints"><li>In the true branch, <code>a[i] = x</code>, so index <code>i</code> adds one to the count. In the empty false branch, <code>a[i] != x</code>.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>True branch: <code>c = c0 + 1</code> = (indices <code>k &lt; i</code> with <code>a[k] = x</code>) + 1 = indices <code>k &lt; i + 1</code>, since <code>a[i] = x</code>. False branch: <code>a[i] != x</code> adds nothing, so again <code>c</code> counts the indices below <code>i + 1</code>.</li>
+      <li>Line 20's old <code>i</code> is <code>i - 1</code>: <code>1 &lt;= i</code>, <code>i &lt;= a.length</code>, and the indices <code>k &lt; i + 1</code> become <code>k &lt; i</code>. That implies I.</li>
+      <li>(1) <code>c = 0</code>, <code>i = 0</code>: no index is below 0. (3) <code>i = a.length</code>, so <code>c</code> counts every index. No line wraps: <code>c &lt;= i</code>.</li>
+      <li class="answer">3; after the <code>if</code>, <code>c</code> counts the indices below <code>i + 1</code>.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l8-find">
+    <h2>4. <code>find</code>, with a return in the loop</h2>
+    <pre class="code"><code>/** @return the smallest index i with a[i] == x, or -1 if there is none */
+static int find(int[] a, int x) {
+    int i = 0;
+    while (i &lt; a.length) {
+        if (a[i] == x) { return i; }
+        i = i + 1;
+    }
+    return -1;
+}</code></pre>
+    <p class="prompt">The invariant is <code>0 &lt;= i and i &lt;= a.length and a[k] != x for every k &lt; i</code>. Write the claim at each return and check it against the spec. Then do check (2): what is the claim after the <code>if</code>?</p>
+    <div class="answer-spec" data-part="first" data-type="int" data-answer="0" data-label="find({4, 7, 4}, 4) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="none" data-type="int" data-answer="-1" data-label="find({4, 7, 4}, 9) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="after-if" data-type="choice" data-answer="false-branch" data-options="both:the or of both branches' claims|false-branch:the false branch's claim: the top of the body with a[i] != x added|true-branch:the true branch's claim" data-label="The claim after the if"></div>
+    <ol class="hints"><li>No run comes out of a branch that returns. What was Lecture 7's claim at the end of such a branch?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>At <code>return i</code>: I, <code>i &lt; a.length</code> and <code>a[i] = x</code>. No index below <code>i</code> holds <code>x</code>, so <code>i</code> is the smallest: what the spec promises.</li>
+      <li>At <code>return -1</code>: I and <code>not (i &lt; a.length)</code> give <code>i = a.length</code>, so no index of <code>a</code> holds <code>x</code>.</li>
+      <li>After the <code>if</code>: the true branch's end is unreachable (claim <code>false</code>), so the claim is the false branch's: the top of the body with <code>a[i] != x</code>. After <code>i = i + 1</code>, <code>a[k] != x</code> for every <code>k &lt; i</code> again.</li>
+      <li class="answer">0; −1; the claim after the <code>if</code> is the false branch's.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l8-sumto-swapped">
+    <h2>5. <code>sumTo</code> with the body swapped</h2>
+    <p class="prompt"><code>sumTo</code>'s body becomes <code>s = s + i; i = i + 1;</code>. Take the right <code>sumTo</code>'s invariant <code>0 &lt;= i and i &lt;= n and s = 1 + ... + i</code>. Which check fails? What does <code>sumTo(4)</code> return?</p>
+    <div class="answer-spec" data-part="check" data-type="int" data-answer="2" data-label="The check that fails (1, 2 or 3)" data-placeholder="1, 2 or 3"></div>
+    <div class="answer-spec" data-part="four" data-type="int" data-answer="6" data-label="This sumTo(4) returns" data-placeholder="a whole number"></div>
+    <div class="answer-spec" data-part="short" data-type="int" data-answer="1" data-label="After a pass, s is how much less than I requires?" data-placeholder="a whole number"></div>
+    <ol class="hints"><li>Forward through the body from <code>I and i &lt; n</code>: <code>s = 1 + ... + i + i</code>, then put <code>i - 1</code> for <code>i</code>.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>After line 19, <code>s = 1 + ... + i + i</code>. After line 20, <code>s = 1 + ... + (i - 1) + (i - 1) = (1 + ... + i) - 1</code>. I asks for <code>1 + ... + i</code>: check (2) fails, 1 short.</li>
+      <li>A state that shows it: <code>n = 1, i = 0, s = 0</code>; the body leaves <code>s = 0, i = 1</code>, where I asks for <code>s = 1</code>.</li>
+      <li>Checks (1) and (3) pass. The run adds 0, 1, 2, 3 and misses 4: 6, where the spec promises 10. So here the code is wrong, not the claim.</li>
+      <li class="answer">Check (2); 6; 1 short.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l8-half-sheet">
+    <h2>6. Half sheet: where does the proof break?</h2>
+    <p class="prompt">For <code>sum</code> with the swapped body (<code>i = i + 1; s = s + a[i];</code>), where does the proof break, and what does a run on <code>{3, 4, 5}</code> do?</p>
+    <div class="answer-spec" data-part="check" data-type="int" data-answer="2" data-label="The check that fails" data-placeholder="1, 2 or 3"></div>
+    <div class="answer-spec" data-part="index" data-type="int" data-answer="3" data-label="The index the run reads past the end" data-placeholder="an index"></div>
+    <div class="answer-spec" data-part="exc" data-type="text" data-answer="ArrayIndexOutOfBoundsException" data-label="The exception it throws" data-placeholder="an exception class"></div>
+    <ol class="hints"><li>The body's first line is now <code>i = i + 1</code>, so put <code>i - 1</code> for <code>i</code> in each fact before reasoning through <code>s = s + a[i]</code>.</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>After <code>i = i + 1</code>: <code>1 &lt;= i and i &lt;= a.length and s = a[0] + ... + a[i - 2]</code>. After <code>s = s + a[i]</code>: <code>s = a[0] + ... + a[i - 2] + a[i]</code>. I needs <code>a[i - 1]</code> where this has <code>a[i]</code>: check (2) fails.</li>
+      <li>On the third pass, <code>i</code> becomes 3 and the body reads <code>a[3]</code>, past the end.</li>
+      <li class="answer">Check (2); index 3; <code>ArrayIndexOutOfBoundsException</code>.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse331-w3-l8-copies">
+    <h2>7. Three copies, three tests</h2>
+    <p class="prompt">For each copy of <code>sum</code>, which check fails? Then: of the lecture's tests, <b>A</b> <code>{}</code>, <b>B</b> <code>{7}</code>, <b>C</b> <code>{3, 4, 5}</code>, which ones catch all three copies on their own?</p>
+    <div class="answer-spec" data-part="start" data-type="int" data-answer="1" data-label="Wrong start (int i = 1;)" data-placeholder="1, 2 or 3"></div>
+    <div class="answer-spec" data-part="exit" data-type="int" data-answer="3" data-label="Wrong exit (i &lt; a.length - 1)" data-placeholder="1, 2 or 3"></div>
+    <div class="answer-spec" data-part="tests" data-type="letters" data-allowed="ABC" data-answer="BC" data-label="Tests that each catch all three copies" data-placeholder="letters, e.g. AB"></div>
+    <ol class="hints"><li>Which part of the code does each copy change: the start, the body, or the condition? Each check is about one of them.</li><li>Run each copy on <code>{}</code>: what does it return?</li></ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Wrong start changes only the claim before the loop: check (1). Wrong exit changes only the condition, so (1) and (2) pass and (3) fails: at exit <code>i</code> may be <code>a.length - 1</code>.</li>
+      <li>On <code>{}</code> every copy returns 0, the right sum. On <code>{7}</code>: wrong start and wrong exit return 0, swapped throws. On <code>{3, 4, 5}</code>: 9, throws, 7.</li>
+      <li class="answer">Check (1); check (3); B and C each catch all three, A catches none.</li>
+    </ol></div></div>
+  </article>
+
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ READINGS -->
+<section class="page" id="readings" data-title="Readings">
+  <p class="where">Reading 2 · due <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span>, 11:59 pm · discussed Mon Oct 19</p>
+  <h1>Readings</h1>
+  <div class="prose">
+    <p>Each reading asks a question about the course motto, <em>"Your job is to deliver code that you know works."</em> Reading 2's question: <strong>knowing takes work</strong> (saying exactly what a method must do, testing it, and reasoning about whether it does that). <strong>Is that work the job itself, or a tax on the job?</strong> Choose one article, read it, and write a reflection. The three take three positions.</p>
+  </div>
+  <div class="reading-cards">
+    <article class="reading-card">
+      <p class="rc-meta">About 10 minutes</p>
+      <h3><a href="https://www.dreamsongs.com/RiseOfWorseIsBetter.html" target="_blank" rel="noopener">Gabriel 1991, "The Rise of Worse is Better"</a></h3>
+      <p>Two ways to design software. The MIT way, "the right thing", puts the interface first: simple, correct, consistent and complete, whatever it costs the implementation. The New Jersey way puts the implementation first and lets users do the extra work. Gabriel caricatures the second on purpose, then argues it won: Unix and C gave people half of what they wanted and were easy to port. Ship half of the right thing, if that half is basically right, and improve it once people depend on it.</p>
+    </article>
+    <article class="reading-card">
+      <p class="rc-meta">About 20 minutes</p>
+      <h3><a href="https://lamport.azurewebsites.net/pubs/future-of-computing.pdf" target="_blank" rel="noopener">Lamport 2003, "The Future of Computing: Logic or Biology"</a></h3>
+      <p>"Logic" is Floyd and Hoare's idea: a program is a mathematical object, so you can ask what it means and whether you could prove it. He asks you to ask yourself, not to write the proof. "Biology" is treating programs as mysterious, met with superstition and left to evolve and fight off viruses; software nobody understands cannot be made dependable. His way back: keep systems simple enough to understand, with logic as the tool. (Lecture 7 quotes him.)</p>
+    </article>
+    <article class="reading-card">
+      <p class="rc-meta">About 10 minutes</p>
+      <h3><a href="https://www.cs.utexas.edu/~EWD/transcriptions/EWD06xx/EWD667.html" target="_blank" rel="noopener">Dijkstra 1978, "On the foolishness of "natural language programming""</a></h3>
+      <p>On the wish to instruct a machine in English. Moving work across an interface does not divide a fixed amount of labor; the work of communicating across it is added, often on both sides. Formal notation is a privilege: with it schoolchildren do what once took a genius. The ease of a natural language is the ease of "making statements the nonsense of which is not obvious."</p>
+    </article>
+  </div>
+  <h3>Optional extras</h3>
+  <ul class="extras">
+    <li><a href="https://www.galois.com/articles/specifications-dont-exist" target="_blank" rel="noopener">Dodds 2025, "Specifications Don't Exist"</a>: the hard part of verification is saying what correct means; a test case is a partial specification that is immediately useful.</li>
+    <li><a href="https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/" target="_blank" rel="noopener">King 2019, "Parse, Don't Validate"</a>: keep what a check found in a type, so removing the check stops the program compiling (compare Lecture 6's wrapper and checked exception). Haskell examples.</li>
+    <li><a href="https://blog.regehr.org/archives/1091" target="_blank" rel="noopener">Regehr 2014, "Use of Assertions"</a>: an assertion is true unless the program has a bug, so it is not error handling; where assertions come from (preconditions, postconditions, invariants). C and C++ examples.</li>
+    <li><a href="https://web.archive.org/web/2008/http://www.michaelcrichton.com/speech-whyspeculate.html" target="_blank" rel="noopener">Crichton 2002, "Why Speculate?"</a>: the Gell-Mann amnesia effect, and what reliable knowledge costs. A speech, with strong language in two places.</li>
+    <li>METR, two productivity studies: <a href="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/" target="_blank" rel="noopener">2025</a> (experienced developers took 19% longer with AI while believing they were faster) and the <a href="https://metr.org/blog/2026-02-24-uplift-update/" target="_blank" rel="noopener">2026 update</a> (the follow-up's signal is unreliable).</li>
+    <li>The extras are optional. A reflection may bring one in if it connects it to the article you chose.</li>
+  </ul>
+  <h2>The reflection</h2>
+  <ol class="reflection-parts">
+    <li><strong>What does the reading argue?</strong> The main claim and how it is supported, in your own words, specific enough for a classmate who read a different article. (About 5 sentences.)</li>
+    <li><strong>What is your reaction?</strong> Agree, disagree, unsure, connected to your own experience as a programmer. (About 5 sentences.)</li>
+    <li><strong>What do you want to discuss in class?</strong> A question your group might answer differently, what in the reading raises it, a concrete case, and two sketched answers. (About 5 sentences.)</li>
+  </ol>
+  <div class="prose">
+    <p>Graded on thoughtful completion: each part Complete, Partial or No credit. Submit on <a href="https://www.gradescope.com/courses/1390633/assignments/8799258" target="_blank" rel="noopener">Gradescope</a> by Fri Oct 16 at 11:59 pm; it asks which article you read and whether you used AI for editing. You may ask AI to explain a term, not to summarize the article or say what it argues. This site does not answer the reflection.</p>
+  </div>
+  <details class="notes" open><summary>Teaching notes</summary><ul>
+    <li>The three positions map onto this week: Gabriel (ship half, fix later) against Lamport (could you prove it?) and Dijkstra (formal care is the point). Lecture 6's "seventh way" and Lecture 7's proofs are good examples for Monday's discussion.</li>
+  </ul></details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CHEAT SHEET -->
+<section class="page" id="cheatsheet" data-title="Cheat sheet">
+  <p class="where">Print with <kbd>Ctrl</kbd>+<kbd>P</kbd>; only this page prints.</p>
+  <h1>Week 3 cheat sheet</h1>
+  <div class="cheat">
+    <section>
+      <h3>Interactive program</h3>
+      <p>Responds to each input as it arrives, and keeps running until the user tells it to stop. Harder: state that lasts, a user who chooses the order, state the user cannot see.</p>
+    </section>
+    <section>
+      <h3>Three kinds of trouble</h3>
+      <p>A user's mistake (checked at the edge, never a stack trace); a programmer's mistake (a broken promise: the spec promises nothing); a request that cannot be carried out.</p>
+    </section>
+    <section>
+      <h3>Six ways to say no</h3>
+      <table class="plain small">
+        <tr><td>precondition</td><td>client checks first; forgotten: anything</td></tr>
+        <tr><td>special value</td><td><code>null</code>, −1; forgotten: printed, or NPE</td></tr>
+        <tr><td>flag</td><td><code>boolean</code>; forgotten: silence</td></tr>
+        <tr><td>wrapper</td><td><code>OptionalInt</code>; forgotten: crash at the ask</td></tr>
+        <tr><td>exception</td><td>unchecked; forgotten: stack trace</td></tr>
+        <tr><td>checked exception</td><td>forgotten: does not compile</td></tr>
+      </table>
+      <p>Seventh (bad): make up an answer (<code>NaN</code>, <code>undefined</code>, <code>null</code>, overflow).</p>
+    </section>
+    <section>
+      <h3>Exceptions</h3>
+      <p>Unchecked: extends <code>RuntimeException</code>. Checked: extends <code>Exception</code> only; callers catch or declare <code>throws</code>. Bloch: recoverable → checked; programmer error → unchecked. <code>@throws</code> is stronger than <code>@requires</code>.</p>
+    </section>
+    <section>
+      <h3>Testing (Section 2)</h3>
+      <p>Black-box, clear-box, boundaries, exhaustive if ≤ 10 inputs. Coverage: statement, branch, loop 0/1/2+, path. Coverage is the floor; add spec-derived cases; then judgment. Check mutated state too.</p>
+    </section>
+    <section>
+      <h3>Hoare triple</h3>
+      <p><code>{{ P }} code {{ Q }}</code> is valid if every terminating run from a P-state ends in a Q-state. <code>{{ P }} {{ Q }}</code>: P implies Q. Stronger claim = smaller set of states.</p>
+    </section>
+    <section>
+      <h3>Assignment rules</h3>
+      <p>Forward: <code>{{ P }} x = e; {{ P[x ↦ x0] and x = e[x ↦ x0] }}</code> (strongest postcondition). Backward: <code>{{ Q[x ↦ e] }} x = e; {{ Q }}</code> (weakest precondition).</p>
+    </section>
+    <section>
+      <h3>Sequence, consequence, if</h3>
+      <p>Sequence: some R between. Consequence: P ⇒ A, <code>{{A}} code {{B}}</code>, B ⇒ Q. If: <code>P and b</code> / <code>P and not b</code> at the tops, <code>A or B</code> after; a branch that returns contributes <code>false</code>. Backward: <code>(b and A) or (not b and B)</code>. Ghost variable <code>n0</code>: the value at the call.</p>
+    </section>
+    <section>
+      <h3>While loop</h3>
+      <p>(1) P ⇒ I. (2) <code>{{ I and b }} body {{ I }}</code>. (3) <code>I and not b</code> ⇒ Q. Plus a variant: integer, ≥ 0 at each check, smaller each pass.</p>
+      <p>Find I from Q: what's done so far (put <code>i</code> for the bound) + how far along (bounds on <code>i</code>). Too weak: (3) fails. Too strong: (1) fails.</p>
+    </section>
+    <section>
+      <h3>This week</h3>
+      <p>Mon Oct 12 Lecture 6 · Tue Oct 13 Section 2 · Wed Oct 14 Lecture 7 · Fri Oct 16 Lecture 8 · Reading 2 due Fri Oct 16, 11:59 pm · Homework 2 due Fri Oct 23.</p>
+    </section>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+</main>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script type="text/plain" id="src-calc">
+import java.util.*;
+
+/**
+ * An interactive stack-based integer calculator.
+ *
+ * Numbers and operations are separated by spaces. Numbers get pushed
+ * onto the stack. An operation like + pops the top two numbers,
+ * combines them, and pushes the answer back onto the stack.
+ *
+ *   > 1 2 +
+ *   > .
+ *   3
+ *
+ * This computes 1 + 2 = 3 using the stack. It pushes 1 and 2, then
+ * pops them, adds them, and pushes the result.
+ *
+ *   > 1 2 -
+ *   > .
+ *   -1
+ *
+ * For operations where the order of the arguments matters, the
+ * number that was second-from-the-top is on the left of the
+ * operator, which is why the above program computes 1 - 2 = -1
+ * rather than 2 - 1 = 1.
+ *
+ * Commands:
+ *   a number   push it onto the stack
+ *   +          pop two numbers, push their sum
+ *   -          pop two numbers, push (second - first)
+ *   *          pop two numbers, push their product
+ *   /          pop two numbers, push (second / first), int div
+ *   p          print the whole stack
+ *   .          pop the top number and print it
+ *   t          print the top number without removing it
+ *   q          quit
+ */
+public class Calculator {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        CalcStack stack = new CalcStack();
+        while (true) {
+            System.out.print("> ");
+            if (!in.hasNextLine()) {
+                break;
+            }
+            String line = in.nextLine();
+            String[] tokens = line.split("\\s+");
+            for (String token : tokens) {
+                if (token.equals("")) {
+                    continue;
+                } else if (token.equals("q")) {
+                    return;
+                } else if (token.equals("p")) {
+                    System.out.println(stack);
+                } else if (token.equals(".")) {
+                    Integer top = stack.pop();
+                    if (top == null) {
+                        System.out.println("error: stack is empty");
+                    } else {
+                        System.out.println(top);
+                    }
+                } else if (token.equals("t")) {
+                    OptionalInt top = stack.top();
+                    if (top.isEmpty()) {
+                        System.out.println("error: stack is empty");
+                    } else {
+                        System.out.println(top.getAsInt());
+                    }
+                } else if (token.equals("+")) {
+                    boolean ok = stack.add();
+                    if (!ok) {
+                        System.out.println(
+                            "error: need two numbers to add");
+                    }
+                } else if (token.equals("-")) {
+                    try {
+                        stack.subtract();
+                    } catch (StackException e) {
+                        System.out.println(
+                            "error: " + e.getMessage());
+                    }
+                } else if (token.equals("*")) {
+                    if (stack.size() < 2) {
+                        System.out.println(
+                            "error: need two numbers to multiply");
+                    } else {
+                        stack.multiply();
+                    }
+                } else if (token.equals("/")) {
+                    try {
+                        stack.divide();
+                    } catch (TooFewOperandsException e) {
+                        System.out.println(
+                            "error: " + e.getMessage());
+                    } catch (DivideByZeroException e) {
+                        System.out.println(
+                            "error: " + e.getMessage());
+                    }
+                } else {
+                    try {
+                        int value = Integer.parseInt(token);
+                        stack.push(value);
+                    } catch (NumberFormatException e) {
+                        System.out.println("error: don't understand '"
+                            + token + "'");
+                    }
+                }
+            }
+        }
+    }
+}
+
+class CalcStack {
+    private List<Integer> items = new ArrayList<Integer>();
+
+    /** @return the number of numbers on the stack */
+    public int size() { return items.size(); }
+
+    /**
+     * @modifies this
+     * @effects pushes value onto the top of the stack
+     */
+    public void push(int value) { items.add(value); }
+
+    /**
+     * @modifies this
+     * @effects removes the top number from the stack, if the stack is
+     *     non-empty
+     * @return the number removed, or null if the stack was empty
+     */
+    public Integer pop() {
+        if (items.size() == 0) { return null; }
+        int last = items.remove(items.size() - 1);
+        return last;
+    }
+
+    /**
+     * @return an OptionalInt holding the top number of the stack, or
+     *     an empty OptionalInt if the stack is empty
+     */
+    public OptionalInt top() {
+        if (items.size() == 0) { return OptionalInt.empty(); }
+        return OptionalInt.of(items.get(items.size() - 1));
+    }
+
+    /**
+     * @modifies this
+     * @effects if the stack has at least two numbers, pops the top
+     *     two and pushes their sum; otherwise leaves the stack
+     *     unchanged
+     * @return true if the top two numbers were replaced with their
+     *     sum, or false if the stack had fewer than two numbers
+     */
+    public boolean add() {
+        if (items.size() < 2) { return false; }
+        int b = pop(); int a = pop();
+        push(a + b);
+        return true;
+    }
+
+    /**
+     * @modifies this
+     * @effects if the stack has at least two numbers, pops the top
+     *     two (first and second) and pushes second - first; otherwise
+     *     does nothing
+     * @throws StackException if the stack had fewer than two numbers
+     */
+    public void subtract() throws StackException {
+        if (items.size() < 2) {
+            throw new StackException("need two numbers to subtract");
+        }
+        int b = pop(); int a = pop();
+        push(a - b);
+    }
+
+    /**
+     * @requires 2 <= size()
+     * @modifies this
+     * @effects pops the top two numbers and pushes their product
+     */
+    public void multiply() {
+        int b = pop(); int a = pop();
+        push(a * b);
+    }
+
+    /**
+     * @modifies this
+     * @effects if the stack has at least two numbers and the top
+     *     number is non-zero, pops the top two (first and second) and
+     *     pushes second / first; otherwise leaves the stack unchanged
+     * @throws TooFewOperandsException if the stack had fewer than two
+     *     numbers
+     * @throws DivideByZeroException if the divisor (the top number)
+     *     was zero
+     */
+    public void divide() {
+        if (items.size() < 2) {
+            throw new TooFewOperandsException(
+                "need two numbers to divide");
+        }
+        int b = pop(); int a = pop();
+        if (b == 0) {
+            push(a); push(b);
+            throw new DivideByZeroException("cannot divide by zero");
+        }
+        push(a / b);
+    }
+
+    /**
+     * @return a string showing the stack's numbers from bottom to top
+     */
+    public String toString() {
+        String result = "[";
+        for (int i = 0; i < items.size(); i++) {
+            if (i > 0) { result = result + " "; }
+            result = result + items.get(i);
+        }
+        return result + "]";
+    }
+}
+
+class StackException extends Exception {
+    public StackException(String message) {
+        super(message);
+    }
+}
+
+class TooFewOperandsException extends RuntimeException {
+    public TooFewOperandsException(String message) {
+        super(message);
+    }
+}
+
+class DivideByZeroException extends RuntimeException {
+    public DivideByZeroException(String message) {
+        super(message);
+    }
+}
+</script>
+
+<script src="../../courses.js"></script>
+<script src="../../core/grader.js"></script>
+<script src="../../core/store.js"></script>
+<script src="calc-sim.js"></script>
+<script src="week.js"></script>
+<script src="../../core/app.js"></script>
+</body>
+</html>
