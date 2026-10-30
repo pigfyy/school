@@ -1,0 +1,678 @@
+--- slide 1 ---
+CSE 332 Autumn 2026Lecture 6: Recurrences
+Ruth Anderson
+http://www.cs.uw.edu/332
+
+1
+
+--- slide 2 ---
+Announcements
+Exercise 0 – was due on Friday, closes tonight
+“Meet the staff” activity - Sometime during the first 4 weeks of class.
+Participate in Section, earn a late day (see Ed Board post)
+Exercise 1 Running Time: 
+Due TONIGHT Mon Oct 12, Closes Wed Oct 14
+Entirely in Gradescope. Save your answers outside of Gradescope and confirm that you have answered/uploaded everything that is needed!
+Exercise 2 Heaps: due Fri Oct 16
+Exercise 3 Recurrences: coming soon, due Fri Oct 23
+
+2
+
+--- slide 3 ---
+Analyzing Recursive Code
+Pick a Scenario/Case to analyze (usually worst)
+Count the number of chosen operation(s) in the recursive code, come up with a Recurrence Relation in terms of 𝑛 (input size)
+Use the “Tree Method” to visualize the number of levels in the tree and the work done at each level of the recursion
+Convert the Recurrence Relation into a summation
+Convert the summation into a closed form (e.g. O(n), O(log n))
+
+ 
+3
+
+--- slide 4 ---
+Recursive Binary Search
+4
+5
+6
+7
+3
+2
+1
+8
+0
+9
+75
+79
+88
+90
+42
+13
+8
+95
+5
+99
+public static boolean binarySearch(List<Integer> lst, int k){
+        return binarySearch(lst, k, 0, lst.size());
+}
+private static boolean binarySearch(List<Integer> lst, int k, int start, int end){
+    if(start == end)
+        return false;
+    int mid = start + (end-start)/2;
+    if(lst.get(mid) == k){
+        return true;
+    } else if(lst.get(mid) > k){
+        return binarySearch(lst, k, start, mid);
+    } else{
+        return binarySearch(lst, k, mid+1, end);
+    }
+}
+4
+
+--- slide 5 ---
+Coming up with a Recurrence Relation
+Overall structure of a recursive function:
+Do some non-recursive “work”
+Do one or more recursive calls on some portion of your input
+(maybe) Do some more non-recursive “work”
+(Repeat recursive calls until you reach a base case)
+Recurrence Relation: 𝑇𝑛=𝑇𝑝1+𝑇𝑝2+…+𝑇𝑝𝑥+𝑓(𝑛)
+The time it takes to run the algorithm on an input of size 𝑛 is:
+The sum of how long it takes to run the same function on each smaller input
+Plus the total amount of non-recursive work done at that step
+Usually: 
+𝑇𝑛=𝑎⋅𝑇𝑛𝑏+𝑓𝑛 
+Called “divide and conquer” 
+𝑇𝑛=𝑇𝑛−𝑐+𝑓𝑛
+Called “chip and conquer”
+ 
+5
+
+--- slide 6 ---
+How Efficient Is It?
+𝑇𝑛=1+𝑇𝑛2
+Base case: 𝑇1=1
+ 
+𝑇𝑛= “cost” of running the entire algorithm on an array of length 𝑛
+ 
+6
+
+--- slide 7 ---
+Let’s Solve the Recurrence!
+𝑇𝑛=1+𝑇(𝑛2)
+ 
+𝑇1=1
+ 
+1+𝑇(𝑛4)
+ 
+1+𝑇(𝑛8)
+ 
+…
+1
+ 
+
+Substitute until  𝑇(1)
+So log2𝑛 steps
+ 
+𝑇𝑛=𝑖=1log2𝑛1=log2𝑛
+ 
+
+𝑇𝑛∈Θlog𝑛
+ 
+7
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 8 ---
+Make our process “prettier”
+Draw a picture of the recursion
+One box per stack frame
+Identify the work done per stack frame
+Add up all the work!
+Sum is the answer!
+In this case Θ(log2𝑛)
+ 
+𝑇𝑛=𝑇𝑛2+1
+ 
+𝑛
+ 
+𝑛/2
+ 
+𝑛/4
+ 
+𝑛/8
+ 
+1
+ 
+…
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+
+log2⁡𝑛 levels
+of recursion
+ 
+The “Tree Method”
+8
+𝑇𝑛=𝑖=1log2𝑛1=log2𝑛
+ 
+𝑇𝑛∈Θlog𝑛
+ 
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 9 ---
+Recursive Linear Search
+4
+5
+6
+7
+3
+2
+1
+8
+0
+9
+75
+79
+88
+90
+42
+13
+8
+95
+5
+99
+public static boolean linearSearch(List<Integer> lst, int k){
+        return linearSearch(lst, k, 0, lst.size());
+    }
+private static boolean linearSearch(List<Integer> lst, int k, int start, int end){
+    if(start == end){
+        return false;
+    } else if(lst.get(start) == k){
+        return true;
+    } else{
+        return linearSearch(lst, k, start+1, end);
+    }
+}
+9
+
+--- slide 10 ---
+Prettier List Sum Substitution 
+Draw a picture of the recursion
+Identify the work done per stack frame
+Add up all the work!
+𝑇𝑛=𝑇𝑛−1+1
+ 
+
+𝑛 levels
+of recursion
+ 
+Running time: Θ(𝑛)
+ 
+𝑛
+ 
+𝑛−1
+ 
+𝑛−2
+ 
+𝑛−3
+ 
+1
+ 
+…
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+10
+𝑇𝑛=𝑖=1𝑛1=𝑛
+ 
+𝑇𝑛∈Θ𝑛
+ 
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 11 ---
+Recursive List Summation Code
+public int sum(int[] list){
+    return sum_helper(list, 0, list.size);
+}
+private int sum_helper(int[] list, int low, int high){
+    if (low == high){ return 0; }
+    if (low == high-1){ return list[low]; }
+    int middle = (high+low)/2;
+    return sum_helper(list, low, middle) + sum_helper(list, middle, high);
+}
+11
+
+--- slide 12 ---
+Tree Method for Recursive Summation
+Red box represents a problem instance
+Blue value next to each box represents time spent at that recursive call
+𝑇𝑛=2𝑇𝑛2 +1
+ 
+𝑛
+ 
+𝑛2
+ 
+𝑛2
+ 
+𝑛4
+ 
+𝑛4
+ 
+𝑛4
+ 
+𝑛4
+ 
+…
+…
+…
+…
+1
+ 
+1
+ 
+1
+ 
+…
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+
+log2⁡𝑛 levels
+of recursion
+ 
+Þ 2𝑖 work per level
+ 
+𝑇𝑛=𝑖=0log2𝑛2𝑖
+ 
+12
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 13 ---
+Recursive List Summation – Solving the Series
+𝑇𝑛=𝑖=0log2𝑛2𝑖
+
+=21+log2𝑛−12−1
+
+=2⋅2log2𝑛−1
+
+=2𝑛−1=Θ(𝑛)
+
+ 
+Remember theMath Identities Reference Sheet
+(will be provided on exams)
+13
+
+--- slide 14 ---
+Tree Method Summary: Chip and Conquer
+Recurrence looks like 𝑇𝑛=𝑎𝑇𝑛−𝑏+𝑓(𝑛)
+Use the recurrence to draw a tree
+𝑎 is the branching factor of the tree (e.g. if 𝑎=2 then it’s a binary tree)
+Subtract 𝑏 from the parent’s input size to get children’s input size
+Work done per node is given by applying 𝑓𝑛 to that node’s input size
+Height of the tree is 𝑛𝑏
+Because that is the number of times we must subtract 𝑏 until reaching a base case
+Answer to the question “how many times must we subtract 𝑏 until we reach 0?”
+Any base case is a constant, so to reach a larger value would just be a constant change
+Use the tree to express running time as a series
+Adding work done for each node level-by-level
+Identify a pattern to express work done at level 𝑖 as a function of 𝑖
+Write a series using 𝑖=0 up to 𝑛𝑏
+Solve the series
+ 
+14
+
+--- slide 15 ---
+Tree Method Summary: Divide and Conquer
+Recurrence looks like 𝑇𝑛=𝑎𝑇𝑛𝑏+𝑓(𝑛)
+Use the recurrence to draw a tree
+𝑎 is the branching factor of the tree (e.g. if 𝑎=2 then it’s a binary tree)
+Divide the parent’s input size by 𝑏 to get children’s input size
+Work done per node is given by applying 𝑓𝑛 to that node’s input size
+Height of the tree is log𝑏𝑛
+Because that is the number of times we must divide by 𝑏 until reaching a base case
+Answer to the question “how many times must we divide by 𝑏 until we reach 1?”
+Any base case is a constant, so to reach a larger value would just be a constant change
+Use the tree to express running time as a series
+Adding work done for each node level-by-level
+Identify a pattern to express work done at level 𝑖 as a function of 𝑖
+Write a series using 𝑖=0 up to log𝑏𝑛
+Solve the series
+
+ 
+15
+
+--- slide 16 ---
+Let’s do some more!
+For each, assume the base case is 𝑛=1 and 𝑇1=1
+𝑇𝑛=2𝑇𝑛2+𝑛
+𝑇𝑛=2𝑇𝑛2+𝑛2
+𝑇𝑛=2𝑇𝑛8+1
+ 
+16
+
+--- slide 17 ---
+Tree Method 𝑇𝑛=2𝑇𝑛2+𝑛
+ 
+Red box represents a problem instance
+Blue value next to each box represents time spent at that recursive call
+𝑛
+ 
+𝑛2
+ 
+𝑛2
+ 
+𝑛4
+ 
+𝑛4
+ 
+𝑛4
+ 
+𝑛4
+ 
+…
+…
+…
+…
+1
+ 
+1
+ 
+1
+ 
+…
+1
+ 
+1
+ 
+1
+ 
+𝑛
+ 
+𝑛2
+ 
+𝑛2
+ 
+𝑛4
+ 
+𝑛4
+ 
+𝑛4
+ 
+𝑛4
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+
+Þ 𝑛 work per level
+ 
+log2⁡𝑛 levels
+of recursion
+ 
+𝑇𝑛=𝑖=0log2𝑛𝑛
+ 
+17
+𝑇𝑛∈Θ𝑛𝑙𝑜𝑔𝑛
+ 
+style.visibility
+
+--- slide 18 ---
+Tree Method 𝑇𝑛=2𝑇𝑛2+𝑛2
+ 
+Red box represents a problem instance
+Blue value next to each box represents time spent at that recursive call
+𝑛
+ 
+𝑛2
+ 
+𝑛2
+ 
+𝑛4
+ 
+𝑛4
+ 
+𝑛4
+ 
+𝑛4
+ 
+…
+…
+…
+…
+1
+ 
+1
+ 
+1
+ 
+…
+1
+ 
+1
+ 
+1
+ 
+𝑛2
+ 
+𝑛24
+ 
+𝑛24
+ 
+𝑛216
+ 
+𝑛216
+ 
+𝑛216
+ 
+𝑛216
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+
+Þ ?? work per level
+ 
+log2⁡𝑛 levels
+of recursion
+ 
+𝑇𝑛=𝑖=0log2𝑛??
+ 
+18
+
+--- slide 19 ---
+Solving 𝑇𝑛=2𝑇𝑛2+𝑛2
+ 
+𝑇𝑛=𝑖=0log2𝑛𝑛22𝑖
+
+=𝑛2⋅𝑖=0log2𝑛12𝑖
+
+≤𝑛2∗2=Θ𝑛2
+
+ 
+Remember theMath Identities Reference Sheet
+(will be provided on exams)
+𝑖=0∞𝑥𝑖 =11−𝑥  for |x| < 1
+ 
+19
+
+--- slide 20 ---
+Tree Method 𝑇𝑛=2𝑇𝑛8+1
+ 
+Red box represents a problem instance
+Blue value next to each box represents time spent at that recursive call
+𝑛
+ 
+𝑛8
+ 
+𝑛8
+ 
+𝑛64
+ 
+𝑛64
+ 
+𝑛64
+ 
+𝑛64
+ 
+…
+…
+…
+…
+1
+ 
+1
+ 
+1
+ 
+…
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+
+Þ 2𝑖 work per level
+ 
+log8⁡𝑛 levels
+of recursion
+ 
+𝑇𝑛=𝑖=0log8𝑛2𝑖
+ 
+20
+
+--- slide 21 ---
+Solving 𝑇𝑛=2𝑇𝑛8+1
+ 
+𝑇𝑛=𝑖=0log8𝑛2𝑖
+
+=21+log8𝑛−12−1
+
+=2⋅2log8𝑛−1
+
+=2𝑛log82−1=Θ𝑛13
+
+ 
+Remember theMath Identities Reference Sheet
+(will be provided on exams)
+
+𝑎log𝑏𝑐 = 𝑐log𝑏𝑎
+ 
+21
+
+--- slide 22 ---
+What matters, recursively
+For 𝑇𝑛=𝑎𝑇𝑛𝑏+𝑓(𝑛)
+The following are important for asymptotic behavior:
+The value of 𝑎
+The value of 𝑏
+Asymptotic behavior of 𝑓(𝑛)
+The following are not important for asymptotic behavior:
+Constants and non-dominant terms in 𝑓(𝑛)
+The base case
+ 
+22
+
+--- slide 23 ---
+Really common recurrences
+Should know how to solve recurrences but also recognize some
+really common ones:
+
+	T(n) = O(1) + T(n/2) 		logarithmic 	O(log n)
+	T(n) = O(1) + 2T(n/2) 		linear		O(n)
+
+	T(n) = O(1) + T(n-1)		linear		O(n)
+	T(n) = O(n) + T(n-1) 		quadratic 	O(n2)
+	T(n) = O(1) + 2T(n-1) 		exponential	O(2n)
+
+	T(n) = O(n) + T(n/2) 		linear		O(n)
+	T(n) = O(n) + 2T(n/2) 		loglinear	O(n log n)
+
+23
+

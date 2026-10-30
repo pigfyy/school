@@ -1,0 +1,36 @@
+/* CSE 332 week 3 widgets: the recursion-tree explorer (.rt) and the BST / AVL drawings (.treelab, .treeview).
+   Base tokens only. Boxes are problem instances (the slides' red boxes); the work label is the slides' blue number. */
+.rt-head { font-size: 1.05rem; margin: 0 0 0.6rem; }
+.rt-svg { max-width: 760px; }
+.rt-box rect { fill: var(--surface); stroke: var(--s2); stroke-width: 1.6; }
+.rt-box.leaf rect { fill: var(--s2-tint); }
+.rt-box text, .rt-dots { font-family: var(--mono); font-size: 12px; fill: var(--ink); }
+.rt-dots { font-size: 22px; }
+.rt-edge { stroke: var(--line-strong); stroke-width: 1.2; }
+.chart .rt-work { font-family: var(--mono); font-size: 12.5px; fill: var(--s1); font-weight: 600; }
+.rt-table td, .rt-table th { font-family: var(--mono); font-size: 0.85rem; white-space: nowrap; }
+.rt-table tr.leaf td { color: var(--ink-soft); }
+.rt-barcell { width: 32%; min-width: 6rem; }
+.rt-bar { display: block; height: 0.7rem; background: var(--s1); border-radius: 2px; }
+
+.tl-svg { max-width: 760px; margin: 0 auto; }
+.tl-edge { stroke: var(--line-strong); stroke-width: 1.5; }
+.tl-edge.on { stroke: var(--s1); stroke-width: 2.5; }
+.tl-node circle { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; }
+.chart .tl-node text { font-family: var(--mono); font-size: 13px; font-weight: 600; fill: var(--ink); }
+.chart .tl-node text.tl-h { font-size: 10.5px; font-weight: 600; fill: var(--accent); }
+.chart .tl-empty { fill: var(--ink-soft); }
+.tl-node.path circle { fill: var(--s1-tint); stroke: var(--s1); }
+.tl-node.new circle { fill: var(--s3); stroke: var(--s3); }
+.tl-node.found circle { fill: var(--s1); stroke: var(--s1); }
+.chart .tl-node.new text:not(.tl-h), .chart .tl-node.found text:not(.tl-h) { fill: #fff; }
+.tl-node.problem circle { fill: var(--s2-tint); stroke: var(--s2); stroke-width: 3; }
+.tl-node.repl circle { fill: var(--amber-tint); stroke: var(--amber); stroke-width: 3; }
+.tl-key { width: 6rem; }
+.tl-orders { font-family: var(--mono); font-size: 0.82rem; overflow-wrap: anywhere; }
+.tl-queue { font-family: var(--mono); font-size: 0.85rem; color: var(--ink-soft); }
+
+.treeview { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 0.5rem 0.75rem; margin: 0.5rem 0 1rem; }
+.treeview figcaption { font-size: 0.9rem; color: var(--ink-soft); text-align: center; }
+.tree-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.75rem; }
+.tree-grid .treeview { margin: 0; }

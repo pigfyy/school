@@ -1,0 +1,467 @@
+CSE 332 Autumn 2026
+Lecture 6: Recurrences
+           Ruth Anderson
+     http://www.cs.uw.edu/332
+
+
+
+
+                                1
+Announcements
+• Exercise 0 – was due on Friday, closes tonight
+• “Meet the staff” activity - Sometime during the first 4 weeks of
+  class.
+• Participate in Section, earn a late day (see Ed Board post)
+• Exercise 1 Running Time:
+   • Due TONIGHT Mon Oct 12, Closes Wed Oct 14
+   • Entirely in Gradescope. Save your answers outside of Gradescope and
+     confirm that you have answered/uploaded everything that is needed!
+• Exercise 2 Heaps: due Fri Oct 16
+• Exercise 3 Recurrences: coming soon, due Fri Oct 23
+
+                                                                           2
+Analyzing Recursive Code
+1. Pick a Scenario/Case to analyze (usually worst)
+2. Count the number of chosen operation(s) in the recursive code,
+   come up with a Recurrence Relation in terms of 𝑛𝑛 (input size)
+3. Use the “Tree Method” to visualize the number of levels in the
+   tree and the work done at each level of the recursion
+4. Convert the Recurrence Relation into a summation
+5. Convert the summation into a closed form (e.g. O(n), O(log n))
+
+
+
+                                                                    3
+Recursive Binary Search                                    5    8   13   42   75     79   88   90       95   99
+                                                           0    1    2    3    4     5    6    7        8    9
+public static boolean binarySearch(List<Integer> lst, int k){
+        return binarySearch(lst, k, 0, lst.size());
+}
+private static boolean binarySearch(List<Integer> lst, int k, int start, int end){
+    if(start == end)
+        return false;
+    int mid = start + (end-start)/2;
+    if(lst.get(mid) == k){
+        return true;
+    } else if(lst.get(mid) > k){
+        return binarySearch(lst, k, start, mid);
+    } else{
+        return binarySearch(lst, k, mid+1, end);
+    }
+}
+
+
+                                                                                                    4
+   Coming up with a Recurrence Relation
+• Overall structure of a recursive function:
+   1. Do some non-recursive “work”
+   2. Do one or more recursive calls on some portion of your input
+   3. (maybe) Do some more non-recursive “work”
+   • (Repeat recursive calls until you reach a base case)
+• Recurrence Relation: 𝑇𝑇 𝑛𝑛 = 𝑇𝑇 𝑝𝑝1 + 𝑇𝑇 𝑝𝑝2 + ⋯ + 𝑇𝑇 𝑝𝑝𝑥𝑥 + 𝑓𝑓(𝑛𝑛)
+• The time it takes to run the algorithm on an input of size 𝑛𝑛 is:
+   • The sum of how long it takes to run the same function on each smaller input
+   • Plus the total amount of non-recursive work done at that step
+• Usually:
+                       𝑛𝑛
+   • 𝑇𝑇 𝑛𝑛 = 𝑎𝑎 ⋅ 𝑇𝑇        + 𝑓𝑓 𝑛𝑛
+                       𝑏𝑏
+       • Called “divide and conquer”
+   • 𝑇𝑇 𝑛𝑛 = 𝑇𝑇 𝑛𝑛 − 𝑐𝑐 + 𝑓𝑓 𝑛𝑛
+       • Called “chip and conquer”
+                                                                                   5
+How Efficient Is It?
+                   𝑛𝑛   𝑇𝑇 𝑛𝑛 = “cost” of running the entire
+• 𝑇𝑇 𝑛𝑛 = 1 + 𝑇𝑇        algorithm on an array of length 𝑛𝑛
+                   2
+• Base case: 𝑇𝑇 1 = 1
+
+
+
+
+                                                           6
+Let’s Solve the Recurrence!
+    𝑇𝑇 1 = 1
+    𝑇𝑇 𝑛𝑛 = 1 + 𝑇𝑇(𝑛𝑛�2)
+                 1 + 𝑇𝑇(𝑛𝑛�4)
+                                   Substitute until 𝑇𝑇(1)
+                    1 + 𝑇𝑇(𝑛𝑛�8)   So log 2 𝑛𝑛 steps
+
+                               1
+
+              log2 𝑛𝑛
+
+    𝑇𝑇 𝑛𝑛 = � 1 = log 2 𝑛𝑛                𝑇𝑇 𝑛𝑛 ∈ Θ log 𝑛𝑛
+               𝑖𝑖=1
+                                                            7
+   Make our process “prettier”
+                                                              𝑛𝑛
+• Draw a picture of the recursion                  𝑇𝑇 𝑛𝑛 = 𝑇𝑇    +1
+                                                              2
+   • One box per stack frame                                    1
+                                                         𝑛𝑛
+• Identify the work done per stack frame
+• Add up all the work!                                  𝑛𝑛/2
+                                                                1
+
+   • Sum is the answer!
+                                                                1
+   • In this case Θ(log 2 𝑛𝑛)                           𝑛𝑛/4          log 2 𝑛𝑛 levels
+                                                                      of recursion
+ The “Tree Method”                                      𝑛𝑛/8
+                                                                1
+
+         log2 𝑛𝑛
+                                                         …
+𝑇𝑇 𝑛𝑛 = � 1 = log 2 𝑛𝑛          𝑇𝑇 𝑛𝑛 ∈ Θ log 𝑛𝑛                1
+          𝑖𝑖=1
+                                                          1
+                                                                               8
+Recursive Linear Search                                5    8   13   42   75   79    88   90       95   99
+                                                       0    1    2   3    4    5     6    7        8    9
+public static boolean linearSearch(List<Integer> lst, int k){
+        return linearSearch(lst, k, 0, lst.size());
+    }
+private static boolean linearSearch(List<Integer> lst, int k, int start, int end){
+    if(start == end){
+        return false;
+    } else if(lst.get(start) == k){
+        return true;
+    } else{
+        return linearSearch(lst, k, start+1, end);
+    }
+}
+
+
+                                                                                               9
+Prettier List Sum Substitution
+• Draw a picture of the recursion        𝑇𝑇 𝑛𝑛 = 𝑇𝑇 𝑛𝑛 − 1 + 1
+                                                           1
+• Identify the work done per stack frame           𝑛𝑛
+• Add up all the work!                                     1
+                                                𝑛𝑛 − 1
+                                                          1
+                                                 𝑛𝑛 − 2            𝑛𝑛 levels
+Running time: Θ(𝑛𝑛)                              𝑛𝑛 − 3
+                                                          1      of recursion
+
+              𝑛𝑛
+                                                   …
+                                                          1
+      𝑇𝑇 𝑛𝑛 = � 1 = 𝑛𝑛      𝑇𝑇 𝑛𝑛 ∈ Θ 𝑛𝑛           1
+             𝑖𝑖=1                                                      10
+Recursive List Summation Code
+public int sum(int[] list){
+    return sum_helper(list, 0, list.size);
+}
+private int sum_helper(int[] list, int low, int high){
+    if (low == high){ return 0; }
+    if (low == high-1){ return list[low]; }
+    int middle = (high+low)/2;
+    return sum_helper(list, low, middle) + sum_helper(list, middle, high);
+}
+
+
+
+
+                                                                             11
+       Tree Method for Recursive Summation
+   Red box represents a                                           𝑛𝑛
+     problem instance                                 𝑇𝑇 𝑛𝑛 = 2𝑇𝑇    +1
+ Blue value next to each
+                                                                  2
+box represents time spent                                     1
+  at that recursive call                             𝑛𝑛                                        ⇒ 2𝑖𝑖 work per level
+
+                                         1                                       1
+                            𝑛𝑛⁄2                                      𝑛𝑛⁄2
+
+                 𝑛𝑛⁄4       1
+                                    𝑛𝑛⁄4         1
+                                                          𝑛𝑛⁄4         1
+                                                                             𝑛𝑛⁄4        1   log 2 𝑛𝑛 levels
+                                                                                             of recursion
+                 …
+
+                                …
+
+
+                                                          …
+
+                                                                             …
+             1
+                  1
+                        1
+                            1
+                                1
+                                     1
+                                             …            1
+                                                                  1
+                                                                       1
+                                                                             1
+                                                                                 1
+                                                                                     1
+                                                                                                          log2 𝑛𝑛
+
+                                                                                                𝑇𝑇 𝑛𝑛 = � 2𝑖𝑖
+                                                                                                           𝑖𝑖=0     12
+Recursive List Summation – Solving the Series
+                         log2 𝑛𝑛     Remember the
+                𝑇𝑇 𝑛𝑛 = � 2𝑖𝑖        Math Identities Reference Sheet
+                                     (will be provided on exams)
+                          𝑖𝑖=0
+
+                 21+log2 𝑛𝑛 − 1
+               =
+                    2−1
+
+                = 2 ⋅ 2log2 𝑛𝑛 − 1
+
+                = 2𝑛𝑛 − 1 = Θ(𝑛𝑛)
+                                                                       13
+Tree Method Summary: Chip and Conquer
+• Recurrence looks like 𝑇𝑇 𝑛𝑛 = 𝑎𝑎𝑎𝑎 𝑛𝑛 − 𝑏𝑏 + 𝑓𝑓(𝑛𝑛)
+• Use the recurrence to draw a tree
+   • 𝑎𝑎 is the branching factor of the tree (e.g. if 𝑎𝑎 = 2 then it’s a binary tree)
+   • Subtract 𝑏𝑏 from the parent’s input size to get children’s input size
+   • Work done per node is given by applying 𝑓𝑓 𝑛𝑛 to that node’s input size
+                           𝑛𝑛
+   • Height of the tree is
+                             𝑏𝑏
+       • Because that is the number of times we must subtract 𝑏𝑏 until reaching a base case
+       • Answer to the question “how many times must we subtract 𝑏𝑏 until we reach 0?”
+           • Any base case is a constant, so to reach a larger value would just be a constant change
+• Use the tree to express running time as a series
+   • Adding work done for each node level-by-level
+   • Identify a pattern to express work done at level 𝑖𝑖 as a function of 𝑖𝑖
+                                       𝑛𝑛
+   • Write a series using 𝑖𝑖 = 0 up to
+                                            𝑏𝑏
+• Solve the series
+                                                                                                       14
+Tree Method Summary: Divide and Conquer
+                                                  𝑛𝑛
+• Recurrence looks like 𝑇𝑇 𝑛𝑛 = 𝑎𝑎𝑎𝑎                   + 𝑓𝑓(𝑛𝑛)
+                                                  𝑏𝑏
+• Use the recurrence to draw a tree
+   • 𝑎𝑎 is the branching factor of the tree (e.g. if 𝑎𝑎 = 2 then it’s a binary tree)
+   • Divide the parent’s input size by 𝑏𝑏 to get children’s input size
+   • Work done per node is given by applying 𝑓𝑓 𝑛𝑛 to that node’s input size
+   • Height of the tree is log 𝑏𝑏 𝑛𝑛
+       • Because that is the number of times we must divide by 𝑏𝑏 until reaching a base case
+       • Answer to the question “how many times must we divide by 𝑏𝑏 until we reach 1?”
+           • Any base case is a constant, so to reach a larger value would just be a constant change
+• Use the tree to express running time as a series
+   • Adding work done for each node level-by-level
+   • Identify a pattern to express work done at level 𝑖𝑖 as a function of 𝑖𝑖
+   • Write a series using 𝑖𝑖 = 0 up to log 𝑏𝑏 𝑛𝑛
+• Solve the series
+                                                                                                       15
+Let’s do some more!
+• For each, assume the base case is 𝑛𝑛 = 1 and 𝑇𝑇 1 = 1
+                𝑛𝑛
+• 𝑇𝑇 𝑛𝑛 = 2𝑇𝑇        + 𝑛𝑛
+                2
+                𝑛𝑛
+• 𝑇𝑇 𝑛𝑛 = 2𝑇𝑇        + 𝑛𝑛2
+                2
+                𝑛𝑛
+• 𝑇𝑇 𝑛𝑛 = 2𝑇𝑇        +1
+                8
+
+
+
+
+                                                          16
+                                                                                  𝑛𝑛
+       Tree Method 𝑇𝑇 𝑛𝑛 = 2𝑇𝑇                                                          + 𝑛𝑛
+                                                                                  2
+   Red box represents a
+    problem instance
+ Blue value next to each
+box represents time spent                                 𝑛𝑛
+                                                                   𝑛𝑛                                        ⇒ 𝑛𝑛 work per level
+  at that recursive call
+                                            𝑛𝑛                                         𝑛𝑛
+                               𝑛𝑛⁄2         2                               𝑛𝑛⁄2       2
+
+                              𝑛𝑛                     𝑛𝑛                      𝑛𝑛                  𝑛𝑛       log 2 𝑛𝑛 levels
+                 𝑛𝑛⁄4         4        𝑛𝑛⁄4          4         𝑛𝑛⁄4          4     𝑛𝑛⁄4          4        of recursion
+                 …
+
+                                   …
+
+
+                                                               …
+
+                                                                                   …
+                                                                                                                      log2 𝑛𝑛
+
+             1
+                  1
+                          1
+                               1
+                                   1
+                                        1
+                                                 …             1
+                                                                        1
+                                                                             1
+                                                                                   1
+                                                                                       1
+                                                                                             1               𝑇𝑇 𝑛𝑛 = � 𝑛𝑛
+                                                                                                                       𝑖𝑖=0
+
+                                                                                            𝑇𝑇 𝑛𝑛 ∈ Θ 𝑛𝑛𝑛𝑛𝑛𝑛𝑛𝑛𝑛𝑛            17
+                                                                           𝑛𝑛                 2
+        Tree Method 𝑇𝑇 𝑛𝑛 = 2𝑇𝑇                                                     + 𝑛𝑛
+                                                                           2
+   Red box represents a
+     problem instance
+                                                               𝑛𝑛2
+ Blue value next to each
+                                                      𝑛𝑛                                            ⇒ ? ? work per level
+box represents time spent
+  at that recursive call
+                                               𝑛𝑛2                                  𝑛𝑛2
+                                𝑛𝑛⁄2            4
+                                                                         𝑛𝑛⁄2
+                                                                                     4
+
+                                𝑛𝑛2                  𝑛𝑛2                  𝑛𝑛2                 𝑛𝑛2
+                                                                                                    log 2 𝑛𝑛 levels
+                     𝑛𝑛⁄4                 𝑛𝑛⁄4             𝑛𝑛⁄4                 𝑛𝑛⁄4                of recursion
+                                16                   16                   16                  16
+                     …
+
+                                      …
+
+
+                                                           …
+
+                                                                                …
+                 1
+                      1
+                            1
+                                 1
+                                      1
+                                           1
+                                                …          1
+                                                                     1
+                                                                          1
+                                                                                1
+                                                                                    1
+                                                                                          1
+                                                                                                              log2 𝑛𝑛
+
+                                                                                                     𝑇𝑇 𝑛𝑛 = � ? ?
+                                                                                                               𝑖𝑖=0
+                                                                                                                      18
+                      𝑛𝑛                  2
+Solving 𝑇𝑇 𝑛𝑛 = 2𝑇𝑇            + 𝑛𝑛
+                      2
+                           log2 𝑛𝑛
+                         𝑛𝑛2
+                𝑇𝑇 𝑛𝑛 = � 𝑖𝑖
+                          2                   Remember the
+                            𝑖𝑖=0
+                                              Math Identities Reference Sheet
+                       log2 𝑛𝑛                (will be provided on exams)
+                                         𝑖𝑖
+                                     1            ∑∞    𝑥𝑥 𝑖𝑖
+                                                                =
+                                                                   1
+                                                                       for |x| < 1
+                = 𝑛𝑛2 ⋅ �                          𝑖𝑖=0           1−𝑥𝑥
+                                     2
+                        𝑖𝑖=0
+
+                ≤ 𝑛𝑛2 ∗ 2 = Θ 𝑛𝑛2
+
+
+                                                                                19
+                                                                          𝑛𝑛
+      Tree Method 𝑇𝑇 𝑛𝑛 = 2𝑇𝑇                                                       +1
+                                                                          8
+   Red box represents a
+     problem instance
+ Blue value next to each
+box represents time spent                                    1
+  at that recursive call
+                                                    𝑛𝑛
+                                                                                                ⇒ 2𝑖𝑖 work per level
+                                        1                                       1
+                            𝑛𝑛⁄8                                     𝑛𝑛⁄8
+                            1                   1                     1                  1
+                                                                                             log 8 𝑛𝑛 levels
+                𝑛𝑛⁄64           𝑛𝑛⁄64                    𝑛𝑛⁄64              𝑛𝑛⁄64            of recursion
+                …
+
+                                …
+
+
+                                                         …
+
+                                                                            …
+                                                                                                               log8 𝑛𝑛
+
+            1
+                 1
+                      1
+                            1
+                                1
+                                    1
+                                            …            1
+                                                                 1
+                                                                      1
+                                                                            1
+                                                                                1
+                                                                                     1             𝑇𝑇 𝑛𝑛 = � 2𝑖𝑖
+                                                                                                                𝑖𝑖=0
+                                                                                                                   20
+                       𝑛𝑛
+Solving 𝑇𝑇 𝑛𝑛 = 2𝑇𝑇           +1
+                       8
+                            log8 𝑛𝑛
+
+                  𝑇𝑇 𝑛𝑛 = � 2𝑖𝑖
+                             𝑖𝑖=0
+
+                  21+log8 𝑛𝑛 − 1
+                =                       Remember the
+                     2−1                Math Identities Reference Sheet
+                                        (will be provided on exams)
+
+                 = 2 ⋅ 2log8 𝑛𝑛 − 1     𝑎𝑎log𝑏𝑏 𝑐𝑐 = 𝑐𝑐 log𝑏𝑏 𝑎𝑎
+
+                                    1
+              = 2𝑛𝑛log8 2 − 1 = Θ 𝑛𝑛3
+                                                                     21
+What matters, recursively
+                      𝑛𝑛
+• For 𝑇𝑇 𝑛𝑛 = 𝑎𝑎𝑎𝑎         + 𝑓𝑓(𝑛𝑛)
+                      𝑏𝑏
+   • The following are important for asymptotic behavior:
+      • The value of 𝑎𝑎
+      • The value of 𝑏𝑏
+      • Asymptotic behavior of 𝑓𝑓(𝑛𝑛)
+   • The following are not important for asymptotic behavior:
+      • Constants and non-dominant terms in 𝑓𝑓(𝑛𝑛)
+      • The base case
+
+
+
+
+                                                                22
+Really common recurrences
+Should know how to solve recurrences but also recognize some
+really common ones:
+ T(n) = O(1) + T(n/2)           logarithmic O(log n)
+ T(n) = O(1) + 2T(n/2)          linear      O(n)
+ T(n) = O(1) + T(n-1)           linear      O(n)
+ T(n) = O(n) + T(n-1)           quadratic   O(n2)
+ T(n) = O(1) + 2T(n-1)          exponential O(2n)
+ T(n) = O(n) + T(n/2)           linear       O(n)
+ T(n) = O(n) + 2T(n/2)          loglinear    O(n log n)
+
+                                                               23
+

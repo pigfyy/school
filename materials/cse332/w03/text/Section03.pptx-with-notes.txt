@@ -1,0 +1,912 @@
+--- slide 1 ---
+Recurrences
+CSE 332 - Section 3
+
+--- slide 2 ---
+Part 1: Recurrence Relations
+
+--- slide 3 ---
+Recurrence Relations Overview
+Describes the time complexity of recursive algorithms, often uses T(n)
+Same way that f(n) and g(n) described time complexity of non recursive algorithms last week
+Generally in the form:
+
+“Divide & Conquer”
+𝑇𝑛=𝑎𝑇𝑛𝑏+𝑓𝑛
+ 
+OR
+“Chip & Conquer”
+𝑇𝑛=𝑎𝑇𝑛−𝑏+𝑓𝑛
+
+--- slide 4 ---
+Recurrence Relations Examples
+𝑇𝑛=𝑎𝑇𝑛𝑏+𝑓𝑛
+ 
+OR
+𝑇𝑛=𝑎𝑇𝑛−𝑏+𝑓𝑛
+ 
+n = input size
+T(n) = runtime for input size n
+b = how input shrinks for next recursive call(s) (reduction factor/ constant)
+a = number of recursive calls made per function call (branching factor)
+
+bar(A, start, n) {
+    if (n-start <= 1) {
+        return 1;
+    }
+    return 2*bar(A, start, n/2);
+}
+a = 1
+b = 2
+
+foo(L) { // n = L.size
+    if (L.size <= 1) {
+        return 1;
+    }
+    L.remove(0); // n = n-1
+    return foo(L) + foo(L);
+}
+a = 2
+b = 1
+[notes]
+`
+
+--- slide 5 ---
+Problem 0a
+Find a recurrence T(n) modelling the worst-case runtime complexity of f(n)
+1  f(stack) {  // stack.size = n
+2    if (stack.size == 0) {
+3      return 0
+4    }
+5    stack.pop  // stack.size -- 
+6    return 2*f(stack)+1
+7  }
+𝑇𝑛=𝑐0                      𝑖𝑓 𝑛≤0𝑇𝑛−1+𝑐1   𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+ 
+When does the base case occur?
+What is the branching factor a?
+What is the reduction factor / constant b?
+What is the amount of non-recursive work f(n)?
+Recurrence relation forms:
+
+--- slide 6 ---
+Problem 0a
+Find a recurrence T(n) modelling the worst-case runtime complexity of f(n)
+1  f(stack) {  // stack.size = n
+2    if (stack.size == 0) {
+3      return 0
+4    }
+5    stack.pop  // stack.size -- 
+6    return 2*f(stack)+1
+7  }
+𝑇𝑛=𝑐0                      𝑖𝑓 𝑛≤0𝑇𝑛−1+𝑐1   𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+ 
+constant, which we can denote as c1
+Recurrence relation forms:
+ 
+
+b = 1 since we always reduce input size by 1
+a = 1 since we only make one recursive call
+n ≤ 0
+When does the base case occur?
+What is the branching factor a?
+What is the reduction factor / constant b?
+What is the amount of non-recursive work f(n)?
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 7 ---
+Problem 0b
+Find a recurrence T(n) modelling the worst-case runtime complexity of bar(n)
+1  bar(A, start, n) {
+2    if n ≤ 10000 {
+3      return 1000
+4    }
+5     if (bar(A, start, n/3) > 5) {
+6      for (int i=0; i<n; i++) {
+7       println("Yay")
+8     }
+9      return 5*bar(A, start, n/3)
+10   } else {
+11     for (int i=0; i<n*n; i++) {
+12       println("Yay")
+13     }
+14     return 4 * bar(A, start, n/3)
+15   }
+When does the base case occur?
+What is the branching factor a?
+What is the reduction factor /b?
+What is the amount of non-recursive work f(n)?
+n ≤ 10000
+a = 2
+b = 3
+c1*n + c2
+Recurrence relation forms:
+ 
+
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 8 ---
+Tree Method Overview
+
+--- slide 9 ---
+Big Idea: T(n/b)
+Red box represents a problem instance
+Blue value next to each box represents time spent at that recursive call
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+…
+…
+…
+…
+ 
+ 
+ 
+…
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+c
+ 
+ 
+ 
+ 
+ 
+…
+ 
+
+…
+…
+ 
+ 
+ 
+ 
+
+Asymptotically, these never matter!
+⟹𝑎𝑖𝑓(𝑛𝑏𝑖) work per level
+ 
+
+≈𝑙𝑜𝑔𝑏𝑛 levels
+ 
+ 
+𝑇(𝑛)=𝑖=0logb𝑛−1𝑎𝑖𝑓(𝑛𝑏𝑖)
+[notes]
+(might not go here): for teaching number of levels, I like to do the following…
+
+T(n)=aT(n/b)+f(n)
+From the tree: root is n
+Children are n/b
+Grandchildren are n/b^2
+At level i the size of the boxes is n/b^i
+
+We reach the base case when n/b^i = 1
+Solve for i to get the height of the tree
+
+General: find the patter for the size of the box per level, and then solve for which level gives the base case size
+
+--- slide 10 ---
+Big Idea: T(n-b)
+Red box represents a problem instance
+Blue value next to each box represents time spent at that recursive call
+n
+f(n)
+n - b
+n - b
+n - 2b
+n - 2b
+n - 2b
+n - 2b
+
+ 
+…
+…
+…
+…
+…
+x
+x
+x
+…
+x
+x
+f(n-b)
+f(n-b)
+f(n-2b)
+f(n-2b)
+f(n-2b)
+f(n-2b)
+c
+c
+c
+c
+c
+⟹ai f(n − bi) work per level
+ 
+
+≈𝑛𝑏 levels
+ 
+𝑇(𝑛)=𝑖=0𝑛𝑏−1𝑎𝑖𝑓(𝑛−𝑏𝑖)
+ 
+ 
+Asymptotically, these never matter!
+[notes]
+(might not go here): for teaching number of levels, I like to do the following…
+
+T(n)=aT(n/b)+f(n)
+From the tree: root is n
+Children are n/b
+Grandchildren are n/b^2
+At level i the size of the boxes is n/b^i
+
+We reach the base case when n/b^i = 1
+Solve for i to get the height of the tree
+
+General: find the patter for the size of the box per level, and then solve for which level gives the base case size
+
+--- slide 11 ---
+Tree Method 𝑇𝑛=2𝑇𝑛2+𝑛
+ 
+Red box represents a problem instance
+Blue value next to each box represents time spent at that recursive call
+𝑛
+ 
+𝑛2
+ 
+𝑛2
+ 
+𝑛4
+ 
+𝑛4
+ 
+𝑛4
+ 
+𝑛4
+ 
+…
+…
+…
+…
+1
+ 
+1
+ 
+1
+ 
+…
+1
+ 
+1
+ 
+1
+ 
+𝑛
+ 
+𝑛2
+ 
+𝑛2
+ 
+𝑛4
+ 
+𝑛4
+ 
+𝑛4
+ 
+𝑛4
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+1
+ 
+
+2i∗n2i= 𝑛 
+work per level 
+(root level is 0)
+ 
+log2⁡𝑛 levels
+of recursion
+ 
+𝑇𝑛=𝑖=0log2𝑛𝑛
+
+--- slide 12 ---
+Q1(a) Solving the Summation
+𝑇𝑛=𝑖=0𝑙𝑜𝑔(𝑛)−1𝑛
+ 
+=(log2𝑛−1)+1⋅𝑛
+ 
+=𝑛⋅log2(𝑛)
+ 
+∈Θ(𝑛𝑙𝑜𝑔𝑛)
+
+--- slide 13 ---
+Your Turn!
+Try problems 1b-1f
+
+--- slide 14 ---
+Q1(b) Base Case Doesn’t Matter!
+Red box represents a problem instance
+Blue value next to each box represents time spent at that recursive call
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+…
+…
+…
+…
+ 
+ 
+ 
+…
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+…
+…
+ 
+ 
+ 
+ 
+⟹2𝑖∗𝑛2𝑖=𝑛 work per level
+ 
+
+log2𝑛−2 levels of 
+recursion
+ 
+𝑇𝑛=𝑖=0log2𝑛−3𝑛
+ 
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 15 ---
+Q1(b) Solving the Summation
+𝑇𝑛=𝑖=0log2(𝑛)−3𝑛
+ 
+=log2(𝑛−3+1]⋅𝑛
+ 
+𝑛⋅log2𝑛−2𝑛
+ 
+∈Θ(𝑛𝑙𝑜𝑔𝑛)
+
+--- slide 16 ---
+Q1(c) Constants for f(n) Don’t Matter!
+Red box represents a problem instance
+Blue value next to each box represents time spent at that recursive call
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+…
+…
+…
+…
+ 
+ 
+ 
+…
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+…
+…
+ 
+ 
+ 
+ 
+⟹2𝑖∗100𝑛2𝑖=100𝑛 work per level
+ 
+
+log2𝑛 levels of 
+recursion
+ 
+𝑇𝑛=𝑖=0log2𝑛−1100𝑛
+ 
+style.visibilitystyle.visibilitystyle.visibility
+
+--- slide 17 ---
+Q(1c) Solving the Summation
+𝑇𝑛=𝑖=0log2𝑛−1100𝑛
+ 
+=log2(𝑛−1+1]⋅100𝑛
+ 
+100𝑛⋅log2𝑛
+ 
+∈Θ(𝑛𝑙𝑜𝑔𝑛)
+
+--- slide 18 ---
+Q1(d) Branching Factor (a) Matters!
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+…
+…
+…
+…
+ 
+ 
+ 
+…
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Red box represents a problem instance
+Blue value represents time spent at that recursive call
+ 
+ 
+ 
+ 
+ 
+ 
+
+…
+ 
+
+ 
+ 
+style.visibilitystyle.visibilitystyle.visibility
+
+--- slide 19 ---
+Q(1d) Solving the Summation
+ 
+ 
+can move the n using the constant multiple rule 
+ 
+ 
+ 
+multiplied by -2 and distributed our n
+ 
+ 
+ 
+=𝑛1 − 32log2𝑛1 − 32
+ 
+=𝑛1 −3log2𝑛𝑛− 12
+ 
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 20 ---
+Q1(e) Reduction Factor (/b) Does Matter!
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+…
+…
+…
+…
+ 
+ 
+ 
+…
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Red box represents a problem instance
+Blue value represents time spent at that recursive call
+…
+…
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 21 ---
+Q(1e) Solving the Summation
+ 
+ 
+can move the n using the constant multiple rule 
+This is a geometric series with a ratio < 1, so it converges to a constant!
+ 
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 22 ---
+Q1(f): Tree method
+ 
+n
+Work: 1
+ n-2 
+n-2 
+n-4
+n-4
+n-4
+n-4
+…
+…
+…
+…
+1
+1
+1
+…
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+≈ n/2 levels 
+
+⇒ 2i work per level
+
+ 
+#children
+#levels
+work
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 23 ---
+Q1(f): Solving the Summation
+ 
+
+ 
+ 
+ 
+Note: formula like this will be provided for exams
+
+--- slide 24 ---
+Reduction Constant (-b) Matters!
+
+ 
+ 
+1
+1
+Left/top represents -1 case
+Right/bottom represents -2 case
+n
+1
+n-1 or n-2 
+n-1 or n-2 
+n-2 or n-4
+n-2 or n-4
+n-2 or n-4
+n-2 or n-4
+…
+…
+…
+…
+1
+1
+1
+…
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+≈  n levels for -1
+≈  n/2 levels for -2
+
+⇒ 2i
+work per level for both cases
+
+ 
+ 
+Hint: Use the Finite Geometric Series (#7 on Math Identities) to solve these summations!
+
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 25 ---
+General Advice
+
+--- slide 26 ---
+Recursive Running Times - Guidance
+
+--- slide 27 ---
+
+
+--- slide 28 ---
+Draw a tree such that:
+Each node has a children
+The “size of each node is b less than the size of its parent
+The “work” for each node is f applied to its size
+The height of the tree is n/b
+Sum the tree horizontally
+I.e. identify the total work done at each level
+Sum the levels’ work vertically
+Given the sum of all work in the entire tree
+Only differences between divide and conquer cases highlighted in yellow
+
+--- slide 29 ---
+Putting it All Together
+
+--- slide 30 ---
+Problem 2(a)
+(a) Find a recurrence T(n) modeling the worst-case runtime complexity of f(n).
+1  f(L, start, n) {
+2    if (n - start <= 1) {
+3      return 0
+4    }
+5    int res = f(L, start, n/2) 
+6    for (int i=0; i<n; i++) {
+7      result *= 4
+8    }
+9    return res + f(L, start, n/2)
+10 }
+
+--- slide 31 ---
+Problem 2(a)
+(a) Find a recurrence T(n) modeling the worst-case runtime complexity of f(n).
+1  f(L, start, j) { //n = j - start
+2    if (j - start <= 1) {
+3      return 0
+4    }
+5    int res = f(L, start, j/2) 
+6    for (int i=0; i<j; i++) {
+7      result *= 4
+8    }
+9    return res + f(L, start, j/2)
+10 }
+2 function calls ->  a = 2 
+Reducing input size by half -> (n / 2)
+Non-recursive work has loop with n iterations and some constant work -> f(n) = c_2n + c_1 
+
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+ 
+style.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibilitystyle.visibility
+
+--- slide 32 ---
+Problem 2(b)
+(b) Find a closed form to your answer for (a).
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛/2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+
+--- slide 33 ---
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛/2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+
+--- slide 34 ---
+Our first call to T(n)
+
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛/2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+[notes]
+Each partial tree on the slide should be made a single group, explain in alt text the difference the previous slide’s partial tree
+From the previous tree, we add…. Because …
+
+--- slide 35 ---
+Our first call to T(n)
+Input:  n
+
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛/2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+
+--- slide 36 ---
+Our first call to T(n)
+Input:  n
+Work:  c2*n + c1
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛/2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+
+--- slide 37 ---
+Input: n/2
+
+Input:
+n/2
+
+“2T(...)” = 2 recursive calls 
+Input:  n
+Work:  c2*n + c1
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛/2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+
+--- slide 38 ---
+Input:  n/2
+
+Input:  n/2
+
+Input:  n
+Work:  c2*n + c1
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛/2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+
+--- slide 39 ---
+Input:  n/2
+Work:  c2*(n/2)+c1
+Input:  n/2
+Work:  c2*(n/2)+c1
+
+Input:  n
+Work:  c2*n + c1
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛/2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+
+--- slide 40 ---
+Input:  n/2
+Work:  c2*(n/2)+c1
+Input:  n/2
+Work:  c2*(n/2)+c1
+Input:  n/4
+
+Input:  n/4
+
+Input:  n/4
+
+Input:  n/4
+
+Input:  n
+Work:  c2*n + c1
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛/2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+
+--- slide 41 ---
+Input:  n/2
+Work:  c2*(n/2)+c1
+Input:  n/2
+Work:  c2*(n/2)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n
+Work:  c2*n + c1
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛/2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+
+--- slide 42 ---
+Input:  n/2
+Work:  c2*(n/2)+c1
+Input:  n/2
+Work:  c2*(n/2)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n
+Work:  c2*n + c1
+Input:  1
+
+Input:  1
+
+Input:  1
+
+Input:  1
+
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛/2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+
+--- slide 43 ---
+Input:  n/2
+Work:  c2*(n/2)+c1
+Input:  n/2
+Work:  c2*(n/2)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n
+Work:  c2*n + c1
+Input:  1
+Work: c0
+
+Input:  1
+Work: c0
+
+Input:  1
+Work: c0
+
+Input:  1
+Work: c0
+
+𝑇𝑛=𝑐0,&𝑛=12𝑇𝑛/2+𝑐2𝑛+𝑐1,&𝑜𝑡h𝑒𝑟𝑤𝑖𝑠𝑒
+
+--- slide 44 ---
+Input:  n/2
+Work:  c2*(n/2)+c1
+Input:  n/2
+Work:  c2*(n/2)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n/4
+Work:  c2*(n/4)+c1
+Input:  n
+Work:  c2*n + c1
+Input:  1
+Work: c0
+
+Input:  1
+Work: c0
+
+Input:  1
+Work: c0
+
+Input:  1
+Work: c0
+Since we’re in /b case:
+With a, b, and f(n) plugged in:
+𝑇𝑛=𝑖=0log𝑏𝑛−1𝑎𝑖𝑓𝑛𝑏𝑖
+ 
+𝑇𝑛=𝑖=0log2𝑛−12𝑖𝑐2𝑛2𝑖+𝑐1
+
+--- slide 45 ---
+Thank You!
+

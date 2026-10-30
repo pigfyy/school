@@ -1,0 +1,64 @@
+0. Recurrence Relations
+Find a recurrence T(n) modeling the worst-case runtime complexity of f(n)
+
+1  f(n) {
+2    if (n &lt;= 0) {
+3      return 1
+4    }
+5    return 2 * f(n - 1) + 1
+6  }
+
+Find a recurrence T(n) modeling the worst-case runtime complexity of bar(n)
+
+ 1 bar(A, start, n) {
+ 2   if (n &lt;= 10000) { 
+ 3     return 1000
+ 4   }
+ 5   if (bar(A, start, n/3) &gt; 5) {
+ 6     for (int i = 0; i &lt; n; i++) {
+ 7       println(&quot;Yay&quot;)
+ 8     }
+ 9     return 5 * bar(A, start, n/3)
+10   } else {
+11     for (int i = 0; i &lt; n * n; i++) {
+12       println(&quot;Yay&quot;)
+13     }
+14     return 4 * bar(A, start, n/3)
+15   }
+
+    
+Tree Method
+For each of the following recurrence relations, use the tree method to convert it to closed form:
+
+At each level the number of nodes in the tree will be triple the number of nodes at the previous level. If we consider the root to be at level 0 then the number of nodes on level i is 3i. Additionally, the size of each subproblem will be half that of its parent, and so the size of each node on level i is n2i, which means there is n2i non-recursive work. The total work done on level i is therefore 32in. Because there are log2n levels the solution is given by the sum
+ni=0log2n - 132i
+Applying the geometric series formula we get
+n1 - 32log2n1 - 32 = 2n 3log2n2log2n -1=2nnlog23n-1=2nlog23-2n
+This means that the solution is Θnlog23.
+
+At each level the number of nodes in the tree will be double the number of nodes at the previous level. If we consider the root to be at level 0, then the number of nodes on level i is 2i. Additionally, the size of each subproblem will be one third that of its parent, and so the size of each node on level i is n3i, which means there is n3i non-recursive work. The total work done on level i is therefore 23in.
+Because there are logn levels the solution is given by the sum
+i=0log3n - 123in = ni=0log3n - 123i=n*c
+Observe that this is a geometric series with a ratio less than 1, and so the sum is upper-bounded by a constant.
+
+This means that the solution is Θ(n).
+
+Each node will have two child nodes since there are two recursive calls from the recurrence relation. At each level, each node will have work of 1, so the total work per level is 2^i. The input size decreases by two for every recursive call and reaches the base case when the input is 1, so the total number of calls will be around n/2. Combining these information, we can conclude that T(n) = i = 0n/2 - 12i. Using the geometric serie sum, we can further simplify T(n) to 2n-1, which is in Θ(2n).
+
+2. Putting It All Together
+Consider the function fL, start, j. Find a recurrence modeling the worst-case runtime of this function and then find a Big-Oh bound for this recurrence.
+1  f(L, start, j) { // n = j - start2      if (j - start &lt;= 1) {3          return 04      }5      int result = f(L, start, j/2)6      for (int i = start; i &lt; j; i++) {7          result *= 48      }9      return result + f(L, start, j/2)10 }
+
+Find a recurrence Tn modeling the worst-case runtime complexity of fL, j where n = j - start
+
+We look at the three separate components (base case, non-recursive work, recursive work). The base case is a constant amount of work, because we only do a return statement. We’ll label it c0. The non-recursive work is a constant amount of work (we'll call it c1) for the assignments and if tests and a constant (we'll call c2) multiple of n for the loops. The recursive work is 2Tn2.
+
+Putting these together, we get:
+
+Tn=c0
+, if 1
+Tn=2Tn2+c2n+c1
+, otherwise
+
+Use your answer in part (a) to find a closed form for Tn
+

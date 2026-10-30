@@ -1,0 +1,67 @@
+0. Recurrence Relations
+Find a recurrence T(n) modeling the worst-case runtime complexity of f(n)
+
+1  f(stack) {  // stack.size = n
+2    if (stack.size == 0) {
+3      return 0
+4    }
+5    stack.pop  // stack.size -- 
+6    return 2*f(stack)+1
+7  }
+
+Find a recurrence T(n) modeling the worst-case runtime complexity of bar(n)
+
+1  bar(A, start, n) {
+2    if (n ≤ 10000) {
+3      return 1000
+4    }
+5    if (bar(A, start, n/3) &gt; 5) {
+6      for (int i=0; i&lt;n; i++) {
+7        println(&quot;Yay&quot;)
+8      }
+9      return 5 * bar(A, start, n/3)
+10   } else {
+11     for (int i=0; i&lt;n*n; i++) {
+12       println(&quot;Yay&quot;)
+13     }
+14     return 4 * bar(A, start, n/3)
+15   }
+
+Tree Method
+For each of the following recurrence relations, use the tree method to convert it to closed form:
+
+Work per level: 
+
+# levels:
+
+Closed form running time: 
+
+Work per level: 
+# levels:
+Closed form running time: 
+
+Work per level: 
+# levels:
+Closed form running time: 
+
+Work per level: 
+# levels:
+Closed form running time: 
+
+Work per level: 
+# levels:
+Closed form running time: 
+
+                       
+
+Work per level: 
+# levels:
+Closed form running time: 
+
+Putting It All Together
+Consider the function fL, start, j. Find a recurrence modeling the worst-case runtime of this function and then find a Big-Oh bound for this recurrence.
+1  f(L, start, j) { // n = j - start2      if (j - start &lt;= 1) {3          return 04      }5      int result = f(L, start, j/2)6      for (int i = start; i &lt; j; i++) {7          result *= 48      }9      return result + f(L, start, j/2)10 }
+Find a recurrence Tn modeling the worst-case runtime complexity of fL, 0, L.size() where n = j - start
+
+Use your answer in part (a) to find a closed form for Tn
+

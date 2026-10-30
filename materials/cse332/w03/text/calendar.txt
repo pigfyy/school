@@ -1,0 +1,377 @@
+CSE332 - Calendar
+
+        CSE 332 – Calendar
+
+                    Home
+
+          Syllabus
+
+          Calendar
+
+          Tasks
+
+          Exams
+
+          Summaries
+
+          Office Hours
+
+          Staff
+
+            This page is from a previous offering of the course. It has been left up for archival purposes.-->
+      This page is under construction. Any content you see now is subject to change until the first day of class. Expect some links to be broken until that time.-->
+      Looking for someone to talk to about CSE332? Try the Study Center in CSE room 006! There's a table there just for working on and discussing CSE332!-->
+      Course Calendar
+
+       x.setAttribute('open','open'))">
+       x.removeAttribute('open'))">
+
+      30 Sep
+
+      Courses begin
+
+      Intro; ADTs; Queues & Stacks
+      Weiss 3.1-3.7 and
+       slides(pptx) and
+       slides(pdf)
+
+      1 Oct
+
+      S1 Intros, Java Generics
+      slides(pptx) and
+       slides(pdf) and
+       worksheet and
+       solutions
+
+      2 Oct
+
+      Algorithm Analysis 1
+      Weiss 2.1-2.4, Math Review: Weiss 1.1-1.6 and
+       slides(pptx) and
+       slides(pdf)
+
+      3 Oct
+
+      4 Oct
+
+      5 Oct
+
+      Algorithm Analysis 2
+      Weiss 2.1-2.4, Math Review: Weiss 1.1-1.6 and
+       slides(pptx) and
+       slides(pdf) and
+       Math Identities
+
+      Prelim Survey
+
+      6 Oct
+
+      7 Oct
+
+      Priority Queues 1 (ADT)
+      Weiss 6.1-6.3 and
+       slides(pptx) and
+       slides(pdf)
+
+      8 Oct
+
+      S2 Algorithm Analysis
+      slides(pptx) and
+       slides(pdf) and
+       worksheet and
+       solutions
+
+      9 Oct
+
+      Priority Queues 2 (Binary Heap)
+      Weiss 6.4-6.5 and
+       slides(pptx) and
+       slides(pdf)
+
+      EX0 Generics
+
+      10 Oct
+
+      11 Oct
+
+      12 Oct
+
+      Recurrences
+      slides(pptx) and
+       slides(pdf)
+
+      EX1 Running Time
+
+      13 Oct
+
+      14 Oct
+
+      Dictionaries (ADT & Binary Search Trees)
+      Weiss 4.1-4.3, 4.6 and
+       slides(pptx) and
+       slides(pdf)
+
+      15 Oct
+
+      S3 Recurrences
+      slides(pptx) and
+       slides(pdf) and
+       worksheet and
+       solutions
+
+      16 Oct
+
+      Dictionaries (AVL Trees 1)
+      Weiss 4.4 and
+       slides(pptx) and
+       slides(pdf)
+
+      EX2 Heaps
+
+      17 Oct
+
+      18 Oct
+
+      19 Oct
+
+      Dictionaries (AVL Trees 2)
+      Weiss 4.4 and
+       slides(pptx) and
+       slides(pdf)
+
+      20 Oct
+
+      Week 3 Survey
+
+      21 Oct
+
+      Dictionaries (Hashing)
+      Weiss 5.1-5.5 and
+       slides(pptx) and
+       slides(pdf)
+
+      22 Oct
+
+      S4 AVL Trees
+      slides(pptx) and
+       slides(pdf) and
+       worksheet and
+       solutions
+
+      23 Oct
+
+      Dictionaries (Hashing 2)
+      Weiss 5.1-5.5 and
+       slides(pptx) and
+       slides(pdf)
+
+      EX3 Recurrences
+
+      24 Oct
+
+      25 Oct
+
+      26 Oct
+
+      Sorting 1
+      Weiss 7.1-7.3, 7.5-7.7 and
+       slides(pptx) and
+       slides(pdf)
+
+      27 Oct
+
+      28 Oct
+
+      Sorting 2
+      Weiss 7.8-7.11 and
+       slides(pptx) and
+       slides(pdf)
+
+      29 Oct
+
+      S5 Hashing and Sorting
+      Hashing(pptx) and
+       Hashing(pdf) and
+       Sorting(pptx) and
+       Sorting(pdf) and
+       Hashing worksheet and
+       Hashing Soln and
+       Sorting worksheet and
+       Sorting Soln
+
+      30 Oct
+
+      Graphs 1 (Intro to Graphs)
+      Weiss 9.1
+
+      EX4 AVL
+
+      31 Oct
+
+      1 Nov
+
+      2 Nov
+
+      Graphs 2 (Traversals)
+      Weiss 9.2
+
+      3 Nov
+
+      4 Nov
+
+      Graphs 3 (Shortest path)
+      Weiss 9.3
+
+      5 Nov
+
+      S6 Graphs
+
+      6 Nov
+
+      Midterm Review
+      EX5 Hashing
+
+      7 Nov
+
+      8 Nov
+
+      9 Nov
+
+      Midterm Exam
+
+      10 Nov
+
+      11 Nov
+
+      Veterans Day (no class)
+
+      12 Nov
+
+      S7 More Graphs
+
+      13 Nov
+
+      Graphs 4 (Minimum Spanning Trees)
+      Weiss 9.5
+
+      EX6 Sorting
+
+      14 Nov
+
+      15 Nov
+
+      16 Nov
+
+      Parallelism 1 (Fork-Join)
+      Grossman 2.1-3.4
+
+      EX7 Graph Traversals
+
+      17 Nov
+
+      18 Nov
+
+      Parallelism 2 (Parallel Prefix)
+      Grossman 5.1-5.2
+
+      19 Nov
+
+      S8 Writing parallel Programs
+
+      20 Nov
+
+      Parallelism 3 (Analysis & Amdahl's Law)
+      Grossman 3.5-4.3
+
+      EX8 Dijkstras
+
+      21 Nov
+
+      22 Nov
+
+      23 Nov
+
+      Synchronization 1 (Locks)
+      Grossman 6
+
+      EX9 MSTs
+
+      24 Nov
+
+      25 Nov
+
+      TBD
+
+      26 Nov
+
+      Thanksgiving Day (no class)
+
+      27 Nov
+
+      Native American Heritage Day (no class)
+
+      28 Nov
+
+      29 Nov
+
+      30 Nov
+
+      Synchronization 2 (Race Conditions)
+      Grossman 7.1
+
+      EX10 ForkJoin
+
+      1 Dec
+
+      2 Dec
+
+      Synchronization 3 (Deadlock & Wisdom)
+      Grossman 8 & 9
+
+      3 Dec
+
+      S9 Concurrency
+
+      4 Dec
+
+      P, NP, NP-Complete
+      Weiss 9.6.3 & 9.7
+
+      5 Dec
+
+      6 Dec
+
+      7 Dec
+
+      P, NP, NP-Complete 2
+      Weiss 9.6.3 & 9.7
+
+      EX11 Concurrency
+
+      8 Dec
+
+      9 Dec
+
+      B-Trees & Wrap Up
+      Weiss 4.7
+
+      10 Dec
+
+      S10 P/NP & Final Review
+
+      11 Dec
+
+      Courses end
+      Final Exam Review
+      EX12 P and NP
+
+      17 Dec
+
+      Final Exam
+
+       to your calender application of choice.-->
+
+          Copyright © 2026 Paul G. Allen School of Computer Science & Engineering, University of Washington. Site design by Nathan Brunelle.
+              Released under the  CC-BY-NC-SA 4.0 license.
+
+        Last updated 2026-10-29 18:38

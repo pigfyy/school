@@ -1,0 +1,144 @@
+{
+  "course": "CSE 332 Autumn 2026 (26au)",
+  "week": "Week 3: 2026-10-12 to 2026-10-16 (America/Los_Angeles)",
+  "extractedText": "text/: pdftotext -layout for every PDF (<name>.txt), slide text plus speaker notes for every deck (<name>.pptx-with-notes.txt), docx text, tag-stripped HTML. All raw files sit at the top of this folder; PDFs, decks and docx are git-ignored, so their sha256 here is the record.",
+  "fetchTimeSource": "fetchedAt = local time right after curl wrote the file",
+  "sources": [
+    {
+      "file": "cse332-26au-lec06-Recurrences.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec06-Recurrences.pdf",
+      "what": "Lecture 6 Recurrences slides (pdf)",
+      "fetchedAt": "2026-10-29T22:04:51-07:00",
+      "bytes": 361792,
+      "sha256": "b08241f6478392b465a16899ae7b0a76278edbfb4ed90f0936cb366f9d7e145a"
+    },
+    {
+      "file": "cse332-26au-lec06-Recurrences.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec06-Recurrences.pptx",
+      "what": "Lecture 6 Recurrences slides (pptx, with speaker notes)",
+      "fetchedAt": "2026-10-29T22:04:51-07:00",
+      "bytes": 819441,
+      "sha256": "555b6f916ec8e4534c0b0b8de2b6db4adf2caec306a7cd43ba5c0082054649f1"
+    },
+    {
+      "file": "cse332-26au-lec07-Dictionaries-BSTs.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec07-Dictionaries-BSTs.pdf",
+      "what": "Lecture 7 Dictionaries (ADT & BSTs) slides (pdf)",
+      "fetchedAt": "2026-10-29T22:04:51-07:00",
+      "bytes": 386031,
+      "sha256": "7fc3f32b6e40e9cdffac9779a6e758ccc91bdf707c1ca3b9d918b423dbd8d1a1"
+    },
+    {
+      "file": "cse332-26au-lec07-Dictionaries-BSTs.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec07-Dictionaries-BSTs.pptx",
+      "what": "Lecture 7 Dictionaries (ADT & BSTs) slides (pptx, with speaker notes)",
+      "fetchedAt": "2026-10-29T22:04:51-07:00",
+      "bytes": 252783,
+      "sha256": "da1bc0314bd433e8b32d9fe68713adfc3a6d930babb16d98555981faa2a812aa"
+    },
+    {
+      "file": "Section03.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section03.pdf",
+      "what": "Section 3 Recurrences slides (pdf)",
+      "fetchedAt": "2026-10-29T22:04:51-07:00",
+      "bytes": 1615116,
+      "sha256": "407d11799a0315cdbfd111ca727ecf44300abad38a1367e503721aec2fbf7707"
+    },
+    {
+      "file": "Section03.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section03.pptx",
+      "what": "Section 3 Recurrences slides (pptx)",
+      "fetchedAt": "2026-10-29T22:04:51-07:00",
+      "bytes": 10744631,
+      "sha256": "8ba079bd7c104af313c3890a92a2c69e89d43f76714bf2f9ffc4b1db63fe5881"
+    },
+    {
+      "file": "Section03-worksheet.docx",
+      "url": "https://docs.google.com/document/d/1GiXbGiS-lWsVSuOgOtOy0pDHRIUdaPEk/export?format=docx",
+      "what": "Section 3 worksheet (Google Doc linked from the calendar, exported as docx)",
+      "fetchedAt": "2026-10-29T22:04:52-07:00",
+      "bytes": 646007,
+      "sha256": "722e0a17ca282db729bcfa10e8d0114ef210be552a64e9f155694c1000881ef7"
+    },
+    {
+      "file": "Section03-solutions.docx",
+      "url": "https://docs.google.com/document/d/1AoXYuz7uZ0V_RBAjzwXxA3w7_fUi5LaB/export?format=docx",
+      "what": "Section 3 worksheet solutions (Google Doc linked from the calendar, exported as docx)",
+      "fetchedAt": "2026-10-29T22:04:53-07:00",
+      "bytes": 1366558,
+      "sha256": "90a0c0de980823bdcf6d74912163a28a03de1e3bcf1405d4c206a9f32f248408"
+    },
+    {
+      "file": "cse332-26au-lec08-AVL-1.pdf",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec08-AVL-1.pdf",
+      "what": "Lecture 8 AVL Trees 1 slides (pdf)",
+      "fetchedAt": "2026-10-29T22:04:53-07:00",
+      "bytes": 476505,
+      "sha256": "ede97ed682986291f05f6edcaacbdf617102ea6de083ea3a6924a3776fa37f5c"
+    },
+    {
+      "file": "cse332-26au-lec08-AVL-1.pptx",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec08-AVL-1.pptx",
+      "what": "Lecture 8 AVL Trees 1 slides (pptx, with speaker notes)",
+      "fetchedAt": "2026-10-29T22:04:53-07:00",
+      "bytes": 748629,
+      "sha256": "8dc824c0326b3a0fd62e5b73db7bd0eaf5fc32640a552f85a5bd674453acec41"
+    },
+    {
+      "file": "summary_recurrences.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries/recurrences.html",
+      "what": "Topic summary: Recurrences",
+      "fetchedAt": "2026-10-29T22:04:53-07:00",
+      "bytes": 73614,
+      "sha256": "b5267233ef30539a1fc652b851b32df88fb418ca54c3082737ba445d5d4caee4"
+    },
+    {
+      "file": "summary_avl.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/summaries/avl.html",
+      "what": "Topic summary: AVL Trees",
+      "fetchedAt": "2026-10-29T22:04:53-07:00",
+      "bytes": 64661,
+      "sha256": "cf2ad5584db2ac3593fbb1f3a68a5bc5b4b105db0b490802a4195cff000ed93b"
+    },
+    {
+      "file": "calendar.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/calendar.html",
+      "what": "Course calendar (last updated 2026-10-29 18:38)",
+      "fetchedAt": "2026-10-29T22:04:53-07:00",
+      "bytes": 38470,
+      "sha256": "055dcd54709c49cf4c26560b0aaf84ff16a34e7a55801eb1f1cdcfb3c98af570"
+    },
+    {
+      "file": "tasks.html",
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/tasks.html",
+      "what": "Tasks page (exercise objectives and due dates only; graded work not downloaded)",
+      "fetchedAt": "2026-10-29T22:04:53-07:00",
+      "bytes": 33696,
+      "sha256": "75cd4a2d6fc41fb4a992e07ab0a7e80563997be185b282c2b74899c68b0e0e65"
+    }
+  ],
+  "notPosted": [],
+  "notFetched": [
+    {
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-1",
+      "why": "EX1 Running Time (due Mon Oct 12, closes Wed Oct 14): graded work in Gradescope; due date only"
+    },
+    {
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/files/exercises/ex2.zip",
+      "why": "EX2 Heaps starter code (due Fri Oct 16): graded work, deliberately not downloaded"
+    },
+    {
+      "url": "https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-3",
+      "why": "EX3 Recurrences (due Fri Oct 23): graded work in Gradescope; due date only"
+    },
+    {
+      "url": "Canvas: Week 3 survey (due Tue Oct 20)",
+      "why": "Graded participation survey; due date only"
+    },
+    {
+      "url": "Weiss, Data Structures & Algorithm Analysis in Java, 4.1-4.4, 4.6",
+      "why": "Textbook not available; listed, not summarized"
+    }
+  ],
+  "pages": "site/cse332/w03/index.html: Lecture 6 (l6-write, l6-tree, l6-series, l6-practice, l6-quiz), Lecture 7 (l7-dict, l7-bst, l7-ops, l7-practice, l7-quiz), Section 3 (s3-recur, s3-practice, s3-quiz), Lecture 8 (l8-balance, l8-insert, l8-cases, l8-height, l8-practice, l8-quiz), readings, cheatsheet"
+}

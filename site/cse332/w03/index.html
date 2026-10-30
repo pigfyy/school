@@ -1,0 +1,1802 @@
+<!doctype html>
+<!--
+  CSE 332 (26au) · Week 3 (Mon Oct 12 – Fri Oct 16). Built with the course-teaching-site skill from week 2's shell.
+  Sources (materials/cse332/w03/): Lecture 6 Recurrences, Lecture 7 Dictionaries & BSTs, Section 3 Recurrences (slides,
+  worksheet and official solutions), Lecture 8 AVL Trees 1, the Recurrences and AVL topic summaries, calendar, tasks.
+  Graded work (EX1, EX2, EX3, the Week 3 survey) is listed by due date only.
+  Every stateful element has a stable data-id (problems: article.task, parts: .answer-spec[data-part], quick checks: .check,
+  quiz questions: li.cyu). Change the id when the question changes.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE 332 week 3</title>
+<link rel="stylesheet" href="../../core/fonts.css">
+<link rel="stylesheet" href="../../core/base.css">
+<link rel="stylesheet" href="../../core/katex/katex.min.css">
+<link rel="stylesheet" href="week.css">
+</head>
+<body data-course="cse332" data-week="w03">
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+
+<nav class="rail" aria-label="Week 3 modules">
+  <div class="rail-top">
+    <a class="brand" href="#home"><span class="brand-kicker">CSE 332 · week 3</span>Recurrences and search trees<small>Recurrences · dictionaries and BSTs · AVL trees 1</small></a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="rail-body">Menu</button>
+  </div>
+  <div class="rail-body" id="rail-body">
+    <div>
+      <h2>Lecture 6: Recurrences <span class="today" data-date="2026-10-12">Mon Oct 12</span></h2>
+      <ol class="modules">
+        <li><a href="#l6-write">Writing a recurrence</a></li>
+        <li><a href="#l6-tree">The tree method</a></li>
+        <li><a href="#l6-series">Solving the series</a></li>
+        <li><a href="#l6-practice">Practice</a></li>
+        <li><a href="#l6-quiz">Check your understanding</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 7: Dictionaries, BSTs <span class="today" data-date="2026-10-14">Wed Oct 14</span></h2>
+      <ol class="modules">
+        <li><a href="#l7-dict">The dictionary ADT</a></li>
+        <li><a href="#l7-bst">Trees, traversals, BSTs</a></li>
+        <li><a href="#l7-ops">Find, insert, delete</a></li>
+        <li><a href="#l7-practice">Practice</a></li>
+        <li><a href="#l7-quiz">Check your understanding</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Section 3: Recurrences <span class="today" data-date="2026-10-15">Thu Oct 15</span></h2>
+      <ol class="modules">
+        <li><a href="#s3-recur">The worksheet, worked</a></li>
+        <li><a href="#s3-practice">Practice</a></li>
+        <li><a href="#s3-quiz">Check your understanding</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Lecture 8: AVL Trees 1 <span class="today" data-date="2026-10-16">Fri Oct 16</span></h2>
+      <ol class="modules">
+        <li><a href="#l8-balance">What balanced means</a></li>
+        <li><a href="#l8-insert">Insert and rotate</a></li>
+        <li><a href="#l8-cases">The four cases</a></li>
+        <li><a href="#l8-height">Why it's log n</a></li>
+        <li><a href="#l8-practice">Practice</a></li>
+        <li><a href="#l8-quiz">Check your understanding</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Due</h2>
+      <ul class="later-list">
+        <li><span>Mon Oct 12 · EX1 Running Time</span><em>closes Wed Oct 14 · <a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-1" target="_blank" rel="noopener">tasks page</a></em></li>
+        <li><span>Fri Oct 16 · EX2 Heaps</span><em><a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-2" target="_blank" rel="noopener">tasks page</a></em></li>
+        <li><span>Tue Oct 20 · Week 3 survey</span><em>on Canvas</em></li>
+        <li><span>Fri Oct 23 · EX3 Recurrences</span><em><a href="https://courses.cs.washington.edu/courses/cse332/26au/tasks.html#exercise-3" target="_blank" rel="noopener">tasks page</a></em></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Reference</h2>
+      <ul class="plain-links">
+        <li><a href="#home">Week overview</a></li>
+        <li><a href="#readings">Readings</a></li>
+        <li><a href="#cheatsheet">Cheat sheet</a></li>
+      </ul>
+    </div>
+    <p class="rail-foot"><kbd>←</kbd> <kbd>→</kbd> modules · <kbd>N</kbd> next step · <kbd>H</kbd> next hint</p>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ================================================================ HOME -->
+<section class="page" id="home" data-title="Week overview">
+  <div class="hero">
+    <p class="kicker">Lecture 6 · <span data-date="2026-10-12" data-plain>Mon Oct 12</span></p>
+    <h1>Same tree, <em>three</em> answers</h1>
+    <p class="lede question">\(T(n) = 2T(n/2) + 1\), \(2T(n/2) + n\) and \(2T(n/2) + n^2\) all draw the same binary tree of calls. Why are they \(\Theta(n)\), \(\Theta(n\log n)\) and \(\Theta(n^2)\)?</p>
+    <div class="panel rt" id="rt-hero" data-presets="sum,nlogn,sq" data-n="16">
+      <p class="rt-head"></p>
+      <div class="controls rt-presets" role="group" aria-label="Recurrence"></div>
+      <div class="controls"><label>\(n\) = <select class="rt-n" aria-label="n"></select></label></div>
+      <div class="chart-box"><svg class="chart rt-svg" role="img" aria-label="Recursion tree"></svg></div>
+      <div class="table-wrap"><table class="plain num rt-table"></table></div>
+      <p class="out rt-out" role="status"></p>
+    </div>
+  </div>
+  <div class="prose">
+    <p>Look at the bars. With \(+1\) the work doubles on every level, so the leaves dominate and the total is about \(2n\). With \(+n\) every level does exactly \(n\) work, and there are \(\log_2 n + 1\) levels. With \(+n^2\) the work halves on every level, so the root dominates and the total is under \(2n^2\). That's the tree method: draw the calls, add up each level, then add up the levels.</p>
+  </div>
+
+  <h2>This week</h2>
+  <div class="week">
+    <a href="#l6-write" class="day"><strong>Mon, Oct 12</strong><span class="tag-today" data-date="2026-10-12">Today</span><span>Lecture 6: Recurrences</span><span>Recurrence relations for recursive code, the tree method, and summing the series.</span></a>
+    <a href="#l7-dict" class="day"><strong>Wed, Oct 14</strong><span class="tag-today" data-date="2026-10-14">Today</span><span>Lecture 7: Dictionaries (ADT &amp; BSTs)</span><span>The dictionary ADT, traversals, binary search trees: find, insert, delete. Weiss 4.1–4.3, 4.6.</span></a>
+    <a href="#s3-recur" class="day"><strong>Thu, Oct 15</strong><span class="tag-today" data-date="2026-10-15">Today</span><span>Section 3: Recurrences</span><span>Writing recurrences from code, then the tree method on six recurrences.</span></a>
+    <a href="#l8-balance" class="day"><strong>Fri, Oct 16</strong><span class="tag-today" data-date="2026-10-16">Today</span><span>Lecture 8: AVL Trees 1</span><span>The AVL balance rule, rotations, the four insert cases, and why the height is \(\Theta(\log n)\). Weiss 4.4.</span></a>
+  </div>
+
+  <h2>Due</h2>
+  <div class="table-wrap">
+  <table class="plain due">
+    <tr><th>Mon Oct 12</th><td>EX1 Running Time (Gradescope; closes Wed Oct 14)</td></tr>
+    <tr><th>Fri Oct 16</th><td>EX2 Heaps (programming, Gradescope)</td></tr>
+    <tr><th>Tue Oct 20</th><td>Week 3 survey (Canvas)</td></tr>
+    <tr><th>Fri Oct 23</th><td>EX3 Recurrences (Gradescope)</td></tr>
+    <tr><th>Mon Nov 9</th><td>Midterm, 5:00–6:00 pm</td></tr>
+  </table>
+  </div>
+  <p class="note">Exercises are graded work, so this site lists their dates only. Participating in section earns a late day (see the Ed post).</p>
+
+  <h2>How to use this site</h2>
+  <div class="prose">
+    <ul>
+      <li>Each lecture's pages follow its slides, end with a quick check, and finish with a practice page and a "Check your understanding" quiz. Section 3's practice page is the worksheet, checked against the official solutions.</li>
+      <li><strong>Teaching notes</strong> are the amber blocks: talking points, questions to ask and common mistakes.</li>
+      <li>Answer boxes take arithmetic like <code>2^10 - 1</code>, classes like <code>n log n</code> or <code>n^(1/3)</code>, and formulas in \(n\) and \(i\) like <code>3^i</code> or <code>(3/2)^i * n</code>. Key sequences (traversals) take keys separated by spaces or commas.</li>
+      <li>The three widgets run the lecture's own code: the recursion-tree explorer, the BST playground and the AVL insert stepper.</li>
+    </ul>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes: the week</summary>
+    <ul>
+      <li>Monday's tree method is the tool for EX3 (due Oct 23). Section 3 is all practice with it.</li>
+      <li>Wednesday starts dictionaries, which run through hashing in week 4. The BST's worst case, \(\Theta(n)\), motivates Friday's AVL trees.</li>
+      <li>Announcements on the slides: the midterm is Monday Nov 9, 5–6 pm; EX4 (AVL trees) comes next and is due Fri Oct 30.</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ================================================================ L6: WRITING A RECURRENCE -->
+<section class="page" id="l6-write" data-title="Writing a recurrence">
+  <p class="where">Lecture 6 · slides 3–11 · <span class="today-chip" data-date="2026-10-12">Mon Oct 12</span></p>
+  <h1>Writing a recurrence</h1>
+  <div class="rule">
+    <p><strong>Analyzing recursive code (slide 3).</strong> Pick a case (usually the worst). Count the operations in the recursive code and write a <em>recurrence relation</em> in terms of \(n\). Use the tree method to see the levels and the work on each. Turn that into a summation, then into a closed form.</p>
+  </div>
+  <div class="split">
+    <pre class="code"><span class="cm">// slide 4: recursive binary search</span>
+private static boolean binarySearch(
+    List&lt;Integer&gt; lst, int k, int start, int end){
+  if(start == end)
+    return false;
+  int mid = start + (end-start)/2;
+  if(lst.get(mid) == k){
+    return true;
+  } else if(lst.get(mid) &gt; k){
+    return binarySearch(lst, k, start, mid);
+  } else{
+    return binarySearch(lst, k, mid+1, end);
+  }
+}</pre>
+    <pre class="code"><span class="cm">// slide 9: recursive linear search</span>
+private static boolean linearSearch(
+    List&lt;Integer&gt; lst, int k, int start, int end){
+  if(start == end){
+    return false;
+  } else if(lst.get(start) == k){
+    return true;
+  } else{
+    return linearSearch(lst, k, start+1, end);
+  }
+}</pre>
+  </div>
+  <div class="rule">
+    <p><strong>The shape of a recursive function (slide 5).</strong> Do some non-recursive work, make one or more recursive calls on part of the input, maybe do more work. So</p>
+    <p>\[T(n) = T(p_1) + T(p_2) + \dots + T(p_x) + f(n).\]</p>
+    <p>Usually it's \(T(n) = a\cdot T\!\left(\frac nb\right) + f(n)\), called <strong>divide and conquer</strong>, or \(T(n) = T(n-c) + f(n)\), called <strong>chip and conquer</strong>.</p>
+  </div>
+  <div class="prose">
+    <p>Binary search does a constant amount of work and then one call on half the range: \(T(n) = 1 + T(n/2)\), with base case \(T(1) = 1\) (slide 6). Linear search does constant work and one call on one fewer item: \(T(n) = T(n-1) + 1\). The list summation on slide 11 makes <em>two</em> calls, each on half: \(T(n) = 2T(n/2) + 1\).</p>
+  </div>
+  <pre class="code"><span class="cm">// slide 11: recursive list summation</span>
+private int sum_helper(int[] list, int low, int high){
+  if (low == high){ return 0; }
+  if (low == high-1){ return list[low]; }
+  int middle = (high+low)/2;
+  return sum_helper(list, low, middle) + sum_helper(list, middle, high);
+}</pre>
+
+  <h2>Unroll it once (slide 7)</h2>
+  <div class="prose">
+    <p>\(T(n) = 1 + T(n/2) = 1 + 1 + T(n/4) = 1 + 1 + 1 + T(n/8) = \cdots\). Substitute until you reach \(T(1)\). That takes \(\log_2 n\) halvings, so \(T(n) = \sum_{i=1}^{\log_2 n} 1 = \log_2 n\) plus the base case's 1, which is \(\Theta(\log n)\).</p>
+  </div>
+
+  <div class="check" data-id="cse332-w3-l6-qc-sum-calls" data-grader="exact" data-answer="2" data-miscon='{"1":"missed-a-level"}'>
+    <p>Quick check: in \(T(n) = a\cdot T(n/b) + f(n)\) form, what is \(a\) for <code>sum_helper</code>?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l6-qc-linear-form">
+    <p>Quick check: which recurrence models <code>linearSearch</code> in the worst case?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w3-l6-qc-linear-form"> \(T(n) = T(n-1) + 1\): chip and conquer<span class="why" hidden>Right. One call on one fewer item, plus constant work.</span></label>
+      <label><input type="radio" name="cse332-w3-l6-qc-linear-form"> \(T(n) = T(n/2) + 1\)<span class="why" hidden>That's binary search. Linear search moves <code>start</code> forward by one, so the input shrinks by 1, not by half.</span></label>
+      <label><input type="radio" name="cse332-w3-l6-qc-linear-form"> \(T(n) = 2T(n/2) + 1\)<span class="why" hidden>That's the list summation: two calls on halves. Linear search makes one call.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Ask for three numbers before writing anything: how many recursive calls (\(a\)), how the input shrinks (\(/b\) or \(-c\)), and the work outside the calls (\(f(n)\)). Section 3 drills exactly this.</li>
+      <li>"Chip and conquer" chips one item (or \(c\) items) off; "divide and conquer" divides by \(b\). The tree method handles both.</li>
+      <li>The slide's sum \(\sum_{i=1}^{\log_2 n} 1 = \log_2 n\) leaves out the base case's 1. Running the recurrence gives \(T(1024) = 11\), not 10. Both are \(\Theta(\log n)\): base cases never change the class.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L6: TREE METHOD -->
+<section class="page" id="l6-tree" data-title="The tree method">
+  <p class="where">Lecture 6 · slides 8, 10, 12–15 · <span class="today-chip" data-date="2026-10-12">Mon Oct 12</span></p>
+  <h1>The tree method</h1>
+  <div class="prose">
+    <p>Draw one box per stack frame (the slides' red boxes) and write the work done in that frame next to it (the blue numbers). Add across each level, then add the levels. Pick any of the lecture's recurrences below and change \(n\): the table sums each level exactly and checks the total against the recurrence itself.</p>
+  </div>
+  <div class="panel rt" id="rt-lecture" data-presets="bsearch,lsearch,sum,nlogn,sq,eighth,exp" data-n="16">
+    <p class="rt-head"></p>
+    <div class="controls rt-presets" role="group" aria-label="Recurrence"></div>
+    <div class="controls"><label>\(n\) = <select class="rt-n" aria-label="n"></select></label></div>
+    <div class="chart-box"><svg class="chart rt-svg" role="img" aria-label="Recursion tree"></svg></div>
+    <div class="table-wrap"><table class="plain num rt-table"></table></div>
+    <p class="out rt-out" role="status"></p>
+  </div>
+
+  <div class="split">
+    <div class="rule">
+      <p><strong>Divide and conquer (slide 15):</strong> \(T(n) = aT(n/b) + f(n)\).</p>
+      <ul>
+        <li>\(a\) is the branching factor: each box has \(a\) children.</li>
+        <li>A child's size is its parent's size divided by \(b\). Level \(i\) has \(a^i\) boxes of size \(n/b^i\).</li>
+        <li>Each box does \(f(\text{its size})\) work, so level \(i\) does \(a^i f(n/b^i)\).</li>
+        <li>The height is \(\log_b n\): how many times you divide by \(b\) to reach 1.</li>
+      </ul>
+    </div>
+    <div class="rule">
+      <p><strong>Chip and conquer (slide 14):</strong> \(T(n) = aT(n-b) + f(n)\).</p>
+      <ul>
+        <li>Each box has \(a\) children.</li>
+        <li>A child's size is its parent's size minus \(b\). Level \(i\) has \(a^i\) boxes of size \(n - bi\).</li>
+        <li>Level \(i\) does \(a^i f(n - bi)\) work.</li>
+        <li>The height is \(n/b\): how many times you subtract \(b\) to reach 0.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="prose">
+    <p>Then write the series \(\sum_i (\text{work on level } i)\) from \(i = 0\) to the height, and solve it. Any base case is a constant, so stopping at a slightly larger size only changes constants.</p>
+    <p><strong>List summation (slides 12–13).</strong> \(T(n) = 2T(n/2) + 1\): level \(i\) has \(2^i\) boxes doing 1 each, so</p>
+    <p>\[T(n) = \sum_{i=0}^{\log_2 n} 2^i = \frac{2^{1+\log_2 n} - 1}{2 - 1} = 2\cdot 2^{\log_2 n} - 1 = 2n - 1 \in \Theta(n).\]</p>
+    <p>The last step uses the finite geometric series from the Math Identities sheet (it's provided on exams).</p>
+  </div>
+
+  <div class="check" data-id="cse332-w3-l6-qc-leaves-16" data-grader="exact" data-answer="16" data-miscon='{"8":"missed-a-level","4":"missed-a-level"}'>
+    <p>Quick check: for \(T(n) = 2T(n/2) + 1\) with \(n = 16\), how many boxes are on the bottom level?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l6-qc-sum-16" data-grader="exact" data-answer="31" data-miscon='{"16":"leaves-only","15":"leaves-only","32":"missed-a-level"}'>
+    <p>Quick check: same recurrence, \(T(1) = 1\), \(n = 16\). What is the total work \(T(16)\)?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Have students fill in one row of the table by hand before using the widget: boxes on the level, size of each, work in each, product. The product is the only thing that goes into the sum.</li>
+      <li>Off-by-one on the number of levels is the usual slip. With base case \(n = 1\), sizes \(n, n/2, \dots, 1\) give \(\log_2 n + 1\) levels, which is why the sum runs from \(i = 0\) to \(\log_2 n\). It never changes the \(\Theta\).</li>
+      <li>Linear search's tree is a path of \(n\) boxes; binary search's is a path of \(\log_2 n + 1\). One child per box means no doubling.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L6: SOLVING THE SERIES -->
+<section class="page" id="l6-series" data-title="Solving the series">
+  <p class="where">Lecture 6 · slides 16–23 · <span class="today-chip" data-date="2026-10-12">Mon Oct 12</span></p>
+  <h1>Solving the series</h1>
+  <div class="prose"><p>Slide 16 gives three more, each with base case \(T(1) = 1\). Try each one in the explorer on the previous page.</p></div>
+
+  <h2>\(T(n) = 2T(n/2) + n\) (slide 17)</h2>
+  <div class="prose">
+    <p>Level \(i\) has \(2^i\) boxes of size \(n/2^i\), each doing \(n/2^i\) work, so every level does \(2^i\cdot\frac{n}{2^i} = n\). There are \(\log_2 n\) levels above the leaves:</p>
+    <p>\[T(n) = \sum_{i=0}^{\log_2 n} n \in \Theta(n\log n).\]</p>
+  </div>
+
+  <h2>\(T(n) = 2T(n/2) + n^2\) (slides 18–19)</h2>
+  <div class="prose">
+    <p>A box of size \(n/2^i\) does \(\left(\frac{n}{2^i}\right)^2 = \frac{n^2}{4^i}\) work, and there are \(2^i\) of them, so level \(i\) does \(\frac{n^2}{2^i}\). The work <em>shrinks</em> as you go down:</p>
+    <p>\[T(n) = \sum_{i=0}^{\log_2 n} \frac{n^2}{2^i} = n^2\sum_{i=0}^{\log_2 n} \left(\tfrac12\right)^i \le n^2\cdot 2 \in \Theta(n^2),\]</p>
+    <p>using \(\sum_{i=0}^{\infty} x^i = \frac{1}{1-x}\) for \(|x| &lt; 1\). The root's \(n^2\) is already a lower bound, so it's \(\Theta(n^2)\).</p>
+  </div>
+
+  <h2>\(T(n) = 2T(n/8) + 1\) (slides 20–21)</h2>
+  <div class="prose">
+    <p>Level \(i\) has \(2^i\) boxes doing 1 each. Dividing by 8 reaches 1 after \(\log_8 n\) levels:</p>
+    <p>\[T(n) = \sum_{i=0}^{\log_8 n} 2^i = \frac{2^{1+\log_8 n} - 1}{2-1} = 2\cdot 2^{\log_8 n} - 1 = 2n^{\log_8 2} - 1 \in \Theta(n^{1/3}),\]</p>
+    <p>using \(a^{\log_b c} = c^{\log_b a}\): \(2^{\log_8 n} = n^{\log_8 2} = n^{1/3}\).</p>
+  </div>
+
+  <h2>What matters, recursively (slide 22)</h2>
+  <div class="rule">
+    <p>For \(T(n) = aT(n/b) + f(n)\), the asymptotic answer depends on <strong>\(a\)</strong>, <strong>\(b\)</strong> and the <strong>asymptotic behavior of \(f(n)\)</strong>. It does not depend on the constants and non-dominant terms in \(f(n)\), or on the base case.</p>
+  </div>
+  <h2>Really common recurrences (slide 23)</h2>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Recurrence</th><th></th><th>Closed form</th></tr>
+    <tr><td>\(T(n) = O(1) + T(n/2)\)</td><td>logarithmic</td><td>\(O(\log n)\)</td></tr>
+    <tr><td>\(T(n) = O(1) + 2T(n/2)\)</td><td>linear</td><td>\(O(n)\)</td></tr>
+    <tr><td>\(T(n) = O(1) + T(n-1)\)</td><td>linear</td><td>\(O(n)\)</td></tr>
+    <tr><td>\(T(n) = O(n) + T(n-1)\)</td><td>quadratic</td><td>\(O(n^2)\)</td></tr>
+    <tr><td>\(T(n) = O(1) + 2T(n-1)\)</td><td>exponential</td><td>\(O(2^n)\)</td></tr>
+    <tr><td>\(T(n) = O(n) + T(n/2)\)</td><td>linear</td><td>\(O(n)\)</td></tr>
+    <tr><td>\(T(n) = O(n) + 2T(n/2)\)</td><td>loglinear</td><td>\(O(n\log n)\)</td></tr>
+  </table>
+  </div>
+
+  <div class="check" data-id="cse332-w3-l6-qc-eighth-class" data-grader="bigo" data-answer="n^(1/3)">
+    <p>Quick check: give the \(\Theta\) class of \(T(n) = 2T(n/8) + 1\). (Type a power like <code>n^(1/2)</code>.)</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l6-qc-what-matters">
+    <p>Quick check: in \(T(n) = 2T(n/2) + n\), which change can change the \(\Theta\) class?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w3-l6-qc-what-matters"> Base case \(T(1) = 5\) instead of 1<span class="why" hidden>The base case only changes constants (slide 22).</span></label>
+      <label><input type="radio" name="cse332-w3-l6-qc-what-matters"> \(f(n) = 3n + 7\) instead of \(n\)<span class="why" hidden>Constants and non-dominant terms of \(f\) don't matter. It's still \(\Theta(n\log n)\).</span></label>
+      <label data-correct><input type="radio" name="cse332-w3-l6-qc-what-matters"> Three recursive calls instead of two<span class="why" hidden>Right: \(a\) matters. \(3T(n/2) + n\) is \(\Theta(n^{\log_2 3})\), Section 3's problem 1d.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The pattern to point out: if the level work grows going down, the leaves win; if it's the same on every level, multiply by the number of levels; if it shrinks, the root wins. The hero on the overview page shows all three side by side.</li>
+      <li>Slide 18 leaves "?? work per level" blank. Ask the room for it. The usual wrong answer is \(\frac{n^2}{4^i}\), which is the work in <em>one</em> box.</li>
+      <li>Students should recognize the slide-23 table on sight, but be able to derive any line with the tree method.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L6: PRACTICE -->
+<section class="page" id="l6-practice" data-title="Lecture 6: practice">
+  <p class="where">Lecture 6 · <span class="today-chip" data-date="2026-10-12">Mon Oct 12</span> · practice</p>
+  <h1>Lecture 6: practice</h1>
+  <div class="prose"><p>Six problems built from the lecture's own recurrences (slides 4–23). Every number was computed by evaluating the recurrence exactly (see <code>checks/cse332/w03/verify.mjs</code>). Formula boxes take expressions in \(n\) and \(i\), like <code>2^i</code> or <code>n^2/2^i</code>.</p></div>
+
+  <article class="task" data-id="cse332-w3-l6-bsearch">
+    <h2>1. Recursive binary search</h2>
+    <p class="prompt">Slide 6 models <code>binarySearch</code> by \(T(n) = 1 + T(n/2)\) with \(T(1) = 1\).</p>
+    <div class="answer-spec" data-part="a" data-grader="exact" data-answer="1" data-label="branching factor \(a\)"></div>
+    <div class="answer-spec" data-part="t1024" data-grader="exact" data-answer="11" data-miscon='{"10":"forgot-base-level","1024":"linear-count","512":"linear-count"}' data-label="\(T(1024)\)"></div>
+    <div class="answer-spec" data-part="class" data-grader="bigo" data-answer="log n" data-label="\(\Theta\) class"></div>
+    <ol class="hints">
+      <li>Unroll: \(T(n) = 1 + T(n/2) = 2 + T(n/4) = \cdots\). How many 1s pile up before you reach \(T(1)\)?</li>
+      <li>\(1024 = 2^{10}\). Ten halvings get you to \(T(1)\), and \(T(1)\) itself is 1.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Each call makes one recursive call, so \(a = 1\).</li>
+      <li>\(T(1024) = 1 + T(512) = 2 + T(256) = \dots = 10 + T(1) = 11\).</li>
+      <li>In general \(T(n) = \log_2 n + 1\).</li>
+      <li class="answer">\(a = 1\); \(T(1024) = 11\); \(\Theta(\log n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l6-sum">
+    <h2>2. The list-summation tree</h2>
+    <p class="prompt">Slide 12: \(T(n) = 2T(n/2) + 1\), \(T(1) = 1\). Level 0 is the root.</p>
+    <div class="answer-spec" data-part="nodes" data-grader="formula" data-answer="2^i" data-points='{"i":["0","1","2","5"]}' data-label="boxes on level \(i\) (in terms of \(i\))"></div>
+    <div class="answer-spec" data-part="t16" data-grader="exact" data-answer="31" data-miscon='{"16":"leaves-only","15":"leaves-only"}' data-label="\(T(16)\)"></div>
+    <div class="answer-spec" data-part="class" data-grader="bigo" data-answer="n" data-label="\(\Theta\) class"></div>
+    <ol class="hints">
+      <li>Every box has 2 children. How many boxes does level 1 have? Level 2?</li>
+      <li>For \(n = 16\) the levels have 1, 2, 4, 8 and 16 boxes, each doing 1.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Level \(i\) has \(2^i\) boxes, each doing 1 unit of work.</li>
+      <li>\(n = 16\): \(1 + 2 + 4 + 8 + 16 = 31\). The formula is \(2n - 1\).</li>
+      <li>\(\sum_{i=0}^{\log_2 n} 2^i = 2n - 1 \in \Theta(n)\).</li>
+      <li class="answer">\(2^i\); 31; \(\Theta(n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l6-square">
+    <h2>3. \(T(n) = 2T(n/2) + n^2\)</h2>
+    <p class="prompt">Slides 18–19, with \(T(1) = 1\). Count level work above the leaves.</p>
+    <div class="answer-spec" data-part="level" data-grader="formula" data-answer="n^2/2^i" data-points='{"n":["64","1024"],"i":["0","1","3"]}' data-miscon='{"n^2/4^i":"per-node-not-level","n^2":"used-n-not-size"}' data-label="work on level \(i\) (in \(n\) and \(i\))"></div>
+    <div class="answer-spec" data-part="t8" data-grader="exact" data-answer="120" data-label="\(T(8)\)"></div>
+    <div class="answer-spec" data-part="class" data-grader="bigo" data-answer="n^2" data-label="\(\Theta\) class"></div>
+    <ol class="hints">
+      <li>A box on level \(i\) has size \(n/2^i\), so it does \((n/2^i)^2\). How many such boxes are there?</li>
+      <li>For \(T(8)\), build up: \(T(2) = 2\cdot1 + 4\), then \(T(4)\), then \(T(8)\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Each box: \(\frac{n^2}{4^i}\). Boxes: \(2^i\). Level total: \(\frac{n^2}{2^i}\).</li>
+      <li>\(T(2) = 2 + 4 = 6\), \(T(4) = 12 + 16 = 28\), \(T(8) = 56 + 64 = 120\). (Check: \(2n^2 - n = 128 - 8 = 120\).)</li>
+      <li>\(n^2\sum_i (1/2)^i \le 2n^2\), and the root alone does \(n^2\).</li>
+      <li class="answer">\(\frac{n^2}{2^i}\); 120; \(\Theta(n^2)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l6-eighth">
+    <h2>4. \(T(n) = 2T(n/8) + 1\)</h2>
+    <p class="prompt">Slides 20–21, with \(T(1) = 1\). Take \(n = 512\).</p>
+    <div class="answer-spec" data-part="levels" data-grader="exact" data-answer="4" data-miscon='{"3":"missed-a-level","9":"log2-not-log8","10":"log2-not-log8"}' data-label="number of levels, counting the leaves"></div>
+    <div class="answer-spec" data-part="t512" data-grader="exact" data-answer="15" data-label="\(T(512)\)"></div>
+    <div class="answer-spec" data-part="class" data-grader="bigo" data-answer="n^(1/3)" data-label="\(\Theta\) class"></div>
+    <ol class="hints">
+      <li>Sizes go 512, 64, 8, 1. That's the number of levels.</li>
+      <li>Level \(i\) has \(2^i\) boxes doing 1 each. And \(2^{\log_8 n} = n^{\log_8 2}\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>512, 64, 8, 1: four levels, \(i = 0\) to \(\log_8 512 = 3\).</li>
+      <li>\(T(512) = 1 + 2 + 4 + 8 = 15 = 2\cdot 512^{1/3} - 1\).</li>
+      <li class="answer">4 levels; 15; \(\Theta(n^{1/3})\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l6-common">
+    <h2>5. Recognize the common ones</h2>
+    <p class="prompt">From slide 23. Give the closed form of each.</p>
+    <div class="answer-spec" data-part="exp" data-grader="bigo" data-answer="2^n" data-label="\(T(n) = O(1) + 2T(n-1)\)"></div>
+    <div class="answer-spec" data-part="quad" data-grader="bigo" data-answer="n^2" data-label="\(T(n) = O(n) + T(n-1)\)"></div>
+    <div class="answer-spec" data-part="halfn" data-grader="bigo" data-answer="n" data-label="\(T(n) = O(n) + T(n/2)\)"></div>
+    <div class="answer-spec" data-part="loglin" data-grader="bigo" data-answer="n log n" data-label="\(T(n) = O(n) + 2T(n/2)\)"></div>
+    <ol class="hints">
+      <li>Draw two levels of each tree. Is the level work growing, flat or shrinking?</li>
+      <li>\(O(n) + T(n/2)\): \(n + n/2 + n/4 + \cdots\). \(O(n) + T(n-1)\): \(n + (n-1) + \cdots + 1\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(2T(n-1) + 1\): level \(i\) has \(2^i\) boxes, and there are \(n\) levels: \(\sum 2^i = 2^n - 1\).</li>
+      <li>\(T(n-1) + n\): one box per level, sizes \(n, n-1, \dots, 1\): \(\frac{n(n+1)}{2}\).</li>
+      <li>\(T(n/2) + n\): \(n(1 + \frac12 + \frac14 + \cdots) \le 2n\).</li>
+      <li>\(2T(n/2) + n\): \(n\) per level, \(\log_2 n\) levels.</li>
+      <li class="answer">\(\Theta(2^n)\); \(\Theta(n^2)\); \(\Theta(n)\); \(\Theta(n\log n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l6-what-matters">
+    <h2>6. What changes the answer?</h2>
+    <p class="prompt">Start from \(T(n) = 2T(n/2) + n\), \(T(1) = 1\), which is \(\Theta(n\log n)\). Does each change give a different \(\Theta\) class?</p>
+    <div class="answer-spec" data-part="base" data-grader="yesno" data-answer="no" data-label="\(T(1) = 1000\)"></div>
+    <div class="answer-spec" data-part="f" data-grader="yesno" data-answer="no" data-label="\(f(n) = 5n + 20\)"></div>
+    <div class="answer-spec" data-part="a" data-grader="yesno" data-answer="yes" data-label="\(4T(n/2) + n\)"></div>
+    <div class="answer-spec" data-part="b" data-grader="yesno" data-answer="yes" data-label="\(2T(n/4) + n\)"></div>
+    <ol class="hints">
+      <li>Slide 22 lists what matters: \(a\), \(b\) and the asymptotic behavior of \(f\).</li>
+      <li>For the last two, find the level-\(i\) work: \(4^i\cdot\frac{n}{2^i}\) and \(2^i\cdot\frac{n}{4^i}\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The base case and the constants in \(f\) only scale things: still \(\Theta(n\log n)\).</li>
+      <li>\(4T(n/2) + n\): level \(i\) does \(2^i n\), growing, so the leaves win: \(\Theta(n^2)\).</li>
+      <li>\(2T(n/4) + n\): level \(i\) does \(\frac{n}{2^i}\), shrinking, so the root wins: \(\Theta(n)\).</li>
+      <li class="answer">no; no; yes; yes.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Section 3's problems 1b–1e are this same experiment, one change at a time.</li></ul>
+    </details>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L6: QUIZ -->
+<section class="page" id="l6-quiz" data-title="Check your understanding: recurrences">
+  <p class="where">Lecture 6 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: recurrences</h1>
+  <div class="prose"><p>Ten questions on Lecture 6. Answer without looking back. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="l6" role="status"></div>
+  <ol class="cyu-list" data-quiz="l6">
+    <li class="cyu" data-id="cse332-w3-l6-cyu-chip" data-kind="mc" data-topic="l6-write">
+      <p class="q">Which recurrence is "chip and conquer"?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-l6-cyu-chip"> \(T(n) = 2T(n/2) + n\)<span class="why" hidden>That divides the input: divide and conquer.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-l6-cyu-chip"> \(T(n) = T(n-1) + n\)<span class="why" hidden>Correct. It chips one item off each time.</span></label>
+        <label><input type="radio" name="cse332-w3-l6-cyu-chip"> \(T(n) = T(n/2) + 1\)<span class="why" hidden>That halves the input: divide and conquer.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l6-cyu-halving" data-kind="bigo" data-answer="log n" data-topic="l6-write">
+      <p class="q">\(T(n) = T(n/2) + 1\). Give its \(\Theta\) class.</p>
+      <p class="why" hidden>One box per level, \(\log_2 n + 1\) levels, 1 each: \(\Theta(\log n)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l6-cyu-nlogn" data-kind="bigo" data-answer="n log n" data-topic="l6-series">
+      <p class="q">\(T(n) = 2T(n/2) + n\). Give its \(\Theta\) class.</p>
+      <p class="why" hidden>Every level does \(n\) work, and there are about \(\log_2 n\) levels.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l6-cyu-t8" data-kind="num" data-answer="32" data-topic="l6-tree" data-miscon='{"24":"leaves-only"}'>
+      <p class="q">\(T(n) = 2T(n/2) + n\), \(T(1) = 1\). What is \(T(8)\)?</p>
+      <p class="why" hidden>Levels: 8, 8, 8, then 8 leaves doing 1 each: \(8 + 8 + 8 + 8 = 32\). Or build up: \(T(2) = 4\), \(T(4) = 12\), \(T(8) = 32\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l6-cyu-quadratic" data-kind="bigo" data-answer="n^2" data-topic="l6-series">
+      <p class="q">\(T(n) = T(n-1) + n\). Give its \(\Theta\) class.</p>
+      <p class="why" hidden>\(n + (n-1) + \cdots + 1 = \frac{n(n+1)}{2} \in \Theta(n^2)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l6-cyu-height" data-kind="mc" data-topic="l6-tree">
+      <p class="q">How tall is the tree for \(T(n) = aT(n/b) + f(n)\)?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-l6-cyu-height"> \(\log_a n\)<span class="why" hidden>\(a\) is how many children each box has. It doesn't change how fast the size shrinks.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-l6-cyu-height"> \(\log_b n\)<span class="why" hidden>Correct: the number of times you divide \(n\) by \(b\) to reach 1.</span></label>
+        <label><input type="radio" name="cse332-w3-l6-cyu-height"> \(n/b\)<span class="why" hidden>That's the height for chip and conquer, \(T(n-b)\).</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l6-cyu-square" data-kind="bigo" data-answer="n^2" data-topic="l6-series">
+      <p class="q">\(T(n) = 2T(n/2) + n^2\). Give its \(\Theta\) class.</p>
+      <p class="why" hidden>Level \(i\) does \(n^2/2^i\): a geometric series with ratio \(\frac12\), at most \(2n^2\). The root dominates.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l6-cyu-doesnt-matter" data-kind="mc" data-topic="l6-series">
+      <p class="q">Which of these never changes the \(\Theta\) class of \(T(n) = aT(n/b) + f(n)\)?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-l6-cyu-doesnt-matter"> The value of \(b\)<span class="why" hidden>\(b\) sets the height and the sizes. It matters.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-l6-cyu-doesnt-matter"> The base case value<span class="why" hidden>Correct (slide 22). The base case is a constant.</span></label>
+        <label><input type="radio" name="cse332-w3-l6-cyu-doesnt-matter"> Whether \(f(n)\) is \(n\) or \(n^2\)<span class="why" hidden>The asymptotic behavior of \(f\) matters: \(2T(n/2) + n\) and \(2T(n/2) + n^2\) differ.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l6-cyu-level3" data-kind="num" data-answer="27" data-topic="l6-tree" data-miscon='{"8":"missed-a-level","9":"missed-a-level"}'>
+      <p class="q">In the tree for \(T(n) = 3T(n/2) + n\), how many boxes are on level 3 (the root is level 0)?</p>
+      <p class="why" hidden>Each box has 3 children: \(3^3 = 27\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l6-cyu-exponential" data-kind="bigo" data-answer="2^n" data-topic="l6-series">
+      <p class="q">\(T(n) = 2T(n-1) + 1\). Give its \(\Theta\) class.</p>
+      <p class="why" hidden>\(n\) levels, level \(i\) has \(2^i\) boxes: \(\sum_{i=0}^{n-1} 2^i = 2^n - 1\).</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="l6" role="status"></div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul><li>Questions 3, 5 and 7 are the same tree method with different \(f\). If someone misses one, ask them to say the work on level \(i\) out loud.</li></ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L7: DICTIONARY ADT -->
+<section class="page" id="l7-dict" data-title="The dictionary ADT">
+  <p class="where">Lecture 7 · slides 3–8 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span> · Weiss 4.1–4.3, 4.6</p>
+  <h1>The dictionary ADT</h1>
+  <div class="rule">
+    <p><strong>Dictionary (Map) ADT.</strong> A set of key + value pairs. Keys are unique (always) and comparable (for many implementations).</p>
+    <p><code>insert(key, value)</code> adds the pair; if the key already has a value, it overwrites it, so keys can't repeat. <code>find(key)</code> returns the key's value. <code>delete(key)</code> removes the key and its value.</p>
+  </div>
+  <div class="prose"><p>Uses (slide 4): router tables, page tables, compilers' symbol tables, databases, inverted indexes, genome maps. Any time you store information by a key and want it back fast.</p></div>
+
+  <h2>Naïve attempts (slide 6)</h2>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Data structure</th><th>insert</th><th>find</th><th>delete</th></tr>
+    <tr><td>Unsorted array</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
+    <tr><td>Unsorted linked list</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
+    <tr><td>Sorted array</td><td>\(\Theta(n)\)</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(n)\)</td></tr>
+    <tr><td>Sorted linked list</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
+    <tr><td>Binary min heap</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
+    <tr><td>BST (worst)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
+    <tr><td>BST (expected)</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(\log n)\)</td></tr>
+  </table>
+  </div>
+  <p class="note">Insert into an <em>unsorted</em> array is \(\Theta(n)\) here, not \(\Theta(1)\): keys are unique, so insert has to look for the key first to overwrite it.</p>
+
+  <h2>Lazy deletion (slide 7)</h2>
+  <div class="prose">
+    <p>A general trick to make delete as fast as find: don't remove the item, just mark it deleted. No shifting. It's simpler, removals can happen later in batches, and a re-added key is just unmarked. The costs: a flag per item, space wasted on deleted items, and find becomes \(O(\log m)\) where \(m \ge n\) counts the deleted items too.</p>
+    <p>The next lectures look at two better dictionaries: <strong>AVL trees</strong> (BSTs with guaranteed balance) and <strong>hash tables</strong> (not tree-like at all).</p>
+  </div>
+
+  <div class="check" data-id="cse332-w3-l7-qc-sorted-find" data-grader="bigo" data-answer="log n">
+    <p>Quick check: worst-case time of <code>find</code> in a sorted array of \(n\) keys.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l7-qc-overwrite">
+    <p>Quick check: the dictionary holds ("cat", 3). What does <code>insert("cat", 9)</code> do?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w3-l7-qc-overwrite"> Adds a second "cat" entry<span class="why" hidden>Keys are unique, so there can't be two "cat" entries.</span></label>
+      <label data-correct><input type="radio" name="cse332-w3-l7-qc-overwrite"> Replaces 3 with 9<span class="why" hidden>Right: if the key already has a value, insert overwrites it.</span></label>
+      <label><input type="radio" name="cse332-w3-l7-qc-overwrite"> Does nothing, because "cat" is already there<span class="why" hidden>The ADT says insert overwrites the old value.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Ask the room to fill in slide 5's empty table first. The heap row surprises people: a heap is good at the minimum, not at an arbitrary key.</li>
+      <li>EX2 (heaps) uses a dictionary inside it; slide 4 hints at that ("see even EX02").</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L7: TREES -->
+<section class="page" id="l7-bst" data-title="Trees, traversals, BSTs">
+  <p class="where">Lecture 7 · slides 9–17 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span></p>
+  <h1>Trees, traversals, BSTs</h1>
+  <div class="split">
+    <div class="rule">
+      <p><strong>Traversal:</strong> an algorithm that visits every node (slide 9). For the tree with root D, children U and B, and U's children S and 2:</p>
+      <ul>
+        <li><strong>Pre-order</strong> (root, left, right): D U S 2 B</li>
+        <li><strong>In-order</strong> (left, root, right): S U 2 D B</li>
+        <li><strong>Post-order</strong> (left, right, root): S 2 U B D</li>
+      </ul>
+    </div>
+    <pre class="code"><span class="cm">// slide 11: the answer to "name that traversal"</span>
+postOrder(root) {
+  if (root.left != Null) postOrder(root.left);
+  if (root.right != Null) postOrder(root.right);
+  process(root);
+}
+<span class="cm">// preOrder: process(root) first; inOrder: in the middle</span></pre>
+  </div>
+
+  <div class="rule">
+    <p><strong>Binary search tree (slide 12).</strong> A binary tree (each node has at most 2 children) with the <strong>order property</strong>: every key in the left subtree is smaller than the node's key, and every key in the right subtree is larger. So keys can't repeat.</p>
+  </div>
+  <div class="treeview" data-shape="7(3(1(0,2),6),10(8,16))"><figcaption>Slide 12's BST. Its in-order traversal is sorted: 0 1 2 3 6 7 8 10 16.</figcaption></div>
+
+  <h2>Are these BSTs? (slides 13–14)</h2>
+  <div class="tree-grid">
+    <figure class="treeview" data-shape="7(3(1(0,),),10(,16))"><figcaption>Yes</figcaption></figure>
+    <figure class="treeview" data-shape="7(3(1(0,),7),10(,16))" data-mark="7"><figcaption>No: a second 7</figcaption></figure>
+    <figure class="treeview" data-shape="7(3(1(0,),8),10(,16))" data-mark="8"><figcaption>No: 8 is in 7's left subtree</figcaption></figure>
+    <figure class="treeview" data-shape="16(10(7(3(1(0,),),),),)"><figcaption>Yes: a chain is still a BST</figcaption></figure>
+  </div>
+  <div class="prose"><p>The third tree is the trap: 8 is bigger than its parent 3, which is fine locally, but it sits in the <em>left subtree of 7</em>, where every key must be smaller than 7.</p></div>
+
+  <h2>Binary trees: some numbers (slides 15–16)</h2>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Binary tree of height \(h\) (edges on the longest root-to-leaf path)</th><th></th></tr>
+    <tr><td>max # of leaves</td><td>\(2^h\)</td></tr>
+    <tr><td>max # of nodes</td><td>\(2^{h+1} - 1\)</td></tr>
+    <tr><td>min # of leaves</td><td>1</td></tr>
+    <tr><td>min # of nodes</td><td>\(h + 1\)</td></tr>
+  </table>
+  </div>
+  <div class="prose"><p>So with \(n\) nodes we can't do better than \(O(\log n)\) height, and we want to avoid \(O(n)\) height. BSTs use nodes and references rather than an array (slide 17): a BST can have gaps, and an array with gaps can need about \(2^n\) slots.</p></div>
+
+  <div class="check" data-id="cse332-w3-l7-qc-inorder-dusb" data-grader="text" data-answer="S U 2 D B|S, U, 2, D, B|SU2DB" data-miscon='{"d u s 2 b":"inorder-not-pre","s 2 u b d":"pre-not-post"}'>
+    <p>Quick check: type the in-order traversal of slide 9's tree (D at the root).</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l7-qc-max-nodes-h3" data-grader="exact" data-answer="15" data-miscon='{"8":"leaves-not-nodes","16":"off-by-one-height","7":"off-by-one-height"}'>
+    <p>Quick check: the most nodes a binary tree of height 3 can have.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Slide 10 shows aOrder, bOrder, cOrder without names. Ask which is which before slide 11. The tell is where <code>process(root)</code> sits.</li>
+      <li>In-order on a BST prints the keys sorted. That's a quick way to check a BST drawing.</li>
+      <li>Watch for height counted in nodes. The course counts edges: a single node has height 0.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L7: OPERATIONS -->
+<section class="page" id="l7-ops" data-title="Find, insert, delete">
+  <p class="where">Lecture 7 · slides 18–29 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span></p>
+  <h1>Find, insert, delete</h1>
+  <div class="split">
+    <pre class="code"><span class="cm">// slide 19: find (iterative)</span>
+find(key, root) {
+  while (root != Null &amp;&amp; key != root.key) {
+    if (key &lt; root.key) root = root.left;
+    else if (key &gt; root.key) root = root.right;
+  }
+  if (root == Null) return Null;
+  return root.value;
+}</pre>
+    <pre class="code"><span class="cm">// slide 20: insert (recursive)</span>
+insertHelper(key, value, root) {
+  if (root == null)
+    return new Node(key, value);
+  if (root.key &lt; key)
+    root.right = insertHelper(key, value, root.right);
+  else
+    root.left = insertHelper(key, value, root.left);
+  return root;
+}</pre>
+  </div>
+  <p class="note">Insert happens only at the leaves. (The iterative version on slide 21 overwrites the value when the key is already there.)</p>
+
+  <h2>Delete: three cases (slides 23–26)</h2>
+  <div class="rule">
+    <ul>
+      <li><strong>0 children</strong> (a leaf, e.g. delete 5): the parent points to null instead.</li>
+      <li><strong>1 child</strong> (e.g. delete 1): replace the node with its child.</li>
+      <li><strong>2 children</strong> (e.g. delete 3): replace it with the largest key to its left, or else the smallest key to its right. The recursive version on slide 26 uses <code>removeMax(root.left)</code>, the largest to the left.</li>
+    </ul>
+    <p>The max of a BST is its right-most node; the min is its left-most node (slide 24).</p>
+  </div>
+
+  <h2>Try it on the slide-22 tree</h2>
+  <div class="panel treelab" id="bst-lab" data-mode="bst" data-presets='[{"label":"Slide 22 tree","shape":"9(3(1(0,),6(5,7)),10(,16))","say":"Slide 22 tree. Try delete 5, then 1, then 3."},{"label":"Slide 12 tree","shape":"7(3(1(0,2),6),10(8,16))","say":"Slide 12 tree. Try find 8 and find 4."},{"label":"Empty","shape":"","say":"Empty tree. Insert 1, 2, 3, 4, 5 in order and watch the height."}]'>
+    <div class="controls">
+      <label>Key <input type="text" inputmode="numeric" class="tl-key" aria-label="Key"></label>
+      <button class="btn primary tl-insert" type="button">Insert</button>
+      <button class="btn tl-find" type="button">Find</button>
+      <button class="btn tl-delete" type="button">Delete</button>
+      <button class="btn quiet tl-reset" type="button">Reset</button>
+    </div>
+    <div class="controls tl-presets" role="group" aria-label="Start from"></div>
+    <div class="chart-box"><svg class="chart tl-svg" role="img"></svg></div>
+    <p class="out tl-out" role="status"></p>
+    <p class="tl-orders"></p>
+  </div>
+
+  <h2>Worst case (slides 27–29)</h2>
+  <div class="prose">
+    <p>Find, insert and delete each take time proportional to the tree's height. The maximum height of a BST with \(n\) nodes is \(n - 1\): insert keys in sorted order and you get a chain. So the worst case is \(\Theta(n)\). To do better, add shape rules that keep the tree short. That's the AVL tree, on Friday.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w3-l7-qc-delete3" data-grader="exact" data-answer="1" data-miscon='{"5":"min-of-right"}'>
+    <p>Quick check: deleting 3 from the slide-22 tree with the lecture's rule, which key takes 3's place?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l7-qc-sorted-height" data-grader="exact" data-answer="9" data-miscon='{"10":"height-counts-nodes","3":"bst-height"}'>
+    <p>Quick check: insert 1, 2, …, 10 in that order into an empty BST. What is its height?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>In the widget, delete 5, then 1, then 3 on the slide-22 tree: you see all three cases in order. After deleting 1, the two-child delete of 3 pulls up 0.</li>
+      <li>Why is the two-child replacement safe? The largest key on the left is bigger than everything else on the left and smaller than everything on the right, and it has no right child, so removing it from below is a 0- or 1-child delete.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L7: PRACTICE -->
+<section class="page" id="l7-practice" data-title="Lecture 7: practice">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span> · practice</p>
+  <h1>Lecture 7: practice</h1>
+  <div class="prose"><p>Six problems on the lecture's own trees (slides 9–27). Traversal boxes take keys separated by spaces or commas. Every answer was produced by running the slides' algorithms (<code>checks/cse332/w03/verify.mjs</code>).</p></div>
+
+  <article class="task" data-id="cse332-w3-l7-traversals">
+    <h2>1. Three traversals</h2>
+    <div class="treeview" data-shape="7(3(1(0,2),6),10(8,16))"></div>
+    <p class="prompt">Give the pre-order, in-order and post-order traversals of slide 12's BST.</p>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="7 3 1 0 2 6 10 8 16|7, 3, 1, 0, 2, 6, 10, 8, 16" data-miscon='{"0 1 2 3 6 7 8 10 16":"inorder-not-pre","0, 1, 2, 3, 6, 7, 8, 10, 16":"inorder-not-pre"}' data-label="pre-order"></div>
+    <div class="answer-spec" data-part="in" data-grader="text" data-answer="0 1 2 3 6 7 8 10 16|0, 1, 2, 3, 6, 7, 8, 10, 16" data-label="in-order"></div>
+    <div class="answer-spec" data-part="post" data-grader="text" data-answer="0 2 1 6 3 8 16 10 7|0, 2, 1, 6, 3, 8, 16, 10, 7" data-miscon='{"7 3 1 0 2 6 10 8 16":"pre-not-post","0 1 2 3 6 7 8 10 16":"inorder-not-post"}' data-label="post-order"></div>
+    <ol class="hints">
+      <li>Pre-order writes a node the first time you reach it; post-order writes it after both subtrees are done.</li>
+      <li>In-order of a BST is just the keys sorted.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Pre-order: 7, then the left subtree (3 1 0 2 6), then the right (10 8 16).</li>
+      <li>In-order: sorted, 0 1 2 3 6 7 8 10 16.</li>
+      <li>Post-order: left subtree (0 2 1 6 3), right subtree (8 16 10), then 7.</li>
+      <li class="answer">7 3 1 0 2 6 10 8 16; 0 1 2 3 6 7 8 10 16; 0 2 1 6 3 8 16 10 7.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l7-build">
+    <h2>2. Build and search</h2>
+    <p class="prompt">Insert 9, 3, 10, 1, 6, 16, 0, 5, 7 in that order into an empty BST (you get slide 22's tree). Then run <code>find(8)</code>.</p>
+    <div class="answer-spec" data-part="height" data-grader="exact" data-answer="3" data-miscon='{"4":"height-counts-nodes"}' data-label="height of the tree"></div>
+    <div class="answer-spec" data-part="parent5" data-grader="exact" data-answer="6" data-label="parent of 5"></div>
+    <div class="answer-spec" data-part="path8" data-grader="text" data-answer="9 3 6 7|9, 3, 6, 7" data-label="keys <code>find(8)</code> compares with, in order"></div>
+    <div class="answer-spec" data-part="found8" data-grader="yesno" data-answer="no" data-label="does it find 8?"></div>
+    <ol class="hints">
+      <li>Each new key walks down from the root, left if smaller, right if larger, and becomes a leaf.</li>
+      <li>8 &gt; 6, so <code>find</code> goes right from 6 to 7. What's to the right of 7?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The tree: 9 has children 3 and 10; 3 has 1 and 6; 1 has 0; 6 has 5 and 7; 10 has right child 16.</li>
+      <li>The longest path is 9–3–1–0 (or 9–3–6–5): 3 edges.</li>
+      <li><code>find(8)</code>: 8 &lt; 9 go left; 8 &gt; 3 go right; 8 &gt; 6 go right; 8 &gt; 7 go right to null.</li>
+      <li class="answer">Height 3; 5's parent is 6; compares 9, 3, 6, 7; not found.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l7-delete">
+    <h2>3. Three deletes in a row</h2>
+    <div class="treeview" data-shape="9(3(1(0,),6(5,7)),10(,16))"></div>
+    <p class="prompt">On slide 22's tree, delete 5, then 1, then 3, each from the result of the last, using the lecture's rule for two children (the largest key to the left).</p>
+    <div class="answer-spec" data-part="case5" data-grader="exact" data-answer="0" data-label="children of 5 when it's deleted"></div>
+    <div class="answer-spec" data-part="case1" data-grader="exact" data-answer="1" data-label="children of 1 when it's deleted"></div>
+    <div class="answer-spec" data-part="repl3" data-grader="exact" data-answer="0" data-miscon='{"1":"missed-a-level","6":"min-of-right","7":"min-of-right"}' data-label="key that replaces 3"></div>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="9 0 6 7 10 16|9, 0, 6, 7, 10, 16" data-label="pre-order of the final tree"></div>
+    <ol class="hints">
+      <li>Delete 1 first changes 3's left subtree. What's left of 3 when you delete it?</li>
+      <li>After deleting 1, 3's left subtree is just 0.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Delete 5: a leaf, so 6's left becomes null.</li>
+      <li>Delete 1: one child (0), so 0 takes 1's place as 3's left child.</li>
+      <li>Delete 3: two children (0 and 6). The largest key to its left is 0, so 0 moves into 3's place.</li>
+      <li>Final tree: 9 with children 0 and 10; 0's right child is 6; 6's right child is 7; 10's right child is 16.</li>
+      <li class="answer">0; 1; 0 replaces 3; pre-order 9 0 6 7 10 16.</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>Deleting 3 straight from the original tree would pull up 1 instead (the quick check on the previous page). Order matters.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l7-numbers">
+    <h2>4. Binary trees of height 5</h2>
+    <p class="prompt">Use slide 16's formulas for a binary tree of height \(h = 5\).</p>
+    <div class="answer-spec" data-part="maxleaves" data-grader="exact" data-answer="32" data-miscon='{"63":"nodes-not-leaves","64":"off-by-one-height"}' data-label="max # of leaves"></div>
+    <div class="answer-spec" data-part="maxnodes" data-grader="exact" data-answer="63" data-miscon='{"32":"leaves-not-nodes","31":"off-by-one-height","127":"off-by-one-height"}' data-label="max # of nodes"></div>
+    <div class="answer-spec" data-part="minleaves" data-grader="exact" data-answer="1" data-label="min # of leaves"></div>
+    <div class="answer-spec" data-part="minnodes" data-grader="exact" data-answer="6" data-miscon='{"5":"off-by-one-height"}' data-label="min # of nodes"></div>
+    <ol class="hints">
+      <li>The fullest tree has every level full; the emptiest is a chain.</li>
+      <li>A chain of height 5 has 5 edges. How many nodes?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Full tree: level 5 holds \(2^5 = 32\) leaves, and all levels hold \(2^6 - 1 = 63\) nodes.</li>
+      <li>Chain: one leaf, and \(5 + 1 = 6\) nodes.</li>
+      <li class="answer">32; 63; 1; 6.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l7-naive">
+    <h2>5. The naïve table</h2>
+    <p class="prompt">Worst-case time for a dictionary with \(n\) keys (slide 6). Give a \(\Theta\) class.</p>
+    <div class="answer-spec" data-part="unsorted-insert" data-grader="bigo" data-answer="n" data-label="insert into an unsorted array"></div>
+    <div class="answer-spec" data-part="sorted-find" data-grader="bigo" data-answer="log n" data-label="find in a sorted array"></div>
+    <div class="answer-spec" data-part="sorted-insert" data-grader="bigo" data-answer="n" data-label="insert into a sorted array"></div>
+    <div class="answer-spec" data-part="bst-find" data-grader="bigo" data-answer="n" data-label="find in a BST (worst case)"></div>
+    <ol class="hints">
+      <li>Keys are unique. What does insert have to do before it adds a pair?</li>
+      <li>A sorted array supports binary search but has to shift to make room. A BST can be a chain.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Unsorted array: insert must first scan for the key (to overwrite it), \(\Theta(n)\).</li>
+      <li>Sorted array: find is binary search, \(\Theta(\log n)\); insert shifts up to \(n\) items, \(\Theta(n)\).</li>
+      <li>BST: a chain of height \(n - 1\) makes find \(\Theta(n)\).</li>
+      <li class="answer">\(\Theta(n)\); \(\Theta(\log n)\); \(\Theta(n)\); \(\Theta(n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l7-is-bst">
+    <h2>6. BST or not?</h2>
+    <div class="tree-grid">
+      <figure class="treeview" data-shape="20(10(5,15(12,25)),30)"><figcaption>Tree P</figcaption></figure>
+      <figure class="treeview" data-shape="20(10(5,15(12,18)),30(,40))"><figcaption>Tree Q</figcaption></figure>
+      <figure class="treeview" data-shape="5(,8(,13(11,21)))"><figcaption>Tree R</figcaption></figure>
+    </div>
+    <p class="prompt">For each tree, is it a binary search tree?</p>
+    <div class="answer-spec" data-part="p" data-grader="yesno" data-answer="no" data-label="Tree P"></div>
+    <div class="answer-spec" data-part="q" data-grader="yesno" data-answer="yes" data-label="Tree Q"></div>
+    <div class="answer-spec" data-part="r" data-grader="yesno" data-answer="yes" data-label="Tree R"></div>
+    <ol class="hints">
+      <li>Check every key against all its ancestors, not just its parent. Or list the in-order traversal: is it sorted?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>P's in-order is 5 10 12 15 25 20 30: 25 sits in 20's left subtree, so P is not a BST.</li>
+      <li>Q's in-order is 5 10 12 15 18 20 30 40: sorted, so it's a BST.</li>
+      <li>R's in-order is 5 8 11 13 21: sorted. Mostly one-child nodes, but still a BST.</li>
+      <li class="answer">no; yes; yes.</li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L7: QUIZ -->
+<section class="page" id="l7-quiz" data-title="Check your understanding: dictionaries and BSTs">
+  <p class="where">Lecture 7 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: dictionaries and BSTs</h1>
+  <div class="prose"><p>Ten questions on Lecture 7. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="l7" role="status"></div>
+  <ol class="cyu-list" data-quiz="l7">
+    <li class="cyu" data-id="cse332-w3-l7-cyu-keys" data-kind="mc" data-topic="l7-dict">
+      <p class="q">What must be true of a dictionary's keys?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w3-l7-cyu-keys"> They're unique (and comparable, for many implementations)<span class="why" hidden>Correct (slide 3).</span></label>
+        <label><input type="radio" name="cse332-w3-l7-cyu-keys"> They're integers<span class="why" hidden>Any comparable type works: strings, for example.</span></label>
+        <label><input type="radio" name="cse332-w3-l7-cyu-keys"> They're inserted in sorted order<span class="why" hidden>Insert order is up to the user. A BST that gets sorted inserts becomes a chain.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l7-cyu-bst-worst" data-kind="bigo" data-answer="n" data-topic="l7-ops">
+      <p class="q">Worst-case time of <code>find</code> in a BST with \(n\) nodes.</p>
+      <p class="why" hidden>The tree can be a chain of height \(n-1\): \(\Theta(n)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l7-cyu-preorder" data-type="text" data-answer="D U S 2 B|D, U, S, 2, B|DUS2B" data-topic="l7-bst" data-miscon='{"s u 2 d b":"inorder-not-pre"}'>
+      <p class="q">Type the pre-order traversal of slide 9's tree: root D, children U (left) and B (right), and U's children S (left) and 2 (right).</p>
+      <p class="why" hidden>Root first, then the left subtree (U S 2), then the right (B): D U S 2 B.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l7-cyu-name-traversal" data-kind="mc" data-topic="l7-bst">
+      <p class="q">A traversal calls itself on the left child, then on the right child, then calls <code>process(root)</code>. Which is it?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-l7-cyu-name-traversal"> Pre-order<span class="why" hidden>Pre-order processes the root first.</span></label>
+        <label><input type="radio" name="cse332-w3-l7-cyu-name-traversal"> In-order<span class="why" hidden>In-order processes the root between the two subtrees.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-l7-cyu-name-traversal"> Post-order<span class="why" hidden>Correct: slide 10's aOrder.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l7-cyu-min-nodes" data-kind="num" data-answer="7" data-topic="l7-bst" data-miscon='{"6":"off-by-one-height"}'>
+      <p class="q">The fewest nodes a binary tree of height 6 can have.</p>
+      <p class="why" hidden>A chain: \(h + 1 = 7\) nodes.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l7-cyu-max-leaves" data-kind="num" data-answer="16" data-topic="l7-bst" data-miscon='{"31":"nodes-not-leaves","15":"nodes-not-leaves"}'>
+      <p class="q">The most leaves a binary tree of height 4 can have.</p>
+      <p class="why" hidden>\(2^h = 2^4 = 16\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l7-cyu-insert-leaf" data-kind="mc" data-topic="l7-ops">
+      <p class="q">Where does BST insert put a new key?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-l7-cyu-insert-leaf"> At the root, pushing the old root down<span class="why" hidden>No: it walks down from the root.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-l7-cyu-insert-leaf"> At a new leaf<span class="why" hidden>Correct: "insert happens only at the leaves."</span></label>
+        <label><input type="radio" name="cse332-w3-l7-cyu-insert-leaf"> In the first empty spot in level order<span class="why" hidden>That's a heap's insert. A BST puts the key where find would have looked for it.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l7-cyu-delete-root" data-kind="num" data-answer="7" data-topic="l7-ops" data-miscon='{"10":"min-of-right","16":"min-of-right"}'>
+      <p class="q">Delete 9 (the root) from slide 22's tree: 9 with children 3 and 10; 3 with 1 and 6; 1 with 0; 6 with 5 and 7; 10 with right child 16. Using the lecture's rule, what's the new root?</p>
+      <p class="why" hidden>Two children, so take the largest key to the left: the right-most node of 3's subtree, which is 7.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l7-cyu-lazy" data-kind="mc" data-topic="l7-dict">
+      <p class="q">Which is a cost of lazy deletion?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-l7-cyu-lazy"> Delete becomes slower than find<span class="why" hidden>The point is that delete becomes as fast as find.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-l7-cyu-lazy"> Deleted items still take space, and find depends on \(m \ge n\)<span class="why" hidden>Correct (slide 7).</span></label>
+        <label><input type="radio" name="cse332-w3-l7-cyu-lazy"> Re-adding a deleted key is impossible<span class="why" hidden>Re-adding is easy: just unmark it.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l7-cyu-local-order" data-kind="mc" data-topic="l7-bst">
+      <p class="q">Every node's left child is smaller than it, and every right child is larger. Is the tree a BST?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-l7-cyu-local-order"> Yes, always<span class="why" hidden>Slide 13's trap: 8 can be 3's right child (fine for 3) and still be in 7's left subtree.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-l7-cyu-local-order"> Not necessarily: the rule is about whole subtrees<span class="why" hidden>Correct. Every key in the left subtree must be smaller, not just the child.</span></label>
+        <label><input type="radio" name="cse332-w3-l7-cyu-local-order"> Only if it's balanced<span class="why" hidden>Balance is a separate question. A chain can be a BST.</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="l7" role="status"></div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul><li>Question 10 is the one to discuss: the order property is about whole subtrees.</li></ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S3: WORKSHEET -->
+<section class="page" id="s3-recur" data-title="Section 3: the worksheet, worked">
+  <p class="where">Section 3 · Recurrences · <span class="today-chip" data-date="2026-10-15">Thu Oct 15</span></p>
+  <h1>Section 3: recurrences</h1>
+  <div class="prose">
+    <p>The section turns code into recurrences, then runs the tree method on six recurrences that each change one thing. Everything below follows the section slides and the <a href="https://docs.google.com/document/d/1GiXbGiS-lWsVSuOgOtOy0pDHRIUdaPEk/edit" target="_blank" rel="noopener">worksheet</a>'s <a href="https://docs.google.com/document/d/1AoXYuz7uZ0V_RBAjzwXxA3w7_fUi5LaB/edit" target="_blank" rel="noopener">official solutions</a>.</p>
+  </div>
+  <div class="rule">
+    <p>\(T(n) = aT(n/b) + f(n)\) (divide and conquer) or \(T(n) = aT(n-b) + f(n)\) (chip and conquer). \(n\) is the input size, \(a\) is the number of recursive calls per call (the branching factor), \(b\) is how the input shrinks, and \(f(n)\) is the non-recursive work.</p>
+  </div>
+
+  <h2>Problem 0: recurrences from code</h2>
+  <div class="split">
+    <pre class="code"><span class="cm">// 0a</span>
+f(stack) {  // stack.size = n
+  if (stack.size == 0) {
+    return 0
+  }
+  stack.pop  // stack.size--
+  return 2*f(stack)+1
+}</pre>
+    <pre class="code"><span class="cm">// 0b</span>
+bar(A, start, n) {
+  if (n &lt;= 10000) {
+    return 1000
+  }
+  if (bar(A, start, n/3) &gt; 5) {
+    for (int i=0; i&lt;n; i++) println("Yay")
+    return 5 * bar(A, start, n/3)
+  } else {
+    for (int i=0; i&lt;n*n; i++) println("Yay")
+    return 4 * bar(A, start, n/3)
+  }
+}</pre>
+  </div>
+  <div class="prose">
+    <p><strong>0a.</strong> The base case is \(n \le 0\). One recursive call (\(a = 1\)) on one fewer item (\(b = 1\)); the <code>2*…+1</code> is arithmetic on the result, not a second call. Constant work otherwise: \(T(n) = c_0\) if \(n \le 0\), else \(T(n-1) + c_1\).</p>
+    <p><strong>0b.</strong> The base case is \(n \le 10000\). Each non-base call calls <code>bar(n/3)</code> twice, once in the <code>if</code> test and once in the <code>return</code>, so \(a = 2\) and \(b = 3\). Which loop runs? The base case returns 1000, and every other call returns 5 or 4 times a recursive result, so every call returns at least 1000 &gt; 5. The test is always true, and only the \(n\)-iteration loop ever runs: \(T(n) = c_0\) if \(n \le 10000\), else \(2T(n/3) + c_1 n + c_2\).</p>
+  </div>
+
+  <h2>Problem 1: the tree method, one change at a time</h2>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th></th><th>Recurrence</th><th>Work on level \(i\)</th><th>Levels</th><th>Closed form</th></tr>
+    <tr><td>1a</td><td>\(2T(n/2) + n\), \(T(1) = 1\)</td><td>\(n\)</td><td>\(\log_2 n\)</td><td>\(n\log_2 n \in \Theta(n\log n)\)</td></tr>
+    <tr><td>1b</td><td>\(2T(n/2) + n\), \(T(n) = 4\) for \(n \le 4\)</td><td>\(n\)</td><td>\(\log_2 n - 2\)</td><td>\(n\log_2 n - 2n \in \Theta(n\log n)\)</td></tr>
+    <tr><td>1c</td><td>\(2T(n/2) + 100n\), \(T(1) = 100\)</td><td>\(100n\)</td><td>\(\log_2 n\)</td><td>\(100n\log_2 n \in \Theta(n\log n)\)</td></tr>
+    <tr><td>1d</td><td>\(3T(n/2) + n\), \(T(1) = 1\)</td><td>\((3/2)^i n\)</td><td>\(\log_2 n\)</td><td>\(2n^{\log_2 3} - 2n \in \Theta(n^{\log_2 3})\)</td></tr>
+    <tr><td>1e</td><td>\(2T(n/3) + n\), \(T(1) = 1\)</td><td>\((2/3)^i n\)</td><td>\(\log_3 n\)</td><td>a constant times \(n\): \(\Theta(n)\)</td></tr>
+    <tr><td>1f</td><td>\(2T(n-2) + 1\), \(T(1) = 1\)</td><td>\(2^i\)</td><td>\(\approx n/2\)</td><td>\(2^{n/2} - 1 = \sqrt2^{\,n} - 1 \in \Theta(\sqrt2^{\,n})\)</td></tr>
+  </table>
+  </div>
+  <p class="note">The slides sum the levels above the leaves (\(i\) from 0 to \(\log_2 n - 1\)) and leave out the leaves' work, which changes constants only. The explorer below adds the leaves too, so its exact totals differ from these formulas by lower-order terms.</p>
+  <div class="prose">
+    <p>The lesson of each: 1b, the base case doesn't matter. 1c, constants in \(f(n)\) don't matter. 1d, the branching factor \(a\) does. 1e, the reduction factor \(b\) does: the work shrinks by \(\frac23\) per level, a geometric series with ratio below 1, so the root's \(n\) dominates. 1f, the reduction constant does too: \(2T(n-1) + 1\) has \(n\) levels and is \(\Theta(2^n)\), but \(2T(n-2) + 1\) has \(n/2\) levels and is \(\Theta(\sqrt2^{\,n})\), a smaller class.</p>
+    <p>1d's algebra (slide 19): \(n\sum_{i=0}^{\log_2 n - 1}(3/2)^i = n\cdot\frac{1 - (3/2)^{\log_2 n}}{1 - 3/2}\), and \((3/2)^{\log_2 n} = \frac{3^{\log_2 n}}{n} = \frac{n^{\log_2 3}}{n}\), giving \(2n^{\log_2 3} - 2n\).</p>
+  </div>
+  <div class="panel rt" id="rt-section" data-presets="nlogn,s1b,s1c,s1d,s1e,s1f,exp" data-n="16">
+    <p class="rt-head"></p>
+    <div class="controls rt-presets" role="group" aria-label="Recurrence"></div>
+    <div class="controls"><label>\(n\) = <select class="rt-n" aria-label="n"></select></label></div>
+    <div class="chart-box"><svg class="chart rt-svg" role="img" aria-label="Recursion tree"></svg></div>
+    <div class="table-wrap"><table class="plain num rt-table"></table></div>
+    <p class="out rt-out" role="status"></p>
+  </div>
+
+  <h2>Problem 2: putting it all together</h2>
+  <pre class="code">f(L, start, j) { // n = j - start
+  if (j - start &lt;= 1) {
+    return 0
+  }
+  int result = f(L, start, j/2)
+  for (int i = start; i &lt; j; i++) {
+    result *= 4
+  }
+  return result + f(L, start, j/2)
+}</pre>
+  <div class="prose">
+    <p>Two recursive calls (\(a = 2\)) on half the range (\(b = 2\)), plus a loop of \(n\) iterations and constant work: \(T(n) = c_0\) if \(n \le 1\), else \(2T(n/2) + c_2 n + c_1\). Level \(i\) has \(2^i\) boxes doing \(c_2\frac{n}{2^i} + c_1\), so</p>
+    <p>\[T(n) = \sum_{i=0}^{\log_2 n - 1} \left(c_2 n + 2^i c_1\right) = c_2 n\log_2 n + c_1(n - 1) \in \Theta(n\log n).\]</p>
+  </div>
+
+  <div class="check" data-id="cse332-w3-s3-qc-0b-calls" data-grader="exact" data-answer="2" data-miscon='{"1":"missed-a-level","3":"missed-a-level"}'>
+    <p>Quick check: how many recursive calls does one non-base call of <code>bar</code> make?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-s3-qc-1e" data-grader="bigo" data-answer="n">
+    <p>Quick check: \(\Theta\) class of 1e, \(T(n) = 2T(n/3) + n\).</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The section's method for the number of levels: sizes are \(n, n/b, n/b^2, \dots\); level \(i\) has size \(n/b^i\); set \(n/b^i = 1\) and solve for \(i\).</li>
+      <li>0b is the favourite trap. Students write \(T(n/3) + n^2\) because they see the \(n^2\) loop. Ask: what does the base case return? Is it ever ≤ 5?</li>
+      <li>The worksheet's 0a code uses a stack; the solution document writes the same recurrence for an <code>f(n)</code> version. Both give \(T(n) = T(n-1) + c_1\).</li>
+      <li>For 1f, students often write \(\Theta(2^n)\). The answer is \(\sqrt2^{\,n} - 1 \in \Theta(\sqrt2^{\,n})\), a smaller class: \(2^n / \sqrt2^{\,n} = \sqrt2^{\,n}\) grows. (\(\Theta(2^n)\) is right for \(2T(n-1) + 1\).)</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S3: PRACTICE -->
+<section class="page" id="s3-practice" data-title="Section 3: practice">
+  <p class="where">Section 3 · Recurrences · <span class="today-chip" data-date="2026-10-15">Thu Oct 15</span> · practice</p>
+  <h1>Section 3: practice</h1>
+  <div class="prose"><p>The worksheet's problems, answerable here and checked against the official solutions. Exact totals assume the base cases shown and \(n\) a power of \(b\); they were computed by evaluating each recurrence (<code>checks/cse332/w03/verify.mjs</code>). Class boxes that need an irrational power use a menu.</p></div>
+
+  <article class="task" data-id="cse332-w3-s3-q0a">
+    <h2>1. Problem 0a</h2>
+    <p class="prompt"><code>f(stack)</code> pops one item and returns <code>2*f(stack)+1</code>. Model its running time.</p>
+    <div class="answer-spec" data-part="a" data-grader="exact" data-answer="1" data-miscon='{"2":"missed-a-level"}' data-label="branching factor \(a\)"></div>
+    <div class="answer-spec" data-part="b" data-grader="exact" data-answer="1" data-label="reduction constant \(b\) (in \(T(n-b)\))"></div>
+    <div class="answer-spec" data-part="class" data-grader="bigo" data-answer="n" data-label="\(\Theta\) class of \(T(n)\)"></div>
+    <ol class="hints">
+      <li>Count calls to <code>f</code>, not multiplications. <code>2*f(stack)</code> calls <code>f</code> once.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>One call per call: \(a = 1\). Each pop shrinks the stack by one: \(b = 1\).</li>
+      <li>\(T(n) = c_0\) for \(n \le 0\), else \(T(n-1) + c_1\): \(n\) levels of constant work.</li>
+      <li class="answer">\(a = 1\), \(b = 1\), \(\Theta(n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-s3-q0b">
+    <h2>2. Problem 0b</h2>
+    <p class="prompt">Model the worst-case running time of <code>bar(A, start, n)</code> from the previous page.</p>
+    <div class="answer-spec" data-part="a" data-grader="exact" data-answer="2" data-miscon='{"1":"missed-a-level"}' data-label="branching factor \(a\)"></div>
+    <div class="answer-spec" data-part="b" data-grader="exact" data-answer="3" data-label="reduction factor \(b\) (in \(T(n/b)\))"></div>
+    <div class="answer-spec" data-part="nsq" data-grader="yesno" data-answer="no" data-label="does the \(n \cdot n\) loop ever run?"></div>
+    <div class="answer-spec" data-part="class" data-grader="bigo" data-answer="n" data-label="\(\Theta\) class of \(T(n)\)"></div>
+    <ol class="hints">
+      <li>Count the calls in the <code>if</code> condition too.</li>
+      <li>What's the smallest value <code>bar</code> can ever return?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Two calls to <code>bar(n/3)</code>: one in the test and one in the return. So \(a = 2\), \(b = 3\).</li>
+      <li>The base case returns 1000, and other calls return 5× or 4× a result, so every result is ≥ 1000 &gt; 5. Only the \(n\)-loop runs.</li>
+      <li>\(T(n) = 2T(n/3) + c_1 n + c_2\). Level \(i\) does \((2/3)^i\) times the root's work: a geometric series with ratio below 1, so \(\Theta(n)\).</li>
+      <li class="answer">\(a = 2\), \(b = 3\), no, \(\Theta(n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-s3-q1abc">
+    <h2>3. Problems 1a–1c</h2>
+    <p class="prompt">1a: \(2T(n/2) + n\), \(T(1) = 1\). 1b: the same with \(T(n) = 4\) for \(n \le 4\). 1c: \(2T(n/2) + 100n\), \(T(1) = 100\).</p>
+    <div class="answer-spec" data-part="level1a" data-grader="formula" data-answer="n" data-points='{"n":["16","1024"],"i":["0","1","3"]}' data-miscon='{"n/2^i":"per-node-not-level"}' data-label="1a: work on level \(i\) (in \(n\) and \(i\))"></div>
+    <div class="answer-spec" data-part="t16b" data-grader="exact" data-answer="48" data-label="1b: \(T(16)\)"></div>
+    <div class="answer-spec" data-part="t16c" data-grader="exact" data-answer="8000" data-label="1c: \(T(16)\)"></div>
+    <div class="answer-spec" data-part="class" data-grader="bigo" data-answer="n log n" data-label="the \(\Theta\) class all three share"></div>
+    <ol class="hints">
+      <li>Level \(i\) has \(2^i\) boxes of size \(n/2^i\).</li>
+      <li>1b: \(T(4) = 4\), \(T(8) = 2\cdot 4 + 8\), \(T(16) = 2T(8) + 16\). 1c: \(T(1) = 100\), \(T(2) = 200 + 200\), …</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>1a: \(2^i\cdot\frac{n}{2^i} = n\) on every level.</li>
+      <li>1b: \(T(8) = 16\), \(T(16) = 32 + 16 = 48\).</li>
+      <li>1c: \(T(2) = 400\), \(T(4) = 1200\), \(T(8) = 3200\), \(T(16) = 8000\) \(= 100\cdot(16\cdot 4 + 16)\).</li>
+      <li>The base case and the constant 100 change the totals, not the class.</li>
+      <li class="answer">\(n\); 48; 8000; \(\Theta(n\log n)\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-s3-q1d">
+    <h2>4. Problem 1d: \(3T(n/2) + n\)</h2>
+    <p class="prompt">\(T(1) = 1\). The branching factor matters.</p>
+    <div class="answer-spec" data-part="nodes" data-grader="formula" data-answer="3^i" data-points='{"i":["0","1","2","4"]}' data-miscon='{"2^i":"missed-a-level"}' data-label="boxes on level \(i\)"></div>
+    <div class="answer-spec" data-part="level" data-grader="formula" data-answer="(3/2)^i*n" data-points='{"n":["16","64"],"i":["0","1","3"]}' data-miscon='{"n/2^i":"per-node-not-level","3^i*n":"used-n-not-size"}' data-label="work on level \(i\)"></div>
+    <div class="answer-spec" data-part="t16" data-grader="exact" data-answer="211" data-label="\(T(16)\)"></div>
+    <div class="answer-spec" data-part="class" data-grader="choice" data-answer="c" data-options="a:Θ(n)|b:Θ(n log n)|c:Θ(n^(log₂3)), about Θ(n^1.585)|d:Θ(n²)" data-label="\(\Theta\) class"></div>
+    <ol class="hints">
+      <li>\(3^i\) boxes, each of size \(n/2^i\).</li>
+      <li>The level work grows by \(\frac32\) per level, so the leaves dominate: count them. \(3^{\log_2 n} = n^{\log_2 3}\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Level \(i\): \(3^i\) boxes doing \(\frac{n}{2^i}\) each: \((3/2)^i n\).</li>
+      <li>\(T(2) = 5\), \(T(4) = 19\), \(T(8) = 65\), \(T(16) = 3\cdot 65 + 16 = 211\).</li>
+      <li>The sum is \(2n^{\log_2 3} - 2n\) (slides), which is \(\Theta(n^{\log_2 3})\) since \(\log_2 3 \approx 1.585 &gt; 1\).</li>
+      <li class="answer">\(3^i\); \((3/2)^i n\); 211; \(\Theta(n^{\log_2 3})\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-s3-q1e">
+    <h2>5. Problem 1e: \(2T(n/3) + n\)</h2>
+    <p class="prompt">\(T(1) = 1\). The reduction factor matters.</p>
+    <div class="answer-spec" data-part="level" data-grader="formula" data-answer="(2/3)^i*n" data-points='{"n":["27","81"],"i":["0","1","2"]}' data-miscon='{"n/3^i":"per-node-not-level"}' data-label="work on level \(i\)"></div>
+    <div class="answer-spec" data-part="t81" data-grader="exact" data-answer="211" data-label="\(T(81)\)"></div>
+    <div class="answer-spec" data-part="class" data-grader="bigo" data-answer="n" data-label="\(\Theta\) class"></div>
+    <ol class="hints">
+      <li>\(2^i\) boxes of size \(n/3^i\).</li>
+      <li>\(\sum (2/3)^i\) is a geometric series with ratio below 1. It's at most \(\frac{1}{1 - 2/3} = 3\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Level \(i\): \(2^i\cdot\frac{n}{3^i} = (2/3)^i n\).</li>
+      <li>\(T(3) = 5\), \(T(9) = 19\), \(T(27) = 65\), \(T(81) = 130 + 81 = 211\).</li>
+      <li>\(n\sum_i (2/3)^i \le 3n\), and the root does \(n\): \(\Theta(n)\).</li>
+      <li class="answer">\((2/3)^i n\); 211; \(\Theta(n)\).</li>
+    </ol></div></div>
+    <details class="notes" open>
+      <summary>Teaching notes</summary>
+      <ul><li>1d at \(n = 16\) and 1e at \(n = 81\) both give 211: the same sums with 2 and 3 swapped. A nice coincidence to point out, and a reminder that one value of \(n\) says nothing about growth.</li></ul>
+    </details>
+  </article>
+
+  <article class="task" data-id="cse332-w3-s3-q1f">
+    <h2>6. Problem 1f: \(2T(n-2) + 1\)</h2>
+    <p class="prompt">\(T(n) = 1\) for \(n \le 1\). Compare with \(2T(n-1) + 1\).</p>
+    <div class="answer-spec" data-part="nodes" data-grader="formula" data-answer="2^i" data-points='{"i":["0","1","3","6"]}' data-label="boxes on level \(i\)"></div>
+    <div class="answer-spec" data-part="t10" data-grader="exact" data-answer="63" data-miscon='{"1023":"missed-a-level","31":"missed-a-level"}' data-label="\(T(10)\)"></div>
+    <div class="answer-spec" data-part="class" data-grader="choice" data-answer="c" data-options="a:Θ(n)|b:Θ(2^n)|c:Θ(√2^n), the same as Θ(2^(n/2))|d:Θ(n²)" data-label="\(\Theta\) class of \(2T(n-2)+1\)"></div>
+    <div class="answer-spec" data-part="t10minus1" data-grader="exact" data-answer="1023" data-label="\(T(10)\) for \(2T(n-1) + 1\)"></div>
+    <ol class="hints">
+      <li>Sizes go 10, 8, 6, 4, 2, 0. Each level doubles the boxes, and each box does 1.</li>
+      <li>\(2^{n/2} = (2^{1/2})^n = \sqrt2^{\,n}\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Level \(i\) has \(2^i\) boxes doing 1 each.</li>
+      <li>\(n = 10\): six levels (sizes 10, 8, 6, 4, 2, 0), so \(T(10) = 1 + 2 + \cdots + 32 = 63\).</li>
+      <li>About \(n/2\) levels: \(\sum_{i=0}^{n/2 - 1} 2^i = 2^{n/2} - 1 \in \Theta(\sqrt2^{\,n})\).</li>
+      <li>\(2T(n-1) + 1\) has 10 levels at \(n = 10\): \(2^{10} - 1 = 1023\), \(\Theta(2^n)\).</li>
+      <li class="answer">\(2^i\); 63; \(\Theta(\sqrt2^{\,n})\); 1023.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-s3-q2">
+    <h2>7. Problem 2: putting it all together</h2>
+    <p class="prompt">Model <code>f(L, start, j)</code> (on the previous page), with \(n = j - \text{start}\), and solve.</p>
+    <div class="answer-spec" data-part="a" data-grader="exact" data-answer="2" data-label="branching factor \(a\)"></div>
+    <div class="answer-spec" data-part="b" data-grader="exact" data-answer="2" data-label="reduction factor \(b\)"></div>
+    <div class="answer-spec" data-part="f" data-grader="bigo" data-answer="n" data-label="non-recursive work \(f(n)\), as a class"></div>
+    <div class="answer-spec" data-part="class" data-grader="bigo" data-answer="n log n" data-label="\(\Theta\) class of \(T(n)\)"></div>
+    <ol class="hints">
+      <li>Find each call to <code>f</code>, and what the loop costs.</li>
+      <li>\(2T(n/2) + c_2 n + c_1\) is 1a with constants.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Two calls on half the range: \(a = 2\), \(b = 2\).</li>
+      <li>The loop runs \(n\) times: \(f(n) = c_2 n + c_1 \in \Theta(n)\).</li>
+      <li>\(\sum_{i=0}^{\log_2 n - 1}(c_2 n + 2^i c_1) = c_2 n\log_2 n + c_1(n - 1)\).</li>
+      <li class="answer">\(a = 2\), \(b = 2\), \(\Theta(n)\), \(\Theta(n\log n)\).</li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S3: QUIZ -->
+<section class="page" id="s3-quiz" data-title="Check your understanding: Section 3">
+  <p class="where">Section 3 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: Section 3</h1>
+  <div class="prose"><p>Eight questions on the section. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="s3" role="status"></div>
+  <ol class="cyu-list" data-quiz="s3">
+    <li class="cyu" data-id="cse332-w3-s3-cyu-a" data-kind="mc" data-topic="s3-recur">
+      <p class="q">In \(T(n) = aT(n/b) + f(n)\), what is \(a\)?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w3-s3-cyu-a"> The number of recursive calls each call makes<span class="why" hidden>Correct: the branching factor.</span></label>
+        <label><input type="radio" name="cse332-w3-s3-cyu-a"> How much the input shrinks<span class="why" hidden>That's \(b\).</span></label>
+        <label><input type="radio" name="cse332-w3-s3-cyu-a"> The base case's cost<span class="why" hidden>The base case isn't in this line of the recurrence.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-s3-cyu-bar-branch" data-kind="mc" data-topic="s3-recur">
+      <p class="q">Why does <code>bar</code>'s \(n \cdot n\) loop never run?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-s3-cyu-bar-branch"> Because \(n \le 10000\) always<span class="why" hidden>For large \(n\) the base case doesn't apply.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-s3-cyu-bar-branch"> Because every call returns at least 1000, so the test is always true<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w3-s3-cyu-bar-branch"> Because worst case means we pick the cheaper branch<span class="why" hidden>Worst case would pick the expensive branch if it could happen. It can't.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-s3-cyu-1d" data-kind="mc" data-topic="s3-recur">
+      <p class="q">\(T(n) = 3T(n/2) + n\) is in which class?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-s3-cyu-1d"> \(\Theta(n\log n)\)<span class="why" hidden>That needs the same work on every level. Here it grows by \(\frac32\) per level.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-s3-cyu-1d"> \(\Theta(n^{\log_2 3})\)<span class="why" hidden>Correct: the leaves dominate, and there are \(3^{\log_2 n} = n^{\log_2 3}\) of them.</span></label>
+        <label><input type="radio" name="cse332-w3-s3-cyu-1d"> \(\Theta(3^n)\)<span class="why" hidden>The tree has only \(\log_2 n\) levels, not \(n\).</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-s3-cyu-1e" data-kind="bigo" data-answer="n" data-topic="s3-recur">
+      <p class="q">\(T(n) = 2T(n/3) + n\). Give its \(\Theta\) class.</p>
+      <p class="why" hidden>The level work is \((2/3)^i n\): a shrinking geometric series, so \(\Theta(n)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-s3-cyu-1b" data-kind="bigo" data-answer="n log n" data-topic="s3-recur">
+      <p class="q">\(T(n) = 2T(n/2) + n\) with base case \(T(n) = 4\) for \(n \le 4\). Give its \(\Theta\) class.</p>
+      <p class="why" hidden>The base case doesn't matter: still \(\Theta(n\log n)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-s3-cyu-1f-level" data-kind="num" data-answer="16" data-topic="s3-recur" data-miscon='{"8":"missed-a-level"}'>
+      <p class="q">In the tree for \(T(n) = 2T(n-2) + 1\), how many boxes are on level 4?</p>
+      <p class="why" hidden>\(2^4 = 16\). Subtracting 2 instead of 1 changes the number of levels, not the branching.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-s3-cyu-geometric" data-kind="mc" data-topic="s3-recur">
+      <p class="q">Why is \(\sum_{i=0}^{\log_3 n - 1}(2/3)^i\) bounded by a constant?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w3-s3-cyu-geometric"> It's part of a geometric series with ratio below 1, whose infinite sum is 3<span class="why" hidden>Correct: \(\sum_{i \ge 0} x^i = \frac1{1-x}\) for \(|x| &lt; 1\).</span></label>
+        <label><input type="radio" name="cse332-w3-s3-cyu-geometric"> It has a constant number of terms<span class="why" hidden>It has about \(\log_3 n\) terms, which grows.</span></label>
+        <label><input type="radio" name="cse332-w3-s3-cyu-geometric"> Every term is less than 1<span class="why" hidden>That alone isn't enough: \(\log n\) terms of \(\frac12\) still grow.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-s3-cyu-1c" data-kind="bigo" data-answer="n log n" data-topic="s3-recur">
+      <p class="q">\(T(n) = 2T(n/2) + 100n\). Give its \(\Theta\) class.</p>
+      <p class="why" hidden>Constants in \(f(n)\) don't matter: \(100n\) on each of \(\log_2 n\) levels.</p>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="s3" role="status"></div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L8: BALANCE -->
+<section class="page" id="l8-balance" data-title="What balanced means">
+  <p class="where">Lecture 8 · slides 15–28 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span> · Weiss 4.4</p>
+  <h1>What balanced means</h1>
+  <div class="prose">
+    <p>BSTs get tall when they're sparse, with many one-child nodes. The fix: change insert and delete so the tree stays more full. But which shape rule? Slides 17–24 try four.</p>
+  </div>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Rule</th><th>The issue</th></tr>
+    <tr><td>1. The root's two subtrees have the same number of nodes</td><td>Too weak: each side can still be a long chain.</td></tr>
+    <tr><td>2. The root's two subtrees have the same height</td><td>Too weak: the same chains, just equally long.</td></tr>
+    <tr><td>3. Every node's two subtrees have the same number of nodes</td><td>Too strong: not every size is possible (no tree of size 2).</td></tr>
+    <tr><td>4. Every node's two subtrees have the same height</td><td>Too strong: again, no tree of size 2.</td></tr>
+  </table>
+  </div>
+  <div class="rule">
+    <p><strong>AVL tree (slide 25).</strong> A binary search tree in which, at every node, the heights of the left and right subtrees differ by at most 1. Not too weak (the tree stays short) and not too strong (any number of nodes works). When an insert or delete throws a node out of balance, fix it with a <em>rotation</em>.</p>
+    <p>Each node stores its key, value, <strong>height</strong>, and left and right children (slide 28). An empty subtree has height −1, so a leaf has height 0.</p>
+  </div>
+
+  <h2>Is it an AVL tree? (slides 26–27)</h2>
+  <div class="tree-grid">
+    <figure class="treeview" data-shape="9(3(1(0,),6(5,)),10)" data-heights data-mark="9"><figcaption>Tree A: not balanced. At 9, the left is height 2 and the right is 0.</figcaption></figure>
+    <figure class="treeview" data-shape="9(3(1(0,),6(5,)),10(,16))" data-heights><figcaption>Tree B: balanced</figcaption></figure>
+    <figure class="treeview" data-shape="9(3(,6(5,)),10(,16))" data-heights data-mark="3"><figcaption>Tree C: not balanced. At 3, the left is −1 and the right is 1.</figcaption></figure>
+    <figure class="treeview" data-shape="9(3(1(0,),6(5,7)),10(,16))" data-heights><figcaption>Tree D: balanced</figcaption></figure>
+  </div>
+  <p class="note">The small numbers are each node's height. A "problem" node is one whose children's heights differ by more than 1.</p>
+
+  <div class="check" data-id="cse332-w3-l8-qc-tree-c" data-grader="exact" data-answer="3" data-miscon='{"9":"not-deepest"}'>
+    <p>Quick check: which key is Tree C's problem node?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l8-qc-root-height-d" data-grader="exact" data-answer="3" data-miscon='{"4":"height-counts-nodes"}'>
+    <p>Quick check: what height does Tree D's root store?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Walk the four ideas quickly and let the room find each flaw. The point is the Goldilocks rule: per node, but with slack of 1.</li>
+      <li>Tree C fools people who only check the root: the root is fine (heights 2 and 1), but 3 is not.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L8: INSERT AND ROTATE -->
+<section class="page" id="l8-insert" data-title="Insert and rotate">
+  <p class="where">Lecture 8 · slides 29–45 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span></p>
+  <h1>Insert and rotate</h1>
+  <div class="rule">
+    <p><strong>AVL insert (slide 29).</strong> Start like a BST: find where the key goes and put it there as a leaf. Then update the heights on the path back to the root and check the balance. If every node is still balanced, you're done. Only nodes on that path can become unbalanced, because nothing else changed.</p>
+  </div>
+
+  <h2>Step through the slides' examples</h2>
+  <div class="panel treelab" id="avl-lab" data-mode="avl" data-presets='[{"label":"Insert −1 (slide 32)","shape":"9(3(1(0,2),6(,7)),11(,16))","seq":[-1],"say":"Slide 32 tree. Press Insert to add −1."},{"label":"Insert 10 (slide 30)","shape":"9(3(1(0,2),6(,7)),11(,16))","seq":[10],"say":"Slide 30 tree. Press Insert to add 10."},{"label":"Insert 20 (slide 39)","shape":"9(3(1(0,2),6),11(10,16(,18)))","seq":[20],"say":"Slide 39 tree. Press Insert to add 20."},{"label":"Empty","shape":"","say":"Empty tree. Type keys and press Insert."}]'>
+    <div class="controls">
+      <label>Key <input type="text" inputmode="numeric" class="tl-key" aria-label="Key" placeholder="next in queue"></label>
+      <button class="btn primary tl-insert" type="button">Insert</button>
+      <button class="btn tl-next" type="button" disabled>Rotate</button>
+      <button class="btn quiet tl-reset" type="button">Reset</button>
+      <span class="tl-queue"></span>
+    </div>
+    <div class="controls tl-presets" role="group" aria-label="Start from"></div>
+    <div class="chart-box"><svg class="chart tl-svg" role="img"></svg></div>
+    <p class="out tl-out" role="status"></p>
+    <p class="tl-orders"></p>
+  </div>
+
+  <div class="prose">
+    <p><strong>Insert 10 (slides 30–31):</strong> 10 becomes 11's left child. On the path 10, 11, 9 every node is balanced, so no rotation.</p>
+    <p><strong>Insert −1 (slides 32–36):</strong> −1 goes under 0. Now 9's left subtree has height 3 and its right has height 1: 9 is the problem node. "Shorten" the left and "lengthen" the right with a <strong>right rotation</strong> at 9: 3 becomes the root, 9 becomes 3's right child, and 3's old right subtree (6 and 7) becomes 9's left subtree.</p>
+    <p><strong>Insert 20 (slides 39–43):</strong> 20 goes under 18. Both 16 and 11 are now unbalanced. Rotating at the <strong>deepest</strong> problem node always works: a left rotation at 16 makes 18 the parent of 16 and 20.</p>
+  </div>
+  <div class="split">
+    <div class="rule">
+      <p><strong>Right rotation (slides 37–38).</strong> We inserted into the left child's left subtree, and \(a\) is the deepest problem node. Make the left child \(b\) the new root, the old root its right child, and \(b\)'s old right subtree the old root's left subtree.</p>
+      <pre class="code">Node b = a.left
+a.left = b.right
+b.right = a
+return b</pre>
+    </div>
+    <div class="rule">
+      <p><strong>Left rotation (slides 44–45).</strong> The mirror image: the right child becomes the root, the old root its left child, and the new root's old left subtree becomes the old root's right subtree.</p>
+      <pre class="code">Node b = a.right
+a.right = b.left
+b.left = a
+return b</pre>
+    </div>
+  </div>
+  <p class="note">A rotation changes three references, so it runs in \(\Theta(1)\). After it, the subtree has the same height it had before the insert, so nothing above it needs fixing.</p>
+
+  <div class="check" data-id="cse332-w3-l8-qc-root-after-minus1" data-grader="exact" data-answer="3" data-miscon='{"9":"not-deepest","1":"single-for-double"}'>
+    <p>Quick check: after inserting −1 and rotating, what is the root?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l8-qc-rotation-time">
+    <p>Quick check: running time of one rotation in a tree of \(n\) nodes.</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w3-l8-qc-rotation-time"> \(\Theta(1)\)<span class="why" hidden>Right: three references change, whatever the size of the subtrees.</span></label>
+      <label><input type="radio" name="cse332-w3-l8-qc-rotation-time"> \(\Theta(\log n)\)<span class="why" hidden>Finding the node takes \(\Theta(\log n)\), but the rotation itself moves whole subtrees by changing three references.</span></label>
+      <label><input type="radio" name="cse332-w3-l8-qc-rotation-time"> \(\Theta(n)\)<span class="why" hidden>Subtrees move as a unit; no node inside them is visited.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>In the stepper, the orange node is the deepest unbalanced one. Ask the room to predict the rotation before pressing Rotate.</li>
+      <li>The slide-37 picture with heights \(h, h+1, h+2, h+3\) is the proof that one rotation is enough: after it, both children of the new root have height \(h+1\).</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L8: FOUR CASES -->
+<section class="page" id="l8-cases" data-title="The four cases">
+  <p class="where">Lecture 8 · slides 46–54 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span></p>
+  <h1>The four cases</h1>
+  <div class="prose">
+    <p>"Rotate toward the shorter side" is incomplete (slide 46). Insert 9, 5, 7: 9 is unbalanced, its left subtree is deeper, but a right rotation at 9 just gives 5 with right child 9 and 9's left child 7, which is unbalanced the other way.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Insert summary (slide 53).</strong> After a BST insert, update the heights of the new node's ancestors, from the leaf up. At the deepest unbalanced node:</p>
+    <ul>
+      <li><strong>LL</strong>, inserted into the left subtree of the left child: rotate right.</li>
+      <li><strong>RR</strong>, inserted into the right subtree of the right child: rotate left.</li>
+      <li><strong>LR</strong>, inserted into the right subtree of the left child: rotate left at the left child, then right at the node.</li>
+      <li><strong>RL</strong>, inserted into the left subtree of the right child: rotate right at the right child, then left at the node.</li>
+    </ul>
+    <p>Stop when you reach the root or have applied one case.</p>
+  </div>
+  <div class="split">
+    <pre class="code"><span class="cm">// slide 50: case LR in one go</span>
+Node b = a.left
+Node c = b.right
+b.right = c.left
+a.left = c.right
+c.right = a
+c.left = b
+return c</pre>
+    <pre class="code"><span class="cm">// slide 54: insert for AVL</span>
+insertHelper(key, value, root) {
+  if (root == null)
+    return new Node(key, value);
+  if (root.key &lt; key)
+    root.right = insertHelper(key, value, root.right);
+  else
+    root.left = insertHelper(key, value, root.left);
+  if (isUnbalanced(root))
+    root = rotate(root);
+  return root;
+}</pre>
+  </div>
+
+  <h2>Try the double rotations</h2>
+  <div class="panel treelab" id="avl-cases" data-mode="avl" data-presets='[{"label":"9, 5, 7 (slide 48, LR)","shape":"","seq":[9,5,7],"say":"Empty tree, queue 9, 5, 7. Press Insert three times."},{"label":"3, 8, 5 (RL)","shape":"","seq":[3,8,5],"say":"Empty tree, queue 3, 8, 5."},{"label":"1 to 7 in order","shape":"","seq":[1,2,3,4,5,6,7],"say":"Sorted inserts. A plain BST would be a chain of height 6."}]'>
+    <div class="controls">
+      <label>Key <input type="text" inputmode="numeric" class="tl-key" aria-label="Key" placeholder="next in queue"></label>
+      <button class="btn primary tl-insert" type="button">Insert</button>
+      <button class="btn tl-next" type="button" disabled>Rotate</button>
+      <button class="btn quiet tl-reset" type="button">Reset</button>
+      <span class="tl-queue"></span>
+    </div>
+    <div class="controls tl-presets" role="group" aria-label="Start from"></div>
+    <div class="chart-box"><svg class="chart tl-svg" role="img"></svg></div>
+    <p class="out tl-out" role="status"></p>
+    <p class="tl-orders"></p>
+  </div>
+
+  <div class="check" data-id="cse332-w3-l8-qc-case-957">
+    <p>Quick check: inserting 7 into the tree 9 → 5 (5 is 9's left child) is which case?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w3-l8-qc-case-957"> LL<span class="why" hidden>7 &gt; 5, so it goes to 5's <em>right</em>.</span></label>
+      <label data-correct><input type="radio" name="cse332-w3-l8-qc-case-957"> LR<span class="why" hidden>Right: left child (5), then its right subtree. Two rotations make 7 the root.</span></label>
+      <label><input type="radio" name="cse332-w3-l8-qc-case-957"> RL<span class="why" hidden>7 &lt; 9, so it's in 9's left subtree.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l8-qc-root-385" data-grader="exact" data-answer="5" data-miscon='{"8":"single-for-double","3":"single-for-double"}'>
+    <p>Quick check: insert 3, 8, 5 into an empty AVL tree. What is the root?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>The case name is the path from the problem node to where the key went: first step, second step. Straight paths (LL, RR) take one rotation; zig-zags (LR, RL) take two.</li>
+      <li>In a double rotation the middle key \(c\) ends up on top. That's a quick check on any answer.</li>
+      <li>EX4 (AVL trees, due Oct 30) implements this. Don't hand out code; the slides' pseudocode is enough.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L8: HEIGHT -->
+<section class="page" id="l8-height" data-title="Why it's log n">
+  <p class="where">Lecture 8 · slides 55–56 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span></p>
+  <h1>Why AVL operations are \(\Theta(\log n)\)</h1>
+  <div class="prose">
+    <p>Operations are slow when the height is close to \(n\). So ask the opposite question: what's the <em>fewest</em> nodes an AVL tree of height \(h\) can have? Call it \(M(h)\). One subtree must have height \(h-1\), and the balance rule lets the other be as short as \(h-2\):</p>
+    <p>\[M(h) = M(h-1) + M(h-2) + 1,\qquad M(0) = 1,\ M(1) = 2.\]</p>
+  </div>
+  <div class="table-wrap">
+  <table class="plain num">
+    <tr><th>\(h\)</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr>
+    <tr><th>\(M(h)\)</th><td>1</td><td>2</td><td>4</td><td>7</td><td>12</td><td>20</td><td>33</td><td>54</td><td>88</td><td>143</td><td>232</td></tr>
+    <tr><th>max \(2^{h+1}-1\)</th><td>1</td><td>3</td><td>7</td><td>15</td><td>31</td><td>63</td><td>127</td><td>255</td><td>511</td><td>1023</td><td>2047</td></tr>
+  </table>
+  </div>
+  <div class="prose">
+    <p>Compare with Fibonacci, \(F(n) = F(n-1) + F(n-2)\) (slide 56): \(M(h) &gt; F(h)\), and \(F(h) \approx \phi^h\) with \(\phi \approx 1.618 &gt; 1.6\). So an AVL tree of height \(h\) has at least about \(\phi^h\) nodes, and at most \(2^{h+1} - 1\). With \(n\) nodes we need \(n \ge \phi^h\), so \(h \le \log_\phi n\). Every operation is \(O(\log n)\), and since even a perfect tree has height about \(\log_2 n\), they're \(\Omega(\log n)\) too.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w3-l8-qc-m4" data-grader="exact" data-answer="12" data-miscon='{"5":"fib-not-m","8":"fib-not-m","31":"leaves-not-nodes"}'>
+    <p>Quick check: \(M(4)\), the fewest nodes in an AVL tree of height 4.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l8-qc-maxh-20" data-grader="exact" data-answer="5" data-miscon='{"19":"bst-height","4":"off-by-one-height"}'>
+    <p>Quick check: the greatest possible height of an AVL tree with 20 nodes.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul>
+      <li>Draw the minimal trees for \(h = 0, 1, 2, 3\) on the board: each is a root over the minimal trees of heights \(h-1\) and \(h-2\).</li>
+      <li>"Greatest height with \(n\) nodes" is the largest \(h\) with \(M(h) \le n\). With 20 nodes that's 5 (\(M(5) = 20\)); a plain BST could reach 19.</li>
+    </ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L8: PRACTICE -->
+<section class="page" id="l8-practice" data-title="Lecture 8: practice">
+  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span> · practice</p>
+  <h1>Lecture 8: practice</h1>
+  <div class="prose"><p>Six problems on the lecture's trees and new insert sequences. Every tree was built by running the slides' AVL insert (<code>checks/cse332/w03/verify.mjs</code> checks the shapes, heights and rotations). Traversal boxes take keys separated by spaces or commas.</p></div>
+
+  <article class="task" data-id="cse332-w3-l8-is-avl">
+    <h2>1. Balanced or not?</h2>
+    <div class="tree-grid">
+      <figure class="treeview" data-shape="5(2(1,4(3,)),8(,9))"><figcaption>Tree X</figcaption></figure>
+      <figure class="treeview" data-shape="5(2(1,4(3,)),8(,9(,10)))"><figcaption>Tree Y</figcaption></figure>
+    </div>
+    <p class="prompt">Both are BSTs. Are they AVL trees? For the one that isn't, name the problem node.</p>
+    <div class="answer-spec" data-part="x" data-grader="yesno" data-answer="yes" data-label="Is Tree X an AVL tree?"></div>
+    <div class="answer-spec" data-part="y" data-grader="yesno" data-answer="no" data-label="Is Tree Y an AVL tree?"></div>
+    <div class="answer-spec" data-part="problem" data-grader="exact" data-answer="8" data-miscon='{"5":"not-deepest"}' data-label="Tree Y's problem node"></div>
+    <ol class="hints">
+      <li>Write each node's height, from the leaves up (a leaf is 0, an empty child −1). Then compare each node's two children.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>X: 2 has children of heights 0 and 1; 8 has −1 and 0; 5 has 2 and 1. All differ by at most 1.</li>
+      <li>Y: 9 has height 1, so 8's children are −1 and 1: they differ by 2. The root 5 has 2 and 2, which is fine.</li>
+      <li class="answer">X yes; Y no; the problem node is 8.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l8-single">
+    <h2>2. Single rotations</h2>
+    <p class="prompt">Insert into an empty AVL tree.</p>
+    <div class="answer-spec" data-part="case123" data-grader="choice" data-answer="rr" data-options="ll:LL|rr:RR|lr:LR|rl:RL" data-label="1, 2, 3: which case?"></div>
+    <div class="answer-spec" data-part="root123" data-grader="exact" data-answer="2" data-label="1, 2, 3: final root"></div>
+    <div class="answer-spec" data-part="case321" data-grader="choice" data-answer="ll" data-options="ll:LL|rr:RR|lr:LR|rl:RL" data-label="3, 2, 1: which case?"></div>
+    <div class="answer-spec" data-part="root321" data-grader="exact" data-answer="2" data-label="3, 2, 1: final root"></div>
+    <ol class="hints">
+      <li>After the third insert, which node is unbalanced, and which way did you go from it twice?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>1, 2, 3: a right-going chain. 1 is unbalanced and 3 went right, then right: RR, so rotate left at 1.</li>
+      <li>3, 2, 1: the mirror. LL, rotate right at 3.</li>
+      <li class="answer">RR, root 2; LL, root 2.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l8-minus1">
+    <h2>3. The slide-32 insert</h2>
+    <div class="treeview" data-shape="9(3(1(0,2),6(,7)),11(,16))" data-heights></div>
+    <p class="prompt">Insert −1 into this AVL tree (slide 32).</p>
+    <div class="answer-spec" data-part="h9" data-grader="exact" data-answer="4" data-label="height of 9 right after the BST insert"></div>
+    <div class="answer-spec" data-part="problem" data-grader="exact" data-answer="9" data-label="deepest unbalanced node"></div>
+    <div class="answer-spec" data-part="case" data-grader="choice" data-answer="ll" data-options="ll:LL|rr:RR|lr:LR|rl:RL" data-label="case"></div>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="3 1 0 -1 2 9 6 7 11 16|3, 1, 0, -1, 2, 9, 6, 7, 11, 16" data-label="pre-order after the rotation"></div>
+    <ol class="hints">
+      <li>−1 goes to 0's left. Recompute heights on the path −1, 0, 1, 3, 9.</li>
+      <li>From 9 the new key went left (to 3), then left again (to 1).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Heights on the path: −1 is 0, 0 is 1, 1 is 2, 3 is 3, 9 is 4. 9's right child 11 has height 1.</li>
+      <li>9's children differ by 2, and 9 is the only unbalanced node: 1 has 1 and 0, 3 has 2 and 1.</li>
+      <li>Left, then left: LL. Rotate right at 9. 3 becomes the root; 9 takes 3's old right subtree (6, 7) as its left.</li>
+      <li class="answer">4; 9; LL; 3 1 0 −1 2 9 6 7 11 16.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l8-insert20">
+    <h2>4. The slide-39 insert</h2>
+    <div class="treeview" data-shape="9(3(1(0,2),6),11(10,16(,18)))" data-heights></div>
+    <p class="prompt">Insert 20 (slide 39). Two nodes become unbalanced.</p>
+    <div class="answer-spec" data-part="deep" data-grader="exact" data-answer="16" data-miscon='{"11":"not-deepest"}' data-label="the node to rotate at"></div>
+    <div class="answer-spec" data-part="case" data-grader="choice" data-answer="rr" data-options="ll:LL|rr:RR|lr:LR|rl:RL" data-label="case"></div>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="9 3 1 0 2 6 11 10 18 16 20|9, 3, 1, 0, 2, 6, 11, 10, 18, 16, 20" data-label="pre-order after the rotation"></div>
+    <ol class="hints">
+      <li>20 goes to 18's right. Which nodes on the path now have children whose heights differ by 2?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>16's children: −1 and 1. 11's children: 0 and 2. Both unbalanced; 16 is deeper.</li>
+      <li>From 16 the key went right, then right: RR. Rotate left at 16, so 18 becomes 11's right child with children 16 and 20.</li>
+      <li>That also fixes 11: its right subtree is back to height 1.</li>
+      <li class="answer">16; RR; 9 3 1 0 2 6 11 10 18 16 20.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l8-double">
+    <h2>5. A sequence with every kind of rotation</h2>
+    <p class="prompt">Insert 10, 20, 30, 25, 28, 27 into an empty AVL tree.</p>
+    <div class="answer-spec" data-part="case28" data-grader="choice" data-answer="lr" data-options="ll:LL|rr:RR|lr:LR|rl:RL|none:no rotation" data-label="case when 28 is inserted"></div>
+    <div class="answer-spec" data-part="case27" data-grader="choice" data-answer="rl" data-options="ll:LL|rr:RR|lr:LR|rl:RL|none:no rotation" data-label="case when 27 is inserted"></div>
+    <div class="answer-spec" data-part="root" data-grader="exact" data-answer="25" data-label="final root"></div>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="25 20 10 28 27 30|25, 20, 10, 28, 27, 30" data-label="final pre-order"></div>
+    <ol class="hints">
+      <li>Draw the tree after each insert. 30 triggers an RR at 10. Where does 28 go then?</li>
+      <li>After 28: 20 is the root, 10 its left child, and 28 its right child with children 25 and 30. Now insert 27.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>10, 20, 30: RR at 10, giving 20(10, 30). 25 goes to 30's left; still balanced.</li>
+      <li>28 goes to 25's right. 30 is unbalanced (left height 1, right −1); from 30 the key went left then right: LR. Result: 20(10, 28(25, 30)).</li>
+      <li>27 goes to 25's right. Now 20 is unbalanced (left 0, right 2); from 20 it went right (28) then left (25): RL. Rotate right at 28, then left at 20: 25 rises to the root.</li>
+      <li class="answer">LR; RL; root 25; pre-order 25 20 10 28 27 30.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l8-sorted">
+    <h2>6. Sorted inserts, and how tall</h2>
+    <p class="prompt">Insert 1, 2, …, 7 in order into an empty AVL tree. Then use \(M(h)\) from slide 55.</p>
+    <div class="answer-spec" data-part="rotations" data-grader="exact" data-answer="4" data-label="number of single rotations"></div>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="4 2 1 3 6 5 7|4, 2, 1, 3, 6, 5, 7" data-label="final pre-order"></div>
+    <div class="answer-spec" data-part="m6" data-grader="exact" data-answer="33" data-miscon='{"13":"fib-not-m","21":"fib-not-m"}' data-label="\(M(6)\)"></div>
+    <div class="answer-spec" data-part="maxh50" data-grader="exact" data-answer="6" data-miscon='{"49":"bst-height","7":"off-by-one-height"}' data-label="greatest height of an AVL tree with 50 nodes"></div>
+    <ol class="hints">
+      <li>Rotations happen when you insert 3, 5, 6 and 7. All are RR.</li>
+      <li>\(M\): 1, 2, 4, 7, 12, 20, 33, 54. Find the largest \(h\) with \(M(h) \le 50\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>3: RR at 1. 5: RR at 3. 6: RR at the root 2 (4 becomes the root). 7: RR at 5.</li>
+      <li>The result is the perfect tree 4(2(1, 3), 6(5, 7)) of height 2, where a plain BST would be a chain of height 6.</li>
+      <li>\(M(6) = M(5) + M(4) + 1 = 20 + 12 + 1 = 33\). \(M(7) = 54 &gt; 50\), so the height is at most 6.</li>
+      <li class="answer">4 rotations; 4 2 1 3 6 5 7; 33; 6.</li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L8: QUIZ -->
+<section class="page" id="l8-quiz" data-title="Check your understanding: AVL trees">
+  <p class="where">Lecture 8 wrap-up · original questions written for this site, not from the course</p>
+  <h1>Check your understanding: AVL trees</h1>
+  <div class="prose"><p>Ten questions on Lecture 8. The score counts first tries.</p></div>
+  <div class="cyu-score" data-quiz-score="l8" role="status"></div>
+  <ol class="cyu-list" data-quiz="l8">
+    <li class="cyu" data-id="cse332-w3-l8-cyu-property" data-kind="mc" data-topic="l8-balance">
+      <p class="q">The AVL balance property says…</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-l8-cyu-property"> the root's two subtrees have equal height<span class="why" hidden>Too weak (idea 2): both sides can be long chains.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-l8-cyu-property"> at every node, the two subtrees' heights differ by at most 1<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w3-l8-cyu-property"> every node's subtrees have the same number of nodes<span class="why" hidden>Too strong (idea 3): no tree of size 2 would qualify.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l8-cyu-leaf-height" data-kind="num" data-answer="0" data-topic="l8-balance">
+      <p class="q">What height does a leaf store?</p>
+      <p class="why" hidden>0. An empty subtree counts as −1.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l8-cyu-which-nodes" data-kind="mc" data-topic="l8-insert">
+      <p class="q">After a BST insert, which nodes can be unbalanced?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w3-l8-cyu-which-nodes"> Only ancestors of the new node<span class="why" hidden>Correct: no other subtree changed.</span></label>
+        <label><input type="radio" name="cse332-w3-l8-cyu-which-nodes"> Only the root<span class="why" hidden>Slide 40 shows 16 and 11 unbalanced while the root is fine.</span></label>
+        <label><input type="radio" name="cse332-w3-l8-cyu-which-nodes"> Any node in the tree<span class="why" hidden>Subtrees that didn't change were balanced before and still are.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l8-cyu-deepest" data-kind="mc" data-topic="l8-insert">
+      <p class="q">Several ancestors are unbalanced. Where do you rotate?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-l8-cyu-deepest"> At the root<span class="why" hidden>Rotating at the root may not fix the lower one.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-l8-cyu-deepest"> At the deepest unbalanced node<span class="why" hidden>Correct: that always works, and it fixes the ones above too.</span></label>
+        <label><input type="radio" name="cse332-w3-l8-cyu-deepest"> At every unbalanced node, bottom up<span class="why" hidden>After one case is applied you're done (slide 53).</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l8-cyu-rotation-cost" data-kind="mc" data-topic="l8-insert">
+      <p class="q">An AVL insert into \(n\) nodes does at most how much rotation work?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w3-l8-cyu-rotation-cost"> \(\Theta(1)\): one case, at most two rotations<span class="why" hidden>Correct. The walk down and back up is what costs \(\Theta(\log n)\).</span></label>
+        <label><input type="radio" name="cse332-w3-l8-cyu-rotation-cost"> \(\Theta(\log n)\): a rotation at every ancestor<span class="why" hidden>After one case the subtree is back to its old height, so nothing above needs a rotation.</span></label>
+        <label><input type="radio" name="cse332-w3-l8-cyu-rotation-cost"> \(\Theta(n)\): the subtrees have to be rebuilt<span class="why" hidden>Subtrees move as a unit by changing references.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l8-cyu-lr" data-kind="mc" data-topic="l8-cases">
+      <p class="q">Case LR is fixed by…</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-l8-cyu-lr"> one right rotation at the problem node<span class="why" hidden>That's LL. Slide 46 shows it failing for 9, 5, 7.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-l8-cyu-lr"> a left rotation at the left child, then a right rotation at the problem node<span class="why" hidden>Correct.</span></label>
+        <label><input type="radio" name="cse332-w3-l8-cyu-lr"> a right rotation at the left child, then a left rotation at the problem node<span class="why" hidden>That's the RL pattern, mirrored the wrong way.</span></label>
+      </div>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l8-cyu-root-123" data-kind="num" data-answer="2" data-topic="l8-cases">
+      <p class="q">Insert 1, 2, 3 into an empty AVL tree. What is the root?</p>
+      <p class="why" hidden>RR at 1: rotate left, and 2 becomes the root.</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l8-cyu-m5" data-kind="num" data-answer="20" data-topic="l8-height" data-miscon='{"8":"fib-not-m","13":"fib-not-m"}'>
+      <p class="q">\(M(5)\), the fewest nodes in an AVL tree of height 5.</p>
+      <p class="why" hidden>\(M(5) = M(4) + M(3) + 1 = 12 + 7 + 1 = 20\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l8-cyu-find" data-kind="bigo" data-answer="log n" data-topic="l8-height">
+      <p class="q">Worst-case time of <code>find</code> in an AVL tree with \(n\) nodes.</p>
+      <p class="why" hidden>The height is at most \(\log_\phi n\): \(\Theta(\log n)\).</p>
+    </li>
+    <li class="cyu" data-id="cse332-w3-l8-cyu-middle" data-kind="mc" data-topic="l8-cases">
+      <p class="q">After a double rotation fixes nodes \(a\), \(b\), \(c\) with keys \(b &lt; c &lt; a\) (case LR), which is on top?</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w3-l8-cyu-middle"> \(a\)<span class="why" hidden>\(a\) was the problem node; it moves down.</span></label>
+        <label><input type="radio" name="cse332-w3-l8-cyu-middle"> \(b\)<span class="why" hidden>That's what a single right rotation would do, and it doesn't fix LR.</span></label>
+        <label data-correct><input type="radio" name="cse332-w3-l8-cyu-middle"> \(c\), the middle key<span class="why" hidden>Correct (slide 50 returns c).</span></label>
+      </div>
+    </li>
+  </ol>
+  <div class="cyu-score" data-quiz-summary="l8" role="status"></div>
+  <details class="notes" open>
+    <summary>Teaching notes</summary>
+    <ul><li>Questions 4 and 6 are the ones people miss. Run 9, 5, 7 in the stepper if they do.</li></ul>
+  </details>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ READINGS -->
+<section class="page" id="readings" data-title="Readings">
+  <h1>Readings</h1>
+  <div class="prose"><p>The textbook is optional; the calendar lists sections per lecture. The topic summaries are a second presentation of the same material.</p></div>
+  <div class="table-wrap">
+  <table class="plain">
+    <tr><th>Mon Oct 12 · Recurrences</th><td>No Weiss sections listed. <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/recurrences.html" target="_blank" rel="noopener">Summary: Recurrences</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec06-Recurrences.pdf" target="_blank" rel="noopener">slides (pdf)</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/math_identities_quick_reference.pdf" target="_blank" rel="noopener">Math identities</a></td></tr>
+    <tr><th>Wed Oct 14 · Dictionaries, BSTs</th><td>Weiss 4.1–4.3, 4.6. <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec07-Dictionaries-BSTs.pdf" target="_blank" rel="noopener">Slides (pdf)</a></td></tr>
+    <tr><th>Thu Oct 15 · Section 3</th><td><a href="https://courses.cs.washington.edu/courses/cse332/26au/files/section/Section03.pdf" target="_blank" rel="noopener">Slides (pdf)</a> · <a href="https://docs.google.com/document/d/1GiXbGiS-lWsVSuOgOtOy0pDHRIUdaPEk/edit" target="_blank" rel="noopener">worksheet</a> · <a href="https://docs.google.com/document/d/1AoXYuz7uZ0V_RBAjzwXxA3w7_fUi5LaB/edit" target="_blank" rel="noopener">solutions</a></td></tr>
+    <tr><th>Fri Oct 16 · AVL Trees 1</th><td>Weiss 4.4. <a href="https://courses.cs.washington.edu/courses/cse332/26au/summaries/avl.html" target="_blank" rel="noopener">Summary: AVL Trees</a> · <a href="https://courses.cs.washington.edu/courses/cse332/26au/files/slides/cse332-26au-lec08-AVL-1.pdf" target="_blank" rel="noopener">slides (pdf)</a></td></tr>
+  </table>
+  </div>
+  <h2>What to read for</h2>
+  <div class="prose">
+    <ul>
+      <li><strong>Recurrences summary:</strong> identifying a recurrence (base case, prep, recursive calls, using the results), then the tree method for chip and conquer and for divide and conquer, and a closing section on what matters, the same as slide 22.</li>
+      <li><strong>AVL summary:</strong> the balance rule, the minimum-node argument, and the rotations, with more pictures than the slides. It also covers the next lecture.</li>
+      <li>Weiss isn't online, so this site doesn't summarize it.</li>
+    </ul>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ CHEATSHEET -->
+<section class="page" id="cheatsheet" data-title="Cheat sheet">
+  <h1>Week 3 cheat sheet</h1>
+  <p class="where">Print with <kbd>Ctrl</kbd>+<kbd>P</kbd>; only this page prints.</p>
+  <div class="cheat">
+    <section>
+      <h3>Recurrences</h3>
+      <p>Divide and conquer \(T(n) = aT(n/b) + f(n)\); chip and conquer \(T(n) = aT(n-b) + f(n)\). \(a\) = calls per call, \(b\) = how the input shrinks, \(f\) = work outside the calls.</p>
+      <p>Matters: \(a\), \(b\), the class of \(f\). Doesn't: constants in \(f\), the base case.</p>
+    </section>
+    <section>
+      <h3>Tree method</h3>
+      <p>Level \(i\): \(a^i\) boxes of size \(n/b^i\) (or \(n - bi\)), level work \(a^i f(n/b^i)\). Height \(\log_b n\) (or \(n/b\)). Sum the levels.</p>
+      <p>Level work grows: leaves win. Flat: work × levels. Shrinks: root wins.</p>
+    </section>
+    <section>
+      <h3>Series</h3>
+      <p>\(\sum_{i=0}^{k} x^i = \frac{x^{k+1}-1}{x-1}\); \(\sum_{i=0}^{\infty} x^i = \frac1{1-x}\) for \(|x|&lt;1\).</p>
+      <p>\(a^{\log_b c} = c^{\log_b a}\), e.g. \(2^{\log_8 n} = n^{1/3}\), \(3^{\log_2 n} = n^{\log_2 3}\).</p>
+    </section>
+    <section>
+      <h3>Common recurrences</h3>
+      <table class="plain">
+        <tr><td>\(T(n/2) + 1\)</td><td>\(\log n\)</td><td>\(2T(n/2) + 1\)</td><td>\(n\)</td></tr>
+        <tr><td>\(T(n-1) + 1\)</td><td>\(n\)</td><td>\(T(n-1) + n\)</td><td>\(n^2\)</td></tr>
+        <tr><td>\(2T(n-1) + 1\)</td><td>\(2^n\)</td><td>\(T(n/2) + n\)</td><td>\(n\)</td></tr>
+        <tr><td>\(2T(n/2) + n\)</td><td>\(n\log n\)</td><td>\(2T(n/2) + n^2\)</td><td>\(n^2\)</td></tr>
+        <tr><td>\(3T(n/2) + n\)</td><td>\(n^{\log_2 3}\)</td><td>\(2T(n/3) + n\)</td><td>\(n\)</td></tr>
+        <tr><td>\(2T(n/8) + 1\)</td><td>\(n^{1/3}\)</td><td>\(2T(n-2) + 1\)</td><td>\(\sqrt2^{\,n}\)</td></tr>
+      </table>
+    </section>
+    <section>
+      <h3>Dictionaries and BSTs</h3>
+      <p><code>insert(k, v)</code> overwrites an existing key; <code>find(k)</code>; <code>delete(k)</code>. BST: left subtree &lt; node &lt; right subtree, for whole subtrees.</p>
+      <p>Pre-order: root, L, R. In-order: L, root, R (sorted). Post-order: L, R, root.</p>
+      <p>Delete: leaf → null; one child → the child; two children → max of the left (or min of the right).</p>
+    </section>
+    <section>
+      <h3>Tree numbers (height \(h\), edges)</h3>
+      <p>Leaves: at most \(2^h\), at least 1. Nodes: at most \(2^{h+1}-1\), at least \(h+1\). Empty tree: height −1. BST find/insert/delete: \(\Theta(\text{height})\), worst \(\Theta(n)\).</p>
+    </section>
+    <section>
+      <h3>AVL insert</h3>
+      <p>BST insert, update heights up the path, rotate at the deepest unbalanced node:</p>
+      <p>LL → right at it. RR → left at it. LR → left at the left child, then right. RL → right at the right child, then left. One case and you're done.</p>
+    </section>
+    <section>
+      <h3>AVL height</h3>
+      <p>\(M(h) = M(h-1) + M(h-2) + 1\): 1, 2, 4, 7, 12, 20, 33, 54, 88. \(M(h) &gt; \phi^h\), so \(h \le \log_\phi n\): every operation \(\Theta(\log n)\).</p>
+    </section>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+</main>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="../../core/katex/katex.min.js"></script>
+<script src="../../core/katex/contrib/auto-render.min.js"></script>
+<script src="../../courses.js"></script>
+<script src="../../core/grader.js"></script>
+<script src="../../core/store.js"></script>
+<script src="sim.js"></script>
+<script src="week.js"></script>
+<script src="../../core/app.js"></script>
+</body>
+</html>

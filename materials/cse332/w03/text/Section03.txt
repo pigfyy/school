@@ -1,0 +1,608 @@
+Recurrences
+CSE 332 - Section 3
+Part 1: Recurrence
+Relations
+Recurrence Relations Overview
+
+● Describes the time complexity of recursive algorithms, often uses T(n)
+    ○ Same way that f(n) and g(n) described time complexity of non
+       recursive algorithms last week
+● Generally in the form:
+                          𝑛𝑛
+             𝑇𝑇 𝑛𝑛 = 𝑎𝑎𝑎𝑎    + 𝑓𝑓 𝑛𝑛                 “Divide & Conquer”
+                          𝑏𝑏
+                                  OR
+
+           𝑇𝑇 𝑛𝑛 = 𝑎𝑎𝑎𝑎 𝑛𝑛 − 𝑏𝑏 + 𝑓𝑓 𝑛𝑛                “Chip & Conquer”
+    Recurrence Relations Examples
+                 𝑛𝑛
+    𝑇𝑇 𝑛𝑛 = 𝑎𝑎𝑎𝑎    + 𝑓𝑓 𝑛𝑛        OR       𝑇𝑇 𝑛𝑛 = 𝑎𝑎𝑎𝑎 𝑛𝑛 − 𝑏𝑏 + 𝑓𝑓 𝑛𝑛
+                 𝑏𝑏
+●    n = input size
+●    T(n) = runtime for input size n
+●    b = how input shrinks for next recursive call(s) (reduction factor/ constant)
+●    a = number of recursive calls made per function call (branching factor)
+                                             foo(L) { // n = L.size
+bar(A, start, n) {                               if (L.size <= 1) { a = 2
+    if (n-start <= 1) { a = 1                        return 1;
+        return 1;                                }                   b= 1
+                        b= 2                     L.remove(0); // n = n-1
+    }
+    return 2*bar(A, start, n/2);                 return foo(L) + foo(L);
+}                                            }
+                                                                                   Recurrence relation forms:
+    Problem 0a                                                                        ●
+
+
+
+Find a recurrence T(n) modelling the worst-case runtime complexity of f(n)
+1       f(stack) { // stack.size = n
+2         if (stack.size == 0) {
+3           return 0
+4         }                                                        𝑐𝑐           𝑖𝑖𝑖𝑖 𝑛𝑛 ≤ 0
+                                                       𝑇𝑇 𝑛𝑛 = � 0
+5         stack.pop // stack.size --                            𝑇𝑇 𝑛𝑛 − 1 + 𝑐𝑐1 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+6         return 2*f(stack)+1
+7       }
+
+    ●    When does the bas e cas e occur?
+    ●    What is the branching factor a?
+    ●    What is the reduction factor / cons tant b?
+    ●    What is the amount of non-recurs ive work f(n)?
+                                                                               Recurrence relation forms:
+    Problem 0a                                                                    ●
+
+
+
+Find a recurrence T(n) modelling the worst-case runtime complexity of f(n)
+1       f(stack) { // stack.size = n
+2         if (stack.size == 0) {
+3           return 0
+4         }                                                    𝑐𝑐           𝑖𝑖𝑖𝑖 𝑛𝑛 ≤ 0
+                                                   𝑇𝑇 𝑛𝑛 = � 0
+5         stack.pop // stack.size --                        𝑇𝑇 𝑛𝑛 − 1 + 𝑐𝑐1 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+6         return 2*f(stack)+1
+7       }
+
+    ●    When does the bas e cas e occur? n ≤0
+    ●    What is the branching factor a? a = 1 since we only make one recursive call
+    ●    What is the reduction factor / cons tant b? b = 1 since we always reduce input size by 1
+    ●    What is the amount of non-recurs ive work f(n)? constant, which we can denote as c1
+                                                                          Recurrence relation forms :
+     Problem 0b                                                             ●
+
+
+
+  Find a recurrence T(n) modelling the worst-case runtime complexity of bar(n)
+1 bar(A, start, n) {
+2   if n ≤ 10000 {                     ●   When does the bas e cas e occur?       n ≤10000
+3      return 1000
+4   }                                  ●   What is the branching factor a? a = 2
+5    if (bar(A, start, n/3) > 5) {
+6      for (int i=0; i<n; i++) {
+                                       ●   What is the reduction factor / b? b = 3
+        println("Yay")
+7
+8    }
+                                       ●   What is the amount of non-recurs ive work f(n)? c1*n + c2
+9      return 5*bar(A, start, n/3)
+10  } else {
+11     for (int i=0; i<n*n; i++) {
+12       println("Yay")
+13     }
+14     return 4 * bar(A, start, n/3)
+15  }
+Tree Method Overview
+                                                    Asymptotically, these never matter!
+
+    Big Idea: T(n/b)
+  Red box represents a
+   problem instance
+                                                                         𝑛𝑛
+                                        …                    ⟹ 𝑎𝑎𝑖𝑖 𝑓𝑓( 𝑖𝑖 ) work per level
+ Blue value next to each                                                𝑏𝑏
+box represents time spent
+  at that recursive call
+
+                            …                   …
+                                                               ≈ 𝑙𝑙𝑙𝑙𝑙𝑙𝑏𝑏 𝑛𝑛 levels
+                 …
+
+                                …
+
+
+                                            …
+
+                                                    …
+                                c
+                                    …                                   logb 𝑛𝑛 −1
+                                                                                              𝑛𝑛
+                                                             𝑇𝑇(𝑛𝑛) =         �      𝑎𝑎𝑖𝑖 𝑓𝑓( 𝑖𝑖 )
+                                                                                             𝑏𝑏
+                                                                              𝑖𝑖=0
+                                                                           Asymptotically, these never matter!
+    Big Idea: T(n-b)
+                                                           f(n)
+  Red box represents a
+   problem instance
+                                                   n
+Blue value next to each                                                            ⟹ ai f(n − bi) work per level
+  box represents time
+spent at that recursive
+                        f(n-b)    n-b              …           n-b    f(n-b)
+          call
+                   f(n-2b)                  f(n-2b) f(n-2b)            f(n-2b)
+                         n - 2b       n - 2b           n - 2b        n - 2b         ≈
+                                                                                        𝑛𝑛
+                                                                                           levels
+                                                                                        𝑏𝑏
+                      …
+
+                                      …
+
+                                                       …
+
+                                                                     …
+                  c               c            c           c                  c
+            x              x            x              x       …       x
+                                                                                             𝑛𝑛
+                                                                                             𝑏𝑏 −1
+                                                                                  𝑇𝑇(𝑛𝑛) = � 𝑎𝑎𝑖𝑖 𝑓𝑓(𝑛𝑛 − 𝑏𝑏𝑏𝑏)
+                                                                                             𝑖𝑖=0
+                                                                                  𝑛𝑛
+       Tree Method 𝑇𝑇 𝑛𝑛 = 2𝑇𝑇                                                             + 𝑛𝑛
+                                                                                  2
+    Red box represents a
+     problem instance
+
+ Blue value next to each box                                      𝑛𝑛                                           n
+represents time spent at that                            𝑛𝑛                                         ⇒ 2i ∗ i = 𝑛𝑛
+        recursive call                                                                                         2
+                                                                                                       work per level
+                                               𝑛𝑛                                     𝑛𝑛              (root level is 0)
+                                𝑛𝑛⁄2           2                           𝑛𝑛⁄2       2
+
+
+                                𝑛𝑛                  𝑛𝑛                      𝑛𝑛                 𝑛𝑛   log 2 𝑛𝑛 levels
+                    𝑛𝑛⁄4        4        𝑛𝑛⁄4       4         𝑛𝑛⁄4          4     𝑛𝑛⁄4         4
+                                                                                                    of recursion
+                    …
+
+                                     …
+
+
+                                                              …
+
+                                                                                  …
+               1
+                      1
+                            1
+                                 1
+                                     1
+                                           1
+                                                    …         1
+                                                                       1
+                                                                            1
+                                                                                  1
+                                                                                       1
+                                                                                           1
+                                                                                                                log2 𝑛𝑛
+
+                                                                                                    𝑇𝑇 𝑛𝑛 = � 𝑛𝑛
+                                                                                                                  𝑖𝑖=0
+Q1(a) Solving the Summation
+           𝑙𝑙𝑙𝑙𝑙𝑙( 𝑛𝑛)−1
+
+ 𝑇𝑇 𝑛𝑛 =      �            𝑛𝑛
+               𝑖𝑖=0
+
+      = (log 2 𝑛𝑛 − 1) + 1 ⋅ 𝑛𝑛
+
+      = 𝑛𝑛 ⋅ log 2 (𝑛𝑛)
+
+      ∈ Θ(𝑛𝑛𝑛𝑛𝑛𝑛𝑛𝑛𝑛𝑛)
+Your Turn!
+Try problems 1b-1f
+Q1(b) Base Case Doesn’t Matter!
+
+    Red box represents a
+     problem instance
+
+ Blue value next to each box                               𝑛𝑛
+represents time spent at that
+                                                    ⟹ 2𝑖𝑖 ∗ 𝑖𝑖 = 𝑛𝑛 work per level
+                                                           2
+        recursive call
+
+
+
+                                …           …
+                                                     log 2 𝑛𝑛 − 2 levels of
+                                                     recursion
+                    …
+
+                                    …
+
+
+                                        …
+
+                                                …
+                                                                 log2 𝑛𝑛−3
+                                    …                 𝑇𝑇 𝑛𝑛 =       �        𝑛𝑛
+                                                                    𝑖𝑖=0
+Q1(b) Solving the Summation
+          log2 (𝑛𝑛)−3
+
+𝑇𝑇 𝑛𝑛 =      �          𝑛𝑛
+             𝑖𝑖=0
+
+    =       log 2 (𝑛𝑛 − 3 + 1] ⋅ 𝑛𝑛
+
+     𝑛𝑛 ⋅ log 2 𝑛𝑛 − 2𝑛𝑛
+
+     ∈ Θ(𝑛𝑛𝑛𝑛𝑛𝑛𝑛𝑛𝑛𝑛)
+Q1(c) Constants for f(n) Don’t Matter!
+
+    Red box represents a
+     problem instance
+
+                                                            100𝑛𝑛
+ Blue value next to each box
+represents time spent at that
+                                                     ⟹ 2𝑖𝑖 ∗ 𝑖𝑖 = 100𝑛𝑛
+                                                             2
+        recursive call                               work per level
+
+                                …           …
+                                                     log 2 𝑛𝑛 levels of
+                                                     recursion
+                    …
+
+                                    …
+
+
+                                        …
+
+                                                …
+                                    …                         log2 𝑛𝑛−1
+
+                                                    𝑇𝑇 𝑛𝑛 =     �         100𝑛𝑛
+                                                                𝑖𝑖=0
+Q(1c) Solving the Summation
+          log2 𝑛𝑛−1
+
+𝑇𝑇 𝑛𝑛 =     �         100𝑛𝑛
+            𝑖𝑖=0
+
+
+    =       log 2 (𝑛𝑛 − 1 + 1] ⋅ 100𝑛𝑛
+
+     100𝑛𝑛 ⋅ log 2 𝑛𝑛
+
+     ∈ Θ(𝑛𝑛𝑛𝑛𝑛𝑛𝑛𝑛𝑛𝑛)
+Q1(d) Branching Factor (a) Matters!
+Red box represents a
+  problem instance
+Blue value represents
+  time spent at that
+    recursive call
+
+
+
+
+                            …
+ …
+
+
+
+                        …
+
+
+                                …
+
+
+                                    …
+                        …
+Q(1d) Solving the Summation
+
+
+
+                        can move the n using the constant multiple rule
+
+            3 log2 𝑛𝑛
+        1−
+   = 𝑛𝑛     2
+                3
+          1 −
+                2
+             log2 𝑛𝑛
+           3
+        1−
+               𝑛𝑛
+   = 𝑛𝑛
+              1
+           −
+              2
+                        multiplied by -2 and distributed our n
+Q1(e) Reduction Factor (/b) Does Matter!
+
+ Red box represents a
+   problem instance
+ Blue value represents
+   time spent at that
+     recursive call
+
+
+                         …           …
+              …
+
+                             …
+
+
+                                 …
+
+                                         …
+                             …
+Q(1e) Solving the Summation
+
+
+
+                               can move the n using the constant multiple rule
+
+
+
+This is a geometric series with a ratio < 1, so it converges to a constant!
+Q1(f): Tree method
+
+                                      n           Work: 1                   #children #levels   work
+
+
+
+
+                1                                               1           ⇒ 2i work per level
+                        n-2                           n-2
+            1                 1               1                     1
+            n-4             n-4               n-4           n-4              ≈ n/2 levels
+                …
+
+                              …
+
+                                                  …
+
+                                                                …
+        1               1                 1            1                1
+    1               1             1               1         …       1
+Q1(f): Solving the Summation
+
+
+
+
+                           Note: formula like this will be provided for exams
+Reduction Constant (-b) Mat t ers!
+Left/top represents -1 case
+Right/bottom represents -2
+            case
+                                                      n            1
+
+
+                                                                                           ⇒ 2i
+                            1 n-1 or n-2                           n-1 or n-2 1
+                                                                                           work per level for
+                        1                     1                1                  1        both cases
+                      n-2 or n-4     n-2 or n-4           n-2 or n-4       n-2 or n-4       ≈ n levels for -1
+                                                                                            ≈ n/2 levels for -2
+                      …
+
+                                      …
+
+                                                          …
+
+                                                                            …
+                  1              1                1                1                1
+            1               1             1                1           …        1
+
+Hint: Use the Finite Geometric Series (#7 on Math Identities) to solve these summations!
+General
+Advice
+Recursive Running Times- Guidance
+                                  Only differences between divide and
+● Draw a tree such that:          conquer cases highlighted in yellow
+   ○ Each node has a children
+   ○ The “size of each node is b less than the size of its
+     parent
+   ○ The “work” for each node is f applied to its size
+   ○ The height of the tree is n/b
+● Sum the tree horizontally
+   ○ I.e. identify the total work done at each level
+● Sum the levels’ work vertically
+   ○ Given the sum of all work in the entire tree
+Putting it All Together
+Problem 2(a)
+(a) Find a recurrence T(n) modeling the worst-case runtime complexity of f(n).
+
+ 1 f(L, start, n) {
+ 2    if (n - start <= 1) {
+ 3      return 0
+ 4    }
+ 5    int res = f(L, start, n/2)
+ 6    for (int i=0; i<n; i++) {
+ 7      result *= 4
+ 8    }
+ 9    return res + f(L, start, n/2)
+ 10 }
+Problem 2(a)
+(a) Find a recurrence T(n) modeling the worst-case runtime complexity of f(n).
+
+ 1 f(L, start, j) { //n = j - start
+ 2    if (j - start <= 1) {
+                                             𝑇𝑇 𝑛𝑛
+ 3      return 0
+ 4    }
+                                                                      𝑐𝑐0 , 𝑛𝑛 = 1
+ 5    int res = f(L, start, j/2)             =�    𝑛𝑛
+                                               2𝑇𝑇    + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+ 6    for (int i=0; i<j; i++) {                    2
+ 7      result *= 4
+ 8    }
+ 9    return res + f(L, start, j/2)
+ 10 }                                   ● 2 function calls -> a = 2
+                                        ● Re ducing input size by half -> (n / 2)
+                                        ● Non-re cursive work has loop with n ite rations
+                                          and some constant work -> f(n) = c_2n + c_1
+Problem 2(b)                                                                  𝑐𝑐0 , 𝑛𝑛 = 1
+                                                 𝑇𝑇 𝑛𝑛 = �
+(b) Find a closed form to your answer for (a).            2𝑇𝑇 𝑛𝑛/2 + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+                             𝑐𝑐0 , 𝑛𝑛 = 1
+𝑇𝑇 𝑛𝑛 = �
+         2𝑇𝑇 𝑛𝑛/2 + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+                             𝑐𝑐0 , 𝑛𝑛 = 1
+𝑇𝑇 𝑛𝑛 = �
+         2𝑇𝑇 𝑛𝑛/2 + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+
+
+  Our first call to T(n)
+                                        𝑐𝑐0 , 𝑛𝑛 = 1
+           𝑇𝑇 𝑛𝑛 = �
+                    2𝑇𝑇 𝑛𝑛/2 + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+Input: n
+             Our first call to T(n)
+                                         𝑐𝑐0 , 𝑛𝑛 = 1
+            𝑇𝑇 𝑛𝑛 = �
+                     2𝑇𝑇 𝑛𝑛/2 + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+Input: n
+Work:
+c2*n + c1     Our first
+              call to T(n)
+                                                    𝑐𝑐0 , 𝑛𝑛 = 1
+                       𝑇𝑇 𝑛𝑛 = �
+                                2𝑇𝑇 𝑛𝑛/2 + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+         Input: n
+         Work:
+         c2*n + c1
+                                        “2T(...)” = 2
+                                        recursive calls
+
+Input:               Input:
+n/2                  n/2
+                                                    𝑐𝑐0 , 𝑛𝑛 = 1
+                       𝑇𝑇 𝑛𝑛 = �
+                                2𝑇𝑇 𝑛𝑛/2 + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+         Input: n
+         Work:
+         c2*n + c1
+
+
+Input:               Input:
+n/2                  n/2
+                                                         𝑐𝑐0 , 𝑛𝑛 = 1
+                            𝑇𝑇 𝑛𝑛 = �
+                                     2𝑇𝑇 𝑛𝑛/2 + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+              Input: n
+              Work:
+              c2*n + c1
+
+
+Input: n/2                Input: n/2
+Work:                     Work:
+c2*(n/2)+c1               c2*(n/2)+c1
+                                                                              𝑐𝑐0 , 𝑛𝑛 = 1
+                                                 𝑇𝑇 𝑛𝑛 = �
+                                                          2𝑇𝑇 𝑛𝑛/2 + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+                            Input: n
+                            Work:
+                            c2*n + c1
+
+
+         Input: n/2                          Input: n/2
+         Work:                               Work:
+         c2*(n/2)+c1                         c2*(n/2)+c1
+
+
+
+Input:                 Input:       Input:                   Input:
+n/4                    n/4          n/4                      n/4
+                                                                             𝑐𝑐0 , 𝑛𝑛 = 1
+                                                𝑇𝑇 𝑛𝑛 = �
+                                                         2𝑇𝑇 𝑛𝑛/2 + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+                          Input: n
+                          Work:
+                          c2*n + c1
+
+
+         Input: n/2                        Input: n/2
+         Work:                             Work:
+         c2*(n/2)+c1                       c2*(n/2)+c1
+
+
+Input: n/4        Input: n/4      Input: n/4           Input: n/4
+Work:             Work:           Work:                Work:
+c2*(n/4)+c1       c2*(n/4)+c1     c2*(n/4)+c1          c2*(n/4)+c1
+                                                                                   𝑐𝑐0 , 𝑛𝑛 = 1
+                                                      𝑇𝑇 𝑛𝑛 = �
+                                                               2𝑇𝑇 𝑛𝑛/2 + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+                                Input: n
+                                Work:
+                                c2*n + c1
+
+
+               Input: n/2                        Input: n/2
+               Work:                             Work:
+               c2*(n/2)+c1                       c2*(n/2)+c1
+
+
+      Input: n/4        Input: n/4      Input: n/4           Input: n/4
+      Work:             Work:           Work:                Work:
+      c2*(n/4)+c1       c2*(n/4)+c1     c2*(n/4)+c1          c2*(n/4)+c1
+
+
+
+
+Input: 1    Input: 1                                    Input: 1           Input: 1
+                                                                                   𝑐𝑐0 , 𝑛𝑛 = 1
+                                                      𝑇𝑇 𝑛𝑛 = �
+                                                               2𝑇𝑇 𝑛𝑛/2 + 𝑐𝑐2 𝑛𝑛 + 𝑐𝑐1 , 𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜𝑜
+                                Input: n
+                                Work:
+                                c2*n + c1
+
+
+               Input: n/2                        Input: n/2
+               Work:                             Work:
+               c2*(n/2)+c1                       c2*(n/2)+c1
+
+
+      Input: n/4        Input: n/4      Input: n/4           Input: n/4
+      Work:             Work:           Work:                Work:
+      c2*(n/4)+c1       c2*(n/4)+c1     c2*(n/4)+c1          c2*(n/4)+c1
+
+
+
+
+Input: 1    Input: 1                                    Input: 1           Input: 1
+Work: c0    Work: c0                                    Work: c0           Work: c0
+                                                                   Since we’re in /b case:
+                                                                                  log𝑏𝑏 𝑛𝑛 −1
+                                Input: n                                                                   𝑛𝑛
+                                                                        𝑇𝑇 𝑛𝑛 =      �          𝑎𝑎𝑖𝑖 𝑓𝑓
+                                Work:                                                                     𝑏𝑏 𝑖𝑖
+                                                                                     𝑖𝑖=0
+                                c2*n + c1
+                                                                   With a, b, and f(n) plugged
+               Input: n/2                        Input: n/2        in:     log 𝑛𝑛 −1
+               Work:                             Work:                              2
+                                                                                                              𝑛𝑛
+               c2*(n/2)+c1                       c2*(n/2)+c1            𝑇𝑇 𝑛𝑛 =     �       2𝑖𝑖 𝑐𝑐2               + 𝑐𝑐1
+                                                                                                              2𝑖𝑖
+                                                                                     𝑖𝑖=0
+
+      Input: n/4        Input: n/4      Input: n/4        Input: n/4
+      Work:             Work:           Work:             Work:
+      c2*(n/4)+c1       c2*(n/4)+c1     c2*(n/4)+c1       c2*(n/4)+c1
+
+
+
+
+Input: 1    Input: 1                                  Input: 1     Input: 1
+Work: c0    Work: c0                                  Work: c0     Work: c0
+Thank You!
+

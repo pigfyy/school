@@ -1,0 +1,652 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>CSE332 - Topic Summary - Recurrences</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">q { quotes: "“" "”" "‘" "’"; }</style>
+  <link rel="stylesheet" href="../style.css?v=2" />
+</head>
+<main>
+<body>
+    <div role="navigation" class="navbar navbar-static-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <span class="doc-title">CSE 332 &ndash; Topic Summary -
+Recurrences</span>
+        <ul class="nav pull-right doc-info">
+                    <li><p class="navbar-text"><a href="../index.html">Home</a></p></li>
+          <li><p class="navbar-text"><a href="../syllabus.html">Syllabus</a></p></li>
+          <li><p class="navbar-text"><a href="../calendar.html">Calendar</a></p></li>
+          <li><p class="navbar-text"><a href="../tasks.html">Tasks</a></p></li>
+          <li><p class="navbar-text"><a href="../exams.html">Exams</a></p></li>
+          <li><p class="navbar-text"><a href="../summaries.html">Summaries</a></p></li>
+          <li><p class="navbar-text"><a href="../oh.html">Office Hours</a></p></li>
+          <li><p class="navbar-text"><a href="../staff.html">Staff</a></p></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+    <div class="container">
+    <div class="row">
+            <div id="TOC" class="span3">
+        <div class="well toc">
+        <ul>
+          <li class="nav-header">Table of Contents</li>
+        </ul>
+        <ul>
+        <li><a href="#identifying-a-recurrence"
+        id="toc-identifying-a-recurrence"><span
+        class="toc-section-number">1</span> Identifying A Recurrence</a>
+        <ul>
+        <li><a href="#divide-and-conquer-example"
+        id="toc-divide-and-conquer-example"><span
+        class="toc-section-number">1.1</span> Divide and Conquer
+        Example</a></li>
+        <li><a href="#chip-and-conquer-example"
+        id="toc-chip-and-conquer-example"><span
+        class="toc-section-number">1.2</span> Chip and Conquer
+        Example</a></li>
+        </ul></li>
+        <li><a href="#solving-recurrences"
+        id="toc-solving-recurrences"><span
+        class="toc-section-number">2</span> Solving Recurrences</a>
+        <ul>
+        <li><a href="#the-tree-method" id="toc-the-tree-method"><span
+        class="toc-section-number">2.1</span> The Tree Method</a>
+        <ul>
+        <li><a href="#chip-and-conquer" id="toc-chip-and-conquer"><span
+        class="toc-section-number">2.1.1</span> Chip and
+        Conquer</a></li>
+        <li><a href="#divide-and-conquer"
+        id="toc-divide-and-conquer"><span
+        class="toc-section-number">2.1.2</span> Divide and
+        Conquer</a></li>
+        </ul></li>
+        </ul></li>
+        <li><a href="#whats-important" id="toc-whats-important"><span
+        class="toc-section-number">3</span> What’s important</a></li>
+        </ul>
+        </div>
+      </div>
+            <div class="span9">
+            <!--<blockquote style="background-color:#fbb; font-size:150%">This page is from a previous offering of the course. It has been left up for archival purposes.</blockquote>-->
+      <!--<blockquote style="background-color:#fbb; font-size:150%">This page is under construction. Any content you see now is subject to change until the first day of class. Expect some links to be broken until that time.</blockquote>-->
+      <!--<blockquote style="background-color:#FFD700; font-size:150%">Looking for someone to talk to about CSE332? Try the Study Center in CSE room 006! There's a table there just for working on and discussing CSE332!</blockquote>-->
+      <p>In this section we will discuss a method for performing running
+      time analysis of recursive algorithms. To summarize the approach,
+      here’s what we’ll do:</p>
+      <ol type="1">
+      <li>A running time analysis of an algorithm is a function. For our
+      recursive algorithm, we’ll identify a recursive running time
+      function. Such a function is called a <strong>recurrence
+      relation</strong>.</li>
+      <li>Next we will <q>solve</q> the recurrence relation, which in
+      our case means converting it into an asymptotically equivalent
+      non-recursive function.</li>
+      </ol>
+      <p>For step 2 of this process, there are many ways to do this.
+      We’ll focus on just one way in the course. We’ll use a method
+      called the <strong>tree method</strong>.</p>
+      <h1 data-number="1" id="identifying-a-recurrence"><span
+      class="header-section-number">1</span> Identifying A
+      Recurrence</h1>
+      <p>First, let’s see how we can express the running time of an
+      algorithm as a recurrence relation. Any recursive algorithm is
+      going to have the following parts:</p>
+      <ol type="1">
+      <li>Base case: Check if the input is small enough
+      (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≤</mo><annotation encoding="application/x-tex">\leq</annotation></semantics></math>
+      some constant) to constitute a base case, if so then solve it
+      using an iterative (i.e. non-recursive) approach</li>
+      <li>Prepare for recursion: Perform iterative steps of computation
+      in preparation for recursive calls</li>
+      <li>Recursive calls: Invoke the algorithm recursively on one or
+      more smaller inputs</li>
+      <li>Use recursive results: Perform iterative steps of computation
+      using the results from the recursive calls</li>
+      </ol>
+      <p>We can then apply our standard running time analysis process to
+      these steps as follows:</p>
+      <ul>
+      <li>We can recognize that the base case does not occur in every
+      recursive invocation, and when it does happen its running time is
+      always constant (base case size must be a constant, and any
+      procedure run on a constant-sized input takes only constant
+      time).</li>
+      <li>The remaining three steps all happen sequentially for one
+      another, so we can add together their running times.</li>
+      <li>The recursive invocations are just like invoking another
+      function, so we want to use the running time of that function in
+      that place.</li>
+      </ul>
+      <p>Therefore, if we use
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n)</annotation></semantics></math>
+      to represent the running time of our algorithm, our analysis of
+      the generic recursive procedure above will look something
+      like:</p>
+      <ol type="1">
+      <li>Base case: Let the constant
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+      be the base case size. If
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>≤</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">n\leq k</annotation></semantics></math>
+      then the running time is the constant
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>.
+      So
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">T(k)=c</annotation></semantics></math></li>
+      <li>Prepare for recursion: This code is iterative, so we can use
+      our standard process for running time analysis. Call the resulting
+      running time function
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(n)</annotation></semantics></math>.</li>
+      <li>Recursive calls: Each recursive call will happen on a smaller
+      input. If we want to recurse on inputs of size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mn>1</mn></msub><annotation encoding="application/x-tex">x_1</annotation></semantics></math>,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mn>2</mn></msub><annotation encoding="application/x-tex">x_2</annotation></semantics></math>,
+      …,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mi>a</mi></msub><annotation encoding="application/x-tex">x_a</annotation></semantics></math>
+      then we can write the running time of this portion as
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>+</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>a</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(x_1)+T(x_2)+...+T(x_a)</annotation></semantics></math>.</li>
+      <li>Use recursive results: Again, this is iterative, so we can use
+      our standard process. Call the resulting running time function
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">r(n)</annotation></semantics></math>.</li>
+      </ol>
+      <p>All together, we therefore get the following running time:</p>
+      <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>+</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>a</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>r</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n)=p(n)+T(x_1)+T(x_2)+...+T(x_a)+r(n)</annotation></semantics></math>
+      where
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">T(k)=c</annotation></semantics></math>.</p>
+      <p>This is now a recursive running time function for our
+      algorithm, i.e. a recurrence relation.</p>
+      <p>For most algorithms each of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><msub><mi>x</mi><mi>a</mi></msub></mrow><annotation encoding="application/x-tex">x_1, x_2, ..., x_a</annotation></semantics></math>
+      will be of the same size. If we call this
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+      then our recurrence could be expressed as :</p>
+      <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>a</mi><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>r</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n)=p(n) + aT(x) + r(n)</annotation></semantics></math>
+      where
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">T(k)=c</annotation></semantics></math>.</p>
+      <p>Furthermore, we can introduce the function
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>r</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)=p(n)+r(n)</annotation></semantics></math>
+      to express all of the iterative work being done in one stack
+      frame, giving us:</p>
+      <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>a</mi><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n)=aT(x) + f(n)</annotation></semantics></math>
+      where
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">T(k)=c</annotation></semantics></math>.</p>
+      <p>Finally, for most algorithms the value of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+      is either going to be some fraction of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      (called a <q>divide and conquer</q> pattern) or it will be a
+      constant reduction in size (called a <q>chip and conquer</q>
+      pattern), and so our recurrence would be one of the following:</p>
+      <ul>
+      <li>Divide and Conquer:
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>a</mi><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mi>b</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n)=aT(\frac{n}{b}) + f(n)</annotation></semantics></math>
+      where
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">T(k)=c</annotation></semantics></math>.</li>
+      <li>Chip and Conquer:
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>a</mi><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mi>b</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n)=aT(n-b) + f(n)</annotation></semantics></math>
+      where
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">T(k)=c</annotation></semantics></math>.</li>
+      </ul>
+      <p>In this class nearly all of our recurrence relations will take
+      one of these two shapes, so we’ll focus on that going forward.</p>
+      <h2 data-number="1.1" id="divide-and-conquer-example"><span
+      class="header-section-number">1.1</span> Divide and Conquer
+      Example</h2>
+      <p>Now let’s see an example of this process being applied to a
+      recursive algorithm. Consider the following algorithm which finds
+      the sum of all elements in a list recursively:</p>
+      <pre><code>public int sum(int[] list){
+    return sum_helper(list, 0, list.size);
+}
+private int sum_helper(int[] list, int low, int high){
+    if (low == high){ return 0; }
+    if (low == high-1){ return list[low]; }
+    int middle = (high+low)/2;
+    return sum_helper(list, low, middle) + sum_helper(list, middle, high);
+}</code></pre>
+      <p>For this algorithm, each stack frame is responsible for summing
+      the values in the list between the index low (inclusive) and high
+      (exclusive). If the distance between low and high is 0 then there
+      are no elements in that region, so it returns 0. If the distance
+      between low and high is 1 then there is exactly one element in
+      that region, so it returns that element. Otherwise it divides the
+      region in half, recursively sums the two halves, and adds those
+      results together.</p>
+      <p>For this algorithm our input size will be measured by the
+      distance between low and high (it is initially
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
+      as that is the size of the original list). The operations we’ll
+      count are additions between elements of the list.</p>
+      <p>Let’s now assign each step of this algorithm to our generic
+      pattern above:</p>
+      <ol type="1">
+      <li>Base case: When the input is size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+      or
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>,
+      in either case there are no additions being done, so
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">T(1)=T(0)=0</annotation></semantics></math>.</li>
+      <li>Prepare for recursion: For this step we calculate the index
+      that is half way between low and high, there are no additions done
+      among elements of the list here, so
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">p(n)=0</annotation></semantics></math>.</li>
+      <li>Recursive calls: There are two recursive calls, each one on a
+      region half the size of the original, so the running time is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mn>2</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mn>2</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(\frac{n}{2})+T(\frac{n}{2})</annotation></semantics></math>
+      or
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mn>2</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">2T(\frac{n}{2})</annotation></semantics></math>.</li>
+      <li>Use recursive results: This one happens to be on the same line
+      as the recursive calls. This is the step of adding together the
+      results of the recursive calls. This is now an addition between
+      elements of the list, so
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">r(n)=1</annotation></semantics></math>.</li>
+      </ol>
+      <p>Overall this gives us the recurrence relation:</p>
+      <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>2</mn><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mn>2</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T(n)=2T(\frac{n}{2}) + 1</annotation></semantics></math>
+      where
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">T(1)=T(0)=0</annotation></semantics></math>.
+      Note that this follows our divide and conquer pattern!</p>
+      <h2 data-number="1.2" id="chip-and-conquer-example"><span
+      class="header-section-number">1.2</span> Chip and Conquer
+      Example</h2>
+      <p>Next we consider this recursive algorithm, which also sums a
+      list recursively:</p>
+      <pre><code>public int sum(int[] list){
+    return sum_helper(list, 0, list.size);
+}
+private int sum_helper(int[] list, int low, int high){
+    if (low == high){ return 0; }
+    if (low == high-1){ return list[low]; }
+    return list[low] + sum_helper(list, low+1, high) ;
+}</code></pre>
+      <p>As with the previous algorithm, each stack frame is responsible
+      for summing the values in the list between the index low
+      (inclusive) and high (exclusive). If the distance between low and
+      high is 0 then there are no elements in that region, so it returns
+      0. If the distance between low and high is 1 then there is exactly
+      one element in that region, so it returns that element. The
+      difference here is that instead of dividing the region in half,
+      this algorithm recursively finds the sum of the region excluding
+      the index low, then adds the value at that index to the
+      result.</p>
+      <p>As before, our input size will be measured by the distance
+      between low and high (it is initially
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
+      as that is the size of the original list). The operations we’ll
+      count are additions between elements of the list.</p>
+      <p>Let’s now assign each step of this algorithm to our generic
+      pattern above:</p>
+      <ol type="1">
+      <li>Base case: When the input is size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+      or
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>,
+      in either case there are no additions being done, so
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">T(1)=T(0)=0</annotation></semantics></math>.</li>
+      <li>Prepare for recursion: For this step we calculate the index
+      that is half way between low and high, there are no additions done
+      among elements of the list here, so
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">p(n)=0</annotation></semantics></math>.</li>
+      <li>Recursive calls: There is one recursive call, each one on a
+      region one smaller than the original, so the running time is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n-1)</annotation></semantics></math>.</li>
+      <li>Use recursive results: This one happens to be on the same line
+      as the recursive call. This is the step of adding the value at
+      index low to the result of the recursive call. This is now an
+      addition between elements of the list, so
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">r(n)=1</annotation></semantics></math>.</li>
+      </ol>
+      <p>Overall this gives us the recurrence relation:</p>
+      <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T(n)=T(n-1) + 1</annotation></semantics></math>
+      where
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">T(1)=T(0)=0</annotation></semantics></math>.
+      Note that this follows our chip and conquer pattern!</p>
+      <h1 data-number="2" id="solving-recurrences"><span
+      class="header-section-number">2</span> Solving Recurrences</h1>
+      <p>Now that we’ve seen how to identify a recursive running time
+      function for our recursive algorithms, let’s wee how we can solve
+      them. Let’s start with our chip an conquer recurrence
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T(n)=T(n-1)+1</annotation></semantics></math>.</p>
+      <p>Our goal is to express this recurrence so that we have an
+      equivalent function (at least asymptotically) that is expressed
+      non-recursively. With that in mind, let’s start by trying to
+      simplify the recurrence.</p>
+      <p>Ultimately we want to know the value of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n)</annotation></semantics></math>
+      in terms of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>.
+      Our definition of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n)</annotation></semantics></math>
+      tells us that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T(n)=T(n-1)+1</annotation></semantics></math>.
+      We could then reapply the definition of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+      to identify the value of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n-1)</annotation></semantics></math>,
+      giving us
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T(n)=(T(n-2)+1)+1</annotation></semantics></math>.
+      We can repeat this process over and over again, replacing
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(x)</annotation></semantics></math>
+      with
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T(x-1)+1</annotation></semantics></math>:</p>
+      <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>3</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>4</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mi>.</mi><mi>.</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">T(n)=T(n-1)+1=T(n-2)+1+1=T(n-3)+1+1+1=T(n-4)+1+1+1+1+...</annotation></semantics></math>.</p>
+      <p>This substitution will then repeat until the argument to
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+      is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>,
+      since this is our base case. In the end we therefore get
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T(n)=T(1)+1+1+1+1+...+1</annotation></semantics></math>
+      where we have accumulated a
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">+1</annotation></semantics></math>
+      term for each substitution we did until reaching our base case. To
+      find our running time, we just need to figure out the number of
+      substitutions we had to do. Recalling back to the recursive
+      algorithm this came from, this matches the length of the chain of
+      stack frames we have from our original input of size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      to our base case of size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>.
+      To identify this number we need to answer the question <q>How many
+      times must we subtract
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+      from
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      until we reach the value
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>?</q>.
+      The answer to this should be the value of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      such that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mi>i</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">n-i=1</annotation></semantics></math>,
+      and so solving for
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      we get
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">n-1</annotation></semantics></math>.
+      This tells us that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n)</annotation></semantics></math>
+      through repeated substitution becomes
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">n-1</annotation></semantics></math>
+      ones added together, and so our running time is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>.</p>
+      <h2 data-number="2.1" id="the-tree-method"><span
+      class="header-section-number">2.1</span> The Tree Method</h2>
+      <p>Next we’ll look at how we can take the <q>repeated
+      substitution</q> approach and apply a bit more structure to it so
+      that we can use it as a tool for solving more complex recurrence
+      relations. We will call this procedure the <strong>Tree
+      Method</strong>. Essentially, the tree method works by performing
+      this repeated substitution, but making each substitution
+      (i.e. stackframe in the recursion) a node in a tree.</p>
+      <h3 data-number="2.1.1" id="chip-and-conquer"><span
+      class="header-section-number">2.1.1</span> Chip and Conquer</h3>
+      <p>Let’s start by reexpressing our repeated substitution of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T(n)=T(n-1)+1</annotation></semantics></math>
+      in this way. The root of our tree will correspond to the
+      stackframe for our original invocation of the algorithm, that in
+      which the input size is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>.
+      That stackframe makes one recursive call on an input of size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">n-1</annotation></semantics></math>,
+      which makes another recursive call on an input size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">n-2</annotation></semantics></math>,
+      which makes another with size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">n-3</annotation></semantics></math>,
+      etc. This chain of invocations continues until we reach a base
+      case. As per our discussion earlier, the length of this chain is
+      therefore
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">n-1</annotation></semantics></math>.
+      All that remains is to identify the total amount of work done
+      within each stackframe, and then add those together. In our
+      recurrences
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>
+      represents the non-recursive work done in a stackframe with input
+      size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
+      and in this case
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">f(n)=1</annotation></semantics></math>.
+      This tells us we need to add
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+      for each stackframe in our chain, therefore giving a running time
+      of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mn>1</mn><mo>=</mo><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">n-1 = \Theta(n)</annotation></semantics></math>.
+      We call this the <q>tree method</q> because we’ll see that this
+      <q>chain</q> of stackframes is actually a tree with no branches.
+      One we analyze our divide and conquer recurrence we’ll see that
+      our tree has branches because each stackframe has multiple
+      recursive calls.</p>
+      <p>We depict this procedure graphically below:</p>
+      <p><img src="files/chip_conquer_tree.png" alt="A graphical depiction of the repeated substitution process described above. There is a chain of boxes. The top-most box has the value n inside of it to represent the input size. It is connected to a box with the value n-1 inside representing a recursive call on an input of size n-1, that is connected to another box of size n-2. There are then ellipses to represent this pattern continuing until finally reaching a base case box which has an input of size 1. Each box has a number 1 written next to it to indicate that there is a constant amount of non-recursive work done by each box. The length of the chain of boxes is n-1." height="150"/></p>
+      <p>We represent each stackframe as a square, write the input size
+      for that stackframe within the square, and then write the
+      non-recursive work done in that stackframe next to each square.
+      Our objective is to sum together all the values written next to
+      the squares.</p>
+      <p>The following describes the general process we can use to solve
+      chip and conquer recurrences using the tree method:</p>
+      <p>To solve a recurrence of the form
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>a</mi><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>−</mo><mi>b</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n)=aT(n-b)+f(n)</annotation></semantics></math>:</p>
+      <ol type="1">
+      <li>Use the recurrence to draw a tree
+      <ul>
+      <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+      is the branching factor of the tree (e.g. if
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">a=2</annotation></semantics></math>
+      then it’s a binary tree)</li>
+      <li>Subtract
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
+      from the parent’s input size to get each child’s input size</li>
+      <li>The height of the tree is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>n</mi><mi>b</mi></mfrac><annotation encoding="application/x-tex">\frac{n}{b}</annotation></semantics></math>.</li>
+      </ul></li>
+      <li>Work done per node is given by applying
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>
+      to that node’s input size, write that value beside each node.</li>
+      <li>Add the total work done across all nodes
+      <ul>
+      <li>Express the work per level
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      as an expression using
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math></li>
+      <li>Write a series adding the work per level for
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">i=0</annotation></semantics></math>
+      through
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mfrac><mi>n</mi><mi>b</mi></mfrac></mrow><annotation encoding="application/x-tex">i=\frac{n}{b}</annotation></semantics></math>.</li>
+      <li>Solve the series</li>
+      </ul></li>
+      <li>Simplify the sum asymptotically</li>
+      </ol>
+      <p>For reasons we’ll get to later in this reading, It is important
+      that the correct values of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+      and
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
+      are chosen in order to get the right asymptotic running time. It
+      is also important to get the function
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>
+      asymptotically correct (i.e. you can use any other function
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">g(n)</annotation></semantics></math>
+      here so long as
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">g(n)=\Theta(f(n))</annotation></semantics></math>
+      and get the same result). The exact size and running time of the
+      base cases will never make a difference in an asymptotic
+      analysis.</p>
+      <h3 data-number="2.1.2" id="divide-and-conquer"><span
+      class="header-section-number">2.1.2</span> Divide and Conquer</h3>
+      <p>Now let’s see how we can use our tree method to solve the
+      divide and conquer recurrence
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>2</mn><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mn>2</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T(n)=2T(\frac{n}{2}) + 1</annotation></semantics></math>
+      where
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">T(1)=T(0)=0</annotation></semantics></math>.
+      Let’s use the process from above. As before, we will start with
+      the stackframe where the input is of size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>.
+      That stackframe then invokes <em>two</em> recursive calls, each on
+      an input of size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>n</mi><mn>2</mn></mfrac><annotation encoding="application/x-tex">\frac{n}{2}</annotation></semantics></math>.
+      Each of those then also invokes <em>two</em> recursive calls, each
+      on an input of size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>n</mi><mn>4</mn></mfrac><annotation encoding="application/x-tex">\frac{n}{4}</annotation></semantics></math>.
+      This means after two rounds we have seven total stack frames: one
+      root, two at depth 1, and four at depth 2. Overall, each level of
+      the tree will have twice as many nodes as the prior level (each
+      node invokes two recursive calls), and the input size to each will
+      be half the size as those on the prior level. Each stackframe will
+      then do one addition operation.</p>
+      <p>We can depict this relationship among stackframes like
+      this:</p>
+      <p><img src="files/divide_conquer_tree.png" alt="A graphical depiction of the tree method applied to the divide and conquer recurrence T(n)=2T(n/2)+1. There is a binary tree of boxes. The top-most box has the value n inside of it to represent the input size. It is connected to two boxes with the value n/2 inside each representing a recursive call on an input of size n/2, each of those are themselves connected to two boxes of size n/4. There are then ellipses to represent this pattern continuing until finally reaching base case boxes which each have an input of size 1. Each box has a number 1 written next to it to indicate that there is a constant amount of non-recursive work done by each box. The height of the tree of boxes is lg(n) (i.e log base 2 of n)." height="150"/></p>
+      <p>Let’s see why the height of this tree is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><msub><mi>g</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">log_2(n)</annotation></semantics></math>.
+      Similar to the chip-and-conquer recurrence, the height of the tree
+      is determined by the distance from our root to our leaves, because
+      this is the number of times we must shrink our original input of
+      size
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      before we reach the base case. For this algorithm we shrink our
+      input by cutting it in half, so we need to determine how many
+      times we must cut
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      in half before we get to the value
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>.
+      If we cut
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+      in half
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      times we will have the value
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>n</mi><msup><mn>2</mn><mi>i</mi></msup></mfrac><annotation encoding="application/x-tex">\frac{n}{2^i}</annotation></semantics></math>.
+      This means that we need to find the value of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      such that
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mi>n</mi><msup><mn>2</mn><mi>i</mi></msup></mfrac><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\frac{n}{2^i}=1</annotation></semantics></math>.
+      Solving for
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      we get
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><msub><mo>log</mo><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">i=\log_2(n)</annotation></semantics></math>.</p>
+      <p>Now that we have the structure of our tree, we again need to
+      add the total work done among all of the stackframes, meaning we
+      want to sum together all of the values that we wrote down next to
+      the boxes in the tree. The easiest way to do this is generally to
+      first find the sum per-level, then use that to identify a pattern
+      to express the work done at each level
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      as a function involving
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+      Then we can write a series summing the work-per-level for
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">i=0</annotation></semantics></math>
+      up to
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mi>l</mi><mi>o</mi><msub><mi>g</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">i=log_2(n)</annotation></semantics></math>.</p>
+      <p>For this tree, the amount of work done on level
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      is equal to the number of nodes in that level. Since we double at
+      each level, the number of nodes on level
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><mi>i</mi></msup><annotation encoding="application/x-tex">2^i</annotation></semantics></math>.
+      This means our running time should be the solution to the series
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>0</mn></mrow><mrow><msub><mo>log</mo><mn>2</mn></msub><mi>n</mi></mrow></msubsup><msup><mn>2</mn><mi>i</mi></msup></mrow><annotation encoding="application/x-tex">\sum_{i=0}^{\log_2 n} 2^i</annotation></semantics></math>.
+      Using our geometric series formula, this is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><msup><mn>2</mn><mrow><msub><mo>log</mo><mn>2</mn></msub><mi>n</mi></mrow></msup><mo>−</mo><mn>1</mn></mrow><mrow><mn>2</mn><mo>−</mo><mn>1</mn></mrow></mfrac><mo>=</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">\frac{2^{\log_2 n}-1}{2-1}=n</annotation></semantics></math>.
+      Therefore the running time is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Theta(n)</annotation></semantics></math>.</p>
+      <p>The following describes the general process we can use to solve
+      divide and conquer recurrences using the tree method:</p>
+      <p>To solve a recurrence of the form
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>a</mi><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mi>b</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(n)=aT(\frac{n}{b})+f(n)</annotation></semantics></math>:</p>
+      <ol type="1">
+      <li>Use the recurrence to draw a tree
+      <ul>
+      <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+      is the branching factor of the tree (e.g. if
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">a=2</annotation></semantics></math>
+      then it’s a binary tree)</li>
+      <li>Divide the parent’s input size by
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
+      to get each child’s input size</li>
+      <li>The height of the tree is
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>log</mo><mi>b</mi></msub><mi>n</mi></mrow><annotation encoding="application/x-tex">\log_b n</annotation></semantics></math>.</li>
+      </ul></li>
+      <li>Work done per node is given by applying
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>
+      to that node’s input size, write that value beside each node.</li>
+      <li>Add the total work done across all nodes
+      <ul>
+      <li>Express the work per level
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+      as an expression using
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math></li>
+      <li>Write a series adding the work per level for
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">i=0</annotation></semantics></math>
+      through
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><msub><mo>log</mo><mi>b</mi></msub><mi>n</mi></mrow><annotation encoding="application/x-tex">i=\log_b n</annotation></semantics></math>.</li>
+      <li>Solve the series</li>
+      </ul></li>
+      <li>Simplify the sum asymptotically</li>
+      </ol>
+      <h1 data-number="3" id="whats-important"><span
+      class="header-section-number">3</span> What’s important</h1>
+      <p>When doing any sort of running time analysis it will be helpful
+      to have an idea of what aspects of your analysis may vs. may not
+      impact your overall asymptotic answer. The following aspects of a
+      recurrence relation <strong>do</strong> matter (meaning changing
+      them may result in a different asymptotic solution):</p>
+      <ol type="1">
+      <li>The coefficient on the recursive call. In other words,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>a</mi><mn>1</mn></msub><msub><mi>T</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mi>b</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T_1(n)=a_1T_1(\frac{n}{b})+f(n)</annotation></semantics></math>
+      might be different from
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>a</mi><mn>2</mn></msub><msub><mi>T</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mi>b</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T_2(n)=a_2T_2(\frac{n}{b})+f(n)</annotation></semantics></math>
+      if
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mn>1</mn></msub><mo>≠</mo><msub><mi>a</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">a_1\neq a_2</annotation></semantics></math>.</li>
+      <li>The argument to the recursive call. In other words,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>a</mi><msub><mi>T</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><msub><mi>b</mi><mn>1</mn></msub></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T_1(n)=aT_1(\frac{n}{b_1})+f(n)</annotation></semantics></math>
+      might be different from
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>a</mi><msub><mi>T</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><msub><mi>b</mi><mn>2</mn></msub></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T_2(n)=aT_2(\frac{n}{b_2})+f(n)</annotation></semantics></math>
+      if
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mn>1</mn></msub><mo>≠</mo><msub><mi>b</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">b_1\neq b_2</annotation></semantics></math>.</li>
+      <li>The asymptotic behavior of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>.
+      In other words,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>a</mi><msub><mi>T</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mi>b</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msub><mi>f</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T_1(n)=aT_1(\frac{n}{b})+f_1(n)</annotation></semantics></math>
+      might be different from
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>a</mi><msub><mi>T</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mi>b</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msub><mi>f</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T_2(n)=aT_2(\frac{n}{b})+f_2(n)</annotation></semantics></math>
+      if
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≠</mo><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>f</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f_1(n) \neq \Theta(f_2(n))</annotation></semantics></math>.</li>
+      </ol>
+      <p>The following aspects of a recurrence relation <strong>do
+      not</strong> matter (meaning changing them may result in a
+      different asymptotic solution):</p>
+      <ol type="1">
+      <li>The constant factors and non-dominant terms of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math>.
+      In other words,
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>a</mi><msub><mi>T</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mi>b</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msub><mi>f</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T_1(n)=aT_1(\frac{n}{b})+f_1(n)</annotation></semantics></math>
+      will have the same result as
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>a</mi><msub><mi>T</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>n</mi><mi>b</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msub><mi>f</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T_2(n)=aT_2(\frac{n}{b})+f_2(n)</annotation></semantics></math>
+      if
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>Θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>f</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f_1(n) = \Theta(f_2(n))</annotation></semantics></math></li>
+      <li>The size of the base cases. If we evaluate the recurrence
+      using a base case of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(1)</annotation></semantics></math>
+      vs. a base case of
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">T(2)</annotation></semantics></math>
+      then the running time will be the same asymptotically.</li>
+      <li>The running time of the base cases. If we use
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">T(2)=8</annotation></semantics></math>
+      or
+      <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">T(2)=100</annotation></semantics></math>
+      we’ll get the same result asymptotically.</li>
+      </ol>
+            </div>
+    </div>
+  </div>
+  <footer>
+          Copyright © 2026 Paul G. Allen School of Computer Science & Engineering, University of Washington. Site design by Nathan Brunelle.
+              <p>Released under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /> CC-BY-NC-SA 4.0</a> license</a>.
+      </p>
+        <p>Last updated 2026-10-16 17:03</p>
+  </footer>
+</body>
+</main>
+</html>
