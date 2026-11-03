@@ -71,6 +71,83 @@
     };
   }
 
+  /* Line-by-line walks through the slide code, for the steppers on the linked and circular pages.
+     Each step is the state right after one line runs, plus what that line did and why. */
+  const LINKED_CODE = {
+    enqueue: ["enqueue(x){", "    last = new ListNode(x);", "    back.next = last;", "    back = last;", "}"],
+    dequeue: ["dequeue(){", "    first = front.value;", "    front = front.next;", "    if (front == null) {back = null;}", "    return first", "}"],
+  };
+  // nodes: [{v, gone, loose}]; front/back: index into nodes or null.
+  function linkedSteps(op, initial, x) {
+    const nodes = initial.map((v) => ({ v }));
+    let front = nodes.length ? 0 : null, back = nodes.length ? nodes.length - 1 : null;
+    const vars = {};
+    const steps = [];
+    const snap = (line, say, extra = {}) => steps.push({ line, say, nodes: nodes.map((n) => ({ ...n })), front, back, vars: { ...vars }, ...extra });
+    snap(null, `Before: the queue holds ${initial.length ? initial.join(", ") : "nothing"}. front points at the oldest item, back at the newest.`);
+    if (op === "enqueue") {
+      nodes.push({ v: x, loose: true }); vars.last = x;
+      snap(1, `Make a new node holding ${x}. Only the local variable last refers to it. No node in the chain points to it, so it isn't in the queue yet.`);
+      if (back === null) {
+        snap(2, "back is null because the queue is empty, so back.next throws a NullPointerException. The slide's code assumes the queue isn't empty. Handling this case is part of Exercise 0.", { crash: true });
+        return steps;
+      }
+      const old = nodes[back].v;
+      nodes[nodes.length - 1].loose = false;
+      snap(2, `The old back node (${old}) now points to the new node, so ${x} is in the chain. back still names ${old}. That's why this line comes first: back is the only way to reach the old last node.`);
+      back = nodes.length - 1;
+      snap(3, `Move back to the new node. ${x} is now the newest item. That was three steps, however long the queue is.`, { done: true });
+    } else {
+      if (front === null) { snap(1, "front is null because the queue is empty, so front.value throws. dequeue assumes the queue isn't empty.", { crash: true }); return steps; }
+      vars.first = nodes[front].v;
+      snap(1, `Save the oldest value, ${vars.first}, before front moves off it.`);
+      const leaving = front;
+      front = leaving + 1 < nodes.length ? leaving + 1 : null;
+      nodes[leaving].gone = true;
+      snap(2, front === null
+        ? `front moves to the next node, but there isn't one: front is null. The node holding ${vars.first} is no longer reachable from the queue.`
+        : `front moves to the next node (${nodes[front].v}). Nothing in the queue points to the ${vars.first} node anymore, so it's gone (Java's garbage collector reclaims it).`);
+      if (front === null) { back = null; snap(3, `The queue is now empty. back was still pointing at the removed ${vars.first} node, so set it to null too. Now front and back agree: empty.`); }
+      else snap(3, `front isn't null, so the queue still has items and back is still right (${nodes[back].v}). Skip.`);
+      snap(4, `Return ${vars.first}, the oldest item. First in, first out.`, { done: true });
+    }
+    return steps;
+  }
+
+  const CIRCULAR_CODE = {
+    enqueue: ["enqueue(x){", "    queue[back] = x;", "    back = (back + 1) % queue.length;", "    size++;", "}"],
+    dequeue: ["dequeue(){", "    // Assumes queue is not empty", "    first = queue[front];", "    front = (front + 1) % queue.length;", "    size--;", "    return first;", "}"],
+  };
+  // Start from a real queue state (run ops from the slide), then step one operation.
+  function circularSteps(op, start, x) {
+    const q = start;
+    const cells = q.queue, length = q.length;
+    let front = q.front, back = q.back, size = q.size;
+    const vars = {};
+    const steps = [];
+    const snap = (line, say, extra = {}) => steps.push({ line, say, cells: cells.slice(), front, back, size, length, vars: { ...vars }, ...extra });
+    snap(null, `Before: front = ${front}, back = ${back}, size = ${size}. The queue is the ${size} slots starting at front.`);
+    if (op === "enqueue") {
+      const at = back;
+      cells[at] = x;
+      snap(1, `Write ${x} into slot ${at}. back is the first open slot, so this is where the new item goes.`, { flash: at });
+      back = (back + 1) % length;
+      snap(2, `Move back one slot: (${at} + 1) % ${length} = ${back}.${back === 0 ? " That's the wrap: past the last index, % sends it back to 0." : ""}`);
+      size++;
+      snap(3, `Count it: size = ${size}. Now ${x} is part of the queue.`, { done: true });
+    } else {
+      const at = front;
+      vars.first = cells[at];
+      snap(2, `Save the oldest value, queue[${at}] = ${vars.first}.`, { flash: at });
+      front = (front + 1) % length;
+      snap(3, `Move front one slot: (${at} + 1) % ${length} = ${front}.${front === 0 ? " It wraps back to 0." : ""} ${vars.first} is still sitting in slot ${at}, but it's no longer in the queue. Nothing erases it; the next enqueue that lands there overwrites it.`);
+      size--;
+      snap(4, `size = ${size}.`);
+      snap(5, `Return ${vars.first}. Nothing moved in the array: only front changed.`, { done: true });
+    }
+    return steps;
+  }
+
   // Run "dequeue" / "enqueue x" / "push x" / "pop" scripts on the ADT's behavior.
   function runAdt(kind, ops) {
     const items = [], out = [];
@@ -222,7 +299,7 @@
   }
 
   return {
-    SLIDE_QUEUE, SLIDE_LENGTH, circularQueue, linkedQueue, runAdt,
+    SLIDE_QUEUE, SLIDE_LENGTH, circularQueue, linkedQueue, runAdt, LINKED_CODE, linkedSteps, CIRCULAR_CODE, circularSteps,
     MYFUNCTION_LINES, myFunctionSteps, myFunctionCount, beAnnoyingCounts,
     arrayListAdds, SLIDE_SORTED, linearSearch, binarySearchTrace, binaryWorstExhaustive, binaryWorstRecurrence,
     ALGS, algValue, fmtHundredths, firstN,

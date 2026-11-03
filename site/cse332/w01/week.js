@@ -7,6 +7,7 @@ window.WEEK.messages = {
   "lifo-q": "That's the order a stack would give. A queue removes the oldest item first.",
   "fifo": "That's what a queue would return. A stack's pop takes the most recent push.",
   "first-pop": "That's what the first pop returns. Keep going: what's on top after the next push?",
+  "peek-removes": "peek looks at the top without removing it, so a second peek sees the same item.",
   "new-t-array": "Java has a rule about creating arrays of a type parameter. Look at how the Tuple constructor makes its array.",
   "bound-is-upper": "T extends Animal means T can be Animal itself. What does that allow for first and second?",
   "t-is-fixed": "Once T is chosen, both fields have that exact type. Is a Cat a Dog?",
@@ -157,7 +158,7 @@ function setupQueues() {
   const cqLog = $("#cq-log"), ringBtn = $("#cq-ring"), svg = $("#cq-svg");
   // SVG elements have no .hidden property, so the circle view is shown and hidden with style.display.
   const ringOn = () => svg.style.display !== "none";
-  svg.style.display = "none";
+  svg.style.display = ringBtn.getAttribute("aria-pressed") === "true" ? "" : "none";
   const drawRing = () => {
     svg.replaceChildren();
     const R = 120, cx = 160, cy = 160;
@@ -204,6 +205,99 @@ function setupQueues() {
     cqDraw();
   });
   cqDraw();
+}
+
+/* =========================================================== Lecture 1: line-by-line steppers */
+const STEP_SCENARIOS = {
+  linked: [
+    { label: "enqueue(9)", op: "enqueue", init: [5, 8, 3, 4, 7], x: 9 },
+    { label: "dequeue()", op: "dequeue", init: [5, 8, 3, 4, 7] },
+    { label: "dequeue() the last item", op: "dequeue", init: [7] },
+    { label: "enqueue(9) on an empty queue", op: "enqueue", init: [], x: 9 },
+  ],
+  circular: [
+    { label: "enqueue(9)", op: "enqueue", start: () => Sim.circularQueue(), x: 9 },
+    { label: "dequeue()", op: "dequeue", start: () => Sim.circularQueue() },
+    { label: "enqueue(5) into the last slot", op: "enqueue", x: 5,
+      start: () => { const q = Sim.circularQueue(); for (let i = 0; i < 3; i++) q.dequeue(); [1, 2, 3, 4].forEach((v) => q.enqueue(v)); return q; } },
+  ],
+};
+
+function drawLinkedStep(box, st) {
+  box.replaceChildren();
+  const chained = st.nodes.filter((n) => !n.loose);
+  if (st.front === null && st.back === null) box.append(el("span", { class: "null", text: "front = null, back = null (empty)" }));
+  st.nodes.forEach((n, i) => {
+    const ptr = [];
+    if (i === st.front) ptr.push("front");
+    if (i === st.back) ptr.push("back");
+    if (n.loose) ptr.push("last");
+    const node = el("div", { class: `node${n.gone ? " gone" : ""}${n.loose ? " loose" : ""}` });
+    node.append(el("span", { class: `ptr${ptr.length === 1 && ptr[0] === "back" ? " back" : ""}`, text: ptr.join(" · ") }), el("b", { text: String(n.v) }));
+    box.append(node);
+    const nextChained = !n.loose && chained.indexOf(n) < chained.length - 1;
+    if (nextChained) box.append(el("span", { class: `arrow${n.gone ? " gone" : ""}`, text: "→" }));
+    else if (!n.loose && n === chained[chained.length - 1]) box.append(el("span", { class: "null", text: "→ null" }));
+  });
+}
+
+function drawCircularStep(box, st) {
+  box.replaceChildren();
+  for (let i = 0; i < st.length; i++) {
+    const live = ((i - st.front + st.length) % st.length) < st.size;
+    const v = st.cells[i];
+    const c = el("div", { class: `cell${live ? "" : " empty stale"}${i === st.flash ? " just" : ""}` });
+    const ptr = [];
+    if (i === st.front) ptr.push("front");
+    if (i === st.back) ptr.push("back");
+    c.append(el("span", { class: `ptr${ptr.length === 1 && ptr[0] === "back" ? " back" : ""}`, text: ptr.join(" · ") }));
+    c.append(el("b", { text: v == null ? "·" : String(v), title: live ? "in the queue" : v == null ? "never used" : "old value, not in the queue" }));
+    c.append(el("span", { class: "idx", text: String(i) }));
+    box.append(c);
+  }
+}
+
+function setupStepper(box, kind) {
+  const scenarios = STEP_SCENARIOS[kind];
+  const chips = el("div", { class: "controls", role: "group", "aria-label": "Pick an operation" });
+  const code = el("pre", { class: "code" });
+  const pic = el("div", { class: kind === "linked" ? "nodes" : "cells" });
+  const vars = el("p", { class: "step-vars" });
+  const say = el("p", { class: "step-say", role: "status" });
+  const back = el("button", { class: "btn", type: "button", text: "← Back" });
+  const next = el("button", { class: "btn primary", type: "button", text: "Next line →" });
+  const count = el("span", { class: "note" });
+  box.append(chips, el("div", { class: "split" }, code, el("div", {}, pic, vars, say, el("div", { class: "controls" }, back, next, count))));
+  let steps = [], k = 0, lines = [];
+  const chipBtns = scenarios.map((sc, i) => {
+    const b = el("button", { class: "chip", type: "button", "aria-pressed": "false", text: sc.label });
+    b.addEventListener("click", () => load(i));
+    chips.append(b);
+    return b;
+  });
+  function load(i) {
+    const sc = scenarios[i];
+    chipBtns.forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
+    if (kind === "linked") { steps = Sim.linkedSteps(sc.op, sc.init, sc.x); lines = Sim.LINKED_CODE[sc.op]; }
+    else { steps = Sim.circularSteps(sc.op, sc.start(), sc.x); lines = Sim.CIRCULAR_CODE[sc.op]; }
+    k = 0;
+    paint();
+  }
+  function paint() {
+    const st = steps[k];
+    code.replaceChildren(...lines.map((ln, i) => el("div", { class: `ln${i === st.line ? " hl" : ""}` }, el("span", { class: "no", text: String(i + 1) }), el("span", { class: "src", text: ln }))));
+    (kind === "linked" ? drawLinkedStep : drawCircularStep)(pic, st);
+    const v = Object.entries(st.vars).map(([n, x]) => (n === "last" ? `last → the new ${x} node` : `${n} = ${x}`));
+    vars.textContent = kind === "circular" ? `front = ${st.front}, back = ${st.back}, size = ${st.size}${v.length ? " · " + v.join(", ") : ""}` : v.join(", ");
+    say.textContent = st.say;
+    say.classList.toggle("crash", Boolean(st.crash));
+    back.disabled = k === 0;
+    next.disabled = k === steps.length - 1;
+    count.textContent = k === 0 ? "Press Next line to run the first line." : st.crash ? "Crashed." : st.done ? "Done." : `Ran line ${st.line + 1}.`;
+  }
+  back.addEventListener("click", () => { if (k > 0) { k--; paint(); } });
+  next.addEventListener("click", () => { if (k < steps.length - 1) { k++; paint(); } });
+  load(0);
 }
 
 function setupStackVsQueue() {
@@ -698,6 +792,8 @@ function setupBrute() {
 /* ---- wire it up */
 setupQueues();
 setupStackVsQueue();
+setupStepper($("#lq-step"), "linked");
+setupStepper($("#cq-step"), "circular");
 setupTermSort();
 setupScenarios();
 setupMyFunction();

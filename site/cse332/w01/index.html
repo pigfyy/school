@@ -28,8 +28,11 @@
   <div>
     <h2>Lecture 1 <span class="today" data-date="2026-09-30">Wed Sept 30</span></h2>
     <ol class="modules">
+      <li><a href="#l1-goals">What this lecture is for</a></li>
       <li><a href="#adt">ADTs and terminology</a></li>
-      <li><a href="#queues">Queues: two data structures</a></li>
+      <li><a href="#linked">Linked queue</a></li>
+      <li><a href="#circular">Circular array queue</a></li>
+      <li><a href="#queue-compare">Linked vs. circular array</a></li>
       <li><a href="#stacks">Stacks</a></li>
       <li><a href="#l1-problems">Lecture 1 exercises</a></li>
       <li><a href="#cyu-l1">Check your understanding</a></li>
@@ -93,7 +96,7 @@
 
   <h2>This week</h2>
   <div class="week">
-    <a href="#adt"><strong>Wed, Sept 30</strong><span>Lecture 1: Intro; ADTs; Queues &amp; Stacks</span><span>Reading: Weiss 3.1–3.7</span></a>
+    <a href="#l1-goals"><strong>Wed, Sept 30</strong><span>Lecture 1: Intro; ADTs; Queues &amp; Stacks</span><span>Reading: Weiss 3.1–3.7</span></a>
     <a href="#generics"><strong>Thu, Oct 1</strong><span>Section 1: Intros, Java Generics</span><span>ADT warm-up + 5 generic pair classes, with posted solutions</span></a>
     <a href="#analysis"><strong>Fri, Oct 2</strong><span>Lecture 2: Algorithm Analysis 1</span><span>Reading: Weiss 2.1–2.4; math review Weiss 1.1–1.6</span></a>
   </div>
@@ -143,27 +146,88 @@
   </details>
 </section>
 
-<!-- ================================================================ L1: ADT -->
-<section class="page" id="adt" data-title="ADTs and terminology">
-  <p class="where">Lecture 1 · <span class="today-chip" data-date="2026-09-30">Wed Sept 30</span> · slides 2–11</p>
-  <h1>ADTs and terminology</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> An <em>ADT</em> is what a thing does (the user's view). A <em>data structure</em> is how you build it (the implementer's view).</p>
+<!-- ================================================================ L1: GOALS -->
+<section class="page" id="l1-goals" data-title="What this lecture is for">
+  <p class="where">Lecture 1 · <span class="today-chip" data-date="2026-09-30">Wed Sept 30</span> · Intro to ADTs, Queues, Stacks</p>
+  <h1>What this lecture is for</h1>
+  <div class="prose">
+    <p>The first topic of CSE 332 (slide 2) is data structures: specific "classic" ones, and how to tell which is better for a job. The second is how to analyze algorithms. To compare data structures, you first need to separate two questions:</p>
+  </div>
+  <div class="grid-2">
+    <div class="rule"><p><strong>What do I need?</strong> Which operations, and how they behave. That's the <em>ADT</em>.</p></div>
+    <div class="rule"><p><strong>How is it built?</strong> How the data is stored, and the steps for each operation. That's the <em>data structure</em>.</p></div>
   </div>
   <div class="prose">
-    <p>Four words, most abstract to most concrete:</p>
+    <p>Lecture 1 teaches that split on two ADTs you already know from CSE 12x, the queue and the stack. Then it builds one ADT, the queue, in two very different ways. Both give the same answers. They store the items differently, and that difference is what Lecture 2 learns to measure.</p>
+  </div>
+
+  <h2>After this lecture you should be able to</h2>
+  <ol class="goals">
+    <li>Say whether something is an ADT, a data structure, an algorithm or an implementation, and why the difference matters. <a href="#adt">ADTs and terminology</a></li>
+    <li>Describe the queue ADT and the stack ADT: what each one is, its operations, and how FIFO differs from LIFO. <a href="#linked">Linked queue</a>, <a href="#stacks">Stacks</a></li>
+    <li>Explain how a linked queue stores its items, and what every line of its <code>enqueue</code> and <code>dequeue</code> does. <a href="#linked">Linked queue</a></li>
+    <li>Explain how a circular array queue stores its items: what <code>front</code> and <code>back</code> mean, why <code>%</code> wraps around, and why it keeps a <code>size</code>. <a href="#circular">Circular array queue</a></li>
+    <li>Trace any sequence of operations on either queue by hand. <a href="#l1-problems">Exercises</a></li>
+    <li>Say what each queue is good and bad at, which is the setup for Lecture 2. <a href="#queue-compare">Linked vs. circular array</a></li>
+  </ol>
+
+  <div class="rule warn">
+    <p><strong>Exercise 0</strong> (due Fri Oct 9) has you build linked and resizing-array versions of both a stack and a queue. This site explains the lecture's queue code in depth but doesn't write any Exercise 0 code. That includes resizing, the empty-queue case, and every stack implementation.</p>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L1: ADT -->
+<section class="page" id="adt" data-title="ADTs and terminology">
+  <p class="where">Lecture 1 · <span class="today-chip" data-date="2026-09-30">Wed Sept 30</span> · slide 11, topic summary, Section 1</p>
+  <h1>ADTs and terminology</h1>
+  <div class="rule">
+    <p><strong>Key idea.</strong> An <em>ADT</em> describes what a kind of data does: the user's view. A <em>data structure</em> is one way to make that happen: the implementer's view. One ADT can have many data structures.</p>
+  </div>
+
+  <h2>You've already seen this split</h2>
+  <pre class="code">List&lt;String&gt; names = new ArrayList&lt;&gt;();</pre>
+  <div class="prose">
+    <p>The left side, <code>List</code>, says what you'll do with <code>names</code>: add, remove, get the item at an index. The right side, <code>ArrayList</code>, says how the items are stored. Change it to <code>new LinkedList&lt;&gt;()</code> and the rest of your program still works, because it only ever used the <code>List</code> operations.</p>
+    <p>That's the whole idea. <code>List</code> plays the part of the ADT. Array list and linked list are two data structures for it.</p>
+  </div>
+
+  <h2>The four terms (slide 11)</h2>
+  <p class="where">From most abstract to most concrete, with the queue as the example at every level:</p>
+  <div class="levels">
+    <div><b>ADT</b><span>A mathematical description of a "thing" and its set of operations. <em>Example: the queue, first in first out, with enqueue, dequeue and isEmpty.</em></span></div>
+    <div><b>Data structure</b><span>An organization of data, plus a family of algorithms that implement an ADT. <em>Example: a circular array queue, which is an array plus front and back indices.</em></span></div>
+    <div><b>Algorithm</b><span>A high-level, language-independent description of a step-by-step process. <em>Example: dequeue in a circular array means read the slot at front, then move front forward one slot.</em></span></div>
+    <div><b>Implementation</b><span>The data structure's organization and algorithms, written in a programming language. <em>Example: your <code>ArrayQueue.java</code> for Exercise 0.</em></span></div>
+  </div>
+
+  <h2>What an ADT pins down</h2>
+  <div class="prose">
+    <p>The topic summary says an ADT gives two things: the <strong>notion</strong> (what it represents) and the <strong>operations</strong>. Section 1 splits the notion into the <em>behavior</em> and the <em>type of data</em> it holds. The behavior matters most: a stack and a queue both add and remove items, and only their behavior says <em>which</em> item comes out.</p>
+  </div>
+  <div class="table-wrap">
+  <table class="plain vs-table">
+    <tr><th>ADT</th><th>Notion</th><th>Operations</th><th>Some data structures</th></tr>
+    <tr><td>List</td><td>An ordered collection you can index into</td><td>add, remove and get, each at an index</td><td>array list, linked list</td></tr>
+    <tr><td>Set</td><td>An unordered collection with no duplicates</td><td>add, remove, contains</td><td>binary search tree, hash set</td></tr>
+    <tr><td>Queue</td><td>You can only reach the item that's been in longest (FIFO)</td><td>enqueue, dequeue, peek, isEmpty</td><td>linked queue, circular array queue</td></tr>
+    <tr><td>Stack</td><td>You can only reach the item added most recently (LIFO)</td><td>push, pop, peek, isEmpty</td><td>linked list, array list (resizable array)</td></tr>
+  </table>
+  </div>
+
+  <h2>Why keep them separate</h2>
+  <div class="prose">
     <ul>
-      <li><strong>ADT</strong>: a description of a "thing" and its operations. Example: queue.</li>
-      <li><strong>Algorithm</strong>: a step-by-step process, in no particular language. Example: how to dequeue.</li>
-      <li><strong>Data structure</strong>: a way to organize data, plus the algorithms for each operation. Example: circular array queue.</li>
-      <li><strong>Implementation</strong>: a data structure written in real code. Example: <code>LinkedQueue.java</code>.</li>
+      <li><strong>The user can't tell the difference.</strong> Any data structure that keeps the ADT's promises can replace another. Test: "Could I swap it, and would the user notice?" If they wouldn't notice, it's a data structure.</li>
+      <li><strong>The difference shows up in cost.</strong> Same answers, but different time and memory. Measuring that is the rest of the course, starting with Lecture 2.</li>
+      <li><strong>Build for the ADT and nothing more.</strong> A queue never asks for the item at index 5, so a queue's data structure doesn't have to make indexing fast. That's why list and queue get different data structures.</li>
     </ul>
-    <p>Test: if you could swap it for something else and the user wouldn't notice, it's a data structure, not the ADT.</p>
+    <p>Most data structures here use one of two designs. With <strong>linked nodes</strong>, each item sits in its own object that points to the next one. With a <strong>resizing array</strong>, the items sit side by side in an array that gets copied into a bigger one when it fills. Lecture 1 builds a queue each way.</p>
   </div>
 
   <h2>Sort the examples</h2>
   <div class="panel" id="term-sort">
-    <p>Click a term to cycle it through the four categories. Then press <strong>Check sort</strong>.</p>
+    <p>Click a term to cycle it through the four categories. Then press <strong>Check sort</strong>. Ask yourself: is it a behavior, a strategy, a process, or code?</p>
     <div id="term-list" class="opts"></div>
     <div class="row controls"><button class="btn primary" id="term-check">Check sort</button><button class="btn quiet" id="term-reset">Reset</button></div>
     <p class="out" id="term-out" role="status"></p>
@@ -179,35 +243,60 @@
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
+  <div class="check" data-id="cse332-w1-l1-adt-which-is-list" data-grader="mc">
+    <p>Quick check: which of these describes the List <em>ADT</em>, not a data structure for it?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w1-l1-adt-which-is-list"> An ordered collection you can add to, remove from, and get an item from at any index<span class="why" hidden>Right. It says what you can do and how it behaves, and nothing about storage.</span></label>
+      <label><input type="radio" name="cse332-w1-l1-adt-which-is-list"> Items stored in an array, copied into a bigger one when it's full<span class="why" hidden>That's a storage strategy, the array list data structure. The user never sees the copying.</span></label>
+      <label><input type="radio" name="cse332-w1-l1-adt-which-is-list"> Items in nodes, each pointing to the next<span class="why" hidden>That's the linked list data structure: a way to store a list, not what a list is.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ L1: QUEUES -->
-<section class="page" id="queues" data-title="Queues: two data structures">
-  <p class="where">Lecture 1 · slides 12–20 · Weiss 3.6–3.7</p>
-  <h1>Queues: two data structures</h1>
+<!-- ================================================================ L1: LINKED QUEUE -->
+<section class="page" id="linked" data-title="Linked queue">
+  <p class="where">Lecture 1 · slides 12–15 · Weiss 3.6–3.7</p>
+  <h1>Linked queue</h1>
   <div class="rule">
-    <p><strong>Key idea.</strong> A <em>queue</em> is First In, First Out (FIFO), like a line at a coffee shop. Operations: <code>enqueue</code> (add), <code>dequeue</code> (remove the oldest), <code>isEmpty</code>.</p>
+    <p><strong>The queue ADT (slide 13).</strong> A collection of items you interact with in a "First In, First Out" (FIFO) way, like a line at a coffee shop. <code>enqueue</code> adds a new item. <code>dequeue</code> removes the oldest item. <code>isEmpty</code> says whether any items are left.</p>
+  </div>
+  <div class="rule">
+    <p><strong>Key idea.</strong> Keep the items in a chain of nodes, oldest first. Items leave from one end and join at the other, so keep a reference to each end.</p>
   </div>
 
-  <h2>Linked queue</h2>
-  <div class="prose">
-    <p>A chain of nodes. <code>front</code> points at the oldest item, <code>back</code> at the newest.</p>
+  <h2>The picture (slide 14)</h2>
+  <div class="nodes" aria-label="front points to 5, then 8, 3, 4, 7; back points to 7">
+    <div class="node"><span class="ptr">front</span><b>5</b></div><span class="arrow">→</span>
+    <div class="node"><span class="ptr"></span><b>8</b></div><span class="arrow">→</span>
+    <div class="node"><span class="ptr"></span><b>3</b></div><span class="arrow">→</span>
+    <div class="node"><span class="ptr"></span><b>4</b></div><span class="arrow">→</span>
+    <div class="node"><span class="ptr back">back</span><b>7</b></div><span class="null">→ null</span>
   </div>
-  <pre class="code">enqueue(x){
-    last = new ListNode(x);
-    back.next = last;
-    back = last;
-}
-dequeue(){
-    first = front.value;
-    front = front.next;
-    if (front == null) {back = null;}
-    return first
-}
-isEmpty(){
-    return front == null;
-}</pre>
+  <div class="prose">
+    <ul>
+      <li><code>front</code> points at the <strong>oldest</strong> item, the next one to leave.</li>
+      <li><code>back</code> points at the <strong>newest</strong> item, the last one to arrive.</li>
+      <li>Each node points to the item enqueued <strong>after</strong> it. So the arrows run from old to new, which is the order items leave in.</li>
+    </ul>
+    <p><strong>Why keep <code>back</code> at all?</strong> <code>dequeue</code> works at the front and <code>enqueue</code> works at the back. Without <code>back</code>, every <code>enqueue</code> would have to walk the whole chain to find the last node. With it, both operations take a few steps, however long the queue is.</p>
+  </div>
+
+  <h2>Step through the slide's code (slide 15)</h2>
+  <div class="prose"><p>Pick an operation, then press <strong>Next line</strong>. Watch which reference changes on each line, and read why.</p></div>
+  <div class="panel" id="lq-step"></div>
+
+  <div class="rule warn">
+    <p><strong>The two empty-queue cases.</strong></p>
+    <ul>
+      <li><strong>Removing the last item:</strong> <code>front</code> becomes <code>null</code>, but <code>back</code> would still point at the node just removed. The <code>if (front == null)</code> line sets <code>back</code> to <code>null</code> as well, so both say "empty". Try "dequeue() the last item" above.</li>
+      <li><strong>Adding to an empty queue:</strong> <code>back</code> is <code>null</code>, so <code>back.next</code> crashes. The slide's code doesn't handle this case. Your Exercise 0 code must.</li>
+    </ul>
+  </div>
+
+  <h2>Try your own sequence</h2>
   <div class="panel" id="lq">
     <div class="controls">
       <label>Value <input type="number" id="lq-val" value="9" min="0" max="99" aria-label="Value to enqueue"></label>
@@ -218,51 +307,108 @@ isEmpty(){
     <div class="nodes" id="lq-nodes"></div>
     <div class="log" id="lq-log" aria-live="polite"></div>
   </div>
-  <div class="prose">
-    <p>Watch out: on an empty queue, <code>back</code> is <code>null</code>, so the slide's <code>back.next = last</code> fails. (Fixing that is part of Exercise 0.)</p>
+
+  <div class="check" data-id="cse332-w1-l1-linked-which-line" data-grader="mc">
+    <p>Quick check: in <code>enqueue</code>, which line puts the new node into the chain?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w1-l1-linked-which-line"> <code>last = new ListNode(x);</code><span class="why" hidden>That only creates the node. Nothing in the chain points to it yet.</span></label>
+      <label data-correct><input type="radio" name="cse332-w1-l1-linked-which-line"> <code>back.next = last;</code><span class="why" hidden>Right. The old last node now points to the new one, so it's reachable from front.</span></label>
+      <label><input type="radio" name="cse332-w1-l1-linked-which-line"> <code>back = last;</code><span class="why" hidden>This only moves the back reference. The node was already linked in by the line before.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w1-l1-linked-swap-lines" data-grader="mc">
+    <p>Quick check: what goes wrong if you swap the last two lines of <code>enqueue</code>, so that <code>back = last;</code> runs before <code>back.next = last;</code>?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w1-l1-linked-swap-lines"> Nothing; the order doesn't matter<span class="why" hidden>Run it in your head: after back = last, what does back.next refer to?</span></label>
+      <label data-correct><input type="radio" name="cse332-w1-l1-linked-swap-lines"> The old last node never gets linked to the new one, so the new item is lost from the chain<span class="why" hidden>Right. back.next would then set the new node's own next to itself, and nothing reaches it from front.</span></label>
+      <label><input type="radio" name="cse332-w1-l1-linked-swap-lines"> It throws a NullPointerException<span class="why" hidden>back isn't null at that point: it was just set to the new node.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L1: CIRCULAR ARRAY QUEUE -->
+<section class="page" id="circular" data-title="Circular array queue">
+  <p class="where">Lecture 1 · slides 16–19</p>
+  <h1>Circular array queue</h1>
+  <div class="rule">
+    <p><strong>Key idea.</strong> Keep the items side by side in an array. Don't move the items. Move two indices, and let them wrap from the last slot back to slot 0, as if the array were a circle.</p>
   </div>
 
-  <h2>Circular array queue</h2>
+  <h2>Why a circle?</h2>
+  <div class="prose">
+    <ol>
+      <li><strong>Plain idea:</strong> keep the oldest item in slot 0. But then every <code>dequeue</code> has to shift every other item left one slot, and that gets slower as the queue grows.</li>
+      <li><strong>Better:</strong> leave the items where they are and keep an index, <code>front</code>, to the oldest one. <code>dequeue</code> just moves <code>front</code> forward.</li>
+      <li><strong>New problem:</strong> as items come and go, the used part of the array creeps right. It reaches the end while slots at the start sit empty.</li>
+      <li><strong>Fix:</strong> when an index goes past the last slot, wrap it back to 0 (slide 17). Now the free slots at the start get reused.</li>
+    </ol>
+  </div>
+
+  <h2>What the fields mean (slide 16)</h2>
   <div class="prose">
     <ul>
-      <li><code>front</code> = index of the oldest item.</li>
-      <li><code>back</code> = index of the first <strong>open</strong> slot (not the last item).</li>
-      <li>Indices wrap around with <code>% queue.length</code>, so the array acts like a circle.</li>
+      <li><code>front</code> is the index of the <strong>oldest</strong> item.</li>
+      <li><code>back</code> is the index of the <strong>first open slot</strong>, where the next item will go. It is <em>not</em> the last item. (The slide corrects itself on exactly this.)</li>
+      <li><code>size</code> is how many items are in the queue. The queue is the <code>size</code> slots starting at <code>front</code>, wrapping if needed.</li>
+      <li><code>(i + 1) % queue.length</code> is "one slot forward, wrapping". With length 10: 3 → 4, 8 → 9, and 9 → <strong>0</strong>.</li>
     </ul>
   </div>
-  <pre class="code">enqueue(x){
-    queue[back] = x;
-    back = (back + 1) % queue.length;
-    size++;
-}
-dequeue(){
-    <span class="cm">// Assumes queue is not empty</span>
-    first = queue[front];
-    front = (front + 1) % queue.length;
-    size--;
-    return first;
-}
-isEmpty(){
-    return size == 0;
-}</pre>
+
+  <h2>Step through the slide's code (slide 18)</h2>
+  <div class="prose"><p>Try "enqueue(5) into the last slot" to watch <code>back</code> wrap. Faded numbers are old values that are no longer in the queue.</p></div>
+  <div class="panel" id="cq-step"></div>
+
+  <h2>Why it counts <code>size</code></h2>
+  <div class="prose"><p>Why can't <code>isEmpty</code> just check <code>front == back</code>? Here's a length-5 array, empty and then full:</p></div>
+  <div class="grid-2">
+    <div>
+      <p class="col-label">Empty: size = 0</p>
+      <div class="cells">
+        <div class="cell empty"><span class="ptr"></span><b>·</b><span class="idx">0</span></div>
+        <div class="cell empty"><span class="ptr"></span><b>·</b><span class="idx">1</span></div>
+        <div class="cell empty"><span class="ptr">front · back</span><b>·</b><span class="idx">2</span></div>
+        <div class="cell empty"><span class="ptr"></span><b>·</b><span class="idx">3</span></div>
+        <div class="cell empty"><span class="ptr"></span><b>·</b><span class="idx">4</span></div>
+      </div>
+    </div>
+    <div>
+      <p class="col-label">Full: size = 5</p>
+      <div class="cells">
+        <div class="cell"><span class="ptr"></span><b>4</b><span class="idx">0</span></div>
+        <div class="cell"><span class="ptr"></span><b>7</b><span class="idx">1</span></div>
+        <div class="cell"><span class="ptr">front · back</span><b>5</b><span class="idx">2</span></div>
+        <div class="cell"><span class="ptr"></span><b>8</b><span class="idx">3</span></div>
+        <div class="cell"><span class="ptr"></span><b>3</b><span class="idx">4</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="rule">
+    <p>In both, <code>front == back == 2</code>. The two indices can't tell empty from full, so the queue keeps <code>size</code>, and <code>isEmpty</code> returns <code>size == 0</code>.</p>
+  </div>
+
+  <h2>Running out of room (slide 19)</h2>
+  <div class="prose">
+    <p>The array has a fixed length. With slide 18's code, an <code>enqueue</code> into a full array writes over the oldest item, because <code>back == front</code>. Slide 19 adds one line at the start of <code>enqueue</code>: <code>if (size == queue.length-1) {resize();}</code>. That grows the array <em>before</em> it can fill. How to resize is Exercise 0, so the visualizer below stops at full.</p>
+  </div>
+
+  <h2>Try your own sequence</h2>
   <div class="panel" id="cq">
     <div class="controls">
       <label>Value <input type="number" id="cq-val" value="9" min="0" max="99" aria-label="Value to enqueue"></label>
       <button class="btn primary" id="cq-enq">enqueue</button>
       <button class="btn" id="cq-deq">dequeue</button>
       <button class="btn quiet" id="cq-reset">Reset to slide</button>
-      <button class="chip" id="cq-ring" aria-pressed="false">Show as a circle</button>
+      <button class="chip" id="cq-ring" aria-pressed="true">Show as a circle</button>
     </div>
     <div class="cells" id="cq-cells"></div>
-    <svg class="chart" id="cq-svg" viewBox="0 0 320 320" role="img" aria-label="Circular view of the array" hidden style="max-width:20rem"></svg>
+    <svg class="chart" id="cq-svg" viewBox="0 0 320 320" role="img" aria-label="Circular view of the array" style="max-width:20rem"></svg>
     <p class="out" id="cq-state" role="status"></p>
     <div class="log" id="cq-log" aria-live="polite"></div>
-  </div>
-  <div class="rule">
-    <p><strong>Why <code>isEmpty</code> uses <code>size</code>.</strong> When the array is full, <code>back</code> wraps around to equal <code>front</code>, the same as when it's empty. The indices alone can't tell the two apart.</p>
-  </div>
-  <div class="prose">
-    <p>Running out of space? Slide 19 calls <code>resize()</code> before the array fills (how is Exercise 0). The visualizer stops at full.</p>
   </div>
 
   <div class="check" data-id="cse332-w1-l1-queues-back-after-two" data-grader="exact" data-answer="6" data-miscon='{"7":"back-points-last","4":"back-points-last"}'>
@@ -275,33 +421,81 @@ isEmpty(){
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
+  <nav class="pager"></nav>
+</section>
 
-  <h2>Think about it: which is better?</h2>
+<!-- ================================================================ L1: COMPARE -->
+<section class="page" id="queue-compare" data-title="Linked vs. circular array">
+  <p class="where">Lecture 1 · slide 20</p>
+  <h1>Linked vs. circular array</h1>
+  <div class="rule">
+    <p><strong>Key idea.</strong> To the user, the two queues are identical: the same operations always return the same values. Underneath, they spend memory and time differently. Choosing between them is the kind of decision this course is about.</p>
+  </div>
   <div class="prose">
-    <p>Slide 20 asks for each one's pros and cons (the slide gives no answer). Think about memory per item, and what happens when you have more items than planned.</p>
+    <p>Slide 20 says "Let's summarize the benefits and drawbacks of each", and the class filled it in live. The table below is worked out from the two designs on the earlier slides. It is not the slide's official list. The <a href="#home">week overview</a> runs both queues side by side on the same buttons, so you can see they always agree.</p>
+  </div>
+  <div class="table-wrap">
+  <table class="plain vs-table">
+    <tr><th></th><th>Linked queue</th><th>Circular array queue</th></tr>
+    <tr><th>Storage</th><td>Each item gets its own node object</td><td>Items sit side by side in one array</td></tr>
+    <tr><th>Extra memory</th><td>One <code>next</code> reference stored with every item</td><td>The unused slots in the array</td></tr>
+    <tr><th>Room to grow</th><td>Never full: each <code>enqueue</code> just makes a new node</td><td>Fixed length: when it fills, <code>resize()</code> has to copy every item into a bigger array</td></tr>
+    <tr><th>Work per operation</th><td>A few steps, however many items there are</td><td>A few steps, however many items there are, except for the <code>enqueue</code> that triggers a resize</td></tr>
+    <tr><th>Empty case</th><td><code>front</code> and <code>back</code> are <code>null</code>, which the code must watch for</td><td><code>size == 0</code>, since <code>front == back</code> also happens when full</td></tr>
+  </table>
+  </div>
+  <div class="prose">
+    <p><strong>So which is better?</strong> It depends on what you care about, and "it depends" isn't a good enough answer for this course. Lecture 2 gives you a way to measure: count how many steps each operation takes as the number of items <em>n</em> grows. It also shows why the occasional costly resize averages out to a small cost per operation.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w1-l1-compare-copies" data-grader="mc">
+    <p>Quick check: which queue sometimes has to copy every item it holds during an <code>enqueue</code>?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w1-l1-compare-copies"> The linked queue<span class="why" hidden>A linked enqueue makes one new node and changes two references. It never touches the other items.</span></label>
+      <label data-correct><input type="radio" name="cse332-w1-l1-compare-copies"> The circular array queue<span class="why" hidden>Right. When the array fills, resize() copies every item into a bigger array.</span></label>
+      <label><input type="radio" name="cse332-w1-l1-compare-copies"> Neither<span class="why" hidden>Think about what happens when an array runs out of slots.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
   </div>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L1: STACKS -->
 <section class="page" id="stacks" data-title="Stacks">
-  <p class="where">Lecture 1 · slide 21 · Weiss 3.6</p>
+  <p class="where">Lecture 1 · slide 21 · Section 1 · Weiss 3.6</p>
   <h1>Stacks</h1>
   <div class="rule">
-    <p><strong>Key idea.</strong> A <em>stack</em> is Last In, First Out (LIFO), like a stack of plates.</p>
+    <p><strong>Key idea.</strong> A <em>stack</em> is a "Last In, First Out" (LIFO) collection, sometimes called FILO. Think of a stack of plates: you add to the top and take from the top.</p>
   </div>
+
+  <h2>Operations (slide 21)</h2>
   <div class="prose">
     <ul>
-      <li><code>push</code>: add an item on top.</li>
-      <li><code>pop</code>: return the top item <strong>and remove it</strong>.</li>
-      <li><code>peek</code>: return the top item <strong>without</strong> removing it.</li>
-      <li><code>isEmpty</code>: is anything left?</li>
+      <li><code>push</code>: add a new item onto the stack.</li>
+      <li><code>pop</code>: return the most recently pushed item <strong>and remove it</strong>.</li>
+      <li><code>peek</code>: return the most recently pushed item <strong>without</strong> removing it.</li>
+      <li><code>isEmpty</code>: are there items still on the stack?</li>
     </ul>
   </div>
 
-  <h2>Same inputs, stack vs. queue</h2>
+  <h2>Stack vs. queue: one difference</h2>
+  <div class="table-wrap">
+  <table class="plain vs-table">
+    <tr><th></th><th>Queue (FIFO)</th><th>Stack (LIFO)</th></tr>
+    <tr><th>Items go in at</th><td>the back</td><td>the top</td></tr>
+    <tr><th>Items come out from</th><td>the front, the <strong>other</strong> end</td><td>the top, the <strong>same</strong> end</td></tr>
+    <tr><th>Next out</th><td>the oldest item</td><td>the newest item</td></tr>
+  </table>
+  </div>
+  <div class="prose">
+    <p>Both ADTs add and remove, and only the behavior differs. That's what the earlier page meant by an ADT pinning down behavior. It also changes what a data structure has to do: a queue works at both ends, which is why the linked queue keeps <code>front</code> and <code>back</code>. A stack only ever works at one end.</p>
+    <p><strong>Data structures for a stack</strong> (Section 1): a linked list or an array list (a resizable array). These are the same two designs as the queue. Building both is Exercise 0, so this site doesn't show the code.</p>
+  </div>
+
+  <h2>Same inputs, two ADTs</h2>
   <div class="panel" id="sq">
-    <p><code>+5</code> adds 5, <code>-</code> removes. Both get the same script.</p>
+    <p>Predict first, then run. <code>+5</code> adds 5 (push or enqueue), and <code>-</code> removes (pop or dequeue). The stack and the queue get the same script.</p>
     <div class="controls">
       <label>Script <input type="text" id="sq-script" class="mono" value="+5 +8 +3 - +4 -" aria-label="Operation script" style="width:16rem"></label>
       <button class="btn primary" id="sq-run">Run</button>
@@ -314,6 +508,11 @@ isEmpty(){
 
   <div class="check" data-id="cse332-w1-l1-stacks-second-pop" data-grader="exact" data-answer="4" data-miscon='{"8":"fifo","5":"fifo","3":"first-pop"}'>
     <p>Quick check: <code>push(5)</code>, <code>push(8)</code>, <code>push(3)</code>, <code>pop()</code>, <code>push(4)</code>, <code>pop()</code>. What does the second <code>pop()</code> return?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w1-l1-stacks-peek-twice" data-grader="exact" data-answer="2" data-miscon='{"1":"peek-removes"}'>
+    <p>Quick check: <code>push(1)</code>, <code>push(2)</code>, <code>peek()</code>, <code>peek()</code>. What does the second <code>peek()</code> return?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
@@ -413,7 +612,7 @@ isEmpty(){
         <label><input type="radio" name="cse332-w1-l1-cyu-implementation"> An algorithm<span class="why" hidden>An algorithm is a language-independent description of one step-by-step process, like "how to dequeue".</span></label>
       </div>
     </li>
-    <li class="cyu" data-id="cse332-w1-l1-cyu-queue-notion" data-kind="mc" data-topic="queues">
+    <li class="cyu" data-id="cse332-w1-l1-cyu-queue-notion" data-kind="mc" data-topic="linked">
       <p class="q">Which describes the queue ADT?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w1-l1-cyu-queue-notion"> Items come out most-recent first<span class="why" hidden>That's LIFO, a stack.</span></label>
@@ -422,15 +621,15 @@ isEmpty(){
         <label><input type="radio" name="cse332-w1-l1-cyu-queue-notion"> Items are stored in an array<span class="why" hidden>That's one data structure for a queue, not what the ADT promises. A linked queue uses no array.</span></label>
       </div>
     </li>
-    <li class="cyu" data-id="cse332-w1-l1-cyu-back-after-enqueues" data-kind="num" data-answer="7" data-topic="queues" data-miscon='{"6":"back-points-last"}'>
+    <li class="cyu" data-id="cse332-w1-l1-cyu-back-after-enqueues" data-kind="num" data-answer="7" data-topic="circular" data-miscon='{"6":"back-points-last"}'>
       <p class="q">Slide state: length 10, holding 5 8 3 4 7, <code>front = 0</code>, <code>back = 5</code>. After <code>enqueue(1)</code> and <code>enqueue(2)</code>, what is <code>back</code>?</p>
       <p class="why" hidden>Each enqueue writes at <code>back</code> then adds 1: 5 → 6 → 7.</p>
     </li>
-    <li class="cyu" data-id="cse332-w1-l1-cyu-back-wraps" data-kind="num" data-answer="2" data-topic="queues" data-miscon='{"12":"no-wrap"}'>
+    <li class="cyu" data-id="cse332-w1-l1-cyu-back-wraps" data-kind="num" data-answer="2" data-topic="circular" data-miscon='{"12":"no-wrap"}'>
       <p class="q">Same start. Do 3 dequeues, then 7 enqueues. What is <code>back</code>?</p>
       <p class="why" hidden>Seven steps from 5: \((5+7) \bmod 10 = 2\). The queue holds \(5-3+7 = 9\) items, so nothing overflows.</p>
     </li>
-    <li class="cyu" data-id="cse332-w1-l1-cyu-back-null" data-kind="mc" data-topic="queues">
+    <li class="cyu" data-id="cse332-w1-l1-cyu-back-null" data-kind="mc" data-topic="linked">
       <p class="q">In the linked queue's <code>dequeue</code>, why does it set <code>back = null</code> when <code>front</code> becomes <code>null</code>?</p>
       <div class="opts">
         <label data-correct><input type="radio" name="cse332-w1-l1-cyu-back-null"> So <code>back</code> doesn't keep pointing at a node that is no longer in the queue<span class="why" hidden>Correct. The queue is empty, so neither reference should point at an old node.</span></label>
@@ -438,7 +637,7 @@ isEmpty(){
         <label><input type="radio" name="cse332-w1-l1-cyu-back-null"> Because <code>isEmpty</code> checks <code>back</code><span class="why" hidden>Slide 15's <code>isEmpty</code> checks <code>front == null</code>.</span></label>
       </div>
     </li>
-    <li class="cyu" data-id="cse332-w1-l1-cyu-full-overwrite" data-kind="mc" data-topic="queues">
+    <li class="cyu" data-id="cse332-w1-l1-cyu-full-overwrite" data-kind="mc" data-topic="circular">
       <p class="q">With slide 18's code (no resize), what happens if you <code>enqueue</code> into a full array?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w1-l1-cyu-full-overwrite"> An ArrayIndexOutOfBoundsException<span class="why" hidden><code>back</code> is always taken <code>% queue.length</code>, so it's always a valid index.</span></label>
@@ -447,7 +646,7 @@ isEmpty(){
         <label><input type="radio" name="cse332-w1-l1-cyu-full-overwrite"> Nothing; the value is dropped<span class="why" hidden>The code always writes <code>queue[back] = x</code>.</span></label>
       </div>
     </li>
-    <li class="cyu" data-id="cse332-w1-l1-cyu-isempty-size" data-kind="mc" data-topic="queues">
+    <li class="cyu" data-id="cse332-w1-l1-cyu-isempty-size" data-kind="mc" data-topic="circular">
       <p class="q">Why does the circular array's <code>isEmpty</code> check <code>size == 0</code> instead of <code>front == back</code>?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w1-l1-cyu-isempty-size"> <code>front == back</code> is slower to compute<span class="why" hidden>Both are a single comparison.</span></label>

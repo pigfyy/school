@@ -37,6 +37,7 @@ for (const r of J("binaryWorst")) {
   ok(Sim.binaryWorstExhaustive(r.n) === r.worst, `binaryWorst n=${r.n}`);
   ok(Math.floor(Math.log2(r.n)) + 1 === r.worst, `floor(log2 n)+1 n=${r.n}`);
 }
+const peekTwice = (() => { const a = [1, 2]; a.at(-1); return a.at(-1); })();
 const circ1 = J("circ1")[0], circ2 = J("circ2")[0], circ3 = J("circ3")[0], circ4 = J("circ4")[0], lk = J("linked1")[0], st = J("stack")[0], cross = J("cross")[0];
 {
   let q = Sim.circularQueue(); q.dequeue(); q.dequeue(); q.enqueue(9);
@@ -52,6 +53,30 @@ const circ1 = J("circ1")[0], circ2 = J("circ2")[0], circ3 = J("circ3")[0], circ4
   ok(sr.removed[1] === st.secondPop, "stack second pop");
   const A = (n) => Sim.algValue("A", n), B = (n) => Sim.algValue("B", n), C = (n) => Sim.algValue("C", n);
   ok(Sim.firstN((n) => A(n) < B(n)) === cross.aBelowB && Sim.firstN((n) => C(n) > A(n)) === cross.cAboveA, "crossovers sim vs java");
+}
+
+/* Lecture 1 line steppers: every walk ends in the same state as running the operation on the simulator
+   (which is checked against javac above), and every arithmetic line it narrates is right. */
+{
+  const L = (init, op, x) => { const q = Sim.linkedQueue(init); const r = op === "enqueue" ? q.enqueue(x) : q.dequeue(); return { q, r }; };
+  for (const [init, op, x] of [[[5, 8, 3, 4, 7], "enqueue", 9], [[5, 8, 3, 4, 7], "dequeue"], [[7], "dequeue"]]) {
+    const steps = Sim.linkedSteps(op, init, x), end = steps.at(-1), { q, r } = L(init, op, x);
+    const live = end.nodes.filter((n) => !n.gone && !n.loose).map((n) => n.v);
+    ok(live.join() === q.values().join(), `linked stepper ${op} ${init}: chain ${live} vs ${q.values()}`);
+    ok((end.front === null ? null : end.nodes[end.front].v) === q.frontValue && (end.back === null ? null : end.nodes[end.back].v) === q.backValue, `linked stepper ${op} ${init}: front/back`);
+    if (op === "dequeue") ok(end.vars.first === r, `linked stepper dequeue returns ${r}`);
+    ok(steps.every((s) => s.line === null || Sim.LINKED_CODE[op][s.line]), "linked stepper lines exist");
+  }
+  ok(Sim.linkedSteps("enqueue", [], 9).at(-1).crash === true && Sim.linkedSteps("enqueue", [], 9).at(-1).line === 2, "empty enqueue crashes on back.next");
+  const starts = { slide: () => Sim.circularQueue(), late: () => { const q = Sim.circularQueue(); for (let i = 0; i < 3; i++) q.dequeue(); [1, 2, 3, 4].forEach((v) => q.enqueue(v)); return q; } };
+  for (const [st, op, x] of [["slide", "enqueue", 9], ["slide", "dequeue"], ["late", "enqueue", 5]]) {
+    const steps = Sim.circularSteps(op, starts[st](), x), end = steps.at(-1), q = starts[st]();
+    const r = op === "enqueue" ? q.enqueue(x) : q.dequeue();
+    ok(end.front === q.front && end.back === q.back && end.size === q.size && end.cells.join() === q.queue.join(), `circular stepper ${st} ${op}`);
+    if (op === "dequeue") ok(end.vars.first === r, "circular stepper dequeue value");
+    for (const s of steps) for (const m of s.say.matchAll(/\((\d+) \+ 1\) % (\d+) = (\d+)/g)) ok((Number(m[1]) + 1) % Number(m[2]) === Number(m[3]), `stepper arithmetic: ${m[0]}`);
+  }
+  ok(Sim.circularSteps("enqueue", starts.late(), 5).at(-1).back === 0, "the late enqueue wraps back to 0");
 }
 
 /* Section 1 generics: the posted solutions compile and behave; the "does it compile" quick checks match javac. */
@@ -78,6 +103,7 @@ const TRUTH = {
   "cse332-w1-l1-queues-back-after-two": S(circ1.back),
   "cse332-w1-l1-queues-back-wrap": S(circ3.back),
   "cse332-w1-l1-stacks-second-pop": S(st.secondPop),
+  "cse332-w1-l1-stacks-peek-twice": S(peekTwice),
   "cse332-w1-l1-circular-trace.front": S(circ2.front),
   "cse332-w1-l1-circular-trace.back": S(circ2.back),
   "cse332-w1-l1-circular-trace.size": S(circ2.size),

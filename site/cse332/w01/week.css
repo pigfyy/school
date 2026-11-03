@@ -104,3 +104,26 @@ pre.code .cm { color: var(--ink-faint); font-style: italic; }
   .cell b { font-size: var(--step-0); }
   .task { padding: 1.1rem 1rem 1rem; }
 }
+
+/* ---------------------------------------------------------------- Lecture 1 line steppers */
+.node.gone b { opacity: 0.35; border-style: dashed; }
+.arrow.gone { opacity: 0.35; }
+.node.loose { margin-left: 1.25rem; }
+.node.loose b { border-style: dashed; background: var(--surface); }
+.cell.stale b { color: var(--ink-faint); }
+.step-vars { font-family: var(--mono); font-size: 0.85rem; color: var(--ink-soft); margin: 0 0 0.5rem; min-height: 1.2rem; }
+.step-say { background: var(--paper); border-radius: var(--r); padding: 0.6rem 0.8rem; margin: 0 0 0.6rem; min-height: 4.5rem; }
+.step-say.crash { background: var(--wrong-tint); color: var(--wrong); }
+.vs-table td, .vs-table th { vertical-align: top; }
+.levels { display: grid; gap: 0.4rem; max-width: var(--measure); margin: 1rem 0 1.25rem; }
+.levels > div { display: grid; grid-template-columns: 9.5rem 1fr; gap: 0.75rem; align-items: baseline; padding: 0.55rem 0.8rem; border-radius: var(--r); border: 1px solid var(--line); background: var(--surface); }
+.levels > div b { font-family: var(--display); font-size: 1.05rem; }
+.levels > div span { font-size: 0.95rem; }
+.levels > div:nth-child(1) { margin-right: 3rem; }
+.levels > div:nth-child(2) { margin-left: 1rem; margin-right: 2rem; }
+.levels > div:nth-child(3) { margin-left: 2rem; margin-right: 1rem; }
+.levels > div:nth-child(4) { margin-left: 3rem; }
+.goals li { margin-bottom: 0.4rem; }
+@media (max-width: 860px) {
+  .levels > div { grid-template-columns: 1fr; gap: 0.15rem; margin-left: 0 !important; margin-right: 0 !important; }
+}
