@@ -48,8 +48,10 @@
   <div>
     <h2>Lecture 2 <span class="today" data-date="2026-10-02">Fri Oct 2</span></h2>
     <ol class="modules">
+      <li><a href="#l2-goals">What this lecture is for</a></li>
       <li><a href="#analysis">Why count operations?</a></li>
-      <li><a href="#counting">Counting worst-case operations</a></li>
+      <li><a href="#scenarios">Worst, best, average, amortized</a></li>
+      <li><a href="#counting">Counting operations</a></li>
       <li><a href="#amortized">Amortized analysis</a></li>
       <li><a href="#search">Binary search</a></li>
       <li><a href="#asymptotic">Comparing running times</a></li>
@@ -98,7 +100,7 @@
   <div class="week">
     <a href="#l1-goals"><strong>Wed, Sept 30</strong><span>Lecture 1: Intro; ADTs; Queues &amp; Stacks</span><span>Reading: Weiss 3.1–3.7</span></a>
     <a href="#generics"><strong>Thu, Oct 1</strong><span>Section 1: Intros, Java Generics</span><span>ADT warm-up + 5 generic pair classes, with posted solutions</span></a>
-    <a href="#analysis"><strong>Fri, Oct 2</strong><span>Lecture 2: Algorithm Analysis 1</span><span>Reading: Weiss 2.1–2.4; math review Weiss 1.1–1.6</span></a>
+    <a href="#l2-goals"><strong>Fri, Oct 2</strong><span>Lecture 2: Algorithm Analysis 1</span><span>Reading: Weiss 2.1–2.4; math review Weiss 1.1–1.6</span></a>
   </div>
 
   <h2>Due soon</h2>
@@ -944,48 +946,160 @@
   <nav class="pager"></nav>
 </section>
 
+<!-- ================================================================ L2: GOALS -->
+<section class="page" id="l2-goals" data-title="What this lecture is for">
+  <p class="where">Lecture 2 · <span class="today-chip" data-date="2026-10-02">Fri Oct 2</span> · Algorithm Analysis 1</p>
+  <h1>What this lecture is for</h1>
+  <div class="prose">
+    <p>Lecture 1 ended with two queues that give the same answers but work differently. Which one is faster? To answer that, you need a way to say "algorithm X is faster than algorithm Y" that doesn't depend on whose laptop ran it, how well it was coded, or which input someone happened to try.</p>
+  </div>
+  <div class="rule">
+    <p><strong>The lecture's answer, in one line.</strong> Count the operations an algorithm does, as a function of the input size \(n\) (usually for the worst input), then compare those functions by how fast they <em>grow</em>.</p>
+  </div>
+
+  <h2>After this lecture you should be able to</h2>
+  <ol class="goals">
+    <li>Explain why timing a program is a poor way to compare algorithms, and what we measure instead. <a href="#analysis">Why count operations?</a></li>
+    <li>Say what a running-time function \(f(n)\) is: its input, its output, and their units. <a href="#analysis">Why count operations?</a></li>
+    <li>Tell worst, best, average and amortized analysis apart, and say why worst case is the usual choice. <a href="#scenarios">Four scenarios</a></li>
+    <li>Count the worst-case operations of code with loops, nested loops and if/else, then put the count in a bucket like \(O(n)\). <a href="#counting">Counting operations</a></li>
+    <li>Explain why one ArrayList <code>add</code> can cost \(O(n)\), yet adds cost about 2 each on average over a long run. <a href="#amortized">Amortized analysis</a></li>
+    <li>Explain why binary search takes about \(\log_2 n\) iterations, and why that's so much less than \(n\). <a href="#search">Binary search</a></li>
+    <li>Read the definitions of \(O\), \(\Omega\) and \(\Theta\), and say what the \(c\) and \(n_0\) in them are for. <a href="#asymptotic">Comparing running times</a></li>
+  </ol>
+  <nav class="pager"></nav>
+</section>
+
 <!-- ================================================================ L2: ANALYSIS -->
 <section class="page" id="analysis" data-title="Why count operations?">
-  <p class="where">Lecture 2 · <span class="today-chip" data-date="2026-10-02">Fri Oct 2</span> · slides 3–14 · Weiss 2.1–2.2</p>
+  <p class="where">Lecture 2 · <span class="today-chip" data-date="2026-10-02">Fri Oct 2</span> · Weiss 2.1–2.2</p>
   <h1>Why count operations?</h1>
+  <div class="rule">
+    <p><strong>Key idea.</strong> A stopwatch measures one program on one computer on one input. We want a property of the <em>algorithm</em>, so we count the steps it takes as a function of the input size.</p>
+  </div>
+
+  <h2>Why it matters</h2>
   <div class="prose">
-    <p>We care about two things in an algorithm. <strong>Correctness</strong>: does it do what's intended? <strong>Performance</strong>: speed (time complexity) and memory (space complexity). Analysis lets us make good design decisions and find the bottlenecks.</p>
-    <p>"Uh, why NOT just run the program and time it??" Timing varies too much to be reliable or portable: hardware, OS, Java version, other programs, the implementation, and the choice of input. Testing can miss the worst-case input, and a stopwatch doesn't explain what happens when \(n\) doubles. Often we want to evaluate an <em>algorithm</em> before anyone codes it.</p>
+    <p>We care about two things in an algorithm. <strong>Correctness</strong>: does it do what's intended? <strong>Performance</strong>: how much time and how much memory does it use? Performance matters because the gap between a good and a bad algorithm can be enormous. The course's running-time reading timed two correct sorting algorithms:</p>
   </div>
-  <div class="rule">
-    <p><strong>Resource analysis.</strong> The end result is a function that maps the algorithm's <em>input size</em> to a <em>count of resources used</em>. Input: number of characters in a string, items in a list, pixels in an image. Output: e.g. the number of additions, the number of <code>&gt;</code>/<code>&lt;</code> comparisons, the maximum bytes of memory in use. Know the "units" of both.</p>
+  <div class="table-wrap">
+  <table class="plain num">
+    <tr><th>Items</th><th>Selection sort</th><th>Permutation sort</th></tr>
+    <tr><td>5</td><td>3.2 ms</td><td>104.6 ms</td></tr>
+    <tr><td>10</td><td>4.4 ms</td><td>164,403.8 ms (2.7 minutes)</td></tr>
+    <tr><td>14</td><td>6.6 ms</td><td>about 26 minutes</td></tr>
+    <tr><td>15</td><td>7.1 ms</td><td>not tried; estimated over 6 hours</td></tr>
+  </table>
+  </div>
+  <div class="prose">
+    <p>Both give the right answer. One is useless past about a dozen items. We'd like to predict that <em>before</em> writing and timing the code.</p>
   </div>
 
-  <h2>Which input? Four scenarios</h2>
-  <div class="rule">
-    <p><strong>Worst case:</strong> max number of steps on the "most challenging" input. <strong>Best case:</strong> min number of steps on the "easiest" input. <strong>Average/expected:</strong> average steps on random inputs (depends on the distribution). <strong>Amortized:</strong> max total steps on \(M\) "most challenging" consecutive inputs, divided by \(M\).</p>
-    <p>Usually: worst case. If the worst-case running time is \(f(n)\), then among all inputs of size \(n\) the worst one does \(f(n)\) operations.</p>
+  <h2>Why not just time it?</h2>
+  <div class="prose">
+    <ul>
+      <li><strong>Too much varies.</strong> Hardware, the operating system, the Java version, other programs running, and how well it was coded all change the time. If your code beats a classmate's on your laptop, that says nothing about the algorithms.</li>
+      <li><strong>The input you picked may not be the hard one.</strong> Testing can miss the worst-case input.</li>
+      <li><strong>A time doesn't explain growth.</strong> One measurement doesn't tell you what happens when \(n\) doubles.</li>
+      <li><strong>You need code first.</strong> We often want to judge an algorithm before anyone implements it.</li>
+    </ul>
   </div>
 
+  <h2>What we measure instead</h2>
+  <div class="rule">
+    <p><strong>Running time</strong> is a function \(f(n)\). Its <em>input</em> is the size of the algorithm's input: the number of items in a list, characters in a string, pixels in an image. Its <em>output</em> is a count of operations, such as additions, comparisons or array accesses.</p>
+  </div>
+  <div class="prose">
+    <p>This fixes every problem above. A faster computer does the same operations, just quicker, so \(f\) doesn't change. You can count from the algorithm without running it. And because \(f\) is a function of \(n\), you can ask what happens as \(n\) grows.</p>
+    <p><strong>Always know the units.</strong> What is \(n\) counting, and what operation is \(f(n)\) counting? "The running time is \(n^2\)" means nothing until you say \(n^2\) of <em>what</em>, for an input of size \(n\) measured <em>how</em>.</p>
+  </div>
+
+  <h2>Which operations to count</h2>
+  <div class="prose">
+    <p>You don't have to count every primitive step. Pick the operations that matter:</p>
+    <ul>
+      <li><strong>Necessity:</strong> any algorithm for the problem has to do them.</li>
+      <li><strong>Frequency:</strong> they're among the most frequent, up to a constant factor.</li>
+      <li><strong>Magnitude:</strong> each one is expensive.</li>
+    </ul>
+    <p>For sorting, that's usually comparisons: one item <code>&lt;</code> or <code>&gt;</code> another. Counting just these gives the same growth as counting everything, with far less work.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w1-l2-analysis-faster-laptop" data-grader="mc">
+    <p>Quick check: you run the same algorithm on a computer that's twice as fast. What happens to its running-time function \(f(n)\)?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w1-l2-analysis-faster-laptop"> It halves<span class="why" hidden>The seconds halve, but \(f(n)\) counts operations. The faster computer does exactly the same operations.</span></label>
+      <label data-correct><input type="radio" name="cse332-w1-l2-analysis-faster-laptop"> It doesn't change<span class="why" hidden>Right. That's the point of counting operations instead of timing: the answer belongs to the algorithm, not the machine.</span></label>
+      <label><input type="radio" name="cse332-w1-l2-analysis-faster-laptop"> It grows more slowly as \(n\) grows<span class="why" hidden>A faster machine speeds up every operation by the same factor. It doesn't change how the count grows with \(n\).</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w1-l2-analysis-which-op" data-grader="mc">
+    <p>Quick check: you're analyzing a sorting algorithm. Which operation is the best one to count?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w1-l2-analysis-which-op"> Comparisons between two items<span class="why" hidden>Right. Every sorting algorithm needs them (necessity), and they happen about as often as anything else it does (frequency).</span></label>
+      <label><input type="radio" name="cse332-w1-l2-analysis-which-op"> Printing the sorted list at the end<span class="why" hidden>That's not part of sorting, and it happens once no matter how the sort works.</span></label>
+      <label><input type="radio" name="cse332-w1-l2-analysis-which-op"> Declaring local variables<span class="why" hidden>Not necessary to the problem, and not where the work is.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L2: SCENARIOS -->
+<section class="page" id="scenarios" data-title="Four scenarios">
+  <p class="where">Lecture 2 · <span class="today-chip" data-date="2026-10-02">Fri Oct 2</span></p>
+  <h1>Worst, best, average, amortized</h1>
+  <div class="rule">
+    <p><strong>Key idea.</strong> Inputs of the same size can take different amounts of work. Before counting, decide <em>which</em> input you're counting for. Usually that's the worst one.</p>
+  </div>
+  <div class="table-wrap">
+  <table class="plain vs-table">
+    <tr><th>Scenario</th><th>What \(f(n)\) counts</th></tr>
+    <tr><td><strong>Worst case</strong></td><td>The most steps on the hardest input of size \(n\)</td></tr>
+    <tr><td><strong>Best case</strong></td><td>The fewest steps on the easiest input of size \(n\)</td></tr>
+    <tr><td><strong>Average case</strong></td><td>The average steps over random inputs. The answer depends on what "random" means.</td></tr>
+    <tr><td><strong>Amortized</strong></td><td>The most total steps over \(M\) hardest operations <em>in a row</em>, divided by \(M\): the cost per operation over a long run</td></tr>
+  </table>
+  </div>
+
+  <h2>See the difference on linear search</h2>
+  <div class="prose">
+    <p>This code checks a list for \(k\), item by item, and stops as soon as it finds it:</p>
+  </div>
+  <pre class="code">public static boolean contains(List&lt;Integer&gt; a, int k){
+    for(int i=0; i&lt; a.size(); i++){
+        if (a.get(i) == k)
+            return true;
+    }
+    return false;
+}</pre>
   <div class="panel" id="scen">
-    <h4>Worst, best, average for <code>contains</code> on the slide-23 list</h4>
-    <p class="note">Slide 23's linear search compares <code>a.get(i) == k</code> until it finds <code>k</code>. Click a target to count its comparisons. The list has 10 items.</p>
+    <h4>Comparisons (<code>a.get(i) == k</code>) for each target, on a list of 10 items</h4>
+    <p class="note">Click a target. The best case is the first item; the worst is the last item or a target that isn't there.</p>
     <div class="cells" id="scen-cells"></div>
     <div class="controls"><button class="chip" id="scen-missing" aria-pressed="false">Target not in the list</button></div>
     <p class="out" id="scen-out" role="status"></p>
     <div class="table-wrap"><table class="plain num" id="scen-table"></table></div>
   </div>
 
-  <h2>The analysis process</h2>
+  <h2>Why worst case is the usual choice</h2>
   <div class="prose">
-    <p>From CSE 123/143: count "primitive operations" (+, −, compare, <code>arr[i]</code>, <code>arr.length</code>…), write the count with \(n\), then put it in a bucket by ignoring constants and non-dominant terms, inside an \(O(\ )\). For example \(4n^2+8n-10\) ends up as \(O(n^2)\), \(\tfrac12 n+80\) as \(O(n)\), \(n(n+1)\) as \(O(n^2)\).</p>
-    <p>In CSE 332:</p>
-    <ol>
-      <li>Pick a scenario (usually worst).</li>
-      <li>Count the chosen operation(s). Choose them for <em>necessity</em> (any solution must do them), <em>frequency</em> (the most frequent, up to a constant factor) and <em>magnitude</em> (the expensive ones).</li>
-      <li>Write the count as an expression in \(n\).</li>
-      <li>Put an asymptotic bound on it: \(O\), \(\Omega\) or \(\Theta\).</li>
-    </ol>
-  </div>
-  <div class="rule">
-    <p><strong>Worst case: general guide.</strong> Add the time of consecutive statements. Loops: sum the time of each iteration; if each takes the same time, time per iteration × number of iterations. Conditionals: time to check the condition plus the time of the slowest branch. Function calls: time of the body. Recursion: solve a recurrence (week 3).</p>
+    <p>A worst-case bound is a <strong>guarantee</strong>: no input of size \(n\) takes more than \(f(n)\) steps. A best case says almost nothing, since nearly any search is fast when the target comes first. An average case needs you to know what inputs look like. So when someone says "the running time", they mean worst case unless they say otherwise.</p>
   </div>
 
+  <div class="check" data-id="cse332-w1-l2-scenarios-why-worst" data-grader="mc">
+    <p>Quick check: <code>contains</code> takes 1 comparison in the best case. Why isn't "1 comparison" a useful way to describe its running time?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w1-l2-scenarios-why-worst"> It only holds when the target happens to come first, so it promises nothing about other inputs<span class="why" hidden>Right. A worst-case count holds for every input of size \(n\); a best-case count holds for the luckiest one.</span></label>
+      <label><input type="radio" name="cse332-w1-l2-scenarios-why-worst"> It's wrong: the best case is really \(n\) comparisons<span class="why" hidden>The best case really is 1: the loop returns on the first item.</span></label>
+      <label><input type="radio" name="cse332-w1-l2-scenarios-why-worst"> Constants don't count, so it should say \(O(1)\) instead<span class="why" hidden>Writing it as \(O(1)\) doesn't fix the problem: it's still about the luckiest input only.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <div class="check" data-id="cse332-w1-l2-analysis-scenario-amortized" data-grader="mc">
     <p>Quick check: "Over any 1,000 adds in a row, the total work divided by 1,000 is at most 3." Which scenario is that?</p>
     <div class="opts">
@@ -996,26 +1110,49 @@
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Slide 4 ("pick an algorithm with the best running time") is blank in the posted deck. It was an in-class activity.</li>
-      <li>The topic summary's example of why this matters: Nathan timed selection sort vs. permutation sort. At length 14, permutation sort took about 26 minutes; selection sort took 6.6 ms.</li>
-      <li>"Units" is the quiet trap: is \(n\) the number of items, or the number of bits? Ask for both units every time.</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L2: COUNTING -->
-<section class="page" id="counting" data-title="Counting worst-case operations">
-  <p class="where">Lecture 2 · slides 15–18 · Weiss 2.3–2.4</p>
-  <h1>Counting worst-case operations</h1>
-  <div class="prose">
-    <p><strong>Example 1</strong> from the slides. Input size: the number of items in the list. Operations counted: arithmetic (+ − * /, including <code>++</code>). Step through it and watch the tally on each line.</p>
+<section class="page" id="counting" data-title="Counting operations">
+  <p class="where">Lecture 2 · <span class="today-chip" data-date="2026-10-02">Fri Oct 2</span> · Weiss 2.3–2.4</p>
+  <h1>Counting operations</h1>
+  <div class="rule">
+    <p><strong>Key idea.</strong> Statements in a row <em>add</em>. A loop <em>multiplies</em> its body by the number of times it runs. An if/else costs its check plus its <em>slower</em> branch. Then keep only the fastest-growing term.</p>
   </div>
 
+  <h2>The rules for worst case</h2>
+  <div class="table-wrap">
+  <table class="plain vs-table">
+    <tr><th>Code shape</th><th>Cost</th></tr>
+    <tr><td>Statements one after another</td><td>Add their costs</td></tr>
+    <tr><td>A loop</td><td>Add up every iteration. If each costs the same: cost per iteration × number of iterations</td></tr>
+    <tr><td>if / else</td><td>The cost of the check + the cost of the slower branch (worst case doesn't know which branch runs)</td></tr>
+    <tr><td>A method call</td><td>The cost of the method's body</td></tr>
+    <tr><td>Recursion</td><td>Solve a recurrence (week 3)</td></tr>
+  </table>
+  </div>
+
+  <h2>Example 1: <code>myFunction</code></h2>
+  <div class="prose">
+    <p><strong>Units:</strong> \(n\) is the number of items in the list. We count arithmetic operations (+ − * / and <code>++</code>). Loop tests like <code>i &lt; n.size()</code> are comparisons, so they don't count here.</p>
+  </div>
+  <div class="table-wrap">
+  <table class="plain vs-table">
+    <tr><th>Line</th><th>Ops each time</th><th>How many times</th><th>Total</th></tr>
+    <tr><td><code>b = 55 + 5;</code></td><td>1</td><td>once</td><td>1</td></tr>
+    <tr><td><code>c = b / 3;</code></td><td>1</td><td>once</td><td>1</td></tr>
+    <tr><td><code>b = c + 100;</code></td><td>1</td><td>once</td><td>1</td></tr>
+    <tr><td>first loop: <code>b++</code> and <code>i++</code></td><td>2</td><td>\(n\)</td><td>\(2n\)</td></tr>
+    <tr><td><code>if (b % 2 == 0)</code></td><td>1</td><td>once</td><td>1</td></tr>
+    <tr><td>if branch: <code>c++</code></td><td>1</td><td>once</td><td>1</td></tr>
+    <tr><td>else branch: <code>c++</code> and <code>i++</code></td><td>2</td><td>\(n\)</td><td>\(2n\)</td></tr>
+  </table>
+  </div>
+  <div class="prose">
+    <p>The else branch (\(2n\)) costs more than the if branch (1) once \(n \ge 1\), so the worst case charges the else branch: \(3 + 2n + 1 + 2n = 4n + 4\).</p>
+    <p>Step through it. Each step shows the line that runs and the running tally.</p>
+  </div>
   <div class="panel" id="mf">
     <div class="controls">
       <label>\(n\) = <input type="number" id="mf-n" value="3" min="0" max="1000" aria-label="list size n"></label>
@@ -1033,26 +1170,23 @@
       </div>
     </div>
   </div>
-
-  <div class="rule">
-    <p><strong>Slide 16's answer.</strong> \(3 + 2n + 1 + 2n = 4n+4\), which is \(O(n)\).</p>
-    <p>3 for the first three lines; \(2n\) for the first loop (<code>b++</code> and <code>i++</code>, \(n\) times each); 1 for <code>b % 2</code>; then the <em>slowest</em> branch, the else loop, another \(2n\).</p>
-  </div>
-  <div class="prose">
-    <p>Try an even \(n\) in the stepper. <code>b</code> ends up as \(120 + n\), so for even \(n\) it's even and the code takes the cheap <code>if</code> branch: \(2n+5\) operations. The general guide charges the slowest branch without tracing <code>b</code>, so \(4n+4\) is an upper bound. It's exact for odd \(n\) and an overestimate for even \(n \ge 2\). Both are \(O(n)\), which is what the analysis is for.</p>
-    <p>One edge case: for \(n = 0\) the else loop does nothing, so the <code>if</code> branch (1 op) is the slower one and the count is 5, not \(4\cdot 0+4\). The slide's formula is for lists with at least one item.</p>
+  <div class="rule warn">
+    <p><strong>Try an even \(n\).</strong> <code>b</code> ends up as \(120 + n\). When \(n\) is even, <code>b</code> is even, so the code takes the cheap if branch and does only \(2n + 5\) operations. The rules didn't trace <code>b</code>. They charged the slower branch, so \(4n+4\) is an <em>upper bound</em>: exact for odd \(n\), more than enough for even \(n\). Both grow like \(n\), and growth is what we're after.</p>
   </div>
 
-  <h2>Example 2: <code>beAnnoying</code></h2>
+  <h2>Example 2: nested loops multiply</h2>
   <pre class="code">beAnnoying(List n){
     List m = [];
-    for (i=0; i &lt; n.size(); i++){      <span class="cm">// n times</span>
+    for (i=0; i &lt; n.size(); i++){
         m.add(n[i]);
-        for (j=0; j&lt; n.size(); j++){   <span class="cm">// n times</span>
-            print ("Hi, I'm annoying"); <span class="cm">// 1</span>
+        for (j=0; j&lt; n.size(); j++){
+            print ("Hi, I'm annoying");
         }
     }
 }</pre>
+  <div class="prose">
+    <p>Count the prints. The inner loop prints \(n\) times, and it runs once for <em>each</em> of the \(n\) outer iterations. So it prints \(n \cdot n = n^2\) times. Each square below is one print: one row per outer iteration, one column per inner iteration.</p>
+  </div>
   <div class="panel" id="ba">
     <div class="controls">
       <label>\(n\) = <input type="number" id="ba-n" value="4" min="0" max="3000" aria-label="list size n"></label>
@@ -1061,7 +1195,26 @@
     <div class="cells" id="ba-grid" aria-hidden="true"></div>
     <p class="out" id="ba-out" role="status"></p>
   </div>
-  <div class="prose"><p>Units: number of items. Operations: adding or printing. Printing: \(O(n^2)\). The inner loop runs all \(n\) times for <em>each</em> of the \(n\) outer iterations, so the counts multiply.</p></div>
+
+  <h2>Putting a count in a bucket</h2>
+  <div class="prose">
+    <p>Exact counts like \(4n+4\) depend on small choices, like whether you count <code>i++</code>. What doesn't depend on them is how the count <em>grows</em>. So we put it in a bucket:</p>
+    <ol>
+      <li>Drop the terms that grow more slowly (the non-dominant terms).</li>
+      <li>Drop constant factors.</li>
+      <li>Wrap what's left in \(O(\ )\).</li>
+    </ol>
+  </div>
+  <div class="table-wrap">
+  <table class="plain vs-table">
+    <tr><th>Count</th><th>Dominant term</th><th>Bucket</th></tr>
+    <tr><td>\(4n + 4\)</td><td>\(4n\)</td><td>\(O(n)\)</td></tr>
+    <tr><td>\(4n^2 + 8n - 10\)</td><td>\(4n^2\)</td><td>\(O(n^2)\)</td></tr>
+    <tr><td>\(\tfrac12 n + 80\)</td><td>\(\tfrac12 n\)</td><td>\(O(n)\)</td></tr>
+    <tr><td>\(n(n+1) = n^2 + n\)</td><td>\(n^2\)</td><td>\(O(n^2)\)</td></tr>
+  </table>
+  </div>
+  <div class="prose"><p>What \(O\) means exactly comes at the end of this lecture and in Lecture 3.</p></div>
 
   <div class="check" data-id="cse332-w1-l2-counting-prints-n10" data-grader="exact" data-answer="100" data-miscon='{"20":"added-loops","10":"inner-only"}'>
     <p>Quick check: for a list of 10 items, how many times does <code>beAnnoying</code> print?</p>
@@ -1069,26 +1222,22 @@
     <p class="feedback" role="status"></p>
   </div>
   <div class="check" data-id="cse332-w1-l2-counting-myfunction-bucket" data-grader="bigo" data-answer="n">
-    <p>Quick check: Example 1's worst-case count is \(4n+4\). What's its bucket? (e.g. <code>O(n^2)</code>)</p>
+    <p>Quick check: <code>myFunction</code>'s worst-case count is \(4n+4\). What's its bucket? (e.g. <code>O(n^2)</code>)</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>The answer slides for both examples (16 and 18) are hidden slides in the posted .pptx. The PDF leaves them out, so students using the PDF won't see them.</li>
-      <li>The stepper counts exactly what slide 16 annotates. The loop tests <code>i &lt; n.size()</code> are comparisons, not arithmetic, so they aren't counted. Ask: "If we counted comparisons too, would the bucket change?" (No: about \(n\) more, still linear.)</li>
-      <li>The stepper stops after 4,000 steps on large \(n\). It then says the run was cut off and doesn't show a total, because a partial count isn't the answer.</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L2: AMORTIZED -->
 <section class="page" id="amortized" data-title="Amortized analysis">
-  <p class="where">Lecture 2 · slides 19–22</p>
+  <p class="where">Lecture 2 · <span class="today-chip" data-date="2026-10-02">Fri Oct 2</span></p>
   <h1>Amortized analysis</h1>
+  <div class="rule">
+    <p><strong>Key idea.</strong> An ArrayList <code>add</code> is usually cheap, but sometimes it has to copy the whole array. The copies are rare enough that, spread over all the adds, each add costs only about 2.</p>
+  </div>
+
+  <h2>The code</h2>
   <pre class="code">public void add(int value){
     if(data.length == size)
         resize();
@@ -1102,14 +1251,15 @@ private void resize(){
         data[i] = oldData[i];
 }</pre>
   <div class="prose">
-    <p><strong>Worst case of one add.</strong> Input size: the size of "this". Operations: indexing. One add that triggers <code>resize()</code> copies every element, so a single add is \(O(n)\).</p>
-    <p><strong>Amortized.</strong> But every time we resize, we earn <code>data.length</code> more adds before the next resize. Slide 21 counts 1 for each value written and 1 for each element copied. Let \(c\) be the initial length of <code>data</code>.</p>
-  </div>
-  <div class="rule">
-    <p>The first \(c\) adds take \(c + c = 2c\). The next \(2c\) adds take \(2c+2c = 4c\). The next \(4c\) adds take \(4c+4c=8c\). Overall:</p>
-    <p>\[\frac{\text{total time}}{\#\text{ of adds}} = \frac{2c+4c+8c}{c+2c+4c} = \frac{14c}{7c} = 2.\]</p>
+    <p><strong>Units:</strong> \(n\) is the number of items in the list. We count array writes: 1 for <code>data[size] = value</code>, plus 1 for each element <code>resize()</code> copies.</p>
+    <ul>
+      <li><strong>Usually:</strong> there's room, so <code>add</code> writes one value. Cost 1.</li>
+      <li><strong>When full:</strong> <code>resize()</code> makes an array twice as long and copies all \(n\) items into it, then writes. Cost \(n + 1\).</li>
+    </ul>
+    <p>So the <strong>worst case of one add is \(O(n)\)</strong>. But that worst case can't happen often. Right after a resize the array is half empty, so the next resize is as many adds away as the copy just made.</p>
   </div>
 
+  <h2>Watch it happen</h2>
   <div class="panel" id="al">
     <div class="controls">
       <label>initial length \(c\) = <input type="number" id="al-c" value="4" min="1" max="8" aria-label="initial capacity c"></label>
@@ -1120,13 +1270,28 @@ private void resize(){
     <div class="cells" id="al-cells"></div>
     <p class="out" id="al-out" role="status"></p>
     <div class="chart-box"><svg class="chart" id="al-bars" viewBox="0 0 640 140" role="img" aria-label="Cost of each add"></svg></div>
-    <p class="note">Bars: the cost of each add (1 write, plus copies when it resizes). A bar's height is the copies it paid for.</p>
+    <p class="note">Each bar is one add. Most are 1 tall. The tall ones are the adds that resized, and each is taller than the one before it, but they get farther apart at the same rate.</p>
   </div>
 
-  <h2>Parking-lot analogy</h2>
+  <h2>Adding it up</h2>
+  <div class="prose"><p>Start with an array of length \(c\). Group the adds by when the next resize happens:</p></div>
+  <div class="table-wrap">
+  <table class="plain vs-table">
+    <tr><th>Adds</th><th>Writes</th><th>Copies charged to these adds</th><th>Cost</th></tr>
+    <tr><td>first \(c\)</td><td>\(c\)</td><td>\(c\)</td><td>\(2c\)</td></tr>
+    <tr><td>next \(2c\)</td><td>\(2c\)</td><td>\(2c\)</td><td>\(4c\)</td></tr>
+    <tr><td>next \(4c\)</td><td>\(4c\)</td><td>\(4c\)</td><td>\(8c\)</td></tr>
+    <tr><td><strong>\(7c\) in all</strong></td><td></td><td></td><td><strong>\(14c\)</strong></td></tr>
+  </table>
+  </div>
+  <div class="rule">
+    <p>\[\frac{\text{total cost}}{\text{number of adds}} = \frac{14c}{7c} = 2.\]</p>
+    <p>Every group's copies equal its number of adds, so each add pays for one write plus one copy. That's the amortized cost: about 2 per add, whatever \(c\) is.</p>
+  </div>
+
+  <h2>The same idea with parking</h2>
   <div class="prose">
-    <p>Parking costs $10 per day. If you're caught without paying, you get a warning. After 3 warnings you pay a $25 fine and the warnings reset. Should you actually pay?</p>
-    <p>Paying every day averages $10 per day. Not paying costs $0 + $0 + $25 every three days. Averaging an occasional big cost over many cheap days is exactly an amortized analysis.</p>
+    <p>Parking costs $10 a day. If you're caught without paying, you get a warning. On the third warning you pay a $25 fine and the warnings reset. Paying every day costs $10 a day. Never paying costs $0, $0, then $25: an occasional big cost, averaged over the cheap days around it.</p>
   </div>
   <div class="check" data-id="cse332-w1-l2-amortized-parking-average" data-grader="decimal" data-answer="25/3" data-tol="0.005" data-miscon='{"25":"no-divide","8.3":"rounding"}'>
     <p>Quick check: what's the average cost per day if you never pay, in dollars? (round to the cent)</p>
@@ -1134,38 +1299,27 @@ private void resize(){
     <p class="feedback" role="status"></p>
   </div>
   <div class="check" data-id="cse332-w1-l2-amortized-total-c4" data-grader="exact" data-answer="56" data-miscon='{"28":"forgot-copies","84":"copies-every-add"}'>
-    <p>Quick check: start with \(c = 4\) and do 28 adds. Counting like slide 21 (1 per write, 1 per element copied), what's the total?</p>
+    <p>Quick check: start with an array of length \(c = 4\) and do 28 adds. Counting 1 per write and 1 per element copied, what's the total cost?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Slide 21's speaker note: amortized is a "running average".</li>
-      <li>The ratio is exactly 2 after \(3c, 7c, 15c, \dots\) adds, and exactly 1 after the first \(c\) (no resize yet). Right after a resize it jumps, but it stays under 3. Here's why: if the last resize happened when the length was \(L\), then \(L\) is less than the number of adds \(m\), and the copies total \(L + L/2 + \dots \le 2L - c < 2m\). So the total is under \(m + 2m = 3m\).</li>
-      <li>The widget shows the exact ratio for <em>this</em> sequence of adds only. The bound for every \(m\) comes from the argument above, not from the widget.</li>
-      <li>Resizing a queue's array is part of Exercise 0. This page uses the ArrayList from the slides.</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L2: SEARCH -->
 <section class="page" id="search" data-title="Binary search">
-  <p class="where">Lecture 2 · slides 23–27</p>
+  <p class="where">Lecture 2 · <span class="today-chip" data-date="2026-10-02">Fri Oct 2</span></p>
   <h1>Binary search</h1>
-  <div class="split">
-    <pre class="code">public static boolean contains(
-        List&lt;Integer&gt; a, int k){
-    for(int i=0; i&lt; a.size(); i++){
-        if (a.get(i) == k)
-            return true;
-    }
-    return false;
-}</pre>
-    <pre class="code">public static boolean binary_contains(
-        List&lt;Integer&gt; a, int k){
+  <div class="rule">
+    <p><strong>Key idea.</strong> If the list is sorted, one comparison with the middle item rules out half the list. Halving again and again reaches 1 item after about \(\log_2 n\) steps, which is far fewer than \(n\).</p>
+  </div>
+
+  <div class="prose">
+    <p>Linear search (the <code>contains</code> on the <a href="#scenarios">scenarios page</a>) checks items one by one: up to \(n\) comparisons. If the list is sorted, it wastes that.</p>
+  </div>
+
+  <h2>Binary search</h2>
+  <pre class="code">public static boolean binary_contains(List&lt;Integer&gt; a, int k){
     int start = 0;
     int end = a.size();
     while(start &lt; end){
@@ -1179,8 +1333,14 @@ private void resize(){
     }
     return false;
 }</pre>
+  <div class="prose">
+    <ul>
+      <li>The items still in play are indices <code>start</code> up to, but not including, <code>end</code>.</li>
+      <li>If <code>a.get(mid) &lt; k</code>, then, because the list is sorted, <code>k</code> can't be at <code>mid</code> or anywhere left of it. So <code>start = mid+1</code>.</li>
+      <li>If <code>a.get(mid) &gt; k</code>, it can't be at <code>mid</code> or to its right. So <code>end = mid</code>.</li>
+      <li>When <code>start == end</code>, nothing is left in play: <code>k</code> isn't there.</li>
+    </ul>
   </div>
-
   <div class="panel" id="bs">
     <div class="controls">
       <label>Search for \(k\) = <input type="number" id="bs-k" value="13" aria-label="target k"></label>
@@ -1193,44 +1353,53 @@ private void resize(){
     <div class="log" id="bs-log"></div>
   </div>
 
-  <h2>Why is this \(\log_2 n\)?</h2>
+  <h2>Why about \(\log_2 n\) iterations</h2>
   <div class="prose">
-    <p>At the start, <code>end - start</code> \(= n\). After one iteration it is about \(\frac n2\): both <code>mid - start</code> and <code>end - mid</code> are half the gap. Each iteration cuts the gap in half, so after \(x\) iterations it is \(\frac{n}{2^x}\). We stop when the gap is 1. Solve \(\frac{n}{2^x} = 1\) for \(x\): \(x = \log_2 n\).</p>
+    <p>Call <code>end - start</code> the <em>gap</em>: how many items are still in play. Each iteration cuts it roughly in half.</p>
   </div>
-
+  <div class="table-wrap">
+  <table class="plain num">
+    <tr><th>After this many iterations</th><td>0</td><td>1</td><td>2</td><td>3</td><td>…</td><td>\(x\)</td></tr>
+    <tr><th>Gap</th><td>\(n\)</td><td>\(n/2\)</td><td>\(n/4\)</td><td>\(n/8\)</td><td>…</td><td>\(n/2^x\)</td></tr>
+  </table>
+  </div>
+  <div class="prose">
+    <p>The search is down to one item when \(n / 2^x = 1\), which means \(2^x = n\), or \(x = \log_2 n\). For a million items that's about 20 iterations, where linear search could need a million comparisons.</p>
+  </div>
   <div class="panel" id="bsw">
     <h4>Worst case, counted exactly</h4>
-    <p class="note">For each \(n\), the page runs <code>binary_contains</code> on a sorted list of \(n\) items for <em>every</em> possible target (each item and each gap between them) and keeps the most loop iterations. That's exhaustive for these \(n\) only.</p>
+    <p class="note">For each \(n\), this runs <code>binary_contains</code> on a sorted list of \(n\) items for every possible target (each item, and each gap between items) and keeps the most iterations.</p>
     <div class="table-wrap"><table class="plain num" id="bsw-table"></table></div>
   </div>
   <div class="prose">
-    <p>The exact worst case is \(\lfloor \log_2 n\rfloor + 1\) iterations. The slide's \(\log_2 n\) is the same bucket; the +1 is the last iteration, which runs with a gap of 1. Linear search's worst case is \(n\) comparisons. Slide 27's graphs show the gap between \(\log n\) and \(n\) as \(n\) grows.</p>
+    <p>The exact worst case is \(\lfloor \log_2 n\rfloor + 1\) iterations. The +1 is the last iteration, which runs when the gap is 1. It's the same bucket as \(\log_2 n\): \(O(\log n)\).</p>
   </div>
 
   <div class="check" data-id="cse332-w1-l2-search-iterations-13" data-grader="exact" data-answer="2" data-miscon='{"3":"linear-count"}'>
-    <p>Quick check: on the slide-23 list (5 8 13 42 75 79 88 90 95 99), how many loop iterations does <code>binary_contains</code> take to find 13?</p>
+    <p>Quick check: on the sorted list 5 8 13 42 75 79 88 90 95 99 (the one in the stepper above), how many loop iterations does <code>binary_contains</code> take to find 13?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Slide 24 asks for a faster algorithm before showing binary search. Get the room to say "the list is sorted" first.</li>
-      <li><code>start + (end-start)/2</code> rather than <code>(start+end)/2</code>: the same value, but it can't overflow an <code>int</code> when <code>start + end</code> would.</li>
-      <li>The quick check's 13 sits at index 2, so linear search also needs 3 comparisons. Try 79: binary search finds it on the first iteration and linear search needs 6.</li>
-    </ul>
-  </details>
+  <div class="check" data-id="cse332-w1-l2-search-double" data-grader="exact" data-answer="1" data-miscon='{"20":"doubles-iterations","2000":"linear-count"}'>
+    <p>Quick check: the worst case for a sorted list of 1,000 items is 10 iterations. How many <em>more</em> iterations does the worst case need for 2,000 items?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L2: ASYMPTOTIC -->
 <section class="page" id="asymptotic" data-title="Comparing running times">
-  <p class="where">Lecture 2 · slides 28–31 · topic summary "Asymptotics"</p>
+  <p class="where">Lecture 2 · <span class="today-chip" data-date="2026-10-02">Fri Oct 2</span> · topic summary "Asymptotics"</p>
   <h1>Comparing running times</h1>
-  <div class="prose">
-    <p>Three algorithms have the same input/output behavior. Algorithm A's worst-case running time is \(10n+900\), B's is \(100n-50\), and C's is \(\frac{n^2}{100}\). Which is best?</p>
+  <div class="rule">
+    <p><strong>Key idea.</strong> Which algorithm is faster can depend on \(n\). For big \(n\), the one whose count <em>grows</em> faster always loses, whatever the constants. \(O\), \(\Omega\) and \(\Theta\) are precise ways to say "grows no faster than", "at least as fast as" and "at the same rate as".</p>
   </div>
 
+  <h2>Three algorithms, same answers</h2>
+  <div class="prose">
+    <p>Their worst-case running times are A: \(10n + 900\), B: \(100n - 50\), C: \(\frac{n^2}{100}\). Which is best? Change the range and watch the order change.</p>
+  </div>
   <div class="panel" id="gr">
     <div class="controls" role="group" aria-label="Range of n">
       <span>Show \(n\) up to</span>
@@ -1246,16 +1415,32 @@ private void resize(){
     </div>
     <p class="out" id="gr-exact" role="status"></p>
     <div class="table-wrap" id="gr-table" hidden></div>
-    <p class="trunc">The plot and table show finitely many \(n\). They're evidence, not proof. A Big-O claim is about <em>all</em> large \(n\), and only the definition below settles it.</p>
+  </div>
+  <div class="prose">
+    <ul>
+      <li><strong>Small \(n\):</strong> C is best by far. For the very smallest \(n\), B even beats A.</li>
+      <li><strong>A little later:</strong> A passes B for good. Both grow like \(n\), and A's 10 per item is less than B's 100.</li>
+      <li><strong>Past about a thousand:</strong> C becomes slower than A, and later slower than B too. From then on it only falls further behind: \(n^2\) eventually passes any constant times \(n\). (Exercise 7 finds the exact crossover points.)</li>
+    </ul>
+    <p>Small inputs are fast with almost any algorithm. What separates algorithms is large \(n\), so we compare how running times grow and ignore constant factors, which depend on the machine and the code anyway. In that sense A and B are "the same" (both linear), and C is worse (quadratic).</p>
   </div>
 
-  <h2>Asymptotic notation</h2>
+  <h2>The definitions</h2>
   <div class="rule">
-    <p><strong>\(O(g(n))\)</strong>: the set of functions with asymptotic behavior less than or equal to \(g(n)\). Upper-bounded by a constant times \(g\) for large enough \(n\):</p>
-    <p>\[f \in O(g(n)) \equiv \exists c>0.\ \exists n_0>0.\ \forall n\ge n_0.\ f(n) \le c\cdot g(n)\]</p>
-    <p><strong>\(\Omega(g(n))\)</strong>: the set of functions with asymptotic behavior greater than or equal to \(g(n)\). Lower-bounded by a constant times \(g\) for large enough \(n\):</p>
-    <p>\[f \in \Omega(g(n)) \equiv \exists c>0.\ \exists n_0>0.\ \forall n\ge n_0.\ f(n) \ge c\cdot g(n)\]</p>
-    <p><strong>\(\Theta(g(n))\)</strong>: "tightly" within a constant of \(g\) for large \(n\): \(\Omega(g(n)) \cap O(g(n))\). Like \(x = y \iff x\le y \wedge x \ge y\).</p>
+    <p><strong>\(f \in O(g)\)</strong>: \(f\) grows no faster than \(g\).</p>
+    <p>\[\exists c>0.\ \exists n_0>0.\ \forall n\ge n_0.\ f(n) \le c\cdot g(n)\]</p>
+    <p><strong>\(f \in \Omega(g)\)</strong>: \(f\) grows at least as fast as \(g\). The same, with \(\ge\):</p>
+    <p>\[\exists c>0.\ \exists n_0>0.\ \forall n\ge n_0.\ f(n) \ge c\cdot g(n)\]</p>
+    <p><strong>\(f \in \Theta(g)\)</strong>: both. \(f\) grows at the same rate as \(g\). Just as \(x = y\) exactly when \(x \le y\) and \(x \ge y\).</p>
+  </div>
+  <div class="prose">
+    <p>Read the \(O\) definition piece by piece:</p>
+    <ul>
+      <li><strong>"there's some \(c\)"</strong> lets you scale \(g\) up by any constant. That's how the definition ignores constant factors: \(10n + 900\) is \(O(n)\) because some multiple of \(n\) gets above it.</li>
+      <li><strong>"there's some \(n_0\)"</strong> lets you ignore small \(n\). The inequality only has to hold from \(n_0\) on. That's how it ignores the +900, which matters at small \(n\) and not at large \(n\).</li>
+      <li><strong>"for all \(n \ge n_0\)"</strong> means forever after, not just at the values you tried. A plot or a table can suggest a bound, but only the definition proves it.</li>
+    </ul>
+    <p>To prove \(f \in O(g)\), you name one \(c\) and one \(n_0\) and show the inequality holds for every \(n \ge n_0\). Any pair that works is enough, and you don't have to explain how you found it.</p>
   </div>
 
   <h2>Find \(c\) and \(n_0\)</h2>
@@ -1270,7 +1455,7 @@ private void resize(){
     </div>
     <p class="out" id="cn-out" role="status"></p>
     <div class="chart-box"><svg class="chart" id="cn-svg" viewBox="0 0 680 240" role="img" aria-label="f(n) and c times g(n)"></svg></div>
-    <p class="note">How the check works: it decides the inequality for <em>every</em> integer \(n \ge n_0\) with exact fractions. It bounds where \(c\cdot g(n) - f(n)\) can change sign (Cauchy's root bound), then tests the few integers where it could be smallest. The plot only illustrates; the verdict doesn't come from it.</p>
+    <p class="note">The verdict checks every integer \(n \ge n_0\) exactly, not just the ones plotted. Try making \(c\) smaller and see how \(n_0\) has to grow.</p>
   </div>
 
   <div class="check" data-id="cse332-w1-l2-asymptotic-c-bucket" data-grader="bigo" data-answer="n^2">
@@ -1287,28 +1472,35 @@ private void resize(){
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Slide 28 leaves the answer to the room. Exact crossovers, checked by script: B is below A only up to \(n=10\) (at 10, \(950 &lt; 1000\)), and A is below B from \(n = 11\) on. C is below A up to \(n=1083\) and above it from \(n=1084\). So "best" depends on \(n\), which is exactly why we compare asymptotically: A and B are both \(\Theta(n)\), and C is \(\Theta(n^2)\).</li>
-      <li>The topic summary's three methods for choosing \(c, n_0\): squeeze, by parts, and guess-and-check/induction. The claims in the dropdown are the summary's own examples. Its proofs use \(c=88, n_0=1\); \(c=14, n_0=1\); and \(c=1, n_0=8\). Have students find smaller pairs that also work: the checker accepts any valid pair.</li>
-      <li>The summary's warning: you don't need to justify <em>how</em> you chose \(c\) and \(n_0\), only that they work for every \(n\ge n_0\).</li>
-      <li>Next lecture (Algorithm Analysis 2, Mon Oct 5) continues with \(O, \Omega, \Theta\). Slide 13 says "more on this next class".</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L2 PROBLEMS -->
 <section class="page" id="l2-problems" data-title="Lecture 2 exercises">
-  <p class="where">Lecture 2 · exercises 1–8 are the lecture's examples (slides 15–28) · 9–11 are the proofs in the "Asymptotics" topic summary · given answers come from the slides and the summary, and the rest were computed by running the code</p>
+  <p class="where">Lecture 2 · exercises 1–8 work through the lecture's examples · 9–11 are proofs from the "Asymptotics" topic summary</p>
   <h1>Lecture 2 exercises</h1>
   <div class="prose"><p>Formula boxes take expressions in \(n\) (like <code>4n+4</code> or <code>n*n</code>) and are checked exactly at several values of \(n\). Big-O boxes take a class like <code>O(n)</code>, <code>n^2</code> or <code>log n</code>.</p></div>
 
   <article class="task" data-id="cse332-w1-l2-myfunction">
     <h2>1. Example 1: <code>myFunction</code></h2>
-    <p class="prompt">Use the general guide (each conditional costs its check plus its slowest branch) to count arithmetic operations (+ − * / and <code>++</code>) for a list of \(n \ge 1\) items. (Code on the <a href="#counting">counting page</a>.)</p>
+    <p class="prompt">Use the worst-case rules (an if/else costs its check plus its slower branch) to count arithmetic operations (+ − * / and <code>++</code>) for a list of \(n \ge 1\) items.</p>
+    <pre class="code">myFunction(List n){
+    b = 55 + 5;
+    c = b / 3;
+    b = c + 100;
+    for (i = 0; i &lt; n.size(); i++) {
+        b++;
+    }
+    if (b % 2 == 0) {
+        c++;
+    }
+    else {
+        for (i = 0; i &lt; n.size(); i++) {
+            c++;
+        }
+    }
+    return c;
+}</pre>
     <div class="answer-spec" data-part="count" data-grader="formula" data-answer="4n+4" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"2n+5":"if-branch","4n+5":"extra-op","4n":"forgot-constant"}' data-label="worst-case count"></div>
     <div class="answer-spec" data-part="bucket" data-grader="bigo" data-answer="n" data-label="bucket"></div>
     <ol class="hints">
@@ -1339,7 +1531,7 @@ private void resize(){
 
   <article class="task" data-id="cse332-w1-l2-arraylist-worst">
     <h2>3. ArrayList add: worst case</h2>
-    <p class="prompt">Input size: the size of "this". Operations counted: indexing. Count the way slide 21 does: 1 per value written into <code>data</code>, 1 per element copied by <code>resize()</code>.</p>
+    <p class="prompt">Input size: the size of "this". Operations counted: indexing. Count 1 per value written into <code>data</code> and 1 per element copied by <code>resize()</code>. (The code is on the <a href="#amortized">amortized analysis page</a>.)</p>
     <div class="answer-spec" data-part="full-8" data-grader="exact" data-answer="9" data-miscon='{"1":"amortized-vs-worst","8":"forgot-write","16":"copied-new-length"}' data-label="cost of add when data.length = size = 8"></div>
     <div class="answer-spec" data-part="bucket" data-grader="bigo" data-answer="n" data-label="worst case of one add"></div>
     <ol class="hints"><li>When <code>data.length == size</code>, <code>resize()</code> runs first. How many elements does its loop copy?</li></ol>
@@ -1352,7 +1544,7 @@ private void resize(){
 
   <article class="task" data-id="cse332-w1-l2-arraylist-amortized">
     <h2>4. ArrayList add: amortized</h2>
-    <p class="prompt">The initial length of <code>data</code> is \(c\). Do \(7c\) adds, counting like slide 21.</p>
+    <p class="prompt">The initial length of <code>data</code> is \(c\). Do \(7c\) adds, counting 1 per write and 1 per element copied.</p>
     <div class="answer-spec" data-part="total" data-grader="formula" data-answer="14c" data-points='{"c":["1","2","3","4","8","10"]}' data-miscon='{"7c":"forgot-copies","8c":"only-last-block"}' data-label="total cost, in terms of c"></div>
     <div class="answer-spec" data-part="ratio" data-grader="exact" data-answer="2" data-miscon='{"1":"forgot-copies"}' data-label="total ÷ number of adds"></div>
     <ol class="hints"><li>Split the \(7c\) adds into blocks of \(c\), \(2c\) and \(4c\). Each block ends by filling the array.</li><li>Each block's adds each cost 1 write, plus that block's resize copies as many elements as the block has adds.</li></ol>
@@ -1364,10 +1556,6 @@ private void resize(){
       </ol></div>
       <div class="step-bar"><button class="btn" data-brute="arraylist-14c">Check by running add()</button><span class="brute"></span></div>
     </div>
-    <details class="notes" open>
-      <summary>Teaching notes</summary>
-      <ul><li>Run the slide's <code>add</code> for exactly \(7c\) adds and the resizes land at adds \(c+1\), \(2c+1\) and \(4c+1\). They copy \(c\), \(2c\) and \(4c\) elements, so the real total is exactly \(7c\) writes + \(7c\) copies = \(14c\), matching the slide. The brute-force button runs it for \(c = 1\) to \(8\).</li></ul>
-    </details>
   </article>
 
   <article class="task" data-id="cse332-w1-l2-parking">
@@ -1378,13 +1566,13 @@ private void resize(){
     <ol class="hints"><li>The pattern repeats every three days. What does one cycle cost?</li></ol>
     <div class="solution"><div class="steps"><ol>
       <li>One cycle is $0 + $0 + $25 over 3 days.</li>
-      <li class="answer">\(\$25/3 \approx \$8.33\) per day, which is less than $10, so yes. (The slide's point is the arithmetic, not the advice.)</li>
+      <li class="answer">\(\$25/3 \approx \$8.33\) per day, which is less than $10, so yes.</li>
     </ol></div></div>
   </article>
 
   <article class="task" data-id="cse332-w1-l2-binary-iterations">
     <h2>6. Binary search iterations</h2>
-    <p class="prompt">Use the code from slide 25.</p>
+    <p class="prompt">Use <code>binary_contains</code> from the <a href="#search">binary search page</a>.</p>
     <div class="answer-spec" data-part="halvings-1024" data-grader="exact" data-answer="10" data-miscon='{"512":"halved-once","1024":"linear-count"}' data-label="solve n/2^x = 1 for n = 1024"></div>
     <div class="answer-spec" data-part="worst-1000" data-grader="exact" data-answer="10" data-miscon='{"9":"stopped-early","1000":"linear-count","500":"halved-once"}' data-label="worst-case loop iterations, n = 1000"></div>
     <div class="answer-spec" data-part="linear-1000" data-grader="exact" data-answer="1000" data-label="worst-case comparisons of contains, n = 1000"></div>
@@ -1482,12 +1670,12 @@ private void resize(){
     <li class="cyu" data-id="cse332-w1-l2-cyu-why-not-time" data-kind="mc" data-topic="analysis">
       <p class="q">Your implementation runs faster than a classmate's on your laptop. What can you conclude about the algorithms?</p>
       <div class="opts">
-        <label><input type="radio" name="cse332-w1-l2-cyu-why-not-time"> Yours is the better algorithm<span class="why" hidden>Hardware, OS, Java version, other programs and implementation details all affect the time. The slide says exactly this: we cannot conclude your algorithm is better.</span></label>
+        <label><input type="radio" name="cse332-w1-l2-cyu-why-not-time"> Yours is the better algorithm<span class="why" hidden>Hardware, OS, Java version, other programs and implementation details all affect the time. So you can't conclude your algorithm is better.</span></label>
         <label data-correct><input type="radio" name="cse332-w1-l2-cyu-why-not-time"> Nothing about the algorithms themselves<span class="why" hidden>Correct. Observations couple the algorithm with its implementation and machine.</span></label>
         <label><input type="radio" name="cse332-w1-l2-cyu-why-not-time"> Yours is better for all large inputs<span class="why" hidden>One timing on one input says nothing about how either grows as \(n\) doubles.</span></label>
       </div>
     </li>
-    <li class="cyu" data-id="cse332-w1-l2-cyu-worst-case-def" data-kind="mc" data-topic="analysis">
+    <li class="cyu" data-id="cse332-w1-l2-cyu-worst-case-def" data-kind="mc" data-topic="scenarios">
       <p class="q">"The worst-case running time is \(f(n)\)." What is \(f(5)\)?</p>
       <div class="opts">
         <label data-correct><input type="radio" name="cse332-w1-l2-cyu-worst-case-def"> The most operations done on any input of size 5<span class="why" hidden>Correct: the maximum count among all inputs of size \(n\).</span></label>
@@ -1495,13 +1683,13 @@ private void resize(){
         <label><input type="radio" name="cse332-w1-l2-cyu-worst-case-def"> The average over inputs of size 5<span class="why" hidden>That's average-case complexity.</span></label>
       </div>
     </li>
-    <li class="cyu" data-id="cse332-w1-l2-cyu-myfunction-n5" data-kind="num" data-answer="24" data-topic="counting" data-miscon='{"15":"if-branch","20":"forgot-constant"}'>
-      <p class="q">Using slide 16's worst-case count for <code>myFunction</code>, how many arithmetic operations for a list of 5 items?</p>
-      <p class="why" hidden>\(4n + 4 = 24\). (For \(n=5\) the code really takes the else branch, so the stepper also counts 24.)</p>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-myfunction-n4-actual" data-kind="num" data-answer="13" data-topic="counting" data-miscon='{"20":"used-bound"}'>
+      <p class="q">For a list of 4 items, how many arithmetic operations does <code>myFunction</code> <em>actually</em> do when it runs? (Its code is on the <a href="#counting">counting page</a>.)</p>
+      <p class="why" hidden><code>b</code> ends as \(120 + 4 = 124\), which is even, so the cheap if branch runs: \(3 + 2\cdot4 + 1 + 1 = 13\). The worst-case count \(4n+4 = 20\) is an upper bound.</p>
     </li>
-    <li class="cyu" data-id="cse332-w1-l2-cyu-beannoying-n7" data-kind="num" data-answer="49" data-topic="counting" data-miscon='{"14":"added-loops","7":"inner-only","56":"counted-adds"}'>
-      <p class="q">How many times does <code>beAnnoying</code> print for a list of 7 items?</p>
-      <p class="why" hidden>The inner loop prints 7 times for each of 7 outer iterations: \(7\cdot7 = 49\).</p>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-beannoying-adds-prints" data-kind="num" data-answer="56" data-topic="counting" data-miscon='{"49":"prints-only","14":"added-loops"}'>
+      <p class="q"><code>beAnnoying</code> also does one <code>m.add</code> per outer iteration. Counting adds <em>and</em> prints, how many for a list of 7 items?</p>
+      <p class="why" hidden>Prints: \(7 \cdot 7 = 49\). Adds: one per outer iteration, 7. Total 56. Still \(O(n^2)\): the \(n\) adds are a non-dominant term.</p>
     </li>
     <li class="cyu" data-id="cse332-w1-l2-cyu-bucket-triangle" data-kind="bigo" data-answer="n^2" data-topic="counting">
       <p class="q">Put \(\frac{n(n+1)}{2}\) in a bucket.</p>
@@ -1511,17 +1699,25 @@ private void resize(){
       <p class="q">Amortized complexity is…</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w1-l2-cyu-amortized-def"> the average over random inputs<span class="why" hidden>That's average/expected complexity, which depends on a distribution.</span></label>
-        <label data-correct><input type="radio" name="cse332-w1-l2-cyu-amortized-def"> the max total over \(M\) consecutive worst-case operations, divided by \(M\)<span class="why" hidden>Correct, word for word from slide 10.</span></label>
+        <label data-correct><input type="radio" name="cse332-w1-l2-cyu-amortized-def"> the max total over \(M\) consecutive worst-case operations, divided by \(M\)<span class="why" hidden>Correct.</span></label>
         <label><input type="radio" name="cse332-w1-l2-cyu-amortized-def"> the cost of the cheapest operation<span class="why" hidden>That's closer to best case, and for a single operation.</span></label>
       </div>
     </li>
-    <li class="cyu" data-id="cse332-w1-l2-cyu-arraylist-c2" data-kind="num" data-answer="28" data-topic="amortized" data-miscon='{"14":"forgot-copies"}'>
-      <p class="q">An ArrayList starts with <code>data.length = 2</code>. Counting like slide 21 (1 per write, 1 per element copied), what's the total for 14 adds?</p>
-      <p class="why" hidden>\(14 = 7c\) with \(c=2\). The resizes copy 2, 4 and 8 elements (14 copies) on top of 14 writes: \(14c = 28\).</p>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-amortized-why" data-kind="mc" data-topic="amortized">
+      <p class="q">One ArrayList <code>add</code> can cost \(O(n)\). Why is the cost per add still only about 2 over a long run?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w1-l2-cyu-amortized-why"> Each resize doubles the array, so the next resize is as many cheap adds away as the copy just cost<span class="why" hidden>Correct. The expensive adds get rarer at the same rate they get more expensive, so each add pays for about one write and one copy.</span></label>
+        <label><input type="radio" name="cse332-w1-l2-cyu-amortized-why"> <code>resize()</code> only copies half of the elements<span class="why" hidden>It copies every element of the old array.</span></label>
+        <label><input type="radio" name="cse332-w1-l2-cyu-amortized-why"> The average is over random inputs, and most inputs don't resize<span class="why" hidden>That's average case. Amortized counts the worst sequence of adds, and the bound still holds.</span></label>
+      </div>
     </li>
-    <li class="cyu" data-id="cse332-w1-l2-cyu-binary-88" data-kind="num" data-answer="4" data-topic="search" data-miscon='{"7":"linear-count"}'>
-      <p class="q">How many loop iterations does <code>binary_contains</code> take to find 88 in 5 8 13 42 75 79 88 90 95 99?</p>
-      <p class="why" hidden>mid = 5 (79 &lt; 88), then [6,10) mid = 8 (95 &gt; 88), then [6,8) mid = 7 (90 &gt; 88), then [6,7) mid = 6: found. 4 iterations.</p>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-binary-why" data-kind="mc" data-topic="search">
+      <p class="q">After comparing \(k\) with the middle item, why can binary search throw away half the list?</p>
+      <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w1-l2-cyu-binary-why"> The list is sorted, so if the middle item is less than \(k\), every item at or before it is too<span class="why" hidden>Correct. Without sorting, one comparison tells you nothing about the other items.</span></label>
+        <label><input type="radio" name="cse332-w1-l2-cyu-binary-why"> The target is always in the second half<span class="why" hidden>It's in whichever half the comparison points to, and that changes with \(k\).</span></label>
+        <label><input type="radio" name="cse332-w1-l2-cyu-binary-why"> Checking half the items is enough on average<span class="why" hidden>Binary search is exact, not a guess: the half it drops can't contain \(k\).</span></label>
+      </div>
     </li>
     <li class="cyu" data-id="cse332-w1-l2-cyu-theta-meaning" data-kind="mc" data-topic="asymptotic">
       <p class="q">\(f \in \Theta(g)\) means…</p>
@@ -1531,19 +1727,16 @@ private void resize(){
         <label><input type="radio" name="cse332-w1-l2-cyu-theta-meaning"> \(f\) is the average case<span class="why" hidden>\(\Theta\) compares functions; it says nothing about which case was analyzed.</span></label>
       </div>
     </li>
-    <li class="cyu" data-id="cse332-w1-l2-cyu-a-below-b" data-kind="num" data-answer="11" data-topic="asymptotic" data-miscon='{"10":"strict-vs-equal"}'>
-      <p class="q">For which smallest \(n \ge 1\) is \(10n + 900 &lt; 100n - 50\)?</p>
-      <p class="why" hidden>\(950 &lt; 90n \iff n &gt; 10.\overline{5}\), so 11. At \(n=10\): \(1000\) vs \(950\).</p>
+    <li class="cyu" data-id="cse332-w1-l2-cyu-doubling" data-kind="mc" data-topic="asymptotic">
+      <p class="q">Going from \(n = 1{,}000{,}000\) to \(n = 2{,}000{,}000\), about how does each running time change? A: \(10n + 900\). C: \(\frac{n^2}{100}\).</p>
+      <div class="opts">
+        <label><input type="radio" name="cse332-w1-l2-cyu-doubling"> Both about double<span class="why" hidden>A about doubles. C has an \(n^2\): \((2n)^2 = 4n^2\).</span></label>
+        <label data-correct><input type="radio" name="cse332-w1-l2-cyu-doubling"> A about doubles; C about quadruples<span class="why" hidden>Correct. Linear growth doubles when \(n\) doubles; quadratic growth goes up 4 times. That's what the buckets \(O(n)\) and \(O(n^2)\) tell you.</span></label>
+        <label><input type="radio" name="cse332-w1-l2-cyu-doubling"> A barely changes, because of the 900<span class="why" hidden>At a million, the 900 is tiny next to \(10n\).</span></label>
+      </div>
     </li>
   </ol>
   <div class="cyu-score" data-quiz-summary="l2" role="status"></div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Question 5 matches the slide-12 examples (\(n(n+1)\) ends up as \(O(n^2)\)). Questions 9 and 10 bridge into Monday's lecture on asymptotics.</li>
-      <li>Every numeric answer was checked by running the slide code (see <code>checks/cse332/w01/</code>).</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 

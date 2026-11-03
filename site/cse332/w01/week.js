@@ -20,7 +20,10 @@ window.WEEK.messages = {
   "no-divide": "That's the cost of one 3-day cycle. The question asks per day.",
   "rounding": "Round to the cent (two decimal places).",
   "two-days": "The fine comes on the 3rd unpaid day. How many days does one cycle cover?",
-  "forgot-copies": "That counts only the writes. Slide 21 also charges 1 for each element resize() copies.",
+  "forgot-copies": "That counts only the writes. Each element resize() copies costs 1 too.",
+  "doubles-iterations": "Doubling n doesn't double the iterations. One more halving takes 2,000 down to 1,000.",
+  "used-bound": "That's the worst-case bound 4n + 4. Trace b for n = 4: is it even or odd, and which branch runs?",
+  "prints-only": "That counts the prints only. Add one m.add per outer iteration.",
   "copies-every-add": "Copies happen only when the array is full, not on every add.",
   "amortized-vs-worst": "That's the cost of a typical add. This one triggers resize(), so count its copies too.",
   "forgot-write": "resize() copies the old elements, then add still writes the new value.",
@@ -427,7 +430,7 @@ function setupMyFunction() {
     const even = (120 + n) % 2 === 0;
     box.append(el("p", { class: "counter" }, "complete run, total ", el("b", { text: fmtInt(count) })));
     box.append(el("p", { class: "note", text: n === 0
-      ? "For n = 0 the else loop would do nothing, so here the if branch is the slower one: 5 ops. Slide 16's 4n + 4 is for n ≥ 1."
+      ? "For n = 0 the else loop would do nothing, so here the if branch is the slower one: 5 ops. The 4n + 4 count is for n ≥ 1."
       : even
       ? `The worst-case formula 4n + 4 gives ${formula}. This run is below it: b ended even, so the cheap if branch ran. The formula charges the slower branch.`
       : `The worst-case formula 4n + 4 gives ${formula}, which matches: b ended odd, so the else loop ran.` }));
