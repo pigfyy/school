@@ -155,6 +155,9 @@ function setupQueues() {
   // circular array page
   let cq = Sim.circularQueue();
   const cqLog = $("#cq-log"), ringBtn = $("#cq-ring"), svg = $("#cq-svg");
+  // SVG elements have no .hidden property, so the circle view is shown and hidden with style.display.
+  const ringOn = () => svg.style.display !== "none";
+  svg.style.display = "none";
   const drawRing = () => {
     svg.replaceChildren();
     const R = 120, cx = 160, cy = 160;
@@ -177,7 +180,7 @@ function setupQueues() {
   const cqDraw = (flash) => {
     drawCells($("#cq-cells"), cq, { flash });
     $("#cq-state").textContent = `front = ${cq.front}, back = ${cq.back}, size = ${cq.size}, queue.length = ${cq.length}${cq.size === cq.length ? " (full: front == back, just like when empty)" : cq.size === 0 ? " (empty: front == back)" : ""}`;
-    if (!svg.hidden) drawRing();
+    if (ringOn()) drawRing();
   };
   $("#cq-enq").addEventListener("click", () => {
     const x = valFrom($("#cq-val"));
@@ -196,8 +199,8 @@ function setupQueues() {
   });
   $("#cq-reset").addEventListener("click", () => { cq = Sim.circularQueue(); cqLog.replaceChildren(); cqDraw(); });
   ringBtn.addEventListener("click", () => {
-    svg.hidden = !svg.hidden;
-    ringBtn.setAttribute("aria-pressed", String(!svg.hidden));
+    svg.style.display = ringOn() ? "none" : "";
+    ringBtn.setAttribute("aria-pressed", String(ringOn()));
     cqDraw();
   });
   cqDraw();
