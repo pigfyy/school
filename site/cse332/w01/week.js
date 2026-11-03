@@ -117,8 +117,8 @@ function setupQueues() {
   };
   $("#hero-enq").addEventListener("click", () => {
     const x = valFrom($("#hero-val"));
-    if (!hc.canEnqueue()) { heroMsg.textContent = "The array is full. Slide 19 would resize() here; that's Exercise 0."; return; }
-    if (!hl.canEnqueue()) { heroMsg.textContent = "The linked queue is empty, so back is null and slide 15's enqueue would crash on back.next. Handling that is part of Exercise 0. Press Reset."; return; }
+    if (!hc.canEnqueue()) { heroMsg.textContent = "The array is full. The fixed version would resize() here; that's Exercise 0."; return; }
+    if (!hl.canEnqueue()) { heroMsg.textContent = "The linked queue is empty, so back is null and the lecture's enqueue would crash on back.next. Handling that is part of Exercise 0. Press Reset."; return; }
     const at = hc.back; hl.enqueue(x); hc.enqueue(x);
     heroMsg.textContent = `enqueue(${x})`;
     $("#hero-val").value = (x + 1) % 100;
@@ -138,14 +138,14 @@ function setupQueues() {
   const lqLog = $("#lq-log");
   $("#lq-enq").addEventListener("click", () => {
     const x = valFrom($("#lq-val"));
-    if (!lq.canEnqueue()) { logLine(lqLog, `enqueue(${x}): back is null, so back.next = last would throw a NullPointerException. The slide's code assumes a non-empty queue.`); return; }
+    if (!lq.canEnqueue()) { logLine(lqLog, `enqueue(${x}): back is null, so back.next = last would throw a NullPointerException. The lecture's code assumes a non-empty queue.`); return; }
     lq.enqueue(x);
     logLine(lqLog, `enqueue(${x}): last = new ListNode(${x}); back.next = last; back = last`);
     $("#lq-val").value = (x + 1) % 100;
     drawNodes($("#lq-nodes"), lq);
   });
   $("#lq-deq").addEventListener("click", () => {
-    if (lq.isEmpty()) { logLine(lqLog, "dequeue(): front is null, so front.value would throw. The slide's code assumes a non-empty queue."); return; }
+    if (lq.isEmpty()) { logLine(lqLog, "dequeue(): front is null, so front.value would throw. The lecture's code assumes a non-empty queue."); return; }
     const v = lq.dequeue();
     logLine(lqLog, `dequeue() → ${v}${lq.isEmpty() ? "; front became null, so back = null" : ""}`);
     drawNodes($("#lq-nodes"), lq);
@@ -185,7 +185,7 @@ function setupQueues() {
   };
   $("#cq-enq").addEventListener("click", () => {
     const x = valFrom($("#cq-val"));
-    if (!cq.canEnqueue()) { logLine(cqLog, `enqueue(${x}): the array is full. Slide 18's code would overwrite queue[${cq.back}], the oldest item. Slide 19 calls resize() first; that's Exercise 0, so this visualizer stops here.`); return; }
+    if (!cq.canEnqueue()) { logLine(cqLog, `enqueue(${x}): the array is full. This code would overwrite queue[${cq.back}], the oldest item. The fixed version calls resize() first; that's Exercise 0, so this visualizer stops here.`); return; }
     const at = cq.back;
     cq.enqueue(x);
     logLine(cqLog, `enqueue(${x}): queue[${at}] = ${x}; back = (${at} + 1) % ${cq.length} = ${cq.back}; size = ${cq.size}`);
@@ -193,7 +193,7 @@ function setupQueues() {
     cqDraw(at);
   });
   $("#cq-deq").addEventListener("click", () => {
-    if (cq.isEmpty()) { logLine(cqLog, "dequeue(): size is 0. The slide's code assumes the queue is not empty."); return; }
+    if (cq.isEmpty()) { logLine(cqLog, "dequeue(): size is 0. The lecture's code assumes the queue is not empty."); return; }
     const f = cq.front, v = cq.dequeue();
     logLine(cqLog, `dequeue() → ${v}: first = queue[${f}]; front = (${f} + 1) % ${cq.length} = ${cq.front}; size = ${cq.size}`);
     cqDraw();
@@ -753,7 +753,7 @@ const BRUTE = {
     const q = Sim.circularQueue();
     for (let i = 0; i < 3; i++) q.dequeue();
     for (let x = 1; x <= 6; x++) q.enqueue(x);
-    return { ok: q.front === 3 && q.back === 1 && q.size === 8 && q.queue[0] === 6, text: `Ran the slide-18 code: front = ${q.front}, back = ${q.back}, size = ${q.size}, queue[0] = ${q.queue[0]}.` };
+    return { ok: q.front === 3 && q.back === 1 && q.size === 8 && q.queue[0] === 6, text: `Ran the circular array code: front = ${q.front}, back = ${q.back}, size = ${q.size}, queue[0] = ${q.queue[0]}.` };
   },
   "arraylist-14c"() {
     const rows = [];

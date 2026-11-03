@@ -89,7 +89,7 @@
       nodes.push({ v: x, loose: true }); vars.last = x;
       snap(1, `Make a new node holding ${x}. Only the local variable last refers to it. No node in the chain points to it, so it isn't in the queue yet.`);
       if (back === null) {
-        snap(2, "back is null because the queue is empty, so back.next throws a NullPointerException. The slide's code assumes the queue isn't empty. Handling this case is part of Exercise 0.", { crash: true });
+        snap(2, "back is null because the queue is empty, so back.next throws a NullPointerException. The lecture's code assumes the queue isn't empty. Handling this case is part of Exercise 0.", { crash: true });
         return steps;
       }
       const old = nodes[back].v;

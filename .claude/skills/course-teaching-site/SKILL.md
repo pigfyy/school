@@ -53,6 +53,11 @@ of `site/core/grader.js`. Answer keys go either in the markup (`data-type`, `dat
 
 - Stay faithful to the course: its notation, wording and examples. Use its official answers, lightly condensed.
 - Plain voice: short sentences, no filler.
+- **Never point at the slides.** No "slide 14", "the slide's code" or "start from the slide". The student may not
+  have the slides open, so every question and explanation carries its own picture or full starting state (draw the
+  array or the nodes on the page). Say "the lecture's code" when the source matters.
+- **Every check asks something new.** A quick check that repeats a widget or check right above it is noise. Test
+  the next idea instead: why a line exists, what breaks if it changes, what stays the same when you swap structures.
 - **Teaching notes** go under each module and problem in `<details class="notes" open>`.
 - Problems: prompt, answer boxes, work box (automatic), 1–3 hints (the first names the approach, none gives the
   answer), a step-by-step `.solution` ending in `li.answer`. Pick the answer type that fits: exact numbers by value,
