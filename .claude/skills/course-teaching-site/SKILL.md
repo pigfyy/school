@@ -58,7 +58,16 @@ of `site/core/grader.js`. Answer keys go either in the markup (`data-type`, `dat
   array or the nodes on the page). Say "the lecture's code" when the source matters.
 - **Every check asks something new.** A quick check that repeats a widget or check right above it is noise. Test
   the next idea instead: why a line exists, what breaks if it changes, what stays the same when you swap structures.
-- **Teaching notes** go under each module and problem in `<details class="notes" open>`.
+- **No instructor-facing notes** ("ask the room…", `<details class="notes">`). Anything worth knowing, like a common
+  mistake or an edge case, is said to the student on the page, for example in a `.rule.warn` "Common mistakes" box.
+- **Build each lecture around what the student must understand.** It opens with a "What this lecture is for" page: the
+  point in a few sentences, then 4–7 "After this you should be able to…" goals, each linked to its page. Then one page
+  per big idea, each opening with a one-line **Key idea.** box and explaining the why: why the definition is shaped
+  that way, why each line of code exists, what breaks without it. Trimming text is not a fix for shallow pages.
+- **Code gets a stepper.** Walk the lecture's code one line or one step at a time (see CSE 332 w01/w02
+  `setupStepper` / `setupHeapStepper`). Keep the step logic pure in `sim.js`, narrate arithmetic and comparisons in a
+  fixed form ("10/2 = 5", "1.5 < 7 is true"), and have `verify.mjs` recheck every narrated claim and end state against
+  the real code.
 - Problems: prompt, answer boxes, work box (automatic), 1–3 hints (the first names the approach, none gives the
   answer), a step-by-step `.solution` ending in `li.answer`. Pick the answer type that fits: exact numbers by value,
   formulas at several points, exact text for program output, yes/no, self-check for proofs and explanations.

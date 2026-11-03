@@ -1,2 +1,102 @@
-/* CSE 332 week 2: nothing of its own. core/base.css is this week's original design, widgets included
-   (graph-paper charts, the race card, cells, ladder, verdicts). */
+/* CSE 332 week 2: widget styles that core/base.css doesn't already have (base tokens only).
+   base.css already styles this week's original widgets: charts, the race card, cells, the category ladder, verdicts. */
+
+.goals li { margin-bottom: 0.45rem; }
+.goals li a { white-space: nowrap; }
+
+/* ---------------------------------------------------------------- steppers (heaps, numUnique) */
+.stepper { align-items: start; }
+.stepper pre.code { margin: 0; max-height: 44rem; overflow-y: auto; position: relative; }
+.stepper .ln .src { white-space: pre-wrap; overflow-wrap: anywhere; }
+.stepper .pic { min-width: 0; }
+.step-vars { font-family: var(--mono); font-size: 0.85rem; color: var(--ink-soft); margin: 0.25rem 0 0.5rem; min-height: 1.2rem; overflow-wrap: anywhere; }
+.step-say { background: var(--paper); border-radius: var(--r-sm); padding: 0.6rem 0.8rem; margin: 0 0 0.6rem; min-height: 5.5rem; }
+
+/* ---------------------------------------------------------------- heap trees */
+svg.htree { display: block; width: 100%; height: auto; margin: 0.25rem 0 0.5rem; }
+.ht-edge { stroke: var(--line-strong); stroke-width: 2; }
+.ht-edge.swap { stroke: var(--accent); stroke-width: 3.5; }
+.ht-node circle { fill: var(--surface); stroke: var(--ink); stroke-width: 1.75; }
+.ht-node text { font-family: var(--mono); font-size: 15px; font-weight: 600; fill: var(--ink); }
+.ht-node text.ht-idx { font-family: var(--font); font-size: 11.5px; font-weight: 700; fill: var(--accent); }
+.ht-node.cur circle { fill: var(--accent); stroke: var(--accent-deep); }
+.ht-node.cur text:not(.ht-idx) { fill: #fff; }
+.ht-node.cmp circle { stroke: var(--amber); stroke-width: 3.5; }
+.ht-node.swap circle { fill: var(--accent-tint); stroke: var(--accent); }
+.ht-node.done circle { stroke: var(--right); stroke-width: 2.5; }
+.ht-node.leaf circle { stroke-dasharray: 4 3; }
+.ht-node[role="button"] { cursor: pointer; }
+.ht-node[role="button"]:focus-visible circle { stroke: var(--amber); stroke-width: 4; }
+.ht-empty { font-family: var(--font); fill: var(--ink-faint); }
+.tree-key { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; font-size: 0.85rem; color: var(--ink-soft); margin: 0 0 0.5rem; }
+.tree-key span::before { content: ""; display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 50%; vertical-align: -0.1rem; margin-right: 0.35rem; border: 2px solid var(--ink); background: var(--surface); }
+.tree-key .k-cur::before { background: var(--accent); border-color: var(--accent-deep); }
+.tree-key .k-cmp::before { border: 3px solid var(--amber); }
+.tree-key .k-swap::before { background: var(--accent-tint); border-color: var(--accent); }
+.tree-key .k-done::before { border-color: var(--right); }
+.tree-key .k-leaf::before { border-style: dashed; }
+
+/* array cells under a tree (base styles .cell / .cell.out / .cell.mid) */
+.heap-cells { margin-top: 0.25rem; }
+.cell.cmp b { box-shadow: 0 0 0 3px var(--amber); }
+.cell.swapped b { background: var(--accent-tint); border-color: var(--accent); }
+.cell.done b { border-color: var(--right); }
+.cell.stale b { text-decoration: line-through; }
+.cell.unused b { color: var(--ink-faint); }
+.cell.seen b { background: var(--right-tint); border-color: var(--right); }
+.cell.pickable { cursor: pointer; }
+.cell.pickable:focus-visible b { outline: 3px solid var(--amber); outline-offset: 2px; }
+.cell .ptr { text-transform: none; }
+.heap-cells .cell.mid b { background: var(--accent); border-color: var(--accent-deep); color: #fff; }
+
+/* small trees side by side, one per question */
+.tree-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.75rem 1.25rem; margin: 0.75rem 0 1.25rem; }
+.tree-row figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 0.5rem 0.75rem; min-width: 0; }
+.tree-row figcaption { font-weight: 700; font-size: 0.9rem; }
+.check svg.htree, .cyu svg.htree, .task svg.htree { max-width: 24rem; }
+
+/* ---------------------------------------------------------------- the c / n0 explorer */
+.bx-sliders label { gap: 0.5rem; }
+.bx-sliders input[type="range"] { width: 12rem; max-width: 55vw; accent-color: var(--accent); }
+.bx-sliders output { font-family: var(--mono); font-weight: 700; min-width: 2.5rem; }
+.chart .dot.ok { fill: var(--right); }
+.chart .dot.bad { fill: var(--wrong); }
+.chart .dot.ign { fill: var(--ink-faint); opacity: 0.6; }
+.dotkey { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; margin-right: 0.35rem; vertical-align: -0.05rem; }
+.dotkey.ok { background: var(--right); }
+.dotkey.bad { background: var(--wrong); }
+.dotkey.ign { background: var(--ink-faint); }
+.bx-verdict { font-weight: 600; padding: 0.5rem 0.75rem; border-radius: var(--r-sm); }
+.bx-verdict.good { background: var(--right-tint); color: var(--right); }
+.bx-verdict.fail { background: var(--wrong-tint); color: var(--wrong); }
+
+/* ---------------------------------------------------------------- queue vs priority queue */
+.pq-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.75rem; }
+.pq-cols > div { background: var(--paper); border-radius: var(--r-sm); padding: 0.5rem 0.75rem; min-width: 0; overflow-wrap: anywhere; }
+.pq-cols h4 { margin: 0 0 0.25rem; }
+#pqrun .controls label { flex: 1 1 16rem; min-width: 0; }
+input.wide-script { flex: 1 1 10rem; width: auto; min-width: 0; max-width: 22rem; font-family: var(--mono); }
+
+/* ---------------------------------------------------------------- Section 2: where f can be */
+.band-ladder { list-style: none; padding: 0; margin: 0.75rem 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.3rem; }
+.band-ladder li { display: flex; flex-direction: column; gap: 0.1rem; padding: 0.45rem 0.4rem; border: 1.5px solid var(--line); border-radius: var(--r-sm); background: var(--surface); font-size: 0.78rem; color: var(--ink-soft); min-width: 0; }
+.band-ladder li b { font-family: var(--mono); font-size: 0.9rem; color: var(--ink); }
+.band-ladder li.band { background: var(--accent-tint); border-color: var(--accent); }
+.band-ladder li.target { box-shadow: 0 0 0 3px var(--amber); }
+.band-ladder li.ok span { color: var(--right); font-weight: 600; }
+.band-ladder li.no span { color: var(--wrong); font-weight: 600; }
+
+/* ---------------------------------------------------------------- buildHeap cost bars */
+.bc-bar-cell { width: 35%; }
+.bc-bar { display: block; height: 0.8rem; background: var(--accent); border-radius: 0 4px 4px 0; min-width: 2px; }
+.bc-slider input[type="range"] { width: 12rem; max-width: 55vw; accent-color: var(--accent); }
+
+.log { max-height: 10rem; }
+.vs-table td, .vs-table th { vertical-align: top; }
+
+@media (max-width: 860px) {
+  .band-ladder { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pq-cols { grid-template-columns: minmax(0, 1fr); }
+  .goals li a { white-space: normal; }
+  .stepper pre.code { max-height: 16rem; }
+}
