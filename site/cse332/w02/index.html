@@ -191,7 +191,7 @@
   </ol>
 
   <div class="rule">
-    <p><strong>How these pages work.</strong> Each page starts with a worked example. Click through it one step at a time (or press N). The rule comes at the end of the example. "Why" boxes are optional. Quick checks close each page, and <a href="#l3-problems">Lecture 3 practice</a> closes the lecture.</p>
+    <p><strong>How these pages work.</strong> Each page starts with a worked example: a few lines of math (one per click, or press N), a small table, or something to tap. The rule comes right after. "Why" boxes are optional. Quick checks close each page, and <a href="#l3-problems">Lecture 3 practice</a> closes the lecture.</p>
   </div>
   <div class="rule warn">
     <p><strong>Exercise 1</strong> (Running Time, due Mon Oct 12, in Gradescope) uses these ideas. This site doesn't show or solve any Exercise 1 problem.</p>
@@ -222,16 +222,14 @@
 
   <div class="example">
     <p class="example-head">Worked example</p>
-    <p class="example-q">The list has \(n = 1024\) items. In the worst case, how many times does the loop run?</p>
-    <div class="steps"><ol>
-      <li data-ask="What should we keep track of?">The <strong>gap</strong>, <code>end - start</code>: how many items could still hold \(k\). It starts at 1024.</li>
-      <li data-ask="What does one loop do to the gap?">It checks the middle item and drops one half. In the worst case it keeps the bigger half: 1024 becomes 512.</li>
-      <li data-ask="Keep halving. How many loops?">
-        <p>\(1024 \to 512 \to 256 \to 128 \to 64 \to 32 \to 16 \to 8 \to 4 \to 2 \to 1\)</p>
-        <p>That's 10 halvings to get down to 1 item. The loop runs once more to check that last item. For \(n = 1024\) that's 11 loops.</p>
-      </li>
-      <li data-ask="Where does log₂ come from?">We halved \(x\) times until 1 item was left: \(\frac{1024}{2^x} = 1\), so \(2^x = 1024\), so \(x = 10\). That's \(\log_2 1024\). For any \(n\), \(x = \log_2 n\).</li>
-      <li data-ask="So what's the rule?"><div class="rule"><p><strong>The rule.</strong> Halving what's left each step takes about \(\log_2 n\) steps. Binary search's worst case is exactly \(\lfloor\log_2 n\rfloor + 1\) loops, which is \(\Theta(\log n)\).</p></div></li>
+    <p class="example-q">The list has \(n = 1024\) items. In the worst case, how many loops?</p>
+    <div class="steps board"><ol>
+      <li><span class="lab">start</span><span class="mth">gap \(= 1024\)</span><span class="note">items that could still hold \(k\)</span></li>
+      <li><span class="lab">each loop</span><span class="mth">gap halves</span><span class="note">worst case keeps the bigger half</span></li>
+      <li><span class="lab"></span><span class="mth">\(1024 \to 512 \to \dots \to 2 \to 1\)</span><span class="note">10 halvings</span></li>
+      <li><span class="lab"></span><span class="mth">\(10 + 1 = 11\) loops</span><span class="note">one more loop checks the last item</span></li>
+      <li><span class="lab">why log</span><span class="mth">\(\frac{n}{2^x} = 1 \Rightarrow x = \log_2 n\)</span><span class="note">\(\log_2 1024 = 10\)</span></li>
+      <li class="wide"><div class="rule"><p><strong>The rule.</strong> Halving each step takes about \(\log_2 n\) steps. Exactly \(\lfloor\log_2 n\rfloor + 1\) loops: \(\Theta(\log n)\).</p></div></li>
     </ol></div>
   </div>
 
@@ -259,11 +257,11 @@
 
   <div class="example">
     <p class="example-head">Worked example</p>
-    <p class="example-q">Another search splits what's left into 5 parts each loop, so it takes about \(\log_5 n\) loops. Is that a different bucket from \(\log_2 n\)?</p>
-    <div class="steps"><ol>
-      <li data-ask="How do the two logs relate?">Change of base: \(\log_5 n = \dfrac{\log_2 n}{\log_2 5}\).</li>
-      <li data-ask="What is log₂ 5?">About 2.32. It doesn't change with \(n\): it's a constant.</li>
-      <li data-ask="So what's the rule?"><div class="rule"><p><strong>The rule.</strong> Logs with different bases differ by a constant factor, and \(O\) ignores constant factors. So the base doesn't matter. Just write \(\log n\).</p></div></li>
+    <p class="example-q">A search that splits into 5 parts takes about \(\log_5 n\) loops. Different bucket from \(\log_2 n\)?</p>
+    <div class="steps board"><ol>
+      <li><span class="lab">change base</span><span class="mth">\(\log_5 n = \dfrac{\log_2 n}{\log_2 5}\)</span><span class="note"></span></li>
+      <li><span class="lab"></span><span class="mth">\(\log_2 5 \approx 2.32\)</span><span class="note">a constant</span></li>
+      <li class="wide"><div class="rule"><p><strong>The rule.</strong> Log bases differ by a constant factor, so the base doesn\'t matter. Write \(\log n\).</p></div></li>
     </ol></div>
   </div>
   <details class="more">
@@ -301,22 +299,15 @@
 
   <div class="example">
     <p class="example-head">Worked example</p>
-    <p class="example-q">Three algorithms give the same answers. Their step counts are \(A = 10n + 900\), \(B = 100n - 50\) and \(C = \frac{n^2}{100}\). Which one is best?</p>
-    <div class="steps"><ol>
-      <li data-ask="Try a small input: n = 5">\(A = 950\), \(B = 450\), \(C = 0.25\). C wins.</li>
-      <li data-ask="Try n = 500">\(A = 5{,}900\), \(B = 49{,}950\), \(C = 2{,}500\). C still wins.</li>
-      <li data-ask="Try n = 2,000">\(A = 20{,}900\), \(B = 199{,}950\), \(C = 40{,}000\). Now A wins.</li>
-      <li data-ask="So which is best?">It depends on \(n\). C is the cheapest of the three up to \(n = 1{,}083\), and A from 1,084 on. B beats A only up to \(n = 10\). An answer that keeps changing isn't useful.</li>
-      <li data-ask="How do we get one answer?">Agree on three things.
-        <ul>
-          <li><strong>Only large \(n\) counts.</strong> Everything is fast on small inputs.</li>
-          <li><strong>Ignore constant factors.</strong> The 10 in \(10n\) depends on what you counted and on the machine.</li>
-          <li><strong>Ignore smaller terms.</strong> The \(+900\) matters less and less as \(n\) grows.</li>
-        </ul>
-      </li>
-      <li data-ask="Apply that to A, B and C">\(A\) becomes \(n\). \(B\) becomes \(n\). \(C\) becomes \(n^2\). So A and B are the same kind of growth. C grows faster, so for big enough \(n\) it loses to both.</li>
-      <li data-ask="So what's the rule?"><div class="rule"><p><strong>The rule.</strong> Compare running times by how they grow for large \(n\), after dropping constant factors and smaller terms.</p></div></li>
-    </ol></div>
+    <p class="example-q">Three algorithms give the same answers: \(A = 10n + 900\), \(B = 100n - 50\), \(C = \frac{n^2}{100}\). Which is cheapest?</p>
+    <div class="table-wrap"><table class="vals">
+      <thead><tr><th></th><th>\(n = 5\)</th><th>\(n = 500\)</th><th>\(n = 2{,}000\)</th></tr></thead>
+      <tr><th>A</th><td>950</td><td>5,900</td><td class="best">20,900</td></tr>
+      <tr><th>B</th><td>450</td><td>49,950</td><td>199,950</td></tr>
+      <tr><th>C</th><td class="best">0.25</td><td class="best">2,500</td><td>40,000</td></tr>
+    </table></div>
+    <p class="line">The winner changes. C is cheapest up to \(n = 1{,}083\), then A. B beats A only up to \(n = 10\).</p>
+    <div class="rule"><p><strong>The rule.</strong> Compare growth for large \(n\): drop constant factors and smaller terms. A and B become \(n\), C becomes \(n^2\). So C eventually loses to both.</p></div>
   </div>
 
   <h2>See where they cross</h2>
@@ -362,15 +353,19 @@
 
   <div class="example">
     <p class="example-head">Worked example</p>
-    <p class="example-q">We want to say \(2n^2 + 9\) grows like \(n^2\). How do we make that exact?</p>
-    <div class="steps"><ol>
-      <li data-ask="Is 2n² + 9 ≤ n²?">Never: it's always more than twice as big. Plain \(\le\) is too strict. It cares about the 2, and we agreed to ignore constant factors.</li>
-      <li data-ask="Fix 1: allow a multiplier c">Compare with \(c\cdot n^2\) instead. Take \(c = 3\). Is \(2n^2 + 9 \le 3n^2\)? Subtract \(2n^2\): that's \(9 \le n^2\).</li>
-      <li data-ask="When is 9 ≤ n² true?">From \(n = 3\) on, since \(3^2 = 9\). It fails at \(n = 1\) and \(n = 2\).</li>
-      <li data-ask="Fix 2: ignore small n">Pick a starting point \(n_0 = 3\), and only ask for \(n \ge n_0\). Now it holds for every \(n\) we care about. So \(c = 3\), \(n_0 = 3\) shows \(2n^2 + 9 \in O(n^2)\).</li>
-      <li data-ask="What about a lower bound?">Flip the inequality to \(\ge\). \(2n^2 + 9 \ge 2\cdot n^2\) for every \(n\), so \(c = 2\), \(n_0 = 1\) works. That's \(2n^2 + 9 \in \Omega(n^2)\). Both together give \(2n^2 + 9 \in \Theta(n^2)\).</li>
-      <li data-ask="So what's the rule?"><div class="rule"><p><strong>The rule.</strong> \(f \in O(g)\) means: from some \(n_0\) on, \(f(n) \le c\cdot g(n)\), for one constant \(c\) you pick. Think \(O\) as \(\le\), \(\Omega\) as \(\ge\), \(\Theta\) as \(=\), for large \(n\) and up to a constant.</p></div></li>
-    </ol></div>
+    <p class="example-q">Is \(2n^2 + 9 \in O(n^2)\)? Pick a \(c\).</p>
+    <div class="tryit">
+      <div class="chips" role="group" aria-label="Pick c">
+        <button class="chip" type="button" aria-pressed="false" data-dots="00000000" data-say="c = 1: never holds. Too small.">\(c = 1\)</button>
+        <button class="chip" type="button" aria-pressed="false" data-dots="00000000" data-say="c = 2: never holds. Always 9 short.">\(c = 2\)</button>
+        <button class="chip" type="button" aria-pressed="false" data-dots="00111111" data-say="c = 3: holds from n = 3 on. So n₀ = 3 works.">\(c = 3\)</button>
+        <button class="chip" type="button" aria-pressed="false" data-dots="00111111" data-say="c = 4: holds from n = 3 on. Also works.">\(c = 4\)</button>
+      </div>
+      <div class="tryit-dots" aria-label="One dot per n: green holds, red fails"></div>
+      <p class="tryit-out" role="status">Each dot is one \(n\). Green: \(2n^2 + 9 \le c\cdot n^2\) there.</p>
+    </div>
+    <p class="line">Lower bound: \(2n^2 + 9 \ge 2n^2\) for every \(n\), so \(c = 2\), \(n_0 = 1\) gives \(\Omega(n^2)\). Both together: \(\Theta(n^2)\).</p>
+    <div class="rule"><p><strong>The rule.</strong> \(f \in O(g)\): from some \(n_0\) on, \(f(n) \le c\cdot g(n)\) for one \(c\) you pick. Think \(O\) as \(\le\), \(\Omega\) as \(\ge\), \(\Theta\) as \(=\).</p></div>
   </div>
 
   <h2>The definitions</h2>
@@ -389,8 +384,8 @@
     <p><strong>\(\Theta\)</strong>, both: \(\Theta(g(n)) = \Omega(g(n)) \cap O(g(n))\).</p>
   </div>
 
-  <h2>Move \(c\) and \(n_0\)</h2>
-  <div class="prose"><p>Same idea for \(3n^2 + 17\). <strong>Green</strong>: holds at that \(n\). <strong>Red</strong>: fails at some \(n \ge n_0\). <strong>Grey</strong>: \(n &lt; n_0\), ignored. Find a pair with no red.</p></div>
+  <h2>Your turn: move \(c\) and \(n_0\)</h2>
+  <div class="prose"><p>Now \(3n^2 + 17\). Grey dots are \(n &lt; n_0\), ignored. Find a pair with no red.</p></div>
   <div class="panel bound" id="bx-notation" data-claims="sq17-o,sq17-omega"></div>
 
   <details class="more">
@@ -428,42 +423,47 @@
   <div class="example">
     <p class="example-head">Worked example 1</p>
     <p class="example-q">Prove \(10n + 100 \in O(n^2)\).</p>
-    <div class="steps"><ol>
-      <li data-ask="What do we have to show?">One \(c\) and one \(n_0\) with \(10n + 100 \le c\cdot n^2\) for every \(n \ge n_0\).</li>
-      <li data-ask="Scratchwork: pick c">\(c = 10\) makes the algebra easy. Divide both sides by 10: we need \(n + 10 \le n^2\).</li>
-      <li data-ask="Scratchwork: pick n₀">If \(n \ge 10\), then \(n + 10 \le 2n \le 10n \le n^2\). So \(n_0 = 10\).</li>
-      <li data-ask="Now write the proof">
-        <div class="proof">
-          <p class="proof-head">Proof</p>
-          <p>Let \(c = 10\) and \(n_0 = 10\). Show that for all \(n \ge 10\), \(10n + 100 \le 10n^2\).</p>
-          <p>\[\begin{aligned} &amp;10n+100 \le 10n^2\\ \equiv\ &amp; n + 10 \le n^2\\ \equiv\ &amp; 10 \le n^2 - n\\ \equiv\ &amp; 10 \le n(n-1)\end{aligned}\]</p>
-          <p>This is true because \(n(n-1)\) is strictly increasing and \(10(10-1) &gt; 10\).</p>
-        </div>
-      </li>
-      <li data-ask="Why does that last line cover every n ≥ 10?">At \(n = 10\), \(n(n-1) = 90\), which is at least 10. And \(n(n-1)\) only grows from there. A starting point plus "it only gets bigger" covers all \(n \ge 10\) at once.</li>
-      <li data-ask="So what's the rule?"><div class="rule"><p><strong>The rule.</strong> A proof says "Let \(c = \dots\) and \(n_0 = \dots\)", then shows the inequality for any \(n \ge n_0\). Scratchwork finds the numbers. The proof just states them and shows they work.</p></div></li>
+    <div class="steps board"><ol>
+      <li><span class="lab">need</span><span class="mth">\(10n + 100 \le c\cdot n^2\)</span><span class="note">for all \(n \ge n_0\)</span></li>
+      <li><span class="lab">\(c = 10\)</span><span class="mth">\(n + 10 \le n^2\)</span><span class="note">divide by 10</span></li>
+      <li><span class="lab">\(n \ge 10\)</span><span class="mth">\(n + 10 \le 2n \le 10n \le n^2\)</span><span class="note">so \(n_0 = 10\)</span></li>
+      <li class="wide"><div class="rule"><p>✓ \(c = 10\), \(n_0 = 10\). <strong>The rule.</strong> A proof names \(c\) and \(n_0\), then shows the inequality for any \(n \ge n_0\).</p></div></li>
     </ol></div>
   </div>
+
+  <details class="more">
+    <summary>See it written as a proof</summary>
+    <div class="proof">
+      <p class="proof-head">Proof</p>
+      <p>Let \(c = 10\) and \(n_0 = 10\). Show that for all \(n \ge 10\), \(10n + 100 \le 10n^2\).</p>
+      <p>\[\begin{aligned} &amp;10n+100 \le 10n^2\\ \equiv\ &amp; n + 10 \le n^2\\ \equiv\ &amp; 10 \le n^2 - n\\ \equiv\ &amp; 10 \le n(n-1)\end{aligned}\]</p>
+      <p>This is true because \(n(n-1)\) is strictly increasing and \(10(10-1) &gt; 10\).</p>
+    </div>
+    <p>The last line covers every \(n \ge 10\): it holds at \(n = 10\), and \(n(n-1)\) only grows.</p>
+  </details>
 
   <div class="example">
     <p class="example-head">Worked example 2</p>
     <p class="example-q">Prove \(13n^2 - 50n \in \Omega(n^2)\).</p>
-    <div class="steps"><ol>
-      <li data-ask="Scratchwork: try c = 13">We need \(13n^2 - 50n \ge 13n^2\). Divide by \(n\): \(13n - 50 \ge 13n\), so \(-50 \ge 0\). That's false for every \(n\).</li>
-      <li data-ask="What went wrong?">The left side is always \(50n\) short of \(13n^2\). So \(c\) must be less than 13, to leave room for the \(-50n\).</li>
-      <li data-ask="Try c = 12">\(13n^2 - 50n \ge 12n^2\) simplifies to \(n^2 \ge 50n\), which is \(n \ge 50\). So \(n_0 = 50\).</li>
-      <li data-ask="Now write the proof">
-        <div class="proof">
-          <p class="proof-head">Proof</p>
-          <p>Let \(c = 12\) and \(n_0 = 50\). Show that for all \(n \ge 50\), \(13n^2 - 50n \ge 12n^2\).</p>
-          <p>\[\begin{aligned} &amp;13n^2 - 50n \ge 12n^2\\ \equiv\ &amp; n^2 - 50n \ge 0\\ \equiv\ &amp; n - 50 \ge 0 \quad(\text{since } n \ge 50, n \ne 0)\\ \equiv\ &amp; n \ge 50\end{aligned}\]</p>
-          <p>Because we chose \(n_0 = 50\), the inequality holds for all \(n \ge n_0\).</p>
-        </div>
-        <p>The "\(n \ne 0\)" is there because the third line divides by \(n\).</p>
-      </li>
-      <li data-ask="So what's the rule?"><div class="rule"><p><strong>The rule.</strong> If your \(c\) fails for every \(n\), no \(n_0\) can fix it. Change \(c\): smaller for \(\Omega\), bigger for \(O\).</p></div></li>
+    <div class="steps board"><ol>
+      <li><span class="lab">need</span><span class="mth">\(13n^2 - 50n \ge c\cdot n^2\)</span><span class="note">for all \(n \ge n_0\)</span></li>
+      <li><span class="lab">\(c = 13\)</span><span class="mth">\(-50n \ge 0\)</span><span class="note">✗ false for every \(n\)</span></li>
+      <li><span class="lab">\(c = 12\)</span><span class="mth">\(n^2 \ge 50n\)</span><span class="note">leave room for the \(-50n\)</span></li>
+      <li><span class="lab"></span><span class="mth">\(n \ge 50\)</span><span class="note">so \(n_0 = 50\)</span></li>
+      <li class="wide"><div class="rule"><p>✓ \(c = 12\), \(n_0 = 50\). <strong>The rule.</strong> If a \(c\) fails for every \(n\), change \(c\): smaller for \(\Omega\), bigger for \(O\).</p></div></li>
     </ol></div>
   </div>
+
+  <details class="more">
+    <summary>See it written as a proof</summary>
+    <div class="proof">
+      <p class="proof-head">Proof</p>
+      <p>Let \(c = 12\) and \(n_0 = 50\). Show that for all \(n \ge 50\), \(13n^2 - 50n \ge 12n^2\).</p>
+      <p>\[\begin{aligned} &amp;13n^2 - 50n \ge 12n^2\\ \equiv\ &amp; n^2 - 50n \ge 0\\ \equiv\ &amp; n - 50 \ge 0 \quad(\text{since } n \ge 50, n \ne 0)\\ \equiv\ &amp; n \ge 50\end{aligned}\]</p>
+      <p>Because we chose \(n_0 = 50\), the inequality holds for all \(n \ge n_0\).</p>
+    </div>
+    <p>"\(n \ne 0\)" is there because the third line divides by \(n\).</p>
+  </details>
 
   <div class="rule warn">
     <p><strong>Common mistakes</strong></p>
@@ -518,21 +518,24 @@
 
   <div class="example">
     <p class="example-head">Worked example 1</p>
-    <p class="example-q">Find the simplest \(\Theta\) class of \(2n\log n + 5n + 40\).</p>
-    <div class="steps"><ol>
-      <li data-ask="Which term grows fastest?">Try \(n = 1024\), where \(\log_2 n = 10\): \(2n\log n = 20{,}480\), \(5n = 5{,}120\), and \(40\). The \(n\log n\) term is biggest, and it keeps pulling away, because \(\frac{n\log n}{n} = \log n\) keeps growing.</li>
-      <li data-ask="Drop the smaller terms">That leaves \(2n\log n\).</li>
-      <li data-ask="Drop the constant factor">The 2 is a multiplier, and \(c\) absorbs multipliers. The \(\log n\) is not a constant, so it stays. Answer: \(\Theta(n\log n)\).</li>
+    <p class="example-q">Simplest \(\Theta\) class of \(2n\log n + 5n + 40\)?</p>
+    <div class="steps board"><ol>
+      <li><span class="lab">\(n = 1024\)</span><span class="mth">\(20{,}480 + 5{,}120 + 40\)</span><span class="note">using \(\log_2 1024 = 10\)</span></li>
+      <li><span class="lab">keep biggest</span><span class="mth">\(2n\log n\)</span><span class="note">it pulls away: \(\frac{n\log n}{n} = \log n\) grows</span></li>
+      <li><span class="lab">drop the 2</span><span class="mth">\(\Theta(n\log n)\)</span><span class="note">\(\log n\) isn\'t a constant, so it stays</span></li>
+      <li class="wide"><div class="rule"><p><strong>The rule.</strong> Keep the fastest-growing term, then drop its constant factor.</p></div></li>
     </ol></div>
   </div>
 
   <div class="example">
     <p class="example-head">Worked example 2</p>
-    <p class="example-q">Find the simplest \(\Theta\) class of \(n^4 + 3^n + 100\).</p>
-    <div class="steps"><ol>
-      <li data-ask="Which term grows fastest?">At \(n = 10\): \(n^4 = 10{,}000\) and \(3^n = 59{,}049\). At \(n = 20\): \(160{,}000\) and \(3{,}486{,}784{,}401\). Each time \(n\) goes up by 1, \(3^n\) triples, while \(n^4\) grows by less and less.</li>
-      <li data-ask="So the answer is?">\(\Theta(3^n)\). Any exponential \(b^n\) with \(b &gt; 1\) eventually beats any polynomial.</li>
-    </ol></div>
+    <p class="example-q">Simplest \(\Theta\) class of \(n^4 + 3^n + 100\)?</p>
+    <div class="table-wrap"><table class="vals">
+      <thead><tr><th></th><th>\(n = 10\)</th><th>\(n = 20\)</th></tr></thead>
+      <tr><th>\(n^4\)</th><td>10,000</td><td>160,000</td></tr>
+      <tr><th>\(3^n\)</th><td class="best">59,049</td><td class="best">3,486,784,401</td></tr>
+    </table></div>
+    <p class="line">\(3^n\) triples each step and leaves \(n^4\) behind: \(\Theta(3^n)\). Any exponential beats any polynomial eventually.</p>
   </div>
 
   <div class="rule">
@@ -617,30 +620,24 @@
   <div class="example">
     <p class="example-head">Worked example 1</p>
     <p class="example-q">True or false: \(n\log n \in O(n^2)\)?</p>
-    <div class="steps"><ol>
-      <li data-ask="Which side grows faster?">Divide: \(\frac{n\log n}{n^2} = \frac{\log n}{n}\). \(\log n\) grows much slower than \(n\), so this shrinks toward 0. \(n^2\) grows faster.</li>
-      <li data-ask="Can we find c and n₀?">\(c = 1\), \(n_0 = 1\): \(n\log n \le n^2\) is the same as \(\log n \le n\), true for every \(n \ge 1\). So it's <strong>true</strong>.</li>
-      <li data-ask="Is it Θ too?">No. \(\frac{n^2}{n\log n} = \frac{n}{\log n}\) grows without bound, so \(n\log n \notin \Omega(n^2)\).</li>
+    <div class="steps board"><ol>
+      <li><span class="lab">ratio</span><span class="mth">\(\frac{n\log n}{n^2} = \frac{\log n}{n} \to 0\)</span><span class="note">\(n^2\) grows faster</span></li>
+      <li><span class="lab">\(c = 1, n_0 = 1\)</span><span class="mth">\(\log n \le n\)</span><span class="note">true for every \(n \ge 1\)</span></li>
+      <li><span class="lab">\(\Theta\)?</span><span class="mth">\(\frac{n^2}{n\log n} = \frac{n}{\log n} \to \infty\)</span><span class="note">so not \(\Omega(n^2)\)</span></li>
+      <li class="wide"><div class="rule"><p><strong>True.</strong> \(n\log n \in O(n^2)\), but not \(\Theta(n^2)\).</p></div></li>
     </ol></div>
   </div>
 
   <div class="example">
     <p class="example-head">Worked example 2</p>
     <p class="example-q">True or false: \(5^n \in O(4^n)\)?</p>
-    <div class="steps"><ol>
-      <li data-ask="Can we simplify?">No. Both are exponentials, and the base of an exponential never drops.</li>
-      <li data-ask="Which side grows faster?">Divide: \(\frac{5^n}{4^n} = 1.25^n\). That grows without bound, so \(5^n\) grows faster.</li>
-      <li data-ask="Can a big c save it?">\(5^n \le c\cdot 4^n\) means \(1.25^n \le c\). Take \(c = 1000\): it holds up to \(n = 30\) and fails from \(n = 31\) on. A bigger \(c\) only moves the failure later. So it's <strong>false</strong>.</li>
-      <li data-ask="So what's the rule?"><div class="rule">
-        <p><strong>The rule.</strong> To decide \(f \in O(g)\):</p>
-        <ol>
-          <li>Simplify both sides.</li>
-          <li>Ask whether \(f/g\) stays bounded as \(n\) grows. If yes, \(f \in O(g)\). If it grows without bound, no \(c\) works.</li>
-          <li>\(\Omega\) is the same question for \(g/f\). \(\Theta\) needs both.</li>
-        </ol>
-        <p>Handy order: powers of \(\log n\) &lt; polynomials &lt; exponentials.</p>
-      </div></li>
-    </ol></div>
+    <p class="line">Ratio: \(\frac{5^n}{4^n} = 1.25^n\), which grows without bound. Can a big \(c\) make \(5^n \le c\cdot 4^n\) hold?</p>
+    <div class="table-wrap"><table class="vals">
+      <thead><tr><th>\(c\)</th><th>10</th><th>100</th><th>1,000</th></tr></thead>
+      <tr><th>fails from</th><td class="no">\(n = 11\)</td><td class="no">\(n = 21\)</td><td class="no">\(n = 31\)</td></tr>
+    </table></div>
+    <p class="line">A bigger \(c\) only moves the failure later. <strong>False.</strong></p>
+    <div class="rule"><p><strong>The rule.</strong> Simplify both sides, then look at \(f/g\). Stays bounded: \(f \in O(g)\). Grows without bound: no \(c\) works. Handy order: logs &lt; polynomials &lt; exponentials.</p></div>
   </div>
 
   <h2>Try any pair</h2>
@@ -708,14 +705,15 @@
 
   <div class="example">
     <p class="example-head">Worked example</p>
-    <p class="example-q">What are true \(O\), \(\Omega\) and \(\Theta\) statements about <code>contains</code> on a list of \(n\) items?</p>
-    <div class="steps"><ol>
-      <li data-ask="Which input is slowest?">\(k\) isn't in the list: it checks all \(n\) items. The worst case is \(W(n) = n\).</li>
-      <li data-ask="Which input is fastest?">\(k\) is first: 1 check. The best case is \(B(n) = 1\).</li>
-      <li data-ask="Now bound each one">\(W(n) = n \in \Theta(n)\). \(B(n) = 1 \in \Theta(1)\).</li>
-      <li data-ask="Are these true too?">\(B(n) \in O(n)\): yes, since \(1 \le n\). Loose, but true. \(W(n) \in \Omega(1)\): yes, since \(n \ge 1\). Weak, but true. So \(O\) and \(\Omega\) each work with both cases.</li>
-      <li data-ask="So what's the rule?"><div class="rule"><p><strong>The rule.</strong> The <em>case</em> (worst, best) picks which function you study. The <em>bound</em> (\(O\), \(\Omega\), \(\Theta\)) says what you know about it. Any bound goes with any case.</p></div></li>
-    </ol></div>
+    <p class="example-q">True statements about <code>contains</code> on \(n\) items?</p>
+    <div class="table-wrap"><table class="vals">
+      <thead><tr><th></th><th>worst</th><th>best</th></tr></thead>
+      <tr><th>input</th><td>\(k\) missing</td><td>\(k\) first</td></tr>
+      <tr><th>checks</th><td>\(n\)</td><td>\(1\)</td></tr>
+      <tr><th>tight</th><td>\(\Theta(n)\)</td><td>\(\Theta(1)\)</td></tr>
+      <tr><th>also true</th><td>\(\Omega(1)\)</td><td>\(O(n)\)</td></tr>
+    </table></div>
+    <div class="rule"><p><strong>The rule.</strong> The case picks which function. The bound says what you know about it. Any bound goes with any case.</p></div>
   </div>
 
   <div class="rule warn">
@@ -767,13 +765,14 @@
 
   <div class="example">
     <p class="example-head">Worked example</p>
-    <p class="example-q">You showed an algorithm does exactly \(3n + 4\) steps in the worst case. What should you write?</p>
-    <div class="steps"><ol>
-      <li data-ask="Is &quot;O(n⁵)&quot; true?">Yes: \(3n + 4 \le 7n^5\) for \(n \ge 1\). But it only says "at most about \(n^5\)", which tells the reader almost nothing.</li>
-      <li data-ask="Is &quot;O(n)&quot; better?">It's tighter, and true. But \(O\) is still only "at most". It doesn't rule out the algorithm being \(O(\log n)\).</li>
-      <li data-ask="What says everything?">\(\Theta(n)\): at most <em>and</em> at least a constant times \(n\). It also tells the reader it is not \(O(\log n)\).</li>
-      <li data-ask="So what's the rule?"><div class="rule"><p><strong>The rule.</strong> Say \(\Theta\) when you know it. Saying \(O\) when you mean \(\Theta\) is a common error.</p></div></li>
-    </ol></div>
+    <p class="example-q">An algorithm does exactly \(3n + 4\) steps in the worst case. What do you write?</p>
+    <div class="table-wrap"><table class="vals">
+      <thead><tr><th>claim</th><th>true?</th><th>says</th></tr></thead>
+      <tr><th>\(O(n^5)\)</th><td class="yes">✓</td><td>almost nothing</td></tr>
+      <tr><th>\(O(n)\)</th><td class="yes">✓</td><td>at most linear; could be faster</td></tr>
+      <tr><th>\(\Theta(n)\)</th><td class="yes">✓</td><td class="best">exactly linear</td></tr>
+    </table></div>
+    <div class="rule"><p><strong>The rule.</strong> Say \(\Theta\) when you know it. \(O\) only promises "at most".</p></div>
   </div>
 
   <h2>Say what you analyzed</h2>

@@ -17,7 +17,10 @@
      [data-progress-bar]           optional empty div: where the page's problem progress bar goes
      .steps                        step-by-step reveal. li[data-ask="plain text"] puts that question on the button
                                    that reveals the step, then heads the step with it
-     .example                      a worked example: .example-head, .example-q, then its .steps
+     .steps.board                  whiteboard lines, one per click: li > .lab + .mth + .note; li.wide spans the row
+     .example                      a worked example: .example-head, .example-q, then its .steps, table.vals or .tryit
+     .tryit                        tap a choice, see one dot per n: buttons with data-dots="0011…" (1 = holds) and
+                                   data-say, plus empty .tryit-dots and .tryit-out; data-from sets the first n (default 1)
      details.more                  optional depth, closed until opened
      nav.pager                     filled with previous / next
    Saved state goes through core/store.js; it never holds answer keys. */
@@ -225,10 +228,11 @@ function setupSteps() {
     const items = $$(":scope > ol > li", steps);
     items.forEach((li) => { if (li.dataset.ask) li.prepend(el("p", { class: "step-q", text: li.dataset.ask })); });
     let shown = 0;
+    const board = steps.classList.contains("board");
     const next = el("button", { class: "btn primary", type: "button" });
     const all = el("button", { class: "btn", type: "button", text: "Show all" });
-    const reset = el("button", { class: "btn", type: "button", text: "Hide steps" });
-    const count = el("span", { class: "count" });
+    const reset = el("button", { class: "btn", type: "button", text: board ? "Start over" : "Hide steps" });
+    const count = el("span", { class: "count", hidden: board });
     steps.append(el("div", { class: "step-bar" }, next, all, reset, count));
     function render(just) {
       items.forEach((li, i) => { li.hidden = i >= shown; li.classList.toggle("just-shown", i === just); });
@@ -236,7 +240,7 @@ function setupSteps() {
       all.hidden = shown >= items.length;
       reset.hidden = shown === 0;
       const ask = items[shown]?.dataset.ask;
-      next.textContent = shown >= items.length ? "All steps shown" : ask ? `${ask} →` : shown === 0 ? "Show first step" : "Show next step";
+      next.textContent = shown >= items.length ? (board ? "Done" : "All steps shown") : ask ? `${ask} →` : board ? "Next line" : shown === 0 ? "Show first step" : "Show next step";
       count.textContent = `${shown} of ${items.length} steps shown`;
     }
     steps._reveal = () => { if (shown < items.length) { shown++; render(shown - 1); } };
@@ -244,6 +248,17 @@ function setupSteps() {
     all.addEventListener("click", () => { shown = items.length; render(-1); });
     reset.addEventListener("click", () => { shown = 0; render(-1); });
     render(-1);
+  });
+}
+function setupTryIts() {
+  $$(".tryit").forEach((box) => {
+    const dots = $(".tryit-dots", box), out = $(".tryit-out", box), from = Number(box.dataset.from || 1);
+    const chips = $$("[data-dots]", box);
+    chips.forEach((chip) => chip.addEventListener("click", () => {
+      chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+      dots.replaceChildren(...[...chip.dataset.dots].map((d, i) => el("span", { class: `try-dot ${d === "1" ? "yes" : "no"}`, text: String(from + i), title: d === "1" ? "holds" : "fails" })));
+      out.textContent = chip.dataset.say || "";
+    }));
   });
 }
 
@@ -736,6 +751,7 @@ function boot() {
   buildPagers();
   setupTasks();
   setupSteps();
+  setupTryIts();
   setupChecks();
   setupQuizzes();
   renderMath(document.body); // before widgets measure text

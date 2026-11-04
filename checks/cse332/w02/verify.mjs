@@ -412,7 +412,7 @@ const text = html.replace(/<!--[\s\S]*?-->/g, "").replace(/\s+/g, " ");
 const has = (s, why) => ok(text.includes(s), `page states "${s}" (${why})`);
 has("4{,}402", "n^50 crossover"); has("between 4,401 and 4,402", "home prose");
 has("first fails at \\(n = 18\\)", "3^n vs 1000*2^n");
-ok(J1("binaryWorst", (r) => r.n === 1024).worst === 11 && text.includes("For \\(n = 1024\\) that's 11"), "n = 1024 worst case is 11");
+ok(J1("binaryWorst", (r) => r.n === 1024).worst === 11 && text.includes("\\(10 + 1 = 11\\) loops"), "n = 1024 worst case is 11");
 {
   const A = (n) => 10n * n + 900n, B = (n) => 100n * n - 50n; // C = n^2/100 -> compare 100*A with n^2
   let bBelowA = 0n; for (let n = 1n; n < 100n; n++) if (B(n) < A(n)) bBelowA = n;
@@ -424,17 +424,23 @@ ok(Math.abs(Math.log2(5) - 2.32) < 0.005, "log2 5 ≈ 2.32");
 {
   const A = (n) => 10 * n + 900, B = (n) => 100 * n - 50, C = (n) => (n * n) / 100;
   const fmt = (x) => (Number.isInteger(x) ? x.toLocaleString("en-US").replace(/,/g, "{,}") : String(x));
-  for (const n of [5, 500, 2000]) has(`\\(A = ${fmt(A(n))}\\), \\(B = ${fmt(B(n))}\\), \\(C = ${fmt(C(n))}\\)`, `A, B, C at n = ${n}`);
+  const cells = html.replace(/<td[^>]*>/g, "<td>");
+  const row = (F) => [5, 500, 2000].map((n) => `<td>${F(n).toLocaleString("en-US")}</td>`).join("");
+  for (const [name, F] of [["A", A], ["B", B], ["C", C]]) ok(cells.includes(row(F)), `table row ${name} at n = 5, 500, 2000`);
+  const best = [5, 500, 2000].map((n) => ["A", "B", "C"][[A(n), B(n), C(n)].indexOf(Math.min(A(n), B(n), C(n)))]).join("");
+  ok(best === "CCA" && /<td class="best">20,900<\/td>/.test(html) && /<td class="best">0\.25<\/td>/.test(html) && /<td class="best">2,500<\/td>/.test(html), `cheapest highlighted: ${best}`);
 }
 {
   const firstFail = (c) => { for (let n = 1n; n < 200n; n++) if (5n ** n > c * 4n ** n) return n; };
-  ok(firstFail(1000n) === 31n && text.includes("holds up to \\(n = 30\\) and fails from \\(n = 31\\) on"), "5^n <= 1000*4^n holds to 30, fails from 31");
+  for (const c of [10n, 100n, 1000n]) { const f = firstFail(c); let stays = true; for (let n = f; n < f + 200n; n++) if (5n ** n <= c * 4n ** n) stays = false; ok(stays && text.includes(`\\(n = ${f}\\)</td>`), `5^n <= ${c}*4^n fails from n = ${f} and never recovers`); }
   let ok9 = true; for (let n = 1n; n < 1000n; n++) if ((2n * n * n + 9n <= 3n * n * n) !== (n >= 3n)) ok9 = false;
-  ok(ok9 && text.includes("From \\(n = 3\\) on"), "2n^2 + 9 <= 3n^2 exactly from n = 3");
+  ok(ok9, "2n^2 + 9 <= 3n^2 exactly from n = 3");
+  for (const m of html.matchAll(/data-dots="([01]+)"[^>]*>\\\(c = (\d+)\\\)/g)) { const c = BigInt(m[2]); const want = [...Array(m[1].length)].map((_, i) => { const n = BigInt(i + 1); return 2n * n * n + 9n <= c * n * n ? "1" : "0"; }).join(""); ok(m[1] === want, `try-it dots for c = ${c}: ${m[1]}`); }
+  ok((html.match(/data-dots=/g) || []).length === 4, "four try-it choices checked");
   let lo = true; for (let n = 1n; n < 1000n; n++) if (2n * n * n + 9n < 2n * n * n) lo = false;
   ok(lo, "2n^2 + 9 >= 2n^2 for every n");
-  ok(2 * 1024 * 10 === 20480 && 5 * 1024 === 5120 && text.includes("\\(2n\\log n = 20{,}480\\), \\(5n = 5{,}120\\)"), "2n log n and 5n at n = 1024");
-  ok(10 ** 4 === 10000 && 3 ** 10 === 59049 && 20 ** 4 === 160000 && 3n ** 20n === 3486784401n && text.includes("\\(160{,}000\\) and \\(3{,}486{,}784{,}401\\)"), "n^4 and 3^n at 10 and 20");
+  ok(2 * 1024 * 10 === 20480 && 5 * 1024 === 5120 && text.includes("\\(20{,}480 + 5{,}120 + 40\\)"), "2n log n and 5n at n = 1024");
+  ok(html.replace(/<td[^>]*>/g, "<td>").includes(`<td>${(10 ** 4).toLocaleString("en-US")}</td><td>${(20 ** 4).toLocaleString("en-US")}</td>`) && html.replace(/<td[^>]*>/g, "<td>").includes(`<td>${(3 ** 10).toLocaleString("en-US")}</td><td>${(3n ** 20n).toLocaleString("en-US")}</td>`), "n^4 and 3^n at 10 and 20");
   let o6 = true; for (let n = 1n; n < 1000n; n++) { if (5n * n * n + 30n * n <= 5n * n * n) o6 = false; if ((5n * n * n + 30n * n <= 6n * n * n) !== (n >= 30n)) o6 = false; }
   ok(o6, "5n^2 + 30n: c = 5 always fails, c = 6 holds exactly from n = 30");
   ok([10n, 11n, 12n].every((n) => text.includes(`\\(${10n * n + 100n} \\le ${10n * n * n}\\)`)), "plugged-in values in the proofs check");
