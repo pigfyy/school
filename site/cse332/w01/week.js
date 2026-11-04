@@ -31,6 +31,8 @@ window.WEEK.messages = {
   "only-last-block": "That's one block's cost. Add the cost of every block.",
   "halved-once": "That's after one halving. Keep halving until the gap is 1.",
   "linear-count": "That's how many items a linear scan would look at. Each binary-search iteration halves the range.",
+  "missed-last": "Close. When k isn't in the list, contains compares every item, including the last one.",
+  "binary-for-linear": "That's binary search's count. contains checks items one at a time from the start, so it can't skip any.",
   "stopped-early": "Close. The loop still runs one more time when end − start is 1.",
   "strict-vs-equal": "At that n the two sides aren't in the right order yet. Check that value directly.",
   "dropped-constant": "Your crossover ignores the +900. Solve the full inequality.",

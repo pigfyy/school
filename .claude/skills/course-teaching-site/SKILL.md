@@ -56,6 +56,18 @@ of `site/core/grader.js`. Answer keys go either in the markup (`data-type`, `dat
 - **Never point at the slides.** No "slide 14", "the slide's code" or "start from the slide". The student may not
   have the slides open, so every question and explanation carries its own picture or full starting state (draw the
   array or the nodes on the page). Say "the lecture's code" when the source matters.
+- **Every exercise and quiz question stands on its own.** A student who opens only that problem can answer it
+  without scrolling back:
+  - Show the code it's about in the problem itself, even when a module page already showed it. A link back is extra,
+    not a substitute.
+  - Draw the starting state (the array, the nodes, the tree).
+  - Define every name it uses. Never write "`contains`", "Example 2", "the ArrayList code" or "the summary's choice"
+    without saying what that is.
+  - Open with one plain line on what it practices and how it connects to the lecture ("This is the lecture's
+    second counting example: two nested loops.").
+  - All parts of one problem are about one thing, and each part's label says exactly what to enter. Don't tack an
+    unrelated question onto the end (binary search iterations, then suddenly linear search comparisons).
+  - Write all math in KaTeX, answer labels included: \(\frac{n}{2^x} = 1\), not "n/2^x = 1".
 - **Every check asks something new.** A quick check that repeats a widget or check right above it is noise. Test
   the next idea instead: why a line exists, what breaks if it changes, what stays the same when you swap structures.
 - **No instructor-facing notes** ("ask the room…", `<details class="notes">`). Anything worth knowing, like a common

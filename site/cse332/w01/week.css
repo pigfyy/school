@@ -127,3 +127,6 @@ pre.code .cm { color: var(--ink-faint); font-style: italic; }
 @media (max-width: 860px) {
   .levels > div { grid-template-columns: 1fr; gap: 0.15rem; margin-left: 0 !important; margin-right: 0 !important; }
 }
+
+/* Marked blanks inside lecture code (exercise prompts) */
+.code mark { background: var(--amber); color: var(--night); border-radius: 3px; padding: 0 3px; }
