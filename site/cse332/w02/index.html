@@ -39,8 +39,7 @@
         <li><a href="#examples">True or false?</a></li>
         <li><a href="#cases">Case vs. bound</a></li>
         <li><a href="#usage">Using the notation well</a></li>
-        <li><a href="#l3-problems">Lecture 3 problems</a></li>
-        <li><a href="#cyu-l3">Check your understanding</a></li>
+        <li><a href="#l3-problems">Lecture 3 practice</a></li>
       </ol>
     </div>
     <div>
@@ -155,7 +154,7 @@
       <li>Every page opens with a <strong>Key idea</strong> box, then explains why things are the way they are. Pages end with quick checks.</li>
       <li>Steppers walk through the lecture's code one line or one step at a time. Press <strong>Next</strong> and read why each line is there.</li>
       <li><strong>Problems</strong> are answerable on the page. Type an answer, write your work, ask for hints. Solutions stay hidden until you press <strong>Show solution</strong>, then show one step at a time.</li>
-      <li>Each lecture and the section end with <strong>Check your understanding</strong>, a short quiz. Your score counts first tries.</li>
+      <li>Lecture 3 ends with one <strong>Practice</strong> page: concept checks and problems together, grouped by the lecture's goals. Lectures 4 and 5 and the section still end with problems and a separate <strong>Check your understanding</strong> quiz.</li>
       <li>Number boxes take arithmetic like <code>2^10+1</code>. Big-O boxes take a class like <code>n log n</code>, <code>O(n^2)</code> or <code>2^n</code>. Yes/no boxes take <code>yes</code>, <code>no</code>, <code>true</code> or <code>false</code>.</li>
     </ul>
   </div>
@@ -842,10 +841,14 @@ public static boolean binary_contains(
 </section>
 
 <!-- ================================================================ L3 PROBLEMS -->
-<section class="page" id="l3-problems" data-title="Lecture 3 problems">
+<section class="page" id="l3-problems" data-title="Lecture 3 practice">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
-  <h1>Lecture 3 problems</h1>
-  <div class="prose"><p>These are built from the lecture's own examples. Where the lecture gives an answer, the solution uses it; every other number was computed with exact integers by running the code. Number boxes take arithmetic like <code>2^10 + 1</code>, Big-O boxes take a class like <code>n log n</code>, yes/no boxes take <code>yes</code> or <code>no</code>. For a \(c\)/\(n_0\) pair, any pair that works is accepted: the checker tests it exactly for every \(n \ge n_0\).</p></div>
+  <h1>Lecture 3 practice</h1>
+  <div class="prose"><p>This page is your practice and your self-check in one. It follows the lecture's goals in order: a few concept checks, then problems. Stuck? Each group's lesson link goes back to the page that teaches it.</p><p>Number boxes take arithmetic like <code>2^10 + 1</code>, Big-O boxes take a class like <code>n log n</code>, and yes/no boxes take <code>yes</code> or <code>no</code>. For a \(c\)/\(n_0\) pair, any pair that works is accepted.</p></div>
+  <div data-progress-bar></div>
+
+  <h2 class="practice-group">Binary search and logs</h2>
+  <p class="note">Lesson: <a href="#search">Why binary search is log n</a></p>
 
   <article class="task" data-id="cse332-w2-l3-gap-halving">
     <h2>1. Halving the gap</h2>
@@ -902,6 +905,33 @@ public static boolean binary_contains(
       <li class="answer">3; 10; yes; yes. So \(\Theta(\log_5 n) = \Theta(\log_2 n)\): ignore the base.</li>
     </ol></div></div>
   </article>
+
+  <h2 class="practice-group">What \(O\), \(\Omega\) and \(\Theta\) mean</h2>
+  <p class="note">Lesson: <a href="#compare">Comparing running times</a>, <a href="#notation">O, Ω, Θ</a></p>
+
+  <div class="check" data-id="cse332-w2-l3-cyu-timing-vs-bigo" data-grader="mc">
+    <p>Quick check: You and a classmate each wrote a HashMap. You want to know whose code runs faster on one particular data set. What should you use?</p>
+    <div class="opts">
+        <label><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Asymptotic analysis only<span class="why" hidden>Asymptotic analysis evaluates algorithms. Two implementations of the same algorithm can have the same \(\Theta\) and still differ in speed.</span></label>
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Timing<span class="why" hidden>Correct: to evaluate an implementation on a specific data set, timing is useful.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Neither tells you anything<span class="why" hidden>Timing does answer this exact question: implementation A vs B on data set C.</span></label>
+      </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w2-l3-cyu-definition-order" data-grader="mc">
+    <p>Quick check: The definition of \(f \in O(g)\) uses a constant \(c\), a starting point \(n_0\), and the inequality \(f(n) \le c\cdot g(n)\). In what order are they chosen and checked?</p>
+    <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-definition-order"> Choose \(c\) and \(n_0\); then the inequality must hold for every \(n \ge n_0\)<span class="why" hidden>Correct. \(\exists c\,\exists n_0\,\forall n\): one pair of constants has to work for all large \(n\).</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-definition-order"> For each \(n\), choose a \(c\) that works for that \(n\)<span class="why" hidden>That would be \(\forall n\,\exists c\), which every positive function satisfies (take \(c = f(n)/g(n)\)). The order of the quantifiers is the whole point.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-definition-order"> Check the inequality at \(n = n_0\) only<span class="why" hidden>It must hold for every \(n \ge n_0\), not just at one point.</span></label>
+      </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group">Proving a bound</h2>
+  <p class="note">Lesson: <a href="#proofs">Proving a bound</a></p>
 
   <article class="task" data-id="cse332-w2-l3-example1-bigo">
     <h2>3. Prove \(10n + 100 \in O(n^2)\)</h2>
@@ -960,8 +990,53 @@ public static boolean binary_contains(
     </ol></div></div>
   </article>
 
+  <article class="task" data-id="cse332-w2-l3-write-proof">
+    <h2>6. Write a full proof</h2>
+    <p class="prompt">This practices turning an intuitive argument into a proof. The lecture justifies \(4 + 3n \in O(n)\) only loosely: "for large inputs, \(4 + 3n &lt; n + 3n = 4n\)". Write a full proof in the shape the lecture used for \(10n + 100 \in O(n^2)\) (problem 3):</p>
+    <ol class="prompt">
+      <li>Name specific values: "Let \(c = \dots\) and \(n_0 = \dots\)."</li>
+      <li>Take an arbitrary \(n \ge n_0\).</li>
+      <li>Show \(4 + 3n \le c\cdot n\) for that \(n\), saying where you use \(n \ge n_0\).</li>
+    </ol>
+    <p class="prompt">Compare with the solution when you're done.</p>
+    <div class="answer-spec" data-part="proof" data-grader="self" data-label="your \(c\), \(n_0\) and key step"></div>
+    <ol class="hints">
+      <li>The justification hints at \(c = 4\). When is \(4 \le n\)?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Let \(c = 4\) and \(n_0 = 4\). Let \(n \ge 4\) be arbitrary.</li>
+      <li>Since \(n \ge 4\), \(4 + 3n \le n + 3n = 4n = c\cdot n\).</li>
+      <li class="answer">So for all \(n \ge 4\), \(4 + 3n \le 4n\), which proves \(4 + 3n \in O(n)\). (\(c = 7, n_0 = 1\) works too: \(4 \le 4n\) for \(n \ge 1\).) Check that yours names specific values and argues for an arbitrary \(n \ge n_0\); "for large \(n\) it works" is not a proof.</li>
+    </ol></div></div>
+  </article>
+
+  <h2 class="practice-group">The simplest \(\Theta\) class</h2>
+  <p class="note">Lesson: <a href="#drop">What you can drop</a></p>
+
+  <div class="check" data-id="cse332-w2-l3-cyu-not-in-o-n2" data-grader="mc">
+    <p>Quick check: Which function is <em>not</em> in \(O(n^2)\)?</p>
+    <div class="opts">
+        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(1000n^2\)<span class="why" hidden>A constant factor: take \(c = 1000\).</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(n^{1.5}\)<span class="why" hidden>\(n^{1.5} \le n^2\) for \(n \ge 1\). \(O\) is an upper bound, so smaller functions are in it.</span></label>
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(n^2\log n\)<span class="why" hidden>Correct. \(\frac{n^2\log n}{n^2} = \log n\) grows without bound, so no constant \(c\) works.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> 50<span class="why" hidden>A constant is in \(O(n^2)\): \(50 \le 50n^2\) for \(n \ge 1\).</span></label>
+      </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w2-l3-cyu-exponent-constant" data-grader="mc">
+    <p>Quick check: Which one is \(\Theta(2^n)\)?</p>
+    <div class="opts">
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(2^{n+1}\)<span class="why" hidden>Correct: \(2^{n+1} = 2\cdot 2^n\), which is a multiplicative constant.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(2^{2n}\)<span class="why" hidden>\(2^{2n} = 4^n\). The constant in the exponent multiplies \(n\), so the base changes.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(n\cdot 2^n\)<span class="why" hidden>The ratio to \(2^n\) is \(n\), which isn't bounded.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(3^n\)<span class="why" hidden>\(3^n/2^n = 1.5^n\) grows without bound, so \(3^n \notin \Theta(2^n)\).</span></label>
+      </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <article class="task" data-id="cse332-w2-l3-intuition-buckets">
-    <h2>6. Simplest \(\Theta\) classes</h2>
+    <h2>7. Simplest \(\Theta\) classes</h2>
     <p class="prompt">This practices the lecture's shortcut for finding a function's \(\Theta\) class: keep only the fastest-growing term and drop its constant factor. Write the simplest class, like <code>n^2</code> or <code>n log n</code>. These four functions are the lecture's examples.</p>
     <div class="answer-spec" data-part="four-n-plus-five" data-grader="bigo" data-answer="n" data-label="simplest \(\Theta\) class of \(4n + 5\)"></div>
     <div class="answer-spec" data-part="half-nlogn" data-grader="bigo" data-answer="n log n" data-label="simplest \(\Theta\) class of \(0.5n\log n + 2n + 7\)"></div>
@@ -980,8 +1055,11 @@ public static boolean binary_contains(
     </ol></div></div>
   </article>
 
+  <h2 class="practice-group">Deciding claims, and how far "eventually" is</h2>
+  <p class="note">Lesson: <a href="#examples">True or false?</a></p>
+
   <article class="task" data-id="cse332-w2-l3-more-examples">
-    <h2>7. True or false?</h2>
+    <h2>8. True or false?</h2>
     <p class="prompt">This practices deciding a Big-O claim by asking which side grows faster in the long run. \(f \in O(g)\) means that from some \(n_0\) on, \(f(n) \le c\cdot g(n)\) for one fixed constant \(c\). \(\Theta\) means both \(\le\) and \(\ge\) that way. These five claims are the lecture's. Answer yes if the claim is true, no if it is false.</p>
     <div class="answer-spec" data-part="four-plus-3n" data-grader="yesno" data-answer="yes" data-label="Is \(4 + 3n \in O(n)\)?"></div>
     <div class="answer-spec" data-part="n-plus-2logn" data-grader="yesno" data-answer="no" data-miscon='{"yes":"bigger-in-smaller"}' data-label="Is \(n + 2\log n \in O(\log n)\)?"></div>
@@ -1003,7 +1081,7 @@ public static boolean binary_contains(
   </article>
 
   <article class="task" data-id="cse332-w2-l3-eventually-exact">
-    <h2>8. How long is "eventually"?</h2>
+    <h2>9. How long is "eventually"?</h2>
     <p class="prompt">This practices what "eventually" means in a Big-O argument: an inequality may fail for small \(n\), then hold for every \(n\) from some point on. The lecture argued four claims this way, each with "for large \(n\)":</p>
     <ul class="prompt">
       <li>\(n^{50} \in O(1.1^n)\): eventually \(n^{50} \le 1.1^n\). (This one is a fact to know, not to compute: it only becomes true at \(n = 4{,}402\). "Eventually" can be far away.)</li>
@@ -1032,7 +1110,7 @@ public static boolean binary_contains(
   </article>
 
   <article class="task" data-id="cse332-w2-l3-tenth-vs-log">
-    <h2>9. \(n^{1/10}\) vs. \(\log n\)</h2>
+    <h2>10. \(n^{1/10}\) vs. \(\log n\)</h2>
     <p class="prompt">This practices the lecture's warning that \(O\) can mislead for real input sizes. \(n^{1/10}\) grows faster than \(\log_2 n\), so \(\log_2 n \in O(n^{1/10})\). But the lecture says the crossover is around \(5\cdot10^{17}\). Compare the two at a trillion-ish input and at a much larger one. Work with \(n = 2^k\), so \(\log_2 n = k\) and \(n^{1/10} = 2^{k/10}\).</p>
     <div class="answer-spec" data-part="tenth-at-2-to-40" data-grader="exact" data-answer="16" data-label="the value of \(n^{1/10}\) at \(n = 2^{40}\)"></div>
     <div class="answer-spec" data-part="bigger-at-2-to-40" data-grader="choice" data-choices='["tenth","log"]' data-options="tenth:n^(1/10) is larger|log:log₂ n is larger" data-answer="log" data-miscon='{"tenth":"asymptotic-not-now"}' data-label="which is larger at \(n = 2^{40}\)?"></div>
@@ -1051,8 +1129,21 @@ public static boolean binary_contains(
     </div>
   </article>
 
+  <h2 class="practice-group">Case vs. bound, and writing it right</h2>
+  <p class="note">Lesson: <a href="#cases">Case vs. bound</a>, <a href="#usage">Using the notation well</a></p>
+
+  <div class="check" data-id="cse332-w2-l3-cyu-set-notation" data-grader="mc">
+    <p>Quick check: \(O(n^2)\) is a set of functions. Which of these ways of writing it is <em>wrong</em>?</p>
+    <div class="opts">
+        <label><input type="radio" name="cse332-w2-l3-cyu-set-notation"> \(3n^2 + 17 \in O(n^2)\)<span class="why" hidden>That's the most correct form: membership in a set.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-set-notation"> \(3n^2 + 17 = O(n^2)\)<span class="why" hidden>Common and accepted, as long as you read "=" as "is in".</span></label>
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-set-notation"> \(O(n^2) = 3n^2 + 17\)<span class="why" hidden>Correct. \(O(n^2)\) is a set of functions. The "=" only reads one way, so this direction is never written.</span></label>
+      </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <article class="task" data-id="cse332-w2-l3-true-statements">
-    <h2>10. Which statements are true?</h2>
+    <h2>11. Which statements are true?</h2>
     <p class="prompt">This practices the lecture's point that two choices in a running-time claim are separate. The <strong>case</strong> picks which function you analyze: the worst case is the count on the slowest input of size \(n\), the best case the count on the fastest. The <strong>bound</strong> says what you know about that function: \(O\) is "at most", \(\Omega\) is "at least", \(\Theta\) is both. A loose bound can still be true.</p>
     <p class="prompt">Three statements are about the lecture's binary search, which checks the middle of the range and throws away half each time:</p>
     <pre class="code">public static boolean binary_contains(
@@ -1088,135 +1179,6 @@ public static boolean binary_contains(
       <li class="answer">False, True, True, True, True. The last one is why you should say \(\Theta\): \(\Theta(n)\) rules out \(O(\log n)\).</li>
     </ol></div></div>
   </article>
-
-  <article class="task" data-id="cse332-w2-l3-write-proof">
-    <h2>11. Write a full proof</h2>
-    <p class="prompt">This practices turning an intuitive argument into a proof. The lecture justifies \(4 + 3n \in O(n)\) only loosely: "for large inputs, \(4 + 3n &lt; n + 3n = 4n\)". Write a full proof in the shape the lecture used for \(10n + 100 \in O(n^2)\):</p>
-    <ol class="prompt">
-      <li>Name specific values: "Let \(c = \dots\) and \(n_0 = \dots\)."</li>
-      <li>Take an arbitrary \(n \ge n_0\).</li>
-      <li>Show \(4 + 3n \le c\cdot n\) for that \(n\), saying where you use \(n \ge n_0\).</li>
-    </ol>
-    <p class="prompt">Compare with the solution when you're done.</p>
-    <div class="answer-spec" data-part="proof" data-grader="self" data-label="your \(c\), \(n_0\) and key step"></div>
-    <ol class="hints">
-      <li>The justification hints at \(c = 4\). When is \(4 \le n\)?</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>Let \(c = 4\) and \(n_0 = 4\). Let \(n \ge 4\) be arbitrary.</li>
-      <li>Since \(n \ge 4\), \(4 + 3n \le n + 3n = 4n = c\cdot n\).</li>
-      <li class="answer">So for all \(n \ge 4\), \(4 + 3n \le 4n\), which proves \(4 + 3n \in O(n)\). (\(c = 7, n_0 = 1\) works too: \(4 \le 4n\) for \(n \ge 1\).) Check that yours names specific values and argues for an arbitrary \(n \ge n_0\); "for large \(n\) it works" is not a proof.</li>
-    </ol></div></div>
-  </article>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ CYU L3 -->
-<section class="page" id="cyu-l3" data-title="Check your understanding (Lecture 3)">
-  <p class="where">Lecture 3 wrap-up · questions written for this site</p>
-  <h1>Check your understanding</h1>
-  <div class="prose"><p>Eleven questions on Lecture 3. Answer without looking back, then use the review links for anything you missed. The score counts first tries.</p></div>
-  <div class="cyu-score" data-quiz-score="l3" role="status"></div>
-  <ol class="cyu-list" data-quiz="l3">
-    <li class="cyu" data-id="cse332-w2-l3-cyu-definition-order" data-kind="mc" data-topic="notation">
-      <p class="q">The definition of \(f \in O(g)\) uses a constant \(c\), a starting point \(n_0\), and the inequality \(f(n) \le c\cdot g(n)\). In what order are they chosen and checked?</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-definition-order"> Choose \(c\) and \(n_0\); then the inequality must hold for every \(n \ge n_0\)<span class="why" hidden>Correct. \(\exists c\,\exists n_0\,\forall n\): one pair of constants has to work for all large \(n\).</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-definition-order"> For each \(n\), choose a \(c\) that works for that \(n\)<span class="why" hidden>That would be \(\forall n\,\exists c\), which every positive function satisfies (take \(c = f(n)/g(n)\)). The order of the quantifiers is the whole point.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-definition-order"> Check the inequality at \(n = n_0\) only<span class="why" hidden>It must hold for every \(n \ge n_0\), not just at one point.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l3-cyu-bucket-cubic" data-kind="bigo" data-answer="n^3" data-topic="drop">
-      <p class="q">What is the simplest \(\Theta\) class of \(5n^3 + n^2\log n + 100\)? Keep the fastest-growing term and drop its constant.</p>
-      <p class="why" hidden>\(n^3\) grows faster than \(n^2\log n\) (\(\log n\) grows slower than \(n\)). Drop the 5 and the lower terms: \(\Theta(n^3)\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l3-cyu-binary-4096" data-kind="num" data-answer="13" data-topic="search" data-miscon='{"12":"stopped-early","4096":"linear-count"}'>
-      <p class="q">This is the lecture's binary search. On a sorted list of 4,096 items, what is the largest number of times its <code>while</code> loop body can run?</p>
-      <pre class="code">public static boolean binary_contains(
-        List&lt;Integer&gt; a, int k){
-    int start = 0;
-    int end = a.size();
-    while(start &lt; end){
-        int mid = start + (end-start)/2;
-        if(a.get(mid) == k)
-               return true;
-        else if(a.get(mid) &lt; k)
-               start = mid+1;
-        else
-               end = mid;
-    }
-    return false;
-}</pre>
-      <p class="why" hidden>The gaps are \(2^{12}, 2^{11}, \dots, 1\): 13 of them. \(\lfloor\log_2 4096\rfloor + 1 = 13\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l3-cyu-log-base-bucket" data-kind="mc" data-topic="search">
-      <p class="q">This is about the base of a log. Algorithm X takes \(\log_{10} n\) steps and Algorithm Y takes \(\log_2 n\) steps. Which is true?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l3-cyu-log-base-bucket"> X is in a smaller \(O\) class than Y<span class="why" hidden>X is faster by a constant factor (\(\log_2 10 \approx 3.32\)), but constants don't change the class.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-log-base-bucket"> Both are \(\Theta(\log n)\)<span class="why" hidden>Correct: \(\log_{10} n = \frac{\log_2 n}{\log_2 10}\). That's a constant factor.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-log-base-bucket"> Y is \(\Theta(n)\) because base 2 means halving<span class="why" hidden>Halving each step is exactly what gives \(\log_2 n\) steps. It's logarithmic, not linear.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l3-cyu-omega-not-best" data-kind="mc" data-topic="cases">
-      <p class="q">Linear search is the lecture's <code>contains</code>: it checks the items one at a time from the front. "Linear search is \(\Omega(n)\) in the worst case." What does this say?</p>
-      <pre class="code">public static boolean contains(
-        List&lt;Integer&gt; a, int k){
-    for(int i=0; i&lt; a.size(); i++){
-        if (a.get(i) == k)
-            return true;
-    }
-    return false;
-}</pre>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l3-cyu-omega-not-best"> Nothing: \(\Omega\) only applies to the best case<span class="why" hidden>That's the misconception. \(\Omega\) is a lower bound on whatever function you analyze.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-omega-not-best"> The worst-case count grows at least as fast as \(n\)<span class="why" hidden>Correct: "worst case" picks the function, and \(\Omega\) says it's eventually at least \(c\cdot n\).</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-omega-not-best"> Every input takes at least \(n\) steps<span class="why" hidden>No. The best case finds the item first, in 1 comparison. The claim is only about the worst-case function.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l3-cyu-example2-c11" data-kind="num" data-answer="25" data-topic="proofs" data-miscon='{"50":"used-c12","24":"strict-vs-equal"}'>
-      <p class="q">You're proving \(13n^2 - 50n \in \Omega(n^2)\) with \(c = 11\). What is the smallest \(n_0\) such that \(13n^2 - 50n \ge 11n^2\) for every \(n \ge n_0\)?</p>
-      <p class="why" hidden>\((13 - 11)\,n \ge 50 \iff n \ge 25\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l3-cyu-not-in-o-n2" data-kind="mc" data-topic="drop">
-      <p class="q">Which function is <em>not</em> in \(O(n^2)\)?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(1000n^2\)<span class="why" hidden>A constant factor: take \(c = 1000\).</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(n^{1.5}\)<span class="why" hidden>\(n^{1.5} \le n^2\) for \(n \ge 1\). \(O\) is an upper bound, so smaller functions are in it.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(n^2\log n\)<span class="why" hidden>Correct. \(\frac{n^2\log n}{n^2} = \log n\) grows without bound, so no constant \(c\) works.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> 50<span class="why" hidden>A constant is in \(O(n^2)\): \(50 \le 50n^2\) for \(n \ge 1\).</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l3-cyu-exponent-constant" data-kind="mc" data-topic="drop">
-      <p class="q">Which one is \(\Theta(2^n)\)?</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(2^{n+1}\)<span class="why" hidden>Correct: \(2^{n+1} = 2\cdot 2^n\), which is a multiplicative constant.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(2^{2n}\)<span class="why" hidden>\(2^{2n} = 4^n\). The constant in the exponent multiplies \(n\), so the base changes.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(n\cdot 2^n\)<span class="why" hidden>The ratio to \(2^n\) is \(n\), which isn't bounded.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(3^n\)<span class="why" hidden>\(3^n/2^n = 1.5^n\) grows without bound, so \(3^n \notin \Theta(2^n)\).</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l3-cyu-sq17-n0" data-kind="num" data-answer="5" data-topic="notation" data-miscon='{"4":"strict-vs-equal","17":"forgot-c"}'>
-      <p class="q">You're proving \(3n^2 + 17 \in O(n^2)\) with \(c = 4\). What is the smallest \(n_0\) such that \(3n^2 + 17 \le 4n^2\) for every \(n \ge n_0\)?</p>
-      <p class="why" hidden>\(3n^2 + 17 \le 4n^2 \iff n^2 \ge 17\). \(4^2 = 16 &lt; 17 \le 25 = 5^2\), so 5.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l3-cyu-timing-vs-bigo" data-kind="mc" data-topic="usage">
-      <p class="q">You and a classmate each wrote a HashMap. You want to know whose code runs faster on one particular data set. What should you use?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Asymptotic analysis only<span class="why" hidden>Asymptotic analysis evaluates algorithms. Two implementations of the same algorithm can have the same \(\Theta\) and still differ in speed.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Timing<span class="why" hidden>Correct: to evaluate an implementation on a specific data set, timing is useful.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Neither tells you anything<span class="why" hidden>Timing does answer this exact question: implementation A vs B on data set C.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l3-cyu-set-notation" data-kind="mc" data-topic="notation">
-      <p class="q">\(O(n^2)\) is a set of functions. Which of these ways of writing it is <em>wrong</em>?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l3-cyu-set-notation"> \(3n^2 + 17 \in O(n^2)\)<span class="why" hidden>That's the most correct form: membership in a set.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-set-notation"> \(3n^2 + 17 = O(n^2)\)<span class="why" hidden>Common and accepted, as long as you read "=" as "is in".</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-set-notation"> \(O(n^2) = 3n^2 + 17\)<span class="why" hidden>Correct. \(O(n^2)\) is a set of functions. The "=" only reads one way, so this direction is never written.</span></label>
-      </div>
-    </li>
-  </ol>
-  <div class="cyu-score" data-quiz-summary="l3" role="status"></div>
   <nav class="pager"></nav>
 </section>
 

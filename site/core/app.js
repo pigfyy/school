@@ -14,6 +14,7 @@
      li.cyu[data-id]               quiz question: .opts for multiple choice, otherwise a text input. In ol.cyu-list,
                                    with .cyu-score[data-role=score|summary] around it
      article.task[data-id]         problem: .answer-spec[data-part] boxes, ol.hints, .solution with .steps
+     [data-progress-bar]           optional empty div: where the page's problem progress bar goes
      .steps                        step-by-step reveal
      nav.pager                     filled with previous / next
    Saved state goes through core/store.js; it never holds answer keys. */
@@ -699,7 +700,9 @@ function setupTasks() {
       if (!confirm("Clear every answer and all work on this page? Your past checks stay in your history.")) return;
       $$(".task[data-id]", page).forEach((t) => { store.clear(t.dataset.id); ITEMS.get(t.dataset.id).restore(); });
     });
-    page.insertBefore(el("div", { class: "task-progress" }, el("p", { class: "progress-text", role: "status" }), el("div", { class: "row" }, clearAll)), first);
+    // A page can say where its progress bar goes with an empty <div data-progress-bar>; otherwise it sits above the first problem.
+    const bar = el("div", { class: "task-progress" }, el("p", { class: "progress-text", role: "status" }), el("div", { class: "row" }, clearAll));
+    ($("[data-progress-bar]", page) || first).before(bar);
   });
 }
 function refreshCounts() {

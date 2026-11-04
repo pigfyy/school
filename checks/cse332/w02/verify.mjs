@@ -200,16 +200,13 @@ Object.assign(TRUTH, {
   "cse332-w2-l3-gap-halving.solve-4096": S(Math.log2(4096)),
   "cse332-w2-l3-gap-halving.worst-2-to-20": S(worst(1048576)),
   "cse332-w2-l3-gap-halving.worst-million": S(worst(1000000)),
-  "cse332-w2-l3-cyu-binary-4096": S(worst(4096)),
   "cse332-w2-l3-log-base.log8-divisor": S(J1("logbase").ratio),
   "cse332-w2-l3-log-base.log8-at-2-to-30": S(30 / J1("logbase").ratio),
   "cse332-w2-l3-log-base.log5-in-o-log2": yn(G.relate("log_5 n", "log n").o),
   "cse332-w2-l3-log-base.log2-in-o-log5": yn(G.relate("log n", "log_5 n").o),
-  "cse332-w2-l3-cyu-sq17-n0": S(J1("sq17").upperSmallestN0),
   "cse332-w2-l3-example1-bigo.smallest-n0-c10": S(J1("ex1").smallestN0),
   "cse332-w2-l3-example2-omega.smallest-n0-c12": S(J1("ex2", (r) => r.c === 12).smallestN0),
   "cse332-w2-l3-example2-omega.c13-possible": yn(J1("ex2c13").anyN),
-  "cse332-w2-l3-cyu-example2-c11": S(J1("ex2", (r) => r.c === 11).smallestN0),
   "cse332-w2-l3-more-examples.four-plus-3n": yn(G.relate("4+3n", "n").o),
   "cse332-w2-l3-more-examples.n-plus-2logn": yn(G.relate("n+2log n", "log n").o),
   "cse332-w2-l3-more-examples.logn-plus-2": yn(G.relate("log n + 2", "1").o),
@@ -234,7 +231,6 @@ Object.assign(BIGO_TRUTH, {
   "cse332-w2-l3-intuition-buckets.half-nlogn": "0.5nlogn + 2n + 7",
   "cse332-w2-l3-intuition-buckets.cube-plus-exp": "n^3 + 2^n + 3n",
   "cse332-w2-l3-intuition-buckets.nlog-10n2": "n log(10n^2)",
-  "cse332-w2-l3-cyu-bucket-cubic": "5n^3 + n^2 log n + 100",
 });
 /* Lecture 4 */
 {
