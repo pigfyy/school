@@ -1174,7 +1174,7 @@
     <p><strong>Try an even \(n\).</strong> <code>b</code> ends up as \(120 + n\). When \(n\) is even, <code>b</code> is even, so the code takes the cheap if branch and does only \(2n + 5\) operations. The rules didn't trace <code>b</code>. They charged the slower branch, so \(4n+4\) is an <em>upper bound</em>: exact for odd \(n\), more than enough for even \(n\). Both grow like \(n\), and growth is what we're after.</p>
   </div>
 
-  <h2>Example 2: nested loops multiply</h2>
+  <h2>Example 2: <code>beAnnoying</code> (nested loops multiply)</h2>
   <pre class="code">beAnnoying(List n){
     List m = [];
     for (i=0; i &lt; n.size(); i++){
@@ -1517,7 +1517,16 @@ private void resize(){
 
   <article class="task" data-id="cse332-w1-l2-beannoying">
     <h2>2. Example 2: <code>beAnnoying</code></h2>
-    <p class="prompt">Count the prints for a list of \(n\) items.</p>
+    <p class="prompt">This is the lecture's second counting example, from the <a href="#counting">counting page</a>. Count the prints for a list of \(n\) items.</p>
+    <pre class="code">beAnnoying(List n){
+    List m = [];
+    for (i=0; i &lt; n.size(); i++){
+        m.add(n[i]);
+        for (j=0; j&lt; n.size(); j++){
+            print ("Hi, I'm annoying");
+        }
+    }
+}</pre>
     <div class="answer-spec" data-part="prints" data-grader="formula" data-answer="n^2" data-points='{"n":["0","1","2","3","7","10","100"]}' data-miscon='{"2n":"added-loops","n":"inner-only","n^2+n":"counted-adds"}' data-label="prints, as a formula"></div>
     <div class="answer-spec" data-part="prints-million" data-grader="exact" data-answer="1000000000000" data-miscon='{"2000000":"added-loops","1000000":"inner-only"}' data-label="prints for n = 1,000,000"></div>
     <div class="answer-spec" data-part="bucket" data-grader="bigo" data-answer="n^2" data-label="bucket"></div>
@@ -1688,7 +1697,7 @@ private void resize(){
       <p class="why" hidden><code>b</code> ends as \(120 + 4 = 124\), which is even, so the cheap if branch runs: \(3 + 2\cdot4 + 1 + 1 = 13\). The worst-case count \(4n+4 = 20\) is an upper bound.</p>
     </li>
     <li class="cyu" data-id="cse332-w1-l2-cyu-beannoying-adds-prints" data-kind="num" data-answer="56" data-topic="counting" data-miscon='{"49":"prints-only","14":"added-loops"}'>
-      <p class="q"><code>beAnnoying</code> also does one <code>m.add</code> per outer iteration. Counting adds <em>and</em> prints, how many for a list of 7 items?</p>
+      <p class="q"><code>beAnnoying</code> also does one <code>m.add</code> per outer iteration. Counting adds <em>and</em> prints, how many for a list of 7 items? (Its code is on the <a href="#counting">counting page</a>.)</p>
       <p class="why" hidden>Prints: \(7 \cdot 7 = 49\). Adds: one per outer iteration, 7. Total 56. Still \(O(n^2)\): the \(n\) adds are a non-dominant term.</p>
     </li>
     <li class="cyu" data-id="cse332-w1-l2-cyu-bucket-triangle" data-kind="bigo" data-answer="n^2" data-topic="counting">
