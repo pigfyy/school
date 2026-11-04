@@ -347,6 +347,16 @@ table.grid6 th, table.grid6 td { padding: 0.35rem 0.75rem 0.35rem 0; }
 .steps li { margin-bottom: 0.6rem; padding-left: 0.25rem; }
 .steps li[hidden] { display: none; }
 .steps li::marker { font-weight: 700; color: var(--accent); font-family: var(--mono); }
+.steps .step-q { font-weight: 700; color: var(--accent-deep); margin: 0 0 0.15rem; }
+.example { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 var(--r-lg) var(--r-lg) 0; padding: 1rem 1.25rem 0.8rem; margin: 1.25rem 0 1.75rem; max-width: var(--measure); min-width: 0; }
+.example-head { font: 700 0.72rem/1.2 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin: 0 0 0.35rem; }
+.example-q { font-size: 1.08rem; font-weight: 600; margin: 0 0 0.6rem; }
+.example .steps ol { margin-top: 0.4rem; }
+.example .rule { margin: 0.5rem 0; }
+details.more { margin: 1rem 0; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); padding: 0.55rem 1rem; max-width: var(--measure); }
+details.more summary { cursor: pointer; font-weight: 600; color: var(--accent-deep); }
+details.more[open] summary { margin-bottom: 0.5rem; }
+details.more ul { padding-left: 1.2rem; }
 .step-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 0.5rem; }
 .answer { font-weight: 700; background: var(--accent-tint); padding: 0.6rem 0.9rem; border-radius: var(--r-sm); border-left: 4px solid var(--accent); }
 .brute { font-size: 0.93rem; color: var(--ink-soft); }

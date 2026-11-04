@@ -196,7 +196,6 @@ Object.assign(TRUTH, {
   "cse332-w2-l3-search-double-n": (() => { const d = new Set(); for (let n = 1; n <= 5000; n++) d.add(Sim.worstGaps(2 * n).length - Sim.worstGaps(n).length); return d.size === 1 ? S([...d][0]) : "varies"; })(),
   "cse332-w2-l3-notation-same-pair-n3": yn(G.checkBound({ f: ["17", "0", "3"], g: ["0", "0", "0", "1"], rel: "O" }, "4", "5").holds),
   "cse332-w2-l3-examples-log-cube": yn(G.relate("log(n^3)", "log n").theta),
-  "cse332-w2-l3-cases-best-is-o-n": yn(J("search").filter((r) => r.found).some((r) => r.linear === 1) && G.relate("1", "n").o),
   "cse332-w2-l3-gap-halving.solve-4096": S(Math.log2(4096)),
   "cse332-w2-l3-gap-halving.worst-2-to-20": S(worst(1048576)),
   "cse332-w2-l3-gap-halving.worst-million": S(worst(1000000)),
@@ -421,6 +420,24 @@ ok(J1("binaryWorst", (r) => r.n === 1024).worst === 11 && text.includes("For \\(
   ok(bBelowA === 10n && cBelowA === 1083n && cBelowB > cBelowA && text.includes("up to \\(n = 1{,}083\\)") && text.includes("only up to \\(n = 10\\)"), `A/B/C crossovers (B<A up to ${bBelowA}, C<A up to ${cBelowA}, C<B up to ${cBelowB})`);
 }
 ok(Math.abs(Math.log2(5) - 2.32) < 0.005, "log2 5 ≈ 2.32");
+{
+  const A = (n) => 10 * n + 900, B = (n) => 100 * n - 50, C = (n) => (n * n) / 100;
+  const fmt = (x) => (Number.isInteger(x) ? x.toLocaleString("en-US").replace(/,/g, "{,}") : String(x));
+  for (const n of [5, 500, 2000]) has(`\\(A = ${fmt(A(n))}\\), \\(B = ${fmt(B(n))}\\), \\(C = ${fmt(C(n))}\\)`, `A, B, C at n = ${n}`);
+}
+{
+  const firstFail = (c) => { for (let n = 1n; n < 200n; n++) if (5n ** n > c * 4n ** n) return n; };
+  ok(firstFail(1000n) === 31n && text.includes("holds up to \\(n = 30\\) and fails from \\(n = 31\\) on"), "5^n <= 1000*4^n holds to 30, fails from 31");
+  let ok9 = true; for (let n = 1n; n < 1000n; n++) if ((2n * n * n + 9n <= 3n * n * n) !== (n >= 3n)) ok9 = false;
+  ok(ok9 && text.includes("From \\(n = 3\\) on"), "2n^2 + 9 <= 3n^2 exactly from n = 3");
+  let lo = true; for (let n = 1n; n < 1000n; n++) if (2n * n * n + 9n < 2n * n * n) lo = false;
+  ok(lo, "2n^2 + 9 >= 2n^2 for every n");
+  ok(2 * 1024 * 10 === 20480 && 5 * 1024 === 5120 && text.includes("\\(2n\\log n = 20{,}480\\), \\(5n = 5{,}120\\)"), "2n log n and 5n at n = 1024");
+  ok(10 ** 4 === 10000 && 3 ** 10 === 59049 && 20 ** 4 === 160000 && 3n ** 20n === 3486784401n && text.includes("\\(160{,}000\\) and \\(3{,}486{,}784{,}401\\)"), "n^4 and 3^n at 10 and 20");
+  let o6 = true; for (let n = 1n; n < 1000n; n++) { if (5n * n * n + 30n * n <= 5n * n * n) o6 = false; if ((5n * n * n + 30n * n <= 6n * n * n) !== (n >= 30n)) o6 = false; }
+  ok(o6, "5n^2 + 30n: c = 5 always fails, c = 6 holds exactly from n = 30");
+  ok([10n, 11n, 12n].every((n) => text.includes(`\\(${10n * n + 100n} \\le ${10n * n * n}\\)`)), "plugged-in values in the proofs check");
+}
 ok(Math.abs(Number(58n ** 10n) / 1e17 - 4.31) < 0.01 && Math.abs(2 ** 58 / 1e17 - 2.88) < 0.01 && Math.abs(Number(59n ** 10n) / 1e17 - 5.11) < 0.01 && Math.abs(2 ** 59 / 1e17 - 5.76) < 0.01, "k = 58, 59 values in problem 9");
 ok(Math.abs(Number(43n ** 8n) / 1e13 - 1.17) < 0.01 && Math.abs(2 ** 43 / 1e12 - 8.80) < 0.01 && Math.abs(Number(44n ** 8n) / 1e13 - 1.40) < 0.01 && Math.abs(2 ** 44 / 1e13 - 1.76) < 0.01, "n = 43, 44 values in problem 8");
 ok(Math.abs(Math.log2(1000) / (Math.log2(3) - 1) - 17.04) < 0.01, "threshold 17.04 for c = 1000");

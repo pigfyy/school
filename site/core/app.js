@@ -15,7 +15,10 @@
                                    with .cyu-score[data-role=score|summary] around it
      article.task[data-id]         problem: .answer-spec[data-part] boxes, ol.hints, .solution with .steps
      [data-progress-bar]           optional empty div: where the page's problem progress bar goes
-     .steps                        step-by-step reveal
+     .steps                        step-by-step reveal. li[data-ask="plain text"] puts that question on the button
+                                   that reveals the step, then heads the step with it
+     .example                      a worked example: .example-head, .example-q, then its .steps
+     details.more                  optional depth, closed until opened
      nav.pager                     filled with previous / next
    Saved state goes through core/store.js; it never holds answer keys. */
 "use strict";
@@ -220,6 +223,7 @@ document.addEventListener("keydown", (e) => {
 function setupSteps() {
   $$(".steps").forEach((steps) => {
     const items = $$(":scope > ol > li", steps);
+    items.forEach((li) => { if (li.dataset.ask) li.prepend(el("p", { class: "step-q", text: li.dataset.ask })); });
     let shown = 0;
     const next = el("button", { class: "btn primary", type: "button" });
     const all = el("button", { class: "btn", type: "button", text: "Show all" });
@@ -229,7 +233,10 @@ function setupSteps() {
     function render(just) {
       items.forEach((li, i) => { li.hidden = i >= shown; li.classList.toggle("just-shown", i === just); });
       next.disabled = shown >= items.length;
-      next.textContent = shown === 0 ? "Show first step" : shown >= items.length ? "All steps shown" : "Show next step";
+      all.hidden = shown >= items.length;
+      reset.hidden = shown === 0;
+      const ask = items[shown]?.dataset.ask;
+      next.textContent = shown >= items.length ? "All steps shown" : ask ? `${ask} →` : shown === 0 ? "Show first step" : "Show next step";
       count.textContent = `${shown} of ${items.length} steps shown`;
     }
     steps._reveal = () => { if (shown < items.length) { shown++; render(shown - 1); } };
