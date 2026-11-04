@@ -215,13 +215,12 @@ Object.assign(TRUTH, {
   "cse332-w2-l3-more-examples.logn-plus-2": yn(G.relate("log n + 2", "1").o),
   "cse332-w2-l3-more-examples.n50-vs-1-1n": yn(G.relate("n^50", "1.1^n").o),
   "cse332-w2-l3-more-examples.3n-theta-2n": yn(G.relate("3^n", "2^n").theta),
-  "cse332-w2-l3-eventually-exact.n50-last-fail": S(J1("n50").lastFail),
-  "cse332-w2-l3-eventually-exact.three-two-c1000": S(J1("threeTwo").firstFail),
+  "cse332-w2-l3-eventually-exact.four-two-c1000": S((() => { let n = 1n; while (!(4n ** n > 1000n * 2n ** n)) n++; return Number(n); })()),
   "cse332-w2-l3-eventually-exact.logn-plus-2-c12": S(J1("logConst").firstFail),
-  "cse332-w2-l3-eventually-exact.n-plus-2logn-c10": S(J1("nlog").firstFail),
+  "cse332-w2-l3-eventually-exact.n-plus-2logn-pow2": S((() => { let k = 1; while (!(2 ** k + 2 * k > 10 * k)) k++; return 2 ** k; })()),
   "cse332-w2-l3-tenth-vs-log.tenth-at-2-to-40": S(J1("tenth").at40.tenth),
   "cse332-w2-l3-tenth-vs-log.bigger-at-2-to-40": BigInt(J1("tenth").at40.k10) > BigInt(J1("tenth").at40.twoK) ? "log" : "tenth",
-  "cse332-w2-l3-tenth-vs-log.crossover-k": S(J1("tenth").firstK),
+  "cse332-w2-l3-tenth-vs-log.bigger-at-2-to-60": 2n ** 6n > 60n ? "tenth" : "log",
   "cse332-w2-l3-true-statements.omega-means-best": "no",
   "cse332-w2-l3-true-statements.binary-best-theta1": J("search").filter((r) => r.found).reduce((m, r) => Math.min(m, r.binary), 99) === 1 ? "yes" : "no",
   "cse332-w2-l3-true-statements.binary-worst-omega-loglog": yn(G.relate("log n", "log log n").omega),
@@ -416,7 +415,7 @@ for (const [tid, part, good, bad] of BOUND_SOLUTIONS) {
 const text = html.replace(/<!--[\s\S]*?-->/g, "").replace(/\s+/g, " ");
 const has = (s, why) => ok(text.includes(s), `page states "${s}" (${why})`);
 has("4{,}402", "n^50 crossover"); has("between 4,401 and 4,402", "home prose");
-has("first fails at \\(n = 18\\)", "3^n vs 1000*2^n"); has("peaks at \\(n = 525\\)", "ratio peak");
+has("first fails at \\(n = 18\\)", "3^n vs 1000*2^n");
 ok(J1("binaryWorst", (r) => r.n === 1024).worst === 11 && text.includes("For \\(n = 1024\\) that's 11"), "n = 1024 worst case is 11");
 {
   const A = (n) => 10n * n + 900n, B = (n) => 100n * n - 50n; // C = n^2/100 -> compare 100*A with n^2

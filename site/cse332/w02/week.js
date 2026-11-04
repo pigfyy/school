@@ -17,8 +17,10 @@ window.WEEK.messages = {
   "log-is-constant": "log n grows without bound, slowly. For any constant c, is log n eventually bigger than c?",
   "poly-vs-exp": "It looks false for small n, but any exponential bⁿ with b > 1 eventually beats any polynomial.",
   "exp-base-dropped": "The base of an exponential isn't a multiplicative constant. Look at 3ⁿ / 2ⁿ.",
-  "first-hold-not-last-fail": "That's the first n where 1.1ⁿ is ahead. The question asks for the last n where n⁵⁰ is bigger.",
-  "peak-not-crossing": "That's where n⁵⁰/1.1ⁿ is largest, not where it drops below 1.",
+  "forgot-power": "Divide both sides by 2ⁿ: you need 2ⁿ > 1000. Which n does that?",
+  "pow2-too-early": "At n = 32, log n = 5, so 8 log n = 40, which is more than 32. Not yet.",
+  "pow2-too-late": "Check n = 64: log n = 6, so 8 log n = 48, which is already less than 64.",
+  "compare-60": "At n = 2⁶⁰, n^(1/10) = 2⁶ = 64 and log₂ n = 60. Which is bigger?",
   "used-2-to-c": "log n + 2 > 12 means log n > 10, not log n > 12.",
   "wrong-c": "That's the crossover for n > 10 log n. Here 2 log n is already on the left, so you need n > 8 log n.",
   "asymptotic-not-now": "n^(1/10) wins eventually, but compare the actual values at n = 2⁴⁰.",
@@ -832,13 +834,15 @@ const BRUTE = {
   eventually() {
     const p = Sim.raceProfile("n50", 12000);
     const lastFail = p.filter((r) => r.s === "gt").pop().to;
-    const tt = Sim.firstN((n) => Sim.threeTwoFails(1000, n));
+    let ff = 1; while (!(4n ** BigInt(ff) > 1000n * 2n ** BigInt(ff))) ff++;
     const lc = Sim.firstN((n) => Sim.logPlusTwoFails(12, n), 1, 5000);
-    const nl = Sim.firstN((n) => Sim.nPlusLogFails(10, n), 2);
+    // n = 2^j has log n = j exactly, so n + 2 log n > 10 log n is 2^j + 2j > 10j
+    const holds = (j) => 2 ** j + 2 * j > 10 * j;
+    let k = 1; while (!holds(k)) k++;
     let stays = true;
-    for (let n = nl; n <= 1000; n++) if (!Sim.nPlusLogFails(10, n)) stays = false;
-    const ok = lastFail === 4401 && tt === 18 && lc === 1025 && nl === 44 && stays && p[p.length - 1].s === "le";
-    return { ok, text: `Exact big-integer scan: n⁵⁰ > 1.1ⁿ last at n = ${fmtInt(lastFail)} (checked to 12,000); 3ⁿ > 1000·2ⁿ first at n = ${tt}; log n + 2 > 12 first at n = ${fmtInt(lc)}; 2ⁿ > n⁸ first at n = ${nl}, and it stays true to n = 1,000.` };
+    for (let j = k; j <= 30; j++) if (!holds(j)) stays = false;
+    const ok = lastFail === 4401 && ff === 10 && lc === 1025 && 2 ** k === 64 && stays && p[p.length - 1].s === "le";
+    return { ok, text: `Exact scan: 4ⁿ > 1000·2ⁿ first at n = ${ff}; log n + 2 > 12 first at n = ${fmtInt(lc)}; n + 2 log n > 10 log n first holds among powers of 2 at n = ${2 ** k}, and stays true up to 2³⁰. (n⁵⁰ > 1.1ⁿ last at n = ${fmtInt(lastFail)}.)` };
   },
   tenth() {
     const p = Sim.raceProfile("tenth", 400);

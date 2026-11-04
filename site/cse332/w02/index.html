@@ -1006,28 +1006,26 @@ public static boolean binary_contains(
     <h2>8. How long is "eventually"?</h2>
     <p class="prompt">This practices what "eventually" means in a Big-O argument: an inequality may fail for small \(n\), then hold for every \(n\) from some point on. The lecture argued four claims this way, each with "for large \(n\)":</p>
     <ul class="prompt">
-      <li>\(n^{50} \in O(1.1^n)\): eventually \(n^{50} \le 1.1^n\).</li>
-      <li>\(3^n \notin O(2^n)\): for any \(c\), eventually \(3^n &gt; c\cdot 2^n\). Here \(c = 1000\).</li>
+      <li>\(n^{50} \in O(1.1^n)\): eventually \(n^{50} \le 1.1^n\). (This one is a fact to know, not to compute: it only becomes true at \(n = 4{,}402\). "Eventually" can be far away.)</li>
+      <li>\(3^n \notin O(2^n)\): for any \(c\), eventually \(3^n &gt; c\cdot 2^n\). Below you do the same argument with \(4^n\), so the numbers come out whole. Here \(c = 1000\).</li>
       <li>\(\log n + 2 \notin O(1)\): for any \(c\), eventually \(\log n + 2 &gt; c\). Here \(c = 12\).</li>
       <li>\(n + 2\log n \notin O(\log n)\): for any \(c\), eventually \(n + 2\log n &gt; c\log n\). Here \(c = 10\).</li>
     </ul>
-    <p class="prompt">Find where "eventually" starts in each case. Use \(\log = \log_2\).</p>
-    <div class="answer-spec" data-part="n50-last-fail" data-grader="exact" data-answer="4401" data-miscon='{"4402":"first-hold-not-last-fail","525":"peak-not-crossing"}' data-label="largest \(n\) with \(n^{50} &gt; 1.1^n\)"></div>
-    <div class="answer-spec" data-part="three-two-c1000" data-grader="exact" data-answer="18" data-miscon='{"17":"strict-vs-equal"}' data-label="smallest \(n\) with \(3^n &gt; 1000\cdot 2^n\)"></div>
+    <p class="prompt">Find where "eventually" starts. Use \(\log = \log_2\). Every answer is a whole number you can reach with one or two steps, or by trying powers of 2.</p>
+    <div class="answer-spec" data-part="four-two-c1000" data-grader="exact" data-answer="10" data-miscon='{"9":"strict-vs-equal","1000":"forgot-power"}' data-label="smallest \(n\) with \(4^n &gt; 1000\cdot 2^n\)"></div>
     <div class="answer-spec" data-part="logn-plus-2-c12" data-grader="exact" data-answer="1025" data-miscon='{"1024":"strict-vs-equal","4097":"used-2-to-c","4096":"used-2-to-c"}' data-label="smallest \(n\) with \(\log n + 2 &gt; 12\)"></div>
-    <div class="answer-spec" data-part="n-plus-2logn-c10" data-grader="exact" data-answer="44" data-miscon='{"59":"wrong-c","43":"strict-vs-equal"}' data-label="smallest \(n \ge 2\) with \(n + 2\log n &gt; 10\log n\)"></div>
+    <div class="answer-spec" data-part="n-plus-2logn-pow2" data-grader="exact" data-answer="64" data-miscon='{"32":"pow2-too-early","128":"pow2-too-late"}' data-label="smallest power of 2, \(n \ge 2\), with \(n + 2\log n &gt; 10\log n\)"></div>
     <ol class="hints">
-      <li>Turn each into a comparison of whole numbers: \(n^{50} \le 1.1^n \iff n^{50}\cdot10^n \le 11^n\). \(\log n + 2 &gt; 12 \iff n &gt; 2^{10}\).</li>
-      <li>\(n + 2\log n &gt; 10\log n \iff n &gt; 8\log n \iff 2^n &gt; n^8\). For \(3^n\), use \(n &gt; \frac{\log_2 c}{\log_2 3 - 1}\).</li>
-      <li>These are small enough to check by computer. Use exact integers, not floating point. Then make sure the inequality stays true after the threshold.</li>
+      <li>Divide both sides of \(4^n &gt; 1000\cdot 2^n\) by \(2^n\). Since \(4^n = 2^n\cdot 2^n\), you get \(2^n &gt; 1000\).</li>
+      <li>\(\log n + 2 &gt; 12\) means \(\log n &gt; 10\), so \(n &gt; 2^{10}\).</li>
+      <li>Subtract \(2\log n\): you need \(n &gt; 8\log n\). Try \(n = 32\) (\(\log n = 5\)) and \(n = 64\) (\(\log n = 6\)).</li>
     </ol>
     <div class="solution">
       <div class="steps"><ol>
-        <li>\(n^{50}\cdot 10^n\) vs \(11^n\): the ratio \(n^{50}/1.1^n\) peaks at \(n = 525\), then falls forever. It drops to 1 or below between 4,401 and 4,402. So 4,401 is the last \(n\) where \(n^{50}\) is bigger.</li>
-        <li>\(3^n &gt; 1000\cdot2^n \iff 1.5^n &gt; 1000 \iff n &gt; \frac{\log_2 1000}{\log_2 3 - 1} \approx 17.04\). So \(n = 18\).</li>
+        <li>\(4^n &gt; 1000\cdot 2^n \iff 2^n &gt; 1000\). \(2^9 = 512\) is too small and \(2^{10} = 1024\) is enough, so \(n = 10\).</li>
         <li>\(\log n + 2 &gt; 12 \iff \log n &gt; 10 \iff n &gt; 1024\). So \(n = 1025\).</li>
-        <li>\(2^n &gt; n^8\): at \(n = 43\), \(2^{43} \approx 8.80\cdot10^{12} &lt; 43^8 \approx 1.17\cdot10^{13}\). At \(n = 44\), \(2^{44} \approx 1.76\cdot10^{13} &gt; 44^8 \approx 1.40\cdot10^{13}\). After that \(2^n\) doubles while \(n^8\) grows by less than a factor of 1.2.</li>
-        <li class="answer">4,401; 18; 1,025; 44. "Eventually" can be far away (4,401) or close (18). The definition only needs it to happen at some fixed \(n_0\).</li>
+        <li>\(n &gt; 8\log n\): at \(n = 32\), \(8\cdot5 = 40\), and 32 isn't bigger. At \(n = 64\), \(8\cdot6 = 48 &lt; 64\). From there \(n\) doubles at each power of 2 while \(8\log n\) only grows by 8, so it stays true.</li>
+        <li class="answer">10; 1,025; 64. "Eventually" can be close (10) or far away (\(n^{50}\)'s 4,402). The definition only needs it to happen at some fixed \(n_0\).</li>
       </ol></div>
       <div class="step-bar"><button class="btn" type="button" data-brute="eventually">Check by brute force</button><span class="brute"></span></div>
     </div>
@@ -1035,19 +1033,19 @@ public static boolean binary_contains(
 
   <article class="task" data-id="cse332-w2-l3-tenth-vs-log">
     <h2>9. \(n^{1/10}\) vs. \(\log n\)</h2>
-    <p class="prompt">This practices the lecture's warning that \(O\) can mislead for real input sizes. \(n^{1/10}\) grows faster than \(\log_2 n\), so \(\log_2 n \in O(n^{1/10})\). But the lecture says the crossover is around \(5\cdot10^{17}\). Find out how far away that is. Work with \(n = 2^k\), so \(\log_2 n = k\) and \(n^{1/10} = 2^{k/10}\).</p>
+    <p class="prompt">This practices the lecture's warning that \(O\) can mislead for real input sizes. \(n^{1/10}\) grows faster than \(\log_2 n\), so \(\log_2 n \in O(n^{1/10})\). But the lecture says the crossover is around \(5\cdot10^{17}\). Compare the two at a trillion-ish input and at a much larger one. Work with \(n = 2^k\), so \(\log_2 n = k\) and \(n^{1/10} = 2^{k/10}\).</p>
     <div class="answer-spec" data-part="tenth-at-2-to-40" data-grader="exact" data-answer="16" data-label="the value of \(n^{1/10}\) at \(n = 2^{40}\)"></div>
     <div class="answer-spec" data-part="bigger-at-2-to-40" data-grader="choice" data-choices='["tenth","log"]' data-options="tenth:n^(1/10) is larger|log:log₂ n is larger" data-answer="log" data-miscon='{"tenth":"asymptotic-not-now"}' data-label="which is larger at \(n = 2^{40}\)?"></div>
-    <div class="answer-spec" data-part="crossover-k" data-grader="exact" data-answer="59" data-miscon='{"58":"strict-vs-equal","60":"strict-vs-equal"}' data-label="the smallest \(k \ge 2\) such that \(n^{1/10} &gt; \log_2 n\) for \(n = 2^k\) and every larger power of 2"></div>
+    <div class="answer-spec" data-part="bigger-at-2-to-60" data-grader="choice" data-choices='["tenth","log"]' data-options="tenth:n^(1/10) is larger|log:log₂ n is larger" data-answer="tenth" data-miscon='{"log":"compare-60"}' data-label="which is larger at \(n = 2^{60}\)?"></div>
     <ol class="hints">
       <li>\(2^{40/10} = 2^4\).</li>
-      <li>\(2^{k/10} &gt; k \iff 2^k &gt; k^{10}\). The crossover is around \(5\cdot10^{17}\), and \(2^{58} \approx 2.9\cdot10^{17}\).</li>
+      <li>At \(n = 2^{60}\): \(n^{1/10} = 2^{60/10}\), and \(\log_2 n = 60\).</li>
     </ol>
     <div class="solution">
       <div class="steps"><ol>
         <li>\(n^{1/10} = 2^{4} = 16\) and \(\log_2 n = 40\). So \(\log n\) is larger at \(n = 2^{40}\), about a trillion.</li>
-        <li>\(k = 58\): \(2^{58} \approx 2.88\cdot10^{17} &lt; 58^{10} \approx 4.31\cdot10^{17}\), so \(\log n\) is still larger. \(k = 59\): \(2^{59} \approx 5.76\cdot10^{17} &gt; 59^{10} \approx 5.11\cdot10^{17}\). From then on \(2^k\) doubles each step and \(k^{10}\) grows by less than a factor of 2.</li>
-        <li class="answer">16; log; 59. That's \(n = 2^{59} \approx 5.8\cdot10^{17}\), matching "around \(5\cdot10^{17}\)".</li>
+        <li>At \(n = 2^{60}\): \(n^{1/10} = 2^6 = 64\) and \(\log_2 n = 60\). Now \(n^{1/10}\) is larger. (The exact switch is at \(n = 2^{59} \approx 5.8\cdot10^{17}\), matching the lecture's "around \(5\cdot10^{17}\)".)</li>
+        <li class="answer">16; log; \(n^{1/10}\). The class that wins "eventually" lost for every input up to about \(10^{17}\), far beyond any real list.</li>
       </ol></div>
       <div class="step-bar"><button class="btn" type="button" data-brute="tenth">Check by brute force</button><span class="brute"></span></div>
     </div>
