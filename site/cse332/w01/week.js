@@ -35,7 +35,7 @@ window.WEEK.messages = {
   "binary-for-linear": "That's binary search's count. contains checks items one at a time from the start, so it can't skip any.",
   "stopped-early": "Close. The loop still runs one more time when end − start is 1.",
   "strict-vs-equal": "At that n the two sides aren't in the right order yet. Check that value directly.",
-  "dropped-constant": "Your crossover ignores the +900. Solve the full inequality.",
+  "forgot-divide": "Remember C divides by 100: compare n²/100, not n², with 10n.",
   "biggest-coefficient": "B has the biggest coefficient, but for large n the highest power of n wins.",
   "not-tight": "That's a valid upper bound, but not the tightest bucket. Drop constants and lower-order terms of the actual count.",
   "too-small": "That bucket grows too slowly. Find the dominant term of the count.",
@@ -772,10 +772,10 @@ const BRUTE = {
   },
   crossovers() {
     const A = (n) => Sim.algValue("A", n), B = (n) => Sim.algValue("B", n), C = (n) => Sim.algValue("C", n);
-    const ab = Sim.firstN((n) => A(n) < B(n)), ca = Sim.firstN((n) => C(n) > A(n));
+    const ab = Sim.firstN((n) => A(n) < B(n)), c10 = Sim.firstN((n) => C(n) > 10n * n * 100n), ca = Sim.firstN((n) => C(n) > A(n));
     let stays = true;
-    for (let n = BigInt(ca); n < 100000n; n++) if (!(C(n) > A(n))) { stays = false; break; }
-    return { ok: ab === 11 && ca === 1084 && stays, text: `Exact integer arithmetic over n = 1 … 100,000: A < B first at n = ${ab}; C > A first at n = ${ca}, and C stays above A for every n in the range checked. (That's a check, not a proof: the algebra in step 2 covers all n.)` };
+    for (let n = BigInt(c10); n < 100000n; n++) if (!(C(n) > 10n * n * 100n)) { stays = false; break; }
+    return { ok: ab === 11 && c10 === 1001 && ca === 1084 && stays, text: `Exact arithmetic over n = 1 … 100,000: A < B first at n = ${ab}; C > 10n first at n = ${c10}, and it stays above; C > A (with the +900) first at n = ${ca}.` };
   },
 };
 

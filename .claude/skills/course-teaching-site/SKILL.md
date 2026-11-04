@@ -68,6 +68,10 @@ of `site/core/grader.js`. Answer keys go either in the markup (`data-type`, `dat
   - All parts of one problem are about one thing, and each part's label says exactly what to enter. Don't tack an
     unrelated question onto the end (binary search iterations, then suddenly linear search comparisons).
   - Write all math in KaTeX, answer labels included: \(\frac{n}{2^x} = 1\), not "n/2^x = 1".
+- **Keep the algebra light.** A problem tests the lecture's idea, not algebra stamina. Answers land on whole numbers
+  (or simple fractions), reachable with a step or two of ordinary algebra or by plugging in values. No quadratic
+  formula, square roots or messy decimals. If the course's own numbers make that impossible, change what's asked
+  (compare with a simpler function, plug in given values) and state the messy result as a fact instead.
 - **Every check asks something new.** A quick check that repeats a widget or check right above it is noise. Test
   the next idea instead: why a line exists, what breaks if it changes, what stays the same when you swap structures.
 - **No instructor-facing notes** ("ask the room…", `<details class="notes">`). Anything worth knowing, like a common

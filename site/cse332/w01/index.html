@@ -1469,7 +1469,7 @@ private void resize(){
     <ul>
       <li><strong>Small \(n\):</strong> C is best by far. For the very smallest \(n\), B even beats A.</li>
       <li><strong>A little later:</strong> A passes B for good. Both grow like \(n\), and A's 10 per item is less than B's 100.</li>
-      <li><strong>Past about a thousand:</strong> C becomes slower than A, and later slower than B too. From then on it only falls further behind: \(n^2\) eventually passes any constant times \(n\). (Exercise 8 finds the exact crossover points.)</li>
+      <li><strong>Past about a thousand:</strong> C becomes slower than A, and later slower than B too. From then on it only falls further behind: \(n^2\) eventually passes any constant times \(n\). (Exercise 8 works out where the order changes.)</li>
     </ul>
     <p>Small inputs are fast with almost any algorithm. What separates algorithms is large \(n\), so we compare how running times grow and ignore constant factors, which depend on the machine and the code anyway. In that sense A and B are "the same" (both linear), and C is worse (quadratic).</p>
   </div>
@@ -1724,19 +1724,20 @@ private void resize(){
     <h2>8. Comparing A, B and C</h2>
     <p class="prompt">The lecture's three algorithms. They solve the same problem, and their worst-case running times are:</p>
     <div class="rule"><p>\[A(n) = 10n + 900 \qquad B(n) = 100n - 50 \qquad C(n) = \frac{n^2}{100}\]</p></div>
-    <p class="prompt">Which is fastest depends on \(n\). Find where the order changes.</p>
+    <p class="prompt">Which is fastest depends on \(n\). Find where the order changes. Every answer is a whole number, and plugging in values is a fine way to check.</p>
     <div class="answer-spec" data-part="a-below-b" data-grader="exact" data-answer="11" data-miscon='{"10":"strict-vs-equal"}' data-label="the smallest \(n \ge 1\) where \(A(n) &lt; B(n)\)"></div>
-    <div class="answer-spec" data-part="c-above-a" data-grader="exact" data-answer="1084" data-miscon='{"1083":"strict-vs-equal","1000":"dropped-constant"}' data-label="the smallest \(n \ge 1\) where \(C(n) &gt; A(n)\)"></div>
+    <div class="answer-spec" data-part="c-above-10n" data-grader="exact" data-answer="1001" data-miscon='{"1000":"strict-vs-equal","100":"forgot-divide"}' data-label="the smallest \(n \ge 1\) where \(C(n) &gt; 10n\) (that's \(A\) without its \(+900\))"></div>
     <div class="answer-spec" data-part="slowest-eventually" data-grader="choice" data-choices='["a","b","c"]' data-answer="c" data-miscon='{"b":"biggest-coefficient"}' data-label="which is slowest for every large \(n\)? (a, b or c)"></div>
     <ol class="hints">
-      <li>Solve each inequality for \(n\), then take the smallest integer that satisfies it.</li>
-      <li>\(\frac{n^2}{100} &gt; 10n + 900 \iff n^2 - 1000n - 90000 &gt; 0\). Find the positive root.</li>
+      <li>For A and B, compute both at \(n = 10\) and at \(n = 11\).</li>
+      <li>For C, multiply both sides of \(\frac{n^2}{100} &gt; 10n\) by 100, then divide both sides by \(n\).</li>
     </ol>
     <div class="solution">
       <div class="steps"><ol>
-        <li>\(10n + 900 &lt; 100n - 50 \iff 950 &lt; 90n \iff n &gt; 10.5\), so \(n = 11\).</li>
-        <li>\(n^2 - 1000n - 90000 = 0\) has positive root \(500 + \sqrt{340000} \approx 1083.1\), so \(n = 1084\). Check: \(C(1083) = 11{,}728.89 &lt; 11{,}730 = A(1083)\), and \(C(1084) = 11{,}750.56 &gt; 11{,}740\).</li>
-        <li class="answer">11; 1084; C (it's \(\Theta(n^2)\), and A and B are \(\Theta(n)\)).</li>
+        <li>At \(n = 10\): \(A = 1000\), \(B = 950\), so B is still faster. At \(n = 11\): \(A = 1010\), \(B = 1050\), so A is faster, and it stays ahead because A grows by 10 per step and B by 100. Answer: 11.</li>
+        <li>\(\frac{n^2}{100} &gt; 10n \iff n^2 &gt; 1000n \iff n &gt; 1000\). The smallest whole number above 1000 is 1001.</li>
+        <li>Putting the \(+900\) back only delays the crossover a little: C passes the real \(A\) at \(n = 1084\). A constant can make C look good for a while, but it can't stop \(n^2\) from winning.</li>
+        <li class="answer">11; 1001; C (it's \(\Theta(n^2)\), and A and B are \(\Theta(n)\)).</li>
       </ol></div>
       <div class="step-bar"><button class="btn" data-brute="crossovers">Check by brute force</button><span class="brute"></span></div>
     </div>

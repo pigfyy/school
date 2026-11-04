@@ -128,7 +128,7 @@ const TRUTH = {
   "cse332-w1-l2-linear-vs-binary.linear-million": S(Sim.linearSearch(Array.from({ length: 1000000 }, (_, i) => i), -1).comparisons),
   "cse332-w1-l2-linear-vs-binary.binary-million": S(Sim.binaryWorstExhaustive(1000000)),
   "cse332-w1-l2-compare-abc.a-below-b": S(cross.aBelowB),
-  "cse332-w1-l2-compare-abc.c-above-a": S(cross.cAboveA),
+  "cse332-w1-l2-compare-abc.c-above-10n": S(Sim.firstN((n) => Sim.algValue("C", n) > 10n * n * 100n)),
   "cse332-w1-l2-cyu-myfunction-n5": S(J("myFunction").find((r) => r.n === 5).ops),
   "cse332-w1-l2-cyu-beannoying-n7": S(J("beAnnoying").find((r) => r.n === 7).prints),
   "cse332-w1-l2-cyu-arraylist-c2": S(J("arrayList").find((r) => r.c === 2 && r.adds === 14).total),
