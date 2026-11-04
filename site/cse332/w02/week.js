@@ -6,6 +6,7 @@ window.WEEK.messages = {
   "stopped-early": "Close. The loop still runs one more time when end − start is 1.",
   "rounded-up": "Check which power of 2 is just below n. The worst case is ⌊log₂ n⌋ + 1.",
   "doubled-log": "Doubling n adds one more halving, not twice as many.",
+  "log-power": "The log shrinks things a lot: log₂(n²) is far smaller than n or n². Rewrite it with log(aᵏ) = k·log a, then drop the constant.",
   "strict-vs-equal": "Check that exact value of n directly. Is the inequality true there, and for every n after it?",
   "forgot-c": "Don't drop c. Solve 3n² + 17 ≤ 4n², which is n² ≥ 17.",
   "not-smallest": "That n₀ works, but it isn't the smallest. Try smaller values.",

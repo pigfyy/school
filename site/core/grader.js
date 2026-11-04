@@ -437,7 +437,8 @@
   }
   // Big-O bucket answers. want is any expression ("n^2", "n log n", "2^n", "log n"). Exact class match;
   // a correct but unsimplified bucket is accepted with a nudge (extra terms, a constant factor, a log base).
-  function checkBigO(raw, want) {
+  // miscon keys are Big-O answers too, matched by growth class: { "n": "log-power" } also catches "2n" and "O(n)".
+  function checkBigO(raw, want, miscon = {}) {
     const s = stripWrapper(normalizeExpr(raw));
     if (!s) return { ok: null, normalized: null };
     const got = parseAsym(s);
@@ -450,6 +451,10 @@
       if (got.lead && !eq(got.lead, ONE)) return { ok: true, normalized, tag: "simplify-constant" };
       if (got.base) return { ok: true, normalized, tag: "simplify-base" };
       return { ok: true, normalized };
+    }
+    for (const [key, tag] of Object.entries(miscon)) {
+      const m = parseAsym(stripWrapper(normalizeExpr(key)));
+      if (m.ok && clsCmp(m.cls, got.cls) === 0) return { ok: false, normalized, tag };
     }
     return { ok: false, normalized, tag: c > 0 ? "not-tight" : "too-small" };
   }
@@ -806,7 +811,7 @@
       case "exact": return fromCheck(spec, checkExact(raw, spec.answer, spec.miscon));
       case "decimal": return fromCheck(spec, checkDecimal(raw, spec.answer, spec.tol, spec.miscon));
       case "formula": return fromCheck(spec, checkFormula(raw, spec.answer, spec.points, spec.miscon));
-      case "bigo": return fromCheck(spec, checkBigO(raw, spec.answer));
+      case "bigo": return fromCheck(spec, checkBigO(raw, spec.answer, spec.miscon));
     }
     const normalized = normalizeFor(spec, raw);
     if (normalized === null) {

@@ -366,6 +366,7 @@ for (const m of html.matchAll(/<(div|li)\s[^>]*(data-answer|data-grader|data-bou
       else if (grader === "yesno") r = G.checkYesNo(k, answer);
       else if (grader === "choice") r = G.checkChoice(k, answer, choices);
       else if (grader === "formula") r = G.checkFormula(k, answer, points);
+      else if (grader === "bigo") r = G.checkBigO(k, answer);
       ok(r && r.ok === false, `${id}: misconception key "${k}" must be wrong`);
     }
   }
