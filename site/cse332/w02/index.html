@@ -523,7 +523,7 @@ public static boolean binary_contains(
   </div>
 
   <div class="check" data-id="cse332-w2-l3-proofs-why-increasing" data-grader="mc">
-    <p>Quick check: Example 1's proof ends with "\(n(n-1)\) is strictly increasing and \(10(10-1) &gt; 10\)". Why are both halves needed?</p>
+    <p>Quick check: the proof of \(10n + 100 \in O(n^2)\) above ends with "\(n(n-1)\) is strictly increasing and \(10(10-1) &gt; 10\)". Why are both halves needed?</p>
     <div class="opts">
       <label><input type="radio" name="cse332-w2-l3-proofs-why-increasing"> The second half alone proves it; the first is decoration<span class="why" hidden>The second half only covers n = 10. The proof has to cover every n ≥ 10.</span></label>
       <label data-correct><input type="radio" name="cse332-w2-l3-proofs-why-increasing"> The second shows it holds at n = 10, and the first shows it keeps holding for every larger n<span class="why" hidden>Right. A starting point plus "it only gets bigger" covers all n ≥ n₀.</span></label>
@@ -533,7 +533,7 @@ public static boolean binary_contains(
     <p class="feedback" role="status"></p>
   </div>
   <div class="check" data-id="cse332-w2-l3-proofs-c13-direction" data-grader="mc">
-    <p>Quick check: in Example 2, trying \(c = 13\) led to \(-50 \ge 0\). What should you do next?</p>
+    <p>Quick check: proving \(13n^2 - 50n \in \Omega(n^2)\) above, trying \(c = 13\) led to \(-50 \ge 0\). What should you do next?</p>
     <div class="opts">
       <label><input type="radio" name="cse332-w2-l3-proofs-c13-direction"> Pick a bigger \(n_0\)<span class="why" hidden>−50 ≥ 0 has no n in it: it's false for every n, so no n₀ can fix it.</span></label>
       <label><input type="radio" name="cse332-w2-l3-proofs-c13-direction"> Pick a bigger \(c\)<span class="why" hidden>A bigger c makes c·n² bigger, and a lower bound needs f to stay above it. That's harder, not easier.</span></label>
@@ -849,10 +849,26 @@ public static boolean binary_contains(
 
   <article class="task" data-id="cse332-w2-l3-gap-halving">
     <h2>1. Halving the gap</h2>
-    <p class="prompt">Use the halving argument and <code>binary_contains</code> (the gap is <code>end - start</code>; it starts at \(n\) and roughly halves each iteration).</p>
-    <div class="answer-spec" data-part="solve-4096" data-grader="exact" data-answer="12" data-miscon='{"2048":"halved-once","4096":"linear-count"}' data-label="solve \(\frac{n}{2^x} = 1\) for \(n = 4096\)"></div>
-    <div class="answer-spec" data-part="worst-2-to-20" data-grader="exact" data-answer="21" data-miscon='{"20":"stopped-early","1048576":"linear-count"}' data-label="worst-case loop iterations, \(n = 2^{20}\)"></div>
-    <div class="answer-spec" data-part="worst-million" data-grader="exact" data-answer="20" data-miscon='{"21":"rounded-up","19":"stopped-early","1000000":"linear-count"}' data-label="worst-case loop iterations, \(n = 1{,}000{,}000\)"></div>
+    <p class="prompt">This practices the lecture's argument for why binary search takes about \(\log_2 n\) loop iterations. Here is the lecture's binary search on a sorted list <code>a</code> of \(n\) items:</p>
+    <pre class="code">public static boolean binary_contains(
+        List&lt;Integer&gt; a, int k){
+    int start = 0;
+    int end = a.size();
+    while(start &lt; end){
+        int mid = start + (end-start)/2;
+        if(a.get(mid) == k)
+               return true;
+        else if(a.get(mid) &lt; k)
+               start = mid+1;
+        else
+               end = mid;
+    }
+    return false;
+}</pre>
+    <p class="prompt">The <strong>gap</strong> is <code>end - start</code>, the number of items that could still hold \(k\). It starts at \(n\), and each iteration of the <code>while</code> loop roughly halves it. After \(x\) iterations about \(\frac{n}{2^x}\) items are left. One iteration is one pass through the loop body. The worst case is a \(k\) that makes the loop run as many times as possible.</p>
+    <div class="answer-spec" data-part="solve-4096" data-grader="exact" data-answer="12" data-miscon='{"2048":"halved-once","4096":"linear-count"}' data-label="the \(x\) with \(\frac{n}{2^x} = 1\) when \(n = 4096\)"></div>
+    <div class="answer-spec" data-part="worst-2-to-20" data-grader="exact" data-answer="21" data-miscon='{"20":"stopped-early","1048576":"linear-count"}' data-label="worst-case loop iterations for \(n = 2^{20}\)"></div>
+    <div class="answer-spec" data-part="worst-million" data-grader="exact" data-answer="20" data-miscon='{"21":"rounded-up","19":"stopped-early","1000000":"linear-count"}' data-label="worst-case loop iterations for \(n = 1{,}000{,}000\)"></div>
     <ol class="hints">
       <li>\(\frac{n}{2^x} = 1\) means \(2^x = n\). For the loop counts, write down the gaps: \(n, \lfloor n/2\rfloor, \dots, 1\). Each gap is one iteration.</li>
       <li>\(2^{20} = 1{,}048{,}576\). Is \(1{,}000{,}000\) above or below that?</li>
@@ -870,11 +886,11 @@ public static boolean binary_contains(
 
   <article class="task" data-id="cse332-w2-l3-log-base">
     <h2>2. The base of the log</h2>
-    <p class="prompt">Change of base: \(\log_c n = \frac{\log_2 n}{\log_2 c}\).</p>
-    <div class="answer-spec" data-part="log8-divisor" data-grader="exact" data-answer="3" data-miscon='{"8":"base-not-log"}' data-label="\(\log_8 n = \frac{\log_2 n}{?}\)"></div>
-    <div class="answer-spec" data-part="log8-at-2-to-30" data-grader="exact" data-answer="10" data-miscon='{"30":"base-ignored","90":"base-multiplied"}' data-label="\(\log_8 n\) at \(n = 2^{30}\)"></div>
-    <div class="answer-spec" data-part="log5-in-o-log2" data-grader="yesno" data-answer="yes" data-label="Is \(\log_5 n \in O(\log_2 n)\)?"></div>
-    <div class="answer-spec" data-part="log2-in-o-log5" data-grader="yesno" data-answer="yes" data-label="Is \(\log_2 n \in O(\log_5 n)\)?"></div>
+    <p class="prompt">This practices the lecture's claim that the base of a log doesn't matter inside \(O(\,)\). The tool is the change-of-base rule: \(\log_c n = \frac{\log_2 n}{\log_2 c}\), so changing the base only divides by a constant.</p>
+    <div class="answer-spec" data-part="log8-divisor" data-grader="exact" data-answer="3" data-miscon='{"8":"base-not-log"}' data-label="the number \(d\) in \(\log_8 n = \frac{\log_2 n}{d}\)"></div>
+    <div class="answer-spec" data-part="log8-at-2-to-30" data-grader="exact" data-answer="10" data-miscon='{"30":"base-ignored","90":"base-multiplied"}' data-label="the value of \(\log_8 n\) at \(n = 2^{30}\)"></div>
+    <div class="answer-spec" data-part="log5-in-o-log2" data-grader="yesno" data-answer="yes" data-label="Is \(\log_5 n \in O(\log_2 n)\)? (yes or no)"></div>
+    <div class="answer-spec" data-part="log2-in-o-log5" data-grader="yesno" data-answer="yes" data-label="Is \(\log_2 n \in O(\log_5 n)\)? (yes or no)"></div>
     <ol class="hints">
       <li>\(\log_2 8\) is a small whole number.</li>
       <li>For the last two, the ratio of the two functions is a constant both ways round. What does that give you for \(c\)?</li>
@@ -888,11 +904,12 @@ public static boolean binary_contains(
   </article>
 
   <article class="task" data-id="cse332-w2-l3-example1-bigo">
-    <h2>3. Example 1: \(10n + 100 \in O(n^2)\)</h2>
-    <p class="prompt">Find \(c &gt; 0\) and \(n_0 &gt; 0\) with \(10n + 100 \le c\cdot n^2\) for all \(n \ge n_0\). Then find the smallest \(n_0\) that works with the lecture's \(c = 10\).</p>
+    <h2>3. Prove \(10n + 100 \in O(n^2)\)</h2>
+    <p class="prompt">This is the lecture's first Big-O proof. It practices the first step of any such proof: choosing the constants. The definition: \(f(n) \in O(g(n))\) when there are constants \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). The lecture chose \(c = 10\) and \(n_0 = 10\).</p>
+    <p class="prompt">Find your own \(c\) and \(n_0\) with \(10n + 100 \le c\cdot n^2\) for all \(n \ge n_0\). Then find the smallest \(n_0\) that works when \(c = 10\).</p>
     <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["100","10"],"g":["0","0","1"],"rel":"O"}' data-label="your \(c\)"></div>
     <div class="answer-spec" data-part="n0" data-grader="bound" data-role="n0" data-label="your \(n_0\)"></div>
-    <div class="answer-spec" data-part="smallest-n0-c10" data-grader="exact" data-answer="4" data-miscon='{"10":"not-smallest","3":"strict-vs-equal"}' data-label="smallest \(n_0\) for \(c = 10\)"></div>
+    <div class="answer-spec" data-part="smallest-n0-c10" data-grader="exact" data-answer="4" data-miscon='{"10":"not-smallest","3":"strict-vs-equal"}' data-label="the smallest \(n_0\) that works with \(c = 10\)"></div>
     <ol class="hints">
       <li>With \(c = 10\), divide both sides by 10: you need \(n + 10 \le n^2\).</li>
       <li>\(n + 10 \le n^2 \iff 10 \le n(n-1)\). Try \(n = 3\) and \(n = 4\).</li>
@@ -906,12 +923,13 @@ public static boolean binary_contains(
   </article>
 
   <article class="task" data-id="cse332-w2-l3-example2-omega">
-    <h2>4. Example 2: \(13n^2 - 50n \in \Omega(n^2)\)</h2>
-    <p class="prompt">Find \(c &gt; 0\) and \(n_0 &gt; 0\) with \(13n^2 - 50n \ge c\cdot n^2\) for all \(n \ge n_0\).</p>
+    <h2>4. Prove \(13n^2 - 50n \in \Omega(n^2)\)</h2>
+    <p class="prompt">This is the lecture's second proof, a lower bound. \(f(n) \in \Omega(g(n))\) is the same definition as \(O\) with the inequality flipped: there are \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \ge c\cdot g(n)\) for every \(n \ge n_0\). The lecture first tried \(c = 13\), saw it fail, and used \(c = 12\), \(n_0 = 50\).</p>
+    <p class="prompt">Find your own \(c\) and \(n_0\) with \(13n^2 - 50n \ge c\cdot n^2\) for all \(n \ge n_0\). Then answer two questions about the choice of \(c\).</p>
     <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["0","-50","13"],"g":["0","0","1"],"rel":"Omega"}' data-label="your \(c\)"></div>
     <div class="answer-spec" data-part="n0" data-grader="bound" data-role="n0" data-label="your \(n_0\)"></div>
-    <div class="answer-spec" data-part="smallest-n0-c12" data-grader="exact" data-answer="50" data-miscon='{"49":"strict-vs-equal","51":"strict-vs-equal"}' data-label="smallest \(n_0\) for \(c = 12\)"></div>
-    <div class="answer-spec" data-part="c13-possible" data-grader="yesno" data-answer="no" data-miscon='{"yes":"c13-works"}' data-label="Can \(c = 13\) work with some \(n_0\)?"></div>
+    <div class="answer-spec" data-part="smallest-n0-c12" data-grader="exact" data-answer="50" data-miscon='{"49":"strict-vs-equal","51":"strict-vs-equal"}' data-label="the smallest \(n_0\) that works with \(c = 12\)"></div>
+    <div class="answer-spec" data-part="c13-possible" data-grader="yesno" data-answer="no" data-miscon='{"yes":"c13-works"}' data-label="Is there any \(n_0\) that works with \(c = 13\)? (yes or no)"></div>
     <ol class="hints">
       <li>Divide both sides by \(n\) (fine for \(n \ge 1\)): you need \(13n - 50 \ge c\cdot n\).</li>
       <li>With \(c = 13\) the \(n\)s cancel. What's left?</li>
@@ -926,7 +944,7 @@ public static boolean binary_contains(
 
   <article class="task" data-id="cse332-w2-l3-sq17-theta">
     <h2>5. \(3n^2 + 17 \in \Theta(n^2)\)</h2>
-    <p class="prompt">\(\Theta\) needs both bounds. Give a pair for \(O\) and a pair for \(\Omega\).</p>
+    <p class="prompt">This practices the lecture's tight bound, \(\Theta\). \(f \in \Theta(g)\) means both \(f \in O(g)\) (some \(c\), \(n_0\) with \(f(n) \le c\cdot g(n)\) for all \(n \ge n_0\)) and \(f \in \Omega(g)\) (some \(c\), \(n_0\) with \(f(n) \ge c\cdot g(n)\) for all \(n \ge n_0\)). The two pairs don't have to match. Give one pair for each.</p>
     <div class="answer-spec" data-part="upper-c" data-grader="bound" data-role="c" data-pair="upper" data-bound='{"f":["17","0","3"],"g":["0","0","1"],"rel":"O"}' data-label="\(O\): your \(c\)"></div>
     <div class="answer-spec" data-part="upper-n0" data-grader="bound" data-role="n0" data-pair="upper" data-label="\(O\): your \(n_0\)"></div>
     <div class="answer-spec" data-part="lower-c" data-grader="bound" data-role="c" data-pair="lower" data-bound='{"f":["17","0","3"],"g":["0","0","1"],"rel":"Omega"}' data-label="\(\Omega\): your \(c\)"></div>
@@ -943,12 +961,12 @@ public static boolean binary_contains(
   </article>
 
   <article class="task" data-id="cse332-w2-l3-intuition-buckets">
-    <h2>6. Simplest buckets</h2>
-    <p class="prompt">The lecture's examples. Give the simplest \(\Theta\) bucket for each.</p>
-    <div class="answer-spec" data-part="four-n-plus-five" data-grader="bigo" data-answer="n" data-label="\(4n + 5\)"></div>
-    <div class="answer-spec" data-part="half-nlogn" data-grader="bigo" data-answer="n log n" data-label="\(0.5n\log n + 2n + 7\)"></div>
-    <div class="answer-spec" data-part="cube-plus-exp" data-grader="bigo" data-answer="2^n" data-label="\(n^3 + 2^n + 3n\)"></div>
-    <div class="answer-spec" data-part="nlog-10n2" data-grader="bigo" data-answer="n log n" data-label="\(n\log(10n^2)\)"></div>
+    <h2>6. Simplest \(\Theta\) classes</h2>
+    <p class="prompt">This practices the lecture's shortcut for finding a function's \(\Theta\) class: keep only the fastest-growing term and drop its constant factor. Write the simplest class, like <code>n^2</code> or <code>n log n</code>. These four functions are the lecture's examples.</p>
+    <div class="answer-spec" data-part="four-n-plus-five" data-grader="bigo" data-answer="n" data-label="simplest \(\Theta\) class of \(4n + 5\)"></div>
+    <div class="answer-spec" data-part="half-nlogn" data-grader="bigo" data-answer="n log n" data-label="simplest \(\Theta\) class of \(0.5n\log n + 2n + 7\)"></div>
+    <div class="answer-spec" data-part="cube-plus-exp" data-grader="bigo" data-answer="2^n" data-label="simplest \(\Theta\) class of \(n^3 + 2^n + 3n\)"></div>
+    <div class="answer-spec" data-part="nlog-10n2" data-grader="bigo" data-answer="n log n" data-label="simplest \(\Theta\) class of \(n\log(10n^2)\)"></div>
     <ol class="hints">
       <li>For each sum, find the term that grows fastest and drop its coefficient.</li>
       <li>For the last one, use \(\log(ab) = \log a + \log b\) and \(\log(n^k) = k\log n\).</li>
@@ -964,12 +982,12 @@ public static boolean binary_contains(
 
   <article class="task" data-id="cse332-w2-l3-more-examples">
     <h2>7. True or false?</h2>
-    <p class="prompt">The lecture's five claims. Decide each one.</p>
-    <div class="answer-spec" data-part="four-plus-3n" data-grader="yesno" data-answer="yes" data-label="\(4 + 3n \in O(n)\)"></div>
-    <div class="answer-spec" data-part="n-plus-2logn" data-grader="yesno" data-answer="no" data-miscon='{"yes":"bigger-in-smaller"}' data-label="\(n + 2\log n \in O(\log n)\)"></div>
-    <div class="answer-spec" data-part="logn-plus-2" data-grader="yesno" data-answer="no" data-miscon='{"yes":"log-is-constant"}' data-label="\(\log n + 2 \in O(1)\)"></div>
-    <div class="answer-spec" data-part="n50-vs-1-1n" data-grader="yesno" data-answer="yes" data-miscon='{"no":"poly-vs-exp"}' data-label="\(n^{50} \in O(1.1^n)\)"></div>
-    <div class="answer-spec" data-part="3n-theta-2n" data-grader="yesno" data-answer="no" data-miscon='{"yes":"exp-base-dropped"}' data-label="\(3^n \in \Theta(2^n)\)"></div>
+    <p class="prompt">This practices deciding a Big-O claim by asking which side grows faster in the long run. \(f \in O(g)\) means that from some \(n_0\) on, \(f(n) \le c\cdot g(n)\) for one fixed constant \(c\). \(\Theta\) means both \(\le\) and \(\ge\) that way. These five claims are the lecture's. Answer yes if the claim is true, no if it is false.</p>
+    <div class="answer-spec" data-part="four-plus-3n" data-grader="yesno" data-answer="yes" data-label="Is \(4 + 3n \in O(n)\)?"></div>
+    <div class="answer-spec" data-part="n-plus-2logn" data-grader="yesno" data-answer="no" data-miscon='{"yes":"bigger-in-smaller"}' data-label="Is \(n + 2\log n \in O(\log n)\)?"></div>
+    <div class="answer-spec" data-part="logn-plus-2" data-grader="yesno" data-answer="no" data-miscon='{"yes":"log-is-constant"}' data-label="Is \(\log n + 2 \in O(1)\)?"></div>
+    <div class="answer-spec" data-part="n50-vs-1-1n" data-grader="yesno" data-answer="yes" data-miscon='{"no":"poly-vs-exp"}' data-label="Is \(n^{50} \in O(1.1^n)\)?"></div>
+    <div class="answer-spec" data-part="3n-theta-2n" data-grader="yesno" data-answer="no" data-miscon='{"yes":"exp-base-dropped"}' data-label="Is \(3^n \in \Theta(2^n)\)?"></div>
     <ol class="hints">
       <li>For each one, ask which side grows faster in the long run. \(O\) means "\(\le\) eventually, up to a constant".</li>
       <li>Any exponential \(b^n\) with \(b &gt; 1\) eventually beats any polynomial. And \(3^n / 2^n = 1.5^n\) isn't bounded.</li>
@@ -986,7 +1004,14 @@ public static boolean binary_contains(
 
   <article class="task" data-id="cse332-w2-l3-eventually-exact">
     <h2>8. How long is "eventually"?</h2>
-    <p class="prompt">The justifications in problem 7 say "eventually". Find the exact thresholds. (Use \(\log = \log_2\).)</p>
+    <p class="prompt">This practices what "eventually" means in a Big-O argument: an inequality may fail for small \(n\), then hold for every \(n\) from some point on. The lecture argued four claims this way, each with "for large \(n\)":</p>
+    <ul class="prompt">
+      <li>\(n^{50} \in O(1.1^n)\): eventually \(n^{50} \le 1.1^n\).</li>
+      <li>\(3^n \notin O(2^n)\): for any \(c\), eventually \(3^n &gt; c\cdot 2^n\). Here \(c = 1000\).</li>
+      <li>\(\log n + 2 \notin O(1)\): for any \(c\), eventually \(\log n + 2 &gt; c\). Here \(c = 12\).</li>
+      <li>\(n + 2\log n \notin O(\log n)\): for any \(c\), eventually \(n + 2\log n &gt; c\log n\). Here \(c = 10\).</li>
+    </ul>
+    <p class="prompt">Find where "eventually" starts in each case. Use \(\log = \log_2\).</p>
     <div class="answer-spec" data-part="n50-last-fail" data-grader="exact" data-answer="4401" data-miscon='{"4402":"first-hold-not-last-fail","525":"peak-not-crossing"}' data-label="largest \(n\) with \(n^{50} &gt; 1.1^n\)"></div>
     <div class="answer-spec" data-part="three-two-c1000" data-grader="exact" data-answer="18" data-miscon='{"17":"strict-vs-equal"}' data-label="smallest \(n\) with \(3^n &gt; 1000\cdot 2^n\)"></div>
     <div class="answer-spec" data-part="logn-plus-2-c12" data-grader="exact" data-answer="1025" data-miscon='{"1024":"strict-vs-equal","4097":"used-2-to-c","4096":"used-2-to-c"}' data-label="smallest \(n\) with \(\log n + 2 &gt; 12\)"></div>
@@ -1010,10 +1035,10 @@ public static boolean binary_contains(
 
   <article class="task" data-id="cse332-w2-l3-tenth-vs-log">
     <h2>9. \(n^{1/10}\) vs. \(\log n\)</h2>
-    <p class="prompt">Work with \(n = 2^k\), so \(\log_2 n = k\) and \(n^{1/10} = 2^{k/10}\).</p>
-    <div class="answer-spec" data-part="tenth-at-2-to-40" data-grader="exact" data-answer="16" data-label="\(n^{1/10}\) at \(n = 2^{40}\)"></div>
-    <div class="answer-spec" data-part="bigger-at-2-to-40" data-grader="choice" data-choices='["tenth","log"]' data-answer="log" data-miscon='{"tenth":"asymptotic-not-now"}' data-label="larger at \(n = 2^{40}\) (tenth or log)"></div>
-    <div class="answer-spec" data-part="crossover-k" data-grader="exact" data-answer="59" data-miscon='{"58":"strict-vs-equal","60":"strict-vs-equal"}' data-label="smallest \(k \ge 2\) with \(n^{1/10} &gt; \log_2 n\) from \(n = 2^k\) on"></div>
+    <p class="prompt">This practices the lecture's warning that \(O\) can mislead for real input sizes. \(n^{1/10}\) grows faster than \(\log_2 n\), so \(\log_2 n \in O(n^{1/10})\). But the lecture says the crossover is around \(5\cdot10^{17}\). Find out how far away that is. Work with \(n = 2^k\), so \(\log_2 n = k\) and \(n^{1/10} = 2^{k/10}\).</p>
+    <div class="answer-spec" data-part="tenth-at-2-to-40" data-grader="exact" data-answer="16" data-label="the value of \(n^{1/10}\) at \(n = 2^{40}\)"></div>
+    <div class="answer-spec" data-part="bigger-at-2-to-40" data-grader="choice" data-choices='["tenth","log"]' data-options="tenth:n^(1/10) is larger|log:log₂ n is larger" data-answer="log" data-miscon='{"tenth":"asymptotic-not-now"}' data-label="which is larger at \(n = 2^{40}\)?"></div>
+    <div class="answer-spec" data-part="crossover-k" data-grader="exact" data-answer="59" data-miscon='{"58":"strict-vs-equal","60":"strict-vs-equal"}' data-label="the smallest \(k \ge 2\) such that \(n^{1/10} &gt; \log_2 n\) for \(n = 2^k\) and every larger power of 2"></div>
     <ol class="hints">
       <li>\(2^{40/10} = 2^4\).</li>
       <li>\(2^{k/10} &gt; k \iff 2^k &gt; k^{10}\). The crossover is around \(5\cdot10^{17}\), and \(2^{58} \approx 2.9\cdot10^{17}\).</li>
@@ -1030,12 +1055,29 @@ public static boolean binary_contains(
 
   <article class="task" data-id="cse332-w2-l3-true-statements">
     <h2>10. Which statements are true?</h2>
-    <p class="prompt">Answer true or false.</p>
-    <div class="answer-spec" data-part="omega-means-best" data-grader="yesno" data-answer="no" data-miscon='{"yes":"omega-best"}' data-label="&quot;\(\Omega\) means best case.&quot;"></div>
-    <div class="answer-spec" data-part="binary-best-theta1" data-grader="yesno" data-answer="yes" data-label="Binary search is \(\Theta(1)\) in the best case."></div>
-    <div class="answer-spec" data-part="binary-worst-omega-loglog" data-grader="yesno" data-answer="yes" data-label="Binary search is \(\Omega(\log\log n)\) in the worst case."></div>
-    <div class="answer-spec" data-part="n-in-o-n5" data-grader="yesno" data-answer="yes" data-label="\(f(n) = n\) is \(O(n^5)\)."></div>
-    <div class="answer-spec" data-part="n-theta-means-not-olog" data-grader="yesno" data-answer="yes" data-label="If the worst case is \(\Theta(n)\), it is not \(O(\log n)\)."></div>
+    <p class="prompt">This practices the lecture's point that two choices in a running-time claim are separate. The <strong>case</strong> picks which function you analyze: the worst case is the count on the slowest input of size \(n\), the best case the count on the fastest. The <strong>bound</strong> says what you know about that function: \(O\) is "at most", \(\Omega\) is "at least", \(\Theta\) is both. A loose bound can still be true.</p>
+    <p class="prompt">Three statements are about the lecture's binary search, which checks the middle of the range and throws away half each time:</p>
+    <pre class="code">public static boolean binary_contains(
+        List&lt;Integer&gt; a, int k){
+    int start = 0;
+    int end = a.size();
+    while(start &lt; end){
+        int mid = start + (end-start)/2;
+        if(a.get(mid) == k)
+               return true;
+        else if(a.get(mid) &lt; k)
+               start = mid+1;
+        else
+               end = mid;
+    }
+    return false;
+}</pre>
+    <p class="prompt">Its worst case takes about \(\log_2 n\) loop iterations. Answer yes if the statement is true, no if it is false.</p>
+    <div class="answer-spec" data-part="omega-means-best" data-grader="yesno" data-answer="no" data-miscon='{"yes":"omega-best"}' data-label="True? &quot;\(\Omega\) means best case.&quot;"></div>
+    <div class="answer-spec" data-part="binary-best-theta1" data-grader="yesno" data-answer="yes" data-label="True? &quot;binary_contains is \(\Theta(1)\) in the best case.&quot;"></div>
+    <div class="answer-spec" data-part="binary-worst-omega-loglog" data-grader="yesno" data-answer="yes" data-label="True? &quot;binary_contains is \(\Omega(\log\log n)\) in the worst case.&quot;"></div>
+    <div class="answer-spec" data-part="n-in-o-n5" data-grader="yesno" data-answer="yes" data-label="True? &quot;\(f(n) = n\) is \(O(n^5)\).&quot;"></div>
+    <div class="answer-spec" data-part="n-theta-means-not-olog" data-grader="yesno" data-answer="yes" data-label="True? &quot;If an algorithm's worst case is \(\Theta(n)\), its worst case is not \(O(\log n)\).&quot;"></div>
     <ol class="hints">
       <li>"Which case" and "which bound" are separate choices.</li>
       <li>An upper bound can be loose and still true. A lower bound can be weak and still true.</li>
@@ -1051,7 +1093,13 @@ public static boolean binary_contains(
 
   <article class="task" data-id="cse332-w2-l3-write-proof">
     <h2>11. Write a full proof</h2>
-    <p class="prompt">The lecture justifies \(4 + 3n \in O(n)\) only semi-intuitively: "for large inputs, \(4 + 3n &lt; n + 3n = 4n\)". Write a proof in the style of Example 1: state \(c\) and \(n_0\), then show the inequality for every \(n \ge n_0\). Compare with the solution when you're done.</p>
+    <p class="prompt">This practices turning an intuitive argument into a proof. The lecture justifies \(4 + 3n \in O(n)\) only loosely: "for large inputs, \(4 + 3n &lt; n + 3n = 4n\)". Write a full proof in the shape the lecture used for \(10n + 100 \in O(n^2)\):</p>
+    <ol class="prompt">
+      <li>Name specific values: "Let \(c = \dots\) and \(n_0 = \dots\)."</li>
+      <li>Take an arbitrary \(n \ge n_0\).</li>
+      <li>Show \(4 + 3n \le c\cdot n\) for that \(n\), saying where you use \(n \ge n_0\).</li>
+    </ol>
+    <p class="prompt">Compare with the solution when you're done.</p>
     <div class="answer-spec" data-part="proof" data-grader="self" data-label="your \(c\), \(n_0\) and key step"></div>
     <ol class="hints">
       <li>The justification hints at \(c = 4\). When is \(4 \le n\)?</li>
@@ -1073,7 +1121,7 @@ public static boolean binary_contains(
   <div class="cyu-score" data-quiz-score="l3" role="status"></div>
   <ol class="cyu-list" data-quiz="l3">
     <li class="cyu" data-id="cse332-w2-l3-cyu-definition-order" data-kind="mc" data-topic="notation">
-      <p class="q">In the definition of \(f \in O(g)\), which comes first?</p>
+      <p class="q">The definition of \(f \in O(g)\) uses a constant \(c\), a starting point \(n_0\), and the inequality \(f(n) \le c\cdot g(n)\). In what order are they chosen and checked?</p>
       <div class="opts">
         <label data-correct><input type="radio" name="cse332-w2-l3-cyu-definition-order"> Choose \(c\) and \(n_0\); then the inequality must hold for every \(n \ge n_0\)<span class="why" hidden>Correct. \(\exists c\,\exists n_0\,\forall n\): one pair of constants has to work for all large \(n\).</span></label>
         <label><input type="radio" name="cse332-w2-l3-cyu-definition-order"> For each \(n\), choose a \(c\) that works for that \(n\)<span class="why" hidden>That would be \(\forall n\,\exists c\), which every positive function satisfies (take \(c = f(n)/g(n)\)). The order of the quantifiers is the whole point.</span></label>
@@ -1081,15 +1129,30 @@ public static boolean binary_contains(
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-l3-cyu-bucket-cubic" data-kind="bigo" data-answer="n^3" data-topic="drop">
-      <p class="q">Put \(5n^3 + n^2\log n + 100\) in its simplest bucket.</p>
+      <p class="q">What is the simplest \(\Theta\) class of \(5n^3 + n^2\log n + 100\)? Keep the fastest-growing term and drop its constant.</p>
       <p class="why" hidden>\(n^3\) grows faster than \(n^2\log n\) (\(\log n\) grows slower than \(n\)). Drop the 5 and the lower terms: \(\Theta(n^3)\).</p>
     </li>
     <li class="cyu" data-id="cse332-w2-l3-cyu-binary-4096" data-kind="num" data-answer="13" data-topic="search" data-miscon='{"12":"stopped-early","4096":"linear-count"}'>
-      <p class="q">On a sorted list of 4,096 items, what's the worst-case number of loop iterations of <code>binary_contains</code>?</p>
+      <p class="q">This is the lecture's binary search. On a sorted list of 4,096 items, what is the largest number of times its <code>while</code> loop body can run?</p>
+      <pre class="code">public static boolean binary_contains(
+        List&lt;Integer&gt; a, int k){
+    int start = 0;
+    int end = a.size();
+    while(start &lt; end){
+        int mid = start + (end-start)/2;
+        if(a.get(mid) == k)
+               return true;
+        else if(a.get(mid) &lt; k)
+               start = mid+1;
+        else
+               end = mid;
+    }
+    return false;
+}</pre>
       <p class="why" hidden>The gaps are \(2^{12}, 2^{11}, \dots, 1\): 13 of them. \(\lfloor\log_2 4096\rfloor + 1 = 13\).</p>
     </li>
     <li class="cyu" data-id="cse332-w2-l3-cyu-log-base-bucket" data-kind="mc" data-topic="search">
-      <p class="q">Algorithm X takes \(\log_{10} n\) steps and Algorithm Y takes \(\log_2 n\) steps. Which is true?</p>
+      <p class="q">This is about the base of a log. Algorithm X takes \(\log_{10} n\) steps and Algorithm Y takes \(\log_2 n\) steps. Which is true?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-l3-cyu-log-base-bucket"> X is in a smaller \(O\) class than Y<span class="why" hidden>X is faster by a constant factor (\(\log_2 10 \approx 3.32\)), but constants don't change the class.</span></label>
         <label data-correct><input type="radio" name="cse332-w2-l3-cyu-log-base-bucket"> Both are \(\Theta(\log n)\)<span class="why" hidden>Correct: \(\log_{10} n = \frac{\log_2 n}{\log_2 10}\). That's a constant factor.</span></label>
@@ -1097,7 +1160,15 @@ public static boolean binary_contains(
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-l3-cyu-omega-not-best" data-kind="mc" data-topic="cases">
-      <p class="q">"Linear search is \(\Omega(n)\) in the worst case." What does this say?</p>
+      <p class="q">Linear search is the lecture's <code>contains</code>: it checks the items one at a time from the front. "Linear search is \(\Omega(n)\) in the worst case." What does this say?</p>
+      <pre class="code">public static boolean contains(
+        List&lt;Integer&gt; a, int k){
+    for(int i=0; i&lt; a.size(); i++){
+        if (a.get(i) == k)
+            return true;
+    }
+    return false;
+}</pre>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-l3-cyu-omega-not-best"> Nothing: \(\Omega\) only applies to the best case<span class="why" hidden>That's the misconception. \(\Omega\) is a lower bound on whatever function you analyze.</span></label>
         <label data-correct><input type="radio" name="cse332-w2-l3-cyu-omega-not-best"> The worst-case count grows at least as fast as \(n\)<span class="why" hidden>Correct: "worst case" picks the function, and \(\Omega\) says it's eventually at least \(c\cdot n\).</span></label>
@@ -1105,7 +1176,7 @@ public static boolean binary_contains(
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-l3-cyu-example2-c11" data-kind="num" data-answer="25" data-topic="proofs" data-miscon='{"50":"used-c12","24":"strict-vs-equal"}'>
-      <p class="q">For \(13n^2 - 50n \ge c\cdot n^2\) with \(c = 11\), what's the smallest \(n_0\) that works?</p>
+      <p class="q">You're proving \(13n^2 - 50n \in \Omega(n^2)\) with \(c = 11\). What is the smallest \(n_0\) such that \(13n^2 - 50n \ge 11n^2\) for every \(n \ge n_0\)?</p>
       <p class="why" hidden>\((13 - 11)\,n \ge 50 \iff n \ge 25\).</p>
     </li>
     <li class="cyu" data-id="cse332-w2-l3-cyu-not-in-o-n2" data-kind="mc" data-topic="drop">
@@ -1127,11 +1198,11 @@ public static boolean binary_contains(
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-l3-cyu-sq17-n0" data-kind="num" data-answer="5" data-topic="notation" data-miscon='{"4":"strict-vs-equal","17":"forgot-c"}'>
-      <p class="q">With \(c = 4\), what's the smallest \(n_0\) for \(3n^2 + 17 \le c\cdot n^2\)?</p>
+      <p class="q">You're proving \(3n^2 + 17 \in O(n^2)\) with \(c = 4\). What is the smallest \(n_0\) such that \(3n^2 + 17 \le 4n^2\) for every \(n \ge n_0\)?</p>
       <p class="why" hidden>\(3n^2 + 17 \le 4n^2 \iff n^2 \ge 17\). \(4^2 = 16 &lt; 17 \le 25 = 5^2\), so 5.</p>
     </li>
     <li class="cyu" data-id="cse332-w2-l3-cyu-timing-vs-bigo" data-kind="mc" data-topic="usage">
-      <p class="q">You want to know whether your HashMap code is faster than a classmate's on the class data set. What should you use?</p>
+      <p class="q">You and a classmate each wrote a HashMap. You want to know whose code runs faster on one particular data set. What should you use?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Asymptotic analysis only<span class="why" hidden>Asymptotic analysis evaluates algorithms. Two implementations of the same algorithm can have the same \(\Theta\) and still differ in speed.</span></label>
         <label data-correct><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Timing<span class="why" hidden>Correct: to evaluate an implementation on a specific data set, timing is useful.</span></label>
@@ -1139,7 +1210,7 @@ public static boolean binary_contains(
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-l3-cyu-set-notation" data-kind="mc" data-topic="notation">
-      <p class="q">Which of these is written <em>wrong</em>?</p>
+      <p class="q">\(O(n^2)\) is a set of functions. Which of these ways of writing it is <em>wrong</em>?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-l3-cyu-set-notation"> \(3n^2 + 17 \in O(n^2)\)<span class="why" hidden>That's the most correct form: membership in a set.</span></label>
         <label><input type="radio" name="cse332-w2-l3-cyu-set-notation"> \(3n^2 + 17 = O(n^2)\)<span class="why" hidden>Common and accepted, as long as you read "=" as "is in".</span></label>
@@ -1239,7 +1310,7 @@ print(extract)</code></pre>
   </div>
 
   <div class="check" data-id="cse332-w2-l4-qc-example2-third" data-grader="exact" data-answer="5" data-miscon='{"3":"oldest-not-smallest"}'>
-    <p>Quick check: in the trace above (insert 5, 6, 3; extract; insert 1; extract; extract; …), what is the <em>third</em> value printed?</p>
+    <p>Quick check: in the trace above (insert 5, 6, 3; print extract; insert 1; print extract; print extract; insert 8; print extract; print extract), what is the <em>third</em> value printed?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
@@ -1538,15 +1609,23 @@ print(extract)</code></pre>
 <section class="page" id="l4-problems" data-title="Lecture 4 problems">
   <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
   <h1>Lecture 4 problems</h1>
-  <div class="prose"><p>Built on the lecture's examples: a trace like its second example, its table of data structures, its height argument, and its insert and extract on a tree. Every answer was computed by running the lecture's pseudocode. Draw the tree as you go.</p></div>
+  <div class="prose"><p>Built on the lecture's examples: a priority queue trace, its table of data structures, its height argument, and its insert and extract on a tree. Every answer was computed by running the lecture's pseudocode. Draw the tree as you go.</p></div>
 
   <article class="task" data-id="cse332-w2-l4-pq-trace">
     <h2>1. Trace a priority queue</h2>
-    <p class="prompt">Start with an empty priority queue (smallest priority first) and run: <code>insert(9)</code>, <code>insert(4)</code>, <code>insert(7)</code>, <code>extract</code>, <code>insert(2)</code>, <code>extract</code>, <code>extract</code>, <code>insert(6)</code>, <code>extract</code>, <code>extract</code>. Each <code>extract</code> prints what it returns.</p>
+    <p class="prompt">This practices the priority queue ADT from the lecture. <code>insert(x)</code> adds \(x\), and \(x\) is also its own priority. <code>extract</code> removes and returns the item with the <em>smallest</em> priority now in the queue, no matter when it arrived. Start with an empty priority queue and run this script. Each <code>print(extract)</code> prints what it returns.</p>
+    <pre class="code"><code>insert(9)  insert(4)  insert(7)
+print(extract)
+insert(2)
+print(extract)
+print(extract)
+insert(6)
+print(extract)
+print(extract)</code></pre>
     <div class="answer-spec" data-part="first" data-grader="exact" data-answer="4" data-miscon='{"9":"oldest-not-smallest"}' data-label="first value printed"></div>
     <div class="answer-spec" data-part="second" data-grader="exact" data-answer="2" data-label="second value printed"></div>
     <div class="answer-spec" data-part="third" data-grader="exact" data-answer="7" data-label="third value printed"></div>
-    <div class="answer-spec" data-part="fifth" data-grader="exact" data-answer="9" data-label="last value printed"></div>
+    <div class="answer-spec" data-part="fifth" data-grader="exact" data-answer="9" data-label="fifth (last) value printed"></div>
     <ol class="hints">
       <li>Keep the items still waiting in a list. An <code>extract</code> removes the smallest one <em>now in the queue</em>, not the smallest ever inserted.</li>
       <li>After the first <code>extract</code> the queue holds 9 and 7. The next insert is 2.</li>
@@ -1561,18 +1640,24 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-l4-pq-costs">
     <h2>2. Pick the data structure</h2>
-    <p class="prompt">Worst-case running time of one operation (\(n\) items, maximum size known in advance). Give a Θ class.</p>
-    <div class="answer-spec" data-part="unsorted-extract" data-grader="bigo" data-answer="n" data-label="extract from an unsorted array"></div>
-    <div class="answer-spec" data-part="sorted-insert" data-grader="bigo" data-answer="n" data-label="insert into a sorted array"></div>
-    <div class="answer-spec" data-part="sorted-extract" data-grader="bigo" data-answer="1" data-label="extract from a sorted array (smallest first)"></div>
-    <div class="answer-spec" data-part="heap-insert" data-grader="bigo" data-answer="log n" data-label="insert into a binary heap"></div>
+    <p class="prompt">This practices the lecture's comparison of ways to store a priority queue. Each structure holds \(n\) items, and the array is big enough that it never has to grow:</p>
+    <ul class="prompt">
+      <li><strong>Unsorted array:</strong> <code>insert</code> writes the new item at the back. <code>extract</code> has to find the smallest item.</li>
+      <li><strong>Sorted array:</strong> kept in descending order, so the smallest item is at the back. <code>insert</code> has to put the new item in its sorted place.</li>
+      <li><strong>Binary heap:</strong> a complete binary tree where every node is \(\le\) its children.</li>
+    </ul>
+    <p class="prompt">Give the worst-case running time of one operation as a \(\Theta\) class, like <code>n</code> or <code>log n</code>.</p>
+    <div class="answer-spec" data-part="unsorted-extract" data-grader="bigo" data-answer="n" data-label="extract from the unsorted array"></div>
+    <div class="answer-spec" data-part="sorted-insert" data-grader="bigo" data-answer="n" data-label="insert into the sorted array"></div>
+    <div class="answer-spec" data-part="sorted-extract" data-grader="bigo" data-answer="1" data-label="extract from the sorted array"></div>
+    <div class="answer-spec" data-part="heap-insert" data-grader="bigo" data-answer="log n" data-label="insert into the binary heap"></div>
     <ol class="hints">
       <li>Which operation is cheap in a structure that keeps its items unsorted? Which in one that keeps them sorted?</li>
-      <li>A sorted array can keep its smallest item at an end, so what does <code>extract</code> do there?</li>
+      <li>The sorted array keeps its smallest item at the back. What does <code>extract</code> have to do to remove it?</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
       <li>Unsorted array: <code>insert</code> is one write at the end, \(\Theta(1)\). <code>extract</code> has to scan for the smallest, \(\Theta(n)\).</li>
-      <li>Sorted array: <code>insert</code> must find the spot and shift the rest, \(\Theta(n)\). The smallest sits at an end, so <code>extract</code> is \(\Theta(1)\).</li>
+      <li>Sorted array: <code>insert</code> must find the spot and shift the rest, \(\Theta(n)\). The smallest sits at the back, so <code>extract</code> removes it without shifting anything: \(\Theta(1)\).</li>
       <li>Binary heap: both operations follow one root-to-leaf path, \(\Theta(\log n)\).</li>
       <li class="answer">\(\Theta(n)\); \(\Theta(n)\); \(\Theta(1)\); \(\Theta(\log n)\). Each simple structure makes one operation cheap and the other expensive; the heap makes both cheap enough.</li>
     </ol></div></div>
@@ -1580,11 +1665,11 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-l4-height">
     <h2>3. How tall can a heap be?</h2>
-    <p class="prompt">A binary tree of height \(h\) (edges on the longest path down from the root) has at most \(2^{h+1}-1\) nodes. A complete binary tree with \(n\) nodes has the smallest height \(h\) with \(n \le 2^{h+1}-1\).</p>
-    <div class="answer-spec" data-part="max-h5" data-grader="exact" data-answer="63" data-label="most nodes in a binary tree of height 5"></div>
-    <div class="answer-spec" data-part="h-1000" data-grader="exact" data-answer="9" data-miscon='{"10":"full-tree-off-by-one"}' data-label="height of a complete tree with 1000 nodes"></div>
-    <div class="answer-spec" data-part="h-1024" data-grader="exact" data-answer="10" data-label="height of a complete tree with 1024 nodes"></div>
-    <div class="answer-spec" data-part="h-1023" data-grader="exact" data-answer="9" data-label="height of a complete tree with 1023 nodes"></div>
+    <p class="prompt">This practices the lecture's reason a heap is short: it is always a <em>complete</em> binary tree, with every level full except the bottom one, which fills from the left. The <strong>height</strong> is the number of edges on the longest path down from the root. A binary tree of height \(h\) has at most \(1 + 2 + 4 + \dots + 2^h = 2^{h+1}-1\) nodes. A complete tree with \(n\) nodes has the smallest height \(h\) with \(n \le 2^{h+1}-1\).</p>
+    <div class="answer-spec" data-part="max-h5" data-grader="exact" data-answer="63" data-label="the most nodes a binary tree of height 5 can have"></div>
+    <div class="answer-spec" data-part="h-1000" data-grader="exact" data-answer="9" data-miscon='{"10":"full-tree-off-by-one"}' data-label="the height of a complete tree with \(n = 1000\) nodes"></div>
+    <div class="answer-spec" data-part="h-1024" data-grader="exact" data-answer="10" data-label="the height of a complete tree with \(n = 1024\) nodes"></div>
+    <div class="answer-spec" data-part="h-1023" data-grader="exact" data-answer="9" data-label="the height of a complete tree with \(n = 1023\) nodes"></div>
     <ol class="hints">
       <li>\(2^{5+1}-1\). For the heights, find the smallest \(h\) whose bound is at least \(n\).</li>
       <li>\(2^{10} = 1024\) and \(2^{9} = 512\), so \(2^{10}-1 = 1023\) is the largest tree of height 9.</li>
@@ -1599,11 +1684,11 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-l4-insert-tree">
     <h2>4. Insert into a tree</h2>
-    <p class="prompt">Start from this min-heap and <code>insert(4)</code>.</p>
+    <p class="prompt">This practices the lecture's insert. Insert puts the new item in the next open spot (the leftmost empty place on the bottom level, or a new level if the bottom is full). Then it <strong>percolates up</strong>: while the item is smaller than its parent, swap the two. Start from this min-heap and <code>insert(4)</code>.</p>
     <svg class="htree" data-tree="2,5,3,9,6,4,8" role="img" aria-label="Min-heap: root 2; children 5 and 3; 5 has children 9 and 6; 3 has children 4 and 8"></svg>
-    <div class="answer-spec" data-part="swaps" data-grader="exact" data-answer="2" data-label="number of swaps"></div>
-    <div class="answer-spec" data-part="root-left" data-grader="exact" data-answer="4" data-label="value at the root's left child afterwards"></div>
-    <div class="answer-spec" data-part="bottom-left" data-grader="exact" data-answer="9" data-label="value at the bottom-left leaf afterwards"></div>
+    <div class="answer-spec" data-part="swaps" data-grader="exact" data-answer="2" data-label="number of swaps while 4 percolates up"></div>
+    <div class="answer-spec" data-part="root-left" data-grader="exact" data-answer="4" data-label="the value at the root's left child afterwards"></div>
+    <div class="answer-spec" data-part="bottom-left" data-grader="exact" data-answer="9" data-label="the value at the bottom-left leaf afterwards"></div>
     <ol class="hints">
       <li>The tree has a full bottom level, so the next open spot starts a new level at the far left: under the 9.</li>
       <li>Compare 4 with each parent on the way up. Stop when the parent is not bigger.</li>
@@ -1618,12 +1703,12 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-l4-extract-tree">
     <h2>5. Extract from a tree</h2>
-    <p class="prompt">Start again from the same heap (before the insert) and call <code>extract()</code> once.</p>
+    <p class="prompt">This practices the lecture's extract. Extract saves the root (the minimum, which it returns), moves the bottom-right item into the root, and then <strong>percolates it down</strong>: while it is bigger than a child, swap it with its <em>smaller</em> child. Start from this min-heap and call <code>extract()</code> once.</p>
     <svg class="htree" data-tree="2,5,3,9,6,4,8" role="img" aria-label="Min-heap: root 2; children 5 and 3; 5 has children 9 and 6; 3 has children 4 and 8"></svg>
-    <div class="answer-spec" data-part="returned" data-grader="exact" data-answer="2" data-label="value returned"></div>
-    <div class="answer-spec" data-part="swaps" data-grader="exact" data-answer="2" data-label="number of swaps"></div>
-    <div class="answer-spec" data-part="new-root" data-grader="exact" data-answer="3" data-miscon='{"8":"moved-item","5":"larger-child"}' data-label="new root"></div>
-    <div class="answer-spec" data-part="parent-of-8" data-grader="exact" data-answer="4" data-label="when 8 stops, its parent's value"></div>
+    <div class="answer-spec" data-part="returned" data-grader="exact" data-answer="2" data-label="the value extract returns"></div>
+    <div class="answer-spec" data-part="swaps" data-grader="exact" data-answer="2" data-label="number of swaps while 8 percolates down"></div>
+    <div class="answer-spec" data-part="new-root" data-grader="exact" data-answer="3" data-miscon='{"8":"moved-item","5":"larger-child"}' data-label="the new root afterwards"></div>
+    <div class="answer-spec" data-part="parent-of-8" data-grader="exact" data-answer="4" data-label="the value of 8's parent when 8 stops"></div>
     <ol class="hints">
       <li>Save the root. The bottom-right item is 8: it moves into the root.</li>
       <li>At each step compare 8 with both children and swap with the smaller one, if it's smaller than 8.</li>
@@ -1638,11 +1723,11 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-l4-larger-child">
     <h2>6. What if it swapped with the larger child?</h2>
-    <p class="prompt">Start from this heap and call <code>extract()</code>. The last item, 9, moves to the root. First do the wrong thing on purpose: swap 9 with its <em>larger</em> child once. Then do it correctly.</p>
+    <p class="prompt">This practices why extract's percolate down swaps with the <em>smaller</em> child. Extract returns the root, moves the bottom-right item into the root, and swaps it down while it is bigger than a child. Start from this min-heap and call <code>extract()</code>. The 1 is returned and the last item, 9, moves to the root. First do the wrong thing on purpose: swap 9 with its <em>larger</em> child once. Then start over and do it correctly.</p>
     <svg class="htree" data-tree="1,3,5,7,8,9" role="img" aria-label="Min-heap: root 1; children 3 and 5; 3 has children 7 and 8; 5 has child 9"></svg>
-    <div class="answer-spec" data-part="valid-after-wrong" data-grader="yesno" data-answer="no" data-label="After one swap with the larger child, is it a valid min-heap?"></div>
-    <div class="answer-spec" data-part="correct-root" data-grader="exact" data-answer="3" data-label="the correct extract: new root"></div>
-    <div class="answer-spec" data-part="correct-swaps" data-grader="exact" data-answer="2" data-label="the correct extract: number of swaps"></div>
+    <div class="answer-spec" data-part="valid-after-wrong" data-grader="yesno" data-answer="no" data-label="After one swap of 9 with its larger child, is the tree a valid min-heap? (yes or no)"></div>
+    <div class="answer-spec" data-part="correct-root" data-grader="exact" data-answer="3" data-label="done correctly: the new root"></div>
+    <div class="answer-spec" data-part="correct-swaps" data-grader="exact" data-answer="2" data-label="done correctly: the number of swaps"></div>
     <ol class="hints">
       <li>After the move, 9 is the root with children 3 and 5. The larger child is 5.</li>
       <li>Swapping with 5 puts 5 above 3. Is that allowed?</li>
@@ -1661,8 +1746,7 @@ print(extract)</code></pre>
 <section class="page" id="cyu-l4" data-title="Check your understanding (Lecture 4)">
   <p class="where">Lecture 4 wrap-up · questions written for this site</p>
   <h1>Check your understanding</h1>
-  <div class="prose"><p>Ten questions on Lecture 4. Questions that need a heap start from this one, the lecture's:</p></div>
-  <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" role="img" aria-label="Min-heap: root 1; children 3 and 2; 3 has children 4 and 7; 2 has children 5 and 6; 4 has children 5 and 9"></svg>
+  <div class="prose"><p>Ten questions on Lecture 4. The score counts first tries.</p></div>
   <div class="cyu-score" data-quiz-score="l4" role="status"></div>
   <ol class="cyu-list" data-quiz="l4">
     <li class="cyu" data-id="cse332-w2-q2-pq-vs-queue" data-kind="mc" data-topic="l4-pq">
@@ -1692,7 +1776,7 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-q2-percolate-down-pick" data-kind="mc" data-topic="l4-extract">
-      <p class="q">Percolating down, which child does the value swap with?</p>
+      <p class="q">In extract, the item moved into the root percolates down: it swaps with a child while it is bigger than that child. Which child does it swap with?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-q2-percolate-down-pick"> The left child<span class="why" hidden>Only if the left child is the smaller one.</span></label>
         <label><input type="radio" name="cse332-w2-q2-percolate-down-pick"> The larger child<span class="why" hidden>That would leave the larger one above a smaller sibling.</span></label>
@@ -1710,11 +1794,12 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-l4-cyu-insert-6" data-kind="num" data-answer="1" data-topic="l4-insert">
-      <p class="q">Insert 6 into the heap above. How many swaps does it make?</p>
+      <p class="q">This is the lecture's min-heap. Insert puts a new item in the next open spot (the leftmost empty place on the bottom level), then swaps it with its parent while it is smaller. Insert 6. How many swaps does it make?</p>
+      <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" role="img" aria-label="Min-heap: root 1; children 3 and 2; 3 has children 4 and 7; 2 has children 5 and 6; 4 has children 5 and 9"></svg>
       <p class="why" hidden>6 goes under 7 (the next open spot). 6 &lt; 7: swap. Its parent is now 3, and 6 &lt; 3 is false: stop. One swap.</p>
     </li>
     <li class="cyu" data-id="cse332-w2-l4-cyu-height-100" data-kind="num" data-answer="6" data-topic="l4-shape" data-miscon='{"7":"full-tree-off-by-one","100":"height-not-count"}'>
-      <p class="q">What is the height of a complete binary tree with 100 nodes?</p>
+      <p class="q">What is the height (edges on the longest path down from the root) of a complete binary tree with 100 nodes?</p>
       <p class="why" hidden>Height 5 holds at most \(2^6 - 1 = 63\) nodes, too few. Height 6 holds up to 127. So 6.</p>
     </li>
     <li class="cyu" data-id="cse332-w2-l4-cyu-root-min" data-kind="mc" data-topic="l4-heap">
@@ -1726,11 +1811,11 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-l4-cyu-sort-with-pq" data-kind="bigo" data-answer="n log n" data-topic="l4-impl">
-      <p class="q">Sort \(n\) items with a binary heap: insert them all, then extract \(n\) times. What's the worst-case total time?</p>
+      <p class="q">Sort \(n\) items with a binary heap: insert them all, then extract \(n\) times. Each insert and each extract is \(O(\log n)\). What is the worst-case total time, as a \(\Theta\) class?</p>
       <p class="why" hidden>\(2n\) operations, each \(O(\log n)\): \(O(n\log n)\). Once the heap is half full, each operation still costs about \(\log(n/2)\), so it's \(\Theta(n\log n)\).</p>
     </li>
     <li class="cyu" data-id="cse332-w2-l4-cyu-down-comparisons" data-kind="mc" data-topic="l4-extract">
-      <p class="q">Percolate down makes about twice as many comparisons per level as percolate up. Does that change extract's worst-case class?</p>
+      <p class="q">Percolate up (in insert) compares the moving item with its one parent at each level. Percolate down (in extract) compares the two children with each other and then the smaller one with the moving item: about twice as many comparisons per level. Does that change extract's worst-case class?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-l4-cyu-down-comparisons"> Yes: extract is \(\Theta(n)\)<span class="why" hidden>It still only walks one path of length at most the height.</span></label>
         <label data-correct><input type="radio" name="cse332-w2-l4-cyu-down-comparisons"> No: about \(2\log n\) comparisons is still \(\Theta(\log n)\)<span class="why" hidden>Correct. Two comparisons per level is a constant factor.</span></label>
@@ -1891,7 +1976,7 @@ print(extract)</code></pre>
   </div>
 
   <div class="check" data-id="cse332-w2-s2-proofs-what-goes-in" data-grader="mc">
-    <p>Quick check: which of these belongs in the final proof?</p>
+    <p>Quick check: you're proving the lecture's \(13n^2 - 50n \in \Omega(n^2)\). Which of these belongs in the final proof?</p>
     <div class="opts">
       <label><input type="radio" name="cse332-w2-s2-proofs-what-goes-in"> "I tried c = 13 first, but that gave −50 ≥ 0, so I lowered it."<span class="why" hidden>That's how you found c: scratchwork. Keep it on your scratch paper.</span></label>
       <label data-correct><input type="radio" name="cse332-w2-s2-proofs-what-goes-in"> "Let c = 12 and n₀ = 50. For an arbitrary n ≥ 50, …" and the steps showing the inequality<span class="why" hidden>Right. Declare the values, then show they work for every n ≥ n₀.</span></label>
@@ -2023,16 +2108,16 @@ print(extract)</code></pre>
 <section class="page" id="s2-problems" data-title="Section 2 problems">
   <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
   <h1>Section 2 problems</h1>
-  <div class="prose"><p>From the section's <a href="https://docs.google.com/document/d/1g0358q2oi3J5rrVmuhcALK6zyPdfaeRn/edit" target="_blank" rel="noopener">worksheet</a>, checked against its <a href="https://docs.google.com/document/d/1HKruUEoMpMcAT95d2jFrr35pVZGVfCWB/edit" target="_blank" rel="noopener">official solutions</a>, plus a few variations. Write your reasoning in the work box. For a \(c\)/\(n_0\) pair, any pair that works is accepted.</p></div>
+  <div class="prose"><p>From the section's <a href="https://docs.google.com/document/d/1g0358q2oi3J5rrVmuhcALK6zyPdfaeRn/edit" target="_blank" rel="noopener">worksheet</a> (the handout of practice questions used in section), checked against its <a href="https://docs.google.com/document/d/1HKruUEoMpMcAT95d2jFrr35pVZGVfCWB/edit" target="_blank" rel="noopener">official solutions</a>, plus a few variations. Write your reasoning in the work box. For a \(c\)/\(n_0\) pair, any pair that works is accepted.</p></div>
 
   <article class="task" data-id="cse332-w2-s2-q0-omega">
     <h2>1. Suppose \(f(n) \in \Omega(n\log n)\)</h2>
-    <p class="prompt">Like worksheet question 0, but with a lower bound. For each statement, is it always true, sometimes true, or always false?</p>
-    <div class="answer-spec" data-part="o-n2" data-grader="choice" data-answer="sometimes" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="\(f \in O(n^2)\)"></div>
-    <div class="answer-spec" data-part="omega-n" data-grader="choice" data-answer="always" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="\(f \in \Omega(n)\)"></div>
-    <div class="answer-spec" data-part="o-n" data-grader="choice" data-answer="never" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="\(f \in O(n)\)"></div>
-    <div class="answer-spec" data-part="theta-nlogn" data-grader="choice" data-answer="sometimes" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="\(f \in \Theta(n\log n)\)"></div>
-    <div class="answer-spec" data-part="omega-n2" data-grader="choice" data-answer="sometimes" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="\(f \in \Omega(n^2)\)"></div>
+    <p class="prompt">This practices reading a bound for what it leaves open. The section did it for \(f \in O(n)\); here the bound is a lower bound. All you know is \(f(n) \in \Omega(n\log n)\): from some point on, \(f\) is at least a constant times \(n\log n\), with no upper limit. A statement is <strong>always true</strong> if it holds for every such \(f\), <strong>always false</strong> if it holds for none, and <strong>sometimes true</strong> otherwise.</p>
+    <div class="answer-spec" data-part="o-n2" data-grader="choice" data-answer="sometimes" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="Is \(f \in O(n^2)\)?"></div>
+    <div class="answer-spec" data-part="omega-n" data-grader="choice" data-answer="always" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="Is \(f \in \Omega(n)\)?"></div>
+    <div class="answer-spec" data-part="o-n" data-grader="choice" data-answer="never" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="Is \(f \in O(n)\)?"></div>
+    <div class="answer-spec" data-part="theta-nlogn" data-grader="choice" data-answer="sometimes" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="Is \(f \in \Theta(n\log n)\)?"></div>
+    <div class="answer-spec" data-part="omega-n2" data-grader="choice" data-answer="sometimes" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="Is \(f \in \Omega(n^2)\)?"></div>
     <ol class="hints">
       <li>\(\Omega(n\log n)\) puts \(f\) anywhere from \(n\log n\) upward, with no upper limit. Test the extremes: \(f = n\log n\) and something huge, like \(f = 2^n\).</li>
       <li>A statement that holds for both test functions is always true; one that fails for both is always false.</li>
@@ -2047,35 +2132,35 @@ print(extract)</code></pre>
   </article>
 
   <article class="task" data-id="cse332-w2-s2-worksheet-pairs">
-    <h2>2. Worksheet questions 1 and 2: your own \(c\) and \(n_0\)</h2>
-    <p class="prompt">Give a \(c &gt; 0\) and \(n_0 &gt; 0\) that prove each claim from the worksheet. Any pair that works is accepted; the checker tests the inequality exactly for every \(n \ge n_0\).</p>
-    <div class="answer-spec" data-part="q1a-c" data-grader="bound" data-role="c" data-pair="q1a" data-bound='{"f":["0","7"],"g":["0","1/10"],"rel":"O"}' data-label="1a \(7n \in O(n/10)\): your \(c\)"></div>
-    <div class="answer-spec" data-part="q1a-n0" data-grader="bound" data-role="n0" data-pair="q1a" data-label="1a: your \(n_0\)"></div>
-    <div class="answer-spec" data-part="q1b-c" data-grader="bound" data-role="c" data-pair="q1b" data-bound='{"f":["1000"],"g":["0","0","3"],"rel":"O"}' data-label="1b \(1000 \in O(3n^2)\): your \(c\)"></div>
-    <div class="answer-spec" data-part="q1b-n0" data-grader="bound" data-role="n0" data-pair="q1b" data-label="1b: your \(n_0\)"></div>
-    <div class="answer-spec" data-part="q2b-o-c" data-grader="bound" data-role="c" data-pair="q2bo" data-bound='{"f":["0","10","0","1"],"g":["0","0","0","3"],"rel":"O"}' data-label="2b \(n^3+10n \in O(3n^3)\): your \(c\)"></div>
-    <div class="answer-spec" data-part="q2b-o-n0" data-grader="bound" data-role="n0" data-pair="q2bo" data-label="2b \(O\): your \(n_0\)"></div>
-    <div class="answer-spec" data-part="q2b-omega-c" data-grader="bound" data-role="c" data-pair="q2bw" data-bound='{"f":["0","10","0","1"],"g":["0","0","0","3"],"rel":"Omega"}' data-label="2b \(n^3+10n \in \Omega(3n^3)\): your \(c\)"></div>
-    <div class="answer-spec" data-part="q2b-omega-n0" data-grader="bound" data-role="n0" data-pair="q2bw" data-label="2b \(\Omega\): your \(n_0\)"></div>
+    <h2>2. Your own \(c\) and \(n_0\) for four claims</h2>
+    <p class="prompt">This practices the first step of every proof in the section: choosing the constants. \(f(n) \in O(g(n))\) when there are constants \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). \(\Omega\) is the same with \(\ge\). Give a \(c\) and \(n_0\) that prove each claim below; these are four of the worksheet's claims. Any pair that works is accepted; the checker tests the inequality exactly for every \(n \ge n_0\).</p>
+    <div class="answer-spec" data-part="q1a-c" data-grader="bound" data-role="c" data-pair="q1a" data-bound='{"f":["0","7"],"g":["0","1/10"],"rel":"O"}' data-label="\(7n \in O(\frac{n}{10})\): your \(c\)"></div>
+    <div class="answer-spec" data-part="q1a-n0" data-grader="bound" data-role="n0" data-pair="q1a" data-label="\(7n \in O(\frac{n}{10})\): your \(n_0\)"></div>
+    <div class="answer-spec" data-part="q1b-c" data-grader="bound" data-role="c" data-pair="q1b" data-bound='{"f":["1000"],"g":["0","0","3"],"rel":"O"}' data-label="\(1000 \in O(3n^2)\): your \(c\)"></div>
+    <div class="answer-spec" data-part="q1b-n0" data-grader="bound" data-role="n0" data-pair="q1b" data-label="\(1000 \in O(3n^2)\): your \(n_0\)"></div>
+    <div class="answer-spec" data-part="q2b-o-c" data-grader="bound" data-role="c" data-pair="q2bo" data-bound='{"f":["0","10","0","1"],"g":["0","0","0","3"],"rel":"O"}' data-label="\(n^3+10n \in O(3n^3)\): your \(c\)"></div>
+    <div class="answer-spec" data-part="q2b-o-n0" data-grader="bound" data-role="n0" data-pair="q2bo" data-label="\(n^3+10n \in O(3n^3)\): your \(n_0\)"></div>
+    <div class="answer-spec" data-part="q2b-omega-c" data-grader="bound" data-role="c" data-pair="q2bw" data-bound='{"f":["0","10","0","1"],"g":["0","0","0","3"],"rel":"Omega"}' data-label="\(n^3+10n \in \Omega(3n^3)\): your \(c\)"></div>
+    <div class="answer-spec" data-part="q2b-omega-n0" data-grader="bound" data-role="n0" data-pair="q2bw" data-label="\(n^3+10n \in \Omega(3n^3)\): your \(n_0\)"></div>
     <ol class="hints">
-      <li>Pick \(c\) first so the algebra is easy, then solve the inequality for \(n\). For 1a, what \(c\) makes \(c\cdot\frac{n}{10}\) equal \(7n\)?</li>
-      <li>For 2b's \(O\), when is \(10n \le n^3\)? For its \(\Omega\), \(n^3 + 10n\) is never below \(n^3\).</li>
+      <li>Pick \(c\) first so the algebra is easy, then solve the inequality for \(n\). For \(7n \in O(\frac{n}{10})\), what \(c\) makes \(c\cdot\frac{n}{10}\) equal \(7n\)?</li>
+      <li>For \(n^3+10n \in O(3n^3)\), when is \(10n \le n^3\)? For the \(\Omega\) claim, \(n^3 + 10n\) is never below \(n^3\).</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>1a: \(c = 70\), \(n_0 = 1\). Then \(c\cdot\frac{n}{10} = 7n\), so \(7n \le 7n\) for every \(n\).</li>
-      <li>1b: \(c = 1\), \(n_0 = 20\). At \(n = 20\), \(3n^2 = 1200 \ge 1000\), and \(3n^2\) only grows. (The smallest \(n_0\) for \(c = 1\) is 19.)</li>
-      <li>2b \(O\): \(c = 1\), \(n_0 = 4\). For \(n \ge 4\), \(10 \le n^2\), so \(10n \le n^3\) and \(n^3 + 10n \le 2n^3 \le 3n^3\).</li>
-      <li>2b \(\Omega\): \(c = \tfrac13\), \(n_0 = 1\). \(n^3 + 10n \ge n^3 = \tfrac13\cdot 3n^3\) for every \(n \ge 1\).</li>
-      <li class="answer">Any valid pairs, e.g. 1a (70, 1); 1b (1, 20); 2b \(O\) (1, 4); 2b \(\Omega\) (\(\tfrac13\), 1). These are the official choices, except that the written solution for 2b's \(O\) part uses \(n_0 = 3\), which also works.</li>
+      <li>\(7n \in O(\frac{n}{10})\): \(c = 70\), \(n_0 = 1\). Then \(c\cdot\frac{n}{10} = 7n\), so \(7n \le 7n\) for every \(n\).</li>
+      <li>\(1000 \in O(3n^2)\): \(c = 1\), \(n_0 = 20\). At \(n = 20\), \(3n^2 = 1200 \ge 1000\), and \(3n^2\) only grows. (The smallest \(n_0\) for \(c = 1\) is 19.)</li>
+      <li>\(n^3+10n \in O(3n^3)\): \(c = 1\), \(n_0 = 4\). For \(n \ge 4\), \(10 \le n^2\), so \(10n \le n^3\) and \(n^3 + 10n \le 2n^3 \le 3n^3\).</li>
+      <li>\(n^3+10n \in \Omega(3n^3)\): \(c = \tfrac13\), \(n_0 = 1\). \(n^3 + 10n \ge n^3 = \tfrac13\cdot 3n^3\) for every \(n \ge 1\).</li>
+      <li class="answer">Any valid pairs, e.g. (70, 1); (1, 20); (1, 4); (\(\tfrac13\), 1). These are the official choices, except that the written solution for the \(n^3+10n \in O(3n^3)\) part uses \(n_0 = 3\), which also works.</li>
     </ol></div></div>
   </article>
 
   <article class="task" data-id="cse332-w2-s2-q1c">
-    <h2>3. Worksheet 1c: \(2^n \in O(3^{2n})\)</h2>
-    <p class="prompt">Rewrite \(3^{2n}\) as a single power \(k^n\), then decide whether \(c = 1\), \(n_0 = 1\) proves the claim.</p>
-    <div class="answer-spec" data-part="k" data-grader="exact" data-answer="9" data-miscon='{"6":"power-of-power"}' data-label="\(3^{2n} = k^n\) with \(k =\)"></div>
-    <div class="answer-spec" data-part="c1-works" data-grader="yesno" data-answer="yes" data-label="Does \(c = 1\), \(n_0 = 1\) work?"></div>
-    <div class="answer-spec" data-part="proof" data-grader="self" data-label="your one-line reason"></div>
+    <h2>3. Is \(2^n \in O(3^{2n})\)?</h2>
+    <p class="prompt">This practices a Big-O claim between two exponentials, where the base matters. \(f(n) \in O(g(n))\) when there are constants \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). \(\Omega\) is the same with \(\ge\). Rewrite \(3^{2n}\) as a single power \(k^n\), then decide whether \(c = 1\), \(n_0 = 1\) proves \(2^n \in O(3^{2n})\).</p>
+    <div class="answer-spec" data-part="k" data-grader="exact" data-answer="9" data-miscon='{"6":"power-of-power"}' data-label="the \(k\) with \(3^{2n} = k^n\)"></div>
+    <div class="answer-spec" data-part="c1-works" data-grader="yesno" data-answer="yes" data-label="Does \(c = 1\), \(n_0 = 1\) prove \(2^n \in O(3^{2n})\)? (yes or no)"></div>
+    <div class="answer-spec" data-part="proof" data-grader="self" data-label="your one-line reason why \(2^n \le 3^{2n}\) for all \(n \ge 1\)"></div>
     <ol class="hints">
       <li>\(3^{2n} = (3^2)^n\).</li>
       <li>Compare \(2^n\) and \(9^n\) for \(n \ge 1\).</li>
@@ -2089,27 +2174,27 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-s2-smallest-n0">
     <h2>4. The smallest \(n_0\)</h2>
-    <p class="prompt">For each pair, give the smallest \(n_0\) so that \(f(n) \le c \cdot g(n)\) for every \(n \ge n_0\), with the constant \(c\) the section chose. (Check the first \(n\) where it holds <em>and keeps holding</em>.)</p>
-    <div class="answer-spec" data-part="q1b" data-grader="exact" data-answer="19" data-miscon='{"20":"not-smallest"}' data-label="1b: \(f=1000\), \(g=3n^2\), \(c=1\)"></div>
-    <div class="answer-spec" data-part="q1d" data-grader="exact" data-answer="1" data-label="1d: \(f=7n^2+3n\), \(g=n^4\), \(c=10\)"></div>
-    <div class="answer-spec" data-part="q2b" data-grader="exact" data-answer="3" data-label="2b: \(f=n^3+10n\), \(g=3n^3\), \(c=1\)"></div>
-    <div class="answer-spec" data-part="q1e" data-grader="exact" data-answer="2" data-label="1e: \(f=n+2n\log_2 n\), \(g=n\log_2 n\), \(c=3\)"></div>
+    <p class="prompt">This practices finding \(n_0\) by solving the inequality. A proof only needs some \(n_0\) that works, but the smallest one shows exactly where the inequality starts to hold. Each inequality below is one of the section's Big-O proofs, with the \(c\) the section chose already filled in. Give the smallest \(n_0\) such that the inequality holds for every \(n \ge n_0\): the first \(n\) where it holds <em>and keeps holding</em>.</p>
+    <div class="answer-spec" data-part="q1b" data-grader="exact" data-answer="19" data-miscon='{"20":"not-smallest"}' data-label="smallest \(n_0\) for \(1000 \le 1\cdot 3n^2\)"></div>
+    <div class="answer-spec" data-part="q1d" data-grader="exact" data-answer="1" data-label="smallest \(n_0\) for \(7n^2+3n \le 10\,n^4\)"></div>
+    <div class="answer-spec" data-part="q2b" data-grader="exact" data-answer="3" data-label="smallest \(n_0\) for \(n^3+10n \le 1\cdot 3n^3\)"></div>
+    <div class="answer-spec" data-part="q1e" data-grader="exact" data-answer="2" data-label="smallest \(n_0\) for \(n+2n\log_2 n \le 3\,n\log_2 n\)"></div>
     <ol class="hints">
       <li>Write the inequality and solve it for \(n\). Then check the value just below your answer: it must fail.</li>
-      <li>For 1b: \(1000 \le 3n^2\) means \(n^2 \ge 333.3\). \(18^2 = 324\) and \(19^2 = 361\).</li>
+      <li>For the first: \(1000 \le 3n^2\) means \(n^2 \ge 333.3\). \(18^2 = 324\) and \(19^2 = 361\).</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>1b: \(3\cdot 18^2 = 972 &lt; 1000\) fails; \(3\cdot 19^2 = 1083 \ge 1000\) holds. So \(n_0 = 19\). The section takes 20, which also works but isn't the smallest.</li>
-      <li>1d: \(7n^2+3n \le 10n^4\) already holds at \(n=1\) (10 ≤ 10). So \(n_0 = 1\).</li>
-      <li>2b: \(n^3+10n \le 3n^3 \iff 10 \le 2n^2 \iff n \ge 3\) (\(n=2\): 28 &gt; 24 fails; \(n=3\): 57 ≤ 81 holds).</li>
-      <li>1e: \(n + 2n\log n \le 3n\log n \iff 1 \le \log n \iff n \ge 2\).</li>
+      <li>\(1000 \le 3n^2\): \(3\cdot 18^2 = 972 &lt; 1000\) fails; \(3\cdot 19^2 = 1083 \ge 1000\) holds. So \(n_0 = 19\). The section takes 20, which also works but isn't the smallest.</li>
+      <li>\(7n^2+3n \le 10n^4\) already holds at \(n=1\) (10 ≤ 10). So \(n_0 = 1\).</li>
+      <li>\(n^3+10n \le 3n^3 \iff 10 \le 2n^2 \iff n \ge 3\) (\(n=2\): 28 &gt; 24 fails; \(n=3\): 57 ≤ 81 holds).</li>
+      <li>\(n + 2n\log n \le 3n\log n \iff 1 \le \log n \iff n \ge 2\).</li>
       <li class="answer">19; 1; 3; 2. The section uses safe values (20, 1, 4, 2) rather than the smallest, and a proof only needs one that works.</li>
     </ol></div></div>
   </article>
 
   <article class="task" data-id="cse332-w2-s2-write-theta-2b">
-    <h2>5. Write the Θ proof for 2b</h2>
-    <p class="prompt">Prove \(n^3 + 10n \in \Theta(3n^3)\) in the section's style: an \(O\) part and an \(\Omega\) part, each declaring \(c\) and \(n_0\) and showing the inequality for every \(n \ge n_0\).</p>
+    <h2>5. Prove \(n^3 + 10n \in \Theta(3n^3)\)</h2>
+    <p class="prompt">This practices writing a full \(\Theta\) proof the way the section does. \(\Theta\) means both \(O\) and \(\Omega\), so the proof has two parts. Each part starts "Let \(c = \dots\) and \(n_0 = \dots\)", takes an arbitrary \(n \ge n_0\), and shows the inequality for it: \(n^3 + 10n \le c\cdot 3n^3\) for \(O\), and \(n^3 + 10n \ge c\cdot 3n^3\) for \(\Omega\). The two parts may use different constants.</p>
     <div class="answer-spec" data-part="proof" data-grader="self" data-long data-label="your two parts"></div>
     <ol class="hints">
       <li>For \(O\): when is \(10 \le n^2\)? Multiply both sides by \(n\).</li>
@@ -2124,11 +2209,13 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-s2-numunique-trace">
     <h2>6. Count the loops in numUnique</h2>
-    <p class="prompt">Run <code>numUnique</code> on <code>["a","b","c","d","e","f"]</code> (all different) and on <code>["a","a","a","a","a","a"]</code> (all the same). Count the inner-loop iterations (lines 10–14 only).</p>
-    <div class="answer-spec" data-part="distinct-out" data-grader="exact" data-answer="6" data-label="result on the six different values"></div>
-    <div class="answer-spec" data-part="distinct-inner" data-grader="exact" data-answer="21" data-miscon='{"36":"sum-off"}' data-label="inner-loop iterations, six different values"></div>
-    <div class="answer-spec" data-part="same-out" data-grader="exact" data-answer="1" data-label="result on the six equal values"></div>
-    <div class="answer-spec" data-part="same-inner" data-grader="exact" data-answer="6" data-label="inner-loop iterations, six equal values"></div>
+    <p class="prompt">This practices the section's method for a running time: run the code on the inputs that make it slowest and fastest, and count loop iterations. <code>numUnique</code> counts how many different strings the array <code>values</code> holds. For each index it hasn't marked yet, it counts one new string and marks every later copy of it as visited. The highlighted lines are the two loops the section counts: the <strong>first loop</strong> (lines 3–5) and the <strong>inner loop</strong> (lines 10–14).</p>
+    <pre class="code"><div class="ln"><span class="no">1</span><span class="src">int numUnique(String[] values) {</span></div><div class="ln"><span class="no">2</span><span class="src">    boolean[] visited = new boolean[values.length];</span></div><div class="ln hl"><span class="no">3</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln hl"><span class="no">4</span><span class="src">        visited[i] = false;</span></div><div class="ln hl"><span class="no">5</span><span class="src">    }</span></div><div class="ln"><span class="no">6</span><span class="src">    int out = 0;</span></div><div class="ln"><span class="no">7</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">8</span><span class="src">        if (!visited[i]) {</span></div><div class="ln"><span class="no">9</span><span class="src">            out += 1;</span></div><div class="ln hl"><span class="no">10</span><span class="src">            for (int j = i; j &lt; values.length; j++) {</span></div><div class="ln hl"><span class="no">11</span><span class="src">                if (values[i].equals(values[j])) {</span></div><div class="ln hl"><span class="no">12</span><span class="src">                    visited[j] = true;</span></div><div class="ln hl"><span class="no">13</span><span class="src">                }</span></div><div class="ln hl"><span class="no">14</span><span class="src">            }</span></div><div class="ln"><span class="no">15</span><span class="src">        }</span></div><div class="ln"><span class="no">16</span><span class="src">    }</span></div><div class="ln"><span class="no">17</span><span class="src">    return out;</span></div><div class="ln"><span class="no">18</span><span class="src">}</span></div></pre>
+    <p class="prompt">Run <code>numUnique</code> on <code>["a","b","c","d","e","f"]</code> (all different) and on <code>["a","a","a","a","a","a"]</code> (all the same). For each, give what it returns and how many times the inner loop's body runs (lines 10–14 only).</p>
+    <div class="answer-spec" data-part="distinct-out" data-grader="exact" data-answer="6" data-label="what it returns on the six different values"></div>
+    <div class="answer-spec" data-part="distinct-inner" data-grader="exact" data-answer="21" data-miscon='{"36":"sum-off"}' data-label="inner-loop iterations on the six different values"></div>
+    <div class="answer-spec" data-part="same-out" data-grader="exact" data-answer="1" data-label="what it returns on the six equal values"></div>
+    <div class="answer-spec" data-part="same-inner" data-grader="exact" data-answer="6" data-label="inner-loop iterations on the six equal values"></div>
     <ol class="hints">
       <li>With all values different, the inner loop starts at index <code>i</code> and runs to the end for every <code>i</code>: how many iterations is that?</li>
       <li>With all equal values, the first outer iteration visits everything. What do the later iterations do?</li>
@@ -2142,9 +2229,11 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-s2-numunique-model">
     <h2>7. numUnique as a formula</h2>
-    <p class="prompt">Count iterations the way the section does: the first loop (lines 3–5) plus the inner loop (lines 10–14). Give each as a formula in \(n\).</p>
-    <div class="answer-spec" data-part="worst" data-grader="formula" data-answer="n + n(n+1)/2" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"n(n+1)/2":"forgot-first-loop","n + n^2":"sum-off"}' data-label="\(f(n)\), worst case"></div>
-    <div class="answer-spec" data-part="best" data-grader="formula" data-answer="2n" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"n":"forgot-first-loop"}' data-label="\(g(n)\), best case"></div>
+    <p class="prompt">This practices turning a method into a running-time function, the way the section does for its worst and best case. <code>numUnique</code> counts how many different strings the array <code>values</code> holds. For each index it hasn't marked yet, it counts one new string and marks every later copy of it as visited. The highlighted lines are the two loops the section counts: the <strong>first loop</strong> (lines 3–5) and the <strong>inner loop</strong> (lines 10–14).</p>
+    <pre class="code"><div class="ln"><span class="no">1</span><span class="src">int numUnique(String[] values) {</span></div><div class="ln"><span class="no">2</span><span class="src">    boolean[] visited = new boolean[values.length];</span></div><div class="ln hl"><span class="no">3</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln hl"><span class="no">4</span><span class="src">        visited[i] = false;</span></div><div class="ln hl"><span class="no">5</span><span class="src">    }</span></div><div class="ln"><span class="no">6</span><span class="src">    int out = 0;</span></div><div class="ln"><span class="no">7</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">8</span><span class="src">        if (!visited[i]) {</span></div><div class="ln"><span class="no">9</span><span class="src">            out += 1;</span></div><div class="ln hl"><span class="no">10</span><span class="src">            for (int j = i; j &lt; values.length; j++) {</span></div><div class="ln hl"><span class="no">11</span><span class="src">                if (values[i].equals(values[j])) {</span></div><div class="ln hl"><span class="no">12</span><span class="src">                    visited[j] = true;</span></div><div class="ln hl"><span class="no">13</span><span class="src">                }</span></div><div class="ln hl"><span class="no">14</span><span class="src">            }</span></div><div class="ln"><span class="no">15</span><span class="src">        }</span></div><div class="ln"><span class="no">16</span><span class="src">    }</span></div><div class="ln"><span class="no">17</span><span class="src">    return out;</span></div><div class="ln"><span class="no">18</span><span class="src">}</span></div></pre>
+    <p class="prompt">Let \(n\) be the length of <code>values</code>. Count iterations of the first loop plus iterations of the inner loop, and give each total as a formula in \(n\).</p>
+    <div class="answer-spec" data-part="worst" data-grader="formula" data-answer="n + n(n+1)/2" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"n(n+1)/2":"forgot-first-loop","n + n^2":"sum-off"}' data-label="\(f(n)\), the count when every string is different (worst case)"></div>
+    <div class="answer-spec" data-part="best" data-grader="formula" data-answer="2n" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"n":"forgot-first-loop"}' data-label="\(g(n)\), the count when every string is the same (best case)"></div>
     <ol class="hints">
       <li>The first loop is \(n\) every time. The inner loop runs \(n - i\) times for each \(i\) that isn't visited yet.</li>
       <li>\(1 + 2 + \dots + n = \frac{n(n+1)}{2}\).</li>
@@ -2166,7 +2255,7 @@ print(extract)</code></pre>
   <div class="cyu-score" data-quiz-score="s2" role="status"></div>
   <ol class="cyu-list" data-quiz="s2">
     <li class="cyu" data-id="cse332-w2-q2-section-sometimes" data-kind="mc" data-topic="s2-sometimes">
-      <p class="q">If \(f(n)\in O(n)\), is \(f(n)\in O(\log n)\)?</p>
+      <p class="q">All you know about \(f\) is \(f(n)\in O(n)\). Is \(f(n)\in O(\log n)\) always true (for every such \(f\)), sometimes true, or never true?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-q2-section-sometimes"> Always<span class="why" hidden>\(f = n\) is in \(O(n)\) and not in \(O(\log n)\).</span></label>
         <label><input type="radio" name="cse332-w2-q2-section-sometimes"> Never<span class="why" hidden>\(f = 1\) is in both.</span></label>
@@ -2174,7 +2263,7 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-s2-cyu-c-meaning" data-kind="mc" data-topic="s2-goals">
-      <p class="q">What does the constant \(c\) in the definition of \(O\) let you do?</p>
+      <p class="q">The definition: \(f(n) \in O(g(n))\) when there are \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). What does the constant \(c\) let you do?</p>
       <div class="opts">
         <label data-correct><input type="radio" name="cse332-w2-s2-cyu-c-meaning"> Compare the shape of the growth and ignore its scale<span class="why" hidden>Correct. 5n³ and 2n³ have the same shape; c absorbs the 5/2.</span></label>
         <label><input type="radio" name="cse332-w2-s2-cyu-c-meaning"> Ignore small inputs<span class="why" hidden>That's n₀'s job.</span></label>
@@ -2182,7 +2271,7 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-s2-cyu-n0-meaning" data-kind="mc" data-topic="s2-goals">
-      <p class="q">What does \(n_0\) let you do?</p>
+      <p class="q">Same definition: \(f(n) \in O(g(n))\) when there are \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). What does \(n_0\) let you do?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-s2-cyu-n0-meaning"> Pick how many terms of \(f\) to keep<span class="why" hidden>n₀ is a starting input size, not a count of terms.</span></label>
         <label data-correct><input type="radio" name="cse332-w2-s2-cyu-n0-meaning"> Ignore small input sizes, so the comparison is about \(n\) growing without bound<span class="why" hidden>Correct.</span></label>
@@ -2190,7 +2279,7 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-s2-cyu-omega-by-parts" data-kind="mc" data-topic="s2-proofs">
-      <p class="q">Why is the "by parts" method a poor fit for \(\Omega\) proofs of something like \(4n^2 - 8n + 10 \in \Omega(n^2)\)?</p>
+      <p class="q">The section's "by parts" method proves \(f \in O(g)\) by bounding each term of \(f\) by a multiple of \(g\), then adding the bounds. Why is it a poor fit for an \(\Omega\) proof like \(4n^2 - 8n + 10 \in \Omega(n^2)\)?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-s2-cyu-omega-by-parts"> Because \(\Omega\) proofs never need algebra<span class="why" hidden>They need the same kind of algebra as O proofs.</span></label>
         <label data-correct><input type="radio" name="cse332-w2-s2-cyu-omega-by-parts"> Because a term like \(-8n\) or \(10\) can't be at least a positive multiple of \(n^2\), so the split fails<span class="why" hidden>Correct. For Ω, bound f from below as a whole, for example by dropping terms that only make it bigger.</span></label>
@@ -2198,7 +2287,7 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-s2-cyu-squeeze-n0" data-kind="num" data-answer="2" data-topic="s2-proofs" data-miscon='{"1":"strict-vs-equal"}'>
-      <p class="q">To show \(n + 5n\log_2 n \le 6n\log_2 n\), you use \(n \le n\log_2 n\). From which \(n\) on is that true?</p>
+      <p class="q">To show \(n + 5n\log_2 n \le 6n\log_2 n\), you use \(n \le n\log_2 n\). What is the smallest \(n\) from which \(n \le n\log_2 n\) is true for every larger \(n\)?</p>
       <p class="why" hidden>\(n \le n\log_2 n \iff 1 \le \log_2 n \iff n \ge 2\). At \(n = 1\), \(\log_2 1 = 0\).</p>
     </li>
     <li class="cyu" data-id="cse332-w2-s2-cyu-sum" data-grader="formula" data-answer="n(n+1)/2" data-points='{"n":["1","2","3","4","10","50"]}' data-topic="s2-numunique">
@@ -2206,7 +2295,8 @@ print(extract)</code></pre>
       <p class="why" hidden>\(\frac{n(n+1)}{2}\). It's the inner-loop count of numUnique's worst case, and it's \(\Theta(n^2)\).</p>
     </li>
     <li class="cyu" data-id="cse332-w2-s2-cyu-worst-input" data-kind="mc" data-topic="s2-numunique">
-      <p class="q">Which input makes <code>numUnique</code> take the longest?</p>
+      <p class="q">This is the section's <code>numUnique</code>, which counts the different strings in <code>values</code>. Which input of length \(n\) makes it take the longest?</p>
+      <pre class="code"><div class="ln"><span class="no">1</span><span class="src">int numUnique(String[] values) {</span></div><div class="ln"><span class="no">2</span><span class="src">    boolean[] visited = new boolean[values.length];</span></div><div class="ln"><span class="no">3</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">4</span><span class="src">        visited[i] = false;</span></div><div class="ln"><span class="no">5</span><span class="src">    }</span></div><div class="ln"><span class="no">6</span><span class="src">    int out = 0;</span></div><div class="ln"><span class="no">7</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">8</span><span class="src">        if (!visited[i]) {</span></div><div class="ln"><span class="no">9</span><span class="src">            out += 1;</span></div><div class="ln"><span class="no">10</span><span class="src">            for (int j = i; j &lt; values.length; j++) {</span></div><div class="ln"><span class="no">11</span><span class="src">                if (values[i].equals(values[j])) {</span></div><div class="ln"><span class="no">12</span><span class="src">                    visited[j] = true;</span></div><div class="ln"><span class="no">13</span><span class="src">                }</span></div><div class="ln"><span class="no">14</span><span class="src">            }</span></div><div class="ln"><span class="no">15</span><span class="src">        }</span></div><div class="ln"><span class="no">16</span><span class="src">    }</span></div><div class="ln"><span class="no">17</span><span class="src">    return out;</span></div><div class="ln"><span class="no">18</span><span class="src">}</span></div></pre>
       <div class="opts">
         <label data-correct><input type="radio" name="cse332-w2-s2-cyu-worst-input"> Every string different<span class="why" hidden>Correct. Nothing is ever marked early, so the inner loop runs for every i.</span></label>
         <label><input type="radio" name="cse332-w2-s2-cyu-worst-input"> Every string the same<span class="why" hidden>That's the best case: everything is marked on the first pass.</span></label>
@@ -2214,7 +2304,8 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-q2-numunique-same-bucket" data-kind="bigo" data-answer="n" data-topic="s2-numunique">
-      <p class="q">Best-case running time of <code>numUnique</code> (every value the same), as a Θ class.</p>
+      <p class="q">This is the section's <code>numUnique</code>, which counts the different strings in <code>values</code>. Its best case is an array where every string is the same. What is its best-case running time, as a \(\Theta\) class in \(n\), the length of <code>values</code>?</p>
+      <pre class="code"><div class="ln"><span class="no">1</span><span class="src">int numUnique(String[] values) {</span></div><div class="ln"><span class="no">2</span><span class="src">    boolean[] visited = new boolean[values.length];</span></div><div class="ln"><span class="no">3</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">4</span><span class="src">        visited[i] = false;</span></div><div class="ln"><span class="no">5</span><span class="src">    }</span></div><div class="ln"><span class="no">6</span><span class="src">    int out = 0;</span></div><div class="ln"><span class="no">7</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">8</span><span class="src">        if (!visited[i]) {</span></div><div class="ln"><span class="no">9</span><span class="src">            out += 1;</span></div><div class="ln"><span class="no">10</span><span class="src">            for (int j = i; j &lt; values.length; j++) {</span></div><div class="ln"><span class="no">11</span><span class="src">                if (values[i].equals(values[j])) {</span></div><div class="ln"><span class="no">12</span><span class="src">                    visited[j] = true;</span></div><div class="ln"><span class="no">13</span><span class="src">                }</span></div><div class="ln"><span class="no">14</span><span class="src">            }</span></div><div class="ln"><span class="no">15</span><span class="src">        }</span></div><div class="ln"><span class="no">16</span><span class="src">    }</span></div><div class="ln"><span class="no">17</span><span class="src">    return out;</span></div><div class="ln"><span class="no">18</span><span class="src">}</span></div></pre>
       <p class="why" hidden>The first loop is \(n\) iterations; the first outer iteration runs the inner loop \(n\) times and marks everything, so no later iteration runs it. \(2n \in \Theta(n)\).</p>
     </li>
   </ol>
@@ -2666,17 +2757,17 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-l5-heap-check">
     <h2>1. Is it a min-heap?</h2>
-    <p class="prompt">Each array lists a complete tree in level order, starting at index 1. Say whether it is a valid binary min-heap.</p>
+    <p class="prompt">This practices the lecture's check for a min-heap: every node must be \(\le\) its own children. Each array below lists a complete tree in level order, starting at index 1, so the children of index \(i\) are at \(2i\) and \(2i+1\). Say whether each is a valid binary min-heap.</p>
     <div class="tree-row">
       <figure><figcaption>A: 2, 4, 3, 8, 5, 9, 7</figcaption><svg class="htree" data-tree="2,4,3,8,5,9,7" data-idx role="img" aria-label="A: root 2; children 4 and 3; 4 has 8 and 5; 3 has 9 and 7"></svg></figure>
       <figure><figcaption>B: 1, 4, 2, 3, 5, 6, 7</figcaption><svg class="htree" data-tree="1,4,2,3,5,6,7" data-idx role="img" aria-label="B: root 1; children 4 and 2; 4 has 3 and 5; 2 has 6 and 7"></svg></figure>
       <figure><figcaption>C: 3, 5, 4, 9, 6, 7, 8, 10</figcaption><svg class="htree" data-tree="3,5,4,9,6,7,8,10" data-idx role="img" aria-label="C: root 3; children 5 and 4; 5 has 9 and 6; 4 has 7 and 8; 9 has 10"></svg></figure>
       <figure><figcaption>D: 4, 6, 5, 7, 3, 8, 9</figcaption><svg class="htree" data-tree="4,6,5,7,3,8,9" data-idx role="img" aria-label="D: root 4; children 6 and 5; 6 has 7 and 3; 5 has 8 and 9"></svg></figure>
     </div>
-    <div class="answer-spec" data-part="a" data-grader="yesno" data-answer="yes" data-label="A"></div>
-    <div class="answer-spec" data-part="b" data-grader="yesno" data-answer="no" data-label="B"></div>
-    <div class="answer-spec" data-part="c" data-grader="yesno" data-answer="yes" data-label="C"></div>
-    <div class="answer-spec" data-part="d" data-grader="yesno" data-answer="no" data-label="D"></div>
+    <div class="answer-spec" data-part="a" data-grader="yesno" data-answer="yes" data-label="Is A a valid min-heap? (yes or no)"></div>
+    <div class="answer-spec" data-part="b" data-grader="yesno" data-answer="no" data-label="Is B a valid min-heap? (yes or no)"></div>
+    <div class="answer-spec" data-part="c" data-grader="yesno" data-answer="yes" data-label="Is C a valid min-heap? (yes or no)"></div>
+    <div class="answer-spec" data-part="d" data-grader="yesno" data-answer="no" data-label="Is D a valid min-heap? (yes or no)"></div>
     <ol class="hints">
       <li>Check each node against its own two children only. Index 2's children are indexes 4 and 5.</li>
       <li>The shape is always right in an array with no gaps. Only the order can fail.</li>
@@ -2692,11 +2783,56 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-l5-insert-extract">
     <h2>2. Percolate by hand</h2>
-    <p class="prompt">The lecture's heap, in level order: <code>1, 3, 2, 4, 7, 5, 6, 5, 9</code>. (a) <code>insert(0)</code>. (b) Start again from a fresh copy of this heap, then <code>extract</code>.</p>
+    <p class="prompt">This practices running the lecture's array code by hand. The heap lives in an array: index 0 is unused, the root is at index 1, and the children of index \(i\) are at \(2i\) and \(2i+1\). Here are <code>insert</code> and <code>extract</code>:</p>
+    <pre class="code">insert(item){
+    if(size == arr.length - 1){resize();}
+    size++;
+    arr[size] = item;
+    percolateUp(size);
+}
+
+percolateUp(int i){
+    int parent = i/2;
+    Item val = arr[i];
+    while(i &gt; 1 &amp;&amp; arr[i] &lt; arr[parent]){
+        arr[i] = arr[parent];
+        arr[parent] = val;
+        i = parent;
+        parent = i/2;
+    }
+}</pre>
+    <pre class="code">extract(){
+    theMin = arr[1];
+    arr[1] = arr[size];
+    size--;
+    percolateDown(1);
+    return theMin;
+}
+
+percolateDown(int i){
+    int left = i*2;
+    int right = i*2+1;
+    Item val = arr[i];
+    while(left &lt;= size){
+        int toSwap = right;
+        if(right &gt; size || arr[left] &lt; arr[right]){
+            toSwap = left;
+        }
+        if(arr[toSwap] &lt; val){
+            arr[i] = arr[toSwap];
+            arr[toSwap] = val;
+            i = toSwap;
+            left = i*2;
+            right = i*2+1;
+        }
+        else{ return;}
+    }
+}</pre>
+    <p class="prompt">Start from the lecture's heap, in level order <code>1, 3, 2, 4, 7, 5, 6, 5, 9</code> (indices 1 to 9). (a) Call <code>insert(0)</code>. (b) Start again from a fresh copy of this heap and call <code>extract()</code>.</p>
     <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" data-idx role="img" aria-label="The lecture's heap: root 1; children 3 and 2; 3 has 4 and 7; 2 has 5 and 6; 4 has 5 and 9"></svg>
-    <div class="answer-spec" data-part="insert-swaps" data-grader="exact" data-answer="3" data-label="(a) number of swaps percolating 0 up"></div>
-    <div class="answer-spec" data-part="insert-root" data-grader="exact" data-answer="0" data-label="(a) the new root"></div>
-    <div class="answer-spec" data-part="extract-returned" data-grader="exact" data-answer="1" data-label="(b) value returned by extract"></div>
+    <div class="answer-spec" data-part="insert-swaps" data-grader="exact" data-answer="3" data-label="(a) the number of swaps while 0 percolates up"></div>
+    <div class="answer-spec" data-part="insert-root" data-grader="exact" data-answer="0" data-label="(a) the root after the insert"></div>
+    <div class="answer-spec" data-part="extract-returned" data-grader="exact" data-answer="1" data-label="(b) the value extract returns"></div>
     <div class="answer-spec" data-part="extract-root" data-grader="exact" data-answer="2" data-miscon='{"9":"moved-item","3":"larger-child"}' data-label="(b) the new root afterwards"></div>
     <ol class="hints">
       <li>Insert goes in the next open spot, index 10, whose parent is index 5 (the 7). Swap upward while the new value is smaller than its parent.</li>
@@ -2711,11 +2847,56 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-l5-build-sequence">
     <h2>3. Insert, then extract: 16, 32, 4, 57, 80, 43, 2</h2>
-    <p class="prompt">The lecture's example: insert these seven values in order into an empty min-heap, then <code>extract</code> once. Use the lecture's array (root at index 1).</p>
-    <div class="answer-spec" data-part="swaps-2" data-grader="exact" data-answer="2" data-miscon='{"1":"one-swap-short"}' data-label="swaps when 2 is inserted"></div>
-    <div class="answer-spec" data-part="root-after-inserts" data-grader="exact" data-answer="2" data-label="root after all seven inserts"></div>
-    <div class="answer-spec" data-part="extracted" data-grader="exact" data-answer="2" data-label="value returned by the extract"></div>
-    <div class="answer-spec" data-part="root-after-extract" data-grader="exact" data-answer="4" data-miscon='{"16":"moved-item"}' data-label="root after the extract"></div>
+    <p class="prompt">This is the lecture's example of a whole sequence of operations, each one starting from the heap the last one left. The heap lives in an array: index 0 is unused, the root is at index 1, and the children of index \(i\) are at \(2i\) and \(2i+1\). The code:</p>
+    <pre class="code">insert(item){
+    if(size == arr.length - 1){resize();}
+    size++;
+    arr[size] = item;
+    percolateUp(size);
+}
+
+percolateUp(int i){
+    int parent = i/2;
+    Item val = arr[i];
+    while(i &gt; 1 &amp;&amp; arr[i] &lt; arr[parent]){
+        arr[i] = arr[parent];
+        arr[parent] = val;
+        i = parent;
+        parent = i/2;
+    }
+}</pre>
+    <pre class="code">extract(){
+    theMin = arr[1];
+    arr[1] = arr[size];
+    size--;
+    percolateDown(1);
+    return theMin;
+}
+
+percolateDown(int i){
+    int left = i*2;
+    int right = i*2+1;
+    Item val = arr[i];
+    while(left &lt;= size){
+        int toSwap = right;
+        if(right &gt; size || arr[left] &lt; arr[right]){
+            toSwap = left;
+        }
+        if(arr[toSwap] &lt; val){
+            arr[i] = arr[toSwap];
+            arr[toSwap] = val;
+            i = toSwap;
+            left = i*2;
+            right = i*2+1;
+        }
+        else{ return;}
+    }
+}</pre>
+    <p class="prompt">Start with an empty min-heap. Insert 16, 32, 4, 57, 80, 43, 2 in that order, then call <code>extract()</code> once.</p>
+    <div class="answer-spec" data-part="swaps-2" data-grader="exact" data-answer="2" data-miscon='{"1":"one-swap-short"}' data-label="the number of swaps while 2 (the last insert) percolates up"></div>
+    <div class="answer-spec" data-part="root-after-inserts" data-grader="exact" data-answer="2" data-label="the root after all seven inserts"></div>
+    <div class="answer-spec" data-part="extracted" data-grader="exact" data-answer="2" data-label="the value extract returns"></div>
+    <div class="answer-spec" data-part="root-after-extract" data-grader="exact" data-answer="4" data-miscon='{"16":"moved-item"}' data-label="the root after the extract"></div>
     <ol class="hints">
       <li>Only 4 and 2 move upward at all. Track where each is inserted and what its parent is.</li>
       <li>By the time 2 is inserted at index 7, 4 has already swapped with 16: index 3 (2's parent) holds 16, and the root holds 4.</li>
@@ -2730,12 +2911,37 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-l5-buildheap">
     <h2>4. Floyd's buildHeap</h2>
-    <p class="prompt">Run <code>buildHeap()</code> on the 9-item array <code>9, 8, 7, 6, 5, 4, 3, 2, 1</code> (index 1 to 9). It percolates down from <code>i = size</code> to 1. Count the swaps, and compare with inserting the same values one at a time.</p>
+    <p class="prompt">This practices Floyd's buildHeap from the lecture, and why it beats inserting items one at a time. buildHeap leaves the items where they are and calls <code>percolateDown(i)</code> for every index from the last one back to 1:</p>
+    <pre class="code">buildHeap(){
+    for(int i = size; i&gt;0; i--){
+        percolateDown(i);
+    }
+}</pre>
+    <pre class="code">percolateDown(int i){
+    int left = i*2;
+    int right = i*2+1;
+    Item val = arr[i];
+    while(left &lt;= size){
+        int toSwap = right;
+        if(right &gt; size || arr[left] &lt; arr[right]){
+            toSwap = left;
+        }
+        if(arr[toSwap] &lt; val){
+            arr[i] = arr[toSwap];
+            arr[toSwap] = val;
+            i = toSwap;
+            left = i*2;
+            right = i*2+1;
+        }
+        else{ return;}
+    }
+}</pre>
+    <p class="prompt">Run <code>buildHeap()</code> on the 9-item array <code>9, 8, 7, 6, 5, 4, 3, 2, 1</code> (indices 1 to 9). Count its swaps. Then compare with inserting the same values one at a time into an empty heap. A node is a <strong>leaf</strong> when it has no children, that is, when \(2i &gt; n\).</p>
     <svg class="htree" data-tree="9,8,7,6,5,4,3,2,1" data-idx role="img" aria-label="Complete tree in level order 9, 8, 7, 6, 5, 4, 3, 2, 1"></svg>
-    <div class="answer-spec" data-part="first-leaf" data-grader="exact" data-answer="5" data-label="index of the first leaf (n = 9)"></div>
-    <div class="answer-spec" data-part="total-swaps" data-grader="exact" data-answer="7" data-label="total swaps made by buildHeap"></div>
-    <div class="answer-spec" data-part="final-root" data-grader="exact" data-answer="1" data-label="the root afterwards"></div>
-    <div class="answer-spec" data-part="insert-swaps" data-grader="exact" data-answer="16" data-label="swaps if you insert 9, 8, 7, …, 1 one at a time"></div>
+    <div class="answer-spec" data-part="first-leaf" data-grader="exact" data-answer="5" data-label="the index of the first leaf, for \(n = 9\)"></div>
+    <div class="answer-spec" data-part="total-swaps" data-grader="exact" data-answer="7" data-label="the total swaps made by buildHeap"></div>
+    <div class="answer-spec" data-part="final-root" data-grader="exact" data-answer="1" data-label="the root after buildHeap"></div>
+    <div class="answer-spec" data-part="insert-swaps" data-grader="exact" data-answer="16" data-label="the total swaps if you instead insert 9, 8, 7, …, 1 one at a time into an empty heap"></div>
     <ol class="hints">
       <li>The leaves are indexes \(\lfloor n/2\rfloor+1\) to \(n\): they don't move. Start at the last non-leaf, index 4.</li>
       <li>Work from 4 down to 1: index 4 (value 6) has children 2 and 1 (indexes 8 and 9).</li>
@@ -2750,11 +2956,11 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-l5-index">
     <h2>5. Index arithmetic</h2>
-    <p class="prompt">A heap holds \(n = 20\) items, stored the lecture's way (root at index 1).</p>
-    <div class="answer-spec" data-part="parent-13" data-grader="exact" data-answer="6" data-miscon='{"6.5":"no-floor","13/2":"no-floor"}' data-label="index of the parent of index 13"></div>
-    <div class="answer-spec" data-part="left-7" data-grader="exact" data-answer="14" data-miscon='{"15":"zero-based"}' data-label="index of the left child of index 7"></div>
-    <div class="answer-spec" data-part="first-leaf" data-grader="exact" data-answer="11" data-miscon='{"10":"leaf-by-index"}' data-label="index of the first leaf"></div>
-    <div class="answer-spec" data-part="leaf-10" data-grader="yesno" data-answer="no" data-miscon='{"yes":"leaf-by-index"}' data-label="Is index 10 a leaf?"></div>
+    <p class="prompt">This practices the lecture's index rules for a heap stored in an array. Index 0 is unused and the root is at index 1. The parent of index \(i\) is \(i/2\) with integer division (drop any remainder), and its children are \(2i\) and \(2i+1\), if those are at most \(n\). A heap holds \(n = 20\) items.</p>
+    <div class="answer-spec" data-part="parent-13" data-grader="exact" data-answer="6" data-miscon='{"6.5":"no-floor","13/2":"no-floor"}' data-label="the index of the parent of index 13"></div>
+    <div class="answer-spec" data-part="left-7" data-grader="exact" data-answer="14" data-miscon='{"15":"zero-based"}' data-label="the index of the left child of index 7"></div>
+    <div class="answer-spec" data-part="first-leaf" data-grader="exact" data-answer="11" data-miscon='{"10":"leaf-by-index"}' data-label="the index of the first leaf (a node with no children)"></div>
+    <div class="answer-spec" data-part="leaf-10" data-grader="yesno" data-answer="no" data-miscon='{"yes":"leaf-by-index"}' data-label="Is index 10 a leaf? (yes or no)"></div>
     <ol class="hints">
       <li>Parent: \(i/2\) with integer division. Children: \(2i\) and \(2i+1\).</li>
       <li>A node is a leaf exactly when it has no left child: when \(2i &gt; n\).</li>
@@ -2770,11 +2976,43 @@ print(extract)</code></pre>
 
   <article class="task" data-id="cse332-w2-l5-update-key">
     <h2>6. Change a key</h2>
-    <p class="prompt">Start each part from the lecture's min-heap, <code>1, 3, 2, 4, 7, 5, 6, 5, 9</code> (drawn in problem 2). (a) The 7 at index 5 has its priority decreased to 0. (b) Starting fresh, the 3 at index 2 has its priority increased to 10.</p>
-    <div class="answer-spec" data-part="dir-a" data-grader="choice" data-answer="up" data-options="up:percolate up|down:percolate down" data-miscon='{"down":"same-direction"}' data-label="(a) which way?"></div>
-    <div class="answer-spec" data-part="swaps-a" data-grader="exact" data-answer="2" data-label="(a) number of swaps"></div>
-    <div class="answer-spec" data-part="dir-b" data-grader="choice" data-answer="down" data-options="up:percolate up|down:percolate down" data-miscon='{"up":"same-direction"}' data-label="(b) which way?"></div>
-    <div class="answer-spec" data-part="index-b" data-grader="exact" data-answer="8" data-label="(b) the index where 10 ends up"></div>
+    <p class="prompt">This practices the lecture's rule for changing a priority. After one item's priority changes, call <code>percolateUp</code> or <code>percolateDown</code> on its index to move it back into place:</p>
+    <pre class="code">percolateUp(int i){
+    int parent = i/2;
+    Item val = arr[i];
+    while(i &gt; 1 &amp;&amp; arr[i] &lt; arr[parent]){
+        arr[i] = arr[parent];
+        arr[parent] = val;
+        i = parent;
+        parent = i/2;
+    }
+}</pre>
+    <pre class="code">percolateDown(int i){
+    int left = i*2;
+    int right = i*2+1;
+    Item val = arr[i];
+    while(left &lt;= size){
+        int toSwap = right;
+        if(right &gt; size || arr[left] &lt; arr[right]){
+            toSwap = left;
+        }
+        if(arr[toSwap] &lt; val){
+            arr[i] = arr[toSwap];
+            arr[toSwap] = val;
+            i = toSwap;
+            left = i*2;
+            right = i*2+1;
+        }
+        else{ return;}
+    }
+}</pre>
+    <p class="prompt">Start each part from the lecture's min-heap, in level order <code>1, 3, 2, 4, 7, 5, 6, 5, 9</code>, drawn here with its array indices:</p>
+    <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" data-idx role="img" aria-label="The lecture's heap with array indices: 1 at index 1, 3 at 2, 2 at 3, 4 at 4, 7 at 5, 5 at 6, 6 at 7, 5 at 8, 9 at 9"></svg>
+    <p class="prompt">(a) The 7 at index 5 has its priority decreased to 0. (b) Starting fresh, the 3 at index 2 has its priority increased to 10.</p>
+    <div class="answer-spec" data-part="dir-a" data-grader="choice" data-answer="up" data-options="up:percolate up|down:percolate down" data-miscon='{"down":"same-direction"}' data-label="(a) does the 0 percolate up or down?"></div>
+    <div class="answer-spec" data-part="swaps-a" data-grader="exact" data-answer="2" data-label="(a) the number of swaps"></div>
+    <div class="answer-spec" data-part="dir-b" data-grader="choice" data-answer="down" data-options="up:percolate up|down:percolate down" data-miscon='{"up":"same-direction"}' data-label="(b) does the 10 percolate up or down?"></div>
+    <div class="answer-spec" data-part="index-b" data-grader="exact" data-answer="8" data-label="(b) the index where the 10 ends up"></div>
     <ol class="hints">
       <li>In a min-heap, a smaller value may be smaller than its parent; a bigger value may be bigger than a child.</li>
       <li>For (b), at each step compare 10 with both children and swap with the smaller.</li>
@@ -2796,15 +3034,15 @@ print(extract)</code></pre>
   <div class="cyu-score" data-quiz-score="l5" role="status"></div>
   <ol class="cyu-list" data-quiz="l5">
     <li class="cyu" data-id="cse332-w2-q2-parent-1based" data-kind="num" data-answer="5" data-topic="l5-array" data-miscon='{"5.5":"no-floor","4":"zero-based"}'>
-      <p class="q">In the lecture's 1-indexed array, what is the index of the parent of node 11?</p>
+      <p class="q">A heap is stored the lecture's way: in an array, level by level, with the root at index 1. What is the index of the parent of the node at index 11?</p>
       <p class="why" hidden>The parent of \(i\) is \(i/2\) with integer division: \(11/2 = 5\).</p>
     </li>
     <li class="cyu" data-id="cse332-w2-l5-cyu-left-child-6" data-kind="num" data-answer="12" data-topic="l5-array" data-miscon='{"13":"zero-based"}'>
-      <p class="q">What is the index of the left child of node 6?</p>
+      <p class="q">In the same kind of heap array (root at index 1), what is the index of the left child of the node at index 6?</p>
       <p class="why" hidden>\(2\cdot 6 = 12\). The right child is 13.</p>
     </li>
     <li class="cyu" data-id="cse332-w2-l5-cyu-leaves-n12" data-kind="num" data-answer="7" data-topic="l5-array" data-miscon='{"6":"leaf-by-index"}'>
-      <p class="q">A heap holds 12 items. At which index do the leaves start?</p>
+      <p class="q">A heap holds 12 items in an array with the root at index 1. A leaf is a node with no children. At which index do the leaves start?</p>
       <p class="why" hidden>\(12/2 + 1 = 7\). Index 6 still has a left child, index 12.</p>
     </li>
     <li class="cyu" data-id="cse332-w2-l5-cyu-wrong-shape" data-kind="mc" data-topic="l5-valid">
@@ -2817,7 +3055,17 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-l5-cyu-why-val" data-kind="mc" data-topic="l5-insert-code">
-      <p class="q">Why does <code>percolateUp</code> save <code>Item val = arr[i];</code> before its loop?</p>
+      <p class="q">This is the lecture's <code>percolateUp</code>, which moves the item at index <code>i</code> up the heap array. Why does it save <code>Item val = arr[i];</code> before its loop?</p>
+      <pre class="code">percolateUp(int i){
+    int parent = i/2;
+    Item val = arr[i];
+    while(i &gt; 1 &amp;&amp; arr[i] &lt; arr[parent]){
+        arr[i] = arr[parent];
+        arr[parent] = val;
+        i = parent;
+        parent = i/2;
+    }
+}</pre>
       <div class="opts">
         <label data-correct><input type="radio" name="cse332-w2-l5-cyu-why-val"> The loop's first line writes the parent's value over <code>arr[i]</code>, so the moving item must be kept somewhere<span class="why" hidden>Correct. val is written into the parent's slot on the next line.</span></label>
         <label><input type="radio" name="cse332-w2-l5-cyu-why-val"> To compare it with arr[0]<span class="why" hidden>arr[0] is never read.</span></label>
@@ -2825,7 +3073,26 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-l5-cyu-only-left" data-kind="mc" data-topic="l5-extract-code">
-      <p class="q">In <code>percolateDown</code>, when does <code>toSwap</code> end up as the left child?</p>
+      <p class="q">This is the lecture's <code>percolateDown</code>, which moves the item at index <code>i</code> down the heap array. When does <code>toSwap</code> end up as the left child?</p>
+      <pre class="code">percolateDown(int i){
+    int left = i*2;
+    int right = i*2+1;
+    Item val = arr[i];
+    while(left &lt;= size){
+        int toSwap = right;
+        if(right &gt; size || arr[left] &lt; arr[right]){
+            toSwap = left;
+        }
+        if(arr[toSwap] &lt; val){
+            arr[i] = arr[toSwap];
+            arr[toSwap] = val;
+            i = toSwap;
+            left = i*2;
+            right = i*2+1;
+        }
+        else{ return;}
+    }
+}</pre>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-l5-cyu-only-left"> Always; the right child is only used if the left is missing<span class="why" hidden>It's the other way: the right child is the default.</span></label>
         <label data-correct><input type="radio" name="cse332-w2-l5-cyu-only-left"> When there is no right child, or the left child is smaller<span class="why" hidden>Correct: that's the test right > size || arr[left] &lt; arr[right].</span></label>
@@ -2833,7 +3100,7 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-l5-cyu-decrease-max" data-kind="mc" data-topic="l5-update">
-      <p class="q">In a <em>max</em>-heap, an item's priority value is decreased. Which way does it percolate?</p>
+      <p class="q">In a <em>max</em>-heap every node is \(\ge\) its children. An item's priority value is decreased. Which way does it percolate?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-l5-cyu-decrease-max"> Up<span class="why" hidden>That's decrease key in a min-heap.</span></label>
         <label data-correct><input type="radio" name="cse332-w2-l5-cyu-decrease-max"> Down<span class="why" hidden>Correct. In a max-heap a smaller value may now be smaller than a child, so it moves down.</span></label>
@@ -2848,7 +3115,13 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-q2-buildheap-time" data-kind="mc" data-topic="l5-buildtime">
-      <p class="q">Floyd's buildHeap on \(n\) items takes…</p>
+      <p class="q">Floyd's buildHeap puts \(n\) items in the heap array in any order, then calls <code>percolateDown(i)</code> for <code>i</code> from the last index back to 1:</p>
+      <pre class="code">buildHeap(){
+    for(int i = size; i&gt;0; i--){
+        percolateDown(i);
+    }
+}</pre>
+      <p class="q">How long does it take on \(n\) items, in the worst case?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-q2-buildheap-time"> \(\Theta(n\log n)\), since there are \(n\) percolate-downs of \(O(\log n)\) each<span class="why" hidden>That's an upper bound but not tight: most nodes are near the bottom and percolate only a step or two.</span></label>
         <label data-correct><input type="radio" name="cse332-w2-q2-buildheap-time"> \(\Theta(n)\)<span class="why" hidden>Correct. \(0\cdot\frac n2 + 1\cdot\frac n4 + 2\cdot\frac n8 + \dots \le n\).</span></label>
@@ -2857,7 +3130,7 @@ print(extract)</code></pre>
       </div>
     </li>
     <li class="cyu" data-id="cse332-w2-l5-cyu-build-vs-insert" data-kind="mc" data-topic="l5-build">
-      <p class="q">You have all \(n\) items up front. Which way of building a heap is asymptotically faster in the worst case?</p>
+      <p class="q">You have all \(n\) items up front. You can insert them one at a time into an empty heap, or put them in the array as given and run buildHeap (<code>percolateDown(i)</code> for <code>i</code> from the last index back to 1). Which is asymptotically faster in the worst case?</p>
       <div class="opts">
         <label><input type="radio" name="cse332-w2-l5-cyu-build-vs-insert"> Inserting them one at a time<span class="why" hidden>That's Θ(n log n) in the worst case: later inserts can climb about log n levels.</span></label>
         <label data-correct><input type="radio" name="cse332-w2-l5-cyu-build-vs-insert"> Putting them in the array and running buildHeap<span class="why" hidden>Correct: Θ(n).</span></label>
