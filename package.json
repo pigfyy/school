@@ -1,0 +1,10 @@
+{
+  "name": "school",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun tools/serve.mjs",
+    "check": "bun tests/check.mjs"
+  },
+  "devDependencies": { "playwright-core": "1.58.2" }
+}

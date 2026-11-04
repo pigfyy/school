@@ -95,7 +95,7 @@ of `site/core/grader.js`. Answer keys go either in the markup (`data-type`, `dat
 - Every computed answer against ground truth in `checks/<course>/<week>/verify.mjs`: run the lecture's code,
   brute-force small counting spaces. Don't trust mental arithmetic. Time-box this: check the answer keys, not
   the edge cases of the runtime.
-- `node tests/check.mjs <course>/<week>`, then look at the new pages once at desktop and phone size.
+- `bun check <course>/<week>`, then look at the new pages once at desktop and phone size (`bun dev` serves them).
 - Then commit and hand the deploy to Codex as `CLAUDE.md` says.
 
 ## Working efficiently

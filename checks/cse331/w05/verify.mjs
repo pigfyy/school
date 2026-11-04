@@ -6,7 +6,7 @@
 //      released in every order eventloop-sim.js allows: the page must end as the model says.
 //   3. Every computed answer key on the page: Section 4 by enumerating every small array each representation allows;
 //      Lecture 12's JSON and Lecture 13's stacks by running the notes' Java.
-// Usage: node checks/cse331/w05/verify.mjs   (java 17+; uses javac, else `java -m jdk.compiler`)
+// Usage: bun checks/cse331/w05/verify.mjs   (java 17+; uses javac, else `java -m jdk.compiler`)
 import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";

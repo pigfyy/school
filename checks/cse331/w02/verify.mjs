@@ -9,7 +9,7 @@
 //      boundary (needs ~10 GB of memory and a minute).
 // Stack traces: the site shows the frames the lecture notes print (JDK 25). This machine's JDK prints other
 // line numbers inside java.base, so for exceptions the test compares the exception line and the Sum.main frame.
-// Usage: node tests/compare-java.mjs   (java 17+; uses javac, else `java -m jdk.compiler`)
+// Usage: bun checks/cse331/w02/verify.mjs   (java 17+; uses javac, else `java -m jdk.compiler`)
 import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir, cpus } from "node:os";

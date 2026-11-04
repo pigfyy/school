@@ -8,7 +8,7 @@
 //   2. The notes' printed runs, against the simulator.
 //   3. Every answer key on the page that is computed (section 2, lectures 7 and 8) against W03.java, which holds
 //      the lectures' methods as printed, and against brute-force enumeration of small state spaces.
-// Usage: node checks/cse331/w03/verify.mjs   (java 17+; uses javac, else `java -m jdk.compiler`)
+// Usage: bun checks/cse331/w03/verify.mjs   (java 17+; uses javac, else `java -m jdk.compiler`)
 import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";

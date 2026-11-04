@@ -1,4 +1,4 @@
-# Dependencies (npm install in tests/)
+# Dependencies (bun install)
 node_modules/
 
 # Raw course files stay on disk; their text copies (materials/*/*/text/) and sources.json are committed

@@ -4,7 +4,7 @@
 //      both must print the same thing (the lecture's claim) and match the simulator.
 //   3. Lecture 2 indexOf impls, count, sign, maxList (SpecMany) vs site/js/spec-sim.js, call by call,
 //      plus the lecture's "which implementations meet which specs" table.
-// Usage: node tests/compare-java.mjs   (needs java 17+; uses javac from PATH, else `java -m jdk.compiler`)
+// Usage: bun checks/cse331/w01/verify.mjs   (needs java 17+; uses javac from PATH, else `java -m jdk.compiler`)
 import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

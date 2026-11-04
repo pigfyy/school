@@ -1,16 +1,17 @@
-// One check for the whole site. node tests/check.mjs [course/wNN ...]   (default: every posted week in site/courses.js)
+// One check for the whole site. bun check [course/wNN ...]   (default: every posted week in site/courses.js)
 // For each week page, at desktop and phone size: loads with no errors and no sideways scrolling; every quick check,
 // quiz question and problem accepts its own answer key; a wrong answer is not accepted; typed work survives a reload.
 // Answer keys themselves are checked against real code by checks/<course>/<week>/verify.mjs.
 import { chromium } from "playwright-core";
 import fs from "node:fs";
 import vm from "node:vm";
-import { serve } from "./serve.mjs";
+import { serve } from "../tools/serve.mjs";
 
 const cat = (() => { const ctx = { window: {} }; vm.runInNewContext(fs.readFileSync(new URL("../site/courses.js", import.meta.url), "utf8"), ctx); return ctx.window.COURSES; })();
 const weeks = process.argv.slice(2).length ? process.argv.slice(2) : cat.courses.flatMap((c) => c.weeks.filter((w) => w.posted).map((w) => `${c.id}/${w.id}`));
 const exe = [`${process.env.HOME}/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome`, process.env.CHROMIUM_PATH].find((p) => p && fs.existsSync(p));
-const server = await serve(8410);
+// No save API here: the check clears localStorage between passes, and a server copy would merge back in.
+const server = serve({ port: 8410 });
 const browser = await chromium.launch(exe ? { executablePath: exe } : {});
 let failures = 0;
 const fail = (msg) => { failures++; console.log("  FAIL", msg); };
@@ -93,6 +94,6 @@ for (const wk of weeks) {
   }
 }
 await browser.close();
-server.close();
+server.stop();
 console.log(failures ? `${failures} failure(s)` : "all good");
 process.exit(failures ? 1 : 0);

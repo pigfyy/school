@@ -6,7 +6,7 @@
 //   2. Lectures 10 and 11's HelpQueue classes and the notes' drafts (built by line edits), run through
 //      QueueHarness on random operation sequences: every result, exception and field must match queue-sim.js.
 //   3. Every computed answer key on the page (Section 3's triples by brute force; the lectures' runs).
-// Usage: node checks/cse331/w04/verify.mjs   (java 17+; uses javac, else `java -m jdk.compiler`)
+// Usage: bun checks/cse331/w04/verify.mjs   (java 17+; uses javac, else `java -m jdk.compiler`)
 import { spawn, spawnSync, execFileSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";

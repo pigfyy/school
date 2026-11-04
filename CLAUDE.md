@@ -22,6 +22,7 @@ site/                       the website, served as-is (no build step; also works
     keys.js / sim.js / …    optional: answer keys kept out of the markup, simulators
 materials/<course>/<week>/  raw course files + text/ (made by tools/ingest.sh)
 checks/<course>/<week>/     verify.mjs: answers checked against real code (javac, brute force)
+tools/serve.mjs             the site on this machine, saving included (`bun dev`)
 tests/check.mjs             one browser check for the whole site
 deploy/                     Worker + deploy steps. Codex runs these; read deploy/README.md
 ```
@@ -43,14 +44,20 @@ it. Adding to a week that already exists is the same job: add the new sessions t
    narrower pass may trim widgets, never the problems and quiz.
 4. Check:
    - Every computed answer against ground truth in `checks/<course>/<week>/verify.mjs` (run the lecture's code,
-     brute-force counts). Run it: `node checks/<course>/<week>/verify.mjs`.
-   - `node tests/check.mjs <course>/<week>` (run `npm install` in `tests/` once). It loads every page at desktop and
+     brute-force counts). Run it: `bun checks/<course>/<week>/verify.mjs`.
+   - `bun check <course>/<week>` (run `bun install` once). It loads every page at desktop and
      phone size, answers every item with its key and with a wrong answer, and checks saving.
    - Look at the new pages once at the end (desktop 1280×800, phone 390×844).
 5. Commit, then deploy (below).
 
 Keep it simple. New behavior that every week needs goes in `core/` once. A week only adds content and its own
 widgets. Don't add per-week stores, graders, test harnesses, export bundles or integration docs.
+
+## Running it locally
+
+`bun dev` serves `site/` at http://localhost:8400/ straight from disk, so an edit shows on the next reload with no
+deploy. Saving works the same as live: it runs `deploy/worker.mjs` with a local SQLite file
+(`.scratch/local.sqlite`) as the database. Those answers stay on this machine; Dot only sees the live Site's.
 
 ## Deploying
 

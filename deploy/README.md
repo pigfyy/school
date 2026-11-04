@@ -15,7 +15,7 @@ For the future Codex subagent told “deploy the latest site”:
    Send {credential: <returned object>} as hidden stdin JSON; retain its result.
 4. Build/package the latest static site with:
 
-   node /home/pigfy/.t3/projects/school/deploy/deploy.mjs
+   bun /home/pigfy/.t3/projects/school/deploy/deploy.mjs
 
    Omit the argument to deploy the latest site/. An optional argument selects
    another existing static directory; the old placeholder directory was deleted.
