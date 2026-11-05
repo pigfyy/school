@@ -860,9 +860,9 @@
     <h2>2. Three traversals</h2>
     <p class="prompt">Give the pre-order, in-order and post-order traversals of the lecture's BST.</p>
     <svg class="htree" data-bst="7(3(1(0,2),6),10(8,16))" role="img" aria-label="BST: root 7; children 3 and 10; 3 has children 1 and 6; 1 has children 0 and 2; 10 has children 8 and 16"></svg>
-    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="7 3 1 0 2 6 10 8 16|7, 3, 1, 0, 2, 6, 10, 8, 16" data-miscon='{"0 1 2 3 6 7 8 10 16":"inorder-not-pre","0 2 1 6 3 8 16 10 7":"inorder-not-pre"}' data-label="pre-order"></div>
-    <div class="answer-spec" data-part="in" data-grader="text" data-answer="0 1 2 3 6 7 8 10 16|0, 1, 2, 3, 6, 7, 8, 10, 16" data-label="in-order"></div>
-    <div class="answer-spec" data-part="post" data-grader="text" data-answer="0 2 1 6 3 8 16 10 7|0, 2, 1, 6, 3, 8, 16, 10, 7" data-miscon='{"7 3 1 0 2 6 10 8 16":"pre-not-post","0 1 2 3 6 7 8 10 16":"inorder-not-post"}' data-label="post-order"></div>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="7 3 1 0 2 6 10 8 16|7, 3, 1, 0, 2, 6, 10, 8, 16" data-miscon='{"0 1 2 3 6 7 8 10 16": "inorder-not-pre", "0, 1, 2, 3, 6, 7, 8, 10, 16": "inorder-not-pre", "0 2 1 6 3 8 16 10 7": "post-not-pre", "0, 2, 1, 6, 3, 8, 16, 10, 7": "post-not-pre"}' data-label="pre-order"></div>
+    <div class="answer-spec" data-part="in" data-grader="text" data-answer="0 1 2 3 6 7 8 10 16|0, 1, 2, 3, 6, 7, 8, 10, 16" data-miscon='{"7 3 1 0 2 6 10 8 16": "pre-not-in", "7, 3, 1, 0, 2, 6, 10, 8, 16": "pre-not-in", "0 2 1 6 3 8 16 10 7": "post-not-in", "0, 2, 1, 6, 3, 8, 16, 10, 7": "post-not-in"}' data-label="in-order"></div>
+    <div class="answer-spec" data-part="post" data-grader="text" data-answer="0 2 1 6 3 8 16 10 7|0, 2, 1, 6, 3, 8, 16, 10, 7" data-miscon='{"7 3 1 0 2 6 10 8 16": "pre-not-post", "7, 3, 1, 0, 2, 6, 10, 8, 16": "pre-not-post", "0 1 2 3 6 7 8 10 16": "inorder-not-post", "0, 1, 2, 3, 6, 7, 8, 10, 16": "inorder-not-post"}' data-label="post-order"></div>
     <ol class="hints">
       <li>Pre-order writes a node the first time you reach it. Post-order writes it after both its subtrees are done.</li>
       <li>In-order of a BST is just the keys sorted.</li>
@@ -944,7 +944,7 @@
     <div class="answer-spec" data-part="case5" data-grader="exact" data-answer="0" data-label="how many children 5 has when it's deleted"></div>
     <div class="answer-spec" data-part="case1" data-grader="exact" data-answer="1" data-label="how many children 1 has when it's deleted"></div>
     <div class="answer-spec" data-part="repl3" data-grader="exact" data-answer="0" data-miscon='{"1":"missed-earlier-delete","6":"min-of-right","7":"min-of-right"}' data-label="the key that takes 3's place"></div>
-    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="9 0 6 7 10 16|9, 0, 6, 7, 10, 16" data-label="pre-order of the final tree"></div>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="9 0 6 7 10 16|9, 0, 6, 7, 10, 16" data-miscon='{"0 6 7 9 10 16": "inorder-not-pre", "0, 6, 7, 9, 10, 16": "inorder-not-pre", "7 6 0 16 10 9": "post-not-pre", "7, 6, 0, 16, 10, 9": "post-not-pre"}' data-label="pre-order of the final tree"></div>
     <ol class="hints">
       <li>Redraw the tree after each delete. Deleting 1 changes 3's left subtree.</li>
       <li>After deleting 1, what's in 3's left subtree?</li>

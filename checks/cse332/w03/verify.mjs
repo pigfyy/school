@@ -628,6 +628,44 @@ ok(del(parse(S22), 3)[2] === 1 && d3.out[2][1] === 0, "deleting 3 first pulls up
     });
     if (!want.found) ok(steps.at(-1).shape === str(ins(t0, k)), `insert ${k} into ${shape}: final tree`);
   };
+  {
+    const src = Sim.INSERT_CODE.join("\n").replace(/^insert/, "function insert").replace(/\bNull\b/g, "null").replace(/new Node\(key, value\)/g, "{ key, value, left: null, right: null }");
+    const insert = new Function("self", `let parent; ${src.replace(/this\.root/g, "self.root")}; return (key, value) => insert.call(self, key, value, self.root);`);
+    const run = (ks) => { const self = { root: null }; const put = insert(self); for (const k of ks) put(k, `v${k}`); return self; };
+    let threw = null;
+    try { run([7]); } catch (e) { threw = e.message; }
+    ok(threw === null, `the displayed insert code runs on an empty tree${threw ? ` (threw: ${threw})` : ""}`);
+    const conv = (n) => (n ? [n.key, conv(n.left), conv(n.right)] : null);
+    for (const ks of [[7], [7, 3], [9, 3, 10, 1, 6, 16, 0, 5, 7], [1, 2, 3, 4, 5], [5, 5, 3]]) {
+      const t = run(ks);
+      ok(str(conv(t.root)) === str(fromKeys(ks)), `the displayed insert code builds ${str(fromKeys(ks))} from an empty tree`);
+    }
+    const t = run([5, 3, 5]);
+    ok(t.root.value === "v5" && t.root.left.key === 3, "the displayed insert code overwrites the value of a key already present");
+    const hl = (s) => s.line.map((i) => Sim.INSERT_CODE[i]).join("\n");
+    for (const k of [5, 8, 6, -1]) {
+      const st = Sim.insertSteps(Sim.parseShape(S7), k);
+      ok(hl(st[0]).trim() === "parent = Null;", `insert ${k} step 0 highlights parent = Null`);
+      st.slice(1).forEach((s, i) => ok(/while \(root != Null/.test(hl(s)) || /root\.value = value/.test(hl(s)) || /new Node/.test(hl(s)), `insert ${k} step ${i + 1} highlights the loop, the overwrite or the new node`));
+      const fin = st.at(-1);
+      if (k === 6) ok(/if \(root != Null\)\n\s+root\.value = value;/.test(hl(fin)), "insert 6 (present) highlights the overwrite");
+    }
+  }
+  {
+    const WEEK = ((window) => (new Function("window", readFileSync(`${here}../../../site/cse332/w03/week.js`, "utf8"))(window), window.WEEK))({});
+    const ORDERS = { pre, in: ino, post }, TAG = { pre: "pre", in: "inorder", post: "post" };
+    const boxes = [["cse332-w3-l7-traversals", "pre", parse(S12)], ["cse332-w3-l7-traversals", "in", parse(S12)], ["cse332-w3-l7-traversals", "post", parse(S12)], ["cse332-w3-l7-delete", "pre", d3.t]];
+    for (const [task, want, t] of boxes) {
+      const a = html.indexOf(`data-id="${task}"`), tag = /<div class="answer-spec" data-part="[^"]*"[^>]*>/g;
+      tag.lastIndex = a;
+      let spec; while ((spec = tag.exec(html)) && attr(spec[0], "data-part") !== want);
+      const miscon = JSON.parse(attr(spec[0], "data-miscon") || "{}");
+      for (const o of Object.keys(ORDERS).filter((o) => o !== want)) for (const typed of [sp(ORDERS[o](t)), ORDERS[o](t).join(", ")]) {
+        ok(miscon[typed] === `${TAG[o]}-not-${want}`, `${task}.${want}: typing the ${o}-order "${typed}" says it's the ${o}-order`);
+        ok(/^That's (the )?(in|pre|post)-order/.test(WEEK.messages[miscon[typed]] || "") && WEEK.messages[miscon[typed]].includes(o === "in" ? "in-order" : `${o}-order`), `${task}.${want}: message for ${miscon[typed]} names the ${o}-order`);
+      }
+    }
+  }
   checkInsert(S7, 5);
   for (const k of [-1, 2, 4, 5, 8, 11, 17, 7, 16]) checkInsert(S7, k);
 
