@@ -1,6 +1,26 @@
 const MAX_BODY = 1024 * 1024;
 const json = (data, status = 200) => Response.json(data, { status, headers: { 'Cache-Control': 'private, no-store' } });
 
+// The same merge as site/core/store.js: per item the newer snapshot wins, attempts and events are unioned by id.
+// Data not shaped like {items: {...}} (such as test/w00's) is replaced.
+const isWeek = (d) => d?.items && typeof d.items === 'object' && !Array.isArray(d.items);
+function unionById(a, b) {
+  const seen = new Map();
+  for (const x of [...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])]) if (x?.id && !seen.has(x.id)) seen.set(x.id, x);
+  return [...seen.values()].sort((x, y) => (x.at < y.at ? -1 : x.at > y.at ? 1 : 0));
+}
+function mergeWeek(incoming, stored) {
+  if (!isWeek(incoming) || !isWeek(stored)) return incoming;
+  const items = {};
+  for (const id of new Set([...Object.keys(stored.items), ...Object.keys(incoming.items)])) {
+    const n = incoming.items[id], s = stored.items[id];
+    if (!n || !s) { items[id] = n || s; continue; }
+    const newer = (n.updatedAt || '') >= (s.updatedAt || '') ? n : s;
+    items[id] = { ...newer, attempts: unionById(n.attempts, s.attempts), events: unionById(n.events, s.events) };
+  }
+  return { items };
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -34,9 +54,19 @@ export default {
       let body;
       try { body = JSON.parse(new TextDecoder().decode(bytes)); } catch { return json({ error: 'Invalid JSON' }, 400); }
       if (!body || typeof body !== 'object' || Array.isArray(body) || !Object.hasOwn(body, 'data')) return json({ error: 'Expected {data: ...}' }, 400);
-      const updatedAt = new Date().toISOString();
-      await env.DB.prepare('INSERT INTO state (user_id, email, course, week, data, updated_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(user_id, course, week) DO UPDATE SET email = excluded.email, data = excluded.data, updated_at = excluded.updated_at').bind(user, request.headers.get('oai-authenticated-user-email'), course, week, JSON.stringify(body.data), updatedAt).run();
-      return json({ updatedAt });
+      const email = request.headers.get('oai-authenticated-user-email');
+      // Compare-and-swap on updated_at, which every write moves strictly forward, so a PUT that raced another rereads and merges again.
+      for (let tries = 0; tries < 5; tries++) {
+        const row = await env.DB.prepare('SELECT data, updated_at FROM state WHERE user_id = ? AND course = ? AND week = ?').bind(user, course, week).first();
+        let updatedAt = new Date().toISOString();
+        if (row?.updated_at && updatedAt <= row.updated_at) updatedAt = new Date(Date.parse(row.updated_at) + 1).toISOString();
+        const data = JSON.stringify(row ? mergeWeek(body.data, JSON.parse(row.data)) : body.data);
+        const write = row
+          ? env.DB.prepare('UPDATE state SET email = ?, data = ?, updated_at = ? WHERE user_id = ? AND course = ? AND week = ? AND updated_at IS ?').bind(email, data, updatedAt, user, course, week, row.updated_at)
+          : env.DB.prepare('INSERT INTO state (user_id, email, course, week, data, updated_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(user_id, course, week) DO NOTHING').bind(user, email, course, week, data, updatedAt);
+        if ((await write.run()).meta.changes === 1) return json({ updatedAt });
+      }
+      return json({ error: 'Busy, try again' }, 409);
     }
     if (!['GET', 'HEAD'].includes(request.method)) return new Response('Method not allowed', { status: 405 });
     let path;

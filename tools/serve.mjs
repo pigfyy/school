@@ -9,13 +9,13 @@ import worker from "../deploy/worker.mjs";
 const repo = resolve(import.meta.dir, "..");
 const site = join(repo, "site");
 
-// The two calls worker.mjs makes on the Site's database: prepare(sql).bind(...).first() / .run().
-function localDb(file) {
+// The two calls worker.mjs makes on the Site's database: prepare(sql).bind(...).first() / .run(), shaped like D1's results.
+export function localDb(file) {
   if (file !== ":memory:") mkdirSync(dirname(file), { recursive: true });
   const db = new Database(file, { create: true });
   if (!db.query("SELECT name FROM sqlite_master WHERE name = 'state'").get()) db.exec(readFileSync(join(repo, "deploy/drizzle/0000_state.sql"), "utf8"));
   return {
-    prepare: (sql) => ({ bind: (...args) => ({ first: async () => db.query(sql).get(...args), run: async () => db.query(sql).run(...args) }) }),
+    prepare: (sql) => ({ bind: (...args) => ({ first: async () => db.query(sql).get(...args), run: async () => ({ meta: { changes: db.query(sql).run(...args).changes } }) }) }),
   };
 }
 

@@ -47,7 +47,10 @@ GET returns {data, updatedAt}; PUT accepts {data} and returns {updatedAt}.
 Course: lowercase letters, digits, hyphens. Week: w plus exactly two digits.
 Identity: oai-authenticated-user-id; missing identity returns 401.
 Email: oai-authenticated-user-email. State is isolated per user/course/week.
-PUT has a 1 MiB body cap. Updates replace the entire JSON value.
+PUT has a 1 MiB body cap. A PUT of {items: {...}} is merged into the stored
+week the way site/core/store.js merges: per item the newer updatedAt wins and
+attempts/events are unioned by id, so one client can't erase another's answers.
+Any other shape (such as test/w00's {check}) replaces the stored value.
 The DB binding and single state table are declared in .openai/hosting.json
 and drizzle/0000_state.sql; append migrations rather than editing applied ones.
 
