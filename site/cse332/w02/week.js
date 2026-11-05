@@ -605,29 +605,6 @@ function setupNumUnique() {
   load("distinct");
 }
 
-/* =========================================================== brute-force buttons */
-const BRUTE = {
-  "worst-cases"() {
-    const rows = [32, 1000].map((n) => [n, Sim.binaryWorstExhaustive(n), Sim.worstGaps(n).length]);
-    const ok = rows[0][1] === 6 && rows[1][1] === 10 && rows.every((r) => r[1] === r[2]);
-    return { ok, text: `Ran binary_contains for every possible target (each item and each gap): 32 items → ${rows[0][1]} loops at most; 1,000 items → ${rows[1][1]}.` };
-  },
-};
-function setupBrute() {
-  $$("[data-brute]").forEach((btn) => {
-    const out = btn.nextElementSibling;
-    btn.addEventListener("click", () => {
-      out.className = "brute"; out.textContent = "Running…"; btn.disabled = true;
-      setTimeout(() => {
-        const r = BRUTE[btn.dataset.brute]();
-        btn.disabled = false;
-        out.className = `brute ${r.ok ? "ok" : ""}`;
-        out.textContent = r.text;
-      }, 20);
-    });
-  });
-}
-
 /* ---- wire it up */
 setupStaticPictures();
 setupHero();
@@ -641,5 +618,4 @@ setupPlayground();
 setupBuildCost();
 setupBand();
 setupNumUnique();
-setupBrute();
 };

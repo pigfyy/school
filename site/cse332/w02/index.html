@@ -48,8 +48,7 @@
         <li><a href="#l4-heap">What a heap is</a></li>
         <li><a href="#l4-insert">Insert: percolate up</a></li>
         <li><a href="#l4-extract">Extract: percolate down</a></li>
-        <li><a href="#l4-problems">Lecture 4 problems</a></li>
-        <li><a href="#cyu-l4">Check your understanding</a></li>
+        <li><a href="#l4-problems">Lecture 4 practice</a></li>
       </ol>
     </div>
     <div>
@@ -507,7 +506,7 @@
 <section class="page" id="l3-problems" data-title="Lecture 3 practice">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
   <h1>Lecture 3 practice</h1>
-  <div class="prose"><p>One problem per lesson, with easy numbers. Stuck? Open a hint. The solution goes one step at a time.</p><p>Number boxes take a number, Big-O boxes take a bucket like <code>n log n</code>, and yes/no boxes take <code>yes</code> or <code>no</code>. For a \(c\) and \(n_0\), any pair that works is accepted.</p></div>
+  <div class="prose"><p>One problem per lesson, with easy numbers. Stuck? Open a hint. The solution goes one step at a time.</p><p>Number boxes take a number and Big-O boxes take a bucket like <code>n log n</code>. Yes/no questions are two buttons. For a \(c\) and \(n_0\), any pair that works is accepted.</p></div>
   <div data-progress-bar></div>
 
   <h2 class="practice-group">Binary search</h2>
@@ -528,12 +527,11 @@
         <li>\(1000 \to 500 \to 250 \to 125 \to 62 \to 31 \to 15 \to 7 \to 3 \to 1\): ten numbers, so 10 loops.</li>
         <li class="answer">6; 10. Both are about \(\log_2 n\) plus one.</li>
       </ol></div>
-      <div class="step-bar"><button class="btn" type="button" data-brute="worst-cases">Check by brute force</button><span class="brute"></span></div>
     </div>
   </article>
 
   <div class="check" data-id="cse332-w2-l3-log-base-same" data-grader="yesno" data-answer="yes">
-    <p>Quick check: \(\log_8 n\) is just \(\log_2 n \div 3\). Are \(\log_8 n\) and \(\log_2 n\) in the same bucket? (yes or no)</p>
+    <p>Quick check: \(\log_8 n\) is just \(\log_2 n \div 3\). Are \(\log_8 n\) and \(\log_2 n\) in the same bucket?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
@@ -646,7 +644,7 @@
     <p class="prompt">Same template, flipped to \(\ge\): find a \(c\) and an \(n_0\) with \(3n - 6 \ge c\cdot n\) for every \(n \ge n_0\).</p>
     <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["-6","3"],"g":["0","1"],"rel":"Omega"}' data-label="your \(c\)"></div>
     <div class="answer-spec" data-part="n0" data-grader="bound" data-role="n0" data-label="your \(n_0\)"></div>
-    <div class="answer-spec" data-part="c3-possible" data-grader="yesno" data-answer="no" data-miscon='{"yes":"c3-works"}' data-label="Does any \(n_0\) work with \(c = 3\)? (yes or no)"></div>
+    <div class="answer-spec" data-part="c3-possible" data-grader="yesno" data-answer="no" data-miscon='{"yes":"c3-works"}' data-label="Does any \(n_0\) work with \(c = 3\)?"></div>
     <ol class="hints">
       <li>Try \(c = 3\) first. What's left after the \(3n\)s cancel?</li>
       <li>For \(\Omega\), a smaller \(c\) is easier. Try \(c = 2\).</li>
@@ -912,224 +910,189 @@
 </section>
 
 <!-- ================================================================ L4 PROBLEMS -->
-<section class="page" id="l4-problems" data-title="Lecture 4 problems">
+<section class="page" id="l4-problems" data-title="Lecture 4 practice">
   <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
-  <h1>Lecture 4 problems</h1>
-  <div class="prose"><p>Built on the lecture's examples: a priority queue trace, its table of data structures, its height argument, and its insert and extract on a tree. Every answer was computed by running the lecture's pseudocode. Draw the tree as you go.</p></div>
+  <h1>Lecture 4 practice</h1>
+  <div class="prose"><p>One group per lesson. Draw the tree on paper as you go: that's the skill. You can check one answer at a time, and each solution draws the tree after every step.</p></div>
+  <div data-progress-bar></div>
+
+  <h2 class="practice-group">Priority queues</h2>
+  <p class="note">Lesson: <a href="#l4-pq">Priority queues</a></p>
 
   <article class="task" data-id="cse332-w2-l4-pq-trace">
     <h2>1. Trace a priority queue</h2>
-    <p class="prompt">This practices the priority queue ADT from the lecture. <code>insert(x)</code> adds \(x\), and \(x\) is also its own priority. <code>extract</code> removes and returns the item with the <em>smallest</em> priority now in the queue, no matter when it arrived. Start with an empty priority queue and run this script. Each <code>print(extract)</code> prints what it returns.</p>
-    <pre class="code"><code>insert(9)  insert(4)  insert(7)
-print(extract)
-insert(2)
-print(extract)
-print(extract)
-insert(6)
-print(extract)
-print(extract)</code></pre>
-    <div class="answer-spec" data-part="first" data-grader="exact" data-answer="4" data-miscon='{"9":"oldest-not-smallest"}' data-label="first value printed"></div>
-    <div class="answer-spec" data-part="second" data-grader="exact" data-answer="2" data-label="second value printed"></div>
-    <div class="answer-spec" data-part="third" data-grader="exact" data-answer="7" data-label="third value printed"></div>
-    <div class="answer-spec" data-part="fifth" data-grader="exact" data-answer="9" data-label="fifth (last) value printed"></div>
+    <p class="prompt">Start empty. Each number is its own priority. What does each <code>extract</code> print?</p>
+    <pre class="code"><code>insert 9, 4, 7
+extract
+insert 2
+extract
+extract
+insert 6
+extract
+extract</code></pre>
+    <div class="answer-spec" data-part="first" data-grader="exact" data-answer="4" data-miscon='{"9":"oldest-not-smallest"}' data-label="1st extract"></div>
+    <div class="answer-spec" data-part="second" data-grader="exact" data-answer="2" data-label="2nd extract"></div>
+    <div class="answer-spec" data-part="third" data-grader="exact" data-answer="7" data-label="3rd extract"></div>
+    <div class="answer-spec" data-part="fourth" data-grader="exact" data-answer="6" data-label="4th extract"></div>
+    <div class="answer-spec" data-part="fifth" data-grader="exact" data-answer="9" data-label="5th extract"></div>
     <ol class="hints">
-      <li>Keep the items still waiting in a list. An <code>extract</code> removes the smallest one <em>now in the queue</em>, not the smallest ever inserted.</li>
-      <li>After the first <code>extract</code> the queue holds 9 and 7. The next insert is 2.</li>
+      <li>Write down what's waiting after every line. Extract takes the smallest one waiting <em>right now</em>.</li>
     </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>After the three inserts the queue holds 9, 4, 7. <code>extract</code> prints 4.</li>
-      <li><code>insert(2)</code>, then <code>extract</code> prints 2 (it beats 7 and 9, even though it arrived later). The next <code>extract</code> prints 7.</li>
-      <li>Now only 9 is left. <code>insert(6)</code>, then <code>extract</code> prints 6, and the last <code>extract</code> prints 9.</li>
-      <li class="answer">4, 2, 7, 6, 9. A queue would print them in arrival order (9, 4, 7, …); a priority queue serves by priority.</li>
+    <div class="solution"><div class="steps board"><ol>
+      <li><span class="lab">insert 9, 4, 7</span><span class="mth">\(\{4, 7, 9\}\)</span><span class="note"></span></li>
+      <li><span class="lab">extract</span><span class="mth">\(\{7, 9\}\)</span><span class="note">prints 4</span></li>
+      <li><span class="lab">insert 2</span><span class="mth">\(\{2, 7, 9\}\)</span><span class="note"></span></li>
+      <li><span class="lab">extract ×2</span><span class="mth">\(\{9\}\)</span><span class="note">prints 2, then 7</span></li>
+      <li><span class="lab">insert 6</span><span class="mth">\(\{6, 9\}\)</span><span class="note"></span></li>
+      <li><span class="lab">extract ×2</span><span class="mth">\(\{\,\}\)</span><span class="note">prints 6, then 9</span></li>
+      <li class="wide answer">4, 2, 7, 6, 9. The 2 arrived late and still left early.</li>
     </ol></div></div>
   </article>
+
+  <h2 class="practice-group">Why not a list</h2>
+  <p class="note">Lesson: <a href="#l4-impl">Why not a list</a></p>
 
   <article class="task" data-id="cse332-w2-l4-pq-costs">
-    <h2>2. Pick the data structure</h2>
-    <p class="prompt">This practices the lecture's comparison of ways to store a priority queue. Each structure holds \(n\) items, and the array is big enough that it never has to grow:</p>
-    <ul class="prompt">
-      <li><strong>Unsorted array:</strong> <code>insert</code> writes the new item at the back. <code>extract</code> has to find the smallest item.</li>
-      <li><strong>Sorted array:</strong> kept in descending order, so the smallest item is at the back. <code>insert</code> has to put the new item in its sorted place.</li>
-      <li><strong>Binary heap:</strong> a complete binary tree where every node is \(\le\) its children.</li>
-    </ul>
-    <p class="prompt">Give the worst-case running time of one operation as a \(\Theta\) class, like <code>n</code> or <code>log n</code>.</p>
-    <div class="answer-spec" data-part="unsorted-extract" data-grader="bigo" data-answer="n" data-label="extract from the unsorted array"></div>
-    <div class="answer-spec" data-part="sorted-insert" data-grader="bigo" data-answer="n" data-label="insert into the sorted array"></div>
-    <div class="answer-spec" data-part="sorted-extract" data-grader="bigo" data-answer="1" data-label="extract from the sorted array"></div>
-    <div class="answer-spec" data-part="heap-insert" data-grader="bigo" data-answer="log n" data-label="insert into the binary heap"></div>
+    <h2>2. What does it cost?</h2>
+    <p class="prompt">Worst case for one operation on \(n\) items. Write a bucket like <code>n</code>, <code>log n</code> or <code>1</code>.</p>
+    <div class="answer-spec" data-part="unsorted-extract" data-grader="bigo" data-answer="n" data-label="unsorted list: extract"></div>
+    <div class="answer-spec" data-part="sorted-insert" data-grader="bigo" data-answer="n" data-label="sorted list: insert"></div>
+    <div class="answer-spec" data-part="sorted-extract" data-grader="bigo" data-answer="1" data-label="sorted list: extract"></div>
+    <div class="answer-spec" data-part="heap-insert" data-grader="bigo" data-answer="log n" data-label="heap: insert"></div>
     <ol class="hints">
-      <li>Which operation is cheap in a structure that keeps its items unsorted? Which in one that keeps them sorted?</li>
-      <li>The sorted array keeps its smallest item at the back. What does <code>extract</code> have to do to remove it?</li>
+      <li>Unsorted: where's the smallest? Sorted: where does a new item go?</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>Unsorted array: <code>insert</code> is one write at the end, \(\Theta(1)\). <code>extract</code> has to scan for the smallest, \(\Theta(n)\).</li>
-      <li>Sorted array: <code>insert</code> must find the spot and shift the rest, \(\Theta(n)\). The smallest sits at the back, so <code>extract</code> removes it without shifting anything: \(\Theta(1)\).</li>
-      <li>Binary heap: both operations follow one root-to-leaf path, \(\Theta(\log n)\).</li>
-      <li class="answer">\(\Theta(n)\); \(\Theta(n)\); \(\Theta(1)\); \(\Theta(\log n)\). Each simple structure makes one operation cheap and the other expensive; the heap makes both cheap enough.</li>
+      <li>Unsorted list, extract: the smallest could be anywhere, so scan all \(n\). \(\Theta(n)\).</li>
+      <li>Sorted list, insert: find the spot and make room. \(\Theta(n)\).</li>
+      <li>Sorted list, extract: the smallest is right at the end. \(\Theta(1)\).</li>
+      <li>Heap, insert: one climb up the tree's height. \(\Theta(\log n)\).</li>
+      <li class="answer">\(n\); \(n\); \(1\); \(\log n\).</li>
     </ol></div></div>
   </article>
+
+  <div class="check" data-id="cse332-w2-l4-cyu-sort-with-pq" data-grader="bigo" data-answer="n log n">
+    <p>Quick check: sort \(n\) items with a heap: insert all \(n\), then extract \(n\) times. Each operation is \(O(\log n)\). What's the total, as a bucket?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="e.g. n log n"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group">What a heap is</h2>
+  <p class="note">Lesson: <a href="#l4-heap">What a heap is</a></p>
 
   <article class="task" data-id="cse332-w2-l4-height">
-    <h2>3. How tall can a heap be?</h2>
-    <p class="prompt">This practices the lecture's reason a heap is short: it is always a <em>complete</em> binary tree, with every level full except the bottom one, which fills from the left. The <strong>height</strong> is the number of edges on the longest path down from the root. A binary tree of height \(h\) has at most \(1 + 2 + 4 + \dots + 2^h = 2^{h+1}-1\) nodes. A complete tree with \(n\) nodes has the smallest height \(h\) with \(n \le 2^{h+1}-1\).</p>
-    <div class="answer-spec" data-part="max-h5" data-grader="exact" data-answer="63" data-label="the most nodes a binary tree of height 5 can have"></div>
-    <div class="answer-spec" data-part="h-1000" data-grader="exact" data-answer="9" data-miscon='{"10":"full-tree-off-by-one"}' data-label="the height of a complete tree with \(n = 1000\) nodes"></div>
-    <div class="answer-spec" data-part="h-1024" data-grader="exact" data-answer="10" data-label="the height of a complete tree with \(n = 1024\) nodes"></div>
-    <div class="answer-spec" data-part="h-1023" data-grader="exact" data-answer="9" data-label="the height of a complete tree with \(n = 1023\) nodes"></div>
+    <h2>3. How tall is it?</h2>
+    <p class="prompt">Height counts the edges from the root down to the bottom. A full tree with 1, 3, 7 or 15 nodes has height 0, 1, 2 or 3. What's the height of a complete tree with this many nodes?</p>
+    <div class="answer-spec" data-part="h-10" data-grader="exact" data-answer="3" data-miscon='{"4":"full-tree-off-by-one","10":"height-not-count"}' data-label="10 nodes"></div>
+    <div class="answer-spec" data-part="h-15" data-grader="exact" data-answer="3" data-miscon='{"4":"full-tree-off-by-one"}' data-label="15 nodes"></div>
+    <div class="answer-spec" data-part="h-16" data-grader="exact" data-answer="4" data-label="16 nodes"></div>
     <ol class="hints">
-      <li>\(2^{5+1}-1\). For the heights, find the smallest \(h\) whose bound is at least \(n\).</li>
-      <li>\(2^{10} = 1024\) and \(2^{9} = 512\), so \(2^{10}-1 = 1023\) is the largest tree of height 9.</li>
+      <li>A new level starts only when the one above is full. Which full tree is just below each number?</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>Height 5: \(2^{6}-1 = 63\) nodes at most.</li>
-      <li>For \(n = 1000\): \(2^{9}-1 = 511 &lt; 1000 \le 1023 = 2^{10}-1\), so \(h = 9\).</li>
-      <li>For \(n = 1023\) the tree is exactly full at height 9: \(2^{10}-1 = 1023\). For \(n = 1024\) one more node starts a new level, so the height is 10.</li>
-      <li class="answer">63; 9; 10; 9. In general \(h = \lceil\log_2(n+1)\rceil - 1\), which is \(\Theta(\log n)\).</li>
+      <li>10 nodes: 7 fill height 2, and 10 fits under 15. Height 3.</li>
+      <li>15 nodes: exactly the full tree of height 3. Height 3.</li>
+      <li>16 nodes: 15 is full, so the 16th starts a new level. Height 4.</li>
+      <li class="answer">3; 3; 4. The height grows by one each time the node count doubles: about \(\log_2 n\).</li>
     </ol></div></div>
   </article>
+
+  <div class="check" data-id="cse332-w2-l4-cyu-root-min" data-grader="mc">
+    <p>Quick check: why is the smallest item always at the root of a min-heap?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w2-l4-cyu-root-min"> Insert puts new items at the root<span class="why" hidden>Insert puts them at the bottom, then lets them climb.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l4-cyu-root-min"> Each parent is ≤ its children, so walking up never makes the value bigger<span class="why" hidden>Right. Every node leads up to the root, so the root is ≤ all of them.</span></label>
+      <label><input type="radio" name="cse332-w2-l4-cyu-root-min"> The tree is complete<span class="why" hidden>Complete is about the shape. A complete tree with random values could have its minimum anywhere.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group">Insert</h2>
+  <p class="note">Lesson: <a href="#l4-insert">Insert: percolate up</a></p>
 
   <article class="task" data-id="cse332-w2-l4-insert-tree">
-    <h2>4. Insert into a tree</h2>
-    <p class="prompt">This practices the lecture's insert. Insert puts the new item in the next open spot (the leftmost empty place on the bottom level, or a new level if the bottom is full). Then it <strong>percolates up</strong>: while the item is smaller than its parent, swap the two. Start from this min-heap and <code>insert(4)</code>.</p>
+    <h2>4. Insert 4</h2>
+    <p class="prompt">Insert 4 into this min-heap: next open spot, then swap up while it's smaller than its parent.</p>
     <svg class="htree" data-tree="2,5,3,9,6,4,8" role="img" aria-label="Min-heap: root 2; children 5 and 3; 5 has children 9 and 6; 3 has children 4 and 8"></svg>
-    <div class="answer-spec" data-part="swaps" data-grader="exact" data-answer="2" data-label="number of swaps while 4 percolates up"></div>
-    <div class="answer-spec" data-part="root-left" data-grader="exact" data-answer="4" data-label="the value at the root's left child afterwards"></div>
-    <div class="answer-spec" data-part="bottom-left" data-grader="exact" data-answer="9" data-label="the value at the bottom-left leaf afterwards"></div>
+    <div class="answer-spec" data-part="swaps" data-grader="exact" data-answer="2" data-label="how many swaps?"></div>
+    <div class="answer-spec" data-part="root-left" data-grader="exact" data-answer="4" data-label="root's left child at the end"></div>
+    <div class="answer-spec" data-part="bottom-left" data-grader="exact" data-answer="9" data-label="bottom-left leaf at the end"></div>
     <ol class="hints">
-      <li>The tree has a full bottom level, so the next open spot starts a new level at the far left: under the 9.</li>
-      <li>Compare 4 with each parent on the way up. Stop when the parent is not bigger.</li>
+      <li>The bottom level is full, so 4 starts a new level at the far left, under the 9.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>4 goes in the next open spot, the left child of 9. \(4 &lt; 9\): swap. 9 is now the bottom-left leaf.</li>
-      <li>4's parent is now 5. \(4 &lt; 5\): swap. 4 is the root's left child.</li>
-      <li>4's parent is now the root, 2. \(4 &lt; 2\) is false: stop.</li>
-      <li class="answer">2 swaps; the root's left child is 4; the bottom-left leaf is 9. Level order: 2, 4, 3, 5, 6, 4, 8, 9.</li>
+      <li>4 goes in the next open spot, under 9.<svg class="htree" data-step data-tree="2,5,3,9,6,4,8,4" data-cmp="8" role="img" aria-label="4 added under 9"></svg></li>
+      <li>\(4 &lt; 9\): swap.<svg class="htree" data-step data-tree="2,5,3,4,6,4,8,9" data-cmp="4" role="img" aria-label="4 swapped above 9"></svg></li>
+      <li>\(4 &lt; 5\): swap.<svg class="htree" data-step data-tree="2,4,3,5,6,4,8,9" data-cmp="2" role="img" aria-label="4 swapped above 5"></svg></li>
+      <li>\(4 &lt; 2\) is false: stop.</li>
+      <li class="answer">2 swaps; the root's left child is 4; the bottom-left leaf is 9.</li>
     </ol></div></div>
   </article>
 
+  <div class="check" data-id="cse332-w2-l4-cyu-insert-spot" data-grader="mc">
+    <p>Quick check: where does a new item go before it starts to climb?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w2-l4-cyu-insert-spot"> At the root<span class="why" hidden>Then the old root has nowhere to go without breaking the shape.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l4-cyu-insert-spot"> The next open spot: leftmost empty place on the bottom level<span class="why" hidden>Right. Shape first: that keeps the tree complete. Climbing fixes the order.</span></label>
+      <label><input type="radio" name="cse332-w2-l4-cyu-insert-spot"> At its sorted position<span class="why" hidden>A heap isn't sorted, and finding a sorted spot would cost Θ(n).</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group">Extract</h2>
+  <p class="note">Lesson: <a href="#l4-extract">Extract: percolate down</a></p>
+
   <article class="task" data-id="cse332-w2-l4-extract-tree">
-    <h2>5. Extract from a tree</h2>
-    <p class="prompt">This practices the lecture's extract. Extract saves the root (the minimum, which it returns), moves the bottom-right item into the root, and then <strong>percolates it down</strong>: while it is bigger than a child, swap it with its <em>smaller</em> child. Start from this min-heap and call <code>extract()</code> once.</p>
+    <h2>5. Extract once</h2>
+    <p class="prompt">Call <code>extract()</code> on the same heap: save the root, move the bottom-right item up, then sink it, swapping with the smaller child.</p>
     <svg class="htree" data-tree="2,5,3,9,6,4,8" role="img" aria-label="Min-heap: root 2; children 5 and 3; 5 has children 9 and 6; 3 has children 4 and 8"></svg>
-    <div class="answer-spec" data-part="returned" data-grader="exact" data-answer="2" data-label="the value extract returns"></div>
-    <div class="answer-spec" data-part="swaps" data-grader="exact" data-answer="2" data-label="number of swaps while 8 percolates down"></div>
-    <div class="answer-spec" data-part="new-root" data-grader="exact" data-answer="3" data-miscon='{"8":"moved-item","5":"larger-child"}' data-label="the new root afterwards"></div>
-    <div class="answer-spec" data-part="parent-of-8" data-grader="exact" data-answer="4" data-label="the value of 8's parent when 8 stops"></div>
+    <div class="answer-spec" data-part="returned" data-grader="exact" data-answer="2" data-label="what it returns"></div>
+    <div class="answer-spec" data-part="new-root" data-grader="exact" data-answer="3" data-miscon='{"8":"moved-item","5":"larger-child"}' data-label="the new root"></div>
+    <div class="answer-spec" data-part="swaps" data-grader="exact" data-answer="2" data-label="how many swaps?"></div>
+    <div class="answer-spec" data-part="parent-of-8" data-grader="exact" data-answer="4" data-label="8's parent when it stops"></div>
     <ol class="hints">
-      <li>Save the root. The bottom-right item is 8: it moves into the root.</li>
-      <li>At each step compare 8 with both children and swap with the smaller one, if it's smaller than 8.</li>
+      <li>The bottom-right item is 8. It goes to the root.</li>
+      <li>Compare 8 with both children and swap with the smaller one, while it's smaller than 8.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>Return value: the root, 2. Move 8 (bottom-right) into the root. The tree now has 6 items.</li>
-      <li>8's children are 5 and 3. The smaller is 3, and \(3 &lt; 8\): swap. 3 is the new root.</li>
-      <li>8's only child is now 4 (the 8's old spot is gone). \(4 &lt; 8\): swap. 8 is a leaf under 4.</li>
-      <li class="answer">Returns 2; 2 swaps; new root 3; 8's parent is 4. Level order: 3, 5, 4, 9, 6, 8.</li>
+      <li>Return the root, 2. Move 8 into the root.<svg class="htree" data-step data-tree="8,5,3,9,6,4" data-cmp="1" role="img" aria-label="8 moved to the root"></svg></li>
+      <li>Children 5 and 3: the smaller is 3, and \(3 &lt; 8\). Swap.<svg class="htree" data-step data-tree="3,5,8,9,6,4" data-cmp="3" role="img" aria-label="8 swapped down below 3"></svg></li>
+      <li>Only child 4, and \(4 &lt; 8\). Swap. 8 is a leaf now: stop.<svg class="htree" data-step data-tree="3,5,4,9,6,8" data-cmp="6" role="img" aria-label="8 swapped down below 4"></svg></li>
+      <li class="answer">Returns 2; new root 3; 2 swaps; 8's parent is 4.</li>
     </ol></div></div>
   </article>
 
   <article class="task" data-id="cse332-w2-l4-larger-child">
-    <h2>6. What if it swapped with the larger child?</h2>
-    <p class="prompt">This practices why extract's percolate down swaps with the <em>smaller</em> child. Extract returns the root, moves the bottom-right item into the root, and swaps it down while it is bigger than a child. Start from this min-heap and call <code>extract()</code>. The 1 is returned and the last item, 9, moves to the root. First do the wrong thing on purpose: swap 9 with its <em>larger</em> child once. Then start over and do it correctly.</p>
+    <h2>6. Why the smaller child?</h2>
+    <p class="prompt">Extract from this heap: 1 is returned and 9 moves to the root, above 3 and 5. First do it wrong on purpose: swap 9 with its <em>larger</em> child, 5.</p>
     <svg class="htree" data-tree="1,3,5,7,8,9" role="img" aria-label="Min-heap: root 1; children 3 and 5; 3 has children 7 and 8; 5 has child 9"></svg>
-    <div class="answer-spec" data-part="valid-after-wrong" data-grader="yesno" data-answer="no" data-label="After one swap of 9 with its larger child, is the tree a valid min-heap? (yes or no)"></div>
-    <div class="answer-spec" data-part="correct-root" data-grader="exact" data-answer="3" data-label="done correctly: the new root"></div>
-    <div class="answer-spec" data-part="correct-swaps" data-grader="exact" data-answer="2" data-label="done correctly: the number of swaps"></div>
+    <div class="answer-spec" data-part="valid-after-wrong" data-grader="yesno" data-answer="no" data-label="After that wrong swap, is it a valid min-heap?"></div>
+    <div class="answer-spec" data-part="correct-root" data-grader="exact" data-answer="3" data-label="done right: the new root"></div>
+    <div class="answer-spec" data-part="correct-swaps" data-grader="exact" data-answer="2" data-label="done right: how many swaps?"></div>
     <ol class="hints">
-      <li>After the move, 9 is the root with children 3 and 5. The larger child is 5.</li>
-      <li>Swapping with 5 puts 5 above 3. Is that allowed?</li>
+      <li>After the wrong swap, 5 is the root and 3 is its child. Is that allowed?</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>After the move, the heap is 9 at the root, children 3 and 5, and 3 has children 7 and 8.</li>
-      <li>Wrong way: swap 9 with 5. Now 5 is the root and 3 is its child: \(5 &gt; 3\) breaks the heap property. Not valid.</li>
-      <li>Right way: swap 9 with 3 (the smaller child). Then 9's children are 7 and 8; swap with 7. 9 is now a leaf.</li>
-      <li class="answer">No; new root 3; 2 swaps. Level order: 3, 7, 5, 9, 8.</li>
+      <li>9 moves to the root.<svg class="htree" data-step data-tree="9,3,5,7,8" data-cmp="1" role="img" aria-label="9 at the root above 3 and 5"></svg></li>
+      <li>Wrong way: swap with 5. Now 5 sits above 3, and \(5 &gt; 3\). Not a heap.<svg class="htree" data-step data-tree="5,3,9,7,8" data-cmp="1,2" role="img" aria-label="5 at the root above 3: broken"></svg></li>
+      <li>Right way: swap with 3, the smaller child.<svg class="htree" data-step data-tree="3,9,5,7,8" data-cmp="2" role="img" aria-label="3 at the root, 9 below it"></svg></li>
+      <li>Children 7 and 8: swap with 7. 9 is a leaf: stop.<svg class="htree" data-step data-tree="3,7,5,9,8" data-cmp="4" role="img" aria-label="9 swapped down below 7"></svg></li>
+      <li class="answer">No; new root 3; 2 swaps. The smaller child can sit above its sibling. The larger one can't.</li>
     </ol></div></div>
   </article>
-  <nav class="pager"></nav>
-</section>
 
-<!-- ================================================================ CYU L4 -->
-<section class="page" id="cyu-l4" data-title="Check your understanding (Lecture 4)">
-  <p class="where">Lecture 4 wrap-up · questions written for this site</p>
-  <h1>Check your understanding</h1>
-  <div class="prose"><p>Ten questions on Lecture 4. The score counts first tries.</p></div>
-  <div class="cyu-score" data-quiz-score="l4" role="status"></div>
-  <ol class="cyu-list" data-quiz="l4">
-    <li class="cyu" data-id="cse332-w2-q2-pq-vs-queue" data-kind="mc" data-topic="l4-pq">
-      <p class="q">What does <code>extract</code> remove from a priority queue?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-q2-pq-vs-queue"> The item inserted first<span class="why" hidden>That's a (FIFO) queue.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-q2-pq-vs-queue"> The item with the highest priority (usually the smallest value)<span class="why" hidden>Correct.</span></label>
-        <label><input type="radio" name="cse332-w2-q2-pq-vs-queue"> The item inserted last<span class="why" hidden>That's a stack.</span></label>
-        <label><input type="radio" name="cse332-w2-q2-pq-vs-queue"> Any item, chosen at random<span class="why" hidden>It's always the top priority. Only ties may come out in any order.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-q2-heap-shape" data-kind="mc" data-topic="l4-heap">
-      <p class="q">A binary min-heap must be…</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w2-q2-heap-shape"> a complete binary tree with every node ≤ its children<span class="why" hidden>Correct. Both parts: the shape keeps the height near \(\log n\), the order puts the minimum at the root.</span></label>
-        <label><input type="radio" name="cse332-w2-q2-heap-shape"> a sorted array<span class="why" hidden>A heap is only partly ordered; that's why it's cheaper to maintain.</span></label>
-        <label><input type="radio" name="cse332-w2-q2-heap-shape"> a binary search tree<span class="why" hidden>A BST orders left versus right; a heap orders parent versus children.</span></label>
-        <label><input type="radio" name="cse332-w2-q2-heap-shape"> a tree where every level is sorted left to right<span class="why" hidden>No such requirement.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-q2-heap-not-sorted" data-kind="mc" data-topic="l4-heap">
-      <p class="q">In a min-heap, is every node on one level smaller than every node on the next?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-q2-heap-not-sorted"> Yes<span class="why" hidden>A node is only compared with its own parent and children. Another branch's nodes can be smaller or larger.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-q2-heap-not-sorted"> No, only a parent is ≤ its children<span class="why" hidden>Correct. A 5 can sit above a 10 in one branch and next to a 3 in another: only ancestors count.</span></label>
-        <label><input type="radio" name="cse332-w2-q2-heap-not-sorted"> Yes, otherwise the minimum wouldn't be at the root<span class="why" hidden>The root is the minimum because every parent is ≤ its children, which makes it ≤ everything below.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-q2-percolate-down-pick" data-kind="mc" data-topic="l4-extract">
-      <p class="q">In extract, the item moved into the root percolates down: it swaps with a child while it is bigger than that child. Which child does it swap with?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-q2-percolate-down-pick"> The left child<span class="why" hidden>Only if the left child is the smaller one.</span></label>
-        <label><input type="radio" name="cse332-w2-q2-percolate-down-pick"> The larger child<span class="why" hidden>That would leave the larger one above a smaller sibling.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-q2-percolate-down-pick"> The smaller child<span class="why" hidden>Correct. Otherwise the sibling would be smaller than its new parent.</span></label>
-        <label><input type="radio" name="cse332-w2-q2-percolate-down-pick"> Neither; it stays put<span class="why" hidden>Only if neither child is smaller than it.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l4-cyu-insert-spot" data-kind="mc" data-topic="l4-insert">
-      <p class="q">Where does a new item go before it starts to percolate up?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l4-cyu-insert-spot"> At the root<span class="why" hidden>Then the old root would have nowhere to go without breaking the shape.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l4-cyu-insert-spot"> In the next open spot: the leftmost empty place on the bottom level<span class="why" hidden>Correct. That keeps the tree complete; percolating up then fixes the order.</span></label>
-        <label><input type="radio" name="cse332-w2-l4-cyu-insert-spot"> Under the smallest leaf<span class="why" hidden>The shape rule decides the spot, not the values.</span></label>
-        <label><input type="radio" name="cse332-w2-l4-cyu-insert-spot"> At its sorted position<span class="why" hidden>A heap isn't sorted; finding a sorted position would cost Θ(n).</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l4-cyu-insert-6" data-kind="num" data-answer="1" data-topic="l4-insert">
-      <p class="q">This is the lecture's min-heap. Insert puts a new item in the next open spot (the leftmost empty place on the bottom level), then swaps it with its parent while it is smaller. Insert 6. How many swaps does it make?</p>
-      <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" role="img" aria-label="Min-heap: root 1; children 3 and 2; 3 has children 4 and 7; 2 has children 5 and 6; 4 has children 5 and 9"></svg>
-      <p class="why" hidden>6 goes under 7 (the next open spot). 6 &lt; 7: swap. Its parent is now 3, and 6 &lt; 3 is false: stop. One swap.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l4-cyu-height-100" data-kind="num" data-answer="6" data-topic="l4-heap" data-miscon='{"7":"full-tree-off-by-one","100":"height-not-count"}'>
-      <p class="q">What is the height (edges on the longest path down from the root) of a complete binary tree with 100 nodes?</p>
-      <p class="why" hidden>Height 5 holds at most \(2^6 - 1 = 63\) nodes, too few. Height 6 holds up to 127. So 6.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l4-cyu-root-min" data-kind="mc" data-topic="l4-heap">
-      <p class="q">Why is the smallest item always at the root of a min-heap?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l4-cyu-root-min"> Because insert always puts new items at the root<span class="why" hidden>Insert puts them at the bottom, then percolates up.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l4-cyu-root-min"> Because each parent is ≤ its children, so walking up from any node never increases the value<span class="why" hidden>Correct. The root is reached from every node, so it is ≤ all of them.</span></label>
-        <label><input type="radio" name="cse332-w2-l4-cyu-root-min"> Because the tree is complete<span class="why" hidden>Completeness is about the shape. A complete tree with values in random order has the minimum anywhere.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l4-cyu-sort-with-pq" data-kind="bigo" data-answer="n log n" data-topic="l4-impl">
-      <p class="q">Sort \(n\) items with a binary heap: insert them all, then extract \(n\) times. Each insert and each extract is \(O(\log n)\). What is the worst-case total time, as a \(\Theta\) class?</p>
-      <p class="why" hidden>\(2n\) operations, each \(O(\log n)\): \(O(n\log n)\). Once the heap is half full, each operation still costs about \(\log(n/2)\), so it's \(\Theta(n\log n)\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l4-cyu-down-comparisons" data-kind="mc" data-topic="l4-extract">
-      <p class="q">Percolate up (in insert) compares the moving item with its one parent at each level. Percolate down (in extract) compares the two children with each other and then the smaller one with the moving item: about twice as many comparisons per level. Does that change extract's worst-case class?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l4-cyu-down-comparisons"> Yes: extract is \(\Theta(n)\)<span class="why" hidden>It still only walks one path of length at most the height.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l4-cyu-down-comparisons"> No: about \(2\log n\) comparisons is still \(\Theta(\log n)\)<span class="why" hidden>Correct. Two comparisons per level is a constant factor.</span></label>
-        <label><input type="radio" name="cse332-w2-l4-cyu-down-comparisons"> Yes: extract is \(\Theta(\log^2 n)\)<span class="why" hidden>Doubling multiplies by 2, not by log n.</span></label>
-      </div>
-    </li>
-  </ol>
-  <div class="cyu-score" data-quiz-summary="l4" role="status"></div>
+  <div class="check" data-id="cse332-w2-l4-cyu-down-comparisons" data-grader="mc">
+    <p>Quick check: sinking compares with both children at each level, so extract does about \(2\log n\) comparisons. What's its worst-case bucket?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w2-l4-cyu-down-comparisons"> \(n\)<span class="why" hidden>It still walks one path, at most the height.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l4-cyu-down-comparisons"> \(\log n\)<span class="why" hidden>Right. The 2 is a constant factor, so it drops.</span></label>
+      <label><input type="radio" name="cse332-w2-l4-cyu-down-comparisons"> \(\log^2 n\)<span class="why" hidden>Twice log n is 2·log n, not log n times log n.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <nav class="pager"></nav>
 </section>
 
@@ -1330,12 +1293,12 @@ print(extract)</code></pre>
   </div>
 
   <div class="check" data-id="cse332-w2-s2-theta-same-c" data-grader="yesno" data-answer="no">
-    <p>Quick check: must the \(O\) part and the \(\Omega\) part of a \(\Theta\) proof use the same \(c\)? (yes or no)</p>
+    <p>Quick check: must the \(O\) part and the \(\Omega\) part of a \(\Theta\) proof use the same \(c\)?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <div class="check" data-id="cse332-w2-s2-theta-c1-omega" data-grader="yesno" data-answer="no">
-    <p>Quick check: for the \(\Omega\) part, could \(c = 1\) work instead of \(\tfrac12\), with some \(n_0\)? That is, is \(2n^2 + 5 \ge 4n^2\) for every \(n\) past some point? (yes or no)</p>
+    <p>Quick check: for the \(\Omega\) part, could \(c = 1\) work instead of \(\tfrac12\), with some \(n_0\)? That is, is \(2n^2 + 5 \ge 4n^2\) for every \(n\) past some point?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
@@ -1465,7 +1428,7 @@ print(extract)</code></pre>
     <h2>3. Is \(2^n \in O(3^{2n})\)?</h2>
     <p class="prompt">This practices a Big-O claim between two exponentials, where the base matters. \(f(n) \in O(g(n))\) when there are constants \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). \(\Omega\) is the same with \(\ge\). Rewrite \(3^{2n}\) as a single power \(k^n\), then decide whether \(c = 1\), \(n_0 = 1\) proves \(2^n \in O(3^{2n})\).</p>
     <div class="answer-spec" data-part="k" data-grader="exact" data-answer="9" data-miscon='{"6":"power-of-power"}' data-label="the \(k\) with \(3^{2n} = k^n\)"></div>
-    <div class="answer-spec" data-part="c1-works" data-grader="yesno" data-answer="yes" data-label="Does \(c = 1\), \(n_0 = 1\) prove \(2^n \in O(3^{2n})\)? (yes or no)"></div>
+    <div class="answer-spec" data-part="c1-works" data-grader="yesno" data-answer="yes" data-label="Does \(c = 1\), \(n_0 = 1\) prove \(2^n \in O(3^{2n})\)?"></div>
     <div class="answer-spec" data-part="proof" data-grader="self" data-label="your one-line reason why \(2^n \le 3^{2n}\) for all \(n \ge 1\)"></div>
     <ol class="hints">
       <li>\(3^{2n} = (3^2)^n\).</li>
@@ -2070,10 +2033,10 @@ print(extract)</code></pre>
       <figure><figcaption>C: 3, 5, 4, 9, 6, 7, 8, 10</figcaption><svg class="htree" data-tree="3,5,4,9,6,7,8,10" data-idx role="img" aria-label="C: root 3; children 5 and 4; 5 has 9 and 6; 4 has 7 and 8; 9 has 10"></svg></figure>
       <figure><figcaption>D: 4, 6, 5, 7, 3, 8, 9</figcaption><svg class="htree" data-tree="4,6,5,7,3,8,9" data-idx role="img" aria-label="D: root 4; children 6 and 5; 6 has 7 and 3; 5 has 8 and 9"></svg></figure>
     </div>
-    <div class="answer-spec" data-part="a" data-grader="yesno" data-answer="yes" data-label="Is A a valid min-heap? (yes or no)"></div>
-    <div class="answer-spec" data-part="b" data-grader="yesno" data-answer="no" data-label="Is B a valid min-heap? (yes or no)"></div>
-    <div class="answer-spec" data-part="c" data-grader="yesno" data-answer="yes" data-label="Is C a valid min-heap? (yes or no)"></div>
-    <div class="answer-spec" data-part="d" data-grader="yesno" data-answer="no" data-label="Is D a valid min-heap? (yes or no)"></div>
+    <div class="answer-spec" data-part="a" data-grader="yesno" data-answer="yes" data-label="Is A a valid min-heap?"></div>
+    <div class="answer-spec" data-part="b" data-grader="yesno" data-answer="no" data-label="Is B a valid min-heap?"></div>
+    <div class="answer-spec" data-part="c" data-grader="yesno" data-answer="yes" data-label="Is C a valid min-heap?"></div>
+    <div class="answer-spec" data-part="d" data-grader="yesno" data-answer="no" data-label="Is D a valid min-heap?"></div>
     <ol class="hints">
       <li>Check each node against its own two children only. Index 2's children are indexes 4 and 5.</li>
       <li>The shape is always right in an array with no gaps. Only the order can fail.</li>
@@ -2266,7 +2229,7 @@ percolateDown(int i){
     <div class="answer-spec" data-part="parent-13" data-grader="exact" data-answer="6" data-miscon='{"6.5":"no-floor","13/2":"no-floor"}' data-label="the index of the parent of index 13"></div>
     <div class="answer-spec" data-part="left-7" data-grader="exact" data-answer="14" data-miscon='{"15":"zero-based"}' data-label="the index of the left child of index 7"></div>
     <div class="answer-spec" data-part="first-leaf" data-grader="exact" data-answer="11" data-miscon='{"10":"leaf-by-index"}' data-label="the index of the first leaf (a node with no children)"></div>
-    <div class="answer-spec" data-part="leaf-10" data-grader="yesno" data-answer="no" data-miscon='{"yes":"leaf-by-index"}' data-label="Is index 10 a leaf? (yes or no)"></div>
+    <div class="answer-spec" data-part="leaf-10" data-grader="yesno" data-answer="no" data-miscon='{"yes":"leaf-by-index"}' data-label="Is index 10 a leaf?"></div>
     <ol class="hints">
       <li>Parent: \(i/2\) with integer division. Children: \(2i\) and \(2i+1\).</li>
       <li>A node is a leaf exactly when it has no left child: when \(2i &gt; n\).</li>

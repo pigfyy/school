@@ -235,19 +235,30 @@ const l4Text = () => html.slice(html.indexOf('id="l4-goals"'), html.indexOf('id=
     "cse332-w2-l4-shape-min-nodes-h5": S(minNodes5),
     "cse332-w2-l4-insert-parent-of-4": S(ins4.after[(at4 >> 1) - 1]),
     "cse332-w2-l4-extract-parent-of-6": S(ext6.after[(at6 >> 1) - 1]),
-    "cse332-w2-l4-pq-trace.first": S(trace[0]), "cse332-w2-l4-pq-trace.second": S(trace[1]), "cse332-w2-l4-pq-trace.third": S(trace[2]), "cse332-w2-l4-pq-trace.fifth": S(trace[4]),
-    "cse332-w2-l4-height.max-h5": S(2 ** 6 - 1), "cse332-w2-l4-height.h-1000": S(heightI(1000)), "cse332-w2-l4-height.h-1024": S(heightI(1024)), "cse332-w2-l4-height.h-1023": S(heightI(1023)),
+    "cse332-w2-l4-pq-trace.first": S(trace[0]), "cse332-w2-l4-pq-trace.second": S(trace[1]), "cse332-w2-l4-pq-trace.third": S(trace[2]), "cse332-w2-l4-pq-trace.fourth": S(trace[3]), "cse332-w2-l4-pq-trace.fifth": S(trace[4]),
+    "cse332-w2-l4-height.h-10": S(heightI(10)), "cse332-w2-l4-height.h-15": S(heightI(15)), "cse332-w2-l4-height.h-16": S(heightI(16)),
     "cse332-w2-l4-insert-tree.swaps": S(pIns.swaps), "cse332-w2-l4-insert-tree.root-left": S(pIns.after[1]), "cse332-w2-l4-insert-tree.bottom-left": S(pIns.after[7]),
     "cse332-w2-l4-extract-tree.returned": S(pExt.min), "cse332-w2-l4-extract-tree.swaps": S(pExt.swaps), "cse332-w2-l4-extract-tree.new-root": S(pExt.after[0]), "cse332-w2-l4-extract-tree.parent-of-8": S(pExt.after[(at8 >> 1) - 1]),
     "cse332-w2-l4-larger-child.valid-after-wrong": yn(Sim.isMinHeap(wrong.slice(1))),
     "cse332-w2-l4-larger-child.correct-root": S(HJ("p-l4-larger-child").after[0]), "cse332-w2-l4-larger-child.correct-swaps": S(HJ("p-l4-larger-child").swaps),
-    "cse332-w2-l4-cyu-insert-6": S(HJ("cyu-l4-insert-6").swaps),
-    "cse332-w2-l4-cyu-height-100": S(heightI(100)),
   });
   ok(same(ex2, [3, 1, 5, 6, 8]) && same(HJ("l4-trace-example1").out, [1, 3, 5, 6, 8]), "the lecture's two PQ examples print 3,1,5,6,8 and 1,3,5,6,8");
   ok(same(pIns.after, [2, 4, 3, 5, 6, 4, 8, 9]) && same(pExt.after, [3, 5, 4, 9, 6, 8]) && same(HJ("p-l4-larger-child").after, [3, 7, 5, 9, 8]), "L4 problem solutions' level orders");
   // every heap drawn on the page as a starting state is a valid min-heap, except the ones asked about
-  const drawn = [...html.matchAll(/data-tree="([^"]+)"/g)].map((m) => m[1]);
+  const drawn = [...html.matchAll(/<svg[^>]*>/g)].map((m) => m[0]).filter((t) => !/\bdata-step\b/.test(t)).map((t) => /data-tree="([^"]+)"/.exec(t)?.[1]).filter(Boolean);
+  // solution pictures (data-step) are the states the real percolate passes through, in order
+  {
+    const task = (tid) => html.slice(html.indexOf(`data-id="${tid}"`), html.indexOf("</article>", html.indexOf(`data-id="${tid}"`)));
+    const steps = (tid) => [...task(tid).matchAll(/<svg[^>]*\bdata-step\b[^>]*data-tree="([^"]+)"/g)].map((m) => m[1]);
+    const statesOf = (gen) => { const seen = []; for (const st of gen) { const t = st.arr.slice(1, st.size + 1).join(","); if (seen.at(-1) !== t) seen.push(t); } return seen; };
+    const ins = statesOf(Sim.insertIdeaSteps([2, 5, 3, 9, 6, 4, 8], 4)).slice(1);
+    ok(same(steps("cse332-w2-l4-insert-tree"), ins), `insert 4 pictures: ${steps("cse332-w2-l4-insert-tree").join(" | ")} vs ${ins.join(" | ")}`);
+    const ext = statesOf(Sim.extractIdeaSteps([2, 5, 3, 9, 6, 4, 8])).slice(1);
+    ok(same(steps("cse332-w2-l4-extract-tree"), ext), `extract pictures: ${steps("cse332-w2-l4-extract-tree").join(" | ")} vs ${ext.join(" | ")}`);
+    const lc = statesOf(Sim.extractIdeaSteps([1, 3, 5, 7, 8, 9])).slice(1);
+    const wrong = "5,3,9,7,8";
+    ok(same(steps("cse332-w2-l4-larger-child"), [lc[0], wrong, ...lc.slice(1)]) && !Sim.isMinHeap(wrong.split(",").map(Number)), `larger-child pictures: ${steps("cse332-w2-l4-larger-child").join(" | ")}`);
+  }
   const notHeaps = new Set(["1,2,3,_,5,6", "5,4,6", "5,7,6,8,_,9", "2,4,3,_,_,6,5", "1,4,2,3,5,6,7", "4,6,5,7,3,8,9", "9,8,7,6,5,4,3,2,1"]);
   for (const t of new Set(drawn)) if (!notHeaps.has(t)) ok(!t.includes("_") && Sim.isMinHeap(t.split(",").map(Number)), `drawn tree ${t} is a valid min-heap`);
   for (const t of notHeaps) ok(drawn.includes(t) && (t.includes("_") || !Sim.isMinHeap(t.split(",").map(Number))), `drawn tree ${t} is not a heap, as the page says`);

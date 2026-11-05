@@ -39,9 +39,9 @@ it. Adding to a week that already exists is the same job: add the new sessions t
 2. Use the `course-teaching-site` skill for what the pages contain and how they look. Start from the course's
    previous week: copy its `index.html` as the shape and replace the content.
 3. Add the week to `site/courses.js` (`posted: true`).
-   Every lecture and section gets the full set from the skill, not a summary: modules with quick checks, a
-   "Check your understanding" quiz per lecture, and answerable problems with hints and solutions. A quicker or
-   narrower pass may trim widgets, never the problems and quiz.
+   Every lecture and section gets the full set from the skill, not a summary: modules with quick checks, and one
+   practice page of answerable problems with hints and solutions. A quicker or narrower pass may trim widgets, never
+   the practice page.
 4. Check:
    - Every computed answer against ground truth in `checks/<course>/<week>/verify.mjs` (run the lecture's code,
      brute-force counts). Run it: `bun checks/<course>/<week>/verify.mjs`.
