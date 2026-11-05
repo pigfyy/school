@@ -1316,7 +1316,7 @@ extract</code></pre>
       <button class="chip" type="button" data-nu="distinct" aria-pressed="false">all different: a b c d e</button>
       <button class="chip" type="button" data-nu="same" aria-pressed="false">all the same: a a a a a</button>
     </div>
-    <div class="split stepper idea">
+    <div class="split stepper nu">
       <pre class="code" id="nu-code"></pre>
       <div class="pic">
         <div class="cells" id="nu-cells"></div>
@@ -1533,7 +1533,7 @@ extract</code></pre>
     <ul class="ix-out" id="ix-out" role="status"></ul>
   </div>
 
-  <div class="rule"><p><strong>The rule.</strong> Root at index 1. The parent of \(i\) is \(i/2\), dropping any remainder. The children of \(i\) are \(2i\) and \(2i+1\), but only if they're at most \(n\). So the leaves are indices \(n/2+1\) to \(n\).</p></div>
+  <div class="rule"><p><strong>The rule.</strong> Root at index 1. The parent of \(i\) is \(i/2\), dropping any remainder. The children of \(i\) are \(2i\) and \(2i+1\), but only if they're at most \(n\). So the leaves are indices \(\lfloor n/2\rfloor+1\) to \(n\): halve \(n\), drop any remainder, add 1.</p></div>
 
   <details class="more">
     <summary>Why \(2i\) and \(2i+1\)?</summary>
@@ -1698,7 +1698,7 @@ extract</code></pre>
   </div>
 
   <p class="line">The same pattern holds for bigger heaps: most nodes sit near the bottom and can sink only a little.</p>
-  <div class="rule"><p><strong>The rule.</strong> All the items together can sink fewer than \(n\) levels. Each level costs a fixed amount of work, and each of the \(n/2\) calls adds a fixed amount more, so buildHeap is \(O(n)\). It touches every index, so it's \(\Theta(n)\).</p></div>
+  <div class="rule"><p><strong>The rule.</strong> All the items together can sink fewer than \(n\) levels. Each level costs a fixed amount of work, and each of the \(n\) calls adds a fixed amount more, so buildHeap is \(O(n)\). It touches every index, so it's \(\Theta(n)\).</p></div>
 
   <details class="more">
     <summary>The lecture's sum</summary>
@@ -1907,7 +1907,7 @@ if(right &gt; size || arr[left] &lt; arr[right]){
   </article>
 
   <div class="check" data-id="cse332-w2-l5-change-key-max" data-grader="mc">
-    <p>Quick check: in a <em>max</em>-heap every node is \(\ge\) its children. An item's priority value gets smaller. Which way does it go?</p>
+    <p>Quick check: in a <em>max</em>-heap every node is \(\ge\) its children. An item's priority value gets smaller. If that breaks the heap order, which way does it move to fix it?</p>
     <div class="opts">
       <label><input type="radio" name="cse332-w2-l5-change-key-max"> Up<span class="why" hidden>That's a smaller value in a min-heap. A max-heap flips it.</span></label>
       <label data-correct><input type="radio" name="cse332-w2-l5-change-key-max"> Down<span class="why" hidden>Right. In a max-heap a smaller value may now be smaller than a child, so it sinks.</span></label>

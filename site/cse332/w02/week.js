@@ -473,6 +473,18 @@ function drawTree(svg, vals, opts = {}) {
   svg.append(g);
 }
 /* keep the highlighted line visible when the listing scrolls (phones) */
+// On phones a code panel is a short window; grow it to fit the highlighted block and scroll the block into view.
+function fitHighlight(pre) {
+  const hls = pre.querySelectorAll(".hl");
+  pre.style.maxHeight = "";
+  if (!hls.length || getComputedStyle(pre).maxHeight === "none") return keepLineInView(pre);
+  const cs = getComputedStyle(pre), pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+  const base = pre.firstElementChild.offsetTop, first = hls[0], last = hls[hls.length - 1];
+  const top = (first.previousElementSibling || first).offsetTop - base;
+  const bottom = last.offsetTop + last.offsetHeight - base;
+  if (bottom - top + pad > pre.clientHeight) pre.style.maxHeight = `${bottom - top + pad}px`;
+  pre.scrollTop = top;
+}
 function keepLineInView(pre) {
   const hl = pre.querySelector(".hl");
   if (hl && pre.scrollHeight > pre.clientHeight) pre.scrollTop = Math.max(0, hl.offsetTop - pre.clientHeight / 2);
@@ -526,10 +538,10 @@ function setupHeapStepper(box) {
     code.classList.toggle("open", open);
     showLine();
   });
+  REDRAW.add((pid) => { if (box.closest(".page").id === pid) showLine(); });
   function showLine() {
-    const hl = code.querySelector(".hl");
-    if (idea || !hl) return keepLineInView(code);
-    if (code.scrollHeight > code.clientHeight) code.scrollTop = (hl.previousElementSibling || hl).offsetTop;
+    if (idea) return keepLineInView(code);
+    fitHighlight(code);
   }
   const steps = kind.startsWith("insert") ? STEP_GEN[kind](sc.start, sc.x) : STEP_GEN[kind](sc.start);
   let k = 0;
@@ -601,7 +613,7 @@ function setupNumUnique() {
   function paint() {
     const st = steps[k], n = values.length;
     code.replaceChildren(...Sim.NUMUNIQUE_CODE.map((ln, i) => el("div", { class: `ln${i + 1 === st.line || (st.line === 3 && i >= 2 && i <= 4) ? " hl" : ""}` }, el("span", { class: "no", text: String(i + 1) }), el("span", { class: "src", text: ln }))));
-    keepLineInView(code);
+    fitHighlight(code);
     cells.replaceChildren(...values.map((v, i) => el("div", { class: `cell${st.visited[i] ? " seen" : ""}${i === st.i ? " mid" : ""}${i === st.j && i !== st.i ? " cmp" : ""}` }, el("span", { class: "ptr", text: [i === st.i ? "i" : "", i === st.j ? "j" : ""].filter(Boolean).join(" ") }), el("b", { text: `"${v}"` }), el("span", { class: "idx", text: st.visited[i] ? `${i} ✓` : String(i) }))));
     const done = new Set(Sim.numUniqueDots(steps.slice(0, k + 1)).map(([i, j]) => `${i},${j}`));
     const dot = (i, j) => el("span", { class: `d${j < i ? " x" : ""}${done.has(`${i},${j}`) ? " on" : ""}${st.i === i && st.j === j ? " now" : ""}` });
@@ -625,6 +637,7 @@ function setupNumUnique() {
     paint();
     timer = setInterval(() => { step(1); if (k === steps.length - 1) stop(); }, 550);
   });
+  REDRAW.add((pid) => { if (box.closest(".page").id === pid) fitHighlight(code); });
   load("distinct");
 }
 

@@ -163,3 +163,6 @@ table.vals.verdict .reason { display: block; font-weight: 400; font-size: 0.82em
   table.vals.verdict { font-size: 0.85rem; }
   table.vals.verdict th, table.vals.verdict td { padding: 0.25rem 0.3rem; }
 }
+
+/* numUnique on phones: a code window on top, then the cells, dots and controls */
+@media (max-width: 860px) { .stepper.nu pre.code { max-height: calc(6 * 1.5em + 1.2rem); overflow: hidden; } }
