@@ -62,12 +62,12 @@
     <div>
       <h2>Lecture 8: AVL Trees 1 <span class="today" data-date="2026-10-16">Fri Oct 16</span></h2>
       <ol class="modules">
+        <li><a href="#l8-goals">What this lecture is for</a></li>
         <li><a href="#l8-balance">What balanced means</a></li>
         <li><a href="#l8-insert">Insert and rotate</a></li>
         <li><a href="#l8-cases">The four cases</a></li>
-        <li><a href="#l8-height">Why it's log n</a></li>
-        <li><a href="#l8-practice">Practice</a></li>
-        <li><a href="#l8-quiz">Check your understanding</a></li>
+        <li><a href="#l8-height">Why the height is log n</a></li>
+        <li><a href="#l8-practice">Lecture 8 practice</a></li>
       </ol>
     </div>
     <div>
@@ -1364,155 +1364,102 @@
   <nav class="pager"></nav>
 </section>
 
+<!-- ================================================================ L8: GOALS -->
+<section class="page" id="l8-goals" data-title="What Lecture 8 is for">
+  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span> · AVL Trees 1</p>
+  <h1>What this lecture is for</h1>
+  <div class="rule">
+    <p><strong>The point.</strong> Find, insert and delete in a BST cost the tree's height, and a plain BST can grow into a chain of height \(n - 1\). An <strong>AVL tree</strong> is a BST with one balance rule, restored by <strong>rotations</strong> after each insert, so its height stays \(\Theta(\log n)\).</p>
+  </div>
+  <div class="tree-row">
+    <figure><figcaption>Plain BST: insert 1 to 7 in order</figcaption><svg class="htree" data-shape="1(,2(,3(,4(,5(,6(,7))))))"></svg><p>A chain of height 6.</p></figure>
+    <figure><figcaption>AVL tree: the same seven inserts</figcaption><svg class="htree" data-shape="4(2(1,3),6(5,7))"></svg><p>Four rotations along the way keep it at height 2.</p></figure>
+  </div>
+
+  <h2>Four short pages</h2>
+  <ol class="goals">
+    <li>The balance rule that makes a BST an AVL tree. <a href="#l8-balance">What balanced means</a></li>
+    <li>Insert like a BST, then fix the first unbalanced node with a rotation. <a href="#l8-insert">Insert and rotate</a></li>
+    <li>Which rotation: four cases, and two of them take two rotations. <a href="#l8-cases">The four cases</a></li>
+    <li>Why the rule keeps the height \(\Theta(\log n)\). <a href="#l8-height">Why the height is log n</a></li>
+  </ol>
+  <p class="line">Then <a href="#l8-practice">Lecture 8 practice</a>. Plain BSTs (find, insert, delete) are Lecture 7. Deleting from an AVL tree comes next lecture.</p>
+  <div class="rule warn">
+    <p><strong>Exercise 4</strong> (AVL trees, due Fri Oct 30) has you implement this. This site traces AVL trees by hand but writes no Exercise 4 code.</p>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
 <!-- ================================================================ L8: BALANCE -->
 <section class="page" id="l8-balance" data-title="What balanced means">
-  <p class="where">Lecture 8 · slides 15–28 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span> · Weiss 4.4</p>
+  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span></p>
   <h1>What balanced means</h1>
   <div class="prose">
-    <p>BSTs get tall when they're sparse, with many one-child nodes. The fix: change insert and delete so the tree stays more full. But which shape rule? Slides 17–24 try four.</p>
+    <p>A node's <strong>height</strong> is the number of edges on the longest path from it down to a leaf. A leaf has height 0, and an empty subtree counts as \(-1\). So a node's height is \(1 + \max(\text{left height}, \text{right height})\). Each node stores its own height, next to its key, value and two children.</p>
+    <p>A node's <strong>balance</strong> is its left subtree's height minus its right subtree's height.</p>
   </div>
-  <div class="table-wrap">
-  <table class="plain">
-    <tr><th>Rule</th><th>The issue</th></tr>
-    <tr><td>1. The root's two subtrees have the same number of nodes</td><td>Too weak: each side can still be a long chain.</td></tr>
-    <tr><td>2. The root's two subtrees have the same height</td><td>Too weak: the same chains, just equally long.</td></tr>
-    <tr><td>3. Every node's two subtrees have the same number of nodes</td><td>Too strong: not every size is possible (no tree of size 2).</td></tr>
-    <tr><td>4. Every node's two subtrees have the same height</td><td>Too strong: again, no tree of size 2.</td></tr>
-  </table>
-  </div>
-  <div class="rule">
-    <p><strong>AVL tree (slide 25).</strong> A binary search tree in which, at every node, the heights of the left and right subtrees differ by at most 1. Not too weak (the tree stays short) and not too strong (any number of nodes works). When an insert or delete throws a node out of balance, fix it with a <em>rotation</em>.</p>
-    <p>Each node stores its key, value, <strong>height</strong>, and left and right children (slide 28). An empty subtree has height −1, so a leaf has height 0.</p>
-  </div>
+  <div class="rule"><p><strong>AVL tree.</strong> A BST where every node's balance is \(-1\), \(0\) or \(+1\): at every node, the two subtrees' heights differ by at most 1. A node whose subtrees differ by more is a <strong>problem node</strong>.</p></div>
 
-  <h2>Is it an AVL tree? (slides 26–27)</h2>
-  <div class="tree-grid">
-    <figure class="treeview" data-shape="9(3(1(0,),6(5,)),10)" data-heights data-mark="9"><figcaption>Tree A: not balanced. At 9, the left is height 2 and the right is 0.</figcaption></figure>
-    <figure class="treeview" data-shape="9(3(1(0,),6(5,)),10(,16))" data-heights><figcaption>Tree B: balanced</figcaption></figure>
-    <figure class="treeview" data-shape="9(3(,6(5,)),10(,16))" data-heights data-mark="3"><figcaption>Tree C: not balanced. At 3, the left is −1 and the right is 1.</figcaption></figure>
-    <figure class="treeview" data-shape="9(3(1(0,),6(5,7)),10(,16))" data-heights><figcaption>Tree D: balanced</figcaption></figure>
+  <p class="tree-key">Purple: each node's height. Under each node: its balance.</p>
+  <div class="tree-row">
+    <figure><figcaption>✓ AVL: every balance is −1, 0 or +1</figcaption><svg class="htree" data-shape="9(3(1(0,),6(5,7)),10(,16))" data-label="hb"></svg></figure>
+    <figure><figcaption>✗ Not AVL: node 3 has balance −2</figcaption><svg class="htree" data-shape="9(3(,6(5,)),10(,16))" data-label="hb" data-bad="3"></svg></figure>
   </div>
-  <p class="note">The small numbers are each node's height. A "problem" node is one whose children's heights differ by more than 1.</p>
+  <p class="line">In the right tree, 3 has no left child (height \(-1\)) and its right child 6 has height 1: \(-1 - 1 = -2\). The root is fine (\(2 - 1 = +1\)). One problem node anywhere breaks the rule, so check every node, not just the root.</p>
 
-  <div class="check" data-id="cse332-w3-l8-qc-tree-c" data-grader="exact" data-answer="3" data-miscon='{"9":"not-deepest"}'>
-    <p>Quick check: which key is Tree C's problem node?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w3-l8-qc-root-height-d" data-grader="exact" data-answer="3" data-miscon='{"4":"height-counts-nodes"}'>
-    <p>Quick check: what height does Tree D's root store?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Walk the four ideas quickly and let the room find each flaw. The point is the Goldilocks rule: per node, but with slack of 1.</li>
-      <li>Tree C fools people who only check the root: the root is fine (heights 2 and 1), but 3 is not.</li>
-    </ul>
+  <details class="more">
+    <summary>Why this rule and not a simpler one?</summary>
+    <div class="table-wrap"><table class="plain">
+      <tr><th>Rule</th><th>The issue</th></tr>
+      <tr><td>The root's two subtrees have the same number of nodes</td><td>Too weak: each side can still be a long chain.</td></tr>
+      <tr><td>The root's two subtrees have the same height</td><td>Too weak: the same chains, just equally long.</td></tr>
+      <tr><td>Every node's two subtrees have the same number of nodes</td><td>Too strong: some sizes are impossible, like a tree of 2 nodes.</td></tr>
+      <tr><td>Every node's two subtrees have the same height</td><td>Too strong: again, no tree of 2 nodes.</td></tr>
+    </table></div>
+    <p>AVL allows a difference of 1 at every node. That's strong enough to keep the tree short and loose enough to work for any number of nodes.</p>
   </details>
+
+  <div class="check" data-id="cse332-w3-l8-qc-tree-a" data-grader="exact" data-answer="9" data-miscon='{"3":"balanced-node","10":"balanced-node","1":"balanced-node","6":"balanced-node"}'>
+    <p>Quick check: this BST has exactly one problem node. Which key is it?</p>
+    <svg class="htree" data-shape="9(3(1(0,),6(5,)),10)"></svg>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l8-qc-chain3">
+    <p>Quick check: insert 1, 2, 3 into a plain BST. You get a chain going right: 1, then 2 below it, then 3. Which node is a problem node?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w3-l8-qc-chain3"> 1, at the top<span class="why" hidden>Right. Its left is empty (−1) and its right child 2 has height 1. They differ by 2.</span></label>
+      <label><input type="radio" name="cse332-w3-l8-qc-chain3"> 2, in the middle<span class="why" hidden>2's left is empty (−1) and its right child 3 is a leaf (0). They differ by 1, which is allowed.</span></label>
+      <label><input type="radio" name="cse332-w3-l8-qc-chain3"> 3, at the bottom<span class="why" hidden>3 is a leaf: both sides are empty, so its balance is 0.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L8: INSERT AND ROTATE -->
 <section class="page" id="l8-insert" data-title="Insert and rotate">
-  <p class="where">Lecture 8 · slides 29–45 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span></p>
+  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span></p>
   <h1>Insert and rotate</h1>
+  <div class="prose"><p>Insert starts as a plain BST insert: the new key becomes a leaf. Only the nodes on the path from that leaf up to the root can change height, because nothing else moved. So walk back up that path, update each height, and stop at the first node whose two children differ by 2. Fix it with a <strong>rotation</strong>. Step through the lecture's example, inserting −1:</p></div>
+  <p class="tree-key"><span class="k-new">new key</span><span class="k-cur">being checked</span><span class="k-bad">unbalanced</span><span class="k-cmp">moved up</span><span class="k-moved">moved across</span></p>
+  <div class="panel avl-step" data-start="9(3(1(0,2),6(,7)),11(,16))" data-key="-1" data-recipe="single"></div>
+
   <div class="rule">
-    <p><strong>AVL insert (slide 29).</strong> Start like a BST: find where the key goes and put it there as a leaf. Then update the heights on the path back to the root and check the balance. If every node is still balanced, you're done. Only nodes on that path can become unbalanced, because nothing else changed.</p>
-  </div>
-
-  <h2>Step through the slides' examples</h2>
-  <div class="panel treelab" id="avl-lab" data-mode="avl" data-presets='[{"label":"Insert −1 (slide 32)","shape":"9(3(1(0,2),6(,7)),11(,16))","seq":[-1],"say":"Slide 32 tree. Press Insert to add −1."},{"label":"Insert 10 (slide 30)","shape":"9(3(1(0,2),6(,7)),11(,16))","seq":[10],"say":"Slide 30 tree. Press Insert to add 10."},{"label":"Insert 20 (slide 39)","shape":"9(3(1(0,2),6),11(10,16(,18)))","seq":[20],"say":"Slide 39 tree. Press Insert to add 20."},{"label":"Empty","shape":"","say":"Empty tree. Type keys and press Insert."}]'>
-    <div class="controls">
-      <label>Key <input type="text" inputmode="numeric" class="tl-key" aria-label="Key" placeholder="next in queue"></label>
-      <button class="btn primary tl-insert" type="button">Insert</button>
-      <button class="btn tl-next" type="button" disabled>Rotate</button>
-      <button class="btn quiet tl-reset" type="button">Reset</button>
-      <span class="tl-queue"></span>
-    </div>
-    <div class="controls tl-presets" role="group" aria-label="Start from"></div>
-    <div class="chart-box"><svg class="chart tl-svg" role="img"></svg></div>
-    <p class="out tl-out" role="status"></p>
-    <p class="tl-orders"></p>
-  </div>
-
-  <div class="prose">
-    <p><strong>Insert 10 (slides 30–31):</strong> 10 becomes 11's left child. On the path 10, 11, 9 every node is balanced, so no rotation.</p>
-    <p><strong>Insert −1 (slides 32–36):</strong> −1 goes under 0. Now 9's left subtree has height 3 and its right has height 1: 9 is the problem node. "Shorten" the left and "lengthen" the right with a <strong>right rotation</strong> at 9: 3 becomes the root, 9 becomes 3's right child, and 3's old right subtree (6 and 7) becomes 9's left subtree.</p>
-    <p><strong>Insert 20 (slides 39–43):</strong> 20 goes under 18. Both 16 and 11 are now unbalanced. Rotating at the <strong>deepest</strong> problem node always works: a left rotation at 16 makes 18 the parent of 16 and 20.</p>
-  </div>
-  <div class="split">
-    <div class="rule">
-      <p><strong>Right rotation (slides 37–38).</strong> We inserted into the left child's left subtree, and \(a\) is the deepest problem node. Make the left child \(b\) the new root, the old root its right child, and \(b\)'s old right subtree the old root's left subtree.</p>
-      <pre class="code">Node b = a.left
+    <p><strong>Right rotation at \(a\).</strong> Its left child \(b\) moves up into \(a\)'s place, and \(a\) becomes \(b\)'s right child. \(b\)'s old right subtree moves across to be \(a\)'s left subtree. Then recompute \(a\)'s height, then \(b\)'s. The keys keep their left-to-right order, so it's still a BST.</p>
+    <pre class="code">Node b = a.left
 a.left = b.right
 b.right = a
 return b</pre>
-    </div>
-    <div class="rule">
-      <p><strong>Left rotation (slides 44–45).</strong> The mirror image: the right child becomes the root, the old root its left child, and the new root's old left subtree becomes the old root's right subtree.</p>
-      <pre class="code">Node b = a.right
-a.right = b.left
-b.left = a
-return b</pre>
-    </div>
+    <p><strong>Left rotation</strong> is the mirror image: the right child moves up. Either way, three references change, so a rotation is \(\Theta(1)\).</p>
   </div>
-  <p class="note">A rotation changes three references, so it runs in \(\Theta(1)\). After it, the subtree has the same height it had before the insert, so nothing above it needs fixing.</p>
+  <div class="rule"><p><strong>The rule.</strong> After the rotation, the fixed subtree is exactly as tall as it was before the insert, so nothing above it changes. One fix per insert, at the first unbalanced node on the way up: the deepest one.</p></div>
 
-  <div class="check" data-id="cse332-w3-l8-qc-root-after-minus1" data-grader="exact" data-answer="3" data-miscon='{"9":"not-deepest","1":"single-for-double"}'>
-    <p>Quick check: after inserting −1 and rotating, what is the root?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w3-l8-qc-rotation-time">
-    <p>Quick check: running time of one rotation in a tree of \(n\) nodes.</p>
-    <div class="opts">
-      <label data-correct><input type="radio" name="cse332-w3-l8-qc-rotation-time"> \(\Theta(1)\)<span class="why" hidden>Right: three references change, whatever the size of the subtrees.</span></label>
-      <label><input type="radio" name="cse332-w3-l8-qc-rotation-time"> \(\Theta(\log n)\)<span class="why" hidden>Finding the node takes \(\Theta(\log n)\), but the rotation itself moves whole subtrees by changing three references.</span></label>
-      <label><input type="radio" name="cse332-w3-l8-qc-rotation-time"> \(\Theta(n)\)<span class="why" hidden>Subtrees move as a unit; no node inside them is visited.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>In the stepper, the orange node is the deepest unbalanced one. Ask the room to predict the rotation before pressing Rotate.</li>
-      <li>The slide-37 picture with heights \(h, h+1, h+2, h+3\) is the proof that one rotation is enough: after it, both children of the new root have height \(h+1\).</li>
-    </ul>
-  </details>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ L8: FOUR CASES -->
-<section class="page" id="l8-cases" data-title="The four cases">
-  <p class="where">Lecture 8 · slides 46–54 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span></p>
-  <h1>The four cases</h1>
-  <div class="prose">
-    <p>"Rotate toward the shorter side" is incomplete (slide 46). Insert 9, 5, 7: 9 is unbalanced, its left subtree is deeper, but a right rotation at 9 just gives 5 with right child 9 and 9's left child 7, which is unbalanced the other way.</p>
-  </div>
-  <div class="rule">
-    <p><strong>Insert summary (slide 53).</strong> After a BST insert, update the heights of the new node's ancestors, from the leaf up. At the deepest unbalanced node:</p>
-    <ul>
-      <li><strong>LL</strong>, inserted into the left subtree of the left child: rotate right.</li>
-      <li><strong>RR</strong>, inserted into the right subtree of the right child: rotate left.</li>
-      <li><strong>LR</strong>, inserted into the right subtree of the left child: rotate left at the left child, then right at the node.</li>
-      <li><strong>RL</strong>, inserted into the left subtree of the right child: rotate right at the right child, then left at the node.</li>
-    </ul>
-    <p>Stop when you reach the root or have applied one case.</p>
-  </div>
-  <div class="split">
-    <pre class="code"><span class="cm">// slide 50: case LR in one go</span>
-Node b = a.left
-Node c = b.right
-b.right = c.left
-a.left = c.right
-c.right = a
-c.left = b
-return c</pre>
-    <pre class="code"><span class="cm">// slide 54: insert for AVL</span>
-insertHelper(key, value, root) {
+  <details class="more">
+    <summary>The lecture's insert code</summary>
+    <p>The walk back up is the recursion returning: each call checks its own node after the call below it has finished.</p>
+    <pre class="code">insertHelper(key, value, root) {
   if (root == null)
     return new Node(key, value);
   if (root.key &lt; key)
@@ -1523,286 +1470,293 @@ insertHelper(key, value, root) {
     root = rotate(root);
   return root;
 }</pre>
+  </details>
+
+  <div class="check" data-id="cse332-w3-l8-qc-insert8-problem" data-grader="exact" data-answer="6" data-miscon='{"9":"not-deepest","3":"balanced-node","7":"balanced-node"}'>
+    <p>Quick check: start again from the lecture's tree below and insert 8 instead. 8 becomes 7's right child. Which node do you rotate at?</p>
+    <svg class="htree" data-shape="9(3(1(0,2),6(,7)),11(,16))" data-label="h"></svg>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l8-qc-insert8-after" data-grader="exact" data-answer="7" data-miscon='{"6":"before-rotation"}'>
+    <p>Quick check: same insert of 8 into this tree. After the rotation, what is 3's right child?</p>
+    <svg class="htree" data-shape="9(3(1(0,2),6(,7)),11(,16))" data-label="h"></svg>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L8: FOUR CASES -->
+<section class="page" id="l8-cases" data-title="The four cases">
+  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span></p>
+  <h1>The four cases</h1>
+  <div class="prose"><p>"Rotate toward the shorter side" fails when the new key went to the <em>inside</em>. Insert 9, 5, 7: 7 goes left of 9, then right of 5, and 9 is unbalanced. One right rotation at 9 just moves the problem to the other side:</p></div>
+  <div class="tree-row">
+    <figure><figcaption>After inserting 7: 9 is unbalanced</figcaption><svg class="htree" data-shape="9(5(,7),)" data-label="h" data-bad="9"></svg></figure>
+    <figure><figcaption>Rotate right at 9: now 5 is unbalanced</figcaption><svg class="htree" data-shape="5(,9(7,))" data-label="h" data-bad="5"></svg></figure>
   </div>
 
-  <h2>Try the double rotations</h2>
-  <div class="panel treelab" id="avl-cases" data-mode="avl" data-presets='[{"label":"9, 5, 7 (slide 48, LR)","shape":"","seq":[9,5,7],"say":"Empty tree, queue 9, 5, 7. Press Insert three times."},{"label":"3, 8, 5 (RL)","shape":"","seq":[3,8,5],"say":"Empty tree, queue 3, 8, 5."},{"label":"1 to 7 in order","shape":"","seq":[1,2,3,4,5,6,7],"say":"Sorted inserts. A plain BST would be a chain of height 6."}]'>
-    <div class="controls">
-      <label>Key <input type="text" inputmode="numeric" class="tl-key" aria-label="Key" placeholder="next in queue"></label>
-      <button class="btn primary tl-insert" type="button">Insert</button>
-      <button class="btn tl-next" type="button" disabled>Rotate</button>
-      <button class="btn quiet tl-reset" type="button">Reset</button>
-      <span class="tl-queue"></span>
-    </div>
-    <div class="controls tl-presets" role="group" aria-label="Start from"></div>
-    <div class="chart-box"><svg class="chart tl-svg" role="img"></svg></div>
-    <p class="out tl-out" role="status"></p>
-    <p class="tl-orders"></p>
+  <p class="line">So name the case by the new key's first two steps down from the unbalanced node, and fix it like this:</p>
+  <div class="tree-row cases">
+    <figure><figcaption>LL: left, then left</figcaption><div class="av-pair"><svg class="htree" data-shape="3(2(1,),)" data-bad="3"></svg><span class="arrow">→</span><svg class="htree" data-shape="2(1,3)" data-cmp="2"></svg></div><p>Rotate right at the unbalanced node.</p></figure>
+    <figure><figcaption>RR: right, then right</figcaption><div class="av-pair"><svg class="htree" data-shape="1(,2(,3))" data-bad="1"></svg><span class="arrow">→</span><svg class="htree" data-shape="2(1,3)" data-cmp="2"></svg></div><p>Rotate left at the unbalanced node.</p></figure>
+    <figure><figcaption>LR: left, then right</figcaption><div class="av-pair"><svg class="htree" data-shape="9(5(,7),)" data-bad="9"></svg><span class="arrow">→</span><svg class="htree" data-shape="7(5,9)" data-cmp="7"></svg></div><p>Rotate left at the left child, then right at the unbalanced node.</p></figure>
+    <figure><figcaption>RL: right, then left</figcaption><div class="av-pair"><svg class="htree" data-shape="4(,8(6,))" data-bad="4"></svg><span class="arrow">→</span><svg class="htree" data-shape="6(4,8)" data-cmp="6"></svg></div><p>Rotate right at the right child, then left at the unbalanced node.</p></figure>
   </div>
+  <div class="rule"><p><strong>The rule.</strong> A straight path (LL, RR) takes one rotation. A zig-zag (LR, RL) takes two: the first turns it into a straight path, the second fixes that.</p></div>
 
-  <div class="check" data-id="cse332-w3-l8-qc-case-957">
-    <p>Quick check: inserting 7 into the tree 9 → 5 (5 is 9's left child) is which case?</p>
+  <h2>Worked example: a double rotation</h2>
+  <p class="line">Here the middle node has a subtree to hand over, so watch where 5 goes.</p>
+  <p class="tree-key"><span class="k-new">new key</span><span class="k-cur">being checked</span><span class="k-bad">unbalanced</span><span class="k-cmp">moved up</span><span class="k-moved">moved across</span></p>
+  <div class="panel avl-step" data-start="8(4(2,6),10)" data-key="5" data-recipe="full"></div>
+
+  <details class="more">
+    <summary>Case LR in code, both rotations at once</summary>
+    <p>\(a\) is the unbalanced node, \(b\) its left child, \(c\) the left child's right child.</p>
+    <pre class="code">Node b = a.left
+Node c = b.right
+b.right = c.left
+a.left = c.right
+c.right = a
+c.left = b
+return c</pre>
+    <p>RL is the mirror image, with left and right swapped.</p>
+  </details>
+
+  <div class="check" data-id="cse332-w3-l8-qc-root-385" data-grader="exact" data-answer="5" data-miscon='{"8":"single-for-double","3":"single-for-double"}'>
+    <p>Quick check: insert 3, 8, 5 into an empty AVL tree. What is the root at the end?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l8-cyu-middle">
+    <p>Quick check: in case LR, \(a\) is the unbalanced node, \(b\) is its left child, and \(c\) is \(b\)'s right child, so \(b &lt; c &lt; a\). After the two rotations, which is on top?</p>
     <div class="opts">
-      <label><input type="radio" name="cse332-w3-l8-qc-case-957"> LL<span class="why" hidden>7 &gt; 5, so it goes to 5's <em>right</em>.</span></label>
-      <label data-correct><input type="radio" name="cse332-w3-l8-qc-case-957"> LR<span class="why" hidden>Right: left child (5), then its right subtree. Two rotations make 7 the root.</span></label>
-      <label><input type="radio" name="cse332-w3-l8-qc-case-957"> RL<span class="why" hidden>7 &lt; 9, so it's in 9's left subtree.</span></label>
+      <label><input type="radio" name="cse332-w3-l8-cyu-middle"> \(a\)<span class="why" hidden>\(a\) was the unbalanced node. It moves down.</span></label>
+      <label><input type="radio" name="cse332-w3-l8-cyu-middle"> \(b\)<span class="why" hidden>That's what one right rotation would do, and one rotation doesn't fix LR.</span></label>
+      <label data-correct><input type="radio" name="cse332-w3-l8-cyu-middle"> \(c\), the middle key<span class="why" hidden>Right. It rises twice, with \(b\) on its left and \(a\) on its right.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <div class="check" data-id="cse332-w3-l8-qc-root-385" data-grader="exact" data-answer="5" data-miscon='{"8":"single-for-double","3":"single-for-double"}'>
-    <p>Quick check: insert 3, 8, 5 into an empty AVL tree. What is the root?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>The case name is the path from the problem node to where the key went: first step, second step. Straight paths (LL, RR) take one rotation; zig-zags (LR, RL) take two.</li>
-      <li>In a double rotation the middle key \(c\) ends up on top. That's a quick check on any answer.</li>
-      <li>EX4 (AVL trees, due Oct 30) implements this. Don't hand out code; the slides' pseudocode is enough.</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L8: HEIGHT -->
-<section class="page" id="l8-height" data-title="Why it's log n">
-  <p class="where">Lecture 8 · slides 55–56 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span></p>
-  <h1>Why AVL operations are \(\Theta(\log n)\)</h1>
-  <div class="prose">
-    <p>Operations are slow when the height is close to \(n\). So ask the opposite question: what's the <em>fewest</em> nodes an AVL tree of height \(h\) can have? Call it \(M(h)\). One subtree must have height \(h-1\), and the balance rule lets the other be as short as \(h-2\):</p>
-    <p>\[M(h) = M(h-1) + M(h-2) + 1,\qquad M(0) = 1,\ M(1) = 2.\]</p>
-  </div>
-  <div class="table-wrap">
-  <table class="plain num">
-    <tr><th>\(h\)</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr>
-    <tr><th>\(M(h)\)</th><td>1</td><td>2</td><td>4</td><td>7</td><td>12</td><td>20</td><td>33</td><td>54</td><td>88</td><td>143</td><td>232</td></tr>
-    <tr><th>max \(2^{h+1}-1\)</th><td>1</td><td>3</td><td>7</td><td>15</td><td>31</td><td>63</td><td>127</td><td>255</td><td>511</td><td>1023</td><td>2047</td></tr>
-  </table>
-  </div>
-  <div class="prose">
-    <p>Compare with Fibonacci, \(F(n) = F(n-1) + F(n-2)\) (slide 56): \(M(h) &gt; F(h)\), and \(F(h) \approx \phi^h\) with \(\phi \approx 1.618 &gt; 1.6\). So an AVL tree of height \(h\) has at least about \(\phi^h\) nodes, and at most \(2^{h+1} - 1\). With \(n\) nodes we need \(n \ge \phi^h\), so \(h \le \log_\phi n\). Every operation is \(O(\log n)\), and since even a perfect tree has height about \(\log_2 n\), they're \(\Omega(\log n)\) too.</p>
+<section class="page" id="l8-height" data-title="Why the height is log n">
+  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span></p>
+  <h1>Why the height is \(\Theta(\log n)\)</h1>
+  <div class="prose"><p>Every AVL operation walks one path, so it costs the tree's height. How tall can an AVL tree with \(n\) nodes get? Turn it around: let \(M(h)\) be the <em>fewest</em> nodes an AVL tree of height \(h\) can have. Here are the smallest ones:</p></div>
+  <div class="tree-row">
+    <figure><figcaption>\(h = 0\): 1 node</figcaption><svg class="htree" data-shape="1" data-label="h"></svg></figure>
+    <figure><figcaption>\(h = 1\): 2 nodes</figcaption><svg class="htree" data-shape="2(1,)" data-label="h"></svg></figure>
+    <figure><figcaption>\(h = 2\): 4 nodes</figcaption><svg class="htree" data-shape="3(2(1,),4)" data-label="h"></svg></figure>
+    <figure><figcaption>\(h = 3\): 7 nodes</figcaption><svg class="htree" data-shape="5(3(2(1,),4),7(6,))" data-label="h"></svg></figure>
   </div>
 
-  <div class="check" data-id="cse332-w3-l8-qc-m4" data-grader="exact" data-answer="12" data-miscon='{"5":"fib-not-m","8":"fib-not-m","31":"leaves-not-nodes"}'>
-    <p>Quick check: \(M(4)\), the fewest nodes in an AVL tree of height 4.</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
+  <div class="example">
+    <p class="example-head">The recurrence</p>
+    <p class="line">A tree of height \(h\) needs one subtree of height \(h-1\). The balance rule lets the other be as short as \(h-2\), and no shorter. Make both as small as possible and add the root:</p>
+    <p>\[M(h) = M(h-1) + M(h-2) + 1, \qquad M(0) = 1,\ M(1) = 2\]</p>
+    <div class="steps board"><ol>
+      <li><span class="lab">\(M(2)\)</span><span class="mth">\(= M(1) + M(0) + 1 = 2 + 1 + 1 = 4\)</span><span class="note">the \(h = 2\) tree above</span></li>
+      <li><span class="lab">\(M(3)\)</span><span class="mth">\(= M(2) + M(1) + 1 = 4 + 2 + 1 = 7\)</span><span class="note">the \(h = 3\) tree</span></li>
+      <li><span class="lab">\(M(4)\)</span><span class="mth">\(= 7 + 4 + 1 = 12\)</span><span class="note"></span></li>
+    </ol></div>
   </div>
-  <div class="check" data-id="cse332-w3-l8-qc-maxh-20" data-grader="exact" data-answer="5" data-miscon='{"19":"bst-height","4":"off-by-one-height"}'>
-    <p>Quick check: the greatest possible height of an AVL tree with 20 nodes.</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Draw the minimal trees for \(h = 0, 1, 2, 3\) on the board: each is a root over the minimal trees of heights \(h-1\) and \(h-2\).</li>
-      <li>"Greatest height with \(n\) nodes" is the largest \(h\) with \(M(h) \le n\). With 20 nodes that's 5 (\(M(5) = 20\)); a plain BST could reach 19.</li>
-    </ul>
+  <div class="table-wrap"><table class="vals">
+    <tr><th>\(h\)</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr>
+    <tr><th>\(M(h)\)</th><td>1</td><td>2</td><td>4</td><td>7</td><td>12</td><td>20</td><td>33</td></tr>
+  </table></div>
+  <div class="rule"><p><strong>The rule.</strong> \(M(h)\) grows like the Fibonacci numbers: each one is a bit more than 1.6 times the one before. So an AVL tree of height \(h\) has at least \(1.6^h\) nodes, and with \(n\) nodes its height is at most about \(\log_{1.6} n\). Find, insert and delete are all \(\Theta(\log n)\) in the worst case.</p></div>
+  <p class="line">With a million keys, a plain BST can reach height 999,999. An AVL tree stays at height 27 or less. The shortest possible tree, a complete one, has height 19.</p>
+
+  <details class="more">
+    <summary>The proof, with the Fibonacci numbers</summary>
+    <p>Fibonacci: \(F(0) = 0\), \(F(1) = 1\), \(F(h) = F(h-1) + F(h-2)\). \(M\) starts bigger and adds an extra 1 at each step, so \(M(h) &gt; F(h)\). For large \(h\), \(F(h)\) grows like \(\phi^h\), where \(\phi \approx 1.618\) is the golden ratio.</p>
+    <p>In fact \(M(h) \ge \phi^h\) for every \(h\): it holds for \(h = 0\) and \(h = 1\), and \(\phi^{h-1} + \phi^{h-2} = \phi^h\), so it carries up the recurrence. A tree with \(n\) nodes and height \(h\) has \(n \ge M(h) \ge \phi^h\), so \(h \le \log_\phi n\): the operations are \(O(\log n)\).</p>
+    <p>The other way: a tree of height \(h\) has at most \(2^{h+1} - 1\) nodes, so even the best tree has height at least \(\log_2(n+1) - 1\). The operations are \(\Omega(\log n)\) too, so \(\Theta(\log n)\).</p>
   </details>
+
+  <div class="check" data-id="cse332-w3-l8-qc-maxh-20" data-grader="exact" data-answer="5" data-miscon='{"19":"bst-height","4":"off-by-one-height","6":"off-by-one-height"}'>
+    <p>Quick check: what's the greatest possible height of an AVL tree with 20 nodes? (The largest \(h\) with \(M(h) \le 20\).)</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l8-qc-m7" data-grader="exact" data-answer="54" data-miscon='{"53":"forgot-root","34":"fib-not-m"}'>
+    <p>Quick check: use the recurrence and the table. What is \(M(7)\)?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L8: PRACTICE -->
-<section class="page" id="l8-practice" data-title="Lecture 8: practice">
-  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span> · practice</p>
-  <h1>Lecture 8: practice</h1>
-  <div class="prose"><p>Six problems on the lecture's trees and new insert sequences. Every tree was built by running the slides' AVL insert (<code>checks/cse332/w03/verify.mjs</code> checks the shapes, heights and rotations). Traversal boxes take keys separated by spaces or commas.</p></div>
+<section class="page" id="l8-practice" data-title="Lecture 8 practice">
+  <p class="where">Lecture 8 · <span class="today-chip" data-date="2026-10-16">Fri Oct 16</span></p>
+  <h1>Lecture 8 practice</h1>
+  <div class="prose"><p>One group per lesson, on the lecture's trees and new ones. Draw the tree on paper as you go: that's the skill. Each part checks on its own, and each solution draws the tree after every step.</p></div>
+  <div data-progress-bar></div>
+
+  <h2 class="practice-group">What balanced means</h2>
+  <p class="note">Lesson: <a href="#l8-balance">What balanced means</a></p>
 
   <article class="task" data-id="cse332-w3-l8-is-avl">
     <h2>1. Balanced or not?</h2>
-    <div class="tree-grid">
-      <figure class="treeview" data-shape="5(2(1,4(3,)),8(,9))"><figcaption>Tree X</figcaption></figure>
-      <figure class="treeview" data-shape="5(2(1,4(3,)),8(,9(,10)))"><figcaption>Tree Y</figcaption></figure>
+    <p class="prompt">Both trees are BSTs. A node's height counts edges down to its deepest leaf (a leaf is 0, an empty child −1). Is each one an AVL tree, where every node's two children differ in height by at most 1?</p>
+    <div class="tree-row">
+      <figure><figcaption>Tree X</figcaption><svg class="htree" data-shape="5(2(1,4(3,)),8(,9))"></svg></figure>
+      <figure><figcaption>Tree Y</figcaption><svg class="htree" data-shape="5(2(1,4(3,)),8(,9(,10)))"></svg></figure>
     </div>
-    <p class="prompt">Both are BSTs. Are they AVL trees? For the one that isn't, name the problem node.</p>
     <div class="answer-spec" data-part="x" data-grader="yesno" data-answer="yes" data-label="Is Tree X an AVL tree?"></div>
     <div class="answer-spec" data-part="y" data-grader="yesno" data-answer="no" data-label="Is Tree Y an AVL tree?"></div>
-    <div class="answer-spec" data-part="problem" data-grader="exact" data-answer="8" data-miscon='{"5":"not-deepest"}' data-label="Tree Y's problem node"></div>
+    <div class="answer-spec" data-part="problem" data-grader="exact" data-answer="8" data-miscon='{"5":"balanced-node","9":"balanced-node"}' data-label="Tree Y's problem node"></div>
     <ol class="hints">
-      <li>Write each node's height, from the leaves up (a leaf is 0, an empty child −1). Then compare each node's two children.</li>
+      <li>Write each node's height from the leaves up. Then, at each node, compare its two children.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>X: 2 has children of heights 0 and 1; 8 has −1 and 0; 5 has 2 and 1. All differ by at most 1.</li>
-      <li>Y: 9 has height 1, so 8's children are −1 and 1: they differ by 2. The root 5 has 2 and 2, which is fine.</li>
+      <li>X, with each height and balance: every balance is −1, 0 or +1.<svg class="htree" data-shape="5(2(1,4(3,)),8(,9))" data-label="hb"></svg></li>
+      <li>Y: 9 now has height 1, so 8's children are −1 and 1. That's −2. The root is fine: 2 and 2.<svg class="htree" data-shape="5(2(1,4(3,)),8(,9(,10)))" data-label="hb" data-bad="8"></svg></li>
       <li class="answer">X yes; Y no; the problem node is 8.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w3-l8-single">
-    <h2>2. Single rotations</h2>
-    <p class="prompt">Insert into an empty AVL tree.</p>
-    <div class="answer-spec" data-part="case123" data-grader="choice" data-answer="rr" data-options="ll:LL|rr:RR|lr:LR|rl:RL" data-label="1, 2, 3: which case?"></div>
-    <div class="answer-spec" data-part="root123" data-grader="exact" data-answer="2" data-label="1, 2, 3: final root"></div>
-    <div class="answer-spec" data-part="case321" data-grader="choice" data-answer="ll" data-options="ll:LL|rr:RR|lr:LR|rl:RL" data-label="3, 2, 1: which case?"></div>
-    <div class="answer-spec" data-part="root321" data-grader="exact" data-answer="2" data-label="3, 2, 1: final root"></div>
+  <h2 class="practice-group">Insert and rotate</h2>
+  <p class="note">Lesson: <a href="#l8-insert">Insert and rotate</a></p>
+
+  <article class="task" data-id="cse332-w3-l8-ins20">
+    <h2>2. Two problem nodes</h2>
+    <p class="prompt">The lecture's second insert: add 20 to this AVL tree. The small numbers are heights.</p>
+    <svg class="htree" data-shape="9(3(1(0,2),6),11(10,16(,18)))" data-label="h"></svg>
+    <div class="answer-spec" data-part="deep" data-grader="exact" data-answer="16" data-miscon='{"11":"not-deepest","9":"balanced-node","18":"balanced-node"}' data-label="the node to rotate at"></div>
+    <div class="answer-spec" data-part="dir" data-grader="choice" data-answer="left" data-options="left:Rotate left|right:Rotate right" data-label="which rotation?"></div>
+    <div class="answer-spec" data-part="parent16" data-grader="exact" data-answer="18" data-miscon='{"11":"before-rotation"}' data-label="16's parent after the fix"></div>
+    <div class="answer-spec" data-part="still11" data-grader="yesno" data-answer="no" data-label="After the fix, is 11 still unbalanced?"></div>
     <ol class="hints">
-      <li>After the third insert, which node is unbalanced, and which way did you go from it twice?</li>
+      <li>20 goes below 18. Walk back up from there, updating heights, and stop at the first node whose children differ by 2.</li>
+      <li>The rotation lifts the taller side. Which child of that node is taller?</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>1, 2, 3: a right-going chain. 1 is unbalanced and 3 went right, then right: RR, so rotate left at 1.</li>
-      <li>3, 2, 1: the mirror. LL, rotate right at 3.</li>
-      <li class="answer">RR, root 2; LL, root 2.</li>
+      <li>\(20 &gt; 9\), \(20 &gt; 11\), \(20 &gt; 16\), \(20 &gt; 18\): 20 becomes 18's right child.<svg class="htree" data-step data-shape="9(3(1(0,2),6),11(10,16(,18(,20))))" data-cmp="20" data-bad="16,11" data-label="h"></svg></li>
+      <li>Walk up: 18 has children −1 and 0, fine. 16 has −1 and 1: unbalanced, and the first on the way up. 11 (0 and 2) is unbalanced too, but 16 is deeper.</li>
+      <li>16's right side is taller, so rotate left at 16: 18 moves up into its place, and 16 becomes 18's left child.<svg class="htree" data-step data-shape="9(3(1(0,2),6),11(10,18(16,20)))" data-cmp="18" data-label="h"></svg></li>
+      <li>That subtree is back to height 1, so 11's children are 0 and 1 again: fixed without touching it.</li>
+      <li class="answer">Rotate at 16; rotate left; 16's parent is 18; no, 11 is balanced.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w3-l8-minus1">
-    <h2>3. The slide-32 insert</h2>
-    <div class="treeview" data-shape="9(3(1(0,2),6(,7)),11(,16))" data-heights></div>
-    <p class="prompt">Insert −1 into this AVL tree (slide 32).</p>
-    <div class="answer-spec" data-part="h9" data-grader="exact" data-answer="4" data-label="height of 9 right after the BST insert"></div>
-    <div class="answer-spec" data-part="problem" data-grader="exact" data-answer="9" data-label="deepest unbalanced node"></div>
-    <div class="answer-spec" data-part="case" data-grader="choice" data-answer="ll" data-options="ll:LL|rr:RR|lr:LR|rl:RL" data-label="case"></div>
-    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="3 1 0 -1 2 9 6 7 11 16|3, 1, 0, -1, 2, 9, 6, 7, 11, 16" data-label="pre-order after the rotation"></div>
+  <div class="check" data-id="cse332-w3-l8-qc-rotation-time">
+    <p>Quick check: how long does one rotation take in an AVL tree with \(n\) nodes?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w3-l8-qc-rotation-time"> \(\Theta(1)\)<span class="why" hidden>Right. Three references change, however big the subtrees are.</span></label>
+      <label><input type="radio" name="cse332-w3-l8-qc-rotation-time"> \(\Theta(\log n)\)<span class="why" hidden>Walking down to the node takes \(\Theta(\log n)\). The rotation itself only changes three references.</span></label>
+      <label><input type="radio" name="cse332-w3-l8-qc-rotation-time"> \(\Theta(n)\)<span class="why" hidden>Subtrees move as a unit. No node inside them is visited.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group">The four cases</h2>
+  <p class="note">Lesson: <a href="#l8-cases">The four cases</a></p>
+
+  <article class="task" data-id="cse332-w3-l8-which-case">
+    <h2>3. Name the case</h2>
+    <p class="prompt">Each part starts fresh from the tree it names. Insert the key, find the first unbalanced node on the way back up, and name the case: the key's first two steps down from that node. Pick "No rotation" if every node stays balanced.</p>
+    <div class="tree-row">
+      <figure><figcaption>Tree P</figcaption><svg class="htree" data-shape="20(10(5,15),30)" data-label="h"></svg></figure>
+      <figure><figcaption>Tree Q</figcaption><svg class="htree" data-shape="10(5,20(15,30))" data-label="h"></svg></figure>
+    </div>
+    <div class="answer-spec" data-part="p3" data-grader="choice" data-answer="ll" data-options="ll:LL|rr:RR|lr:LR|rl:RL|none:No rotation" data-label="Tree P, insert 3"></div>
+    <div class="answer-spec" data-part="p17" data-grader="choice" data-answer="lr" data-options="ll:LL|rr:RR|lr:LR|rl:RL|none:No rotation" data-label="Tree P, insert 17"></div>
+    <div class="answer-spec" data-part="p25" data-grader="choice" data-answer="none" data-options="ll:LL|rr:RR|lr:LR|rl:RL|none:No rotation" data-label="Tree P, insert 25"></div>
+    <div class="answer-spec" data-part="q35" data-grader="choice" data-answer="rr" data-options="ll:LL|rr:RR|lr:LR|rl:RL|none:No rotation" data-label="Tree Q, insert 35"></div>
     <ol class="hints">
-      <li>−1 goes to 0's left. Recompute heights on the path −1, 0, 1, 3, 9.</li>
-      <li>From 9 the new key went left (to 3), then left again (to 1).</li>
+      <li>Only the taller side of the root can become unbalanced here. Which side is taller in P? In Q?</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>Heights on the path: −1 is 0, 0 is 1, 1 is 2, 3 is 3, 9 is 4. 9's right child 11 has height 1.</li>
-      <li>9's children differ by 2, and 9 is the only unbalanced node: 1 has 1 and 0, 3 has 2 and 1.</li>
-      <li>Left, then left: LL. Rotate right at 9. 3 becomes the root; 9 takes 3's old right subtree (6, 7) as its left.</li>
-      <li class="answer">4; 9; LL; 3 1 0 −1 2 9 6 7 11 16.</li>
+      <li>P, insert 3: below 5. 20's children are now 2 and 0. From 20, 3 went left (10), then left (5): LL.<svg class="htree" data-step data-shape="20(10(5(3,),15),30)" data-cmp="3" data-bad="20" data-label="h"></svg></li>
+      <li>Rotate right at 20: 10 moves up.<svg class="htree" data-step data-shape="10(5(3,),20(15,30))" data-cmp="10"></svg></li>
+      <li>P, insert 17: below 15. 20 is unbalanced again. From 20, 17 went left (10), then right (15): LR.<svg class="htree" data-step data-shape="20(10(5,15(,17)),30)" data-cmp="17" data-bad="20" data-label="h"></svg></li>
+      <li>Rotate left at 10: 15 moves up.<svg class="htree" data-step data-shape="20(15(10(5,),17),30)" data-cmp="15"></svg></li>
+      <li>Rotate right at 20: 15 moves up again, to the top.<svg class="htree" data-step data-shape="15(10(5,),20(17,30))" data-cmp="15"></svg></li>
+      <li>P, insert 25: below 30, on the shorter side. 30 becomes height 1, 20's children are 1 and 1: no rotation.<svg class="htree" data-step data-shape="20(10(5,15),30(25,))" data-cmp="25" data-label="h"></svg></li>
+      <li>Q, insert 35: below 30. 10's children are 0 and 2. From 10, 35 went right (20), then right (30): RR.<svg class="htree" data-step data-shape="10(5,20(15,30(,35)))" data-cmp="35" data-bad="10" data-label="h"></svg></li>
+      <li>Rotate left at 10: 20 moves up.<svg class="htree" data-step data-shape="20(10(5,15),30(,35))" data-cmp="20"></svg></li>
+      <li class="answer">LL; LR; no rotation; RR.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w3-l8-insert20">
-    <h2>4. The slide-39 insert</h2>
-    <div class="treeview" data-shape="9(3(1(0,2),6),11(10,16(,18)))" data-heights></div>
-    <p class="prompt">Insert 20 (slide 39). Two nodes become unbalanced.</p>
-    <div class="answer-spec" data-part="deep" data-grader="exact" data-answer="16" data-miscon='{"11":"not-deepest"}' data-label="the node to rotate at"></div>
-    <div class="answer-spec" data-part="case" data-grader="choice" data-answer="rr" data-options="ll:LL|rr:RR|lr:LR|rl:RL" data-label="case"></div>
-    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="9 3 1 0 2 6 11 10 18 16 20|9, 3, 1, 0, 2, 6, 11, 10, 18, 16, 20" data-label="pre-order after the rotation"></div>
+  <article class="task" data-id="cse332-w3-l8-double-steps">
+    <h2>4. A double rotation, step by step</h2>
+    <p class="prompt">Insert 12 into this AVL tree. The small numbers are heights.</p>
+    <svg class="htree" data-shape="10(5,20(15,30))" data-label="h"></svg>
+    <div class="answer-spec" data-part="case" data-grader="choice" data-answer="rl" data-options="ll:LL|rr:RR|lr:LR|rl:RL" data-label="which case?"></div>
+    <div class="answer-spec" data-part="mid" data-grader="exact" data-answer="15" data-miscon='{"20":"before-rotation"}' data-label="after the first rotation: 10's right child"></div>
+    <div class="answer-spec" data-part="root" data-grader="exact" data-answer="15" data-miscon='{"20":"single-for-double","10":"no-rotation"}' data-label="the root at the end"></div>
+    <div class="answer-spec" data-part="p12" data-grader="exact" data-answer="10" data-miscon='{"15":"subtree-stays"}' data-label="12's parent at the end"></div>
     <ol class="hints">
-      <li>20 goes to 18's right. Which nodes on the path now have children whose heights differ by 2?</li>
+      <li>12 goes below 15. Walk up: 15 and 20 are fine. What about 10?</li>
+      <li>In the second rotation, 15's old left subtree moves across to the node that moves down.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>16's children: −1 and 1. 11's children: 0 and 2. Both unbalanced; 16 is deeper.</li>
-      <li>From 16 the key went right, then right: RR. Rotate left at 16, so 18 becomes 11's right child with children 16 and 20.</li>
-      <li>That also fixes 11: its right subtree is back to height 1.</li>
-      <li class="answer">16; RR; 9 3 1 0 2 6 11 10 18 16 20.</li>
+      <li>12 becomes 15's left child. 20's children are 1 and 0, fine. 10's are 0 and 2: unbalanced. From 10, 12 went right (20), then left (15): RL.<svg class="htree" data-step data-shape="10(5,20(15(12,),30))" data-cmp="12" data-bad="10" data-label="h"></svg></li>
+      <li>Rotate right at 20: 15 moves up, and 20 becomes its right child. 10's right child is now 15.<svg class="htree" data-step data-shape="10(5,15(12,20(,30)))" data-cmp="15"></svg></li>
+      <li>Rotate left at 10: 15 moves up to the root, and 10 becomes its left child. 15's old left subtree, 12, moves across to be 10's right child.<svg class="htree" data-step data-shape="15(10(5,12),20(,30))" data-cmp="15"></svg></li>
+      <li class="answer">RL; 15; 15; 10.</li>
     </ol></div></div>
   </article>
 
   <article class="task" data-id="cse332-w3-l8-double">
-    <h2>5. A sequence with every kind of rotation</h2>
-    <p class="prompt">Insert 10, 20, 30, 25, 28, 27 into an empty AVL tree.</p>
-    <div class="answer-spec" data-part="case28" data-grader="choice" data-answer="lr" data-options="ll:LL|rr:RR|lr:LR|rl:RL|none:no rotation" data-label="case when 28 is inserted"></div>
-    <div class="answer-spec" data-part="case27" data-grader="choice" data-answer="rl" data-options="ll:LL|rr:RR|lr:LR|rl:RL|none:no rotation" data-label="case when 27 is inserted"></div>
-    <div class="answer-spec" data-part="root" data-grader="exact" data-answer="25" data-label="final root"></div>
-    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="25 20 10 28 27 30|25, 20, 10, 28, 27, 30" data-label="final pre-order"></div>
+    <h2>5. A sequence of inserts</h2>
+    <p class="prompt">Insert 10, 20, 30, 25, 28, 27, in that order, into an empty AVL tree. Name the case each insert triggers ("No rotation" if none).</p>
+    <div class="answer-spec" data-part="case30" data-grader="choice" data-answer="rr" data-options="ll:LL|rr:RR|lr:LR|rl:RL|none:No rotation" data-label="when 30 is inserted"></div>
+    <div class="answer-spec" data-part="case28" data-grader="choice" data-answer="lr" data-options="ll:LL|rr:RR|lr:LR|rl:RL|none:No rotation" data-label="when 28 is inserted"></div>
+    <div class="answer-spec" data-part="case27" data-grader="choice" data-answer="rl" data-options="ll:LL|rr:RR|lr:LR|rl:RL|none:No rotation" data-label="when 27 is inserted"></div>
+    <div class="answer-spec" data-part="root" data-grader="exact" data-answer="25" data-miscon='{"20":"no-rotation","28":"single-for-double"}' data-label="the root at the end"></div>
     <ol class="hints">
-      <li>Draw the tree after each insert. 30 triggers an RR at 10. Where does 28 go then?</li>
-      <li>After 28: 20 is the root, 10 its left child, and 28 its right child with children 25 and 30. Now insert 27.</li>
+      <li>Draw the tree after every insert, with heights. 10 and 20 make a two-node tree with no rotation.</li>
+      <li>When 28 goes in, two nodes are unbalanced. Fix the deeper one.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>10, 20, 30: RR at 10, giving 20(10, 30). 25 goes to 30's left; still balanced.</li>
-      <li>28 goes to 25's right. 30 is unbalanced (left height 1, right −1); from 30 the key went left then right: LR. Result: 20(10, 28(25, 30)).</li>
-      <li>27 goes to 25's right. Now 20 is unbalanced (left 0, right 2); from 20 it went right (28) then left (25): RL. Rotate right at 28, then left at 20: 25 rises to the root.</li>
-      <li class="answer">LR; RL; root 25; pre-order 25 20 10 28 27 30.</li>
+      <li>10, then 20: 20 is 10's right child, both balanced. 30 goes right, right: 10 is unbalanced, case RR.<svg class="htree" data-step data-shape="10(,20(,30))" data-cmp="30" data-bad="10" data-label="h"></svg></li>
+      <li>Rotate left at 10.<svg class="htree" data-step data-shape="20(10,30)" data-cmp="20"></svg></li>
+      <li>25 goes left of 30. Everything is still balanced.<svg class="htree" data-step data-shape="20(10,30(25,))" data-cmp="25" data-label="h"></svg></li>
+      <li>28 goes right of 25. 30 (children 1 and −1) and 20 (0 and 2) are both unbalanced. The deeper one is 30: from 30, 28 went left (25), then right: LR.<svg class="htree" data-step data-shape="20(10,30(25(,28),))" data-cmp="28" data-bad="30,20" data-label="h"></svg></li>
+      <li>Rotate left at 25, then right at 30: 28 rises to the middle. That fixes 20 too.<svg class="htree" data-step data-shape="20(10,28(25,30))" data-cmp="28"></svg></li>
+      <li>27 goes right of 25. 20's children are 0 and 2: unbalanced. From 20, 27 went right (28), then left (25): RL.<svg class="htree" data-step data-shape="20(10,28(25(,27),30))" data-cmp="27" data-bad="20" data-label="h"></svg></li>
+      <li>Rotate right at 28: 25 moves up, and 27 moves across to be 28's left child.<svg class="htree" data-step data-shape="20(10,25(,28(27,30)))" data-cmp="25"></svg></li>
+      <li>Rotate left at 20: 25 moves up to the root.<svg class="htree" data-step data-shape="25(20(10,),28(27,30))" data-cmp="25"></svg></li>
+      <li class="answer">RR; LR; RL; the root is 25.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w3-l8-sorted">
-    <h2>6. Sorted inserts, and how tall</h2>
-    <p class="prompt">Insert 1, 2, …, 7 in order into an empty AVL tree. Then use \(M(h)\) from slide 55.</p>
-    <div class="answer-spec" data-part="rotations" data-grader="exact" data-answer="4" data-label="number of single rotations"></div>
-    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="4 2 1 3 6 5 7|4, 2, 1, 3, 6, 5, 7" data-label="final pre-order"></div>
-    <div class="answer-spec" data-part="m6" data-grader="exact" data-answer="33" data-miscon='{"13":"fib-not-m","21":"fib-not-m"}' data-label="\(M(6)\)"></div>
-    <div class="answer-spec" data-part="maxh50" data-grader="exact" data-answer="6" data-miscon='{"49":"bst-height","7":"off-by-one-height"}' data-label="greatest height of an AVL tree with 50 nodes"></div>
+  <h2 class="practice-group">Why the height is log n</h2>
+  <p class="note">Lesson: <a href="#l8-height">Why the height is log n</a></p>
+
+  <div class="check" data-id="cse332-w3-l8-cyu-find" data-grader="bigo" data-answer="log n">
+    <p>Quick check: what's the worst-case time of <code>find</code> in an AVL tree with \(n\) nodes, as a bucket?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="e.g. log n"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <article class="task" data-id="cse332-w3-l8-how-tall">
+    <h2>6. How tall can it get?</h2>
+    <p class="prompt">\(M(h)\) is the fewest nodes an AVL tree of height \(h\) can have: \(M(h) = M(h-1) + M(h-2) + 1\), with \(M(5) = 20\), \(M(6) = 33\) and \(M(7) = 54\). Height counts edges, so a single node has height 0.</p>
+    <div class="answer-spec" data-part="m8" data-grader="exact" data-answer="88" data-miscon='{"87":"forgot-root","55":"fib-not-m"}' data-label="\(M(8)\)"></div>
+    <div class="answer-spec" data-part="avl100" data-grader="exact" data-answer="8" data-miscon='{"99":"bst-height","9":"off-by-one-height","7":"off-by-one-height"}' data-label="greatest possible height of an AVL tree with 100 nodes"></div>
+    <div class="answer-spec" data-part="bst100" data-grader="exact" data-answer="99" data-miscon='{"100":"height-counts-nodes","8":"bst-not-avl"}' data-label="greatest possible height of a plain BST with 100 nodes"></div>
     <ol class="hints">
-      <li>Rotations happen when you insert 3, 5, 6 and 7. All are RR.</li>
-      <li>\(M\): 1, 2, 4, 7, 12, 20, 33, 54. Find the largest \(h\) with \(M(h) \le 50\).</li>
+      <li>The greatest height with \(n\) nodes is the largest \(h\) with \(M(h) \le n\). You'll need \(M(9)\) too.</li>
+      <li>A plain BST has no balance rule. What shape is tallest?</li>
     </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>3: RR at 1. 5: RR at 3. 6: RR at the root 2 (4 becomes the root). 7: RR at 5.</li>
-      <li>The result is the perfect tree 4(2(1, 3), 6(5, 7)) of height 2, where a plain BST would be a chain of height 6.</li>
-      <li>\(M(6) = M(5) + M(4) + 1 = 20 + 12 + 1 = 33\). \(M(7) = 54 &gt; 50\), so the height is at most 6.</li>
-      <li class="answer">4 rotations; 4 2 1 3 6 5 7; 33; 6.</li>
+    <div class="solution"><div class="steps board"><ol>
+      <li><span class="lab">\(M(8)\)</span><span class="mth">\(= 54 + 33 + 1 = 88\)</span><span class="note"></span></li>
+      <li><span class="lab">\(M(9)\)</span><span class="mth">\(= 88 + 54 + 1 = 143\)</span><span class="note">more than 100</span></li>
+      <li><span class="lab">AVL</span><span class="mth">\(M(8) = 88 \le 100 &lt; 143 = M(9)\)</span><span class="note">so at most height 8</span></li>
+      <li><span class="lab">BST</span><span class="mth">a chain of 100 nodes</span><span class="note">has 99 edges</span></li>
+      <li class="wide answer">88; 8; 99. The balance rule caps 100 nodes at height 8 instead of 99.</li>
     </ol></div></div>
   </article>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ L8: QUIZ -->
-<section class="page" id="l8-quiz" data-title="Check your understanding: AVL trees">
-  <p class="where">Lecture 8 wrap-up · original questions written for this site, not from the course</p>
-  <h1>Check your understanding: AVL trees</h1>
-  <div class="prose"><p>Ten questions on Lecture 8. The score counts first tries.</p></div>
-  <div class="cyu-score" data-quiz-score="l8" role="status"></div>
-  <ol class="cyu-list" data-quiz="l8">
-    <li class="cyu" data-id="cse332-w3-l8-cyu-property" data-kind="mc" data-topic="l8-balance">
-      <p class="q">The AVL balance property says…</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w3-l8-cyu-property"> the root's two subtrees have equal height<span class="why" hidden>Too weak (idea 2): both sides can be long chains.</span></label>
-        <label data-correct><input type="radio" name="cse332-w3-l8-cyu-property"> at every node, the two subtrees' heights differ by at most 1<span class="why" hidden>Correct.</span></label>
-        <label><input type="radio" name="cse332-w3-l8-cyu-property"> every node's subtrees have the same number of nodes<span class="why" hidden>Too strong (idea 3): no tree of size 2 would qualify.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l8-cyu-leaf-height" data-kind="num" data-answer="0" data-topic="l8-balance">
-      <p class="q">What height does a leaf store?</p>
-      <p class="why" hidden>0. An empty subtree counts as −1.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l8-cyu-which-nodes" data-kind="mc" data-topic="l8-insert">
-      <p class="q">After a BST insert, which nodes can be unbalanced?</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w3-l8-cyu-which-nodes"> Only ancestors of the new node<span class="why" hidden>Correct: no other subtree changed.</span></label>
-        <label><input type="radio" name="cse332-w3-l8-cyu-which-nodes"> Only the root<span class="why" hidden>Slide 40 shows 16 and 11 unbalanced while the root is fine.</span></label>
-        <label><input type="radio" name="cse332-w3-l8-cyu-which-nodes"> Any node in the tree<span class="why" hidden>Subtrees that didn't change were balanced before and still are.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l8-cyu-deepest" data-kind="mc" data-topic="l8-insert">
-      <p class="q">Several ancestors are unbalanced. Where do you rotate?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w3-l8-cyu-deepest"> At the root<span class="why" hidden>Rotating at the root may not fix the lower one.</span></label>
-        <label data-correct><input type="radio" name="cse332-w3-l8-cyu-deepest"> At the deepest unbalanced node<span class="why" hidden>Correct: that always works, and it fixes the ones above too.</span></label>
-        <label><input type="radio" name="cse332-w3-l8-cyu-deepest"> At every unbalanced node, bottom up<span class="why" hidden>After one case is applied you're done (slide 53).</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l8-cyu-rotation-cost" data-kind="mc" data-topic="l8-insert">
-      <p class="q">An AVL insert into \(n\) nodes does at most how much rotation work?</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w3-l8-cyu-rotation-cost"> \(\Theta(1)\): one case, at most two rotations<span class="why" hidden>Correct. The walk down and back up is what costs \(\Theta(\log n)\).</span></label>
-        <label><input type="radio" name="cse332-w3-l8-cyu-rotation-cost"> \(\Theta(\log n)\): a rotation at every ancestor<span class="why" hidden>After one case the subtree is back to its old height, so nothing above needs a rotation.</span></label>
-        <label><input type="radio" name="cse332-w3-l8-cyu-rotation-cost"> \(\Theta(n)\): the subtrees have to be rebuilt<span class="why" hidden>Subtrees move as a unit by changing references.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l8-cyu-lr" data-kind="mc" data-topic="l8-cases">
-      <p class="q">Case LR is fixed by…</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w3-l8-cyu-lr"> one right rotation at the problem node<span class="why" hidden>That's LL. Slide 46 shows it failing for 9, 5, 7.</span></label>
-        <label data-correct><input type="radio" name="cse332-w3-l8-cyu-lr"> a left rotation at the left child, then a right rotation at the problem node<span class="why" hidden>Correct.</span></label>
-        <label><input type="radio" name="cse332-w3-l8-cyu-lr"> a right rotation at the left child, then a left rotation at the problem node<span class="why" hidden>That's the RL pattern, mirrored the wrong way.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l8-cyu-root-123" data-kind="num" data-answer="2" data-topic="l8-cases">
-      <p class="q">Insert 1, 2, 3 into an empty AVL tree. What is the root?</p>
-      <p class="why" hidden>RR at 1: rotate left, and 2 becomes the root.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l8-cyu-m5" data-kind="num" data-answer="20" data-topic="l8-height" data-miscon='{"8":"fib-not-m","13":"fib-not-m"}'>
-      <p class="q">\(M(5)\), the fewest nodes in an AVL tree of height 5.</p>
-      <p class="why" hidden>\(M(5) = M(4) + M(3) + 1 = 12 + 7 + 1 = 20\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l8-cyu-find" data-kind="bigo" data-answer="log n" data-topic="l8-height">
-      <p class="q">Worst-case time of <code>find</code> in an AVL tree with \(n\) nodes.</p>
-      <p class="why" hidden>The height is at most \(\log_\phi n\): \(\Theta(\log n)\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l8-cyu-middle" data-kind="mc" data-topic="l8-cases">
-      <p class="q">After a double rotation fixes nodes \(a\), \(b\), \(c\) with keys \(b &lt; c &lt; a\) (case LR), which is on top?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w3-l8-cyu-middle"> \(a\)<span class="why" hidden>\(a\) was the problem node; it moves down.</span></label>
-        <label><input type="radio" name="cse332-w3-l8-cyu-middle"> \(b\)<span class="why" hidden>That's what a single right rotation would do, and it doesn't fix LR.</span></label>
-        <label data-correct><input type="radio" name="cse332-w3-l8-cyu-middle"> \(c\), the middle key<span class="why" hidden>Correct (slide 50 returns c).</span></label>
-      </div>
-    </li>
-  </ol>
-  <div class="cyu-score" data-quiz-summary="l8" role="status"></div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul><li>Questions 4 and 6 are the ones people miss. Run 9, 5, 7 in the stepper if they do.</li></ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
