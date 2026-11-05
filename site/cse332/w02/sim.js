@@ -162,14 +162,16 @@
     const left = 2 * i, right = 2 * i + 1;
     return { i, n, parent: i > 1 ? Math.floor(i / 2) : null, left: left <= n ? left : null, right: right <= n ? right : null, leaf: left > n, firstLeaf: Math.floor(n / 2) + 1 };
   }
-  function indexSay(i, n) {
-    const r = indexInfo(i, n);
-    return [
-      i === 1 ? "Parent: none. Index 1 is the root (and index 0 is never used)." : `Parent: ${i}/2 = ${r.parent}. Integer division throws away the remainder, so both children of ${r.parent} lead back to it.`,
-      2 * i <= n ? `Left child: ${i}*2 = ${2 * i}, and ${2 * i} <= ${n} is true, so it exists.` : `Left child: ${i}*2 = ${2 * i}, but ${2 * i} <= ${n} is false: there is no left child, so index ${i} is a leaf.`,
-      2 * i + 1 <= n ? `Right child: ${i}*2+1 = ${2 * i + 1}, and ${2 * i + 1} <= ${n} is true, so it exists.` : `Right child: ${i}*2+1 = ${2 * i + 1}, but ${2 * i + 1} <= ${n} is false: no right child.`,
-      `Leaves: ${n}/2 = ${Math.floor(n / 2)}, so the leaves are index ${r.firstLeaf} to ${n}. Index ${i} is ${r.leaf ? "" : "not "}one of them.`,
-    ];
+  // what the index widget says about index i of a heap given in level order
+  function indexSay(i, levelOrder) {
+    const n = levelOrder.length, at = (k) => fmt(levelOrder[k - 1]), p = Math.floor(i / 2);
+    const lines = [i === 1 ? "Parent: none. Index 1 is the root." : `Parent: ${i}/2 = ${p}, which holds ${at(p)}.`];
+    if (2 * i > n) lines.push(`Children: ${i}*2 = ${2 * i} is past n = ${n}, so none. Index ${i} is a leaf.`);
+    else {
+      lines.push(`Left child: ${i}*2 = ${2 * i}, which holds ${at(2 * i)}.`);
+      lines.push(2 * i + 1 <= n ? `Right child: ${i}*2+1 = ${2 * i + 1}, which holds ${at(2 * i + 1)}.` : `Right child: ${i}*2+1 = ${2 * i + 1} is past n = ${n}, so none.`);
+    }
+    return lines;
   }
   function heightSay(n) {
     const h = heightOf(n);
@@ -177,8 +179,8 @@
     return `n = ${n}: height ${h}. A tree of height ${h} holds at most 2^${h + 1} − 1 = ${cap} node${cap === 1 ? "" : "s"}${h > 0 ? `, and height ${h - 1} holds at most 2^${h} − 1 = ${below}, which is fewer than ${n}` : ""}.${n === cap ? " This tree is full: one more node starts a new level." : ""}`;
   }
 
-  /* Step-by-step walks for the steppers. Each step is the state right after one line runs, plus what that line did
-     and why. Comparisons are narrated as "a < b is true/false" and index arithmetic as "10/2 = 5", "4*2 = 8",
+  /* Step-by-step walks for the steppers. Each step is the state right after its line (or list of lines) runs, plus
+     what it did and why. Comparisons are narrated as "a < b is true/false" and index arithmetic as "10/2 = 5", "4*2 = 8",
      "4*2+1 = 9", so verify.mjs can recheck every one. */
   const CODE = {
     insertIdea: ["insert(item, priority){", "    put item in the “next open” spot (keep tree complete)", "    while (priority < parent’s priority){", "        swap item with parent", "    }", "}"],
@@ -193,7 +195,6 @@
     const snap = (line, say, extra = {}) => steps.push({ line, say, arr: h.arr.slice(), size: h.size, mark: {}, vars: {}, ...extra });
     return { steps, snap };
   }
-  const levelName = (i) => (i === 1 ? "the root" : `index ${i}`);
 
   // Lecture 4's insert, at the level of the tree
   function insertIdeaSteps(levelOrder, x) {
@@ -243,152 +244,109 @@
     return steps;
   }
 
-  // Lecture 5's array code, line by line: insert + percolateUp
+  // Lecture 5's array code: insert + percolateUp, one step per decision
   function insertCodeSteps(levelOrder, x, capacity = 16) {
     const h = heapOf(levelOrder);
     const { steps, snap } = recorder(h);
-    snap(null, `Before: size = ${h.size}. The items sit in arr[1] to arr[${h.size}] in level order; arr[0] is never used. The array has length ${capacity}.`);
-    snap(1, `size == arr.length - 1 is ${h.size} == ${capacity - 1}: ${tf(h.size === capacity - 1)}. ${h.size === capacity - 1 ? "The array is full, so it grows first." : "There's room, so no resize."} (It's length − 1 because index 0 is never used.)`);
-    h.size++;
-    snap(2, `size = ${h.size}. Index ${h.size} is the next open spot: the next place on the bottom level, left to right.`, { mark: { cur: h.size } });
-    h.arr[h.size] = x;
-    snap(3, `arr[${h.size}] = ${fmt(x)}. The tree is complete again; now fix the order.`, { mark: { cur: h.size } });
-    let i = h.size;
-    snap(4, `Call percolateUp(${i}).`, { mark: { cur: i }, vars: { i } });
-    let parent = Math.floor(i / 2);
-    snap(8, `parent = ${i}/2 = ${parent}. Integer division drops any .5, which is exactly the parent's index.`, { mark: { cur: i, cmp: [parent] }, vars: { i, parent } });
+    snap(null, `A min-heap of ${h.size} items in arr[1] to arr[${h.size}], level by level. The array has length ${capacity}, and arr[0] is never used. Now insert ${fmt(x)}.`);
+    const full = h.size === capacity - 1;
+    h.size++; h.arr[h.size] = x;
+    let i = h.size, parent = Math.floor(i / 2);
+    snap([1, 2, 3], `size == arr.length - 1 is ${h.size - 1} == ${capacity - 1}: ${tf(full)}, so ${full ? "the array grows first" : "no resize"}. size++ makes size = ${h.size}, and arr[${i}] = ${fmt(x)} puts the item in the next open spot.`, { mark: { cur: i } });
     const val = h.arr[i];
-    snap(9, `val = arr[${i}] = ${fmt(val)}. Save the moving item: the loop body writes over arr[i], and val is how we still have it.`, { mark: { cur: i }, vars: { i, parent, val } });
+    snap([4, 8, 9], `percolateUp(${i}): parent = ${i}/2 = ${parent}, and val = arr[${i}] = ${fmt(val)} saves the moving item.`, { mark: { cur: i, cmp: [parent] }, vars: { i, parent, val } });
     let swaps = 0;
     while (true) {
-      const a = i > 1;
-      const b = a && h.arr[i] < h.arr[parent];
-      if (!a) { snap(10, `${i} > 1 is false: i is the root, which has no parent. The loop stops before it reads arr[${parent}] (that's index 0, the unused slot).`, { mark: { cur: i }, vars: { i, parent, val } }); break; }
-      if (!b) { snap(10, `${i} > 1 is true, but ${fmt(h.arr[i])} < ${fmt(h.arr[parent])} is false: the item is not smaller than its parent. The loop stops.`, { mark: { cur: i, cmp: [parent] }, vars: { i, parent, val } }); break; }
-      snap(10, `${i} > 1 is true and ${fmt(h.arr[i])} < ${fmt(h.arr[parent])} is true: the item is smaller than its parent. Run the loop body.`, { mark: { cur: i, cmp: [parent] }, vars: { i, parent, val } });
-      h.arr[i] = h.arr[parent];
-      snap(11, `arr[${i}] = arr[${parent}] = ${fmt(h.arr[i])}. The parent's value moves down. For a moment it's in both slots.`, { mark: { cur: parent, swap: [i, parent] }, vars: { i, parent, val } });
-      h.arr[parent] = val;
-      snap(12, `arr[${parent}] = val = ${fmt(val)}. These two assignments together are one swap.`, { mark: { cur: parent, swap: [i, parent] }, vars: { i, parent, val } });
-      swaps++;
-      i = parent;
-      snap(13, `i = ${i}. Follow the item to its new spot.`, { mark: { cur: i }, vars: { i, parent, val } });
-      parent = Math.floor(i / 2);
-      snap(14, `parent = ${i}/2 = ${parent}.${parent === 0 ? " That's index 0, the unused slot, but the loop test checks i > 1 first, so it is never read." : ""}`, { mark: { cur: i, cmp: parent ? [parent] : [] }, vars: { i, parent, val } });
+      const vars = { i, parent, val };
+      if (!(i > 1)) { snap(10, `${i} > 1 is false: ${fmt(val)} is at the root. The && stops before it reads arr[0], the unused slot.`, { mark: { cur: i }, vars }); break; }
+      if (!(h.arr[i] < h.arr[parent])) { snap(10, `${i} > 1 is true, but ${fmt(h.arr[i])} < ${fmt(h.arr[parent])} is false: the parent is no bigger. The loop ends.`, { mark: { cur: i, cmp: [parent] }, vars }); break; }
+      snap(10, `${i} > 1 is true and ${fmt(h.arr[i])} < ${fmt(h.arr[parent])} is true: the item is smaller than its parent, so the loop runs.`, { mark: { cur: i, cmp: [parent] }, vars });
+      const pv = h.arr[parent], from = i;
+      h.arr[i] = pv; h.arr[parent] = val; swaps++;
+      i = parent; parent = Math.floor(i / 2);
+      snap([11, 12, 13, 14], `Swap in two lines: arr[${from}] = arr[${i}] = ${fmt(pv)} moves the parent down, and arr[${i}] = val = ${fmt(val)} moves the item up. Then i = ${i} and parent = ${i}/2 = ${parent}.`, { mark: { cur: i, swap: [from, i] }, vars: { i, parent, val } });
     }
-    snap(16, `percolateUp returns. ${fmt(x)} ended at index ${i} after ${swaps} swap${swaps === 1 ? "" : "s"}.`, { mark: { cur: i }, vars: { i, parent, val }, done: true, swaps });
+    snap(16, `percolateUp returns. ${fmt(x)} is at index ${i} after ${swaps} swap${swaps === 1 ? "" : "s"}.`, { mark: { cur: i }, vars: { i, parent, val }, done: true, swaps });
     return steps;
   }
 
-  // Lecture 5's array code, line by line: extract + percolateDown
+  // Lecture 5's array code: extract + percolateDown, one step per decision
   function extractCodeSteps(levelOrder) {
     const h = heapOf(levelOrder);
     const { steps, snap } = recorder(h);
-    snap(null, `Before: size = ${h.size}. The smallest item is arr[1] = ${fmt(h.arr[1])}.`);
-    const theMin = h.arr[1];
-    snap(1, `theMin = arr[1] = ${fmt(theMin)}. Save it before the next line writes over arr[1].`, { mark: { cur: 1 }, vars: { theMin } });
     const last = h.size;
-    h.arr[1] = h.arr[last];
-    snap(2, `arr[1] = arr[${last}] = ${fmt(h.arr[1])}. The last item is copied into the root.`, { mark: { cur: 1, cmp: [last] }, vars: { theMin } });
-    h.size--;
-    snap(3, `size = ${h.size}. The copy left in arr[${last}] is now outside the heap. Nothing erases it; size is what says it's gone.`, { mark: { cur: 1 }, vars: { theMin }, stale: last });
-    let i = 1;
-    snap(4, `Call percolateDown(1).`, { mark: { cur: 1 }, vars: { theMin, i }, stale: last });
-    let left = i * 2;
-    snap(9, `left = ${i}*2 = ${left}.`, { mark: { cur: i }, vars: { theMin, i, left }, stale: last });
-    let right = i * 2 + 1;
-    snap(10, `right = ${i}*2+1 = ${right}.`, { mark: { cur: i }, vars: { theMin, i, left, right }, stale: last });
-    const val = h.arr[i];
-    snap(11, `val = arr[${i}] = ${fmt(val)}. Save the moving item, as in percolateUp.`, { mark: { cur: i }, vars: { theMin, i, left, right, val }, stale: last });
-    let swaps = 0, ended = "leaf";
-    const V = () => ({ theMin, i, left, right, val });
+    snap(null, `A min-heap of ${h.size} items. The smallest is at the root: arr[1] = ${fmt(h.arr[1])}.`);
+    const theMin = h.arr[1];
+    snap(1, `theMin = arr[1] = ${fmt(theMin)}. Save the answer first: the next line writes over arr[1].`, { mark: { cur: 1 }, vars: { theMin } });
+    h.arr[1] = h.arr[last]; h.size--;
+    snap([2, 3], `arr[1] = arr[${last}] = ${fmt(h.arr[1])}: the last item moves to the root. Then size = ${h.size}, so the old copy at index ${last} is no longer in the heap.`, { mark: { cur: 1 }, vars: { theMin }, stale: last });
+    let i = 1, left = 2, right = 3;
+    const val = h.arr[1];
+    snap([4, 9, 10, 11], `percolateDown(1): left = 1*2 = 2, right = 1*2+1 = 3, and val = arr[1] = ${fmt(val)} saves the moving item.`, { mark: { cur: 1 }, vars: { theMin, i, left, right, val }, stale: last });
+    let swaps = 0;
     while (true) {
-      if (!(left <= h.size)) { snap(12, `${left} <= ${h.size} is false: index ${i} has no left child, so it is a leaf. The loop ends.`, { mark: { cur: i }, vars: V(), stale: last }); break; }
-      snap(12, `${left} <= ${h.size} is true: index ${i} has at least a left child. Run the loop body.`, { mark: { cur: i, cmp: [left] }, vars: V(), stale: last });
-      let toSwap = right;
-      snap(13, `toSwap = right = ${right}. Start by assuming the right child is the smaller one.`, { mark: { cur: i, cmp: [left] }, vars: { ...V(), toSwap }, stale: last });
+      const vars = { theMin, i, left, right, val };
+      if (!(left <= h.size)) { snap(12, `${left} <= ${h.size} is false: index ${i} has no children. The loop ends.`, { mark: { cur: i }, vars, stale: last }); break; }
       const noRight = right > h.size;
       const leftLess = !noRight && h.arr[left] < h.arr[right];
-      snap(14, noRight
-        ? `${right} > ${h.size} is true: there is no right child. The || stops here without reading arr[${right}].`
-        : `${right} > ${h.size} is false, so compare the children: ${fmt(h.arr[left])} < ${fmt(h.arr[right])} is ${tf(leftLess)}.`,
-      { mark: { cur: i, cmp: noRight ? [left] : [left, right] }, vars: { ...V(), toSwap }, stale: last });
-      if (noRight || leftLess) { toSwap = left; snap(15, `toSwap = left = ${left}. ${noRight ? "The only child" : "The left child is smaller"}.`, { mark: { cur: i, cmp: [left] }, vars: { ...V(), toSwap }, stale: last }); }
-      const go = h.arr[toSwap] < val;
-      if (!go) {
-        snap(17, `${fmt(h.arr[toSwap])} < ${fmt(val)} is false: even the smaller child is not smaller than the moving item. So it is ≤ both children.`, { mark: { cur: i, cmp: [toSwap] }, vars: { ...V(), toSwap }, stale: last });
-        snap(24, `else: return. The heap property holds; percolateDown is done.`, { mark: { cur: i }, vars: { ...V(), toSwap }, stale: last });
-        ended = "stop"; break;
-      }
-      snap(17, `${fmt(h.arr[toSwap])} < ${fmt(val)} is true: the smaller child is smaller than the moving item, so they swap.`, { mark: { cur: i, cmp: [toSwap] }, vars: { ...V(), toSwap }, stale: last });
-      h.arr[i] = h.arr[toSwap];
-      snap(18, `arr[${i}] = arr[${toSwap}] = ${fmt(h.arr[i])}. The smaller child moves up.`, { mark: { cur: toSwap, swap: [i, toSwap] }, vars: { ...V(), toSwap }, stale: last });
-      h.arr[toSwap] = val;
-      snap(19, `arr[${toSwap}] = val = ${fmt(val)}. The moving item goes down. Swap done.`, { mark: { cur: toSwap, swap: [i, toSwap] }, vars: { ...V(), toSwap }, stale: last });
-      swaps++;
-      i = toSwap;
-      snap(20, `i = ${i}. Follow the item down.`, { mark: { cur: i }, vars: { ...V(), toSwap }, stale: last });
-      left = i * 2;
-      snap(21, `left = ${i}*2 = ${left}.`, { mark: { cur: i }, vars: { ...V(), toSwap }, stale: last });
-      right = i * 2 + 1;
-      snap(22, `right = ${i}*2+1 = ${right}.`, { mark: { cur: i }, vars: { ...V(), toSwap }, stale: last });
+      const toSwap = noRight || leftLess ? left : right;
+      const pick = noRight
+        ? `${right} > ${h.size} is true: there's no right child, so the || stops without reading index ${right}. toSwap = left = ${left}.`
+        : `${right} > ${h.size} is false, and ${fmt(h.arr[left])} < ${fmt(h.arr[right])} is ${tf(leftLess)}, so toSwap = ${leftLess ? `left = ${left}` : `right = ${right}`}.`;
+      snap(toSwap === left ? [12, 13, 14, 15] : [12, 13, 14], `${left} <= ${h.size} is true: index ${i} has a child. Pick the smaller child. ${pick}`, { mark: { cur: i, cmp: [toSwap] }, vars: { ...vars, toSwap }, stale: last });
+      const cv = h.arr[toSwap];
+      if (!(cv < val)) { snap([17, 24], `${fmt(cv)} < ${fmt(val)} is false: no child is smaller than ${fmt(val)}. else: return. The heap is fixed.`, { mark: { cur: i, cmp: [toSwap] }, vars: { ...vars, toSwap }, stale: last }); break; }
+      const from = i;
+      h.arr[i] = cv; h.arr[toSwap] = val; swaps++;
+      i = toSwap; left = i * 2; right = i * 2 + 1;
+      snap([17, 18, 19, 20, 21, 22], `${fmt(cv)} < ${fmt(val)} is true, so swap: arr[${from}] = arr[${i}] = ${fmt(cv)} and arr[${i}] = val = ${fmt(val)}. Then i = ${i}, left = ${i}*2 = ${left}, right = ${i}*2+1 = ${right}.`, { mark: { cur: i, swap: [from, i] }, vars: { theMin, i, left, right, val, toSwap }, stale: last });
     }
-    snap(5, `Back in extract: return theMin = ${fmt(theMin)}. ${swaps} swap${swaps === 1 ? "" : "s"}; the moved item ${ended === "leaf" ? "reached a leaf" : "stopped above larger children"} at index ${i}.`, { mark: { cur: i }, vars: V(), done: true, swaps, returned: theMin, stale: last });
+    snap(5, `Back in extract: return theMin = ${fmt(theMin)}. ${swaps} swap${swaps === 1 ? "" : "s"}.`, { mark: { cur: i }, vars: { theMin, i, left, right, val }, done: true, swaps, returned: theMin, stale: last });
     return steps;
   }
 
-  // Floyd's buildHeap: one step per decision, grouping the leaves
+  // Floyd's buildHeap: one step per percolateDown(i) call, drawn after the call with the path the item sank along
   function buildSteps(levelOrder) {
     const h = heapOf(levelOrder);
     const { steps, snap } = recorder(h);
-    const n = h.size, firstLeaf = Math.floor(n / 2) + 1;
-    snap(null, `Before: ${n} items in the order given. The shape is already a complete tree. The order is not a heap yet.`, { done_from: n + 1 });
-    if (firstLeaf <= n) snap(1, `i = ${n} down to ${firstLeaf}: each is a leaf, because left = i*2 is at least ${firstLeaf}*2 = ${2 * firstLeaf} > ${n} = size. percolateDown returns at once. Half the nodes cost nothing.`, { done_from: firstLeaf, mark: { leaves: [firstLeaf, n] } });
+    const n = h.size, half = Math.floor(n / 2);
+    snap(null, `${n} items, in the order given. The shape is already a complete tree. The order isn't a heap yet.`, { done_from: n + 1 });
+    snap(1, `i = ${n} down to ${half + 1} are leaves: ${half + 1}*2 = ${2 * (half + 1)} is past ${n}, so they have no children and percolateDown does nothing. The first real work is at i = ${n}/2 = ${half}.`, { done_from: half + 1, mark: { leaves: [half + 1, n] } });
     let total = 0;
-    for (let i = firstLeaf - 1; i >= 1; i--) {
+    for (let i = half; i >= 1; i--) {
+      const val = h.arr[i], path = [i], said = [];
       let at = i;
-      const val = h.arr[i];
-      snap(2, `percolateDown(${i}): the item ${fmt(val)}. Everything below index ${i} was fixed earlier, so both of its subtrees are already heaps. Only ${fmt(val)} itself can be out of place.`, { done_from: i + 1, mark: { cur: i } });
-      while (true) {
-        const l = 2 * at, r = 2 * at + 1;
-        if (l > n) { snap(2, `${fmt(val)} is at a leaf now (index ${at}): it stops.`, { done_from: i, mark: { cur: at } }); break; }
-        const lv = h.arr[l], rv = r <= n ? h.arr[r] : null;
-        const c = rv === null || lv < rv ? l : r, sv = h.arr[c];
-        if (!(sv < val)) { snap(2, `${rv === null ? `Its only child is ${fmt(lv)}` : `Its children are ${fmt(lv)} and ${fmt(rv)}; the smaller is ${fmt(sv)}`}. ${fmt(sv)} < ${fmt(val)} is false, so ${fmt(val)} stays. The subtree at index ${i} is a heap.`, { done_from: i, mark: { cur: at, cmp: rv === null ? [l] : [l, r] } }); break; }
-        h.arr[at] = sv; h.arr[c] = val; total++;
-        snap(2, `${rv === null ? `Its only child is ${fmt(lv)}` : `Its children are ${fmt(lv)} and ${fmt(rv)}; the smaller is ${fmt(sv)}`}. ${fmt(sv)} < ${fmt(val)} is true: swap. ${fmt(val)} moves down to index ${c}.`, { done_from: i + 1, mark: { cur: c, swap: [at, c] } });
-        at = c;
+      while (2 * at <= n) {
+        const l = 2 * at, r = l + 1;
+        const c = r <= n && !(h.arr[l] < h.arr[r]) ? r : l, cv = h.arr[c];
+        const kid = r <= n ? `Smaller child ${fmt(cv)}` : `Only child ${fmt(cv)}`;
+        if (!(cv < val)) { said.push(`${kid}: ${fmt(cv)} < ${fmt(val)} is false, so stop.`); break; }
+        h.arr[at] = cv; h.arr[c] = val; total++; path.push(c); at = c;
+        said.push(`${kid}: ${fmt(cv)} < ${fmt(val)} is true, so swap.`);
       }
+      if (2 * at > n) said.push("Now it's a leaf.");
+      const k = path.length - 1;
+      const why = i === Math.floor(half / 2) ? ` Both subtrees under index ${i} were fixed by earlier calls, so only ${fmt(val)} can be out of place.` : "";
+      snap(2, `percolateDown(${i}) sinks ${fmt(val)}. ${said.join(" ")} ${k} swap${k === 1 ? "" : "s"}.${why}`, { done_from: i, mark: { cur: at, swap: path } });
     }
-    snap(3, `The loop ends after i = 1. ${total} swap${total === 1 ? "" : "s"} in all, and every node is ≤ its children: it's a min-heap with ${fmt(h.arr[1])} at the root.`, { done_from: 1, done: true, swaps: total });
+    snap(3, `The loop ends after i = 1: ${total} swap${total === 1 ? "" : "s"} in all. Every node is ≤ its children, so it's a min-heap.`, { done_from: 1, done: true, swaps: total });
     return steps;
   }
 
   // the steppers' scenarios; Heap.java runs the same ones by name
   const HEAP_SCENARIOS = {
     insert: [
-      { name: "lecture-1.5", label: "insert(1.5): the lecture's example", start: LECTURE_HEAP, x: 1.5 },
-      { name: "lecture-8", label: "insert(8): no swaps", start: LECTURE_HEAP, x: 8 },
-      { name: "small-1", label: "insert(1): all the way to the root", start: [3, 5, 4, 9, 6, 7], x: 1 },
+      { name: "lecture-1.5", start: LECTURE_HEAP, x: 1.5 },
+      { name: "array-insert", start: [2, 4, 3, 7, 5], x: 1 },
     ],
     extract: [
-      { name: "lecture-after-1.5", label: "extract(): the lecture's example", start: [1, 1.5, 2, 4, 3, 5, 6, 5, 9, 7] },
-      { name: "stops-early", label: "extract(): stops above two larger children", start: [1, 3, 2, 4, 5, 10, 11, 6] },
-      { name: "left-only", label: "extract(): a node with only a left child", start: [1, 2, 3, 4, 5] },
+      { name: "lecture-after-1.5", start: [1, 1.5, 2, 4, 3, 5, 6, 5, 9, 7] },
+      { name: "array-extract", start: [1, 4, 2, 5, 6, 9, 7] },
     ],
     build: [
-      { name: "lecture-build", label: "buildHeap: the lecture's 10 items", start: BUILD_INPUT },
-      { name: "already-heap", label: "buildHeap: input that is already a heap", start: [1, 2, 3, 4, 5, 6, 7] },
+      { name: "lecture-build", start: BUILD_INPUT },
     ],
   };
-
-  // buildHeap's worst-case moves on a perfect tree of height H: level by level from the bottom
-  function buildCost(H) {
-    const rows = [];
-    for (let d = 0; d <= H; d++) rows.push({ height: d, nodes: 2 ** (H - d), moves: d, product: d * 2 ** (H - d) });
-    const n = 2 ** (H + 1) - 1;
-    return { H, n, rows, total: rows.reduce((s, r) => s + r.product, 0), nlogn: n * Math.log2(n) };
-  }
 
   /* ---------------------------------------------------------------- Section 2: numUnique, one step per loop decision */
   const NUMUNIQUE_CODE = ["int numUnique(String[] values) {", "    boolean[] visited = new boolean[values.length];", "    for (int i = 0; i < values.length; i++) {", "        visited[i] = false;", "    }", "    int out = 0;", "    for (int i = 0; i < values.length; i++) {", "        if (!visited[i]) {", "            out += 1;", "            for (int j = i; j < values.length; j++) {", "                if (values[i].equals(values[j])) {", "                    visited[j] = true;", "                }", "            }", "        }", "    }", "    return out;", "}"];
@@ -423,7 +381,7 @@
     CLAIMS, polyNum,
     LECTURE_HEAP, BUILD_INPUT, CODE, HEAP_SCENARIOS,
     percolateUp, percolateDown, heapOf, live, heapInsert, heapExtract, buildHeap, isMinHeap, heightOf, indexInfo, indexSay, heightSay,
-    insertIdeaSteps, extractIdeaSteps, insertCodeSteps, extractCodeSteps, buildSteps, buildCost,
+    insertIdeaSteps, extractIdeaSteps, insertCodeSteps, extractCodeSteps, buildSteps,
     NUMUNIQUE_CODE, numUniqueSteps, numUniqueDots,
   };
 });

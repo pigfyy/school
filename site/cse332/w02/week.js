@@ -37,6 +37,13 @@ window.WEEK.messages = {
   "chain-both": "Both comparisons have to hold at the same n. At n = 2, 3 or 4, the second one isn't true yet.",
   "times-g": "c multiplies n/10. What times n/10 gives exactly 7n?",
   "build-first-leaf": "That index is a leaf: percolateDown does nothing there. The first index that can move is the last one with a child.",
+  "child-not-parent": "That's a child's index (2i). The parent goes the other way.",
+  "child-past-n": "A child exists only if its index is at most n. Work out the index and compare it with n.",
+  "left-not-right": "That's the left child's index. Which formula gives the right child?",
+  "not-own-child": "Compare each node with its own children only. A smaller value in another branch doesn't break the order.",
+  "shape-gap": "Read the bottom level from the left. Is there an empty spot before the last node?",
+  "leaves-sink-0": "Those are the leaves, and they can't sink at all. Look one level up.",
+  "n-times-height": "That's every node sinking the full height. Most nodes are near the bottom: count level by level.",
 };
 
 "use strict";
@@ -489,48 +496,48 @@ function drawCells(box, arr, size, opts = {}) {
   box.replaceChildren(...cells);
 }
 
-/* static pictures for questions: <svg class="htree" data-tree="1,3,2,_,4"> and <div class="cells heap-cells" data-cells="…"> */
+/* static pictures for questions: <svg class="htree" data-tree="1,3,2,_,4"> */
 function setupStaticPictures() {
   $$("svg.htree[data-tree]").forEach((svg) => drawTree(svg, parseList(svg.dataset.tree), { idx: svg.hasAttribute("data-idx"), mark: svg.dataset.cmp ? { cmp: svg.dataset.cmp.split(",").map(Number) } : undefined }));
-  $$("[data-cells]").forEach((box) => { const vals = parseList(box.dataset.cells); drawCells(box, [null, ...vals], vals.length); });
 }
 
-/* =========================================================== heap steppers (Lectures 4 and 5) */
+/* =========================================================== heap steppers (Lectures 4 and 5): one scenario each, named by data-scenario */
 const STEP_GEN = { insertIdea: Sim.insertIdeaSteps, extractIdea: Sim.extractIdeaSteps, insert: Sim.insertCodeSteps, extract: Sim.extractCodeSteps, build: Sim.buildSteps };
 function setupHeapStepper(box) {
   const kind = box.dataset.kind;
-  const scenarios = Sim.HEAP_SCENARIOS[kind.replace("Idea", "")].filter((sc) => !box.dataset.scenario || sc.name === box.dataset.scenario);
+  const sc = Sim.HEAP_SCENARIOS[kind.replace("Idea", "")].find((s) => s.name === box.dataset.scenario);
   const lines = Sim.CODE[kind];
   const idea = kind.endsWith("Idea"); // Lecture 4 works on the tree only; the array comes in Lecture 5
-  const chips = el("div", { class: "controls", role: "group", "aria-label": "Pick a starting heap" });
   const code = el("pre", { class: "code" });
   const svg = svgEl("svg", { class: "htree live", role: "img", "aria-label": "The heap as a tree" });
   const cells = el("div", { class: "cells heap-cells" });
   const vars = el("p", { class: "step-vars" });
   const say = el("p", { class: "step-say", role: "status" });
   const back = el("button", { class: "btn", type: "button", text: "← Back" });
-  const next = el("button", { class: "btn primary", type: "button", text: kind === "build" || kind.endsWith("Idea") ? "Next step →" : "Next line →" });
+  const next = el("button", { class: "btn primary", type: "button", text: "Next step →" });
   const count = el("span", { class: "note" });
-  box.append(chips, el("div", { class: `split stepper${idea ? " idea" : ""}` }, code, el("div", { class: "pic" }, svg, idea ? null : cells, vars, say, el("div", { class: "controls" }, back, next, count))));
-  let steps = [], k = 0;
-  if (scenarios.length < 2) chips.style.display = "none";
-  const btns = scenarios.map((sc, i) => {
-    const b = el("button", { class: "chip", type: "button", "aria-pressed": "false", text: sc.label });
-    b.addEventListener("click", () => load(i));
-    chips.append(b);
-    return b;
+  // phones show a few lines around the highlight; this button opens the whole listing
+  const full = !idea && lines.length > 5 ? el("button", { class: "btn code-toggle", type: "button", "aria-expanded": "false", text: "Full code" }) : null;
+  box.append(el("div", { class: `split stepper${idea ? " idea" : " arr"}` }, code, full, el("div", { class: "pic" }, svg, idea ? null : cells, vars, say, el("div", { class: "controls" }, back, next, count))));
+  if (full) full.addEventListener("click", () => {
+    const open = full.getAttribute("aria-expanded") !== "true";
+    full.setAttribute("aria-expanded", String(open));
+    full.textContent = open ? "Fewer lines" : "Full code";
+    code.classList.toggle("open", open);
+    showLine();
   });
-  function load(i) {
-    const sc = scenarios[i];
-    btns.forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
-    steps = kind.startsWith("insert") ? STEP_GEN[kind](sc.start, sc.x) : STEP_GEN[kind](sc.start);
-    k = 0;
-    paint();
+  function showLine() {
+    const hl = code.querySelector(".hl");
+    if (idea || !hl) return keepLineInView(code);
+    if (code.scrollHeight > code.clientHeight) code.scrollTop = (hl.previousElementSibling || hl).offsetTop;
   }
+  const steps = kind.startsWith("insert") ? STEP_GEN[kind](sc.start, sc.x) : STEP_GEN[kind](sc.start);
+  let k = 0;
   function paint() {
     const st = steps[k];
-    code.replaceChildren(...lines.map((ln, i) => el("div", { class: `ln${i === st.line ? " hl" : ""}` }, el("span", { class: "no", text: String(i + 1) }), el("span", { class: "src", text: ln }))));
-    keepLineInView(code);
+    const hl = new Set([].concat(st.line ?? []));
+    code.replaceChildren(...lines.map((ln, i) => el("div", { class: `ln${hl.has(i) ? " hl" : ""}` }, el("span", { class: "no", text: String(i + 1) }), el("span", { class: "src", text: ln }))));
+    showLine();
     drawTree(svg, st.arr.slice(1, st.size + 1), { mark: st.mark, doneFrom: st.done_from, idx: !idea });
     const v = st.vars || {};
     const ptrs = {};
@@ -541,81 +548,38 @@ function setupHeapStepper(box) {
     say.textContent = st.say;
     back.disabled = k === 0;
     next.disabled = k === steps.length - 1;
-    count.textContent = k === 0 ? `Press ${next.textContent.replace(" →", "")}.` : st.done ? "Done." : `Step ${k} of ${steps.length - 1}.`;
+    count.textContent = k === 0 ? "Press Next step." : st.done ? "Done." : `Step ${k} of ${steps.length - 1}.`;
   }
   back.addEventListener("click", () => { if (k > 0) { k--; paint(); } });
   next.addEventListener("click", () => { if (k < steps.length - 1) { k++; paint(); } });
-  load(0);
+  paint();
 }
 
 /* =========================================================== queue vs priority queue on the same script */
 
 /* =========================================================== complete tree: height grows only when a level fills */
 
-/* =========================================================== index arithmetic, 1-based */
+/* =========================================================== Lecture 5: pick an index of the lecture's heap, see its parent and children */
 function setupIndex() {
-  const BASE = [1, 3, 2, 4, 7, 5, 6, 5, 9, 8, 11, 10, 12, 13, 14];
-  let pick = 5;
-  const draw = () => {
-    const n = Number($("#ix-n").value);
-    $("#ix-n-out").textContent = String(n);
-    if (pick > n) pick = n;
+  const vals = Sim.LECTURE_HEAP, n = vals.length;
+  let pick = 4;
+  const choose = (p) => { pick = p; draw(); };
+  function draw() {
     const info = Sim.indexInfo(pick, n);
     const rel = {};
     if (info.parent) rel[info.parent] = "cmp";
     if (info.left) rel[info.left] = "swap";
     if (info.right) rel[info.right] = "swap";
-    for (let p = info.firstLeaf; p <= n; p++) if (!rel[p] && p !== pick) rel[p] = "leaf";
-    drawTree($("#ix-svg"), BASE.slice(0, n), { idx: true, pick, rel, onPick: (p) => { pick = p; draw(); } });
-    drawCells($("#ix-cells"), [null, ...BASE], n, { mark: { cur: pick, cmp: info.parent ? [info.parent] : [], swap: [info.left, info.right].filter(Boolean) } });
-    $$("#ix-cells .cell").forEach((c, i) => { if (i >= 1) { c.classList.add("pickable"); c.setAttribute("role", "button"); c.setAttribute("tabindex", "0"); c.setAttribute("aria-label", `index ${i}`); c.onclick = () => { pick = i; draw(); }; c.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick = i; draw(); } }; } });
-    $("#ix-pick").textContent = `i = ${pick}`;
-    $("#ix-out").replaceChildren(...Sim.indexSay(pick, n).map((t) => el("li", { text: t })));
-  };
-  $("#ix-n").addEventListener("input", draw);
-  draw();
-}
-
-/* =========================================================== try your own sequence */
-function setupPlayground() {
-  let h = Sim.heapOf([]);
-  const log = $("#play-log");
-  const draw = (mark) => { drawTree($("#play-svg"), Sim.live(h), { idx: true, mark }); drawCells($("#play-cells"), h.arr, h.size, { mark }); };
-  const line = (t) => { log.prepend(el("div", { text: t })); };
-  $("#play-ins").addEventListener("click", () => {
-    const raw = $("#play-val").value.trim();
-    const v = Number(raw);
-    if (!raw || !Number.isFinite(v)) { line("Type a number to insert."); return; }
-    if (h.size >= 31) { line("This picture stops at 31 items."); return; }
-    const r = Sim.heapInsert(h, v);
-    const at = h.arr.indexOf(v, 1);
-    line(`insert(${fmtV(v)}): ${r.swaps} swap${r.swaps === 1 ? "" : "s"} percolating up.`);
-    draw({ cur: at });
-  });
-  $("#play-ext").addEventListener("click", () => {
-    if (!h.size) { line("extract(): the heap is empty."); return; }
-    const r = Sim.heapExtract(h);
-    line(`extract() returned ${fmtV(r.min)}: ${r.swaps} swap${r.swaps === 1 ? "" : "s"} percolating down.`);
-    draw({});
-  });
-  $("#play-reset").addEventListener("click", () => { h = Sim.heapOf([]); log.replaceChildren(); draw({}); });
-  $("#play-val").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#play-ins").click(); });
-  draw({});
-}
-
-/* =========================================================== buildHeap: the cost, level by level */
-function setupBuildCost() {
-  const draw = () => {
-    const H = Number($("#bc-h").value);
-    $("#bc-h-out").textContent = String(H);
-    const r = Sim.buildCost(H);
-    const t = el("table", { class: "plain num" }, el("tr", {}, el("th", { text: "height of the node" }), el("th", { class: "r", text: "nodes" }), el("th", { class: "r", text: "max moves each" }), el("th", { class: "r", text: "max moves" }), el("th", { text: "" })));
-    const maxP = Math.max(...r.rows.map((x) => x.product), 1);
-    for (const row of r.rows) t.append(el("tr", {}, el("td", { text: row.height === 0 ? "0 (leaves)" : row.height === H ? `${H} (root)` : String(row.height) }), el("td", { class: "r", text: fmtInt(row.nodes) }), el("td", { class: "r", text: String(row.moves) }), el("td", { class: "r", text: fmtInt(row.product) }), el("td", { class: "bc-bar-cell" }, el("span", { class: "bc-bar", style: `width:${(row.product / maxP) * 100}%` }))));
-    $("#bc-table").replaceChildren(t);
-    $("#bc-out").textContent = `n = ${fmtInt(r.n)} nodes. Total moves at most ${fmtInt(r.total)}, which is less than n. Compare n·log₂ n ≈ ${fmtInt(Math.round(r.nlogn))}, the bound you get from “n calls, each up to log n”.`;
-  };
-  $("#bc-h").addEventListener("input", draw);
+    drawTree($("#ix-svg"), vals, { idx: true, pick, rel, onPick: choose });
+    drawCells($("#ix-cells"), [null, ...vals], n, { mark: { cur: pick, cmp: info.parent ? [info.parent] : [], swap: [info.left, info.right].filter(Boolean) } });
+    $$("#ix-cells .cell").forEach((c, i) => {
+      if (i === 0) return;
+      c.classList.add("pickable"); c.setAttribute("role", "button"); c.setAttribute("tabindex", "0"); c.setAttribute("aria-label", `index ${i}`);
+      c.onclick = () => choose(i);
+      c.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(i); } };
+    });
+    $("#ix-out").replaceChildren(...Sim.indexSay(pick, vals).map((t) => el("li", { text: t })));
+  }
   draw();
 }
 
@@ -674,7 +638,5 @@ setupSandwich();
 $$(".bound").forEach(setupBound);
 $$(".heap-step").forEach(setupHeapStepper);
 setupIndex();
-setupPlayground();
-setupBuildCost();
 setupNumUnique();
 };

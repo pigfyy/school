@@ -67,16 +67,13 @@
       <h2>Lecture 5 <span class="today" data-date="2026-10-09">Fri Oct 9</span></h2>
       <ol class="modules">
         <li><a href="#l5-goals">What this lecture is for</a></li>
-        <li><a href="#l5-valid">Is it a min-heap?</a></li>
         <li><a href="#l5-array">The heap as an array</a></li>
-        <li><a href="#l5-insert-code">The code: insert</a></li>
-        <li><a href="#l5-extract-code">The code: extract</a></li>
-        <li><a href="#l5-trace">Trace a sequence</a></li>
+        <li><a href="#l5-insert-code">Insert in code</a></li>
+        <li><a href="#l5-extract-code">Extract in code</a></li>
         <li><a href="#l5-update">Changing a priority</a></li>
         <li><a href="#l5-build">buildHeap</a></li>
         <li><a href="#l5-buildtime">Why buildHeap is Θ(n)</a></li>
-        <li><a href="#l5-problems">Lecture 5 problems</a></li>
-        <li><a href="#cyu-l5">Check your understanding</a></li>
+        <li><a href="#l5-problems">Lecture 5 practice</a></li>
       </ol>
     </div>
     <div>
@@ -1504,137 +1501,52 @@ extract</code></pre>
 <section class="page" id="l5-goals" data-title="What Lecture 5 is for">
   <p class="where">Lecture 5 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span> · Priority Queues 2</p>
   <h1>What this lecture is for</h1>
-  <div class="prose">
-    <p>Lecture 5 reviews the heap from Lecture 4 and makes it concrete. Because a heap is always a complete tree, it fits in an <strong>array</strong> with no gaps, and simple index arithmetic finds any node's parent and children. The lecture's code runs insert and extract on that array.</p>
-    <p>Then two new tools. <strong>Changing a key</strong>: if an item's priority changes, percolate it up or down. And <strong>Floyd's buildHeap</strong>: turn \(n\) items into a heap in \(\Theta(n)\) time, faster than \(n\) inserts at \(\Theta(n\log n)\).</p>
-  </div>
-  <div class="grid-2">
-    <div class="rule"><p><strong>The array.</strong> Root at index 1. Node \(i\)'s parent is \(i/2\); its children are \(2i\) and \(2i+1\).</p></div>
-    <div class="rule"><p><strong>buildHeap.</strong> Percolate down from the last index back to 1. Most nodes are near the bottom, so the total work is linear.</p></div>
-  </div>
-
-  <h2>After this lecture you should be able to</h2>
-  <ol class="goals">
-    <li>Decide whether a tree is a valid min-heap, and say what's wrong when it isn't: the order or the shape. <a href="#l5-valid">Is it a min-heap?</a></li>
-    <li>Move between the tree and the array: the root's index, the parent and children of index \(i\), and where the leaves start. <a href="#l5-array">The heap as an array</a></li>
-    <li>Explain each line of the lecture's <code>insert</code> and <code>percolateUp</code>, and trace them on the array. <a href="#l5-insert-code">The code: insert</a></li>
-    <li>Explain each line of <code>extract</code> and <code>percolateDown</code>, including a node with only a left child. <a href="#l5-extract-code">The code: extract</a></li>
-    <li>Trace a whole sequence of inserts and extracts. <a href="#l5-trace">Trace a sequence</a></li>
-    <li>Say which way an item percolates after its priority changes, in a min-heap and in a max-heap. <a href="#l5-update">Changing a priority</a></li>
-    <li>Run Floyd's buildHeap, and explain why it takes \(\Theta(n)\). <a href="#l5-build">buildHeap</a>, <a href="#l5-buildtime">its running time</a></li>
-  </ol>
-  <div class="rule warn">
-    <p><strong>Exercise 2</strong> (Heaps, due Fri Oct 16) stores its heaps starting at index 0; the lecture counts from 1. This site uses the lecture's 1-based arrays everywhere and leaves the 0-based version, and all Exercise 2 code, to the exercise.</p>
-  </div>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ L5: VALID -->
-<section class="page" id="l5-valid" data-title="Is it a min-heap?">
-  <p class="where">Lecture 5 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
-  <h1>Is it a min-heap?</h1>
   <div class="rule">
-    <p><strong>Key idea.</strong> A min-heap needs two things: the right <em>shape</em> (a complete tree) and the right <em>order</em> (every node \(\le\) its children). Check them separately.</p>
-  </div>
-  <div class="prose">
-    <ol>
-      <li><strong>Shape:</strong> read the nodes level by level, left to right. Every level but the last must be full, and the last must have no gaps before its last node.</li>
-      <li><strong>Order:</strong> compare each node with its own children only. A smaller value in some other branch, even on a higher level, is not a problem.</li>
-    </ol>
-    <p>The lecture's four trees follow. Decide each one before you check.</p>
+    <p><strong>The point.</strong> Lecture 4's heap is stored in a plain array, and simple index math finds any node's parent and children. This lecture writes insert and extract as array code, changes a priority in place, and builds a heap from \(n\) items in \(\Theta(n)\) time.</p>
   </div>
 
-  <div class="check" data-id="cse332-w2-l5-valid-a" data-grader="mc">
-    <p>Quick check: tree A. Is it a binary min-heap?</p>
-    <svg class="htree" data-tree="3,4,5" role="img" aria-label="Tree A: root 3 with children 4 and 5"></svg>
-    <div class="opts">
-      <label data-correct><input type="radio" name="cse332-w2-l5-valid-a"> Valid min-heap<span class="why" hidden>Right. Complete, and 3 ≤ 4 and 3 ≤ 5.</span></label>
-      <label><input type="radio" name="cse332-w2-l5-valid-a"> Not a heap: a node is bigger than its child<span class="why" hidden>Check the root against each child.</span></label>
-      <label><input type="radio" name="cse332-w2-l5-valid-a"> Not a heap: wrong shape<span class="why" hidden>One full level under the root: that's complete.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l5-valid-b" data-grader="mc">
-    <p>Quick check: tree B. Is it a binary min-heap?</p>
-    <svg class="htree" data-tree="5,4,6" role="img" aria-label="Tree B: root 5 with children 4 and 6"></svg>
-    <div class="opts">
-      <label><input type="radio" name="cse332-w2-l5-valid-b"> Valid min-heap<span class="why" hidden>Compare the root with its left child.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l5-valid-b"> Not a heap: a node is bigger than its child<span class="why" hidden>Right. 5 has a child, 4, that is smaller.</span></label>
-      <label><input type="radio" name="cse332-w2-l5-valid-b"> Not a heap: wrong shape<span class="why" hidden>The shape is fine. The order isn't.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l5-valid-c" data-grader="mc">
-    <p>Quick check: tree C. Is it a binary min-heap?</p>
-    <svg class="htree" data-tree="3,4,10,5,6" role="img" aria-label="Tree C: root 3 with children 4 and 10; 4 has children 5 and 6"></svg>
-    <div class="opts">
-      <label data-correct><input type="radio" name="cse332-w2-l5-valid-c"> Valid min-heap<span class="why" hidden>Right. 5 is smaller than 10, but 10 isn't 5's ancestor, so that's not a violation.</span></label>
-      <label><input type="radio" name="cse332-w2-l5-valid-c"> Not a heap: a node is bigger than its child<span class="why" hidden>10 is bigger than 5 and 6, but they aren't its children. Compare each node with its own children only.</span></label>
-      <label><input type="radio" name="cse332-w2-l5-valid-c"> Not a heap: wrong shape<span class="why" hidden>The bottom level is filled from the left with no gap: complete.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l5-valid-d" data-grader="mc">
-    <p>Quick check: tree D. Is it a binary min-heap?</p>
-    <svg class="htree" data-tree="5,7,6,8,_,9" role="img" aria-label="Tree D: root 5 with children 7 and 6; 7 has a left child 8; 6 has a left child 9; 7 has no right child"></svg>
-    <div class="opts">
-      <label><input type="radio" name="cse332-w2-l5-valid-d"> Valid min-heap<span class="why" hidden>The values are in order, but look at the bottom level from the left.</span></label>
-      <label><input type="radio" name="cse332-w2-l5-valid-d"> Not a heap: a node is bigger than its child<span class="why" hidden>Every node is smaller than its children here.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l5-valid-d"> Not a heap: wrong shape<span class="why" hidden>Right. 7 has no right child, but 6 has a child: the bottom level has a gap.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
+  <h2>Six short pages</h2>
+  <ol class="goals">
+    <li>Store the tree in an array. <a href="#l5-array">The heap as an array</a></li>
+    <li>Insert, step by step in code. <a href="#l5-insert-code">Insert in code</a></li>
+    <li>Extract, step by step in code. <a href="#l5-extract-code">Extract in code</a></li>
+    <li>A priority changes: climb or sink. <a href="#l5-update">Changing a priority</a></li>
+    <li>Build a heap from all \(n\) items at once. <a href="#l5-build">buildHeap</a></li>
+    <li>Why that takes only \(\Theta(n)\). <a href="#l5-buildtime">Why buildHeap is Θ(n)</a></li>
+  </ol>
+  <p class="line">The lecture opens by reviewing Lecture 4: the shape and order rules (<a href="#l4-heap">What a heap is</a>), then insert and extract on the tree. Its "is this a heap?" check is the first problem on the <a href="#l5-problems">practice page</a>.</p>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L5: ARRAY -->
 <section class="page" id="l5-array" data-title="The heap as an array">
-  <p class="where">Lecture 5 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span> · Weiss 6.3</p>
+  <p class="where">Lecture 5 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
   <h1>The heap as an array</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> Write the tree's nodes into an array level by level, left to right, starting at index 1. Then node \(i\)'s parent is at \(i/2\) and its children are at \(2i\) and \(2i+1\), using integer division. No pointers needed.</p>
-  </div>
+  <div class="prose"><p>A heap is always a complete tree, so it fits in an array with no gaps. Number the nodes level by level, left to right, starting at 1. Node number \(i\) goes in <code>arr[i]</code>, and <code>arr[0]</code> stays empty.</p></div>
 
-  <h2>The lecture's heap, both ways</h2>
-  <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" data-idx role="img" aria-label="The lecture's heap with each node's array index: 1 at index 1, 3 at 2, 2 at 3, 4 at 4, 7 at 5, 5 at 6, 6 at 7, 5 at 8, 9 at 9"></svg>
-  <div class="cells heap-cells" data-cells="1,3,2,4,7,5,6,5,9" aria-label="Array: index 0 unused, then 1, 3, 2, 4, 7, 5, 6, 5, 9 at indices 1 to 9"></div>
-  <p class="where">The small purple numbers under the nodes are the array indices. Index 0 is never used.</p>
-
-  <h2>Why this works</h2>
-  <div class="prose">
-    <ul>
-      <li><strong>No gaps.</strong> A complete tree fills level by level, left to right, so its nodes land in indices 1, 2, …, \(n\) with nothing skipped. Every complete tree with \(n\) nodes uses the same positions and edges.</li>
-      <li><strong>Children at \(2i\) and \(2i+1\).</strong> Level \(d\) starts at index \(2^d\). Every node before \(i\) on its level has two children on the next level, and those come first. Count it out and node \(i\)'s children land exactly at \(2i\) and \(2i+1\).</li>
-      <li><strong>Parent at \(i/2\).</strong> Integer division undoes both: \(2i/2 = i\) and \((2i+1)/2 = i\).</li>
-      <li><strong>Why start at 1.</strong> With the root at index 1, the formulas are this simple. That's why index 0 is left empty.</li>
-      <li><strong>Leaves are indices \(n/2 + 1\) to \(n\).</strong> A node is a leaf when it has no left child, that is, when \(2i &gt; n\).</li>
-    </ul>
-  </div>
-
-  <h2>Click any node</h2>
-  <p class="tree-key"><span class="k-cur">index i</span><span class="k-cmp">its parent</span><span class="k-swap">its children</span><span class="k-leaf">leaves</span></p>
+  <h2>Worked example: the lecture's heap</h2>
+  <p class="line">The small purple numbers are the indices. Tap any node or cell to pick another index.</p>
+  <p class="tree-key"><span class="k-cur">index i</span><span class="k-cmp">its parent</span><span class="k-swap">its children</span></p>
   <div class="panel" id="ix">
-    <div class="controls bc-slider">
-      <label for="ix-n">\(n\) =</label>
-      <input type="range" id="ix-n" min="1" max="15" value="12" aria-label="number of items n">
-      <output id="ix-n-out">12</output>
-      <span class="pill" id="ix-pick">i = 5</span>
-    </div>
-    <svg class="htree" id="ix-svg" role="img" aria-label="A heap with its indices; click a node to pick i"></svg>
+    <svg class="htree" id="ix-svg" role="img" aria-label="The lecture's heap 1, 3, 2, 4, 7, 5, 6, 5, 9 with each node's index; pick a node to see its parent and children"></svg>
     <div class="cells heap-cells" id="ix-cells"></div>
-    <ul id="ix-out" role="status"></ul>
+    <ul class="ix-out" id="ix-out" role="status"></ul>
   </div>
 
-  <div class="check" data-id="cse332-w2-l5-array-first-leaf-6" data-grader="exact" data-answer="4" data-miscon='{"3":"leaf-by-index"}'>
-    <p>Quick check: a heap holds \(n = 6\) items. At which index do the leaves start?</p>
+  <div class="rule"><p><strong>The rule.</strong> Root at index 1. The parent of \(i\) is \(i/2\), dropping any remainder. The children of \(i\) are \(2i\) and \(2i+1\), but only if they're at most \(n\). So the leaves are indices \(n/2+1\) to \(n\).</p></div>
+
+  <details class="more">
+    <summary>Why \(2i\) and \(2i+1\)?</summary>
+    <p>Children come in pairs, in order: 1's children are 2 and 3, 2's are 4 and 5, 3's are 6 and 7. Each node's pair comes right after the pair of the node before it, so node \(i\)'s pair starts at \(2i\). Dividing by 2 undoes it: \(2i/2 = i\) and \((2i+1)/2 = i\) with the remainder dropped. Starting at index 1 is what keeps these formulas this simple.</p>
+  </details>
+  <div class="rule warn"><p><strong>Exercise 2</strong> stores its heap starting at index 0, so its formulas are different. This site uses the lecture's index 1 everywhere.</p></div>
+
+  <div class="check" data-id="cse332-w2-l5-array-parent-of-11" data-grader="exact" data-answer="5" data-miscon='{"5.5":"no-floor","22":"child-not-parent"}'>
+    <p>Quick check: a heap holds 20 items. What is the index of the parent of index 11?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <div class="check" data-id="cse332-w2-l5-array-children-of-5" data-grader="exact" data-answer="1" data-miscon='{"2":"leaf-by-index"}'>
+  <div class="check" data-id="cse332-w2-l5-array-children-of-5" data-grader="exact" data-answer="1" data-miscon='{"2":"child-past-n"}'>
     <p>Quick check: a heap holds \(n = 10\) items. How many children does the node at index 5 have?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
@@ -1643,41 +1555,14 @@ extract</code></pre>
 </section>
 
 <!-- ================================================================ L5: INSERT CODE -->
-<section class="page" id="l5-insert-code" data-title="The code: insert">
+<section class="page" id="l5-insert-code" data-title="Insert in code">
   <p class="where">Lecture 5 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
-  <h1>The code: insert</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> In the array, insert writes the item at index <code>size+1</code>, the next open spot. Then <code>percolateUp</code> follows \(i \to i/2\) toward index 1, swapping while the item is smaller than its parent.</p>
-  </div>
-
-  <h2>Step through the lecture's code</h2>
-  <p class="where">For simplicity, each item is its own priority.</p>
+  <h1>Insert in code</h1>
+  <div class="prose"><p>This is Lecture 4's insert, written on the array. The next open spot is index <code>size+1</code>, and climbing to the parent is <code>i/2</code>. Each item is its own priority. Step through the lecture's code inserting 1:</p></div>
   <p class="tree-key"><span class="k-cur">arr[i], the moving item</span><span class="k-cmp">arr[parent]</span><span class="k-swap">just swapped</span></p>
-  <div class="panel heap-step" data-kind="insert"></div>
+  <div class="panel heap-step" data-kind="insert" data-scenario="array-insert"></div>
+  <div class="rule"><p><strong>The rule.</strong> Climbing one level is <code>i = i/2</code>. The loop stops when the item reaches index 1 or its parent is no bigger.</p></div>
 
-  <h2>Why each line is there</h2>
-  <div class="prose">
-    <ul>
-      <li><code>if(size == arr.length - 1){resize();}</code>: index 0 is unused, so an array of length \(L\) holds \(L - 1\) items. When it's full, grow it first.</li>
-      <li><code>size++; arr[size] = item;</code>: index <code>size+1</code> is the next open spot, the next place on the bottom level. The shape is fixed before the order.</li>
-      <li><code>int parent = i/2;</code>: integer division gives the parent's index.</li>
-      <li><code>Item val = arr[i];</code>: saves the moving item. The loop's first line writes over <code>arr[i]</code>, and <code>val</code> is how the item survives.</li>
-      <li><code>while(i &gt; 1 &amp;&amp; arr[i] &lt; arr[parent])</code>: keep going while the item isn't at the root <em>and</em> is smaller than its parent. <code>i &gt; 1</code> comes first: at the root, <code>parent</code> is 0, and <code>&amp;&amp;</code> stops before reading the unused <code>arr[0]</code>.</li>
-      <li><code>arr[i] = arr[parent]; arr[parent] = val;</code>: a swap, in two lines. The parent's value moves down, then the item moves up.</li>
-      <li><code>i = parent; parent = i/2;</code>: follow the item to its new spot and find its new parent.</li>
-    </ul>
-  </div>
-
-  <div class="check" data-id="cse332-w2-l5-insert-code-no-val-line" data-grader="mc">
-    <p>Quick check: suppose the line <code>arr[parent] = val;</code> were deleted. What goes wrong when the item should move up?</p>
-    <div class="opts">
-      <label><input type="radio" name="cse332-w2-l5-insert-code-no-val-line"> Nothing: the next iteration fixes it<span class="why" hidden>Without that line, the item's value is never written anywhere.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l5-insert-code-no-val-line"> The parent's value gets copied down, but the new item is never written above it: the item is lost and the parent's value appears twice<span class="why" hidden>Right. The two lines are a swap only together.</span></label>
-      <label><input type="radio" name="cse332-w2-l5-insert-code-no-val-line"> It throws an ArrayIndexOutOfBoundsException<span class="why" hidden>Every index used is still between 1 and size.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
   <div class="check" data-id="cse332-w2-l5-insert-code-why-i-gt-1" data-grader="mc">
     <p>Quick check: why does the loop test <code>i &gt; 1</code> <em>before</em> <code>arr[i] &lt; arr[parent]</code>?</p>
     <div class="opts">
@@ -1688,40 +1573,29 @@ extract</code></pre>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
+  <div class="check" data-id="cse332-w2-l5-insert-code-first-parent-12" data-grader="exact" data-answer="6" data-miscon='{"6.5":"no-floor","5":"zero-based"}'>
+    <p>Quick check: a heap holds 12 items, and you call <code>insert(x)</code>. What is the index of the first parent that \(x\) is compared with?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L5: EXTRACT CODE -->
-<section class="page" id="l5-extract-code" data-title="The code: extract">
+<section class="page" id="l5-extract-code" data-title="Extract in code">
   <p class="where">Lecture 5 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
-  <h1>The code: extract</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> <code>extract</code> saves <code>arr[1]</code>, copies <code>arr[size]</code> into it, shrinks <code>size</code>, then <code>percolateDown(1)</code> moves that item down, each time swapping with the smaller child, while the child is smaller.</p>
-  </div>
-
-  <h2>Step through the lecture's code</h2>
-  <p class="tree-key"><span class="k-cur">arr[i], the moving item</span><span class="k-cmp">being compared</span><span class="k-swap">just swapped</span></p>
-  <div class="panel heap-step" data-kind="extract"></div>
-  <p class="note">A crossed-out cell is past <code>size</code>: an old value that's no longer in the heap.</p>
-
-  <h2>Why each line is there</h2>
-  <div class="prose">
-    <ul>
-      <li><code>theMin = arr[1];</code>: the answer. Saved first, because the next line writes over it.</li>
-      <li><code>arr[1] = arr[size]; size--;</code>: the last item moves to the root, and the heap shrinks by one. The old copy stays in the array, but <code>size</code> says it's gone.</li>
-      <li><code>left = i*2; right = i*2+1; val = arr[i];</code>: the children's indices, and the moving item saved.</li>
-      <li><code>while(left &lt;= size)</code>: \(i\) has at least one child. If there's no left child there's no right child either (the tree is complete), so \(i\) is a leaf and we're done.</li>
-      <li><code>toSwap = right; if(right &gt; size || arr[left] &lt; arr[right]) toSwap = left;</code>: pick the smaller child, or the left one when there's no right child. <code>right &gt; size</code> comes first so that <code>||</code> stops before reading a slot outside the heap. On a tie, the right child is used; either is correct.</li>
-      <li><code>if(arr[toSwap] &lt; val)</code>: swap only if the smaller child is smaller than the moving item. Then follow the item down and recompute <code>left</code> and <code>right</code>.</li>
-      <li><code>else{ return;}</code>: the item is \(\le\) both children, so the heap property holds everywhere.</li>
-    </ul>
-  </div>
+  <h1>Extract in code</h1>
+  <div class="prose"><p>This is Lecture 4's extract, written on the array: save <code>arr[1]</code>, move the last item there, shrink <code>size</code>, then sink it. The children of index <code>i</code> are <code>i*2</code> and <code>i*2+1</code>. Step through the lecture's code:</p></div>
+  <p class="tree-key"><span class="k-cur">arr[i], the moving item</span><span class="k-cmp">arr[toSwap], the child it's compared with</span><span class="k-swap">just swapped</span></p>
+  <div class="panel heap-step" data-kind="extract" data-scenario="array-extract"></div>
+  <p class="note">A crossed-out cell is past <code>size</code>: an old copy that isn't in the heap anymore.</p>
+  <div class="rule"><p><strong>The rule.</strong> <code>toSwap</code> is the smaller child, or the left one when there's no right child. Swap while it's smaller than the moving item. The loop ends at a leaf (<code>left &gt; size</code>), or with <code>return</code> once no child is smaller.</p></div>
 
   <div class="check" data-id="cse332-w2-l5-extract-code-no-return" data-grader="mc">
     <p>Quick check: what would happen without the <code>else{ return;}</code>?</p>
     <div class="opts">
       <label><input type="radio" name="cse332-w2-l5-extract-code-no-return"> Nothing changes: the loop ends anyway<span class="why" hidden>Look at what changes inside the loop when there's no swap.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l5-extract-code-no-return"> When the item stops above larger children, i, left and right never change, so the loop never ends<span class="why" hidden>Right. Only the swap branch moves i. Without the return, a stop above two larger children loops forever.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l5-extract-code-no-return"> When the item stops above larger children, i, left and right never change, so the loop never ends<span class="why" hidden>Right. Only the swap branch moves i. Without the return, stopping above larger children loops forever.</span></label>
       <label><input type="radio" name="cse332-w2-l5-extract-code-no-return"> The item would always go down to a leaf<span class="why" hidden>Without a swap the item doesn't move at all.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
@@ -1740,93 +1614,36 @@ extract</code></pre>
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ L5: TRACE -->
-<section class="page" id="l5-trace" data-title="Trace a sequence">
-  <p class="where">Lecture 5 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
-  <h1>Trace a sequence</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> A sequence of operations is just insert and extract, one after another. Each one leaves a valid heap, which is the starting point for the next.</p>
-  </div>
-  <div class="prose">
-    <p>The lecture's example inserts 16, 32, 4, 57, 80, 43, 2 into an empty heap and then extracts once. It's <a href="#l5-problems">problem 3</a>: do it by hand there. Use the playground to check your own sequences.</p>
-    <p>A good habit: after each operation, write the array, and check two things before going on. Is index \(i\) \(\le\) indices \(2i\) and \(2i+1\) everywhere? Are the items packed into indices 1 to <code>size</code>?</p>
-  </div>
-
-  <div class="panel" id="play">
-    <div class="controls">
-      <label>Value <input type="number" id="play-val" value="5" step="any" aria-label="Value to insert"></label>
-      <button class="btn primary" type="button" id="play-ins">insert</button>
-      <button class="btn" type="button" id="play-ext">extract</button>
-      <button class="btn quiet" type="button" id="play-reset">Reset</button>
-    </div>
-    <svg class="htree" id="play-svg" role="img" aria-label="The heap so far"></svg>
-    <div class="cells heap-cells" id="play-cells"></div>
-    <div class="log" id="play-log" aria-live="polite"></div>
-  </div>
-
-  <div class="rule warn">
-    <p><strong>Common mistakes</strong></p>
-    <ul>
-      <li>Putting a new item at the root, or at its "sorted" place, instead of the next open spot.</li>
-      <li>Stopping percolate up after one swap. Keep comparing with each new parent.</li>
-      <li>On extract, moving the root's child up instead of moving the <em>last</em> item to the root.</li>
-    </ul>
-  </div>
-
-  <div class="check" data-id="cse332-w2-l5-trace-root" data-grader="exact" data-answer="3" data-miscon='{"1":"smallest-ever","5":"moved-item"}'>
-    <p>Quick check: insert 5, 3, 8, 1 into an empty heap, then extract once. What's at the root now?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l5-trace-n-inserts" data-grader="bigo" data-answer="n log n">
-    <p>Quick check: you insert \(n\) items, one at a time, into an empty heap. What's the worst-case total time?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <nav class="pager"></nav>
-</section>
-
 <!-- ================================================================ L5: UPDATE KEY -->
 <section class="page" id="l5-update" data-title="Changing a priority">
   <p class="where">Lecture 5 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
   <h1>Changing a priority</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> After one item's priority changes, the heap property can only break between that item and its parent, or that item and its children. Percolate it toward where it now belongs.</p>
+  <div class="prose"><p>Sometimes an item's priority changes while it waits, like a patient who gets worse. The lecture's operations take the item's index, change its priority, then percolate it up or down.</p></div>
+
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">In the lecture's heap, the 3 at index 2 becomes 10. Where does the 10 go?</p>
+    <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" data-idx role="img" aria-label="The lecture's heap with indices: 1 at index 1, 3 at 2, 2 at 3, 4 at 4, 7 at 5, 5 at 6, 6 at 7, 5 at 8, 9 at 9"></svg>
+    <div class="steps"><ol>
+      <li>Index 2 now holds 10 (circled). Above it, \(1 \le 10\): fine. Below it, 4 and 7 are smaller than 10: broken. So percolate down.<svg class="htree" data-step data-tree="1,10,2,4,7,5,6,5,9" data-idx data-cmp="2" role="img" aria-label="10 at index 2, above 4 and 7"></svg></li>
+      <li>The smaller child is 4, and \(4 &lt; 10\): swap.<svg class="htree" data-step data-tree="1,4,2,10,7,5,6,5,9" data-idx data-cmp="4" role="img" aria-label="10 swapped down to index 4, above 5 and 9"></svg></li>
+      <li>The children are 5 and 9. The smaller is 5, and \(5 &lt; 10\): swap. Index 8 has no children: stop.<svg class="htree" data-step data-tree="1,4,2,5,7,5,6,10,9" data-idx data-cmp="8" role="img" aria-label="10 swapped down to index 8, a leaf"></svg></li>
+    </ol></div>
   </div>
 
-  <h2>Which way?</h2>
-  <div class="table-wrap">
-  <table class="plain vs-table">
-    <tr><th>Given the index of an item…</th><th>Min-heap</th><th>Max-heap</th></tr>
-    <tr><td><strong>Decrease key</strong>: make its priority value smaller</td><td>percolate up</td><td>percolate down</td></tr>
-    <tr><td><strong>Increase key</strong>: make its priority value larger</td><td>percolate down</td><td>percolate up</td></tr>
-  </table>
-  </div>
-  <div class="prose">
-    <ul>
-      <li><strong>Decrease key in a min-heap.</strong> Before, the item was \(\ge\) its parent and \(\le\) its children. Smaller, it's still \(\le\) its children, but it may now be smaller than its parent: too low in the tree. So percolate up.</li>
-      <li><strong>Increase key in a min-heap.</strong> Larger, it's still \(\ge\) its parent, but it may now be larger than a child: too high. So percolate down.</li>
-      <li><strong>Max-heap:</strong> every inequality flips, so the directions flip too.</li>
-    </ul>
-    <p>The lecture also lists <strong>remove</strong>: take out the item at a given index. It doesn't go into how here.</p>
-  </div>
+  <p class="line"><strong>Min-heap:</strong> smaller → up; bigger → down.</p>
+  <p class="line"><strong>Max-heap:</strong> smaller → down; bigger → up.</p>
+  <div class="rule"><p><strong>The rule.</strong> Only the item's links to its parent and children can break. In a min-heap, a smaller value can only break the link above it, so it climbs. A bigger value can only break the links below it, so it sinks. A max-heap flips both.</p></div>
+  <p class="note">The lecture also lists <code>remove</code>, which takes out the item at a given index, without going into it.</p>
 
-  <h2>Check yourself</h2>
-  <p class="where">This check starts from the lecture's heap, with array indices:</p>
-  <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" data-idx role="img" aria-label="The lecture's heap with indices: 1 at index 1, 3 at 2, 2 at 3, 4 at 4, 7 at 5, 5 at 6, 6 at 7, 5 at 8, 9 at 9"></svg>
   <div class="check" data-id="cse332-w2-l5-update-max-increase" data-grader="mc">
-    <p>Quick check: in a <em>max</em>-heap, you increase an item's priority value. Which way does it percolate?</p>
+    <p>Quick check: in a <em>max</em>-heap, you increase an item's priority value. If that breaks the heap order, which way does it move to fix it?</p>
     <div class="opts">
       <label data-correct><input type="radio" name="cse332-w2-l5-update-max-increase"> Up<span class="why" hidden>Right. In a max-heap, parents are ≥ children. A bigger value may now be bigger than its parent.</span></label>
       <label><input type="radio" name="cse332-w2-l5-update-max-increase"> Down<span class="why" hidden>That's increase key in a min-heap. A max-heap flips it.</span></label>
-      <label><input type="radio" name="cse332-w2-l5-update-max-increase"> It doesn't move<span class="why" hidden>It might not, but if anything breaks, it's the link to its parent.</span></label>
+      <label><input type="radio" name="cse332-w2-l5-update-max-increase"> Either way, depending on its children<span class="why" hidden>A bigger value can't be too small for its children. Only the link to its parent can break.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l5-update-swaps-9" data-grader="exact" data-answer="3">
-    <p>Quick check: in the heap above, the 9 at index 9 has its priority decreased to 0. How many swaps happen as it percolates?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <nav class="pager"></nav>
@@ -1834,38 +1651,12 @@ extract</code></pre>
 
 <!-- ================================================================ L5: BUILDHEAP -->
 <section class="page" id="l5-build" data-title="buildHeap">
-  <p class="where">Lecture 5 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span> · Weiss 6.3</p>
+  <p class="where">Lecture 5 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
   <h1>buildHeap</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> Floyd's buildHeap puts all \(n\) items into the array as given, then calls <code>percolateDown(i)</code> for \(i\) = <code>size</code> down to 1. Working from the bottom up means that when it's \(i\)'s turn, both subtrees under \(i\) are already heaps.</p>
-  </div>
-
-  <h2>Building a heap from scratch</h2>
-  <div class="prose">
-    <p>Suppose you have \(n\) items and want a heap of them. Put them in the array in any order: the shape is already a complete tree, but the order breaks the heap property in many places. Two ways to fix it:</p>
-    <ol>
-      <li><strong>Percolate up:</strong> insert the items one at a time. Each insert is \(O(\log n)\), so \(O(n\log n)\) in all.</li>
-      <li><strong>Percolate down:</strong> Floyd's method, below. It's \(\Theta(n)\).</li>
-    </ol>
-  </div>
-  <pre class="code"><code>buildHeap(){
-    for(int i = size; i&gt;0; i--){
-        percolateDown(i);
-    }
-}</code></pre>
-
-  <h2>Why this order</h2>
-  <div class="prose">
-    <ul>
-      <li><strong>percolateDown(i) needs heaps below \(i\).</strong> It only moves one item. It works when the only thing wrong in \(i\)'s subtree is the item at \(i\) itself.</li>
-      <li><strong>Going from the back guarantees that.</strong> Every index below \(i\) is bigger than \(i\), so it was handled earlier. By the time the loop reaches \(i\), both of its subtrees are already heaps.</li>
-      <li><strong>The leaves cost nothing.</strong> Indices \(n/2+1\) to \(n\) are leaves: one-node subtrees are already heaps, and <code>percolateDown</code> returns at once. The first index that can move is \(n/2\).</li>
-    </ul>
-  </div>
-
-  <h2>Step through it</h2>
-  <p class="tree-key"><span class="k-cur">the item being placed</span><span class="k-cmp">its children</span><span class="k-done">finished: already a heap below</span></p>
-  <div class="panel heap-step" data-kind="build"></div>
+  <div class="prose"><p>Say you have all \(n\) items at once. Inserting them one at a time costs \(\Theta(n\log n)\) in the worst case. Floyd's buildHeap is faster: put the items in the array as given, which already makes a complete tree, then call <code>percolateDown(i)</code> for <code>i</code> from the last index back to 1. Step through the lecture's 10 items:</p></div>
+  <p class="tree-key"><span class="k-cur">where the item stopped</span><span class="k-swap">the path it sank along</span><span class="k-done">a finished heap</span><span class="k-leaf">leaves</span></p>
+  <div class="panel heap-step" data-kind="build" data-scenario="lecture-build"></div>
+  <div class="rule"><p><strong>The rule.</strong> Work from the bottom up. When it's index \(i\)'s turn, both subtrees below it are already heaps, so only the item at \(i\) can be out of place, and one <code>percolateDown(i)</code> fixes it. The leaves have nothing to do.</p></div>
 
   <div class="check" data-id="cse332-w2-l5-build-first-i" data-grader="exact" data-answer="6" data-miscon='{"12":"build-first-leaf","7":"build-first-leaf"}'>
     <p>Quick check: buildHeap runs on 12 items. What is the first (largest) \(i\) for which <code>percolateDown(i)</code> can actually move something?</p>
@@ -1876,7 +1667,7 @@ extract</code></pre>
     <p>Quick check: why not run the loop the other way, from \(i = 1\) up to <code>size</code>?</p>
     <div class="opts">
       <label><input type="radio" name="cse332-w2-l5-build-why-bottom-up"> It would be slower but still correct<span class="why" hidden>It can give a wrong answer. Think about a small item deep in the tree.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l5-build-why-bottom-up"> percolateDown(i) assumes the subtrees below i are already heaps; going top-down, they aren't yet, so a small item deep down can stay stuck below larger ones<span class="why" hidden>Right. Percolating down only ever moves items down, so it can't pull a small value up from the bottom.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l5-build-why-bottom-up"> percolateDown(i) assumes the subtrees below i are already heaps; going top-down, they aren't yet, so a small item deep down can stay stuck below larger ones<span class="why" hidden>Right. If a subtree is fixed after its parent, a smaller value can rise to the subtree's top after the parent's turn is over, and the parent stays too big.</span></label>
       <label><input type="radio" name="cse332-w2-l5-build-why-bottom-up"> Index 1 has no parent<span class="why" hidden>percolateDown never looks at parents.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
@@ -1889,89 +1680,126 @@ extract</code></pre>
 <section class="page" id="l5-buildtime" data-title="Why buildHeap is Θ(n)">
   <p class="where">Lecture 5 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
   <h1>Why buildHeap is \(\Theta(n)\)</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> A node can only percolate down as far as the height of its subtree, and most nodes sit near the bottom. Adding up "most moves × how many nodes" gives at most about \(n\) moves, so buildHeap is \(\Theta(n)\), not \(\Theta(n\log n)\).</p>
+  <div class="prose"><p>buildHeap calls <code>percolateDown</code> about \(n\) times, and one call can take \(\log n\) swaps. That suggests \(n\log n\). But an item can only sink as far as the bottom, and most nodes are already near it.</p></div>
+
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">A full tree (every level full) of 15 nodes. Each node shows the most swaps it can make: the number of levels below it.</p>
+    <svg class="htree" data-tree="3,2,2,1,1,1,1,0,0,0,0,0,0,0,0" role="img" aria-label="A full tree of 15 nodes labeled with how far each can sink: the root 3, the next two 2, the next four 1, the eight leaves 0"></svg>
+    <div class="table-wrap"><table class="vals">
+      <thead><tr><th>nodes × swaps each</th><th>swaps</th></tr></thead>
+      <tr><th>8 leaves × 0</th><td>0</td></tr>
+      <tr><th>4 nodes × 1</th><td>4</td></tr>
+      <tr><th>2 nodes × 2</th><td>4</td></tr>
+      <tr><th>1 root × 3</th><td>3</td></tr>
+      <tr><th>Total</th><td class="best">11</td></tr>
+    </table></div>
+    <p class="line">At most 11 swaps for 15 nodes. "15 calls × 3 swaps" would say 45, but only the root can sink 3 levels, and half the nodes can't sink at all.</p>
   </div>
 
-  <h2>Count by level</h2>
-  <div class="prose">
-    <p>"\(n\) calls, each up to \(\log n\)" gives \(O(n\log n)\), which is true but not tight. Count more carefully, by height above the bottom:</p>
-    <ul>
-      <li>When \(i\) is a leaf: 0 moves. About \(\frac n2\) nodes are leaves.</li>
-      <li>Second-from-last level: at most 1 move. About \(\frac n4\) nodes.</li>
-      <li>Third-from-last level: at most 2 moves. About \(\frac n8\) nodes.</li>
-      <li>…and the root: at most \(\log_2 n\) moves, 1 node.</li>
-    </ul>
-    <p>\[0\cdot\frac n2 + 1\cdot\frac n4 + 2\cdot\frac n8 + \dots + \log_2 n\cdot 1 \;=\; n\sum_{i=0}^{\log_2 n}\frac{i}{2^{i+1}} \;\le\; n\sum_{i=0}^{\infty}\frac{i}{2^{i+1}} \;=\; n.\]</p>
-    <p>Each move costs at most two comparisons (one between the children, one with the moving item), so that's at most \(2n\) comparisons: the \(2n\) in the lecture's bound. Either way it's \(O(n)\). And buildHeap has to look at every item at least once, so it's \(\Omega(n)\) too. So \(\Theta(n)\).</p>
-  </div>
+  <p class="line">The same pattern holds for bigger heaps: most nodes sit near the bottom and can sink only a little.</p>
+  <div class="rule"><p><strong>The rule.</strong> All the items together can sink fewer than \(n\) levels. Each level costs a fixed amount of work, and each of the \(n/2\) calls adds a fixed amount more, so buildHeap is \(O(n)\). It touches every index, so it's \(\Theta(n)\).</p></div>
 
-  <h2>See the levels</h2>
-  <div class="panel" id="bc">
-    <div class="controls bc-slider">
-      <label for="bc-h">Height of a full tree</label>
-      <input type="range" id="bc-h" min="1" max="20" value="3" aria-label="height of the tree">
-      <output id="bc-h-out">3</output>
-    </div>
-    <div class="table-wrap" id="bc-table"></div>
-    <p class="out" id="bc-out" role="status"></p>
-    <p class="note">The bars show where the work is: in the low levels, which have many nodes but few moves each, and the high levels, which have big moves but few nodes. Neither end adds up to much.</p>
-  </div>
+  <details class="more">
+    <summary>The lecture's sum</summary>
+    <p>Count level by level from the bottom: about \(\frac n2\) leaves sink 0 levels, \(\frac n4\) nodes sink at most 1, \(\frac n8\) at most 2, and so on up to the root.</p>
+    <p>\[0\cdot\frac n2 + 1\cdot\frac n4 + 2\cdot\frac n8 + 3\cdot\frac n{16} + \dots \;\le\; n\sum_{i=0}^{\infty}\frac{i}{2^{i+1}} \;=\; n.\]</p>
+    <p>The infinite sum adds up to exactly 1. That's at most \(n\) swaps, or \(2n\) comparisons, the lecture's bound.</p>
+  </details>
 
-  <div class="check" data-id="cse332-w2-l5-buildtime-leaves-half" data-grader="mc">
-    <p>Quick check: in a full binary tree, about what fraction of the nodes are leaves?</p>
+  <div class="check" data-id="cse332-w2-l5-buildtime-why-not-nlogn" data-grader="mc">
+    <p>Quick check: one <code>percolateDown</code> can take \(\log n\) swaps, and buildHeap makes about \(n\) calls. Why isn't the total \(n\log n\)?</p>
     <div class="opts">
-      <label><input type="radio" name="cse332-w2-l5-buildtime-leaves-half"> About \(\frac{1}{\log n}\)<span class="why" hidden>Each level has twice as many nodes as the one above, so the bottom one is big.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l5-buildtime-leaves-half"> About half<span class="why" hidden>Right. A full tree with 2^(h+1) − 1 nodes has 2^h leaves: just over half. They cost buildHeap nothing.</span></label>
-      <label><input type="radio" name="cse332-w2-l5-buildtime-leaves-half"> About a quarter<span class="why" hidden>That's the level just above the leaves.</span></label>
+      <label><input type="radio" name="cse332-w2-l5-buildtime-why-not-nlogn"> percolateDown is really \(O(1)\)<span class="why" hidden>From the root it can take log n swaps. Count how many nodes are that high up.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l5-buildtime-why-not-nlogn"> Only a few nodes are high enough to sink far; half are leaves and can't sink at all<span class="why" hidden>Right. The many low nodes sink a little, and the few high nodes sink a lot. Added up, that's less than n.</span></label>
+      <label><input type="radio" name="cse332-w2-l5-buildtime-why-not-nlogn"> The items usually arrive almost sorted<span class="why" hidden>The bound is for the worst case, whatever order the items come in.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l5-buildtime-sum" data-grader="exact" data-answer="1">
-    <p>Quick check: what does the infinite sum \(\displaystyle\sum_{i=0}^{\infty}\frac{i}{2^{i+1}} = 0 + \frac14 + \frac28 + \frac3{16} + \dots\) add up to?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ L5 PROBLEMS -->
-<section class="page" id="l5-problems" data-title="Lecture 5 problems">
+<!-- ================================================================ L5 PRACTICE -->
+<section class="page" id="l5-problems" data-title="Lecture 5 practice">
   <p class="where">Lecture 5 · <span class="today-chip" data-date="2026-10-09">Fri Oct 9</span></p>
-  <h1>Lecture 5 problems</h1>
-  <div class="prose"><p>Built on the lecture's examples: its heap, its insert sequence, its buildHeap, and its index rules. Arrays use the lecture's convention: index 0 unused, root at index 1, children of \(i\) at \(2i\) and \(2i+1\). Every answer was computed by running the lecture's pseudocode. Draw the tree as you go.</p></div>
+  <h1>Lecture 5 practice</h1>
+  <div class="prose"><p>One group per lesson, with the lecture's own examples where it has them. Draw the tree and the array as you go. Arrays use the lecture's layout: <code>arr[0]</code> unused, the root at index 1, the children of \(i\) at \(2i\) and \(2i+1\). Each solution draws the heap after every step.</p></div>
+  <div data-progress-bar></div>
 
-  <article class="task" data-id="cse332-w2-l5-heap-check">
-    <h2>1. Is it a min-heap?</h2>
-    <p class="prompt">This practices the lecture's check for a min-heap: every node must be \(\le\) its own children. Each array below lists a complete tree in level order, starting at index 1, so the children of index \(i\) are at \(2i\) and \(2i+1\). Say whether each is a valid binary min-heap.</p>
-    <div class="tree-row">
-      <figure><figcaption>A: 2, 4, 3, 8, 5, 9, 7</figcaption><svg class="htree" data-tree="2,4,3,8,5,9,7" data-idx role="img" aria-label="A: root 2; children 4 and 3; 4 has 8 and 5; 3 has 9 and 7"></svg></figure>
-      <figure><figcaption>B: 1, 4, 2, 3, 5, 6, 7</figcaption><svg class="htree" data-tree="1,4,2,3,5,6,7" data-idx role="img" aria-label="B: root 1; children 4 and 2; 4 has 3 and 5; 2 has 6 and 7"></svg></figure>
-      <figure><figcaption>C: 3, 5, 4, 9, 6, 7, 8, 10</figcaption><svg class="htree" data-tree="3,5,4,9,6,7,8,10" data-idx role="img" aria-label="C: root 3; children 5 and 4; 5 has 9 and 6; 4 has 7 and 8; 9 has 10"></svg></figure>
-      <figure><figcaption>D: 4, 6, 5, 7, 3, 8, 9</figcaption><svg class="htree" data-tree="4,6,5,7,3,8,9" data-idx role="img" aria-label="D: root 4; children 6 and 5; 6 has 7 and 3; 5 has 8 and 9"></svg></figure>
+  <h2 class="practice-group">Is it a min-heap?</h2>
+  <p class="note">Review: <a href="#l4-heap">What a heap is</a> (Lecture 4)</p>
+
+  <article class="task" data-id="cse332-w2-l5-four-trees">
+    <h2>1. Four trees</h2>
+    <p class="prompt">The lecture's own check. A min-heap needs the right <strong>shape</strong> (complete: each level full before the next, the bottom filled from the left) and the right <strong>order</strong> (every node \(\le\) its own children). Which is each tree?</p>
+    <div class="tree-row pairs">
+      <figure><figcaption>A</figcaption><svg class="htree" data-tree="3,4,5" role="img" aria-label="Tree A: root 3 with children 4 and 5"></svg></figure>
+      <figure><figcaption>B</figcaption><svg class="htree" data-tree="5,4,6" role="img" aria-label="Tree B: root 5 with children 4 and 6"></svg></figure>
+      <figure><figcaption>C</figcaption><svg class="htree" data-tree="3,4,10,5,6" role="img" aria-label="Tree C: root 3 with children 4 and 10; 4 has children 5 and 6"></svg></figure>
+      <figure><figcaption>D</figcaption><svg class="htree" data-tree="5,7,6,8,_,9" role="img" aria-label="Tree D: root 5 with children 7 and 6; 7 has only a left child 8; 6 has a left child 9"></svg></figure>
     </div>
-    <div class="answer-spec" data-part="a" data-grader="yesno" data-answer="yes" data-label="Is A a valid min-heap?"></div>
-    <div class="answer-spec" data-part="b" data-grader="yesno" data-answer="no" data-label="Is B a valid min-heap?"></div>
-    <div class="answer-spec" data-part="c" data-grader="yesno" data-answer="yes" data-label="Is C a valid min-heap?"></div>
-    <div class="answer-spec" data-part="d" data-grader="yesno" data-answer="no" data-label="Is D a valid min-heap?"></div>
+    <div class="answer-spec" data-part="a" data-grader="choice" data-answer="heap" data-options="heap:Heap|order:Bad order|shape:Bad shape" data-label="Tree A"></div>
+    <div class="answer-spec" data-part="b" data-grader="choice" data-answer="order" data-options="heap:Heap|order:Bad order|shape:Bad shape" data-label="Tree B"></div>
+    <div class="answer-spec" data-part="c" data-grader="choice" data-answer="heap" data-options="heap:Heap|order:Bad order|shape:Bad shape" data-miscon='{"order":"not-own-child"}' data-label="Tree C"></div>
+    <div class="answer-spec" data-part="d" data-grader="choice" data-answer="shape" data-options="heap:Heap|order:Bad order|shape:Bad shape" data-miscon='{"heap":"shape-gap"}' data-label="Tree D"></div>
     <ol class="hints">
-      <li>Check each node against its own two children only. Index 2's children are indexes 4 and 5.</li>
-      <li>The shape is always right in an array with no gaps. Only the order can fail.</li>
+      <li>Shape first: read the bottom level from the left. An empty spot before the last node is a gap.</li>
+      <li>Order: compare each node with its own children only, never with another branch.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>A: 2 ≤ 4, 3; 4 ≤ 8, 5; 3 ≤ 9, 7. Valid.</li>
-      <li>B: index 2 holds 4, but its child at index 4 is 3, and 3 &lt; 4. Not a heap.</li>
-      <li>C: 3 ≤ 5, 4; 5 ≤ 9, 6; 4 ≤ 7, 8; 9 ≤ 10 (index 4's child at index 8). Valid.</li>
-      <li>D: index 2 holds 6, and its child at index 5 is 3. Not a heap.</li>
-      <li class="answer">A yes; B no; C yes; D no. The heap property relates a node only to its own children.</li>
+      <li>A: complete, and \(3 \le 4\), \(3 \le 5\). A heap.</li>
+      <li>B: complete, but \(5 &gt; 4\): the root is bigger than its left child. Bad order.</li>
+      <li>C: complete. \(3 \le 4\), \(3 \le 10\), \(4 \le 5\), \(4 \le 6\). The 5 is smaller than the 10, but the 10 isn't its parent, so that's allowed. A heap.</li>
+      <li>D: 7 has no right child, yet 6 has a child after that empty spot. Bad shape.</li>
+      <li class="answer">Heap; bad order; heap; bad shape.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w2-l5-insert-extract">
-    <h2>2. Percolate by hand</h2>
-    <p class="prompt">This practices running the lecture's array code by hand. The heap lives in an array: index 0 is unused, the root is at index 1, and the children of index \(i\) are at \(2i\) and \(2i+1\). Here are <code>insert</code> and <code>extract</code>:</p>
-    <pre class="code">insert(item){
+  <h2 class="practice-group">The heap as an array</h2>
+  <p class="note">Lesson: <a href="#l5-array">The heap as an array</a></p>
+
+  <article class="task" data-id="cse332-w2-l5-index-12">
+    <h2>2. Index math</h2>
+    <p class="prompt">A heap holds \(n = 12\) items, stored the lecture's way. Use the formulas: parent \(i/2\) (drop any remainder), children \(2i\) and \(2i+1\), and a child exists only if its index is at most \(n\).</p>
+    <div class="answer-spec" data-part="parent-9" data-grader="exact" data-answer="4" data-miscon='{"4.5":"no-floor","18":"child-not-parent"}' data-label="the index of the parent of index 9"></div>
+    <div class="answer-spec" data-part="right-4" data-grader="exact" data-answer="9" data-miscon='{"10":"zero-based","8":"left-not-right"}' data-label="the index of the right child of index 4"></div>
+    <div class="answer-spec" data-part="first-leaf" data-grader="exact" data-answer="7" data-miscon='{"6":"leaf-by-index"}' data-label="the index of the first leaf"></div>
+    <div class="answer-spec" data-part="right-of-6" data-grader="yesno" data-answer="no" data-miscon='{"yes":"child-past-n"}' data-label="Does index 6 have a right child?"></div>
+    <ol class="hints">
+      <li>Sketch the tree with indices 1 to 12 if it helps: each node's children are the next two numbers in line.</li>
+      <li>A leaf has no left child: \(2i &gt; 12\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Here are indices 1 to 12 as a tree. Each node shows its own index.<svg class="htree" data-tree="1,2,3,4,5,6,7,8,9,10,11,12" role="img" aria-label="A complete tree of 12 nodes, each labeled with its index from 1 to 12"></svg></li>
+      <li>Parent of 9: \(9/2 = 4\), dropping the remainder.</li>
+      <li>Right child of 4: \(2\cdot 4+1 = 9\).</li>
+      <li>First leaf: \(12/2 + 1 = 7\). Index 6 still has a child, index 12.</li>
+      <li>Right child of 6: \(2\cdot 6+1 = 13\), and \(13 &gt; 12\). No.</li>
+      <li class="answer">4; 9; 7; no.</li>
+    </ol></div></div>
+  </article>
+
+  <div class="check" data-id="cse332-w2-l5-array-no-gaps" data-grader="mc">
+    <p>Quick check: why can a heap live in an array with no empty slots between items?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w2-l5-array-no-gaps"> The heap property keeps the values sorted<span class="why" hidden>The values aren't sorted. The layout is about the shape.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l5-array-no-gaps"> The tree is complete: level by level, left to right, it never has a gap<span class="why" hidden>Right. Its n nodes land exactly in indices 1 to n.</span></label>
+      <label><input type="radio" name="cse332-w2-l5-array-no-gaps"> Every node has exactly two children<span class="why" hidden>Leaves have none, and one node may have only a left child.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group">Insert and extract in code</h2>
+  <p class="note">Lessons: <a href="#l5-insert-code">Insert in code</a>, <a href="#l5-extract-code">Extract in code</a></p>
+
+  <article class="task" data-id="cse332-w2-l5-lecture-sequence">
+    <h2>3. The lecture's example</h2>
+    <p class="prompt">Start with an empty min-heap. Insert 16, 32, 4, 57, 80, 43, 2 in that order, then call <code>extract()</code> once. Insert puts the item at index <code>size+1</code> and swaps it with its parent at <code>i/2</code> while it's smaller. Extract moves the last item to index 1 and swaps it with its smaller child while that child is smaller.</p>
+    <details class="more">
+      <summary>The lecture's code</summary>
+      <pre class="code">insert(item){
     if(size == arr.length - 1){resize();}
     size++;
     arr[size] = item;
@@ -1988,7 +1816,7 @@ percolateUp(int i){
         parent = i/2;
     }
 }</pre>
-    <pre class="code">extract(){
+      <pre class="code">extract(){
     theMin = arr[1];
     arr[1] = arr[size];
     size--;
@@ -2015,317 +1843,139 @@ percolateDown(int i){
         else{ return;}
     }
 }</pre>
-    <p class="prompt">Start from the lecture's heap, in level order <code>1, 3, 2, 4, 7, 5, 6, 5, 9</code> (indices 1 to 9). (a) Call <code>insert(0)</code>. (b) Start again from a fresh copy of this heap and call <code>extract()</code>.</p>
-    <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" data-idx role="img" aria-label="The lecture's heap: root 1; children 3 and 2; 3 has 4 and 7; 2 has 5 and 6; 4 has 5 and 9"></svg>
-    <div class="answer-spec" data-part="insert-swaps" data-grader="exact" data-answer="3" data-label="(a) the number of swaps while 0 percolates up"></div>
-    <div class="answer-spec" data-part="insert-root" data-grader="exact" data-answer="0" data-label="(a) the root after the insert"></div>
-    <div class="answer-spec" data-part="extract-returned" data-grader="exact" data-answer="1" data-label="(b) the value extract returns"></div>
-    <div class="answer-spec" data-part="extract-root" data-grader="exact" data-answer="2" data-miscon='{"9":"moved-item","3":"larger-child"}' data-label="(b) the new root afterwards"></div>
+    </details>
+    <div class="answer-spec" data-part="swaps-2" data-grader="exact" data-answer="2" data-miscon='{"1":"one-swap-short"}' data-label="swaps while 2, the last insert, climbs"></div>
+    <div class="answer-spec" data-part="arr3-inserts" data-grader="exact" data-answer="4" data-label="arr[3] after all seven inserts"></div>
+    <div class="answer-spec" data-part="arr7-inserts" data-grader="exact" data-answer="16" data-label="arr[7] after all seven inserts"></div>
+    <div class="answer-spec" data-part="root-extract" data-grader="exact" data-answer="4" data-miscon='{"16":"moved-item"}' data-label="arr[1] after the extract"></div>
+    <div class="answer-spec" data-part="arr3-extract" data-grader="exact" data-answer="16" data-label="arr[3] after the extract"></div>
     <ol class="hints">
-      <li>Insert goes in the next open spot, index 10, whose parent is index 5 (the 7). Swap upward while the new value is smaller than its parent.</li>
-      <li>Extract moves the last item (9) to the root, then swaps it with its smaller child until neither child is smaller.</li>
+      <li>Only 4 and 2 ever climb. Each new item starts at index <code>size+1</code>, and its parent is at half that.</li>
+      <li>For extract, move the value at the last index to the root, then compare it with the children at indices 2 and 3.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>(a) 0 lands at index 10 under 7: swap with 7, then with 3, then with 1. Three swaps, and 0 is the root. The heap is <code>0, 1, 2, 4, 3, 5, 6, 5, 9, 7</code>.</li>
-      <li>(b) <code>extract</code> returns the root, 1. Move 9 to the root; its children are 3 and 2; swap with the smaller, 2. Then 9's children are 5 and 6; swap with 5. The new root is 2: <code>2, 3, 5, 4, 7, 9, 6, 5</code>.</li>
-      <li class="answer">(a) 3 swaps, root 0; (b) returns 1, new root 2. Each is one trip along a root–leaf path, so \(\Theta(\log n)\).</li>
+      <li>Insert 16, then 32 at index 2. \(32 &lt; 16\) is false: no swap.<svg class="htree" data-step data-tree="16,32" data-idx data-cmp="2" role="img" aria-label="16 at the root, 32 at index 2"></svg></li>
+      <li>Insert 4 at index 3. Its parent \(3/2 = 1\) holds 16, and \(4 &lt; 16\): swap.<svg class="htree" data-step data-tree="4,32,16" data-idx data-cmp="1" role="img" aria-label="4 at the root, 32 and 16 below"></svg></li>
+      <li>Insert 57, 80, 43 at indices 4, 5, 6. Each is bigger than its parent: no swaps.<svg class="htree" data-step data-tree="4,32,16,57,80,43" data-idx role="img" aria-label="4; 32 and 16; 57, 80 under 32; 43 under 16"></svg></li>
+      <li>Insert 2 at index 7. Its parent \(7/2 = 3\) holds 16, and \(2 &lt; 16\): swap.<svg class="htree" data-step data-tree="4,32,2,57,80,43,16" data-idx data-cmp="3" role="img" aria-label="2 moved up to index 3, 16 down to index 7"></svg></li>
+      <li>Now its parent \(3/2 = 1\) holds 4, and \(2 &lt; 4\): swap. That's 2 swaps.<svg class="htree" data-step data-tree="2,32,4,57,80,43,16" data-idx data-cmp="1" role="img" aria-label="2 at the root; 32 and 4; 57, 80, 43, 16 below"></svg></li>
+      <li>Extract: save 2. <code>arr[1] = arr[7]</code> moves 16 to the root, and <code>size</code> drops to 6.<svg class="htree" data-step data-tree="16,32,4,57,80,43" data-idx data-cmp="1" role="img" aria-label="16 at the root above 32 and 4"></svg></li>
+      <li>Children 32 and 4. The smaller is 4, and \(4 &lt; 16\): swap.<svg class="htree" data-step data-tree="4,32,16,57,80,43" data-idx data-cmp="3" role="img" aria-label="4 at the root; 16 at index 3 above 43"></svg></li>
+      <li>16's only child is 43 (index 7 is past <code>size</code>). \(43 &lt; 16\) is false: stop.</li>
+      <li class="answer">2 swaps. After the inserts the array is 2, 32, 4, 57, 80, 43, 16, so arr[3] = 4 and arr[7] = 16. After the extract it's 4, 32, 16, 57, 80, 43, so arr[1] = 4 and arr[3] = 16.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w2-l5-build-sequence">
-    <h2>3. Insert, then extract: 16, 32, 4, 57, 80, 43, 2</h2>
-    <p class="prompt">This is the lecture's example of a whole sequence of operations, each one starting from the heap the last one left. The heap lives in an array: index 0 is unused, the root is at index 1, and the children of index \(i\) are at \(2i\) and \(2i+1\). The code:</p>
-    <pre class="code">insert(item){
-    if(size == arr.length - 1){resize();}
-    size++;
-    arr[size] = item;
-    percolateUp(size);
-}
-
-percolateUp(int i){
-    int parent = i/2;
-    Item val = arr[i];
-    while(i &gt; 1 &amp;&amp; arr[i] &lt; arr[parent]){
-        arr[i] = arr[parent];
-        arr[parent] = val;
-        i = parent;
-        parent = i/2;
-    }
+  <div class="check" data-id="cse332-w2-l5-only-left" data-grader="mc">
+    <p>Quick check: in the lecture's <code>percolateDown</code>, when does <code>toSwap</code> end up as the left child?</p>
+    <pre class="code">int toSwap = right;
+if(right &gt; size || arr[left] &lt; arr[right]){
+    toSwap = left;
 }</pre>
-    <pre class="code">extract(){
-    theMin = arr[1];
-    arr[1] = arr[size];
-    size--;
-    percolateDown(1);
-    return theMin;
-}
+    <div class="opts">
+      <label><input type="radio" name="cse332-w2-l5-only-left"> Always, unless the left child is missing<span class="why" hidden>It's the other way around: the right child is the starting guess.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l5-only-left"> When there's no right child, or the left child is smaller<span class="why" hidden>Right. On a tie it keeps the right child; either is correct.</span></label>
+      <label><input type="radio" name="cse332-w2-l5-only-left"> When the left child is bigger than the moving item<span class="why" hidden>This test compares the two children with each other, not with the moving item.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
 
-percolateDown(int i){
-    int left = i*2;
-    int right = i*2+1;
-    Item val = arr[i];
-    while(left &lt;= size){
-        int toSwap = right;
-        if(right &gt; size || arr[left] &lt; arr[right]){
-            toSwap = left;
-        }
-        if(arr[toSwap] &lt; val){
-            arr[i] = arr[toSwap];
-            arr[toSwap] = val;
-            i = toSwap;
-            left = i*2;
-            right = i*2+1;
-        }
-        else{ return;}
-    }
-}</pre>
-    <p class="prompt">Start with an empty min-heap. Insert 16, 32, 4, 57, 80, 43, 2 in that order, then call <code>extract()</code> once.</p>
-    <div class="answer-spec" data-part="swaps-2" data-grader="exact" data-answer="2" data-miscon='{"1":"one-swap-short"}' data-label="the number of swaps while 2 (the last insert) percolates up"></div>
-    <div class="answer-spec" data-part="root-after-inserts" data-grader="exact" data-answer="2" data-label="the root after all seven inserts"></div>
-    <div class="answer-spec" data-part="extracted" data-grader="exact" data-answer="2" data-label="the value extract returns"></div>
-    <div class="answer-spec" data-part="root-after-extract" data-grader="exact" data-answer="4" data-miscon='{"16":"moved-item"}' data-label="the root after the extract"></div>
+  <h2 class="practice-group">Changing a priority</h2>
+  <p class="note">Lesson: <a href="#l5-update">Changing a priority</a></p>
+
+  <article class="task" data-id="cse332-w2-l5-change-key">
+    <h2>4. Climb or sink?</h2>
+    <p class="prompt">Start each part from the lecture's min-heap, drawn with its indices. (a) The 7 at index 5 becomes 0. (b) Starting fresh, the 2 at index 3 becomes 8. Each time, which way does the item go, and at which index does it stop?</p>
+    <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" data-idx role="img" aria-label="The lecture's heap with indices: 1 at index 1, 3 at 2, 2 at 3, 4 at 4, 7 at 5, 5 at 6, 6 at 7, 5 at 8, 9 at 9"></svg>
+    <div class="answer-spec" data-part="dir-a" data-grader="choice" data-answer="up" data-options="up:Percolate up|down:Percolate down" data-miscon='{"down":"same-direction"}' data-label="(a) the 0 goes"></div>
+    <div class="answer-spec" data-part="at-a" data-grader="exact" data-answer="1" data-label="(a) the index where it stops"></div>
+    <div class="answer-spec" data-part="dir-b" data-grader="choice" data-answer="down" data-options="up:Percolate up|down:Percolate down" data-miscon='{"up":"same-direction"}' data-label="(b) the 8 goes"></div>
+    <div class="answer-spec" data-part="at-b" data-grader="exact" data-answer="6" data-label="(b) the index where it stops"></div>
     <ol class="hints">
-      <li>Only 4 and 2 move upward at all. Track where each is inserted and what its parent is.</li>
-      <li>By the time 2 is inserted at index 7, 4 has already swapped with 16: index 3 (2's parent) holds 16, and the root holds 4.</li>
+      <li>In a min-heap, a smaller value can only be too low (smaller than its parent). A bigger value can only be too high (bigger than a child).</li>
+      <li>Going down, compare with both children and swap with the smaller one.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>16 is the root; 32 goes under it (no swap); 4 goes under 16 and swaps with it (1 swap); 57, 80 and 43 land with no swaps. The array is <code>4, 32, 16, 57, 80, 43</code> at that point.</li>
-      <li>2 lands at index 7 under 16: swap with 16, then with 4. Two swaps, and 2 is the root: <code>2, 32, 4, 57, 80, 43, 16</code>.</li>
-      <li><code>extract</code> returns 2. The last item, 16, moves to the root and swaps with its smaller child, 4. 16's only child is then 43, which is bigger: stop. Result: <code>4, 32, 16, 57, 80, 43</code>.</li>
-      <li class="answer">2 swaps; root 2; extract returns 2; new root 4.</li>
+      <li>(a) Index 5 now holds 0 (circled). Its parent \(5/2 = 2\) holds 3, and \(0 &lt; 3\): too low, so percolate up.<svg class="htree" data-step data-tree="1,3,2,4,0,5,6,5,9" data-idx data-cmp="5" role="img" aria-label="0 at index 5, below 3"></svg></li>
+      <li>Swap with 3.<svg class="htree" data-step data-tree="1,0,2,4,3,5,6,5,9" data-idx data-cmp="2" role="img" aria-label="0 at index 2, below the root 1"></svg></li>
+      <li>Its parent \(2/2 = 1\) holds 1, and \(0 &lt; 1\): swap. It's the root now: stop at index 1.<svg class="htree" data-step data-tree="0,1,2,4,3,5,6,5,9" data-idx data-cmp="1" role="img" aria-label="0 at the root"></svg></li>
+      <li>(b) Fresh copy. Index 3 now holds 8 (circled). Above it, \(1 \le 8\): fine. Its children 5 and 6 are smaller: too high, so percolate down.<svg class="htree" data-step data-tree="1,3,8,4,7,5,6,5,9" data-idx data-cmp="3" role="img" aria-label="8 at index 3, above 5 and 6"></svg></li>
+      <li>The smaller child is 5 (index 6), and \(5 &lt; 8\): swap. Index 6 has no children (\(12 &gt; 9\)): stop at index 6.<svg class="htree" data-step data-tree="1,3,5,4,7,8,6,5,9" data-idx data-cmp="6" role="img" aria-label="8 at index 6, a leaf"></svg></li>
+      <li class="answer">(a) up, stops at index 1; (b) down, stops at index 6.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w2-l5-buildheap">
-    <h2>4. Floyd's buildHeap</h2>
-    <p class="prompt">This practices Floyd's buildHeap from the lecture, and why it beats inserting items one at a time. buildHeap leaves the items where they are and calls <code>percolateDown(i)</code> for every index from the last one back to 1:</p>
+  <div class="check" data-id="cse332-w2-l5-change-key-max" data-grader="mc">
+    <p>Quick check: in a <em>max</em>-heap every node is \(\ge\) its children. An item's priority value gets smaller. Which way does it go?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w2-l5-change-key-max"> Up<span class="why" hidden>That's a smaller value in a min-heap. A max-heap flips it.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l5-change-key-max"> Down<span class="why" hidden>Right. In a max-heap a smaller value may now be smaller than a child, so it sinks.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group">buildHeap</h2>
+  <p class="note">Lesson: <a href="#l5-build">buildHeap</a></p>
+
+  <article class="task" data-id="cse332-w2-l5-build7">
+    <h2>5. Build a heap from 7, 6, 5, 4, 3, 2, 1</h2>
+    <p class="prompt">The array holds 7, 6, 5, 4, 3, 2, 1 at indices 1 to 7. Run the lecture's buildHeap on it. Each <code>percolateDown(i)</code> sinks the item at index <code>i</code>, swapping it with its smaller child while that child is smaller.</p>
     <pre class="code">buildHeap(){
     for(int i = size; i&gt;0; i--){
         percolateDown(i);
     }
 }</pre>
-    <pre class="code">percolateDown(int i){
-    int left = i*2;
-    int right = i*2+1;
-    Item val = arr[i];
-    while(left &lt;= size){
-        int toSwap = right;
-        if(right &gt; size || arr[left] &lt; arr[right]){
-            toSwap = left;
-        }
-        if(arr[toSwap] &lt; val){
-            arr[i] = arr[toSwap];
-            arr[toSwap] = val;
-            i = toSwap;
-            left = i*2;
-            right = i*2+1;
-        }
-        else{ return;}
-    }
-}</pre>
-    <p class="prompt">Run <code>buildHeap()</code> on the 9-item array <code>9, 8, 7, 6, 5, 4, 3, 2, 1</code> (indices 1 to 9). Count its swaps. Then compare with inserting the same values one at a time into an empty heap. A node is a <strong>leaf</strong> when it has no children, that is, when \(2i &gt; n\).</p>
-    <svg class="htree" data-tree="9,8,7,6,5,4,3,2,1" data-idx role="img" aria-label="Complete tree in level order 9, 8, 7, 6, 5, 4, 3, 2, 1"></svg>
-    <div class="answer-spec" data-part="first-leaf" data-grader="exact" data-answer="5" data-label="the index of the first leaf, for \(n = 9\)"></div>
-    <div class="answer-spec" data-part="total-swaps" data-grader="exact" data-answer="7" data-label="the total swaps made by buildHeap"></div>
-    <div class="answer-spec" data-part="final-root" data-grader="exact" data-answer="1" data-label="the root after buildHeap"></div>
-    <div class="answer-spec" data-part="insert-swaps" data-grader="exact" data-answer="16" data-label="the total swaps if you instead insert 9, 8, 7, …, 1 one at a time into an empty heap"></div>
+    <svg class="htree" data-tree="7,6,5,4,3,2,1" data-idx role="img" aria-label="Complete tree in level order 7, 6, 5, 4, 3, 2, 1 with indices 1 to 7"></svg>
+    <div class="answer-spec" data-part="first-i" data-grader="exact" data-answer="3" data-miscon='{"7":"build-first-leaf","4":"build-first-leaf"}' data-label="the first (largest) \(i\) where percolateDown moves something"></div>
+    <div class="answer-spec" data-part="swaps-1" data-grader="exact" data-answer="2" data-label="swaps made by percolateDown(1)"></div>
+    <div class="answer-spec" data-part="total" data-grader="exact" data-answer="4" data-label="total swaps"></div>
+    <div class="answer-spec" data-part="at-7" data-grader="exact" data-answer="6" data-label="the index where 7 ends up"></div>
     <ol class="hints">
-      <li>The leaves are indexes \(\lfloor n/2\rfloor+1\) to \(n\): they don't move. Start at the last non-leaf, index 4.</li>
-      <li>Work from 4 down to 1: index 4 (value 6) has children 2 and 1 (indexes 8 and 9).</li>
+      <li>A node with no children has nothing to do. Which indices have a child (\(2i \le 7\))?</li>
+      <li>When <code>percolateDown(1)</code> runs, the 7 can sink more than one level.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>Indexes 9 down to 5 are leaves: no swaps. Index 4 (6) swaps with its smaller child: 1 swap. Index 3 (7) swaps once. Index 2 (8) swaps twice. Index 1 (9) swaps three times: 1 + 1 + 2 + 3 = 7.</li>
-      <li>The final array is <code>1, 2, 3, 6, 5, 4, 7, 8, 9</code>, with root 1.</li>
-      <li>Inserting 9, 8, …, 1 one at a time percolates each new smaller value up: 0, 1, 1, 2, 2, 2, 2, 3, 3 swaps, a total of 16.</li>
-      <li class="answer">First leaf 5; 7 swaps; root 1; 16 swaps by repeated insert. Both give a heap, but buildHeap does fewer swaps: \(\Theta(n)\) in total versus \(\Theta(n\log n)\) for repeated insertion.</li>
+      <li>Indices 7, 6, 5, 4 are leaves: \(4\cdot 2 = 8 &gt; 7\). Nothing to do. The first real call is <code>percolateDown(3)</code>.</li>
+      <li><code>percolateDown(3)</code>: 5's children are 2 and 1. The smaller is 1, and \(1 &lt; 5\): swap. 5 is a leaf now.<svg class="htree" data-step data-tree="7,6,1,4,3,2,5" data-idx data-cmp="7" role="img" aria-label="1 at index 3, 5 at index 7"></svg></li>
+      <li><code>percolateDown(2)</code>: 6's children are 4 and 3. The smaller is 3, and \(3 &lt; 6\): swap.<svg class="htree" data-step data-tree="7,3,1,4,6,2,5" data-idx data-cmp="5" role="img" aria-label="3 at index 2, 6 at index 5"></svg></li>
+      <li><code>percolateDown(1)</code>: 7's children are 3 and 1. The smaller is 1, and \(1 &lt; 7\): swap.<svg class="htree" data-step data-tree="1,3,7,4,6,2,5" data-idx data-cmp="3" role="img" aria-label="1 at the root, 7 at index 3"></svg></li>
+      <li>7's children are now 2 and 5. The smaller is 2, and \(2 &lt; 7\): swap. 7 is a leaf: stop. That call made 2 swaps.<svg class="htree" data-step data-tree="1,3,2,4,6,7,5" data-idx data-cmp="6" role="img" aria-label="Final heap 1; 3 and 2; 4, 6, 7, 5"></svg></li>
+      <li class="answer">3; 2; 4 swaps in all; 7 ends at index 6. Inserting the same values one at a time makes 10 swaps.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w2-l5-index">
-    <h2>5. Index arithmetic</h2>
-    <p class="prompt">This practices the lecture's index rules for a heap stored in an array. Index 0 is unused and the root is at index 1. The parent of index \(i\) is \(i/2\) with integer division (drop any remainder), and its children are \(2i\) and \(2i+1\), if those are at most \(n\). A heap holds \(n = 20\) items.</p>
-    <div class="answer-spec" data-part="parent-13" data-grader="exact" data-answer="6" data-miscon='{"6.5":"no-floor","13/2":"no-floor"}' data-label="the index of the parent of index 13"></div>
-    <div class="answer-spec" data-part="left-7" data-grader="exact" data-answer="14" data-miscon='{"15":"zero-based"}' data-label="the index of the left child of index 7"></div>
-    <div class="answer-spec" data-part="first-leaf" data-grader="exact" data-answer="11" data-miscon='{"10":"leaf-by-index"}' data-label="the index of the first leaf (a node with no children)"></div>
-    <div class="answer-spec" data-part="leaf-10" data-grader="yesno" data-answer="no" data-miscon='{"yes":"leaf-by-index"}' data-label="Is index 10 a leaf?"></div>
+  <div class="check" data-id="cse332-w2-l5-trace-n-inserts" data-grader="bigo" data-answer="n log n">
+    <p>Quick check: instead of buildHeap, you insert \(n\) items one at a time into an empty heap. What's the worst-case total time, as a bucket?</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="e.g. log n"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group">Why buildHeap is \(\Theta(n)\)</h2>
+  <p class="note">Lesson: <a href="#l5-buildtime">Why buildHeap is Θ(n)</a></p>
+
+  <article class="task" data-id="cse332-w2-l5-sink-31">
+    <h2>6. Count the swaps on 31 nodes</h2>
+    <p class="prompt">A full tree of height 4 has 31 nodes: 1 root, then 2, 4, 8, and 16 leaves. Count as in the lesson's 15-node example: each node can sink at most as many levels as there are below it.</p>
+    <div class="answer-spec" data-part="sink-1" data-grader="exact" data-answer="8" data-miscon='{"16":"leaves-sink-0"}' data-label="how many nodes have exactly 1 level below them?"></div>
+    <div class="answer-spec" data-part="root" data-grader="exact" data-answer="4" data-label="the most swaps the root can make"></div>
+    <div class="answer-spec" data-part="total" data-grader="exact" data-answer="26" data-miscon='{"124":"n-times-height"}' data-label="the most swaps buildHeap can make in total"></div>
+    <div class="answer-spec" data-part="bucket" data-grader="bigo" data-answer="n" data-label="buildHeap's worst-case time on \(n\) items, as a bucket"></div>
     <ol class="hints">
-      <li>Parent: \(i/2\) with integer division. Children: \(2i\) and \(2i+1\).</li>
-      <li>A node is a leaf exactly when it has no left child: when \(2i &gt; n\).</li>
+      <li>Make the lesson's table: for each level, nodes × levels below it.</li>
+      <li>The 16 leaves can't sink at all. The 8 nodes just above them can sink 1 level.</li>
     </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>Parent of 13: \(13/2 = 6\) (integer division drops the .5).</li>
-      <li>Left child of 7: \(2\cdot 7 = 14\).</li>
-      <li>Leaves start at \(20/2 + 1 = 11\).</li>
-      <li>Index 10: \(2\cdot 10 = 20 \le 20\), so it has a left child (index 20). Not a leaf, though it has no right child.</li>
-      <li class="answer">6; 14; 11; no.</li>
+    <div class="solution"><div class="steps board"><ol>
+      <li><span class="lab">16 leaves</span><span class="mth">\(16 \cdot 0 = 0\)</span><span class="note"></span></li>
+      <li><span class="lab">8 nodes one up</span><span class="mth">\(8 \cdot 1 = 8\)</span><span class="note"></span></li>
+      <li><span class="lab">4 nodes two up</span><span class="mth">\(4 \cdot 2 = 8\)</span><span class="note"></span></li>
+      <li><span class="lab">2 nodes three up</span><span class="mth">\(2 \cdot 3 = 6\)</span><span class="note"></span></li>
+      <li><span class="lab">the root</span><span class="mth">\(1 \cdot 4 = 4\)</span><span class="note"></span></li>
+      <li><span class="lab">total</span><span class="mth">\(0 + 8 + 8 + 6 + 4 = 26\)</span><span class="note">fewer than \(n = 31\)</span></li>
+      <li class="wide"><p class="answer">8; 4; 26; \(n\). "31 calls × 4 swaps" would say 124, but the many low nodes can sink only a little.</p></li>
     </ol></div></div>
   </article>
-
-  <article class="task" data-id="cse332-w2-l5-update-key">
-    <h2>6. Change a key</h2>
-    <p class="prompt">This practices the lecture's rule for changing a priority. After one item's priority changes, call <code>percolateUp</code> or <code>percolateDown</code> on its index to move it back into place:</p>
-    <pre class="code">percolateUp(int i){
-    int parent = i/2;
-    Item val = arr[i];
-    while(i &gt; 1 &amp;&amp; arr[i] &lt; arr[parent]){
-        arr[i] = arr[parent];
-        arr[parent] = val;
-        i = parent;
-        parent = i/2;
-    }
-}</pre>
-    <pre class="code">percolateDown(int i){
-    int left = i*2;
-    int right = i*2+1;
-    Item val = arr[i];
-    while(left &lt;= size){
-        int toSwap = right;
-        if(right &gt; size || arr[left] &lt; arr[right]){
-            toSwap = left;
-        }
-        if(arr[toSwap] &lt; val){
-            arr[i] = arr[toSwap];
-            arr[toSwap] = val;
-            i = toSwap;
-            left = i*2;
-            right = i*2+1;
-        }
-        else{ return;}
-    }
-}</pre>
-    <p class="prompt">Start each part from the lecture's min-heap, in level order <code>1, 3, 2, 4, 7, 5, 6, 5, 9</code>, drawn here with its array indices:</p>
-    <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" data-idx role="img" aria-label="The lecture's heap with array indices: 1 at index 1, 3 at 2, 2 at 3, 4 at 4, 7 at 5, 5 at 6, 6 at 7, 5 at 8, 9 at 9"></svg>
-    <p class="prompt">(a) The 7 at index 5 has its priority decreased to 0. (b) Starting fresh, the 3 at index 2 has its priority increased to 10.</p>
-    <div class="answer-spec" data-part="dir-a" data-grader="choice" data-answer="up" data-options="up:percolate up|down:percolate down" data-miscon='{"down":"same-direction"}' data-label="(a) does the 0 percolate up or down?"></div>
-    <div class="answer-spec" data-part="swaps-a" data-grader="exact" data-answer="2" data-label="(a) the number of swaps"></div>
-    <div class="answer-spec" data-part="dir-b" data-grader="choice" data-answer="down" data-options="up:percolate up|down:percolate down" data-miscon='{"up":"same-direction"}' data-label="(b) does the 10 percolate up or down?"></div>
-    <div class="answer-spec" data-part="index-b" data-grader="exact" data-answer="8" data-label="(b) the index where the 10 ends up"></div>
-    <ol class="hints">
-      <li>In a min-heap, a smaller value may be smaller than its parent; a bigger value may be bigger than a child.</li>
-      <li>For (b), at each step compare 10 with both children and swap with the smaller.</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>(a) 0 is now smaller than its parent: percolate up. Index 5's parent is index 2 (3): swap. Then index 2's parent is index 1 (1): swap. 0 is the root after 2 swaps.</li>
-      <li>(b) 10 may be bigger than a child: percolate down. Index 2's children are 4 and 7: swap with 4 (index 4). Index 4's children are 5 and 9 (indexes 8 and 9): swap with 5. 10 is now at index 8, a leaf.</li>
-      <li class="answer">(a) up, 2 swaps; (b) down, ends at index 8. Array after (b): <code>1, 4, 2, 5, 7, 5, 6, 10, 9</code>.</li>
-    </ol></div></div>
-  </article>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ CYU L5 -->
-<section class="page" id="cyu-l5" data-title="Check your understanding (Lecture 5)">
-  <p class="where">Lecture 5 wrap-up · questions written for this site</p>
-  <h1>Check your understanding</h1>
-  <div class="prose"><p>Ten questions on Lecture 5. Arrays use the lecture's convention: root at index 1. The score counts first tries.</p></div>
-  <div class="cyu-score" data-quiz-score="l5" role="status"></div>
-  <ol class="cyu-list" data-quiz="l5">
-    <li class="cyu" data-id="cse332-w2-q2-parent-1based" data-kind="num" data-answer="5" data-topic="l5-array" data-miscon='{"5.5":"no-floor","4":"zero-based"}'>
-      <p class="q">A heap is stored the lecture's way: in an array, level by level, with the root at index 1. What is the index of the parent of the node at index 11?</p>
-      <p class="why" hidden>The parent of \(i\) is \(i/2\) with integer division: \(11/2 = 5\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l5-cyu-left-child-6" data-kind="num" data-answer="12" data-topic="l5-array" data-miscon='{"13":"zero-based"}'>
-      <p class="q">In the same kind of heap array (root at index 1), what is the index of the left child of the node at index 6?</p>
-      <p class="why" hidden>\(2\cdot 6 = 12\). The right child is 13.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l5-cyu-leaves-n12" data-kind="num" data-answer="7" data-topic="l5-array" data-miscon='{"6":"leaf-by-index"}'>
-      <p class="q">A heap holds 12 items in an array with the root at index 1. A leaf is a node with no children. At which index do the leaves start?</p>
-      <p class="why" hidden>\(12/2 + 1 = 7\). Index 6 still has a left child, index 12.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l5-cyu-wrong-shape" data-kind="mc" data-topic="l5-valid">
-      <p class="q">This tree's values are 2 at the root, 4 and 3 below it, and 6 and 5 as the two children of the 3 (the 4 has no children). Is it a min-heap?</p>
-      <svg class="htree" data-tree="2,4,3,_,_,6,5" role="img" aria-label="Root 2; children 4 and 3; 4 has no children; 3 has children 6 and 5"></svg>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l5-cyu-wrong-shape"> Yes<span class="why" hidden>The order is fine. Check the shape level by level from the left.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l5-cyu-wrong-shape"> No: wrong shape<span class="why" hidden>Correct. The bottom level starts under the 3, leaving gaps under the 4.</span></label>
-        <label><input type="radio" name="cse332-w2-l5-cyu-wrong-shape"> No: a node is bigger than its child<span class="why" hidden>Every parent here is ≤ its children.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l5-cyu-why-val" data-kind="mc" data-topic="l5-insert-code">
-      <p class="q">This is the lecture's <code>percolateUp</code>, which moves the item at index <code>i</code> up the heap array. Why does it save <code>Item val = arr[i];</code> before its loop?</p>
-      <pre class="code">percolateUp(int i){
-    int parent = i/2;
-    Item val = arr[i];
-    while(i &gt; 1 &amp;&amp; arr[i] &lt; arr[parent]){
-        arr[i] = arr[parent];
-        arr[parent] = val;
-        i = parent;
-        parent = i/2;
-    }
-}</pre>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w2-l5-cyu-why-val"> The loop's first line writes the parent's value over <code>arr[i]</code>, so the moving item must be kept somewhere<span class="why" hidden>Correct. val is written into the parent's slot on the next line.</span></label>
-        <label><input type="radio" name="cse332-w2-l5-cyu-why-val"> To compare it with arr[0]<span class="why" hidden>arr[0] is never read.</span></label>
-        <label><input type="radio" name="cse332-w2-l5-cyu-why-val"> To return it at the end<span class="why" hidden>percolateUp doesn't return anything.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l5-cyu-only-left" data-kind="mc" data-topic="l5-extract-code">
-      <p class="q">This is the lecture's <code>percolateDown</code>, which moves the item at index <code>i</code> down the heap array. When does <code>toSwap</code> end up as the left child?</p>
-      <pre class="code">percolateDown(int i){
-    int left = i*2;
-    int right = i*2+1;
-    Item val = arr[i];
-    while(left &lt;= size){
-        int toSwap = right;
-        if(right &gt; size || arr[left] &lt; arr[right]){
-            toSwap = left;
-        }
-        if(arr[toSwap] &lt; val){
-            arr[i] = arr[toSwap];
-            arr[toSwap] = val;
-            i = toSwap;
-            left = i*2;
-            right = i*2+1;
-        }
-        else{ return;}
-    }
-}</pre>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l5-cyu-only-left"> Always; the right child is only used if the left is missing<span class="why" hidden>It's the other way: the right child is the default.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l5-cyu-only-left"> When there is no right child, or the left child is smaller<span class="why" hidden>Correct: that's the test right > size || arr[left] &lt; arr[right].</span></label>
-        <label><input type="radio" name="cse332-w2-l5-cyu-only-left"> When the left child is bigger than the moving item<span class="why" hidden>The choice compares the two children with each other.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l5-cyu-decrease-max" data-kind="mc" data-topic="l5-update">
-      <p class="q">In a <em>max</em>-heap every node is \(\ge\) its children. An item's priority value is decreased. Which way does it percolate?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l5-cyu-decrease-max"> Up<span class="why" hidden>That's decrease key in a min-heap.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l5-cyu-decrease-max"> Down<span class="why" hidden>Correct. In a max-heap a smaller value may now be smaller than a child, so it moves down.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l5-cyu-array-no-gaps" data-kind="mc" data-topic="l5-array">
-      <p class="q">Why can a heap live in an array with no wasted slots between items?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l5-cyu-array-no-gaps"> Because the heap property keeps values sorted<span class="why" hidden>The values aren't sorted. The layout is about the shape.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l5-cyu-array-no-gaps"> Because the tree is complete: level by level, left to right, there are never any gaps<span class="why" hidden>Correct.</span></label>
-        <label><input type="radio" name="cse332-w2-l5-cyu-array-no-gaps"> Because every node has exactly two children<span class="why" hidden>Leaves have none, and one node may have only a left child.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-q2-buildheap-time" data-kind="mc" data-topic="l5-buildtime">
-      <p class="q">Floyd's buildHeap puts \(n\) items in the heap array in any order, then calls <code>percolateDown(i)</code> for <code>i</code> from the last index back to 1:</p>
-      <pre class="code">buildHeap(){
-    for(int i = size; i&gt;0; i--){
-        percolateDown(i);
-    }
-}</pre>
-      <p class="q">How long does it take on \(n\) items, in the worst case?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-q2-buildheap-time"> \(\Theta(n\log n)\), since there are \(n\) percolate-downs of \(O(\log n)\) each<span class="why" hidden>That's an upper bound but not tight: most nodes are near the bottom and percolate only a step or two.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-q2-buildheap-time"> \(\Theta(n)\)<span class="why" hidden>Correct. \(0\cdot\frac n2 + 1\cdot\frac n4 + 2\cdot\frac n8 + \dots \le n\).</span></label>
-        <label><input type="radio" name="cse332-w2-q2-buildheap-time"> \(\Theta(\log n)\)<span class="why" hidden>Every item has to be looked at, so at least \(n\).</span></label>
-        <label><input type="radio" name="cse332-w2-q2-buildheap-time"> \(\Theta(n^2)\)<span class="why" hidden>Far too many: each percolate-down is at most \(\log n\).</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-l5-cyu-build-vs-insert" data-kind="mc" data-topic="l5-build">
-      <p class="q">You have all \(n\) items up front. You can insert them one at a time into an empty heap, or put them in the array as given and run buildHeap (<code>percolateDown(i)</code> for <code>i</code> from the last index back to 1). Which is asymptotically faster in the worst case?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-l5-cyu-build-vs-insert"> Inserting them one at a time<span class="why" hidden>That's Θ(n log n) in the worst case: later inserts can climb about log n levels.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l5-cyu-build-vs-insert"> Putting them in the array and running buildHeap<span class="why" hidden>Correct: Θ(n).</span></label>
-        <label><input type="radio" name="cse332-w2-l5-cyu-build-vs-insert"> They're the same<span class="why" hidden>Both give a valid heap, but buildHeap does asymptotically less work.</span></label>
-      </div>
-    </li>
-  </ol>
-  <div class="cyu-score" data-quiz-summary="l5" role="status"></div>
   <nav class="pager"></nav>
 </section>
 

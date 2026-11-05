@@ -54,6 +54,7 @@ svg.htree { display: block; width: 100%; height: auto; margin: 0.25rem 0 0.5rem;
 .tree-row figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 0.5rem 0.75rem; min-width: 0; }
 .tree-row figcaption { font-weight: 700; font-size: 0.9rem; }
 .check svg.htree, .cyu svg.htree, .task svg.htree { max-width: 24rem; }
+.tree-row.pairs { grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); }
 
 /* ---------------------------------------------------------------- the c / n0 explorer */
 .bx-sliders label { gap: 0.5rem; }
@@ -99,13 +100,8 @@ table.vals.verdict .reason { display: block; font-weight: 400; font-size: 0.82em
 .nu-count { font-family: var(--mono); font-weight: 700; margin: 0 0 0.5rem; }
 @media (prefers-reduced-motion: reduce) { .nu-dots .d { transition: none; } }
 
-/* ---------------------------------------------------------------- buildHeap cost bars */
-.bc-bar-cell { width: 35%; }
-.bc-bar { display: block; height: 0.8rem; background: var(--accent); border-radius: 0 4px 4px 0; min-width: 2px; }
-.bc-slider input[type="range"] { width: 12rem; max-width: 55vw; accent-color: var(--accent); }
-
-.log { max-height: 10rem; }
-.vs-table td, .vs-table th { vertical-align: top; }
+/* ---------------------------------------------------------------- Lecture 5: the index picker */
+.ix-out { margin: 0.25rem 0 0; padding-left: 1.2rem; }
 
 @media (max-width: 860px) {
   .band-ladder { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -125,6 +121,25 @@ table.vals.verdict .reason { display: block; font-weight: 400; font-size: 0.82em
 
 /* Lecture 4 steppers: on phones, the tree and its narration come before the recipe */
 @media (max-width: 860px) { .split.stepper.idea .pic { order: -1; } }
+
+/* Lecture 5 code steppers: on phones one step fits on one screen. A few code lines around the highlight, the array in
+   one row, then the controls (they stay put from step to step), the narration and the tree. */
+.code-toggle { display: none; }
+@media (max-width: 860px) {
+  .split.stepper.arr { gap: 0.45rem; }
+  .split.stepper.arr .pic { display: contents; }
+  .stepper.arr pre.code { order: 1; max-height: calc(5 * 1.5em + 1.2rem); overflow: hidden; }
+  .stepper.arr pre.code.open { max-height: none; }
+  .stepper.arr .code-toggle { order: 2; display: inline-flex; justify-self: start; padding: 0.25rem 0.7rem; font-size: 0.85rem; }
+  .stepper.arr .heap-cells { order: 3; flex-wrap: nowrap; gap: 2px; margin: 0; }
+  .stepper.arr .heap-cells .cell { flex: 1 1 0; min-width: 0; }
+  .stepper.arr .heap-cells .cell b { align-self: stretch; min-width: 0; padding: 0.3rem 0; font-size: 0.85rem; }
+  .stepper.arr .heap-cells .cell .ptr { display: flex; flex-direction: column; justify-content: flex-end; height: 1.45rem; min-height: 0; font-size: 0.62rem; line-height: 1.1; text-align: center; }
+  .stepper.arr .step-vars { order: 4; margin: 0; min-height: 2.65rem; font-size: 0.8rem; }
+  .stepper.arr .controls { order: 5; }
+  .stepper.arr .step-say { order: 6; margin: 0; min-height: 0; }
+  .stepper.arr svg.htree { order: 7; margin: 0; }
+}
 
 /* Lecture 4: the priority queue, animated */
 .pq-grid { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: 1rem 1.5rem; align-items: start; }
