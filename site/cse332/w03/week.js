@@ -33,6 +33,9 @@ Object.assign(window.WEEK.messages, {
 /* L7 */
 Object.assign(window.WEEK.messages, {
   "height-short": "Count the edges on the longest path, from the root down to the deepest leaf.",
+  "post-not-pre": "That's the post-order: each root comes after its subtrees. Pre-order processes the root first.",
+  "pre-not-in": "That's the pre-order: each root comes before its subtrees. In-order processes the root between its left and right subtrees.",
+  "post-not-in": "That's the post-order: each root comes after its subtrees. In-order processes the root between its left and right subtrees.",
   "chain-not-bst": "Check the rule at each node: every key in its left subtree is smaller, every key in its right subtree is larger. Nothing says the tree has to be bushy.",
   "path-skips-root": "find compares with the root first, then with each node on the way down.",
   "wrong-direction": "Compare at every node on the way down: smaller goes left, larger goes right. The new key hangs off the node where that walk hits an empty child.",

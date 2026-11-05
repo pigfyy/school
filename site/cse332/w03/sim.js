@@ -236,6 +236,7 @@
     "insert(key, value, root) {",
     "  if (root == Null) {",
     "    this.root = new Node(key, value);",
+    "    return;",
     "  }",
     "  parent = Null;",
     "  while (root != Null &&",
@@ -260,23 +261,23 @@
     const marks = (cur) => Object.fromEntries([...path.map((k) => [k, "path"]), ...(cur == null ? [] : [[cur, "cur"]])]);
     const show = (n) => (n ? String(n.key) : "Null");
     let cur = t, parent = null;
-    steps.push({ shape: shape(t), line: [4], marks: marks(cur.key), vars: { key, root: show(cur), parent: "Null" }, say: `Insert ${key}. parent = Null, and root points at ${cur.key}.` });
+    steps.push({ shape: shape(t), line: [5], marks: marks(cur.key), vars: { key, root: show(cur), parent: "Null" }, say: `Insert ${key}. parent = Null, and root points at ${cur.key}.` });
     while (cur && cur.key !== key) {
       parent = cur; path.push(cur.key);
       const left = key < cur.key;
       cur = left ? cur.left : cur.right;
       const where = cur ? `go ${left ? "left" : "right"} to ${cur.key}` : `go ${left ? "left" : "right"}. ${parent.key} has no ${left ? "left" : "right"} child, so root = Null`;
-      steps.push({ shape: shape(t), line: [5, 6, 7, ...(left ? [8, 9] : [10, 11])], marks: marks(cur && cur.key), vars: { key, root: show(cur), parent: String(parent.key) },
+      steps.push({ shape: shape(t), line: [6, 7, 8, ...(left ? [9, 10] : [11, 12])], marks: marks(cur && cur.key), vars: { key, root: show(cur), parent: String(parent.key) },
         say: `${key} ≠ ${parent.key}, so the loop runs. parent = ${parent.key}. ${left ? `${key} < ${parent.key} is true` : `${key} < ${parent.key} is false, ${key} > ${parent.key} is true`}: ${where}.` });
     }
     if (cur) {
-      steps.push({ shape: shape(t), line: [13, 14], marks: { ...marks(), [key]: "cmp" }, vars: { key, root: show(cur), parent: show(parent) }, say: `${key} == ${key}: the key is already here. Insert only overwrites its value; the tree doesn't change.` });
+      steps.push({ shape: shape(t), line: [14, 15], marks: { ...marks(), [key]: "cmp" }, vars: { key, root: show(cur), parent: show(parent) }, say: `${key} == ${key}: the key is already here. Insert only overwrites its value; the tree doesn't change.` });
       return steps;
     }
-    steps.push({ shape: shape(t), line: [5, 6], marks: marks(), vars: { key, root: "Null", parent: String(parent.key) }, say: `root == Null, so the loop stops. ${key} is not in the tree: find, which runs this same loop, would return Null right here.` });
+    steps.push({ shape: shape(t), line: [6, 7], marks: marks(), vars: { key, root: "Null", parent: String(parent.key) }, say: `root == Null, so the loop stops. ${key} is not in the tree: find, which runs this same loop, would return Null right here.` });
     const left = key < parent.key;
     if (left) parent.left = node(key); else parent.right = node(key);
-    steps.push({ shape: shape(t), line: left ? [15, 16] : [17, 18], marks: { ...marks(), [key]: "new" }, vars: { key, root: "Null", parent: String(parent.key) },
+    steps.push({ shape: shape(t), line: left ? [16, 17] : [18, 19], marks: { ...marks(), [key]: "new" }, vars: { key, root: "Null", parent: String(parent.key) },
       say: `${left ? `${key} < ${parent.key} is true` : `${key} < ${parent.key} is false`}, so parent.${left ? "left" : "right"} = new Node(${key}). The new key is a leaf, in the empty spot where find fell off.` });
     return steps;
   }
