@@ -518,7 +518,7 @@ Sim.levels(Sim.REC.sum, 16).forEach((l) => ok(l.nodes === 2n ** BigInt(l.i), `su
   formulaIs("cse332-w3-s3-q2.level", "1a", "level", [16, 1024], [0, 1, 3]); // problem 2's loop count per level is 1a's level work
 
   // numbers and closed forms written in the pages' prose (each one checked above)
-  s3has("<th>9,000</th><td>1000</td><td>base case</td></tr> <tr><th>27,000</th><td>5000</td><td>\\(5 \\cdot 1000\\)</td></tr> <tr><th>81,000</th><td>25000</td>", "bar's returns");
+  s3has("(\\(n = 27{,}000\\) returns \\(5 \\cdot 1000 = 5000\\))", "bar(27000) returns 5000");
   s3has("\\(4^i \\cdot n/2^i = 2^i n\\)", "more calls: level work"); s3has("\\(n^2 - n\\), \\(\\Theta(n^2)\\)", "more calls: closed form");
   s3has("\\(2^i \\cdot n/4^i = n/2^i\\)", "smaller calls: level work"); s3has("\\(\\log_4 n\\)", "smaller calls: levels");
   s3has("\\(5n\\log_2 n\\), \\(\\Theta(n\\log n)\\)", "bigger constant"); s3has("\\(\\log_2 n - 3\\)", "bigger base case: levels"); s3has("\\(n\\log_2 n - 3n\\)", "bigger base case: closed form");
@@ -526,6 +526,90 @@ Sim.levels(Sim.REC.sum, 16).forEach((l) => ok(l.nodes === 2n ** BigInt(l.i), `su
   s3has("= 2n^{\\log_2 3} - 2n,\\]", "1d sum"); s3has("\\le n \\cdot \\frac{1}{1 - 2/3} = 3n\\)", "1e bound");
   s3has("\\(\\sum_{i=0}^{n/2 - 1} 2^i = 2^{n/2} - 1 = \\sqrt2^{\\,n} - 1 \\in \\Theta(\\sqrt2^{\\,n})\\)", "1f sum"); s3has("\\le n^2 \\cdot \\frac{1}{1 - 2/9} = \\frac97 n^2\\)", "bar0 bound");
   s3has("= c_2 n\\log_2 n + c_1(n - 1).\\]", "problem 2 sum"); s3has("\\(\\sum_{i=0}^{\\log_2 n - 1} n = n\\log_2 n\\)", "1a sum");
+
+  // the exact formulas need the inputs the pages state: n a power of b (and at least the base-case size), n even in 1f
+  for (const n of [3, 5, 7, 9, 21]) {
+    ok(levelsAbove(REC3["1f"], n) === (n - 1) / 2 && G.eq(sumAbove(REC3["1f"], n), Qn(2 ** ((n - 1) / 2) - 1)), `1f, odd n=${n}: (n-1)/2 levels, sum 2^((n-1)/2) - 1`);
+    ok(G.qToNumber(sumAbove(REC3["1f"], n)) < 2 ** (n / 2) - 1, `1f, odd n=${n}: the sum is less than 2^(n/2) - 1, so "even n" is needed`);
+  }
+  ok(levelsAbove(REC3["1b"], 10) === 2 && Math.log2(10) - 2 !== 2, "1b at n=10: 2 levels, not log2 10 - 2, so the label needs n a power of 2");
+  ok(levelsAbove(REC3["1b"], 4) === 0 && levelsAbove(REC3.base8, 8) === 0, "1b at n=4 and base 8 at n=8: 0 levels, matching log2 n - 2 and log2 n - 3");
+  ok(levelsAbove(REC3["1b"], 2) === 0 && Math.log2(2) - 2 < 0 && levelsAbove(REC3.base8, 4) === 0 && Math.log2(4) - 3 < 0, "below the base-case size the level formulas go negative: hence 'at least 4' and 'at least 8'");
+  { const byDepth = []; const f = (start, j, d) => { if (j - start <= 1) return; f(start, Math.floor(j / 2), d + 1); byDepth[d] = (byDepth[d] || 0) + j - start; f(start, Math.floor(j / 2), d + 1); }; f(0, 10, 0); ok(byDepth.join() === "10,10,8", `problem 2 at n=10: loop counts by level ${byDepth} are not all n, so the page takes n a power of 2`); }
+  s3has("<p>Exact level counts and closed forms on this page take \\(n\\) to be a power of the number it is divided by (a power of 2 for 1a)", "s3-change states the assumption");
+  s3has("The exact counts take \\(n\\) to be a power of 2 (a power of 4 for smaller calls, and at least 8 for the bigger base case)", "comparison table assumption");
+  s3has("<p>Exact level counts and closed forms take \\(n\\) to be a power of the number it is divided by (in 1f, \\(n\\) even)", "s3-practice states the assumption");
+  s3has('data-label="# levels, for \\(n\\) a power of 2 (at least 4)"', "1b levels label");
+  s3has("For \\(n\\) a power of 2, at least 4: work per level", "1b closed form"); s3has("For \\(n\\) a power of 2: work per level \\(100n\\)", "1c closed form");
+  s3has("For \\(n\\) a power of 2: work per level \\((3/2)^i n\\)", "1d closed form"); s3has("For \\(n\\) a power of 3: work per level \\((2/3)^i n\\)", "1e closed form");
+  s3has("For even \\(n\\): work per level \\(2^i\\), # levels \\(n/2\\)", "1f closed form"); s3has("For odd \\(n\\) there are \\((n-1)/2\\) levels and the sum is \\(2^{(n-1)/2} - 1\\)", "1f odd n");
+  s3has("Take \\(n\\) to be a power of 2, so <code>j/2</code> never rounds.", "problem 2 assumption");
+  ok(!/for any \\\(n\\\)/.test(s3text.slice(s3text.indexOf('id="s3-goals"'), s3text.indexOf('id="l8-goals"'))), 'no "for any n" left on the Section 3 pages');
+}
+
+/* L6+S3 ---------------------------------------------------------- code steppers: each step highlights the lines it reads */
+{
+  const page = readFileSync(`${here}../../../site/cse332/w03/index.html`, "utf8");
+  const plain = (s) => s.replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+  const expand = (spec) => new Set(spec.split(",").flatMap((r) => { const [a, b = a] = r.split("-").map(Number); return Array.from({ length: b - a + 1 }, (_, j) => a + j); }));
+  const sameSet = (a, b) => [...a].sort((x, y) => x - y).join() === [...b].sort((x, y) => x - y).join();
+  const steppers = [...page.matchAll(/<section class="page" id="([^"]+)"[\s\S]*?<\/section>/g)].flatMap((sec) => [...sec[0].matchAll(/<div class="code-step">([\s\S]*?)<\/ol>/g)].map((m) => ({
+    page: sec[1],
+    code: [...m[1].matchAll(/<div class="ln"><span class="no">(\d+)<\/span><span class="src">(.*?)<\/span><\/div>/g)].map((x, i) => { ok(Number(x[1]) === i + 1, `${sec[1]} stepper: line ${i + 1} is numbered ${x[1]}`); return plain(x[2]); }),
+    steps: [...m[1].matchAll(/<li[^>]*data-line="([^"]+)"[^>]*>([\s\S]*?)<\/li>/g)].map((x) => ({ hl: expand(x[1]), lab: plain((/<span class="lab">([\s\S]*?)<\/span>/.exec(x[2]) || [, "template"])[1]).replace(/\\\(|\\\)/g, ""), mth: plain((/<span class="mth">([\s\S]*?)<\/span>/.exec(x[2]) || [, ""])[1]).replace(/\\\(|\\\)/g, ""), text: plain(x[2]) })),
+  })));
+  ok(steppers.map((s) => s.page).join() === "l6-write,s3-code", `code steppers on l6-write and s3-code (${steppers.map((s) => s.page)})`);
+  // the lines each kind of call runs, from instrumented copies of the two methods (line numbers as on the page)
+  function sumTrace(low, high, log) {
+    const run = []; log.push(run);
+    run.push(2); if (low === high) return { base: true };
+    run.push(3); if (low === high - 1) return { base: true };
+    run.push(4); const middle = Math.floor((high + low) / 2);
+    run.push(5); run.calls = [[5, middle - low], [5, high - middle]]; sumTrace(low, middle, log); sumTrace(middle, high, log);
+  }
+  function barTrace(m, log) {
+    const run = { lines: [], calls: [] }; log.push(run);
+    run.lines.push(2); if (m <= 10000) { run.lines.push(3); return 1000; }
+    run.lines.push(5); run.calls.push([5, Math.floor(m / 3)]); const r = barTrace(Math.floor(m / 3), log);
+    if (r > 5) { run.lines.push(6, 7, 8, 9); run.calls.push([9, Math.floor(m / 3)]); return 5 * barTrace(Math.floor(m / 3), log); }
+    run.lines.push(11, 12, 13, 14); run.calls.push([14, Math.floor(m / 3)]); return 4 * barTrace(Math.floor(m / 3), log);
+  }
+  const sumLog = []; sumTrace(0, 16, sumLog);
+  const sumInner = sumLog.filter((r) => r.calls), sumBase = sumLog.filter((r) => !r.calls);
+  const barLog = []; barTrace(3 ** 9 * 2, barLog);
+  const barInner = barLog.filter((r) => r.calls.length), barBase = barLog.filter((r) => !r.calls.length);
+  const union = (xs) => new Set(xs.flat());
+  const where = (code, re) => new Set(code.flatMap((s, i) => (re.test(s) ? [i + 1] : [])));
+  ok(sumInner.length && sumInner.every((r) => sameSet(r, [2, 3, 4, 5]) && r.calls.length === 2) && barInner.every((r) => r.calls.length === 2 && sameSet(r.lines, [2, 5, 6, 7, 8, 9])), "traced runs: every non-base sum_helper runs lines 2-5 with 2 calls; every non-base bar runs 2, 5-9 with 2 calls");
+  for (const s of steppers) {
+    const sum = s.page === "l6-write", code = s.code, inner = sum ? union(sumInner.map((r) => [...r])) : union(barInner.map((r) => r.lines)), base = sum ? union(sumBase.map((r) => [...r])) : union(barBase.map((r) => r.lines));
+    const callLines = where(code, sum ? /sum_helper\(list,/ : /bar\(A, start, n\/3\)/);
+    const ran = new Set([...inner, ...base]);
+    const want = sum
+      ? { "base case": base, a: callLines, size: union([[...callLines], [...where(code, /int middle =/)]]), "f(n)": union([[...where(code, /int middle =/)], [...where(code, / \+ /)]]), template: inner }
+      : { "base case": union([[...base], [...where(code, /^\s*}$/)].filter((l) => l < Math.min(...callLines))]), calls: callLines, size: callLines, "which loop?": union([[...where(code, /return/)], [...where(code, /> 5/)]]), "f(n)": new Set([...inner].filter((l) => !callLines.has(l) && !/^\s*if \(/.test(code[l - 1]))), template: inner };
+    ok(s.steps.map((st) => st.lab).join("|") === Object.keys(want).join("|"), `${s.page}: steps ${s.steps.map((st) => st.lab).join(", ")}`);
+    for (const st of s.steps) {
+      ok(want[st.lab] && sameSet(st.hl, want[st.lab]), `${s.page} step "${st.lab}": highlights ${[...st.hl]} (want ${want[st.lab] && [...want[st.lab]]})`);
+      ok([...st.hl].every((l) => l >= 1 && l <= code.length), `${s.page} step "${st.lab}": highlighted lines exist`);
+      for (const m of st.text.matchAll(/\blines? (\d+(?:–\d+)?(?:(?:,| and| or) (?:line )?\d+(?:–\d+)?)*)('s)?( never run)?/gi)) {
+        const named = new Set([...m[1].matchAll(/(\d+)(?:–(\d+))?/g)].flatMap((x) => { const a = +x[1], b = +(x[2] || x[1]); return Array.from({ length: b - a + 1 }, (_, j) => a + j); }));
+        if (m[3]) ok([...named].every((l) => !ran.has(l)), `${s.page} step "${st.lab}": "${m[0]}" never run in any traced call`);
+        else ok([...named].every((l) => st.hl.has(l)), `${s.page} step "${st.lab}": "${m[0]}" is highlighted`);
+      }
+    }
+    const step = (lab) => s.steps.find((st) => st.lab === lab);
+    if (sum) {
+      ok(step("a").mth === "2" && sumInner.every((r) => r.calls.length === 2), "l6-write: a = 2, as every non-base run makes 2 calls");
+      ok(sumInner.every((r) => r.calls.every(([, size]) => size === (r.calls[0][1] + r.calls[1][1]) / 2)), "l6-write: on 16 items each call gets half");
+      ok(code[1].includes("return 0") && code[2].includes("return list[low]"), "l6-write: lines 2-3 return at once");
+    } else {
+      ok(step("calls").mth === "a = 2" && barInner.every((r) => r.calls.length === 2 && r.calls.every(([ln]) => ln === 5 || ln === 9)), "s3-code: a = 2, calls on lines 5 and 9 only");
+      ok([...callLines].every((l) => code[l - 1].includes("n/3")), "s3-code: every call site passes n/3");
+      ok(barLog.every((r) => !r.lines.some((l) => l >= 11 && l <= 14)) && barTrace(27000, []) === 5000, "s3-code: lines 11-14 never run; n = 27,000 returns 5000");
+      ok(code[2].trim() === "return 1000" && /if \(n <= 10000\)/.test(code[1]), "s3-code: line 2 tests n <= 10000, line 3 returns 1000");
+    }
+  }
 }
 
 /* ---------------------------------------------------------------- 3. the page's keys */

@@ -345,22 +345,92 @@ window.WEEK.widgets = function ({ $, $$, el, renderMath, REDRAW }) {
   }
   $$(".bst-step").forEach(setupBSTStepper);
 
+  /* L6+S3 =========================================================== reading a recurrence off code, one piece per step
+     .code-step: a pre.code of .ln lines, then an ol whose li[data-line="2-3" | "5,9,14"] are the steps (board style:
+     .lab .mth .note, li.wide spans). Each step adds its line to the board and highlights the code it reads. */
+  function setupCodeStepper(box) {
+    const code = $("pre.code", box), lines = $$(".ln", code), items = $$(":scope > ol > li", box);
+    const board = $(":scope > ol", box);
+    board.className = "cs-board";
+    code.classList.toggle("long", lines.length > 8);
+    const lit = items.map((li) => new Set(li.dataset.line.split(",").flatMap((r) => { const [a, b = a] = r.split("-").map(Number); return Array.from({ length: b - a + 1 }, (_, j) => a + j - 1); })));
+    const back = el("button", { class: "btn", type: "button", text: "← Back" });
+    const next = el("button", { class: "btn primary", type: "button", text: "Next step →" });
+    const count = el("span", { class: "note" });
+    box.append(el("div", { class: "split stepper cs" }, code, el("div", { class: "pic" }, el("div", { class: "controls" }, back, next, count), board)));
+    let k = 0;
+    function show() {
+      if (k) fitHighlight(code); else { code.style.maxHeight = ""; code.scrollTop = 0; }
+    }
+    function paint() {
+      lines.forEach((ln, i) => ln.classList.toggle("hl", k > 0 && lit[k - 1].has(i)));
+      items.forEach((li, i) => { li.hidden = i >= k; li.classList.toggle("now", i === k - 1); });
+      show();
+      back.disabled = k === 0;
+      next.disabled = k === items.length;
+      count.textContent = k === 0 ? "Press Next step." : k === items.length ? "Done." : `Step ${k} of ${items.length}.`;
+    }
+    back.addEventListener("click", () => { if (k > 0) { k--; paint(); } });
+    next.addEventListener("click", () => { if (k < items.length) { k++; paint(); } });
+    REDRAW.add((pid) => { if (box.closest(".page").id === pid) show(); });
+    paint();
+  }
+  $$(".code-step").forEach(setupCodeStepper);
+
   /* S3 =========================================================== the worksheet's tree-method picture
      .s3tree[data-rows]: one row per level, top down: { i, k, more, s, w, L }. k boxes are drawn ("…" after them if
      more), each with one call's input size s (red box) and its work w (blue box); L is the work on the whole level.
-     "dots" is the ⋮ row. "?" draws an empty blank, for the template. s, w and L are TeX. */
-  $$(".s3tree[data-rows]").forEach((box) => {
+     "dots" is the ⋮ row. "?" draws an empty blank, for the template. s, w and L are TeX.
+     Each box sits in an equal slot of its row (the "…" is a slot too), so lines are drawn in percent and need no
+     measuring. Lines join a box to its children only between consecutive numbered levels. A row whose children are
+     not drawn next (the row above a ⋮, level i) gets a short stub per call instead, and a ⋮ separates level i from
+     the base cases. Level 1's box count is the number of calls per box. On a phone a "more" row shows 3 boxes and
+     the level work is listed under the tree. */
+  function drawS3Tree(box, rows) {
+    const narrow = innerWidth < 600, cap = narrow ? 3 : 4;
+    const a = rows.find((r) => r.i === "1").k;
     const math = (t) => (t === "?" ? el("span", { class: "s3-blank", "aria-label": "blank" }) : el("span", { text: `\\(${t}\\)` }));
-    for (const r of JSON.parse(box.dataset.rows)) {
-      if (r === "dots") { box.append(el("div", { class: "s3-row" }, el("div", { class: "s3-boxes s3-dots", text: "⋮" }), el("div"))); continue; }
-      const boxes = el("div", { class: "s3-boxes" });
-      for (let j = 0; j < r.k; j++) boxes.append(el("span", { class: "s3-node" }, el("span", { class: "s3-size" }, math(r.s)), el("span", { class: "s3-work" }, math(r.w))));
-      if (r.more) boxes.append(el("span", { class: "s3-more", text: "…" }));
-      const level = el("div", { class: "s3-level" }, el("span", { class: "s3-i", text: r.i === "base" ? "base cases" : `level ${r.i}` }));
-      if (r.L) level.append(el("span", { text: "⟹ " }), math(r.L));
-      box.append(el("div", { class: "s3-row" }, boxes, level));
+    const shape = (r) => ({ shown: r.more ? Math.min(r.k, cap) : r.k, more: Boolean(r.more) });
+    const slots = (sh) => sh.shown + (sh.more ? 1 : 0);
+    const slotX = (sh, j) => ((j + 0.5) / slots(sh)) * 100;
+    const lines = (cls, segs) => {
+      const svg = svgEl("svg", { class: cls, viewBox: "0 0 100 10", preserveAspectRatio: "none", "aria-hidden": "true" });
+      for (const [x1, x2] of segs) svg.append(svgEl("line", { x1, y1: 0, x2, y2: 10, "vector-effect": "non-scaling-stroke" }));
+      return svg;
+    };
+    function link(P, C) {
+      const segs = new Map(), dotP = P.more ? P.shown : null, dotC = C.more ? C.shown : null;
+      const add = (p, c) => { if (p != null && c != null) segs.set(`${p},${c}`, [slotX(P, p), slotX(C, c)]); };
+      for (let j = 0; j < C.shown; j++) add(Math.floor(j / a) < P.shown ? Math.floor(j / a) : dotP, j);
+      if (C.more) { for (let p = 0; p < P.shown; p++) if ((p + 1) * a > C.shown) add(p, dotC); add(dotP, dotC); }
+      return lines("s3-link", segs.values());
     }
+    const stubs = (P) => lines("s3-link s3-stubs", Array.from({ length: P.shown * a }, (_, j) => { const x = slotX(P, Math.floor(j / a)); return [x, x + ((j % a) - (a - 1) / 2) * (30 / slots(P))]; }));
+    const dots = () => el("div", { class: "s3-boxes s3-dots", text: "⋮" });
+    const levels = [];
+    box.replaceChildren();
+    box.classList.toggle("narrow", narrow);
+    rows.forEach((r, ri) => {
+      if (r === "dots") { box.append(dots()); return; }
+      const sh = shape(r), nx = rows[ri + 1];
+      const boxes = el("div", { class: "s3-boxes", style: `grid-template-columns: repeat(${slots(sh)}, minmax(0, 1fr))` });
+      for (let j = 0; j < sh.shown; j++) boxes.append(el("span", { class: "s3-node" }, el("span", { class: "s3-size" }, math(r.s)), el("span", { class: "s3-work" }, math(r.w))));
+      if (sh.more) boxes.append(el("span", { class: "s3-more", text: "…" }));
+      const level = el("div", { class: "s3-level" }, el("span", { class: "s3-i", text: r.i === "base" ? (narrow ? "bottom row: base cases" : "base cases") : `level ${r.i}` }));
+      if (r.L) level.append(el("span", { text: "⟹ " }), math(r.L));
+      box.append(boxes);
+      if (narrow) levels.push(level); else box.append(level);
+      if (nx && nx !== "dots" && /^\d+$/.test(r.i) && Number(nx.i) === Number(r.i) + 1) box.append(link(sh, shape(nx)));
+      else if (r.i !== "base") { box.append(stubs(sh)); if (nx && nx !== "dots") box.append(dots()); }
+    });
+    if (narrow) box.append(el("div", { class: "s3-levels" }, ...levels));
     renderMath(box);
+  }
+  $$(".s3tree[data-rows]").forEach((box) => {
+    const rows = JSON.parse(box.dataset.rows);
+    drawS3Tree(box, rows);
+    let wasNarrow = innerWidth < 600;
+    REDRAW.add(() => { if ((innerWidth < 600) !== wasNarrow) { wasNarrow = !wasNarrow; drawS3Tree(box, rows); } });
   });
 
   /* L8 */

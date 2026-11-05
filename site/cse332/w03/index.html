@@ -192,18 +192,20 @@
   <div class="example">
     <p class="example-head">Worked example</p>
     <p class="example-q">The lecture's recursive list sum. <code>sum_helper</code> adds up <code>list[low]</code> to <code>list[high-1]</code>, so its input size is \(n = \) <code>high - low</code>. Write its recurrence.</p>
-    <pre class="code wrap"><span class="ln"><span class="no">1</span><span class="src">private int sum_helper(int[] list, int low, int high){</span></span><span class="ln"><span class="no">2</span><span class="src">  if (low == high){ return 0; }</span></span><span class="ln"><span class="no">3</span><span class="src">  if (low == high-1){ return list[low]; }</span></span><span class="ln"><span class="no">4</span><span class="src">  int middle = (high+low)/2;</span></span><span class="ln"><span class="no">5</span><span class="src">  return sum_helper(list, low, middle) + sum_helper(list, middle, high);</span></span><span class="ln"><span class="no">6</span><span class="src">}</span></span></pre>
-    <div class="steps board"><ol>
-      <li><span class="lab">base case</span><span class="mth">\(T(1) = 1\)</span><span class="note">lines 2–3: 0 or 1 items returns at once, a constant</span></li>
-      <li><span class="lab">\(a\)</span><span class="mth">\(2\)</span><span class="note">line 5 makes two calls</span></li>
-      <li><span class="lab">size</span><span class="mth">\(\frac{n}{2}\)</span><span class="note"><code>low</code> to <code>middle</code> and <code>middle</code> to <code>high</code>: each is half</span></li>
-      <li><span class="lab">\(f(n)\)</span><span class="mth">\(1\)</span><span class="note">line 4 and the <code>+</code> on line 5: a constant, written 1</span></li>
-      <li class="wide"><div class="proof">
-        <p class="proof-head">Fill in the template</p>
-        <p>\(T(n) =\) <span class="blank">\(2\)</span> \(\cdot\; T\big(\)<span class="blank">\(\frac n2\)</span>\(\big) \;+\) <span class="blank">\(1\)</span>, with \(T(1) = 1\).</p>
-        <p>Divide and conquer, with \(a = 2\) and \(b = 2\).</p>
-      </div></li>
-    </ol></div>
+    <div class="code-step">
+      <pre class="code"><div class="ln"><span class="no">1</span><span class="src">private int sum_helper(int[] list, int low, int high){</span></div><div class="ln"><span class="no">2</span><span class="src">  if (low == high){ return 0; }</span></div><div class="ln"><span class="no">3</span><span class="src">  if (low == high-1){ return list[low]; }</span></div><div class="ln"><span class="no">4</span><span class="src">  int middle = (high+low)/2;</span></div><div class="ln"><span class="no">5</span><span class="src">  return sum_helper(list, low, middle) + sum_helper(list, middle, high);</span></div><div class="ln"><span class="no">6</span><span class="src">}</span></div></pre>
+      <ol>
+        <li data-line="2-3"><span class="lab">base case</span><span class="mth">\(T(1) = 1\)</span><span class="note">lines 2–3: with 0 or 1 items it returns at once, a constant</span></li>
+        <li data-line="5"><span class="lab">\(a\)</span><span class="mth">\(2\)</span><span class="note">line 5 calls <code>sum_helper</code> twice, and both calls run</span></li>
+        <li data-line="4-5"><span class="lab">size</span><span class="mth">\(\frac{n}{2}\)</span><span class="note">line 4 finds the middle. Line 5 calls on <code>low</code> to <code>middle</code> and on <code>middle</code> to <code>high</code>: half each</span></li>
+        <li data-line="4-5"><span class="lab">\(f(n)\)</span><span class="mth">\(1\)</span><span class="note">line 4 and the <code>+</code> on line 5: a constant, written 1</span></li>
+        <li class="wide" data-line="2-5"><div class="proof">
+          <p class="proof-head">Fill in the template</p>
+          <p>\(T(n) =\) <span class="blank">\(2\)</span> \(\cdot\; T\big(\)<span class="blank">\(\frac n2\)</span>\(\big) \;+\) <span class="blank">\(1\)</span>, with \(T(1) = 1\).</p>
+          <p>Divide and conquer, with \(a = 2\) and \(b = 2\).</p>
+        </div></li>
+      </ol>
+    </div>
   </div>
   <div class="rule"><p><strong>The rule.</strong> Count the calls that actually run (\(a\)), how big each one is (\(\frac nb\) or \(n - b\)), and the work around them (\(f(n)\)). Any constant amount of work is written as 1. The base case is a constant too.</p></div>
 
@@ -287,7 +289,7 @@
     <li><span class="lab">work for level \(i\)</span><span class="mth">\(2^i \cdot 1 = 2^i\)</span><span class="note">calls × work per call</span></li>
     <li><span class="lab">last level</span><span class="mth">\(\frac{n}{2^i} = 1 \;\Rightarrow\; i = \log_2 n\)</span><span class="note">at \(n = 16\), the last level is \(i = 4\)</span></li>
     <li><span class="lab">sum</span><span class="mth">\(T(n) = \sum_{i=0}^{\log_2 n} 2^i = 1 + 2 + 4 + \dots + n = 2n - 1\)</span><span class="note">at \(n = 16\): \(31\)</span></li>
-    <li class="wide answer">\(T(n) = 2n - 1 \in \Theta(n)\). The next page shows how to add up any such sum quickly.</li>
+    <li class="wide"><p class="answer">\(T(n) = 2n - 1 \in \Theta(n)\). The next page shows how to add up any such sum quickly.</p></li>
   </ol></div>
 
   <div class="rule"><p><strong>The rule.</strong> For \(T(n) = aT(n/b) + f(n)\), level \(i\) has \(a^i\) calls, each of size \(\frac{n}{b^i}\). Work for the level is calls × \(f(\text{size})\). The tree ends at the base case, where \(\frac{n}{b^i} = 1\): level \(i = \log_b n\). That makes \(\log_b n + 1\) levels.</p>
@@ -422,7 +424,7 @@
       <li><span class="lab">size</span><span class="mth">\(n - 1\)</span><span class="note"><code>low+1</code> to <code>high</code> skips one item: chip and conquer</span></li>
       <li><span class="lab">\(f(n)\)</span><span class="mth">\(1\)</span><span class="note">one <code>+</code>: constant</span></li>
       <li><span class="lab">tree</span><span class="mth">\(1 + 1 + \dots + 1 = n\)</span><span class="note">sizes \(n, n-1, \dots, 1\): \(n\) levels of one call each</span></li>
-      <li class="wide answer">\(a = 1\); \(n - 1\); \(1\); \(\Theta(n)\). That's \(T(n) = T(n-1) + 1\).</li>
+      <li class="wide"><p class="answer">\(a = 1\); \(n - 1\); \(1\); \(\Theta(n)\). That's \(T(n) = T(n-1) + 1\).</p></li>
     </ol></div></div>
   </article>
 
@@ -470,16 +472,17 @@
     <p class="prompt">The lecture's third example, on \(n = 512\) with \(T(1) = 1\). Each call makes 2 calls on an eighth of its input and does 1 unit of work.</p>
     <div class="answer-spec" data-part="levels" data-grader="exact" data-answer="4" data-miscon='{"3":"missed-a-level","9":"log2-not-log8","10":"log2-not-log8"}' data-label="number of levels, counting the first call's and the base case's"></div>
     <div class="answer-spec" data-part="t512" data-grader="exact" data-answer="15" data-label="\(T(512)\)"></div>
-    <div class="answer-spec" data-part="class" data-grader="bigo" data-answer="n^(1/3)" data-label="\(\Theta\) class (type a power like <code>n^(1/2)</code>)"></div>
+    <div class="answer-spec" data-part="class" data-grader="bigo" data-answer="n^(1/3)" data-label="\(\Theta\) class. Simplify the exponent to a plain fraction, then type it like n^(1/2). A log in the exponent isn't accepted."></div>
     <ol class="hints">
       <li>Write the sizes: 512, then 512/8, and so on down to 1.</li>
       <li>Level \(i\) does \(2^i\): it doubles, so the leaves win. How many leaves are there at \(n = 512\)? Compare that number with 512.</li>
+      <li>There are \(2^{\log_8 n} = n^{\log_8 2}\) leaves. \(\log_8 2\) is the power of 8 that gives 2. Write it as a fraction.</li>
     </ol>
     <div class="solution"><div class="steps board"><ol>
       <li><span class="lab">sizes</span><span class="mth">\(512, 64, 8, 1\)</span><span class="note">four levels, \(i = 0\) to \(\log_8 512 = 3\)</span></li>
       <li><span class="lab">work</span><span class="mth">\(1 + 2 + 4 + 8 = 15\)</span><span class="note">level \(i\) has \(2^i\) calls doing 1 each</span></li>
       <li><span class="lab">leaves</span><span class="mth">\(8 = 512^{1/3}\)</span><span class="note">\(2^{\log_8 n} = n^{\log_8 2} = n^{1/3}\), since \(8^{1/3} = 2\)</span></li>
-      <li class="wide answer">4 levels; 15; \(\Theta(n^{1/3})\). The exact sum is \(2n^{1/3} - 1\).</li>
+      <li class="wide"><p class="answer">4 levels; 15; \(\Theta(n^{1/3})\). The exact sum is \(2n^{1/3} - 1\).</p></li>
     </ol></div></div>
   </article>
 
@@ -509,7 +512,7 @@
       <li><span class="lab">level \(i\)</span><span class="mth">\(n - i\)</span><span class="note">1 call of size \(n - i\), doing \(n - i\) work</span></li>
       <li><span class="lab">\(n = 5\)</span><span class="mth">\(5, 4, 3, 2, 1\)</span><span class="note">5 levels; the last is the base case, \(T(1) = 1\)</span></li>
       <li><span class="lab">sum</span><span class="mth">\(5 + 4 + 3 + 2 + 1 = 15\)</span><span class="note">in general \(\frac{n(n+1)}{2}\)</span></li>
-      <li class="wide answer">\(n - i\); 5; 15; \(\Theta(n^2)\). About \(n\) work on each of \(n\) levels.</li>
+      <li class="wide"><p class="answer">\(n - i\); 5; 15; \(\Theta(n^2)\). About \(n\) work on each of \(n\) levels.</p></li>
     </ol></div></div>
   </article>
 
@@ -535,7 +538,7 @@
       <li><span class="lab">\(5n + 20\)</span><span class="mth">\(\Theta(n\log n)\)</span><span class="note">still \(\Theta(n)\) work per level</span></li>
       <li><span class="lab">\(4T(n/2) + n\)</span><span class="mth">\(4^i \cdot \frac{n}{2^i} = 2^i n\)</span><span class="note">grows: the leaves win. \(4^{\log_2 n} = n^2\) leaves: \(\Theta(n^2)\)</span></li>
       <li><span class="lab">\(2T(n/4) + n\)</span><span class="mth">\(2^i \cdot \frac{n}{4^i} = \frac{n}{2^i}\)</span><span class="note">shrinks: the root wins, \(f(n) = n\): \(\Theta(n)\)</span></li>
-      <li class="wide answer">\(n\log n\); \(n\log n\); grows, \(n^2\); shrinks, \(n\). Only \(a\) and \(b\) changed the answer.</li>
+      <li class="wide"><p class="answer">\(n\log n\); \(n\log n\); grows, \(n^2\); shrinks, \(n\). Only \(a\) and \(b\) changed the answer.</p></li>
     </ol></div></div>
   </article>
 
@@ -554,7 +557,7 @@
       <li><span class="lab">\(T(n-1) + 1\)</span><span class="mth">\(1, 1, 1, \dots\)</span><span class="note">same, \(n\) levels: \(\Theta(n)\)</span></li>
       <li><span class="lab">\(2T(n-1) + 1\)</span><span class="mth">\(1, 2, 4, \dots, 2^{n-1}\)</span><span class="note">grows, \(n\) levels: \(2^n - 1\), so \(\Theta(2^n)\)</span></li>
       <li><span class="lab">\(T(n/2) + n\)</span><span class="mth">\(n, \frac n2, \frac n4, \dots\)</span><span class="note">shrinks: the root wins, \(\Theta(n)\)</span></li>
-      <li class="wide answer">\(\log n\); \(n\); \(2^n\); \(n\).</li>
+      <li class="wide"><p class="answer">\(\log n\); \(n\); \(2^n\); \(n\).</p></li>
     </ol></div></div>
   </article>
   <nav class="pager"></nav>
@@ -1047,26 +1050,21 @@
 
   <div class="example">
     <p class="example-head">Worked example</p>
-    <p class="example-q">The worksheet's Problem 0b. Find a recurrence for the worst-case running time of <code>bar</code>. The lines that call <code>bar</code> are highlighted.</p>
-    <pre class="code"><div class="ln"><span class="no">1</span><span class="src">bar(A, start, n) {</span></div><div class="ln"><span class="no">2</span><span class="src">  if (n &lt;= 10000) {</span></div><div class="ln"><span class="no">3</span><span class="src">    return 1000</span></div><div class="ln"><span class="no">4</span><span class="src">  }</span></div><div class="ln hl"><span class="no">5</span><span class="src">  if (bar(A, start, n/3) &gt; 5) {</span></div><div class="ln"><span class="no">6</span><span class="src">    for (int i = 0; i &lt; n; i++) {</span></div><div class="ln"><span class="no">7</span><span class="src">      println("Yay")</span></div><div class="ln"><span class="no">8</span><span class="src">    }</span></div><div class="ln hl"><span class="no">9</span><span class="src">    return 5 * bar(A, start, n/3)</span></div><div class="ln"><span class="no">10</span><span class="src">  } else {</span></div><div class="ln"><span class="no">11</span><span class="src">    for (int i = 0; i &lt; n * n; i++) {</span></div><div class="ln"><span class="no">12</span><span class="src">      println("Yay")</span></div><div class="ln"><span class="no">13</span><span class="src">    }</span></div><div class="ln hl"><span class="no">14</span><span class="src">    return 4 * bar(A, start, n/3)</span></div><div class="ln"><span class="no">15</span><span class="src">  }</span></div><div class="ln"><span class="no">16</span><span class="src">}</span></div></pre>
-    <p class="line">Which loop runs depends on what <code>bar</code> returns. Here are three runs:</p>
-    <div class="table-wrap"><table class="vals">
-      <thead><tr><th>\(n\)</th><th>returns</th><th>because</th></tr></thead>
-      <tr><th>9,000</th><td>1000</td><td>base case</td></tr>
-      <tr><th>27,000</th><td>5000</td><td>\(5 \cdot 1000\)</td></tr>
-      <tr><th>81,000</th><td>25000</td><td>\(5 \cdot 5000\)</td></tr>
-    </table></div>
-    <div class="steps board"><ol>
-      <li><span class="lab">base case</span><span class="mth">\(n \le 10000\)</span><span class="note">line 2: it returns 1000 without recursing</span></li>
-      <li><span class="lab">calls</span><span class="mth">\(a = 2\)</span><span class="note">line 5's test always runs, then line 9 <em>or</em> line 14, never both</span></li>
-      <li><span class="lab">size</span><span class="mth">\(T(n/3)\)</span><span class="note">every call gets <code>n/3</code>, so \(b = 3\)</span></li>
-      <li><span class="lab">which loop?</span><span class="mth">the \(n\) loop</span><span class="note">every call returns 1000 or more, so the test \(&gt; 5\) is always true and lines 11–13 never run</span></li>
-      <li><span class="lab">\(f(n)\)</span><span class="mth">\(c_1 n + c_2\)</span><span class="note">lines 6–8 run \(n\) times, plus a constant amount of other work</span></li>
-      <li class="wide"><div class="proof">
-        <p class="proof-head">Fill in the template</p>
-        <p class="s3-rec">If \(n \le 10000\): \(T(n) = c_0\).<br>Otherwise: \(T(n) = 2T(n/3) + c_1 n + c_2\).</p>
-      </div></li>
-    </ol></div>
+    <p class="example-q">The worksheet's Problem 0b. Find a recurrence for the worst-case running time of <code>bar</code>. Each step highlights the lines it reads.</p>
+    <div class="code-step">
+      <pre class="code"><div class="ln"><span class="no">1</span><span class="src">bar(A, start, n) {</span></div><div class="ln"><span class="no">2</span><span class="src">  if (n &lt;= 10000) {</span></div><div class="ln"><span class="no">3</span><span class="src">    return 1000</span></div><div class="ln"><span class="no">4</span><span class="src">  }</span></div><div class="ln"><span class="no">5</span><span class="src">  if (bar(A, start, n/3) &gt; 5) {</span></div><div class="ln"><span class="no">6</span><span class="src">    for (int i = 0; i &lt; n; i++) {</span></div><div class="ln"><span class="no">7</span><span class="src">      println("Yay")</span></div><div class="ln"><span class="no">8</span><span class="src">    }</span></div><div class="ln"><span class="no">9</span><span class="src">    return 5 * bar(A, start, n/3)</span></div><div class="ln"><span class="no">10</span><span class="src">  } else {</span></div><div class="ln"><span class="no">11</span><span class="src">    for (int i = 0; i &lt; n * n; i++) {</span></div><div class="ln"><span class="no">12</span><span class="src">      println("Yay")</span></div><div class="ln"><span class="no">13</span><span class="src">    }</span></div><div class="ln"><span class="no">14</span><span class="src">    return 4 * bar(A, start, n/3)</span></div><div class="ln"><span class="no">15</span><span class="src">  }</span></div><div class="ln"><span class="no">16</span><span class="src">}</span></div></pre>
+      <ol>
+        <li data-line="2-4"><span class="lab">base case</span><span class="mth">\(n \le 10000\)</span><span class="note">lines 2–4: it returns 1000 without recursing</span></li>
+        <li data-line="5,9,14"><span class="lab">calls</span><span class="mth">\(a = 2\)</span><span class="note">line 5's test always runs, then line 9 <em>or</em> line 14, never both</span></li>
+        <li data-line="5,9,14"><span class="lab">size</span><span class="mth">\(T(n/3)\)</span><span class="note">all three calls pass <code>n/3</code>, so \(b = 3\)</span></li>
+        <li data-line="3,5,9,14"><span class="lab">which loop?</span><span class="mth">the \(n\) loop</span><span class="note">line 3 returns 1000, and lines 9 and 14 return 5 or 4 times a return, so every return is 1000 or more (\(n = 27{,}000\) returns \(5 \cdot 1000 = 5000\)). Line 5's test \(&gt; 5\) is always true, so lines 11–14 never run</span></li>
+        <li data-line="6-8"><span class="lab">\(f(n)\)</span><span class="mth">\(c_1 n + c_2\)</span><span class="note">lines 6–8 loop \(n\) times, plus a constant amount of other work</span></li>
+        <li class="wide" data-line="2,5-9"><div class="proof">
+          <p class="proof-head">Fill in the template</p>
+          <p class="s3-rec">If \(n \le 10000\): \(T(n) = c_0\).<br>Otherwise: \(T(n) = 2T(n/3) + c_1 n + c_2\).</p>
+        </div></li>
+      </ol>
+    </div>
   </div>
   <div class="rule"><p><strong>The rule.</strong> \(a\) counts the calls that run in one call. A call inside an <code>if</code> test counts. Calls in different branches count once, because only one branch runs. <code>2 * f(…)</code> is one call: the 2 multiplies its result.</p></div>
   <p class="line"><strong>Worst case means the worst input, not the worst branch.</strong> The \(n \cdot n\) loop would cost more, but no input ever reaches it, so it isn't in \(T(n)\).</p>
@@ -1097,7 +1095,7 @@
 <section class="page" id="s3-change" data-title="One change at a time">
   <p class="where">Section 3 · <span class="today-chip" data-date="2026-10-15">Thu Oct 15</span></p>
   <h1>One change at a time</h1>
-  <div class="prose"><p>The worksheet's Problem 1 runs the tree method on six recurrences. The first, 1a, is \(T(n) = 2T(n/2) + n\), and 1b to 1f each change one thing in it. Here is the worksheet's template, 1a filled in, and what each kind of change does.</p></div>
+  <div class="prose"><p>The worksheet's Problem 1 runs the tree method on six recurrences. The first, 1a, is \(T(n) = 2T(n/2) + n\), and 1b to 1f each change one thing in it. Here is the worksheet's template, 1a filled in, and what each kind of change does.</p><p>Exact level counts and closed forms on this page take \(n\) to be a power of the number it is divided by (a power of 2 for 1a), so every size is a whole number. For other \(n\) they hold only roughly, and the \(\Theta\) class is the same.</p></div>
 
   <div class="proof">
     <p class="proof-head">The template</p>
@@ -1115,7 +1113,7 @@
       <li><span class="lab">level 0</span><span class="mth">\(n\)</span><span class="note">one box of size \(n\), doing \(n\) work</span></li>
       <li><span class="lab">level 1</span><span class="mth">\(2 \cdot n/2 = n\)</span><span class="note">two calls, each on \(n/2\), each doing \(n/2\)</span></li>
       <li><span class="lab">level \(i\)</span><span class="mth">\(2^i \cdot n/2^i = n\)</span><span class="note">the boxes double and their sizes halve, so every level does \(n\)</span></li>
-      <li><span class="lab"># levels</span><span class="mth">\(\log_2 n\)</span><span class="note">sizes reach 1 when \(n/2^i = 1\), at \(i = \log_2 n\). That bottom row is base cases. The course leaves it out of the sum; adding it never changes the \(\Theta\) class.</span></li>
+      <li><span class="lab"># levels</span><span class="mth">\(\log_2 n\)</span><span class="note">for \(n\) a power of 2, sizes reach 1 when \(n/2^i = 1\), at \(i = \log_2 n\). That bottom row is base cases. The course leaves it out of the sum; adding it never changes the \(\Theta\) class.</span></li>
       <li><span class="lab">total</span><span class="mth">\(\sum_{i=0}^{\log_2 n - 1} n = n\log_2 n\)</span><span class="note">\(\log_2 n\) levels of \(n\) each</span></li>
       <li class="wide"><div class="proof">
         <p class="proof-head">Fill in the template</p>
@@ -1128,7 +1126,7 @@
   </div>
 
   <h2>Change one thing</h2>
-  <div class="prose"><p>Each row changes one thing in 1a. The shaded cells are the ones that moved.</p></div>
+  <div class="prose"><p>Each row changes one thing in 1a. The shaded cells are the ones that moved. The exact counts take \(n\) to be a power of 2 (a power of 4 for smaller calls, and at least 8 for the bigger base case).</p></div>
   <div class="table-wrap"><table class="vals s3-compare">
     <thead><tr><th>Change</th><th>Recurrence</th><th>Work on level \(i\)</th><th># levels</th><th>Closed form</th></tr></thead>
     <tr><th>none (1a)</th><td>\(2T(n/2) + n\)</td><td>\(n\)</td><td>\(\log_2 n\)</td><td>\(n\log_2 n\), \(\Theta(n\log n)\)</td></tr>
@@ -1162,7 +1160,7 @@
 <section class="page" id="s3-practice" data-title="Section 3 practice">
   <p class="where">Section 3 · <span class="today-chip" data-date="2026-10-15">Thu Oct 15</span></p>
   <h1>Section 3 practice</h1>
-  <div class="prose"><p>One group per lesson. Problems 1 and 3 to 8 are the section's <a href="https://docs.google.com/document/d/1GiXbGiS-lWsVSuOgOtOy0pDHRIUdaPEk/edit" target="_blank" rel="noopener">worksheet</a> (0a, 1b to 1f, and 2), checked against its <a href="https://docs.google.com/document/d/1AoXYuz7uZ0V_RBAjzwXxA3w7_fUi5LaB/edit" target="_blank" rel="noopener">official solutions</a>. Problem 2 changes one line of the worksheet's <code>bar</code>.</p><p>Formula boxes take \(n\) and \(i\), like <code>3^i</code>, <code>n/2^i</code> or <code>(3/2)^i*n</code>.</p></div>
+  <div class="prose"><p>One group per lesson. Problems 1 and 3 to 8 are the section's <a href="https://docs.google.com/document/d/1GiXbGiS-lWsVSuOgOtOy0pDHRIUdaPEk/edit" target="_blank" rel="noopener">worksheet</a> (0a, 1b to 1f, and 2), checked against its <a href="https://docs.google.com/document/d/1AoXYuz7uZ0V_RBAjzwXxA3w7_fUi5LaB/edit" target="_blank" rel="noopener">official solutions</a>. Problem 2 changes one line of the worksheet's <code>bar</code>.</p><p>Formula boxes take \(n\) and \(i\), like <code>3^i</code>, <code>n/2^i</code> or <code>(3/2)^i*n</code>.</p><p>Exact level counts and closed forms take \(n\) to be a power of the number it is divided by (in 1f, \(n\) even), so every size is a whole number.</p></div>
   <div data-progress-bar></div>
 
   <h2 class="practice-group">Reading a recurrence off code</h2>
@@ -1214,14 +1212,14 @@
   </article>
 
   <h2 class="practice-group">The tree method, one change at a time</h2>
-  <p class="note">Lesson: <a href="#s3-change">One change at a time</a>. 1a is \(T(n) = 2T(n/2) + n\) with \(T(1) = 1\): \(n\) work on each of \(\log_2 n\) levels, \(\Theta(n\log n)\).</p>
+  <p class="note">Lesson: <a href="#s3-change">One change at a time</a>. 1a is \(T(n) = 2T(n/2) + n\) with \(T(1) = 1\): for \(n\) a power of 2, \(n\) work on each of \(\log_2 n\) levels, \(\Theta(n\log n)\).</p>
 
   <article class="task" data-id="cse332-w3-s3-q1b">
     <h2>3. 1b: a bigger base case</h2>
     <p class="prompt">Same as 1a, except the base case covers every \(n \le 4\): \[T(n) = \begin{cases} 4 &amp; \text{if } n \le 4 \\ 2T(n/2) + n &amp; \text{else} \end{cases}\]</p>
     <div class="answer-spec" data-part="level" data-grader="formula" data-answer="n" data-points='{"n":["16","1024"],"i":["0","1","3"]}' data-miscon='{"n/2^i":"per-node-not-level"}' data-label="Work on level \(i\), above the base cases"></div>
     <div class="answer-spec" data-part="l64" data-grader="exact" data-answer="4" data-miscon='{"5":"s3-base-level","6":"s3-to-one","7":"s3-to-one"}' data-label="For \(n = 64\): how many levels do that work?"></div>
-    <div class="answer-spec" data-part="levels" data-grader="choice" data-answer="lgm2" data-options="lg:\(\log_2 n\)|lgm2:\(\log_2 n - 2\)|lgm4:\(\log_2 n - 4\)" data-label="# levels, for any \(n\)"></div>
+    <div class="answer-spec" data-part="levels" data-grader="choice" data-answer="lgm2" data-options="lg:\(\log_2 n\)|lgm2:\(\log_2 n - 2\)|lgm4:\(\log_2 n - 4\)" data-label="# levels, for \(n\) a power of 2 (at least 4)"></div>
     <div class="answer-spec" data-part="class" data-grader="bigo" data-answer="n log n" data-label="\(\Theta\) class"></div>
     <ol class="hints">
       <li>Level \(i\) still has \(2^i\) boxes of size \(n/2^i\).</li>
@@ -1231,7 +1229,7 @@
       <li>Level \(i\): \(2^i \cdot n/2^i = n\), as in 1a.</li>
       <li>For \(n = 64\), boxes of size 64, 32, 16 and 8 do work, and the boxes of size 4 are base cases: 4 levels, which is \(\log_2 64 - 2\).</li>
       <li><div class="s3tree" data-rec="1b" data-rows='[{"i":"0","k":1,"s":"n","w":"n","L":"n"},{"i":"1","k":2,"s":"n/2","w":"n/2","L":"2 \\cdot n/2 = n"},"dots",{"i":"i","k":4,"more":1,"s":"n/2^i","w":"n/2^i","L":"2^i \\cdot n/2^i = n"},{"i":"base","k":4,"more":1,"s":"4","w":"4"}]'></div>
-        Work per level: \(n\). # levels: \(\log_2 n - 2\). Closed form: \(n(\log_2 n - 2) = n\log_2 n - 2n \in \Theta(n\log n)\).</li>
+        For \(n\) a power of 2, at least 4: work per level \(n\), # levels \(\log_2 n - 2\), closed form \(n(\log_2 n - 2) = n\log_2 n - 2n \in \Theta(n\log n)\).</li>
       <li class="answer">\(n\); 4; \(\log_2 n - 2\); \(\Theta(n\log n)\). The base case doesn't change the class.</li>
     </ol></div></div>
   </article>
@@ -1251,7 +1249,7 @@
       <li>Level \(i\): \(2^i\) boxes, each doing \(100n/2^i\), so \(100n\) per level.</li>
       <li>The sizes still halve, so there are still \(\log_2 n\) levels.</li>
       <li><div class="s3tree" data-rec="1c" data-rows='[{"i":"0","k":1,"s":"n","w":"100n","L":"100n"},{"i":"1","k":2,"s":"n/2","w":"100n/2","L":"2 \\cdot 100n/2 = 100n"},"dots",{"i":"i","k":4,"more":1,"s":"n/2^i","w":"100n/2^i","L":"2^i \\cdot 100n/2^i = 100n"},{"i":"base","k":4,"more":1,"s":"1","w":"100"}]'></div>
-        Work per level: \(100n\). # levels: \(\log_2 n\). Closed form: \(100n\log_2 n \in \Theta(n\log n)\).</li>
+        For \(n\) a power of 2: work per level \(100n\), # levels \(\log_2 n\), closed form \(100n\log_2 n \in \Theta(n\log n)\).</li>
       <li class="answer">\(100n/2^i\); \(100n\); \(\log_2 n\); \(\Theta(n\log n)\). Constants in \(f(n)\) don't change the class.</li>
     </ol></div></div>
   </article>
@@ -1275,7 +1273,7 @@
         \[n\sum_{i=0}^{\log_2 n - 1}\left(\tfrac32\right)^i = n\cdot\frac{(3/2)^{\log_2 n} - 1}{3/2 - 1}\]
         \[= 2n\left(\frac{n^{\log_2 3}}{n} - 1\right) = 2n^{\log_2 3} - 2n,\]
         using \((3/2)^{\log_2 n} = 3^{\log_2 n}/n\) and \(3^{\log_2 n} = n^{\log_2 3}\).</li>
-      <li>Work per level: \((3/2)^i n\). # levels: \(\log_2 n\). Closed form: \(2n^{\log_2 3} - 2n \in \Theta(n^{\log_2 3})\), since \(\log_2 3 \approx 1.585 &gt; 1\).</li>
+      <li>For \(n\) a power of 2: work per level \((3/2)^i n\), # levels \(\log_2 n\), closed form \(2n^{\log_2 3} - 2n \in \Theta(n^{\log_2 3})\), since \(\log_2 3 \approx 1.585 &gt; 1\).</li>
       <li class="answer">\(3^i\); \((3/2)^i n\); \(\log_2 n\); grows; \(\Theta(n^{\log_2 3})\). The number of calls changes the class.</li>
     </ol></div></div>
   </article>
@@ -1296,7 +1294,7 @@
       <li>Level \(i\): \(2^i\) boxes of size \(n/3^i\), so \(2^i \cdot n/3^i = (2/3)^i n\). Sizes reach 1 at \(i = \log_3 n\).</li>
       <li><div class="s3tree" data-rec="1e" data-rows='[{"i":"0","k":1,"s":"n","w":"n","L":"n"},{"i":"1","k":2,"s":"n/3","w":"n/3","L":"2 \\cdot n/3 = (2/3) n"},{"i":"2","k":4,"s":"n/9","w":"n/9","L":"4 \\cdot n/9 = (4/9) n"},"dots",{"i":"i","k":4,"more":1,"s":"n/3^i","w":"n/3^i","L":"2^i \\cdot n/3^i = (2/3)^i n"},{"i":"base","k":4,"more":1,"s":"1","w":"1"}]'></div></li>
       <li>The level work shrinks, so the top wins: \(n\sum_{i=0}^{\log_3 n - 1}(2/3)^i \le n \cdot \frac{1}{1 - 2/3} = 3n\), and the root alone does \(n\).</li>
-      <li>Work per level: \((2/3)^i n\). # levels: \(\log_3 n\). Closed form: between \(n\) and \(3n\), so \(\Theta(n)\).</li>
+      <li>For \(n\) a power of 3: work per level \((2/3)^i n\), # levels \(\log_3 n\), closed form between \(n\) and \(3n\), so \(\Theta(n)\).</li>
       <li class="answer">\(n/3^i\); \((2/3)^i n\); \(\log_3 n\); shrinks; \(\Theta(n)\). The size of the calls changes the class.</li>
     </ol></div></div>
   </article>
@@ -1329,7 +1327,7 @@
     <div class="solution"><div class="steps"><ol>
       <li>Level \(i\): \(2^i\) boxes of size \(n - 2i\), each doing 1, so \(2^i\) per level. The size drops by 2 per level, so it reaches 1 after about \(n/2\) levels.</li>
       <li><div class="s3tree" data-rec="1f" data-rows='[{"i":"0","k":1,"s":"n","w":"1","L":"1"},{"i":"1","k":2,"s":"n-2","w":"1","L":"2"},{"i":"2","k":4,"s":"n-4","w":"1","L":"4"},"dots",{"i":"i","k":4,"more":1,"s":"n-2i","w":"1","L":"2^i"},{"i":"base","k":4,"more":1,"s":"\\le 1","w":"1"}]'></div></li>
-      <li>Work per level: \(2^i\). # levels: \(n/2\). Closed form: \(\sum_{i=0}^{n/2 - 1} 2^i = 2^{n/2} - 1 = \sqrt2^{\,n} - 1 \in \Theta(\sqrt2^{\,n})\).</li>
+      <li>For even \(n\): work per level \(2^i\), # levels \(n/2\), closed form \(\sum_{i=0}^{n/2 - 1} 2^i = 2^{n/2} - 1 = \sqrt2^{\,n} - 1 \in \Theta(\sqrt2^{\,n})\). For odd \(n\) there are \((n-1)/2\) levels and the sum is \(2^{(n-1)/2} - 1\): the same class.</li>
       <li>\(2T(n-1) + 1\) has \(n\) levels instead, and \(2^n - 1 \in \Theta(2^n)\). These differ: \(2^n / \sqrt2^{\,n} = \sqrt2^{\,n}\), which grows without bound.</li>
       <li class="answer">\(2^i\); \(n - 2i\); \(2^i\); \(n/2\); \(\Theta(\sqrt2^{\,n})\); no. In chip and conquer, how much each call subtracts changes the class.</li>
     </ol></div></div>
@@ -1340,7 +1338,7 @@
 
   <article class="task" data-id="cse332-w3-s3-q2">
     <h2>8. Write the recurrence, then solve it</h2>
-    <p class="prompt">The worksheet's Problem 2. It's called as <code>f(L, 0, L.size())</code>, so <code>start</code> is 0 and the input size is \(n = j - \text{start} = j\).</p>
+    <p class="prompt">The worksheet's Problem 2. It's called as <code>f(L, 0, L.size())</code>, so <code>start</code> is 0 and the input size is \(n = j - \text{start} = j\). Take \(n\) to be a power of 2, so <code>j/2</code> never rounds.</p>
     <pre class="code"><div class="ln"><span class="no">1</span><span class="src">f(L, start, j) { // n = j - start</span></div><div class="ln"><span class="no">2</span><span class="src">  if (j - start &lt;= 1) {</span></div><div class="ln"><span class="no">3</span><span class="src">    return 0</span></div><div class="ln"><span class="no">4</span><span class="src">  }</span></div><div class="ln"><span class="no">5</span><span class="src">  int result = f(L, start, j/2)</span></div><div class="ln"><span class="no">6</span><span class="src">  for (int i = start; i &lt; j; i++) {</span></div><div class="ln"><span class="no">7</span><span class="src">    result *= 4</span></div><div class="ln"><span class="no">8</span><span class="src">  }</span></div><div class="ln"><span class="no">9</span><span class="src">  return result + f(L, start, j/2)</span></div><div class="ln"><span class="no">10</span><span class="src">}</span></div></pre>
     <div class="answer-spec" data-part="a" data-grader="exact" data-answer="2" data-label="Recursive calls in one run, \(a\)"></div>
     <div class="answer-spec" data-part="b" data-grader="exact" data-answer="2" data-label="Each call gets \(n/b\) items. \(b =\)"></div>
