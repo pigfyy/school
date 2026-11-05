@@ -765,7 +765,7 @@ ok(del(parse(S22), 3)[2] === 1 && d3.out[2][1] === 0, "deleting 3 first pulls up
     "cse332-w3-l8-ins20": [[ins20]],
     "cse332-w3-l8-which-case": [[avlTrace(parse(T_P), 3)], [avlTrace(parse(T_P), 17)], [avlTrace(parse(T_P), 25)], [avlTrace(parse(T_Q), 35)]],
     "cse332-w3-l8-double-steps": [[q12]],
-    "cse332-w3-l8-double": [[seqCases[30]], [seqCases[25]], [seqCases[28], [0, 2]], [seqCases[27]]],
+    "cse332-w3-l8-double": [[seqCases[30]], [seqCases[25]], [seqCases[28]], [seqCases[27]]],
   };
   for (const [tid, parts] of Object.entries(plan)) {
     const want = parts.flatMap(([tr, pick]) => (pick ? pick.map((i) => tr.states[i]) : tr.states));
