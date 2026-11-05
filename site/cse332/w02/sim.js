@@ -118,7 +118,7 @@
      Polynomials as coefficient strings, lowest degree first (the format Grader.checkBound takes).
      cs: the values the c slider steps through; c0 / n00: where the sliders start; N: the last n drawn. */
   const CLAIMS = [
-    { id: "lin10", f: ["10", "2"], g: ["0", "1"], rel: "O", fTex: "2n + 10", gTex: "n", cs: ["1", "2", "3", "4", "5"], c0: "2", n00: 1, N: 30 },
+    { id: "lin10", f: ["10", "2"], g: ["0", "1"], rel: "O", fTex: "2n + 10", gTex: "n", cs: ["1", "2", "3", "4", "5"], c0: "3", n00: 1, N: 30 },
   ];
   function polyNum(coeffs, n) { return coeffs.reduce((s, a, k) => s + Number(eval_(a)) * n ** k, 0); }
   function eval_(s) { const m = /^(-?\d+)(?:\/(\d+))?$/.exec(s); return m ? Number(m[1]) / (m[2] ? Number(m[2]) : 1) : NaN; }

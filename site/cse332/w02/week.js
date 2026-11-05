@@ -276,6 +276,24 @@ function setupBuckets() {
   draw();
 }
 
+/* =========================================================== 2n + 10 between a 2n floor and a 3n ceiling */
+function setupSandwich() {
+  const f = (n) => 2 * n + 10, N = 30;
+  const draw = () => {
+    const xs = Array.from({ length: 121 }, (_, i) => (i / 120) * N);
+    lineChart($("#sandwich-svg"), {
+      xDomain: [0, N], yDomain: [0, 95], xLabel: "n", yLabel: "steps",
+      series: [{ color: COLORS.g, label: "3n", pts: xs.map((n) => [n, 3 * n]) }, { color: COLORS.f, label: "f", pts: xs.map((n) => [n, f(n)]) }, { color: COLORS.h, label: "2n", pts: xs.map((n) => [n, 2 * n]) }],
+      markers: [{ x: 10, label: "n₀ = 10" }],
+      shade: { from: 10, label: "f squeezed" },
+      snap: (v) => Math.max(0, Math.round(v)),
+      hover: (n) => [`n = ${n}`, `3n = ${3 * n}`, `f = ${f(n)}`, `2n = ${2 * n}`],
+    });
+  };
+  REDRAW.add((id) => { if (id === "notation") draw(); });
+  draw();
+}
+
 /* =========================================================== the c / n0 explorer: move c and n0, see where the bound holds */
 const CLAIM = Object.fromEntries(Sim.CLAIMS.map((c) => [c.id, c]));
 const qNum = (s) => G.qToNumber(G.evalExact(s));
@@ -676,6 +694,7 @@ setupStaticPictures();
 setupHero();
 setupGap();
 setupBuckets();
+setupSandwich();
 $$(".bound").forEach(setupBound);
 setupPQRun();
 setupHeight();

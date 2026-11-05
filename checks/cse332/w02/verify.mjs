@@ -430,7 +430,7 @@ ok(Math.abs(Math.log2(5) - 2.32) < 0.005, "log2 5 ≈ 2.32");
 for (const [f, g] of [["3n + 5", "n"], ["n^2 + 100n", "n^2"], ["4 log n + 7", "log n"], ["2^n + n^3", "2^n"]]) ok(G.relate(f, g).theta, `bucket of ${f} is ${g}`);
 {
   const say = { "O(n^2)": "o", "O(n)": "o", "O(\\log n)": "o", "\\Omega(n)": "omega", "\\Omega(n^2)": "omega", "\\Theta(n)": "theta" };
-  const board = html.slice(html.indexOf("is in bucket \\(n\\). Which claims are true?"));
+  const board = html.slice(html.indexOf("Which claims about \\(f(n) = 2n + 10\\) are true?"));
   for (const [claim, key] of Object.entries(say)) {
     const g = claim.replace(/^\\?\w+\((.*)\)$/, "$1").replace(/\\/g, "");
     const truth = G.relate("2n + 10", g)[key];

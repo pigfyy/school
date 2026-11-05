@@ -326,24 +326,30 @@
 <section class="page" id="notation" data-title="O, Ω, Θ">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
   <h1>\(O\), \(\Omega\), \(\Theta\)</h1>
+  <div class="prose"><p>Each one compares a step count \(f\) to a simple function \(g\), like \(n\). Here \(f(n) = 2n + 10\) and \(g(n) = n\).</p></div>
+
+  <div class="panel" id="sandwich">
+    <div class="legend"><span><span class="key" style="border-color:var(--s2)"></span>ceiling: 3n</span><span><span class="key" style="border-color:var(--s1)"></span>f = 2n + 10</span><span><span class="key" style="border-color:var(--s3)"></span>floor: 2n</span></div>
+    <div class="chart-box"><svg class="chart" id="sandwich-svg" viewBox="0 0 760 260" role="img" aria-label="2n + 10 is above 3n until n = 10, then stays between 2n and 3n"></svg></div>
+  </div>
 
   <div class="table-wrap"><table class="vals">
-    <thead><tr><th></th><th>means</th><th>like</th></tr></thead>
-    <tr><th>\(f \in O(g)\)</th><td>\(f\) grows at most like \(g\)</td><td>\(\le\)</td></tr>
-    <tr><th>\(f \in \Omega(g)\)</th><td>\(f\) grows at least like \(g\)</td><td>\(\ge\)</td></tr>
-    <tr><th>\(f \in \Theta(g)\)</th><td>both: same bucket</td><td>\(=\)</td></tr>
+    <thead><tr><th></th><th>in the picture</th><th>like</th></tr></thead>
+    <tr><th>\(f \in O(n)\)</th><td>\(f\) stays under a ceiling, \(3n\)</td><td>\(\le\)</td></tr>
+    <tr><th>\(f \in \Omega(n)\)</th><td>\(f\) stays over a floor, \(2n\)</td><td>\(\ge\)</td></tr>
+    <tr><th>\(f \in \Theta(n)\)</th><td>both: stuck between them</td><td>\(=\)</td></tr>
   </table></div>
-  <p class="line">"Grows like" ignores constants and small \(n\), the same way buckets do.</p>
+  <div class="rule"><p><strong>You choose two things.</strong> The constant \(c\) in front of \(g\) (3 for the ceiling, 2 for the floor), and where it has to start holding, \(n_0\) (here 10). Before \(n_0\), anything goes. That's how constants and small \(n\) get ignored.</p></div>
 
   <div class="example">
     <p class="example-head">Worked example</p>
-    <p class="example-q">\(f(n) = 2n + 10\) is in bucket \(n\). Which claims are true?</p>
+    <p class="example-q">Which claims about \(f(n) = 2n + 10\) are true?</p>
     <div class="steps board"><ol>
-      <li><span class="lab">\(O(n^2)\)</span><span class="mth">✓</span><span class="note">at most \(n^2\): true, just loose</span></li>
-      <li><span class="lab">\(O(n)\)</span><span class="mth">✓</span><span class="note">at most \(n\)</span></li>
-      <li><span class="lab">\(O(\log n)\)</span><span class="mth">✗</span><span class="note">\(n\) outgrows \(\log n\)</span></li>
-      <li><span class="lab">\(\Omega(n)\)</span><span class="mth">✓</span><span class="note">at least \(n\)</span></li>
-      <li><span class="lab">\(\Omega(n^2)\)</span><span class="mth">✗</span><span class="note">never keeps up with \(n^2\)</span></li>
+      <li><span class="lab">\(O(n^2)\)</span><span class="mth">✓</span><span class="note">\(n^2\) is an even higher ceiling: true, just loose</span></li>
+      <li><span class="lab">\(O(n)\)</span><span class="mth">✓</span><span class="note">ceiling \(3n\), from the picture</span></li>
+      <li><span class="lab">\(O(\log n)\)</span><span class="mth">✗</span><span class="note">\(f\) breaks through any \(c\log n\)</span></li>
+      <li><span class="lab">\(\Omega(n)\)</span><span class="mth">✓</span><span class="note">floor \(2n\), from the picture</span></li>
+      <li><span class="lab">\(\Omega(n^2)\)</span><span class="mth">✗</span><span class="note">\(n^2\) climbs past \(f\), so it can't be a floor</span></li>
       <li><span class="lab">\(\Theta(n)\)</span><span class="mth">✓</span><span class="note">both \(O(n)\) and \(\Omega(n)\)</span></li>
       <li class="wide"><div class="rule"><p><strong>The rule.</strong> Compare buckets. \(O\): same bucket or a bigger one. \(\Omega\): same or smaller. \(\Theta\): same. When you know the bucket, say \(\Theta\).</p></div></li>
     </ol></div>
@@ -352,9 +358,9 @@
   <div class="check" data-id="cse332-w2-l3-usage-read-o" data-grader="mc">
     <p>Quick check: a paper says its algorithm's worst case is \(O(n^2)\). What can you conclude?</p>
     <div class="opts">
-      <label><input type="radio" name="cse332-w2-l3-usage-read-o"> It takes about \(n^2\) steps on big inputs<span class="why" hidden>O only says "at most". The algorithm might really be bucket n.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l3-usage-read-o"> Its worst case grows at most like \(n^2\), and it might be much faster<span class="why" hidden>Right. That's all an upper bound promises.</span></label>
-      <label><input type="radio" name="cse332-w2-l3-usage-read-o"> It can't be faster than \(n^2\)<span class="why" hidden>That would be a lower bound, Ω(n²).</span></label>
+      <label><input type="radio" name="cse332-w2-l3-usage-read-o"> It takes about \(n^2\) steps on big inputs<span class="why" hidden>O only gives a ceiling. The algorithm might really be bucket n.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l3-usage-read-o"> Its worst case grows at most like \(n^2\), and it might be much faster<span class="why" hidden>Right. That's all a ceiling promises.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-usage-read-o"> It can't be faster than \(n^2\)<span class="why" hidden>That would be a floor: Ω(n²).</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
@@ -362,7 +368,7 @@
   <div class="check" data-id="cse332-w2-l3-notation-theta-from-both" data-grader="mc">
     <p>Quick check: you know \(f \in O(n^3)\) and \(f \in \Omega(n^3)\). What else is true?</p>
     <div class="opts">
-      <label data-correct><input type="radio" name="cse332-w2-l3-notation-theta-from-both"> \(f \in \Theta(n^3)\)<span class="why" hidden>Right. At most and at least the same bucket means exactly that bucket.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l3-notation-theta-from-both"> \(f \in \Theta(n^3)\)<span class="why" hidden>Right. A ceiling and a floor in the same bucket means exactly that bucket.</span></label>
       <label><input type="radio" name="cse332-w2-l3-notation-theta-from-both"> \(f \in O(n^2)\)<span class="why" hidden>f is bucket n³, which is bigger than n². So f is not at most n².</span></label>
       <label><input type="radio" name="cse332-w2-l3-notation-theta-from-both"> Nothing more<span class="why" hidden>Both bounds together are exactly what Θ means.</span></label>
     </div>
@@ -376,33 +382,46 @@
 <section class="page" id="proofs" data-title="Proving a bound">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
   <h1>Proving a bound</h1>
-  <div class="rule"><p><strong>What you prove.</strong> \(f \in O(g)\) means: pick a constant \(c\) and a starting point \(n_0\) so that \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). In a picture: past \(n_0\), \(f\) stays under \(c\cdot g\).</p></div>
+  <div class="prose"><p>Every \(O\) proof has the same shape. You fill in two numbers, then show one inequality.</p></div>
+
+  <div class="proof">
+    <p class="proof-head">The template</p>
+    <p>Let \(c =\) <span class="blank">?</span> and \(n_0 =\) <span class="blank">?</span>.</p>
+    <p>Show: for every \(n \ge n_0\), \(f(n) \le c\cdot g(n)\).</p>
+    <p><span class="blank wide">algebra, one line at a time, until it's obviously true</span></p>
+    <p>This holds for every \(n \ge n_0\).</p>
+  </div>
 
   <div class="example">
     <p class="example-head">Worked example</p>
     <p class="example-q">Prove \(2n + 10 \in O(n)\).</p>
     <div class="steps board"><ol>
-      <li><span class="lab">need</span><span class="mth">\(2n + 10 \le c\cdot n\)</span><span class="note">for every \(n \ge n_0\)</span></li>
-      <li><span class="lab">\(c = 2\)?</span><span class="mth">\(2n + 10 \le 2n\)</span><span class="note">✗ never: it's always 10 over</span></li>
-      <li><span class="lab">\(c = 3\)?</span><span class="mth">\(2n + 10 \le 3n\)</span><span class="note">take \(2n\) off both sides</span></li>
-      <li><span class="lab"></span><span class="mth">\(10 \le n\)</span><span class="note">true from \(n = 10\) on</span></li>
-      <li class="wide"><div class="rule"><p>✓ \(c = 3\), \(n_0 = 10\). <strong>The rule.</strong> Pick \(c\) a little above the leading constant, then solve for where it starts holding.</p></div></li>
+      <li><span class="lab">pick \(c\)</span><span class="mth">\(c = 3\)</span><span class="note">just above the 2 in \(2n\)</span></li>
+      <li><span class="lab">find \(n_0\)</span><span class="mth">\(2n + 10 \le 3n\)</span><span class="note">when is this true?</span></li>
+      <li><span class="lab"></span><span class="mth">\(10 \le n\)</span><span class="note">take \(2n\) off both sides, so \(n_0 = 10\)</span></li>
+      <li class="wide"><div class="proof">
+        <p class="proof-head">Fill in the template</p>
+        <p>Let \(c =\) <span class="blank">\(3\)</span> and \(n_0 =\) <span class="blank">\(10\)</span>.</p>
+        <p>Show: for every \(n \ge 10\), \(2n + 10 \le 3n\).</p>
+        <p>\[\begin{aligned} &amp;2n + 10 \le 3n\\ \equiv\ &amp;10 \le n\end{aligned}\]</p>
+        <p>This holds for every \(n \ge 10\).</p>
+      </div></li>
     </ol></div>
   </div>
 
   <h2>See it</h2>
-  <div class="prose"><p>At \(c = 2\) every dot is red. Raise \(c\) to 3, then move \(n_0\) to 10.</p></div>
+  <div class="prose"><p>Red dots are where \(2n + 10\) is over \(3n\). Move \(n_0\) to 10 and they drop out.</p></div>
   <div class="panel bound" id="bx-proofs" data-claims="lin10"></div>
 
-  <details class="more">
-    <summary>See it written as a proof</summary>
-    <div class="proof">
-      <p class="proof-head">Proof</p>
-      <p>Let \(c = 3\) and \(n_0 = 10\). Take any \(n \ge 10\). Then \(10 \le n\), so \(2n + 10 \le 2n + n = 3n = c\cdot n\).</p>
-    </div>
-  </details>
-
-  <p class="line"><strong>For \(\Omega\)</strong>, flip to \(\ge\) and pick a small \(c\): \(2n + 10 \ge 2n\) for every \(n\), so \(c = 2\), \(n_0 = 1\). Both bounds together: \(2n + 10 \in \Theta(n)\).</p>
+  <h2>\(\Omega\): same template, flip to \(\ge\)</h2>
+  <div class="proof">
+    <p class="proof-head">Prove \(2n + 10 \in \Omega(n)\)</p>
+    <p>Let \(c =\) <span class="blank">\(2\)</span> and \(n_0 =\) <span class="blank">\(1\)</span>.</p>
+    <p>Show: for every \(n \ge 1\), \(2n + 10 \ge 2n\).</p>
+    <p>\[\begin{aligned} &amp;2n + 10 \ge 2n\\ \equiv\ &amp;10 \ge 0\end{aligned}\]</p>
+    <p>This holds for every \(n \ge 1\).</p>
+  </div>
+  <p class="line">Both proofs together give \(2n + 10 \in \Theta(n)\).</p>
 
   <div class="rule warn">
     <p><strong>Not a proof</strong></p>

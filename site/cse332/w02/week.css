@@ -104,3 +104,8 @@ input.wide-script { flex: 1 1 10rem; width: auto; min-width: 0; max-width: 22rem
 /* Lecture 3 practice: one group per lecture goal */
 .practice-group { margin-top: 2.75rem; padding-top: 1.1rem; border-top: 2px solid var(--line); }
 .practice-group + .note { margin-top: -0.4rem; }
+
+/* Lecture 3 proof template: the blanks you fill in */
+.proof .blank { display: inline-block; min-width: 2.2em; padding: 0 0.4em; text-align: center; font-weight: 600; background: var(--accent-tint); border-bottom: 2px solid var(--accent); border-radius: 4px 4px 0 0; }
+.proof .blank.wide { font-weight: 400; font-style: italic; color: var(--ink-soft); }
+.steps.board .proof { margin-top: 0.25rem; }
