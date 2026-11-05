@@ -1705,20 +1705,17 @@ extract</code></pre>
     </ol></div>
   </div>
 
-  <div class="table-wrap"><table class="vals">
-    <thead><tr><th></th><th>min-heap</th><th>max-heap</th></tr></thead>
-    <tr><th>decrease key: value gets smaller</th><td>up</td><td>down</td></tr>
-    <tr><th>increase key: value gets bigger</th><td>down</td><td>up</td></tr>
-  </table></div>
+  <p class="line"><strong>Min-heap:</strong> smaller → up; bigger → down.</p>
+  <p class="line"><strong>Max-heap:</strong> smaller → down; bigger → up.</p>
   <div class="rule"><p><strong>The rule.</strong> Only the item's links to its parent and children can break. In a min-heap, a smaller value can only break the link above it, so it climbs. A bigger value can only break the links below it, so it sinks. A max-heap flips both.</p></div>
   <p class="note">The lecture also lists <code>remove</code>, which takes out the item at a given index, without going into it.</p>
 
   <div class="check" data-id="cse332-w2-l5-update-max-increase" data-grader="mc">
-    <p>Quick check: in a <em>max</em>-heap, you increase an item's priority value. Which way does it percolate?</p>
+    <p>Quick check: in a <em>max</em>-heap, you increase an item's priority value. If that breaks the heap order, which way does it move to fix it?</p>
     <div class="opts">
       <label data-correct><input type="radio" name="cse332-w2-l5-update-max-increase"> Up<span class="why" hidden>Right. In a max-heap, parents are ≥ children. A bigger value may now be bigger than its parent.</span></label>
       <label><input type="radio" name="cse332-w2-l5-update-max-increase"> Down<span class="why" hidden>That's increase key in a min-heap. A max-heap flips it.</span></label>
-      <label><input type="radio" name="cse332-w2-l5-update-max-increase"> It doesn't move<span class="why" hidden>It might not, but if anything breaks, it's the link to its parent.</span></label>
+      <label><input type="radio" name="cse332-w2-l5-update-max-increase"> Either way, depending on its children<span class="why" hidden>A bigger value can't be too small for its children. Only the link to its parent can break.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
@@ -1744,7 +1741,7 @@ extract</code></pre>
     <p>Quick check: why not run the loop the other way, from \(i = 1\) up to <code>size</code>?</p>
     <div class="opts">
       <label><input type="radio" name="cse332-w2-l5-build-why-bottom-up"> It would be slower but still correct<span class="why" hidden>It can give a wrong answer. Think about a small item deep in the tree.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l5-build-why-bottom-up"> percolateDown(i) assumes the subtrees below i are already heaps; going top-down, they aren't yet, so a small item deep down can stay stuck below larger ones<span class="why" hidden>Right. Percolating down only ever moves items down, so it can't pull a small value up from the bottom.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l5-build-why-bottom-up"> percolateDown(i) assumes the subtrees below i are already heaps; going top-down, they aren't yet, so a small item deep down can stay stuck below larger ones<span class="why" hidden>Right. If a subtree is fixed after its parent, a smaller value can rise to the subtree's top after the parent's turn is over, and the parent stays too big.</span></label>
       <label><input type="radio" name="cse332-w2-l5-build-why-bottom-up"> Index 1 has no parent<span class="why" hidden>percolateDown never looks at parents.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
@@ -1764,23 +1761,18 @@ extract</code></pre>
     <p class="example-q">A full tree (every level full) of 15 nodes. Each node shows the most swaps it can make: the number of levels below it.</p>
     <svg class="htree" data-tree="3,2,2,1,1,1,1,0,0,0,0,0,0,0,0" role="img" aria-label="A full tree of 15 nodes labeled with how far each can sink: the root 3, the next two 2, the next four 1, the eight leaves 0"></svg>
     <div class="table-wrap"><table class="vals">
-      <thead><tr><th>level</th><th>nodes</th><th>swaps each, at most</th><th>swaps</th></tr></thead>
-      <tr><th>leaves</th><td>8</td><td>0</td><td>0</td></tr>
-      <tr><th>one up</th><td>4</td><td>1</td><td>4</td></tr>
-      <tr><th>two up</th><td>2</td><td>2</td><td>4</td></tr>
-      <tr><th>root</th><td>1</td><td>3</td><td>3</td></tr>
-      <tr><th>total</th><td>15</td><td></td><td class="best">11</td></tr>
+      <thead><tr><th>nodes × swaps each</th><th>swaps</th></tr></thead>
+      <tr><th>8 leaves × 0</th><td>0</td></tr>
+      <tr><th>4 nodes × 1</th><td>4</td></tr>
+      <tr><th>2 nodes × 2</th><td>4</td></tr>
+      <tr><th>1 root × 3</th><td>3</td></tr>
+      <tr><th>Total</th><td class="best">11</td></tr>
     </table></div>
     <p class="line">At most 11 swaps for 15 nodes. "15 calls × 3 swaps" would say 45, but only the root can sink 3 levels, and half the nodes can't sink at all.</p>
   </div>
 
-  <p class="line">Bigger full trees follow the same pattern:</p>
-  <div class="table-wrap"><table class="vals">
-    <thead><tr><th>nodes \(n\)</th><th>15</th><th>1,023</th><th>1,048,575</th></tr></thead>
-    <tr><th>buildHeap swaps, at most</th><td class="best">11</td><td class="best">1,013</td><td class="best">1,048,555</td></tr>
-    <tr><th>\(n\) calls × height</th><td>45</td><td>9,207</td><td>19,922,925</td></tr>
-  </table></div>
-  <div class="rule"><p><strong>The rule.</strong> On \(n\) items, buildHeap makes fewer than \(n\) swaps, and each swap takes at most 2 comparisons, so it's \(O(n)\). It has to look at every item, so it's \(\Omega(n)\) too. So buildHeap is \(\Theta(n)\).</p></div>
+  <p class="line">The same pattern holds for bigger heaps: most nodes sit near the bottom and can sink only a little.</p>
+  <div class="rule"><p><strong>The rule.</strong> All the items together can sink fewer than \(n\) levels. Each level costs a fixed amount of work, and each of the \(n/2\) calls adds a fixed amount more, so buildHeap is \(O(n)\). It touches every index, so it's \(\Theta(n)\).</p></div>
 
   <details class="more">
     <summary>The lecture's sum</summary>
@@ -1933,7 +1925,7 @@ percolateDown(int i){
     <div class="answer-spec" data-part="arr3-extract" data-grader="exact" data-answer="16" data-label="arr[3] after the extract"></div>
     <ol class="hints">
       <li>Only 4 and 2 ever climb. Each new item starts at index <code>size+1</code>, and its parent is at half that.</li>
-      <li>For the extract, 16 (the last item) moves to index 1. Compare it with its children at indices 2 and 3.</li>
+      <li>For extract, move the value at the last index to the root, then compare it with the children at indices 2 and 3.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
       <li>Insert 16, then 32 at index 2. \(32 &lt; 16\) is false: no swap.<svg class="htree" data-step data-tree="16,32" data-idx data-cmp="2" role="img" aria-label="16 at the root, 32 at index 2"></svg></li>
@@ -2040,7 +2032,7 @@ if(right &gt; size || arr[left] &lt; arr[right]){
   <article class="task" data-id="cse332-w2-l5-sink-31">
     <h2>6. Count the swaps on 31 nodes</h2>
     <p class="prompt">A full tree of height 4 has 31 nodes: 1 root, then 2, 4, 8, and 16 leaves. Count as in the lesson's 15-node example: each node can sink at most as many levels as there are below it.</p>
-    <div class="answer-spec" data-part="sink-1" data-grader="exact" data-answer="8" data-miscon='{"16":"leaves-sink-0"}' data-label="how many nodes can sink at most 1 level?"></div>
+    <div class="answer-spec" data-part="sink-1" data-grader="exact" data-answer="8" data-miscon='{"16":"leaves-sink-0"}' data-label="how many nodes have exactly 1 level below them?"></div>
     <div class="answer-spec" data-part="root" data-grader="exact" data-answer="4" data-label="the most swaps the root can make"></div>
     <div class="answer-spec" data-part="total" data-grader="exact" data-answer="26" data-miscon='{"124":"n-times-height"}' data-label="the most swaps buildHeap can make in total"></div>
     <div class="answer-spec" data-part="bucket" data-grader="bigo" data-answer="n" data-label="buildHeap's worst-case time on \(n\) items, as a bucket"></div>

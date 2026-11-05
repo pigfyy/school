@@ -423,12 +423,11 @@ const l4Text = () => html.slice(html.indexOf('id="l4-goals"'), html.indexOf('id=
     for (let d = 0; d <= 4; d++) { const k = s.filter((x) => x === d).length; ok(text.includes(`\\(${k} \\cdot ${d} = ${k * d}\\)`), `problem 6 board: ${k} nodes × ${d}`); }
     const s15 = sinks(15);
     ok(html.includes(`data-tree="${s15.join(",")}"`), "the 15-node picture shows the levels below each node");
-    const rows = [["leaves", 0], ["one up", 1], ["two up", 2], ["root", 3]].map(([name, d]) => { const k = s15.filter((x) => x === d).length; return `<tr><th>${name}</th><td>${k}</td><td>${d}</td><td>${k * d}</td></tr>`; });
-    ok(rows.every((r) => html.includes(r)) && html.includes(`<tr><th>total</th><td>15</td><td></td><td class="best">${total(15)}</td></tr>`), "the 15-node table");
+    const rows = [["leaves", 0], ["nodes", 1], ["nodes", 2], ["root", 3]].map(([name, d]) => { const k = s15.filter((x) => x === d).length; return `<tr><th>${k} ${name} × ${d}</th><td>${k * d}</td></tr>`; });
+    ok(rows.every((r) => html.includes(r)) && html.includes(`<tr><th>Total</th><td class="best">${total(15)}</td></tr>`), "the 15-node table");
     ok(text.includes(`At most ${total(15)} swaps for 15 nodes. "15 calls × 3 swaps" would say ${15 * 3}`), "15 nodes: 11 swaps vs 45");
-    const big = [3, 9, 19].map((Hh) => { const n = 2 ** (Hh + 1) - 1; return { n, t: total(n), nh: n * Hh }; });
-    const c = (x) => x.toLocaleString("en-US");
-    ok(html.includes(big.map((b) => `<th>${c(b.n)}</th>`).join("")) && html.includes(big.map((b) => `<td class="best">${c(b.t)}</td>`).join("")) && html.includes(big.map((b) => `<td>${c(b.nh)}</td>`).join("")) && big.every((b) => b.t < b.n), `bigger full trees: ${big.map((b) => `${b.n}: ${b.t} < n, n·H = ${b.nh}`).join("; ")}`);
+    const sizes = Array.from({ length: 5000 }, (_, k) => k + 1);
+    ok(sizes.every((n) => total(n) < n) && text.includes("All the items together can sink fewer than \\(n\\) levels."), "the rule: the total sinking distance is under n for every n up to 5,000");
   }
   ok(same(HJ("lecture-build").after, [1, 2, 7, 3, 6, 8, 10, 14, 5, 15]), "the lecture's buildHeap result 1,2,7,3,6,8,10,14,5,15");
   Object.assign(BIGO_TRUTH, { "cse332-w2-l5-trace-n-inserts": "n log n + n", "cse332-w2-l5-sink-31.bucket": "2n" });

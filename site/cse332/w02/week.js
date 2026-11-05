@@ -514,14 +514,28 @@ function setupHeapStepper(box) {
   const back = el("button", { class: "btn", type: "button", text: "← Back" });
   const next = el("button", { class: "btn primary", type: "button", text: "Next step →" });
   const count = el("span", { class: "note" });
-  box.append(el("div", { class: `split stepper${idea ? " idea" : ""}` }, code, el("div", { class: "pic" }, svg, idea ? null : cells, vars, say, el("div", { class: "controls" }, back, next, count))));
+  // phones show a few lines around the highlight; this button opens the whole listing
+  const full = !idea && lines.length > 5 ? el("button", { class: "btn code-toggle", type: "button", "aria-expanded": "false", text: "Full code" }) : null;
+  box.append(el("div", { class: `split stepper${idea ? " idea" : " arr"}` }, code, full, el("div", { class: "pic" }, svg, idea ? null : cells, vars, say, el("div", { class: "controls" }, back, next, count))));
+  if (full) full.addEventListener("click", () => {
+    const open = full.getAttribute("aria-expanded") !== "true";
+    full.setAttribute("aria-expanded", String(open));
+    full.textContent = open ? "Fewer lines" : "Full code";
+    code.classList.toggle("open", open);
+    showLine();
+  });
+  function showLine() {
+    const hl = code.querySelector(".hl");
+    if (idea || !hl) return keepLineInView(code);
+    if (code.scrollHeight > code.clientHeight) code.scrollTop = (hl.previousElementSibling || hl).offsetTop;
+  }
   const steps = kind.startsWith("insert") ? STEP_GEN[kind](sc.start, sc.x) : STEP_GEN[kind](sc.start);
   let k = 0;
   function paint() {
     const st = steps[k];
     const hl = new Set([].concat(st.line ?? []));
     code.replaceChildren(...lines.map((ln, i) => el("div", { class: `ln${hl.has(i) ? " hl" : ""}` }, el("span", { class: "no", text: String(i + 1) }), el("span", { class: "src", text: ln }))));
-    keepLineInView(code);
+    showLine();
     drawTree(svg, st.arr.slice(1, st.size + 1), { mark: st.mark, doneFrom: st.done_from, idx: !idea });
     const v = st.vars || {};
     const ptrs = {};
