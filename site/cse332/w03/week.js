@@ -5,9 +5,6 @@
 "use strict";
 window.WEEK = window.WEEK || {};
 window.WEEK.messages = {
-  "forgot-base-level": "Close. Count the base case too: the levels go n, n/2, …, 2, 1, and T(1) = 1 adds one more.",
-  "linear-count": "That's a linear count. Each call halves the range.",
-  "leaves-only": "That's only the bottom level. Add the work on every level above it too.",
   "missed-a-level": "Count the levels again: the root is level 0 and the leaves are a level too.",
   "log2-not-log8": "Each call divides by 8, not by 2. How many times can you divide 512 by 8?",
   "per-node-not-level": "That's the work in one box on level i. Multiply by the number of boxes on that level.",
@@ -25,6 +22,14 @@ window.WEEK.messages = {
   "off-by-one-height": "Check the definition: height counts edges, and an empty tree has height −1, a single node height 0.",
   "bst-height": "That's the plain BST's height for sorted inserts. The AVL rotations keep it short.",
 };
+
+/* L6 */
+Object.assign(window.WEEK.messages, {
+  "used-b-for-calls": "Each call makes 3 calls (the 3 in front of T), so the count is multiplied by 3 on every level.",
+  "extra-level": "The tree stops at the base case, T(1). No call has size 0.",
+  "size-not-work": "That's the size of each call. Its work is f(size) = size².",
+  "leaves-forgot": "Add the last level too: each base-case call does T(1) = 1.",
+});
 
 window.WEEK.widgets = function ({ $, $$, el, renderMath, REDRAW }) {
   const Sim = window.Sim;
@@ -241,4 +246,72 @@ window.WEEK.widgets = function ({ $, $$, el, renderMath, REDRAW }) {
     keyIn.addEventListener("keydown", (e) => { if (e.key === "Enter") $(".tl-insert", panel).click(); });
   }
   $$(".treelab").forEach(setupLab);
+
+  /* L6 =========================================================== tree-method stepper: one level (one table row) per click */
+  function setupTreeStepper(box) {
+    const s = Sim.REC[box.dataset.rec], n = Number(box.dataset.n);
+    const { levels: L, steps, sum } = Sim.treeSteps(s, n);
+    const svg = svgEl("svg", { class: "chart tm-svg", role: "img" });
+    const table = el("table", { class: "vals tm-table" });
+    const say = el("p", { class: "step-say", role: "status" });
+    const back = el("button", { class: "btn", type: "button", text: "← Back" });
+    const next = el("button", { class: "btn primary", type: "button", text: "Next level →" });
+    const count = el("span", { class: "note" });
+    box.append(el("div", { class: "chart-box" }, svg), say, el("div", { class: "controls" }, back, next, count), el("div", { class: "table-wrap" }, table));
+    let k = 0;
+    function drawTree() {
+      const narrow = innerWidth < 600, W = narrow ? 340 : 640, dy = narrow ? 44 : 50, bh = 24, shown = Math.min(k, L.length);
+      svg.setAttribute("viewBox", `0 0 ${W} ${L.length * dy}`);
+      svg.replaceChildren();
+      let prev = null;
+      L.forEach((l, d) => {
+        const cnt = Number(l.nodes), slot = W / cnt, bw = Math.min(56, slot - 3), y = 2 + d * dy;
+        const xs = Array.from({ length: cnt }, (_, j) => slot * (j + 0.5));
+        const on = d < shown;
+        if (prev) xs.forEach((x, j) => svg.append(svgEl("line", { x1: prev[Math.floor(j / s.a)], y1: y - dy + bh, x2: x, y2: y, class: `tm-edge${on ? "" : " ghost"}` })));
+        for (const x of xs) {
+          const g = svgEl("g", { class: `tm-box${on ? (d === shown - 1 && k <= L.length ? " now" : "") : " ghost"}` });
+          g.append(svgEl("rect", { x: x - bw / 2, y, width: bw, height: bh, rx: 3 }));
+          if (on) g.append(svgEl("text", { x, y: y + 16.5, "text-anchor": "middle" }, fmt(l.size)));
+          svg.append(g);
+        }
+        prev = xs;
+      });
+      svg.setAttribute("aria-label", shown ? `Recursion tree, levels 0 to ${shown - 1}: ${L.slice(0, shown).map((l) => `${l.nodes} call${l.nodes === 1n ? "" : "s"} of size ${l.size}`).join("; ")}` : "Recursion tree, not drawn yet");
+    }
+    function drawTable() {
+      const head = el("tr", {}, ...["level i", "calls", "size of each", "work per call", "work for the level"].map((t) => el("th", { text: t })));
+      const rows = L.map((l, d) => {
+        const on = d < k, cell = (v) => el("td", { class: on ? null : "tm-blank", text: on ? fmt(v) : "?" });
+        return el("tr", { class: d === k - 1 ? "now" : null }, el("th", { text: String(l.i) }), cell(l.nodes), cell(l.size), cell(l.each), cell(l.total));
+      });
+      const done = k > L.length;
+      const total = el("tr", { class: `tm-total${done ? " now" : ""}` }, el("th", { text: "total" }), el("td", { colspan: "3" }), el("td", { class: done ? null : "tm-blank", text: done ? fmt(sum) : "?" }));
+      table.replaceChildren(el("thead", {}, head), el("tbody", {}, ...rows, total));
+    }
+    function paint() {
+      drawTree(); drawTable();
+      say.textContent = k === 0 ? `${Sim.recTex(s)} with n = ${n}. Each click adds one level of calls and fills its row of the table.` : steps[k - 1];
+      back.disabled = k === 0;
+      next.disabled = k === steps.length;
+      next.textContent = k === L.length ? "Add the levels →" : "Next level →";
+      count.textContent = k === 0 ? "Press Next level." : k === steps.length ? "Done." : `Level ${k - 1} of ${L.length - 1}.`;
+    }
+    back.addEventListener("click", () => { if (k > 0) { k--; paint(); } });
+    next.addEventListener("click", () => { if (k < steps.length) { k++; paint(); } });
+    paint();
+    let wasNarrow = innerWidth < 600;
+    REDRAW.add(() => { if ((innerWidth < 600) !== wasNarrow) { wasNarrow = !wasNarrow; drawTree(); } });
+  }
+  $$(".tm-step").forEach(setupTreeStepper);
+
+  /* L6 =========================================================== work per level as bars (.lvbars) */
+  $$(".lvbars[data-rec]").forEach((box) => {
+    const L = Sim.levels(Sim.REC[box.dataset.rec], Number(box.dataset.n));
+    const max = L.reduce((m, l) => (l.total > m ? l.total : m), 0n);
+    box.replaceChildren(...L.map((l) => el("div", { class: "lv-row" },
+      el("span", { class: "lv-i", text: `level ${l.i}` }),
+      el("span", { class: "lv-track" }, el("span", { class: "lv-bar", style: `width:${Number((l.total * 1000n) / max) / 10}%` })),
+      el("span", { class: "lv-n", text: fmt(l.total) }))));
+  });
 };

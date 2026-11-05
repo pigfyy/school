@@ -186,7 +186,24 @@
   // M(h): fewest nodes in an AVL tree of height h (slide 55)
   function minAVL(hh) { const m = [1, 2]; for (let i = 2; i <= hh; i++) m.push(m[i - 1] + m[i - 2] + 1); return m[hh]; }
 
+  /* L6 ---------------------------------------------------------- tree-method stepper: one table row per level */
+  // Each step's narration states its arithmetic as "x × y = z", "x/y = z" and "a + b = s" so verify.mjs can recheck it.
+  function treeSteps(s, n) {
+    const L = levels(s, n);
+    const work = (l) => (l.leaf ? `the base case, T(${l.size}) = ${l.each}` : s.f === "1" ? "1" : s.f === "n" ? `${l.size}` : `${l.size}² = ${l.each}`);
+    const steps = L.map((l, i) => {
+      if (i === 0) return `Level 0 is the first call: 1 call on n = ${l.size}. Work per call: ${work(l)}. Level work: 1 × ${l.each} = ${l.total}.`;
+      const up = L[i - 1];
+      const calls = `Each of the ${up.nodes} calls above makes ${s.a}: ${up.nodes} × ${s.a} = ${l.nodes} calls, each on ${up.size}/${s.b} = ${l.size}.`;
+      return `Level ${i}. ${calls} Work per call: ${work(l)}. Level work: ${l.nodes} × ${l.each} = ${l.total}.`;
+    });
+    const sum = L.reduce((t, l) => t + l.total, 0n);
+    steps.push(`Add the levels: ${L.map((l) => l.total).join(" + ")} = ${sum}. So T(${n}) = ${sum}.`);
+    return { levels: L, steps, sum };
+  }
+
   return {
+    treeSteps,
     REC, F, recTex, evalRec, levels, levelSum,
     node, clone, bstInsert, build, bstFind, bstDelete, maxNode, minNode, height, size,
     preOrder, inOrder, postOrder, levelOrder, shape, parseShape, isBST,

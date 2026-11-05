@@ -146,6 +146,88 @@ const nodeH = (t, k) => { while (t[0] !== k) t = k < t[0] ? t[1] : t[2]; return 
   }
 }
 
+/* L6 ---------------------------------------------------------- Lecture 6: the lecture's code, run and instrumented */
+// sum_helper (divide and conquer) and the course's chip-and-conquer sum, each frame recorded as { depth, size, calls, adds }.
+function sumHelper(list, low, high, depth, frames) {
+  const f = { depth, size: high - low, calls: 0, adds: 0 };
+  frames.push(f);
+  if (low === high) return 0;
+  if (low === high - 1) return list[low];
+  const middle = Math.floor((high + low) / 2);
+  f.calls = 2; f.adds = 1;
+  return sumHelper(list, low, middle, depth + 1, frames) + sumHelper(list, middle, high, depth + 1, frames);
+}
+function chipHelper(list, low, high, frames, depth = 0) {
+  const f = { depth, size: high - low, calls: 0, adds: 0, child: null };
+  frames.push(f);
+  if (low === high) return 0;
+  if (low === high - 1) return list[low];
+  f.calls = 1; f.adds = 1; f.child = high - (low + 1);
+  return list[low] + chipHelper(list, low + 1, high, frames, depth + 1);
+}
+const L6 = (() => {
+  // tree levels by brute force: expand every call of T(n) = a·T(n/b) + f(n) (or n − b), grouped by depth
+  function bruteLevels(a, shrink, f, n, baseAt = 1n, baseVal = 1n) {
+    const out = [];
+    let row = [n];
+    while (row.length) {
+      const size = row[0];
+      ok(row.every((x) => x === size), "all calls on one level have the same size");
+      const leaf = size <= baseAt, each = leaf ? baseVal : f(size);
+      out.push({ calls: BigInt(row.length), size, each, total: BigInt(row.length) * each, leaf });
+      row = leaf ? [] : row.flatMap((x) => Array.from({ length: Number(a) }, () => shrink(x)));
+    }
+    return out;
+  }
+  const levelCalls = (a, i) => bruteLevels(a, half, id, 16n)[i].calls;
+  const chipLevels = (n) => bruteLevels(1n, dec, one, n).length;
+  const linN = ev(1n, dec, id, 1n, 1n);
+  const sq8 = bruteLevels(2n, half, sq, 8n);
+  const shape = (a, b) => { const w = bruteLevels(a, (x) => x / b, id, 256n).filter((l) => !l.leaf).map((l) => l.total); return w.every((x, i) => !i || x > w[i - 1]) ? "grows" : w.every((x, i) => !i || x === w[i - 1]) ? "same" : w.every((x, i) => !i || x < w[i - 1]) ? "shrinks" : "?"; };
+  const frames = []; const list = Array.from({ length: 8 }, (_, i) => i + 1);
+  ok(chipHelper(list, 0, 8, frames) === 36, "chip sum_helper sums the list");
+  const inner = frames.filter((f) => f.calls);
+  const chipSum = { calls: inner[0].calls, shrink: inner[0].size - inner[0].child, adds: inner[0].adds };
+  ok(inner.every((f) => f.calls === chipSum.calls && f.size - f.child === chipSum.shrink && f.adds === chipSum.adds) && frames.length === 8, "chip sum_helper: one call on n − 1, one addition, n frames");
+  return { bruteLevels, levelCalls, chipLevels, linN, sq8, shape, chipSum };
+})();
+// the tree-method stepper (l6-tree): sum_helper on 16 items, run for real
+{
+  const frames = [], list = Array.from({ length: 16 }, (_, i) => 3 * i + 1);
+  ok(sumHelper(list, 0, 16, 0, frames) === list.reduce((x, y) => x + y, 0), "sum_helper sums the list");
+  const byDepth = [];
+  for (const f of frames) (byDepth[f.depth] ||= []).push(f);
+  // one unit of work per call, as on the lecture's tree (inner calls: the +; leaves: T(1) = 1)
+  const real = byDepth.map((fs) => ({ calls: fs.length, size: fs[0].size, same: fs.every((f) => f.size === fs[0].size), total: fs.length }));
+  ok(real.every((r) => r.same) && real.map((r) => r.calls).join() === "1,2,4,8,16" && real.map((r) => r.size).join() === "16,8,4,2,1", "sum_helper's real calls by level");
+  const st = Sim.treeSteps(Sim.REC.sum, 16);
+  ok(st.steps.length === real.length + 1 && st.sum === R.sum(16n) && Number(st.sum) === frames.length, `stepper: ${real.length} levels + the sum; T(16) = ${frames.length} calls`);
+  st.steps.forEach((say, i) => {
+    for (const m of say.matchAll(/(\d+) × (\d+) = (\d+)/g)) ok(+m[1] * +m[2] === +m[3], `step ${i}: ${m[0]}`);
+    for (const m of say.matchAll(/(\d+)\/(\d+) = (\d+)/g)) ok(+m[1] / +m[2] === +m[3], `step ${i}: ${m[0]}`);
+    for (const m of say.matchAll(/((?:\d+ \+ )+\d+) = (\d+)/g)) ok(m[1].split(" + ").reduce((x, y) => x + +y, 0) === +m[2], `step ${i}: ${m[0]}`);
+    if (i < real.length) {
+      const r = real[i];
+      ok(new RegExp(`^Level ${i}\\b`).test(say), `step ${i} names level ${i}`);
+      ok(say.includes(i === 0 ? `1 call on n = ${r.size}` : `= ${r.calls} calls, each on ${real[i - 1].size}/2 = ${r.size}.`), `step ${i}: ${r.calls} calls of size ${r.size}: ${say}`);
+      ok(say.endsWith(`Level work: ${r.calls} × 1 = ${r.total}.`), `step ${i}: level work ${r.total}: ${say}`);
+      ok(r.size === 1 ? say.includes("the base case, T(1) = 1") : say.includes("Work per call: 1."), `step ${i}: work per call`);
+    } else ok(say === `Add the levels: ${real.map((r) => r.total).join(" + ")} = ${frames.length}. So T(16) = ${frames.length}.`, `last step: ${say}`);
+  });
+  // the stepper's table rows are Sim.levels; they must match the real calls
+  ok(JSON.stringify(st.levels.map((l) => [l.nodes, l.size, l.total].map(Number))) === JSON.stringify(real.map((r) => [r.calls, r.size, r.total])), "stepper table rows = real calls");
+  // level bars on l6-series: Sim.levels vs brute force, for the three shapes at n = 16
+  for (const [k, f] of [["sum", one], ["nlogn", id], ["sq", sq]]) ok(Sim.levels(Sim.REC[k], 16).map((l) => l.total).join() === L6.bruteLevels(2n, half, f, 16n).map((l) => l.total).join(), `level bars ${k}`);
+  ok(L6.bruteLevels(2n, half, sq, 16n).map((l) => l.total).join() === "256,128,64,32,16" && R.sq(16n) === 496n && R.nlogn(16n) === 80n && R.sum(16n) === 31n, "series page: 496, 80, 31");
+  // 3T(n/3) + n = n log3 n + n; T(n/2) + n = 2n − 1; T(n−1) + n = n(n+1)/2
+  const t33 = ev(3n, third, id, 1n, 1n);
+  for (let k = 0; k <= 12; k++) ok(t33(3n ** BigInt(k)) === 3n ** BigInt(k) * BigInt(k + 1), `3T(n/3)+n at 3^${k}`);
+  ok(G.relate("n log n + n", "n log n").theta, "3T(n/3)+n is Θ(n log n)");
+  ok(L6.shape(2n, 2n) === "same" && L6.shape(4n, 2n) === "grows" && L6.shape(2n, 4n) === "shrinks", "level work: 2T(n/2)+n same, 4T(n/2)+n grows, 2T(n/4)+n shrinks");
+  ok(L6.sq8.map((l) => `${l.calls}/${l.size}/${l.each}/${l.total}`).join(" ") === "1/8/64/64 2/4/16/32 4/2/4/16 8/1/1/8", "sq table at n = 8");
+  ok(L6.bruteLevels(2n, eighth, one, 512n).map((l) => l.size).join() === "512,64,8,1" && L6.bruteLevels(2n, eighth, one, 512n).at(-1).calls === 8n, "2T(n/8)+1 at 512: sizes and 8 leaves");
+}
+
 /* ---------------------------------------------------------------- 2. expected values for every key */
 const S22 = "9(3(1(0,),6(5,7)),10(,16))", S12 = "7(3(1(0,2),6),10(8,16))", S30 = "9(3(1(0,2),6(,7)),11(,16))", S39 = "9(3(1(0,2),6),11(10,16(,18)))";
 const sp = (a) => a.join(" ");
@@ -165,18 +247,16 @@ const lvl = (key, n, i) => Sim.levels(Sim.REC[key], n)[i].total; // used only to
 
 const EXPECT = {
   // Lecture 6
-  "cse332-w3-l6-qc-sum-calls": "2",
-  "cse332-w3-l6-qc-leaves-16": String(Sim.levels(Sim.REC.sum, 16).at(-1).nodes),
-  "cse332-w3-l6-qc-sum-16": String(R.sum(16n)),
-  "cse332-w3-l6-qc-eighth-class": "n^(1/3)",
-  "cse332-w3-l6-bsearch.a": "1", "cse332-w3-l6-bsearch.t1024": String(R.bsearch(1024n)), "cse332-w3-l6-bsearch.class": "log n",
-  "cse332-w3-l6-sum.nodes": "2^i", "cse332-w3-l6-sum.t16": String(R.sum(16n)), "cse332-w3-l6-sum.class": "n",
-  "cse332-w3-l6-square.level": "n^2/2^i", "cse332-w3-l6-square.t8": String(R.sq(8n)), "cse332-w3-l6-square.class": "n^2",
+  "cse332-w3-l6-cyu-level3": String(L6.levelCalls(3n, 3)), "cse332-w3-l6-qc-chip-levels": String(L6.chipLevels(10n)),
+  "cse332-w3-l6-qc-3n3": "n log n",
+  "cse332-w3-l6-chip-sum.a": String(L6.chipSum.calls), "cse332-w3-l6-chip-sum.size": L6.chipSum.shrink === 1 ? "minus1" : "?", "cse332-w3-l6-chip-sum.f": String(L6.chipSum.adds), "cse332-w3-l6-chip-sum.class": "n",
+  "cse332-w3-l6-sq-table.calls1": String(L6.sq8[1].calls), "cse332-w3-l6-sq-table.size1": String(L6.sq8[1].size), "cse332-w3-l6-sq-table.each1": String(L6.sq8[1].each),
+  "cse332-w3-l6-sq-table.level1": String(L6.sq8[1].total), "cse332-w3-l6-sq-table.level": "n^2/2^i", "cse332-w3-l6-sq-table.t8": String(R.sq(8n)),
   "cse332-w3-l6-eighth.levels": String(Sim.levels(Sim.REC.eighth, 512).length), "cse332-w3-l6-eighth.t512": String(R.eighth(512n)), "cse332-w3-l6-eighth.class": "n^(1/3)",
-  "cse332-w3-l6-common.exp": "2^n", "cse332-w3-l6-common.quad": "n^2", "cse332-w3-l6-common.halfn": "n", "cse332-w3-l6-common.loglin": "n log n",
-  "cse332-w3-l6-what-matters.base": "no", "cse332-w3-l6-what-matters.f": "no", "cse332-w3-l6-what-matters.a": "yes", "cse332-w3-l6-what-matters.b": "yes",
-  "cse332-w3-l6-cyu-halving": "log n", "cse332-w3-l6-cyu-nlogn": "n log n", "cse332-w3-l6-cyu-t8": String(R.nlogn(8n)),
-  "cse332-w3-l6-cyu-quadratic": "n^2", "cse332-w3-l6-cyu-square": "n^2", "cse332-w3-l6-cyu-level3": String(3 ** 3), "cse332-w3-l6-cyu-exponential": "2^n",
+  "cse332-w3-l6-chip-tree.level": "n-i", "cse332-w3-l6-chip-tree.levels5": String(L6.chipLevels(5n)), "cse332-w3-l6-chip-tree.t5": String(L6.linN(5n)), "cse332-w3-l6-chip-tree.class": "n^2",
+  "cse332-w3-l6-change-one.base": "n log n", "cse332-w3-l6-change-one.f": "n log n", "cse332-w3-l6-change-one.a-shape": L6.shape(4n, 2n), "cse332-w3-l6-change-one.a": "n^2",
+  "cse332-w3-l6-change-one.b-shape": L6.shape(2n, 4n), "cse332-w3-l6-change-one.b": "n",
+  "cse332-w3-l6-recognize.log": "log n", "cse332-w3-l6-recognize.lin": "n", "cse332-w3-l6-recognize.exp": "2^n", "cse332-w3-l6-recognize.halfn": "n",
   // Lecture 7
   "cse332-w3-l7-qc-sorted-find": "log n",
   "cse332-w3-l7-qc-inorder-dusb": ino(dusb).join(" "),
@@ -275,14 +355,15 @@ const has = (s, why) => ok(text.includes(s), `page states "${s}" (${why})`);
 has("\\(M(h)\\)</th><td>1</td><td>2</td><td>4</td><td>7</td><td>12</td><td>20</td><td>33</td><td>54</td><td>88</td><td>143</td><td>232</td>", "M(h) row");
 ok([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(M).join() === "1,2,4,7,12,20,33,54,88,143,232" && [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(Sim.minAVL).join() === "1,2,4,7,12,20,33,54,88,143,232", "M(h) values (both implementations)");
 has("<td>1</td><td>3</td><td>7</td><td>15</td><td>31</td><td>63</td><td>127</td><td>255</td><td>511</td><td>1023</td><td>2047</td>", "2^(h+1)-1 row");
-has("gives \\(T(1024) = 11\\)", "bsearch note"); ok(R.bsearch(1024n) === 11n, "T(1024) = 11");
-has("\\(T(2) = 2 + 4 = 6\\), \\(T(4) = 12 + 16 = 28\\), \\(T(8) = 56 + 64 = 120\\)", "square steps"); ok(R.sq(2n) === 6n && R.sq(4n) === 28n, "sq T(2), T(4)");
 has("\\(T(2) = 5\\), \\(T(4) = 19\\), \\(T(8) = 65\\)", "1d steps"); ok(R.s1d(2n) === 5n && R.s1d(4n) === 19n && R.s1d(8n) === 65n, "1d T(2..8)");
 has("\\(T(3) = 5\\), \\(T(9) = 19\\), \\(T(27) = 65\\)", "1e steps"); ok(R.s1e(3n) === 5n && R.s1e(9n) === 19n && R.s1e(27n) === 65n, "1e T(3..27)");
 has("\\(T(2) = 400\\), \\(T(4) = 1200\\), \\(T(8) = 3200\\)", "1c steps"); ok(R.s1c(2n) === 400n && R.s1c(4n) === 1200n && R.s1c(8n) === 3200n, "1c T(2..8)");
 has("\\(T(8) = 16\\), \\(T(16) = 32 + 16 = 48\\)", "1b steps"); ok(R.s1b(8n) === 16n, "1b T(8)");
-has("Levels: 8, 8, 8, then 8 leaves", "T(8) why"); ok(Sim.levels(Sim.REC.nlogn, 8).map((l) => l.total).join() === "8,8,8,8", "nlogn levels at 8");
-has("\\(T(2) = 4\\), \\(T(4) = 12\\), \\(T(8) = 32\\)", "nlogn build-up"); ok(R.nlogn(2n) === 4n && R.nlogn(4n) === 12n, "nlogn T(2), T(4)");
+/* L6 */
+has("\\(1 + 2 + 4 + 8 + 16 = 31\\)", "series: grows"); has("\\(16 \\times 5 = 80\\)", "series: same"); has("\\(256 + 128 + 64 + 32 + 16 = 496\\)", "series: shrinks");
+has("\\(T(8) = 64 + 32 + 16 + 8 = 120\\)", "sq table sum"); has("\\(1 + 2 + 4 + 8 = 15\\)", "eighth sum"); has("\\(5 + 4 + 3 + 2 + 1 = 15\\)", "chip tree sum");
+has("at \\(n = 16\\): \\(31\\)", "tree page sum"); has("\\(8 = 512^{1/3}\\)", "eighth leaves");
+ok(R.sum(16n) === 31n && R.eighth(512n) === 15n && L6.linN(5n) === 15n && R.sq(8n) === 120n, "L6 prose numbers");
 // the delete-3-first quick check really differs from the sequence answer
 ok(del(parse(S22), 3)[2] === 1 && d3.out[2][1] === 0, "deleting 3 first pulls up 1; after deleting 1 it pulls up 0");
 
