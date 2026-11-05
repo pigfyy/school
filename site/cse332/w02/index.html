@@ -507,87 +507,114 @@
 <section class="page" id="l3-problems" data-title="Lecture 3 practice">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
   <h1>Lecture 3 practice</h1>
-  <div class="prose"><p>This page is your practice and your self-check in one. It follows the lecture's goals in order: a few concept checks, then problems. Stuck? Each group's lesson link goes back to the page that teaches it.</p><p>Number boxes take arithmetic like <code>2^10 + 1</code>, Big-O boxes take a class like <code>n log n</code>, and yes/no boxes take <code>yes</code> or <code>no</code>. For a \(c\)/\(n_0\) pair, any pair that works is accepted.</p></div>
+  <div class="prose"><p>One problem per lesson, with easy numbers. Stuck? Open a hint. The solution goes one step at a time.</p><p>Number boxes take a number, Big-O boxes take a bucket like <code>n log n</code>, and yes/no boxes take <code>yes</code> or <code>no</code>. For a \(c\) and \(n_0\), any pair that works is accepted.</p></div>
   <div data-progress-bar></div>
 
-  <h2 class="practice-group">Binary search and logs</h2>
+  <h2 class="practice-group">Binary search</h2>
   <p class="note">Lesson: <a href="#search">Why binary search is log n</a></p>
 
   <article class="task" data-id="cse332-w2-l3-gap-halving">
-    <h2>1. Halving the gap</h2>
-    <p class="prompt">This practices the lecture's argument for why binary search takes about \(\log_2 n\) loop iterations. Here is the lecture's binary search on a sorted list <code>a</code> of \(n\) items:</p>
-    <pre class="code">public static boolean binary_contains(
-        List&lt;Integer&gt; a, int k){
-    int start = 0;
-    int end = a.size();
-    while(start &lt; end){
-        int mid = start + (end-start)/2;
-        if(a.get(mid) == k)
-               return true;
-        else if(a.get(mid) &lt; k)
-               start = mid+1;
-        else
-               end = mid;
-    }
-    return false;
-}</pre>
-    <p class="prompt">The <strong>gap</strong> is <code>end - start</code>, the number of items that could still hold \(k\). It starts at \(n\), and each iteration of the <code>while</code> loop roughly halves it. After \(x\) iterations about \(\frac{n}{2^x}\) items are left. One iteration is one pass through the loop body. The worst case is a \(k\) that makes the loop run as many times as possible.</p>
-    <div class="answer-spec" data-part="solve-4096" data-grader="exact" data-answer="12" data-miscon='{"2048":"halved-once","4096":"linear-count"}' data-label="the \(x\) with \(\frac{n}{2^x} = 1\) when \(n = 4096\)"></div>
-    <div class="answer-spec" data-part="worst-2-to-20" data-grader="exact" data-answer="21" data-miscon='{"20":"stopped-early","1048576":"linear-count"}' data-label="worst-case loop iterations for \(n = 2^{20}\)"></div>
-    <div class="answer-spec" data-part="worst-million" data-grader="exact" data-answer="20" data-miscon='{"21":"rounded-up","19":"stopped-early","1000000":"linear-count"}' data-label="worst-case loop iterations for \(n = 1{,}000{,}000\)"></div>
+    <h2>1. Count the loops</h2>
+    <p class="prompt">Binary search halves the items left on each loop, and takes one more loop for the last item. How many loops does it take in the worst case?</p>
+    <div class="answer-spec" data-part="worst-32" data-grader="exact" data-answer="6" data-miscon='{"5":"stopped-early","32":"linear-count","16":"halved-once"}' data-label="worst-case loops for 32 items"></div>
+    <div class="answer-spec" data-part="worst-1000" data-grader="exact" data-answer="10" data-miscon='{"9":"stopped-early","11":"rounded-up","1000":"linear-count"}' data-label="worst-case loops for 1,000 items"></div>
     <ol class="hints">
-      <li>\(\frac{n}{2^x} = 1\) means \(2^x = n\). For the loop counts, write down the gaps: \(n, \lfloor n/2\rfloor, \dots, 1\). Each gap is one iteration.</li>
-      <li>\(2^{20} = 1{,}048{,}576\). Is \(1{,}000{,}000\) above or below that?</li>
+      <li>Write the items left: \(32 \to 16 \to \dots \to 1\). Each number is one loop.</li>
+      <li>For 1,000, halve and round down: \(1000 \to 500 \to 250 \to \dots\)</li>
     </ol>
     <div class="solution">
       <div class="steps"><ol>
-        <li>\(2^{12} = 4096\), so \(x = 12\).</li>
-        <li>For \(n = 2^{20}\), the gaps are \(2^{20}, 2^{19}, \dots, 2^0 = 1\). That's 21 gaps, so 21 iterations. The loop still runs when the gap is 1.</li>
-        <li>For \(n = 10^6\): \(2^{19} = 524{,}288 \le 10^6 &lt; 2^{20}\), so \(\lfloor\log_2 10^6\rfloor = 19\) and the worst case is \(19 + 1 = 20\).</li>
-        <li class="answer">12; 21; 20. All are \(\lfloor\log_2 n\rfloor + 1\), which is \(\Theta(\log n)\).</li>
+        <li>\(32 \to 16 \to 8 \to 4 \to 2 \to 1\): six numbers, so 6 loops.</li>
+        <li>\(1000 \to 500 \to 250 \to 125 \to 62 \to 31 \to 15 \to 7 \to 3 \to 1\): ten numbers, so 10 loops.</li>
+        <li class="answer">6; 10. Both are about \(\log_2 n\) plus one.</li>
       </ol></div>
       <div class="step-bar"><button class="btn" type="button" data-brute="worst-cases">Check by brute force</button><span class="brute"></span></div>
     </div>
   </article>
 
-  <article class="task" data-id="cse332-w2-l3-log-base">
-    <h2>2. The base of the log</h2>
-    <p class="prompt">This practices the lecture's claim that the base of a log doesn't matter inside \(O(\,)\). The tool is the change-of-base rule: \(\log_c n = \frac{\log_2 n}{\log_2 c}\), so changing the base only divides by a constant.</p>
-    <div class="answer-spec" data-part="log8-divisor" data-grader="exact" data-answer="3" data-miscon='{"8":"base-not-log"}' data-label="the number \(d\) in \(\log_8 n = \frac{\log_2 n}{d}\)"></div>
-    <div class="answer-spec" data-part="log8-at-2-to-30" data-grader="exact" data-answer="10" data-miscon='{"30":"base-ignored","90":"base-multiplied"}' data-label="the value of \(\log_8 n\) at \(n = 2^{30}\)"></div>
-    <div class="answer-spec" data-part="log5-in-o-log2" data-grader="yesno" data-answer="yes" data-label="Is \(\log_5 n \in O(\log_2 n)\)? (yes or no)"></div>
-    <div class="answer-spec" data-part="log2-in-o-log5" data-grader="yesno" data-answer="yes" data-label="Is \(\log_2 n \in O(\log_5 n)\)? (yes or no)"></div>
+  <div class="check" data-id="cse332-w2-l3-log-base-same" data-grader="yesno" data-answer="yes">
+    <p>Quick check: \(\log_8 n\) is just \(\log_2 n \div 3\). Are \(\log_8 n\) and \(\log_2 n\) in the same bucket? (yes or no)</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group">Buckets</h2>
+  <p class="note">Lesson: <a href="#compare">Buckets</a></p>
+
+  <article class="task" data-id="cse332-w2-l3-intuition-buckets">
+    <h2>2. Find the bucket</h2>
+    <p class="prompt">Keep the fastest-growing term and drop its constant. Write the bucket, like <code>n^2</code> or <code>n log n</code>.</p>
+    <div class="answer-spec" data-part="seven-n" data-grader="bigo" data-answer="n" data-label="bucket of \(7n + 2\)"></div>
+    <div class="answer-spec" data-part="four-n2" data-grader="bigo" data-answer="n^2" data-label="bucket of \(4n^2 + 100n + 9\)"></div>
+    <div class="answer-spec" data-part="nlogn-plus-n" data-grader="bigo" data-answer="n log n" data-label="bucket of \(n\log n + 5n\)"></div>
+    <div class="answer-spec" data-part="three-to-n" data-grader="bigo" data-answer="3^n" data-label="bucket of \(3^n + n^{10}\)"></div>
     <ol class="hints">
-      <li>\(\log_2 8\) is a small whole number.</li>
-      <li>For the last two, the ratio of the two functions is a constant both ways round. What does that give you for \(c\)?</li>
+      <li>Slowest to fastest: \(1 &lt; \log n &lt; n &lt; n\log n &lt; n^2 &lt; n^3 &lt; 2^n &lt; 3^n\).</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>\(\log_2 8 = 3\), so \(\log_8 n = \frac{\log_2 n}{3}\).</li>
-      <li>At \(n = 2^{30}\): \(\frac{30}{3} = 10\). Check: \(8^{10} = 2^{30}\).</li>
-      <li>\(\log_5 n = \frac{1}{\log_2 5}\log_2 n \le 1\cdot\log_2 n\), so \(c = 1\) works. And \(\log_2 n = (\log_2 5)\cdot\log_5 n\), so \(c = \log_2 5 \approx 2.32\) works the other way.</li>
-      <li class="answer">3; 10; yes; yes. So \(\Theta(\log_5 n) = \Theta(\log_2 n)\): ignore the base.</li>
+      <li>\(7n + 2\): keep \(7n\), drop the 7. Bucket \(n\).</li>
+      <li>\(4n^2 + 100n + 9\): \(n^2\) outgrows \(100n\). Bucket \(n^2\).</li>
+      <li>\(n\log n + 5n\): \(n\log n\) outgrows \(n\). Bucket \(n\log n\).</li>
+      <li>\(3^n + n^{10}\): any exponential outgrows any polynomial. Bucket \(3^n\), and the 3 stays.</li>
+      <li class="answer">\(n\); \(n^2\); \(n\log n\); \(3^n\).</li>
     </ol></div></div>
   </article>
 
-  <h2 class="practice-group">What \(O\), \(\Omega\) and \(\Theta\) mean</h2>
-  <p class="note">Lesson: <a href="#compare">Buckets</a>, <a href="#notation">O, Ω, Θ</a></p>
+  <article class="task" data-id="cse332-w2-l3-crossover">
+    <h2>3. Who wins, and when?</h2>
+    <p class="prompt">Algorithm A takes \(100n\) steps. Algorithm B takes \(n^2\).</p>
+    <div class="answer-spec" data-part="cheaper-at-10" data-grader="choice" data-choices='["a","b"]' data-options="a:A (100n)|b:B (n²)" data-answer="b" data-label="which is cheaper at \(n = 10\)?"></div>
+    <div class="answer-spec" data-part="a-from" data-grader="exact" data-answer="100" data-miscon='{"101":"strict-vs-equal","99":"strict-vs-equal"}' data-label="from which \(n\) on is A never slower?"></div>
+    <ol class="hints">
+      <li>Plug in: at \(n = 10\), A is \(1{,}000\) and B is \(100\).</li>
+      <li>\(100n \le n^2\): divide both sides by \(n\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>At \(n = 10\): A is \(1{,}000\), B is \(100\). B is cheaper.</li>
+      <li>\(100n \le n^2 \iff 100 \le n\). So from \(n = 100\) on, A is never slower.</li>
+      <li class="answer">B; 100. The smaller bucket (\(n\)) wins, but only for big enough \(n\).</li>
+    </ol></div></div>
+  </article>
 
-  <div class="check" data-id="cse332-w2-l3-cyu-timing-vs-bigo" data-grader="mc">
-    <p>Quick check: You and a classmate each wrote a HashMap. You want to know whose code runs faster on one particular data set. What should you use?</p>
+  <h2 class="practice-group">\(O\), \(\Omega\), \(\Theta\)</h2>
+  <p class="note">Lesson: <a href="#notation">O, Ω, Θ</a></p>
+
+  <article class="task" data-id="cse332-w2-l3-more-examples">
+    <h2>4. True or false?</h2>
+    <p class="prompt">\(f(n) = 3n + 5\), which is in bucket \(n\). Answer yes or no.</p>
+    <div class="answer-spec" data-part="in-o-n2" data-grader="yesno" data-answer="yes" data-label="Is \(f \in O(n^2)\)?"></div>
+    <div class="answer-spec" data-part="in-o-logn" data-grader="yesno" data-answer="no" data-miscon='{"yes":"bigger-in-smaller"}' data-label="Is \(f \in O(\log n)\)?"></div>
+    <div class="answer-spec" data-part="in-omega-1" data-grader="yesno" data-answer="yes" data-label="Is \(f \in \Omega(1)\)?"></div>
+    <div class="answer-spec" data-part="in-theta-n2" data-grader="yesno" data-answer="no" data-label="Is \(f \in \Theta(n^2)\)?"></div>
+    <ol class="hints">
+      <li>Compare buckets. \(O\): same or bigger. \(\Omega\): same or smaller. \(\Theta\): same.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(O(n^2)\): \(n^2\) is a bigger bucket. True, just loose.</li>
+      <li>\(O(\log n)\): \(\log n\) is a smaller bucket, so it can't be a ceiling. False.</li>
+      <li>\(\Omega(1)\): \(1\) is a smaller bucket, so it's a floor. True, just weak.</li>
+      <li>\(\Theta(n^2)\): needs the same bucket, and \(n \ne n^2\). False.</li>
+      <li class="answer">yes; no; yes; no.</li>
+    </ol></div></div>
+  </article>
+
+  <div class="check" data-id="cse332-w2-l3-cyu-not-in-o-n2" data-grader="mc">
+    <p>Quick check: which function is <em>not</em> in \(O(n^2)\)?</p>
     <div class="opts">
-        <label><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Asymptotic analysis only<span class="why" hidden>Asymptotic analysis evaluates algorithms. Two implementations of the same algorithm can have the same \(\Theta\) and still differ in speed.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Timing<span class="why" hidden>Correct: to evaluate an implementation on a specific data set, timing is useful.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Neither tells you anything<span class="why" hidden>Timing does answer this exact question: implementation A vs B on data set C.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(1000n^2\)<span class="why" hidden>Same bucket: 1000 is only a constant.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(n\)<span class="why" hidden>A smaller bucket fits under the n² ceiling.</span></label>
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(n^2\log n\)<span class="why" hidden>Right. It's n² times log n, and log n keeps growing, so no constant ceiling holds it.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> 50<span class="why" hidden>A constant is the smallest bucket of all, so it fits under n².</span></label>
       </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <div class="check" data-id="cse332-w2-l3-cyu-definition-order" data-grader="mc">
-    <p>Quick check: The definition of \(f \in O(g)\) uses a constant \(c\), a starting point \(n_0\), and the inequality \(f(n) \le c\cdot g(n)\). In what order are they chosen and checked?</p>
+  <div class="check" data-id="cse332-w2-l3-cyu-timing-vs-bigo" data-grader="mc">
+    <p>Quick check: you and a classmate each wrote a HashMap. You want to know whose code runs faster on one particular data set. What should you use?</p>
     <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-definition-order"> Choose \(c\) and \(n_0\); then the inequality must hold for every \(n \ge n_0\)<span class="why" hidden>Correct. \(\exists c\,\exists n_0\,\forall n\): one pair of constants has to work for all large \(n\).</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-definition-order"> For each \(n\), choose a \(c\) that works for that \(n\)<span class="why" hidden>That would be \(\forall n\,\exists c\), which every positive function satisfies (take \(c = f(n)/g(n)\)). The order of the quantifiers is the whole point.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-definition-order"> Check the inequality at \(n = n_0\) only<span class="why" hidden>It must hold for every \(n \ge n_0\), not just at one point.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Big-O only<span class="why" hidden>Big-O compares algorithms. Two versions of the same algorithm have the same bucket and can still differ in speed.</span></label>
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Timing<span class="why" hidden>Right. To compare two pieces of code on one data set, time them.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-timing-vs-bigo"> Neither tells you anything<span class="why" hidden>Timing answers exactly this question: code A vs. code B on data set C.</span></label>
       </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
@@ -596,252 +623,94 @@
   <h2 class="practice-group">Proving a bound</h2>
   <p class="note">Lesson: <a href="#proofs">Proving a bound</a></p>
 
-  <article class="task" data-id="cse332-w2-l3-example1-bigo">
-    <h2>3. Prove \(10n + 100 \in O(n^2)\)</h2>
-    <p class="prompt">This is the lecture's first Big-O proof. It practices the first step of any such proof: choosing the constants. The definition: \(f(n) \in O(g(n))\) when there are constants \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). The lecture chose \(c = 10\) and \(n_0 = 10\).</p>
-    <p class="prompt">Find your own \(c\) and \(n_0\) with \(10n + 100 \le c\cdot n^2\) for all \(n \ge n_0\). Then find the smallest \(n_0\) that works when \(c = 10\).</p>
-    <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["100","10"],"g":["0","0","1"],"rel":"O"}' data-label="your \(c\)"></div>
+  <article class="task" data-id="cse332-w2-l3-prove-4n8">
+    <h2>5. Prove \(4n + 8 \in O(n)\)</h2>
+    <p class="prompt">Fill the template's blanks: a \(c\) and an \(n_0\) with \(4n + 8 \le c\cdot n\) for every \(n \ge n_0\).</p>
+    <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["8","4"],"g":["0","1"],"rel":"O"}' data-label="your \(c\)"></div>
     <div class="answer-spec" data-part="n0" data-grader="bound" data-role="n0" data-label="your \(n_0\)"></div>
-    <div class="answer-spec" data-part="smallest-n0-c10" data-grader="exact" data-answer="4" data-miscon='{"10":"not-smallest","3":"strict-vs-equal"}' data-label="the smallest \(n_0\) that works with \(c = 10\)"></div>
+    <div class="answer-spec" data-part="smallest-n0-c5" data-grader="exact" data-answer="8" data-miscon='{"7":"strict-vs-equal","9":"strict-vs-equal"}' data-label="with \(c = 5\), the smallest \(n_0\) that works"></div>
     <ol class="hints">
-      <li>With \(c = 10\), divide both sides by 10: you need \(n + 10 \le n^2\).</li>
-      <li>\(n + 10 \le n^2 \iff 10 \le n(n-1)\). Try \(n = 3\) and \(n = 4\).</li>
+      <li>Pick \(c\) just above the 4 in \(4n\).</li>
+      <li>With \(c = 5\): \(4n + 8 \le 5n\). Take \(4n\) off both sides.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>With \(c = 10\): \(10n + 100 \le 10n^2 \iff 10 \le n(n-1)\).</li>
-      <li>\(n(n-1)\) is increasing for \(n \ge 1\), and \(3\cdot2 = 6 &lt; 10 \le 4\cdot3 = 12\). So the smallest \(n_0\) is 4. The lecture uses \(n_0 = 10\), which also works.</li>
-      <li>Another pair: for \(n \ge 1\), \(10n + 100 \le 10n^2 + 100n^2 = 110n^2\), so \(c = 110, n_0 = 1\).</li>
-      <li class="answer">Any valid pair, e.g. \(c = 10, n_0 = 10\) (the lecture's) or \(c = 110, n_0 = 1\). The smallest \(n_0\) for \(c = 10\) is 4.</li>
+      <li>Pick \(c = 5\).</li>
+      <li>\(4n + 8 \le 5n \iff 8 \le n\). So \(n_0 = 8\), and nothing smaller works: at \(n = 7\), \(36 \le 35\) is false.</li>
+      <li>Another pair: for \(n \ge 1\), \(8 \le 8n\), so \(4n + 8 \le 12n\): \(c = 12\), \(n_0 = 1\).</li>
+      <li class="answer">Any pair that works, like \(c = 5, n_0 = 8\) or \(c = 12, n_0 = 1\). With \(c = 5\), the smallest \(n_0\) is 8.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w2-l3-example2-omega">
-    <h2>4. Prove \(13n^2 - 50n \in \Omega(n^2)\)</h2>
-    <p class="prompt">This is the lecture's second proof, a lower bound. \(f(n) \in \Omega(g(n))\) is the same definition as \(O\) with the inequality flipped: there are \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \ge c\cdot g(n)\) for every \(n \ge n_0\). The lecture first tried \(c = 13\), saw it fail, and used \(c = 12\), \(n_0 = 50\).</p>
-    <p class="prompt">Find your own \(c\) and \(n_0\) with \(13n^2 - 50n \ge c\cdot n^2\) for all \(n \ge n_0\). Then answer two questions about the choice of \(c\).</p>
-    <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["0","-50","13"],"g":["0","0","1"],"rel":"Omega"}' data-label="your \(c\)"></div>
+  <article class="task" data-id="cse332-w2-l3-prove-omega">
+    <h2>6. Prove \(3n - 6 \in \Omega(n)\)</h2>
+    <p class="prompt">Same template, flipped to \(\ge\): find a \(c\) and an \(n_0\) with \(3n - 6 \ge c\cdot n\) for every \(n \ge n_0\).</p>
+    <div class="answer-spec" data-part="c" data-grader="bound" data-role="c" data-bound='{"f":["-6","3"],"g":["0","1"],"rel":"Omega"}' data-label="your \(c\)"></div>
     <div class="answer-spec" data-part="n0" data-grader="bound" data-role="n0" data-label="your \(n_0\)"></div>
-    <div class="answer-spec" data-part="smallest-n0-c12" data-grader="exact" data-answer="50" data-miscon='{"49":"strict-vs-equal","51":"strict-vs-equal"}' data-label="the smallest \(n_0\) that works with \(c = 12\)"></div>
-    <div class="answer-spec" data-part="c13-possible" data-grader="yesno" data-answer="no" data-miscon='{"yes":"c13-works"}' data-label="Is there any \(n_0\) that works with \(c = 13\)? (yes or no)"></div>
+    <div class="answer-spec" data-part="c3-possible" data-grader="yesno" data-answer="no" data-miscon='{"yes":"c3-works"}' data-label="Does any \(n_0\) work with \(c = 3\)? (yes or no)"></div>
     <ol class="hints">
-      <li>Divide both sides by \(n\) (fine for \(n \ge 1\)): you need \(13n - 50 \ge c\cdot n\).</li>
-      <li>With \(c = 13\) the \(n\)s cancel. What's left?</li>
+      <li>Try \(c = 3\) first. What's left after the \(3n\)s cancel?</li>
+      <li>For \(\Omega\), a smaller \(c\) is easier. Try \(c = 2\).</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>Equivalent: \(13n - 50 \ge cn\), i.e. \((13 - c)\,n \ge 50\).</li>
-      <li>\(c = 13\): \(0 \ge 50\) is false for every \(n\), so no \(n_0\) works.</li>
-      <li>\(c = 12\): \(n \ge 50\), so the smallest \(n_0\) is exactly 50, the lecture's choice.</li>
-      <li class="answer">Any \(c &lt; 13\) with \(n_0 \ge \frac{50}{13 - c}\), e.g. \(c = 12, n_0 = 50\). Smallest \(n_0\) for \(c = 12\): 50. \(c = 13\): impossible. The trade-off: \(c = 1\) needs \(n_0 = 5\), \(c = 11\) needs 25, \(c = 12.5\) needs 100.</li>
-    </ol></div></div>
-  </article>
-
-  <article class="task" data-id="cse332-w2-l3-sq17-theta">
-    <h2>5. \(3n^2 + 17 \in \Theta(n^2)\)</h2>
-    <p class="prompt">This practices the lecture's tight bound, \(\Theta\). \(f \in \Theta(g)\) means both \(f \in O(g)\) (some \(c\), \(n_0\) with \(f(n) \le c\cdot g(n)\) for all \(n \ge n_0\)) and \(f \in \Omega(g)\) (some \(c\), \(n_0\) with \(f(n) \ge c\cdot g(n)\) for all \(n \ge n_0\)). The two pairs don't have to match. Give one pair for each.</p>
-    <div class="answer-spec" data-part="upper-c" data-grader="bound" data-role="c" data-pair="upper" data-bound='{"f":["17","0","3"],"g":["0","0","1"],"rel":"O"}' data-label="\(O\): your \(c\)"></div>
-    <div class="answer-spec" data-part="upper-n0" data-grader="bound" data-role="n0" data-pair="upper" data-label="\(O\): your \(n_0\)"></div>
-    <div class="answer-spec" data-part="lower-c" data-grader="bound" data-role="c" data-pair="lower" data-bound='{"f":["17","0","3"],"g":["0","0","1"],"rel":"Omega"}' data-label="\(\Omega\): your \(c\)"></div>
-    <div class="answer-spec" data-part="lower-n0" data-grader="bound" data-role="n0" data-pair="lower" data-label="\(\Omega\): your \(n_0\)"></div>
-    <ol class="hints">
-      <li>The lower bound is the easy one: \(3n^2 + 17\) is never below \(3n^2\).</li>
-      <li>For the upper bound, \(17 \le 17n^2\) when \(n \ge 1\). Or keep \(c\) small and ask when \(17 \le n^2\).</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>\(\Omega\): \(3n^2 + 17 \ge 3n^2\) for every \(n\), so \(c = 3, n_0 = 1\).</li>
-      <li>\(O\): for \(n \ge 1\), \(3n^2 + 17 \le 3n^2 + 17n^2 = 20n^2\), so \(c = 20, n_0 = 1\). Or \(c = 4\): \(3n^2 + 17 \le 4n^2 \iff n^2 \ge 17\), so \(n_0 = 5\).</li>
-      <li class="answer">For example, \(O\) with \(c = 20, n_0 = 1\) (or \(c = 4, n_0 = 5\)), and \(\Omega\) with \(c = 3, n_0 = 1\). So \(3n^2+17 \in \Theta(n^2)\).</li>
+      <li>\(c = 3\): \(3n - 6 \ge 3n \iff -6 \ge 0\). Never true, so no \(n_0\) works.</li>
+      <li>\(c = 2\): \(3n - 6 \ge 2n \iff n \ge 6\). So \(n_0 = 6\).</li>
+      <li class="answer">For example \(c = 2, n_0 = 6\). With \(c = 3\): no. If a \(c\) never works, make it smaller for \(\Omega\) (bigger for \(O\)).</li>
     </ol></div></div>
   </article>
 
   <article class="task" data-id="cse332-w2-l3-write-proof">
-    <h2>6. Write a full proof</h2>
-    <p class="prompt">This practices turning an intuitive argument into a proof. The lecture justifies \(4 + 3n \in O(n)\) only loosely: "for large inputs, \(4 + 3n &lt; n + 3n = 4n\)". Write a full proof in the shape the lecture used for \(10n + 100 \in O(n^2)\) (problem 3):</p>
-    <ol class="prompt">
-      <li>Name specific values: "Let \(c = \dots\) and \(n_0 = \dots\)."</li>
-      <li>Take an arbitrary \(n \ge n_0\).</li>
-      <li>Show \(4 + 3n \le c\cdot n\) for that \(n\), saying where you use \(n \ge n_0\).</li>
-    </ol>
-    <p class="prompt">Compare with the solution when you're done.</p>
-    <div class="answer-spec" data-part="proof" data-grader="self" data-label="your \(c\), \(n_0\) and key step"></div>
-    <ol class="hints">
-      <li>The justification hints at \(c = 4\). When is \(4 \le n\)?</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>Let \(c = 4\) and \(n_0 = 4\). Let \(n \ge 4\) be arbitrary.</li>
-      <li>Since \(n \ge 4\), \(4 + 3n \le n + 3n = 4n = c\cdot n\).</li>
-      <li class="answer">So for all \(n \ge 4\), \(4 + 3n \le 4n\), which proves \(4 + 3n \in O(n)\). (\(c = 7, n_0 = 1\) works too: \(4 \le 4n\) for \(n \ge 1\).) Check that yours names specific values and argues for an arbitrary \(n \ge n_0\); "for large \(n\) it works" is not a proof.</li>
-    </ol></div></div>
-  </article>
-
-  <h2 class="practice-group">The simplest \(\Theta\) class</h2>
-  <p class="note">Lesson: <a href="#compare">Buckets</a></p>
-
-  <div class="check" data-id="cse332-w2-l3-cyu-not-in-o-n2" data-grader="mc">
-    <p>Quick check: Which function is <em>not</em> in \(O(n^2)\)?</p>
-    <div class="opts">
-        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(1000n^2\)<span class="why" hidden>A constant factor: take \(c = 1000\).</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(n^{1.5}\)<span class="why" hidden>\(n^{1.5} \le n^2\) for \(n \ge 1\). \(O\) is an upper bound, so smaller functions are in it.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> \(n^2\log n\)<span class="why" hidden>Correct. \(\frac{n^2\log n}{n^2} = \log n\) grows without bound, so no constant \(c\) works.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-not-in-o-n2"> 50<span class="why" hidden>A constant is in \(O(n^2)\): \(50 \le 50n^2\) for \(n \ge 1\).</span></label>
-      </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l3-cyu-exponent-constant" data-grader="mc">
-    <p>Quick check: Which one is \(\Theta(2^n)\)?</p>
-    <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(2^{n+1}\)<span class="why" hidden>Correct: \(2^{n+1} = 2\cdot 2^n\), which is a multiplicative constant.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(2^{2n}\)<span class="why" hidden>\(2^{2n} = 4^n\). The constant in the exponent multiplies \(n\), so the base changes.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(n\cdot 2^n\)<span class="why" hidden>The ratio to \(2^n\) is \(n\), which isn't bounded.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-exponent-constant"> \(3^n\)<span class="why" hidden>\(3^n/2^n = 1.5^n\) grows without bound, so \(3^n \notin \Theta(2^n)\).</span></label>
-      </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <article class="task" data-id="cse332-w2-l3-intuition-buckets">
-    <h2>7. Simplest \(\Theta\) classes</h2>
-    <p class="prompt">This practices the lecture's shortcut for finding a function's \(\Theta\) class: keep only the fastest-growing term and drop its constant factor. Write the simplest class, like <code>n^2</code> or <code>n log n</code>. These four functions are the lecture's examples.</p>
-    <div class="answer-spec" data-part="four-n-plus-five" data-grader="bigo" data-answer="n" data-label="simplest \(\Theta\) class of \(4n + 5\)"></div>
-    <div class="answer-spec" data-part="half-nlogn" data-grader="bigo" data-answer="n log n" data-label="simplest \(\Theta\) class of \(0.5n\log n + 2n + 7\)"></div>
-    <div class="answer-spec" data-part="cube-plus-exp" data-grader="bigo" data-answer="2^n" data-label="simplest \(\Theta\) class of \(n^3 + 2^n + 3n\)"></div>
-    <div class="answer-spec" data-part="nlog-10n2" data-grader="bigo" data-answer="n log n" data-label="simplest \(\Theta\) class of \(n\log(10n^2)\)"></div>
-    <ol class="hints">
-      <li>For each sum, find the term that grows fastest and drop its coefficient.</li>
-      <li>For the last one, use \(\log(ab) = \log a + \log b\) and \(\log(n^k) = k\log n\).</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>\(4n + 5\): drop the 5 and the 4. That gives \(n\).</li>
-      <li>\(0.5n\log n + 2n + 7\): \(n\log n\) dominates \(n\). That gives \(n\log n\).</li>
-      <li>\(n^3 + 2^n + 3n\): the exponential dominates every polynomial. That gives \(2^n\).</li>
-      <li>\(n\log(10n^2) = n(\log 10 + 2\log n) = (\log 10)\,n + 2n\log n\). That gives \(n\log n\).</li>
-      <li class="answer">\(\Theta(n)\); \(\Theta(n\log n)\); \(\Theta(2^n)\); \(\Theta(n\log n)\).</li>
-    </ol></div></div>
-  </article>
-
-  <h2 class="practice-group">Deciding claims, and how far "eventually" is</h2>
-  <p class="note">Lesson: <a href="#notation">O, Ω, Θ</a>, <a href="#proofs">Proving a bound</a></p>
-
-  <article class="task" data-id="cse332-w2-l3-more-examples">
-    <h2>8. True or false?</h2>
-    <p class="prompt">This practices deciding a Big-O claim by asking which side grows faster in the long run. \(f \in O(g)\) means that from some \(n_0\) on, \(f(n) \le c\cdot g(n)\) for one fixed constant \(c\). \(\Theta\) means both \(\le\) and \(\ge\) that way. These five claims are the lecture's. Answer yes if the claim is true, no if it is false.</p>
-    <div class="answer-spec" data-part="four-plus-3n" data-grader="yesno" data-answer="yes" data-label="Is \(4 + 3n \in O(n)\)?"></div>
-    <div class="answer-spec" data-part="n-plus-2logn" data-grader="yesno" data-answer="no" data-miscon='{"yes":"bigger-in-smaller"}' data-label="Is \(n + 2\log n \in O(\log n)\)?"></div>
-    <div class="answer-spec" data-part="logn-plus-2" data-grader="yesno" data-answer="no" data-miscon='{"yes":"log-is-constant"}' data-label="Is \(\log n + 2 \in O(1)\)?"></div>
-    <div class="answer-spec" data-part="n50-vs-1-1n" data-grader="yesno" data-answer="yes" data-miscon='{"no":"poly-vs-exp"}' data-label="Is \(n^{50} \in O(1.1^n)\)?"></div>
-    <div class="answer-spec" data-part="3n-theta-2n" data-grader="yesno" data-answer="no" data-miscon='{"yes":"exp-base-dropped"}' data-label="Is \(3^n \in \Theta(2^n)\)?"></div>
-    <ol class="hints">
-      <li>For each one, ask which side grows faster in the long run. \(O\) means "\(\le\) eventually, up to a constant".</li>
-      <li>Any exponential \(b^n\) with \(b &gt; 1\) eventually beats any polynomial. And \(3^n / 2^n = 1.5^n\) isn't bounded.</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>True: for large inputs, \(4 + 3n &lt; n + 3n = 4n\).</li>
-      <li>False: for any constant \(c\), eventually \(n &gt; c\log n\).</li>
-      <li>False: for any constant \(c\), eventually \(\log n &gt; c\) (specifically when \(n &gt; 2^c\)).</li>
-      <li>True: for large \(n\), \(50\log_{1.1} n \le n\).</li>
-      <li>False: \(3^n \le c\,2^n \iff (\log_2 3)\,n \le \log_2 c + n\), and eventually multiplying by \(\log_2 3\) has more impact than adding \(\log_2 c\).</li>
-      <li class="answer">True, False, False, True, False.</li>
-    </ol></div></div>
-  </article>
-
-  <article class="task" data-id="cse332-w2-l3-eventually-exact">
-    <h2>9. How long is "eventually"?</h2>
-    <p class="prompt">This practices what "eventually" means in a Big-O argument: an inequality may fail for small \(n\), then hold for every \(n\) from some point on. The lecture argued four claims this way, each with "for large \(n\)":</p>
-    <ul class="prompt">
-      <li>\(n^{50} \in O(1.1^n)\): eventually \(n^{50} \le 1.1^n\). (This one is a fact to know, not to compute: it only becomes true at \(n = 4{,}402\). "Eventually" can be far away.)</li>
-      <li>\(3^n \notin O(2^n)\): for any \(c\), eventually \(3^n &gt; c\cdot 2^n\). Below you do the same argument with \(4^n\), so the numbers come out whole. Here \(c = 1000\).</li>
-      <li>\(\log n + 2 \notin O(1)\): for any \(c\), eventually \(\log n + 2 &gt; c\). Here \(c = 12\).</li>
-      <li>\(n + 2\log n \notin O(\log n)\): for any \(c\), eventually \(n + 2\log n &gt; c\log n\). Here \(c = 10\).</li>
-    </ul>
-    <p class="prompt">Find where "eventually" starts. Use \(\log = \log_2\). Every answer is a whole number you can reach with one or two steps, or by trying powers of 2.</p>
-    <div class="answer-spec" data-part="four-two-c1000" data-grader="exact" data-answer="10" data-miscon='{"9":"strict-vs-equal","1000":"forgot-power"}' data-label="smallest \(n\) with \(4^n &gt; 1000\cdot 2^n\)"></div>
-    <div class="answer-spec" data-part="logn-plus-2-c12" data-grader="exact" data-answer="1025" data-miscon='{"1024":"strict-vs-equal","4097":"used-2-to-c","4096":"used-2-to-c"}' data-label="smallest \(n\) with \(\log n + 2 &gt; 12\)"></div>
-    <div class="answer-spec" data-part="n-plus-2logn-pow2" data-grader="exact" data-answer="64" data-miscon='{"32":"pow2-too-early","128":"pow2-too-late"}' data-label="smallest power of 2, \(n \ge 2\), with \(n + 2\log n &gt; 10\log n\)"></div>
-    <ol class="hints">
-      <li>Divide both sides of \(4^n &gt; 1000\cdot 2^n\) by \(2^n\). Since \(4^n = 2^n\cdot 2^n\), you get \(2^n &gt; 1000\).</li>
-      <li>\(\log n + 2 &gt; 12\) means \(\log n &gt; 10\), so \(n &gt; 2^{10}\).</li>
-      <li>Subtract \(2\log n\): you need \(n &gt; 8\log n\). Try \(n = 32\) (\(\log n = 5\)) and \(n = 64\) (\(\log n = 6\)).</li>
-    </ol>
-    <div class="solution">
-      <div class="steps"><ol>
-        <li>\(4^n &gt; 1000\cdot 2^n \iff 2^n &gt; 1000\). \(2^9 = 512\) is too small and \(2^{10} = 1024\) is enough, so \(n = 10\).</li>
-        <li>\(\log n + 2 &gt; 12 \iff \log n &gt; 10 \iff n &gt; 1024\). So \(n = 1025\).</li>
-        <li>\(n &gt; 8\log n\): at \(n = 32\), \(8\cdot5 = 40\), and 32 isn't bigger. At \(n = 64\), \(8\cdot6 = 48 &lt; 64\). From there \(n\) doubles at each power of 2 while \(8\log n\) only grows by 8, so it stays true.</li>
-        <li class="answer">10; 1,025; 64. "Eventually" can be close (10) or far away (\(n^{50}\)'s 4,402). The definition only needs it to happen at some fixed \(n_0\).</li>
-      </ol></div>
-      <div class="step-bar"><button class="btn" type="button" data-brute="eventually">Check by brute force</button><span class="brute"></span></div>
+    <h2>7. Write the whole proof</h2>
+    <p class="prompt">Prove \(3n + 4 \in O(n)\) by filling in the template, then compare with the solution.</p>
+    <div class="proof">
+      <p>Let \(c =\) <span class="blank">?</span> and \(n_0 =\) <span class="blank">?</span>.</p>
+      <p>Show: for every \(n \ge n_0\), \(3n + 4 \le c\cdot n\).</p>
+      <p><span class="blank wide">algebra, one line at a time, until it's obviously true</span></p>
+      <p>This holds for every \(n \ge n_0\).</p>
     </div>
-  </article>
-
-  <article class="task" data-id="cse332-w2-l3-tenth-vs-log">
-    <h2>10. \(n^{1/10}\) vs. \(\log n\)</h2>
-    <p class="prompt">This practices the lecture's warning that \(O\) can mislead for real input sizes. \(n^{1/10}\) grows faster than \(\log_2 n\), so \(\log_2 n \in O(n^{1/10})\). But the lecture says the crossover is around \(5\cdot10^{17}\). Compare the two at a trillion-ish input and at a much larger one. Work with \(n = 2^k\), so \(\log_2 n = k\) and \(n^{1/10} = 2^{k/10}\).</p>
-    <div class="answer-spec" data-part="tenth-at-2-to-40" data-grader="exact" data-answer="16" data-label="the value of \(n^{1/10}\) at \(n = 2^{40}\)"></div>
-    <div class="answer-spec" data-part="bigger-at-2-to-40" data-grader="choice" data-choices='["tenth","log"]' data-options="tenth:n^(1/10) is larger|log:log₂ n is larger" data-answer="log" data-miscon='{"tenth":"asymptotic-not-now"}' data-label="which is larger at \(n = 2^{40}\)?"></div>
-    <div class="answer-spec" data-part="bigger-at-2-to-60" data-grader="choice" data-choices='["tenth","log"]' data-options="tenth:n^(1/10) is larger|log:log₂ n is larger" data-answer="tenth" data-miscon='{"log":"compare-60"}' data-label="which is larger at \(n = 2^{60}\)?"></div>
+    <div class="answer-spec" data-part="proof" data-grader="self" data-label="your \(c\), \(n_0\) and algebra"></div>
     <ol class="hints">
-      <li>\(2^{40/10} = 2^4\).</li>
-      <li>At \(n = 2^{60}\): \(n^{1/10} = 2^{60/10}\), and \(\log_2 n = 60\).</li>
+      <li>\(c = 4\) is just above the 3. When is \(3n + 4 \le 4n\)?</li>
     </ol>
-    <div class="solution">
-      <div class="steps"><ol>
-        <li>\(n^{1/10} = 2^{4} = 16\) and \(\log_2 n = 40\). So \(\log n\) is larger at \(n = 2^{40}\), about a trillion.</li>
-        <li>At \(n = 2^{60}\): \(n^{1/10} = 2^6 = 64\) and \(\log_2 n = 60\). Now \(n^{1/10}\) is larger. (The exact switch is at \(n = 2^{59} \approx 5.8\cdot10^{17}\), matching the lecture's "around \(5\cdot10^{17}\)".)</li>
-        <li class="answer">16; log; \(n^{1/10}\). The class that wins "eventually" lost for every input up to about \(10^{17}\), far beyond any real list.</li>
-      </ol></div>
-      <div class="step-bar"><button class="btn" type="button" data-brute="tenth">Check by brute force</button><span class="brute"></span></div>
-    </div>
+    <div class="solution"><div class="steps"><ol>
+      <li>Let \(c = 4\) and \(n_0 = 4\).</li>
+      <li>Show: for every \(n \ge 4\), \(3n + 4 \le 4n\).</li>
+      <li>\(3n + 4 \le 4n \equiv 4 \le n\).</li>
+      <li class="answer">This holds for every \(n \ge 4\). Check yours names specific numbers and argues for every \(n \ge n_0\). "It works for large \(n\)" isn't a proof.</li>
+    </ol></div></div>
   </article>
 
-  <h2 class="practice-group">Case vs. bound, and writing it right</h2>
+  <h2 class="practice-group">Case vs. bound</h2>
   <p class="note">Lesson: <a href="#cases">Case vs. bound</a></p>
 
-  <div class="check" data-id="cse332-w2-l3-cyu-set-notation" data-grader="mc">
-    <p>Quick check: \(O(n^2)\) is a set of functions. Which of these ways of writing it is <em>wrong</em>?</p>
+  <article class="task" data-id="cse332-w2-l3-true-statements">
+    <h2>8. Which statements are true?</h2>
+    <p class="prompt">Binary search takes 1 loop in its best case (the target is right in the middle) and about \(\log_2 n\) loops in its worst case. Answer yes or no.</p>
+    <div class="answer-spec" data-part="omega-means-best" data-grader="yesno" data-answer="no" data-miscon='{"yes":"omega-best"}' data-label="True? &quot;\(\Omega\) means best case.&quot;"></div>
+    <div class="answer-spec" data-part="binary-best-theta1" data-grader="yesno" data-answer="yes" data-label="True? &quot;Binary search is \(\Theta(1)\) in the best case.&quot;"></div>
+    <div class="answer-spec" data-part="binary-worst-o-n" data-grader="yesno" data-answer="yes" data-label="True? &quot;Binary search is \(O(n)\) in the worst case.&quot;"></div>
+    <div class="answer-spec" data-part="binary-worst-omega-n" data-grader="yesno" data-answer="no" data-label="True? &quot;Binary search is \(\Omega(n)\) in the worst case.&quot;"></div>
+    <ol class="hints">
+      <li>The case picks the step count: 1 or \(\log_2 n\). Then compare that count's bucket with the bound.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>False. \(\Omega\) means "at least", about whichever case you picked.</li>
+      <li>True. The best case is 1 loop: bucket \(1\).</li>
+      <li>True, just loose. \(\log n\) is under the \(n\) ceiling.</li>
+      <li>False. \(\log n\) never keeps up with \(n\), so \(n\) can't be a floor.</li>
+      <li class="answer">no; yes; yes; no.</li>
+    </ol></div></div>
+  </article>
+
+  <div class="check" data-id="cse332-w2-l3-cyu-definition-order" data-grader="mc">
+    <p>Quick check: in the definition of \(f \in O(g)\), what do you choose first?</p>
     <div class="opts">
-        <label><input type="radio" name="cse332-w2-l3-cyu-set-notation"> \(3n^2 + 17 \in O(n^2)\)<span class="why" hidden>That's the most correct form: membership in a set.</span></label>
-        <label><input type="radio" name="cse332-w2-l3-cyu-set-notation"> \(3n^2 + 17 = O(n^2)\)<span class="why" hidden>Common and accepted, as long as you read "=" as "is in".</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-set-notation"> \(O(n^2) = 3n^2 + 17\)<span class="why" hidden>Correct. \(O(n^2)\) is a set of functions. The "=" only reads one way, so this direction is never written.</span></label>
+        <label data-correct><input type="radio" name="cse332-w2-l3-cyu-definition-order"> One \(c\) and one \(n_0\); then it must hold for every \(n \ge n_0\)<span class="why" hidden>Right. One fixed pair has to work for all large n.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-definition-order"> A new \(c\) for each \(n\)<span class="why" hidden>Then any function would fit under any other: just pick c = f(n)/g(n) each time. The pair is fixed first.</span></label>
+        <label><input type="radio" name="cse332-w2-l3-cyu-definition-order"> Check only at \(n = n_0\)<span class="why" hidden>It must hold for every n ≥ n₀, not just at one point.</span></label>
       </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <article class="task" data-id="cse332-w2-l3-true-statements">
-    <h2>11. Which statements are true?</h2>
-    <p class="prompt">This practices the lecture's point that two choices in a running-time claim are separate. The <strong>case</strong> picks which function you analyze: the worst case is the count on the slowest input of size \(n\), the best case the count on the fastest. The <strong>bound</strong> says what you know about that function: \(O\) is "at most", \(\Omega\) is "at least", \(\Theta\) is both. A loose bound can still be true.</p>
-    <p class="prompt">Three statements are about the lecture's binary search, which checks the middle of the range and throws away half each time:</p>
-    <pre class="code">public static boolean binary_contains(
-        List&lt;Integer&gt; a, int k){
-    int start = 0;
-    int end = a.size();
-    while(start &lt; end){
-        int mid = start + (end-start)/2;
-        if(a.get(mid) == k)
-               return true;
-        else if(a.get(mid) &lt; k)
-               start = mid+1;
-        else
-               end = mid;
-    }
-    return false;
-}</pre>
-    <p class="prompt">Its worst case takes about \(\log_2 n\) loop iterations. Answer yes if the statement is true, no if it is false.</p>
-    <div class="answer-spec" data-part="omega-means-best" data-grader="yesno" data-answer="no" data-miscon='{"yes":"omega-best"}' data-label="True? &quot;\(\Omega\) means best case.&quot;"></div>
-    <div class="answer-spec" data-part="binary-best-theta1" data-grader="yesno" data-answer="yes" data-label="True? &quot;binary_contains is \(\Theta(1)\) in the best case.&quot;"></div>
-    <div class="answer-spec" data-part="binary-worst-omega-loglog" data-grader="yesno" data-answer="yes" data-label="True? &quot;binary_contains is \(\Omega(\log\log n)\) in the worst case.&quot;"></div>
-    <div class="answer-spec" data-part="n-in-o-n5" data-grader="yesno" data-answer="yes" data-label="True? &quot;\(f(n) = n\) is \(O(n^5)\).&quot;"></div>
-    <div class="answer-spec" data-part="n-theta-means-not-olog" data-grader="yesno" data-answer="yes" data-label="True? &quot;If an algorithm's worst case is \(\Theta(n)\), its worst case is not \(O(\log n)\).&quot;"></div>
-    <ol class="hints">
-      <li>"Which case" and "which bound" are separate choices.</li>
-      <li>An upper bound can be loose and still true. A lower bound can be weak and still true.</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>False. \(\Omega\) is a lower bound on some function. That function can be the worst case, the best case or anything else.</li>
-      <li>True: if the item is in the middle, the first iteration finds it.</li>
-      <li>True, but weak: \(\log n\) is at least \(\log\log n\) for large \(n\).</li>
-      <li>True: \(n \le n^5\) for \(n \ge 1\). It's just not tight.</li>
-      <li class="answer">False, True, True, True, True. The last one is why you should say \(\Theta\): \(\Theta(n)\) rules out \(O(\log n)\).</li>
-    </ol></div></div>
-  </article>
   <nav class="pager"></nav>
 </section>
 

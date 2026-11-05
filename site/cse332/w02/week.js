@@ -7,25 +7,10 @@ window.WEEK.messages = {
   "rounded-up": "Check which power of 2 is just below n. The worst case is ⌊log₂ n⌋ + 1.",
   "doubled-log": "Doubling n adds one more halving, not twice as many.",
   "strict-vs-equal": "Check that exact value of n directly. Is the inequality true there, and for every n after it?",
-  "forgot-c": "Don't drop c. Solve 3n² + 17 ≤ 4n², which is n² ≥ 17.",
   "not-smallest": "That n₀ works, but it isn't the smallest. Try smaller values.",
-  "c13-works": "Plug c = 13 in: the n² terms cancel. What's left, and is it ever true?",
-  "base-not-log": "Change of base divides by log₂ of the base, not by the base itself.",
-  "base-ignored": "That's log₂ n. The base 8 changes the value by a constant factor.",
-  "base-multiplied": "Change of base divides by log₂ 8; it doesn't multiply.",
   "bigger-in-smaller": "Which grows faster, n or log n? O asks whether the left side is eventually at most a constant times the right.",
-  "log-is-constant": "log n grows without bound, slowly. For any constant c, is log n eventually bigger than c?",
-  "poly-vs-exp": "It looks false for small n, but any exponential bⁿ with b > 1 eventually beats any polynomial.",
-  "exp-base-dropped": "The base of an exponential isn't a multiplicative constant. Look at 3ⁿ / 2ⁿ.",
-  "forgot-power": "Divide both sides by 2ⁿ: you need 2ⁿ > 1000. Which n does that?",
-  "pow2-too-early": "At n = 32, log n = 5, so 8 log n = 40, which is more than 32. Not yet.",
-  "pow2-too-late": "Check n = 64: log n = 6, so 8 log n = 48, which is already less than 64.",
-  "compare-60": "At n = 2⁶⁰, n^(1/10) = 2⁶ = 64 and log₂ n = 60. Which is bigger?",
-  "used-2-to-c": "log n + 2 > 12 means log n > 10, not log n > 12.",
-  "wrong-c": "That's the crossover for n > 10 log n. Here 2 log n is already on the left, so you need n > 8 log n.",
-  "asymptotic-not-now": "n^(1/10) wins eventually, but compare the actual values at n = 2⁴⁰.",
+  "c3-works": "Plug c = 3 in: the 3n terms cancel. What's left, and is it ever true?",
   "omega-best": "Ω is a lower bound on whatever function you analyze. The case (best, worst…) is a separate choice.",
-  "used-c12": "That's the answer for c = 12. Redo (13 − c)·n ≥ 50 with c = 11.",
   "not-tight": "That's a valid upper bound, but not the tightest bucket. Drop constants and lower-order terms of the actual function.",
   "too-small": "That bucket grows too slowly. Find the dominant term.",
   "simplify-terms": "Correct bucket. Write it simplified, though: drop the non-dominant terms.",
@@ -623,27 +608,9 @@ function setupNumUnique() {
 /* =========================================================== brute-force buttons */
 const BRUTE = {
   "worst-cases"() {
-    const rows = [4096, 1048576, 1000000].map((n) => [n, Sim.binaryWorstExhaustive(n), Sim.worstGaps(n).length]);
-    const ok = rows[1][1] === 21 && rows[2][1] === 20 && rows.every((r) => r[1] === r[2]);
-    return { ok, text: `Ran binary_contains for every possible target (each item and each gap): n = 4,096 → ${rows[0][1]}; n = 2²⁰ → ${rows[1][1]}; n = 1,000,000 → ${rows[2][1]} iterations at most.` };
-  },
-  eventually() {
-    const p = Sim.raceProfile("n50", 12000);
-    const lastFail = p.filter((r) => r.s === "gt").pop().to;
-    let ff = 1; while (!(4n ** BigInt(ff) > 1000n * 2n ** BigInt(ff))) ff++;
-    const lc = Sim.firstN((n) => Sim.logPlusTwoFails(12, n), 1, 5000);
-    // n = 2^j has log n = j exactly, so n + 2 log n > 10 log n is 2^j + 2j > 10j
-    const holds = (j) => 2 ** j + 2 * j > 10 * j;
-    let k = 1; while (!holds(k)) k++;
-    let stays = true;
-    for (let j = k; j <= 30; j++) if (!holds(j)) stays = false;
-    const ok = lastFail === 4401 && ff === 10 && lc === 1025 && 2 ** k === 64 && stays && p[p.length - 1].s === "le";
-    return { ok, text: `Exact scan: 4ⁿ > 1000·2ⁿ first at n = ${ff}; log n + 2 > 12 first at n = ${fmtInt(lc)}; n + 2 log n > 10 log n first holds among powers of 2 at n = ${2 ** k}, and stays true up to 2³⁰. (n⁵⁰ > 1.1ⁿ last at n = ${fmtInt(lastFail)}.)` };
-  },
-  tenth() {
-    const p = Sim.raceProfile("tenth", 400);
-    const k = p[p.length - 1].from;
-    return { ok: k === 59 && p[p.length - 1].s === "gt", text: `Compared 2ᵏ with k¹⁰ exactly for k = 1 … 400: n^(1/10) > log₂ n at k = 1, then log₂ n ≥ n^(1/10) for k = 2 … ${k - 1}, then n^(1/10) wins for every k from ${k} on.` };
+    const rows = [32, 1000].map((n) => [n, Sim.binaryWorstExhaustive(n), Sim.worstGaps(n).length]);
+    const ok = rows[0][1] === 6 && rows[1][1] === 10 && rows.every((r) => r[1] === r[2]);
+    return { ok, text: `Ran binary_contains for every possible target (each item and each gap): 32 items → ${rows[0][1]} loops at most; 1,000 items → ${rows[1][1]}.` };
   },
 };
 function setupBrute() {
