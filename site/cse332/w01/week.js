@@ -752,48 +752,6 @@ function setupBoundChecker() {
   plot();
 }
 
-/* =========================================================== brute-force buttons */
-const BRUTE = {
-  "circular-trace"() {
-    const q = Sim.circularQueue();
-    for (let i = 0; i < 3; i++) q.dequeue();
-    for (let x = 1; x <= 6; x++) q.enqueue(x);
-    return { ok: q.front === 3 && q.back === 1 && q.size === 8 && q.queue[0] === 6, text: `Ran the circular array code: front = ${q.front}, back = ${q.back}, size = ${q.size}, queue[0] = ${q.queue[0]}.` };
-  },
-  "arraylist-14c"() {
-    const rows = [];
-    let ok = true;
-    for (let c = 1; c <= 8; c++) { const r = Sim.arrayListAdds(c, 7 * c); rows.push(`c=${c}: ${r.total}`); if (r.total !== 14 * c) ok = false; }
-    return { ok, text: `Ran add() 7c times from length c: ${rows.join(", ")}. ${ok ? "Every total is exactly 14c." : "Mismatch."}` };
-  },
-  "binary-1000"() {
-    const w = Sim.binaryWorstExhaustive(1000);
-    return { ok: w === 10, text: `Searched a sorted list of 1,000 for all 2,001 possible targets (each item and each gap): the most iterations was ${w}.` };
-  },
-  crossovers() {
-    const A = (n) => Sim.algValue("A", n), B = (n) => Sim.algValue("B", n), C = (n) => Sim.algValue("C", n);
-    const ab = Sim.firstN((n) => A(n) < B(n)), c10 = Sim.firstN((n) => C(n) > 10n * n * 100n), ca = Sim.firstN((n) => C(n) > A(n));
-    let stays = true;
-    for (let n = BigInt(c10); n < 100000n; n++) if (!(C(n) > 10n * n * 100n)) { stays = false; break; }
-    return { ok: ab === 11 && c10 === 1001 && ca === 1084 && stays, text: `Exact arithmetic over n = 1 … 100,000: A < B first at n = ${ab}; C > 10n first at n = ${c10}, and it stays above; C > A (with the +900) first at n = ${ca}.` };
-  },
-};
-
-function setupBrute() {
-  $$("[data-brute]").forEach((btn) => {
-    const out = btn.nextElementSibling;
-    btn.addEventListener("click", () => {
-      out.className = "brute"; out.textContent = "Running…"; btn.disabled = true;
-      setTimeout(() => {
-        const r = BRUTE[btn.dataset.brute]();
-        btn.disabled = false;
-        out.className = `brute ${r.ok ? "ok" : ""}`;
-        out.textContent = r.text;
-      }, 20);
-    });
-  });
-}
-
 /* ---- wire it up */
 setupQueues();
 setupStackVsQueue();
@@ -807,5 +765,4 @@ setupArrayList();
 setupBinarySearch();
 setupGrowth();
 setupBoundChecker();
-setupBrute();
 };

@@ -591,7 +591,6 @@ dequeue(){
         <li>The sixth enqueue writes 6 at index 0 (over the old 5, which was already dequeued), and <code>back = 1</code>.</li>
         <li class="answer"><code>front = 3</code>, <code>back = 1</code>, <code>size = 8</code>, <code>queue[0] = 6</code>.</li>
       </ol></div>
-      <div class="step-bar"><button class="btn" data-brute="circular-trace">Run it in the visualizer's code</button><span class="brute"></span></div>
     </div>
   </article>
 
@@ -1638,7 +1637,6 @@ private void resize(){
         <li>Next \(2c\): \(2c + 2c = 4c\). Next \(4c\): \(4c + 4c = 8c\).</li>
         <li class="answer">Total \(14c\) over \(7c\) adds: \(\frac{14c}{7c} = 2\) per add.</li>
       </ol></div>
-      <div class="step-bar"><button class="btn" data-brute="arraylist-14c">Check by running add()</button><span class="brute"></span></div>
     </div>
   </article>
 
@@ -1681,7 +1679,6 @@ private void resize(){
         <li>For \(n = 1000\), the worst \(k\) always lands in the larger half. The items in play go 1000 → 500 → 250 → 125 → 62 → 31 → 15 → 7 → 3 → 1. That's 10 sizes, one iteration each.</li>
         <li class="answer">10 and 10. In general the worst case is \(\lfloor\log_2 n\rfloor + 1\) iterations.</li>
       </ol></div>
-      <div class="step-bar"><button class="btn" data-brute="binary-1000">Check by brute force</button><span class="brute"></span></div>
     </div>
   </article>
 
@@ -1739,7 +1736,6 @@ private void resize(){
         <li>Putting the \(+900\) back only delays the crossover a little: C passes the real \(A\) at \(n = 1084\). A constant can make C look good for a while, but it can't stop \(n^2\) from winning.</li>
         <li class="answer">11; 1001; C (it's \(\Theta(n^2)\), and A and B are \(\Theta(n)\)).</li>
       </ol></div>
-      <div class="step-bar"><button class="btn" data-brute="crossovers">Check by brute force</button><span class="brute"></span></div>
     </div>
   </article>
 

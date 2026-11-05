@@ -165,8 +165,6 @@ details.spoiler summary, details.full-specs summary { cursor: pointer; font-weig
 .metcount .slot b { min-width: 3rem; }
 ol.calls { font-size: 0.95rem; padding-left: 1.4rem; margin: 0.5rem 0; }
 ol.calls li { margin-bottom: 0.3rem; }
-.brute { margin: 0.6rem 0 0; font-weight: 500; }
-.brute.ok { color: var(--right); }
 
 /* ---------------------------------------------------------------- problems: small extras */
 .task-actions .btn.hint-btn { border-color: var(--note); color: var(--note); }

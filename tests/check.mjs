@@ -30,9 +30,11 @@ const answerAll = (wrong) => {
     return Boolean(choice);
   };
   for (const box of document.querySelectorAll(".check[data-id]:not([data-custom])")) {
-    const spec = S.specFor(box.dataset.id, box), input = box.querySelector("input[type=text]");
-    if (input) { input.value = wrong ? bad(spec) : first(spec); fire(input, "input"); } else if (!pick(box, spec)) { res.push([box.dataset.id, "no option"]); continue; }
-    box.querySelector("button.primary").click();
+    const spec = S.specFor(box.dataset.id, box), input = box.querySelector("input[type=text]"), btns = box.querySelector(".choice-btns");
+    if (btns) { const v = wrong ? bad(spec) : first(spec); const b = btns.querySelector(`[data-value="${v}"]`); if (!b) { res.push([box.dataset.id, `no ${v} button`]); continue; } b.click(); }
+    else if (input) { input.value = wrong ? bad(spec) : first(spec); fire(input, "input"); box.querySelector("button.primary").click(); }
+    else if (!pick(box, spec)) { res.push([box.dataset.id, "no option"]); continue; }
+    else box.querySelector("button.primary").click();
     res.push([box.dataset.id, box.querySelector(".feedback").classList.contains("ok")]);
   }
   for (const li of document.querySelectorAll(".cyu[data-id]")) {
@@ -47,9 +49,11 @@ const answerAll = (wrong) => {
     // c/n0 pairs, Java types and counterexamples have many right answers; verify.mjs checks those graders.
     if (!auto.length || auto.some((p) => ["bound", "java", "witness"].includes(p.spec.type))) continue;
     auto.forEach((p, i) => {
+      const btns = [...p.sp.querySelectorAll(".choice-btns button")];
+      if (btns.length) { const b = wrong && i === 0 ? btns.find((x) => x.dataset.value !== first(p.spec)) : btns.find((x) => x.dataset.value === first(p.spec)); if (b) b.click(); return; }
       const input = p.sp.querySelector("input, select");
-      input.value = wrong && i === 0 ? (input.tagName === "SELECT" ? [...input.options].map((o) => o.value).find((v) => v && v !== first(p.spec)) : bad(p.spec)) : first(p.spec);
-      fire(input, input.tagName === "SELECT" ? "change" : "input");
+      input.value = wrong && i === 0 ? bad(p.spec) : first(p.spec);
+      fire(input, "input");
     });
     task.querySelector(".check-btn").click();
     res.push([task.dataset.id, task.querySelector(".my-work > .feedback").classList.contains("ok")]);

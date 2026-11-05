@@ -632,22 +632,6 @@ function setupRunButtons() {
     const o = Sim.sign(3, x);
     $(".run-out", b.closest(".solution")).replaceChildren(el("div", { class: "term small" }, el("pre", { text: `x / Math.abs(x) with x = ${x}\n${"value" in o ? `returns ${o.value}` : `Exception: java.lang.${o.exception}: ${o.message}`}` })));
   }));
-  $$("[data-brute]").forEach((btn) => {
-    const out = btn.nextElementSibling;
-    btn.addEventListener("click", () => {
-      out.className = "brute"; out.textContent = "Running every call…"; btn.disabled = true;
-      setTimeout(() => {
-        const t0 = performance.now();
-        const want = { 1: "ABD", 2: "AE", 3: "A", 4: "ACD" };
-        let calls = 0; for (const _ of Sim.lectureDomain()) calls++;
-        const rows = [1, 2, 3, 4].map((i) => { const t = Sim.meetsTable(i); return [i, SPEC_NAMES.filter((s) => t[s].meets).join("")]; });
-        const ok = rows.every(([i, got]) => got === want[i]);
-        btn.disabled = false;
-        out.className = `brute ${ok ? "ok" : ""}`;
-        out.textContent = `Ran ${calls.toLocaleString("en-US")} calls per implementation in ${Math.round(performance.now() - t0)} ms. Meets: ${rows.map(([i, g]) => `${i}: ${g.split("").join(" ")}`).join(" · ")}. ${ok ? "Matches the lecture's table." : "Doesn't match the lecture's table."}`;
-      }, 30);
-    });
-  });
 }
 
 /* ---- wire it up */

@@ -244,6 +244,7 @@ function setupSteps() {
       count.textContent = `${shown} of ${items.length} steps shown`;
     }
     steps._reveal = () => { if (shown < items.length) { shown++; render(shown - 1); } };
+    steps._shown = () => shown;
     next.addEventListener("click", steps._reveal);
     all.addEventListener("click", () => { shown = items.length; render(-1); });
     reset.addEventListener("click", () => { shown = 0; render(-1); });
@@ -287,9 +288,17 @@ function setupChecks() {
     const fb = $(".feedback", box) || box.appendChild(el("p", { class: "feedback", role: "status" }));
     const btn = $("button.primary", box) || $(".row", box)?.appendChild(el("button", { class: "btn primary", type: "button", text: "Check" }));
     const title = titleOf(box);
+    let yn = null;
+    if (input && specFor(id, box).type === "yesno") {
+      yn = choiceButtons(YES_NO, (v) => { input.value = v; check(); });
+      input.hidden = true;
+      if (btn) btn.hidden = true;
+      input.parentNode.insertBefore(yn.group, input);
+    }
 
     function paint(s) {
       fb.className = "feedback"; fb.textContent = "";
+      if (yn) yn.paint(s?.raw || "", s?.correct ?? null);
       if (input) input.classList.remove("ok", "bad");
       opts.forEach((o) => { o.label.classList.remove("right", "wrong"); const w = $(".why", o.label); if (w) w.hidden = true; });
       if (!s || s.correct == null) return;
@@ -458,7 +467,7 @@ function setupQuizzes() {
 }
 
 /* =========================================================== problems */
-const PLACEHOLDER = { exact: "a number, e.g. 2^10+1", decimal: "e.g. 12.34", formula: "a formula, e.g. 3n+2", bigo: "e.g. n log n", yesno: "yes or no", int: "a whole number", output: "exactly as printed", stream: "standard output or standard error", strength: "stronger, weaker or incomparable", java: "a Java type", bound: "a positive number", self: "your answer" };
+const PLACEHOLDER = { exact: "a number", decimal: "e.g. 12.34", formula: "a formula, e.g. 3n+2", bigo: "e.g. n log n", yesno: "yes or no", int: "a whole number", output: "exactly as printed", stream: "standard output or standard error", strength: "stronger, weaker or incomparable", java: "a Java type", bound: "a positive number", self: "your answer" };
 function statusOf(s, hasAuto, hasSelf) {
   if (!s) return ["Not started", ""];
   if (s.result === "wrong" || s.selfMark === "missed") return ["Not yet", "bad"];
@@ -469,6 +478,24 @@ function statusOf(s, hasAuto, hasSelf) {
   return ["Not started", ""];
 }
 const TASKS = new Map();
+// Yes/no and data-options answers are buttons over a hidden input that holds the chosen value.
+function choiceButtons(choices, onPick) {
+  const group = el("div", { class: "choice-btns", role: "group" });
+  const btns = choices.map(([v, t]) => {
+    const b = el("button", { class: "chip", type: "button", "aria-pressed": "false", "data-value": v, text: t });
+    b.addEventListener("click", () => onPick(v));
+    group.append(b);
+    return b;
+  });
+  const paint = (value, correct) => btns.forEach((b) => {
+    const on = b.dataset.value === value;
+    b.setAttribute("aria-pressed", String(on));
+    b.classList.toggle("ok", on && correct === true);
+    b.classList.toggle("bad", on && correct === false);
+  });
+  return { group, paint };
+}
+const YES_NO = [["yes", "Yes"], ["no", "No"]];
 function buildTask(task) {
   const id = task.dataset.id;
   const title = $("h2", task).textContent.trim();
@@ -494,11 +521,12 @@ function buildTask(task) {
     const domId = `${p.pid}-input`.replace(/\./g, "--");
     const d = p.spec.dataset;
     let input;
+    const choices = p.type === "yesno" ? YES_NO : d.options ? d.options.split("|").map((o) => { const [v, t] = o.split(":"); return [v, t || v]; }) : null;
     // Short self-check answers are one line, like the other rows; data-long gives a written one a textarea.
     if (p.type === "self" && p.spec.hasAttribute("data-long")) input = el("textarea", { id: domId, rows: "3", spellcheck: "true", placeholder: d.placeholder || "your answer" });
-    else if (d.options) {
-      input = el("select", { id: domId }, el("option", { value: "", text: "Choose…" }));
-      for (const o of d.options.split("|")) { const [v, t] = o.split(":"); input.append(el("option", { value: v, text: t || v })); }
+    else if (choices) {
+      input = el("input", { type: "hidden", id: domId });
+      p.choice = choiceButtons(choices, (v) => { input.value = v; input.dispatchEvent(new Event("input")); check(); });
     } else input = el("input", { type: "text", id: domId, autocomplete: "off", spellcheck: "false", placeholder: d.placeholder || PLACEHOLDER[p.type] || (d.choices ? JSON.parse(d.choices).join(" or ") : ""), class: p.type === "java" ? "mono" : null });
     p.spec.classList.add("ans-row");
     if (p.type === "self" && input.tagName === "TEXTAREA") p.spec.classList.add("self");
@@ -506,6 +534,7 @@ function buildTask(task) {
     p.spec.dataset.itemId = p.pid;
     p.fb = el("p", { class: "part-fb", role: "status" });
     p.spec.append(el("label", { for: domId, text: d.label || (parts.length === 1 ? "Your answer" : `Part ${i + 1}`) }), input);
+    if (p.choice) p.spec.append(p.choice.group);
     if (p.type === "self") p.spec.append(el("span", { class: "where", text: "check against the solution" }));
     p.spec.append(p.fb);
     rows.append(p.spec);
@@ -514,6 +543,7 @@ function buildTask(task) {
       s.parts = { ...s.parts, [p.part]: { raw: input.value, normalized: null, correct: null } };
       store.put(id, "problem", { ...s, title, result: null, selfMark: p.type === "self" ? null : s.selfMark });
       input.classList.remove("ok", "bad");
+      if (p.choice) p.choice.paint(input.value, null);
       p.fb.textContent = ""; p.fb.className = "part-fb";
       fb.textContent = ""; fb.className = "feedback";
       render();
@@ -577,7 +607,8 @@ function buildTask(task) {
     const results = new Map();
     const val = (p) => inputs[parts.indexOf(p)].value;
     const java = auto.filter((p) => p.type === "java");
-    if (java.length) {
+    if (java.some((p) => isBlank(val(p)))) java.forEach((p) => results.set(p.part, { ok: null, blank: true }));
+    else if (java.length) {
       const out = G.checkJavaParts(java.map((p) => {
         const sp = specFor(p.pid, p.spec);
         return { id: p.part, raw: val(p), header: p.spec.hasAttribute("data-header"), accept: sp.accept || JSON.parse(p.spec.dataset.accept), miscon: sp.miscon || {} };
@@ -588,6 +619,7 @@ function buildTask(task) {
     for (const p of auto.filter((x) => x.type === "bound")) { const k = p.spec.dataset.pair || "_"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(p); }
     for (const group of groups.values()) {
       const cP = group.find((p) => p.spec.dataset.role === "c"), nP = group.find((p) => p.spec.dataset.role === "n0");
+      if (isBlank(val(cP)) || isBlank(val(nP))) { results.set(cP.part, { ok: null, blank: true }); results.set(nP.part, { ok: null, blank: true }); continue; }
       const bound = specFor(cP.pid, cP.spec).bound || JSON.parse(cP.spec.dataset.bound);
       const b = G.checkBound(bound, val(cP), val(nP));
       if (b.unreadable) { results.set(cP.part, { ok: null }); results.set(nP.part, { ok: null }); continue; }
@@ -607,19 +639,19 @@ function buildTask(task) {
     return results;
   }
   function check() {
-    if (auto.some((p) => isBlank(inputs[parts.indexOf(p)].value))) {
-      fb.className = "feedback"; fb.textContent = auto.length > 1 ? "Fill in every answer box first." : "Type an answer first.";
+    if (auto.every((p) => isBlank(inputs[parts.indexOf(p)].value))) {
+      fb.className = "feedback"; fb.textContent = auto.length > 1 ? "Answer at least one part first." : "Type an answer first.";
       return;
     }
     const results = gradeParts();
-    const unread = auto.filter((p) => results.get(p.part).ok === null && !results.get(p.part).skip);
+    const unread = auto.filter((p) => { const r = results.get(p.part); return r.ok === null && !r.skip && !r.blank; });
     if (unread.length) {
       unread.forEach((p) => { p.fb.className = "part-fb bad"; p.fb.textContent = results.get(p.part).note || G.UNREADABLE[p.type] || "Couldn't read that."; inputs[parts.indexOf(p)].classList.add("bad"); });
       fb.className = "feedback bad"; fb.textContent = "Some boxes couldn't be read. See the notes under them.";
       return;
     }
     const right = auto.filter((p) => results.get(p.part).ok === true).length;
-    const all = right === auto.length;
+    const all = right === auto.length, anyWrong = auto.some((p) => results.get(p.part).ok === false);
     const s = get();
     const answer = {}, partsOut = { ...s.parts };
     for (const p of parts) {
@@ -628,7 +660,7 @@ function buildTask(task) {
       partsOut[p.part] = { raw: answer[p.part].raw, normalized: answer[p.part].normalized, correct: answer[p.part].correct, note: r ? r.note || null : null, tag: r ? r.tag || null : null };
     }
     store.attempt(id, "problem", { type: "check", answer, correct: all, hintsShown: s.hintsRevealed || 0, solutionSeen: Boolean(s.solutionViewed) });
-    store.put(id, "problem", { ...s, title, parts: partsOut, result: all ? "right" : "wrong" });
+    store.put(id, "problem", { ...s, title, parts: partsOut, result: all ? "right" : anyWrong ? "wrong" : null });
     restore();
   }
   function markSelf(mark) {
@@ -659,6 +691,7 @@ function buildTask(task) {
       return;
     }
     armed = false; solutionOpen = true;
+    if (solution) $$(".steps", solution).forEach((st) => { if (st._shown && st._shown() === 0) st._reveal(); });
     if (fb.textContent.startsWith("You haven't answered")) { fb.textContent = ""; fb.className = "feedback"; }
     store.event(id, "problem", "solution", { answeredFirst: Boolean(tried) });
     store.put(id, "problem", { ...s, title, solutionViewed: true });
@@ -681,6 +714,7 @@ function buildTask(task) {
       if (document.activeElement !== inputs[i]) inputs[i].value = r.raw || "";
       inputs[i].classList.toggle("ok", r.correct === true);
       inputs[i].classList.toggle("bad", r.correct === false);
+      if (p.choice) p.choice.paint(inputs[i].value, r.correct);
       p.fb.className = "part-fb"; p.fb.textContent = "";
       if (r.correct === false || (r.correct === true && r.tag && r.tag !== "correct")) {
         p.fb.className = `part-fb ${r.correct ? "ok" : "bad"}`;
@@ -689,13 +723,13 @@ function buildTask(task) {
     });
     if (document.activeElement !== work) work.value = s?.work || "";
     fb.className = "feedback"; fb.textContent = "";
+    const n = auto.filter((p) => s?.parts?.[p.part]?.correct === true).length;
     if (s?.result) {
-      const n = auto.filter((p) => s.parts?.[p.part]?.correct === true).length;
       fb.className = `feedback ${s.result === "right" ? "ok" : "bad"}`;
       fb.textContent = s.result === "right"
         ? (hasSelf ? "Correct. Compare your written parts with the solution." : auto.length > 1 ? "All correct." : "Correct.")
-        : auto.length > 1 ? `${n} of ${auto.length} right. The boxes in red need another look.` : "Not quite. Try again, or ask for a hint.";
-    }
+        : auto.length > 1 ? `${n} of ${auto.length} right. The red ones need another look.` : "Not quite. Try again, or ask for a hint.";
+    } else if (n) { fb.className = "feedback ok"; fb.textContent = `${n} of ${auto.length} right so far.`; }
     renderPreview();
     render();
   }

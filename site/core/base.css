@@ -233,6 +233,10 @@ button.btn:hover, .chip:hover { background: var(--accent-tint); border-color: va
 button.btn.primary { background: var(--accent); color: #fff; }
 button.btn.primary:hover { background: var(--accent-deep); }
 .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.choice-btns { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.choice-btns .chip { min-width: 4.5rem; justify-content: center; }
+.choice-btns .chip.ok { background: var(--right); border-color: var(--right); color: #fff; }
+.choice-btns .chip.bad { background: var(--wrong); border-color: var(--wrong); color: #fff; }
 button.btn.quiet { border-color: var(--line); color: var(--ink-soft); }
 button.btn:disabled { opacity: 0.55; cursor: default; }
 
@@ -385,8 +389,6 @@ details.more[open] summary { margin-bottom: 0.5rem; }
 details.more ul { padding-left: 1.2rem; }
 .step-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 0.5rem; }
 .answer { font-weight: 700; background: var(--accent-tint); padding: 0.6rem 0.9rem; border-radius: var(--r-sm); border-left: 4px solid var(--accent); }
-.brute { font-size: 0.93rem; color: var(--ink-soft); }
-.brute.ok { color: var(--right); font-weight: 600; }
 
 details.notes { margin: 1.25rem 0; background: var(--amber-tint); border: 1px solid #ecd4a2; border-left: 4px solid var(--amber); border-radius: 0 var(--r-sm) var(--r-sm) 0; padding: 0.55rem 1rem 0.3rem; max-width: var(--measure); }
 details.notes summary { cursor: pointer; font-weight: 700; color: var(--amber-deep); }
