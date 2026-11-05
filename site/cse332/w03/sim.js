@@ -1,7 +1,8 @@
 /* CSE 332 week 3 · pure models of the week's code. No DOM. checks/cse332/w03/verify.mjs checks these against its own
    independent implementations and against every answer key on the page.
    - Recurrences (Lecture 6, Section 3): exact evaluation with BigInt, and the tree method's levels.
-   - BSTs (Lecture 7): insert, find, delete exactly as the slides' code (two children: replace with the max of the left).
+   - BSTs (Lecture 7): insert, find, delete exactly as the slides' code (two children: replace with the max of the left),
+     and the step lists behind Lecture 7's traversal, insert and delete steppers.
    - AVL trees (Lecture 8): insert with the four cases, rotating at the deepest unbalanced node. */
 (function (root, factory) {
   if (typeof module === "object" && module.exports) module.exports = factory();
@@ -202,11 +203,176 @@
     return { levels: L, steps, sum };
   }
 
+  /* ---------------------------------------------------------------- L7: steppers and pictures
+     A step is { shape, line: [code line indexes], marks: { key: "cur" | "path" | "cmp" | "new" }, vars, say }.
+     labelTree reads the same shape text as parseShape, but a key that isn't a number stays a string ("D(U(S,2),B)"). */
+  function labelTree(s) {
+    let i = 0;
+    const tree = () => {
+      if (i >= s.length || s[i] === "," || s[i] === ")") return null;
+      let j = i; while (j < s.length && !"(),".includes(s[j])) j++;
+      const k = s.slice(i, j);
+      const n = node(/^-?\d+$/.test(k) ? Number(k) : k); i = j;
+      if (s[i] === "(") { i++; n.left = tree(); i++; n.right = tree(); i++; }
+      return n;
+    };
+    return tree();
+  }
+  const TRAVERSE_CODE = [
+    "traverse(root) {",
+    "  // pre-order: process(root)",
+    "  if (root.left != Null)",
+    "    traverse(root.left);",
+    "  // in-order: process(root)",
+    "  if (root.right != Null)",
+    "    traverse(root.right);",
+    "  // post-order: process(root)",
+    "}",
+  ];
+  // One walk around the tree. Each step is one visit to a node; each order writes the node at its own visit.
+  function traverseSteps(t) {
+    const out = { pre: [], in: [], post: [] }, steps = [];
+    const snap = (cur, line, wrote, say) => steps.push({ cur, line, wrote, pre: [...out.pre], in: [...out.in], post: [...out.post], say });
+    snap(null, [0], [], `Start at the root, ${t.key}. Each step visits one node. Pre-order, in-order and post-order take the same walk; they only write a node at different visits.`);
+    const walk = (n, from) => {
+      if (!n.left && !n.right) {
+        out.pre.push(n.key); out.in.push(n.key); out.post.push(n.key);
+        return snap(n.key, [1, 4, 7], ["pre", "in", "post"], `Down to ${n.key} ${from}. ${n.key} is a leaf: no subtrees, so pre-order, in-order and post-order all write ${n.key} now.`);
+      }
+      out.pre.push(n.key);
+      snap(n.key, [1], ["pre"], from ? `Down to ${n.key} ${from}. First visit: pre-order writes ${n.key} before either subtree.` : `First visit to ${n.key}: pre-order writes ${n.key} before either subtree.`);
+      if (n.left) walk(n.left, `(left child of ${n.key})`);
+      out.in.push(n.key);
+      snap(n.key, [4], ["in"], n.left ? `Back up at ${n.key}: its left subtree is done. In-order writes ${n.key}.` : `${n.key} has no left subtree. In-order writes ${n.key}.`);
+      if (n.right) walk(n.right, `(right child of ${n.key})`);
+      out.post.push(n.key);
+      snap(n.key, [7], ["post"], n.right ? `Back up at ${n.key}: both subtrees are done. Post-order writes ${n.key}.` : `${n.key} has no right subtree. Post-order writes ${n.key}.`);
+    };
+    walk(t, "");
+    steps[steps.length - 1].say += ` Done: every node was written once by each order.`;
+    return steps;
+  }
+
+  // insert, iterative (the lecture's code); the while loop is find's loop
+  const INSERT_CODE = [
+    "insert(key, value, root) {",
+    "  if (root == Null) {",
+    "    this.root = new Node(key, value);",
+    "  }",
+    "  parent = Null;",
+    "  while (root != Null &&",
+    "         key != root.key) {",
+    "    parent = root;",
+    "    if (key < root.key)",
+    "      root = root.left;",
+    "    else if (key > root.key)",
+    "      root = root.right;",
+    "  }",
+    "  if (root != Null)",
+    "    root.value = value;",
+    "  else if (key < parent.key)",
+    "    parent.left = new Node(key, value);",
+    "  else",
+    "    parent.right = new Node(key, value);",
+    "}",
+  ];
+  function insertSteps(t, key) {
+    t = clone(t);
+    const steps = [], path = [];
+    const marks = (cur) => Object.fromEntries([...path.map((k) => [k, "path"]), ...(cur == null ? [] : [[cur, "cur"]])]);
+    const show = (n) => (n ? String(n.key) : "Null");
+    let cur = t, parent = null;
+    steps.push({ shape: shape(t), line: [4], marks: marks(cur.key), vars: { key, root: show(cur), parent: "Null" }, say: `Insert ${key}. parent = Null, and root points at ${cur.key}.` });
+    while (cur && cur.key !== key) {
+      parent = cur; path.push(cur.key);
+      const left = key < cur.key;
+      cur = left ? cur.left : cur.right;
+      const where = cur ? `go ${left ? "left" : "right"} to ${cur.key}` : `go ${left ? "left" : "right"}. ${parent.key} has no ${left ? "left" : "right"} child, so root = Null`;
+      steps.push({ shape: shape(t), line: [5, 6, 7, ...(left ? [8, 9] : [10, 11])], marks: marks(cur && cur.key), vars: { key, root: show(cur), parent: String(parent.key) },
+        say: `${key} ≠ ${parent.key}, so the loop runs. parent = ${parent.key}. ${left ? `${key} < ${parent.key} is true` : `${key} < ${parent.key} is false, ${key} > ${parent.key} is true`}: ${where}.` });
+    }
+    if (cur) {
+      steps.push({ shape: shape(t), line: [13, 14], marks: { ...marks(), [key]: "cmp" }, vars: { key, root: show(cur), parent: show(parent) }, say: `${key} == ${key}: the key is already here. Insert only overwrites its value; the tree doesn't change.` });
+      return steps;
+    }
+    steps.push({ shape: shape(t), line: [5, 6], marks: marks(), vars: { key, root: "Null", parent: String(parent.key) }, say: `root == Null, so the loop stops. ${key} is not in the tree: find, which runs this same loop, would return Null right here.` });
+    const left = key < parent.key;
+    if (left) parent.left = node(key); else parent.right = node(key);
+    steps.push({ shape: shape(t), line: left ? [15, 16] : [17, 18], marks: { ...marks(), [key]: "new" }, vars: { key, root: "Null", parent: String(parent.key) },
+      say: `${left ? `${key} < ${parent.key} is true` : `${key} < ${parent.key} is false`}, so parent.${left ? "left" : "right"} = new Node(${key}). The new key is a leaf, in the empty spot where find fell off.` });
+    return steps;
+  }
+
+  // delete, iterative, with the lecture's two-children rule: the max of the left subtree takes the node's place
+  const DELETE_CODE = [
+    "delete(key, root) {",
+    "  while (root != Null &&",
+    "         key != root.key) {",
+    "    if (key < root.key)",
+    "      root = root.left;",
+    "    else if (key > root.key)",
+    "      root = root.right;",
+    "  }",
+    "  if (root == Null) return;",
+    "  if (root has no children)",
+    "    parent points to Null;",
+    "  if (root has one child)",
+    "    parent points to that child;",
+    "  if (root has two children) {",
+    "    m = maxNode(root.left);",
+    "    move m's key into root;",
+    "    delete m from root.left;",
+    "  }",
+    "}",
+    "maxNode(root) {",
+    "  while (root.right != Null)",
+    "    root = root.right;",
+    "  return root;",
+    "}",
+  ];
+  function deleteSteps(t, key) {
+    t = clone(t);
+    const steps = [], path = [];
+    const marks = (extra) => ({ ...Object.fromEntries(path.map((k) => [k, "path"])), ...extra });
+    let cur = t;
+    steps.push({ shape: shape(t), line: [0], marks: { [cur.key]: "cur" }, vars: { key, root: String(cur.key) }, say: `Delete ${key}. root points at ${cur.key}. First find the node, with find's loop.` });
+    while (cur && cur.key !== key) {
+      const from = cur.key, left = key < cur.key;
+      path.push(from);
+      cur = left ? cur.left : cur.right;
+      steps.push({ shape: shape(t), line: [1, 2, ...(left ? [3, 4] : [5, 6])], marks: marks(cur ? { [cur.key]: "cur" } : {}), vars: { key, root: cur ? String(cur.key) : "Null" },
+        say: `${key} ≠ ${from}. ${left ? `${key} < ${from} is true: go left` : `${key} < ${from} is false, ${key} > ${from} is true: go right`}${cur ? ` to ${cur.key}` : `. There's no child there, so root = Null`}.` });
+    }
+    if (!cur) { steps.push({ shape: shape(t), line: [8], marks: marks(), vars: { key, root: "Null" }, say: `root == Null: ${key} isn't in the tree, so delete does nothing.` }); return steps; }
+    steps.push({ shape: shape(t), line: [1, 2], marks: marks({ [key]: "cmp" }), vars: { key, root: String(key) }, say: `${key} == ${key}: the loop stops. root is the node to delete.` });
+    const kids = [cur.left, cur.right].filter(Boolean);
+    const after = bstDelete(clone(t), key).root;
+    if (kids.length === 0) { steps.push({ shape: shape(after), line: [9, 10], marks: marks(), vars: { key }, say: `${key} has no children: its parent now points to Null.` }); return steps; }
+    if (kids.length === 1) { const c = kids[0].key; steps.push({ shape: shape(after), line: [11, 12], marks: marks({ [c]: "new" }), vars: { key }, say: `${key} has one child, ${c}: its parent now points to ${c}, and ${c}'s subtree moves up with it.` }); return steps; }
+    steps.push({ shape: shape(t), line: [13], marks: marks({ [key]: "cmp" }), vars: { key },
+      say: `${key} has two children, ${cur.left.key} and ${cur.right.key}. Its place needs a key bigger than everything on its left and smaller than everything on its right: the largest key on its left.` });
+    let m = cur.left;
+    const walk = [];
+    steps.push({ shape: shape(t), line: [14, 19], marks: marks({ [key]: "cmp", [m.key]: "cur" }), vars: { key, m: String(m.key) }, say: `maxNode starts at ${key}'s left child, ${m.key}. The max is the right-most node: keep going right.` });
+    while (m.right) {
+      walk.push(m.key);
+      const from = m.key; m = m.right;
+      steps.push({ shape: shape(t), line: [20, 21], marks: marks({ [key]: "cmp", ...Object.fromEntries(walk.map((k) => [k, "path"])), [m.key]: "cur" }), vars: { key, m: String(m.key) }, say: `${from}.right is ${m.key}, not Null: go right to ${m.key}.` });
+    }
+    const mk = m.key, mKid = m.left ? m.left.key : null;
+    steps.push({ shape: shape(t), line: [20, 22], marks: marks({ [key]: "cmp", ...Object.fromEntries(walk.map((k) => [k, "path"])), [mk]: "cur" }), vars: { key, m: String(mk) },
+      say: `${mk}.right is Null: stop. The largest key on ${key}'s left is ${mk}. It has no right child, so removing it is the ${mKid == null ? "no-children" : "one-child"} case.` });
+    steps.push({ shape: shape(after), line: [15, 16], marks: { [mk]: "new", ...(mKid == null ? {} : { [mKid]: "cmp" }) }, vars: { key },
+      say: `${mk} moves up into ${key}'s spot. ${mKid == null ? `${mk} was a leaf, so its old spot just becomes Null.` : `The old ${mk} had one child, ${mKid}, which takes its old spot.`} In-order is still sorted: ${inOrder(after).join(" ")}.` });
+    return steps;
+  }
+
   return {
     treeSteps,
     REC, F, recTex, evalRec, levels, levelSum,
     node, clone, bstInsert, build, bstFind, bstDelete, maxNode, minNode, height, size,
     preOrder, inOrder, postOrder, levelOrder, shape, parseShape, isBST,
     fix, fixHeights, rotateLeft, rotateRight, avlInsert, avlBstStep, findNode, isAVL, problemNodes, avlBuild, minAVL,
+    labelTree, TRAVERSE_CODE, traverseSteps, INSERT_CODE, insertSteps, DELETE_CODE, deleteSteps,
   };
 });

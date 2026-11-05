@@ -40,11 +40,14 @@
     <div>
       <h2>Lecture 7: Dictionaries, BSTs <span class="today" data-date="2026-10-14">Wed Oct 14</span></h2>
       <ol class="modules">
+        <li><a href="#l7-goals">What this lecture is for</a></li>
         <li><a href="#l7-dict">The dictionary ADT</a></li>
-        <li><a href="#l7-bst">Trees, traversals, BSTs</a></li>
-        <li><a href="#l7-ops">Find, insert, delete</a></li>
+        <li><a href="#l7-trees">Trees and traversals</a></li>
+        <li><a href="#l7-bst">The BST property</a></li>
+        <li><a href="#l7-find">Find and insert</a></li>
+        <li><a href="#l7-delete">Delete</a></li>
+        <li><a href="#l7-worst">The worst case</a></li>
         <li><a href="#l7-practice">Practice</a></li>
-        <li><a href="#l7-quiz">Check your understanding</a></li>
       </ol>
     </div>
     <div>
@@ -556,112 +559,258 @@
   <nav class="pager"></nav>
 </section>
 
+<!-- ================================================================ L7: GOALS -->
+<section class="page" id="l7-goals" data-title="What Lecture 7 is for">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span> · Dictionaries, BSTs</p>
+  <h1>What this lecture is for</h1>
+  <div class="rule">
+    <p><strong>The point.</strong> A dictionary looks up values by key. A <strong>binary search tree</strong> keeps the keys in order inside a tree, so find, insert and delete each walk one path down from the root. That's fast when the tree is short, and as slow as a list when it's a long chain.</p>
+  </div>
+
+  <h2>Six short pages</h2>
+  <ol class="goals">
+    <li>What a dictionary does, and why lists are slow at it. <a href="#l7-dict">The dictionary ADT</a></li>
+    <li>Tree words, and the three ways to visit every node. <a href="#l7-trees">Trees and traversals</a></li>
+    <li>The one rule that makes a tree a BST. <a href="#l7-bst">The BST property</a></li>
+    <li>Find and insert: walk down one path. <a href="#l7-find">Find and insert</a></li>
+    <li>Delete: three cases. <a href="#l7-delete">Delete</a></li>
+    <li>Why a BST can be slow, and what fixes it. <a href="#l7-worst">The worst case</a></li>
+  </ol>
+  <p class="line">Then the <a href="#l7-practice">practice page</a>.</p>
+  <nav class="pager"></nav>
+</section>
+
 <!-- ================================================================ L7: DICTIONARY ADT -->
 <section class="page" id="l7-dict" data-title="The dictionary ADT">
-  <p class="where">Lecture 7 · slides 3–8 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span> · Weiss 4.1–4.3, 4.6</p>
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span></p>
   <h1>The dictionary ADT</h1>
-  <div class="rule">
-    <p><strong>Dictionary (Map) ADT.</strong> A set of key + value pairs. Keys are unique (always) and comparable (for many implementations).</p>
-    <p><code>insert(key, value)</code> adds the pair; if the key already has a value, it overwrites it, so keys can't repeat. <code>find(key)</code> returns the key's value. <code>delete(key)</code> removes the key and its value.</p>
-  </div>
-  <div class="prose"><p>Uses (slide 4): router tables, page tables, compilers' symbol tables, databases, inverted indexes, genome maps. Any time you store information by a key and want it back fast.</p></div>
+  <div class="prose"><p>A <strong>dictionary</strong> (also called a map) stores <strong>key + value</strong> pairs, like a phone book: look up a name (the key), get back a number (the value). Keys are unique. Most implementations also need keys to be comparable: for any two keys, you can tell which is smaller.</p></div>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th>operation</th><th>does</th></tr></thead>
+    <tr><th><code>insert(key, value)</code></th><td>add the pair; if the key is already there, overwrite its value</td></tr>
+    <tr><th><code>find(key)</code></th><td>return the key's value</td></tr>
+    <tr><th><code>delete(key)</code></th><td>remove the key and its value</td></tr>
+  </table></div>
 
-  <h2>Naïve attempts (slide 6)</h2>
-  <div class="table-wrap">
-  <table class="plain">
-    <tr><th>Data structure</th><th>insert</th><th>find</th><th>delete</th></tr>
-    <tr><td>Unsorted array</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
-    <tr><td>Unsorted linked list</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
-    <tr><td>Sorted array</td><td>\(\Theta(n)\)</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(n)\)</td></tr>
-    <tr><td>Sorted linked list</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
-    <tr><td>Binary min heap</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
-    <tr><td>BST (worst)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
-    <tr><td>BST (expected)</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(\log n)\)</td></tr>
-  </table>
-  </div>
-  <p class="note">Insert into an <em>unsorted</em> array is \(\Theta(n)\) here, not \(\Theta(1)\): keys are unique, so insert has to look for the key first to overwrite it.</p>
-
-  <h2>Lazy deletion (slide 7)</h2>
-  <div class="prose">
-    <p>A general trick to make delete as fast as find: don't remove the item, just mark it deleted. No shifting. It's simpler, removals can happen later in batches, and a re-added key is just unmarked. The costs: a flag per item, space wasted on deleted items, and find becomes \(O(\log m)\) where \(m \ge n\) counts the deleted items too.</p>
-    <p>The next lectures look at two better dictionaries: <strong>AVL trees</strong> (BSTs with guaranteed balance) and <strong>hash tables</strong> (not tree-like at all).</p>
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">Start empty. What does the dictionary hold after each line?</p>
+    <div class="steps board"><ol>
+      <li><span class="lab"><code>insert("cat", 3)</code></span><span class="mth">{cat: 3}</span><span class="note"></span></li>
+      <li><span class="lab"><code>insert("dog", 5)</code></span><span class="mth">{cat: 3, dog: 5}</span><span class="note"></span></li>
+      <li><span class="lab"><code>insert("cat", 9)</code></span><span class="mth">{cat: 9, dog: 5}</span><span class="note">"cat" is already a key: overwrite</span></li>
+      <li><span class="lab"><code>find("cat")</code></span><span class="mth">{cat: 9, dog: 5}</span><span class="note">returns 9</span></li>
+      <li><span class="lab"><code>delete("dog")</code></span><span class="mth">{cat: 9}</span><span class="note"></span></li>
+    </ol></div>
   </div>
 
-  <div class="check" data-id="cse332-w3-l7-qc-sorted-find" data-grader="bigo" data-answer="log n">
-    <p>Quick check: worst-case time of <code>find</code> in a sorted array of \(n\) keys.</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w3-l7-qc-overwrite">
-    <p>Quick check: the dictionary holds ("cat", 3). What does <code>insert("cat", 9)</code> do?</p>
+  <h2>Naïve attempts</h2>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th>kept as</th><th>insert</th><th>find</th><th>delete</th></tr></thead>
+    <tr><th>unsorted array</th><td class="no">\(\Theta(n)\)</td><td class="no">\(\Theta(n)\)</td><td class="no">\(\Theta(n)\)</td></tr>
+    <tr><th>unsorted linked list</th><td class="no">\(\Theta(n)\)</td><td class="no">\(\Theta(n)\)</td><td class="no">\(\Theta(n)\)</td></tr>
+    <tr><th>sorted array</th><td class="no">\(\Theta(n)\)</td><td class="best">\(\Theta(\log n)\)</td><td class="no">\(\Theta(n)\)</td></tr>
+    <tr><th>sorted linked list</th><td class="no">\(\Theta(n)\)</td><td class="no">\(\Theta(n)\)</td><td class="no">\(\Theta(n)\)</td></tr>
+    <tr><th>binary min heap</th><td class="no">\(\Theta(n)\)</td><td class="no">\(\Theta(n)\)</td><td class="no">\(\Theta(n)\)</td></tr>
+  </table></div>
+  <p class="line">Worst cases, with \(n\) keys stored.</p>
+  <p class="line"><strong>Insert is \(\Theta(n)\) even unsorted:</strong> keys are unique, so insert first has to look for the key, in case it must overwrite.</p>
+  <p class="line"><strong>Sorted array:</strong> find is binary search, but insert and delete shift items over to make or close a gap.</p>
+  <p class="line"><strong>Linked list:</strong> no binary search, because you can't jump to the middle. <strong>Heap:</strong> good at the minimum only; any other key could be anywhere.</p>
+  <div class="rule"><p><strong>The rule.</strong> Every list-like choice is \(\Theta(n)\) for something. A binary search tree aims to make all three \(\Theta(\log n)\).</p></div>
+
+  <details class="more">
+    <summary>Lazy deletion</summary>
+    <p>Instead of removing an item, mark it deleted. Nothing shifts, so delete costs just a find. Removals can be done later in a batch, and a key that's re-added soon is just unmarked. The costs: an extra flag per item, space wasted on deleted items, and find takes \(O(\log m)\) in a sorted array, where \(m \ge n\) counts the deleted items too.</p>
+  </details>
+
+  <div class="check" data-id="cse332-w3-l7-qc-pick-naive" data-grader="mc">
+    <p>Quick check: a dictionary of \(n\) keys is loaded once, then only searched: millions of <code>find</code> calls, no more inserts or deletes. Which naïve choice is best?</p>
     <div class="opts">
-      <label><input type="radio" name="cse332-w3-l7-qc-overwrite"> Adds a second "cat" entry<span class="why" hidden>Keys are unique, so there can't be two "cat" entries.</span></label>
-      <label data-correct><input type="radio" name="cse332-w3-l7-qc-overwrite"> Replaces 3 with 9<span class="why" hidden>Right: if the key already has a value, insert overwrites it.</span></label>
-      <label><input type="radio" name="cse332-w3-l7-qc-overwrite"> Does nothing, because "cat" is already there<span class="why" hidden>The ADT says insert overwrites the old value.</span></label>
+      <label><input type="radio" name="cse332-w3-l7-qc-pick-naive"> Unsorted linked list<span class="why" hidden>Every find scans the list: Θ(n), a million times.</span></label>
+      <label data-correct><input type="radio" name="cse332-w3-l7-qc-pick-naive"> Sorted array<span class="why" hidden>Right. Find is binary search, Θ(log n). Its slow operations, insert and delete, don't happen here.</span></label>
+      <label><input type="radio" name="cse332-w3-l7-qc-pick-naive"> Sorted linked list<span class="why" hidden>Sorted doesn't help a linked list: it can't jump to the middle, so find is still Θ(n).</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Ask the room to fill in slide 5's empty table first. The heap row surprises people: a heap is good at the minimum, not at an arbitrary key.</li>
-      <li>EX2 (heaps) uses a dictionary inside it; slide 4 hints at that ("see even EX02").</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ L7: TREES -->
-<section class="page" id="l7-bst" data-title="Trees, traversals, BSTs">
-  <p class="where">Lecture 7 · slides 9–17 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span></p>
-  <h1>Trees, traversals, BSTs</h1>
+<!-- ================================================================ L7: TREES AND TRAVERSALS -->
+<section class="page" id="l7-trees" data-title="Trees and traversals">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span></p>
+  <h1>Trees and traversals</h1>
   <div class="split">
-    <div class="rule">
-      <p><strong>Traversal:</strong> an algorithm that visits every node (slide 9). For the tree with root D, children U and B, and U's children S and 2:</p>
+    <div class="prose">
+      <p>A <strong>binary tree</strong>: each node has at most 2 children, a left and a right.</p>
       <ul>
-        <li><strong>Pre-order</strong> (root, left, right): D U S 2 B</li>
-        <li><strong>In-order</strong> (left, root, right): S U 2 D B</li>
-        <li><strong>Post-order</strong> (left, right, root): S 2 U B D</li>
+        <li><strong>Root:</strong> the top node, D.</li>
+        <li><strong>Leaf:</strong> a node with no children: S, 2 and B.</li>
+        <li><strong>Subtree:</strong> a node and everything below it. U's subtree is U, S, 2.</li>
+        <li><strong>Height:</strong> the number of <em>edges</em> on the longest path from the root down to a leaf. This tree has height 2. A single node has height 0.</li>
       </ul>
     </div>
-    <pre class="code"><span class="cm">// slide 11: the answer to "name that traversal"</span>
-postOrder(root) {
-  if (root.left != Null) postOrder(root.left);
-  if (root.right != Null) postOrder(root.right);
+    <svg class="htree" data-bst="D(U(S,2),B)" role="img" aria-label="Tree: root D; D's children U (left) and B (right); U's children S (left) and 2 (right)"></svg>
+  </div>
+
+  <h2>Traversals</h2>
+  <p class="line">A <strong>traversal</strong> visits every node once. The three standard ones make the same recursive walk. They differ only in when they process (write down) the node:</p>
+  <div class="table-wrap"><table class="vals">
+    <tr><th>pre-order</th><td>root, then left subtree, then right subtree</td></tr>
+    <tr><th>in-order</th><td>left subtree, then root, then right subtree</td></tr>
+    <tr><th>post-order</th><td>left subtree, then right subtree, then root</td></tr>
+  </table></div>
+  <p class="line">Here is the walk as code, with a slot for each order. Step through it on the tree above, one visit per step:</p>
+  <p class="bt-key"><span class="k-cur">node being visited</span></p>
+  <div class="panel bst-step" data-kind="traverse" data-shape="D(U(S,2),B)"></div>
+  <div class="rule"><p><strong>The rule.</strong> Pre-order writes a node on the way down, before its subtrees. In-order writes it between its left and right subtrees. Post-order writes it on the way back up, after both. A leaf has no subtrees, so all three write it at the same moment.</p></div>
+
+  <p class="where">This check uses a new tree:</p>
+  <svg class="htree" data-bst="7(3(1(0,),6),10(,16))" role="img" aria-label="Tree: root 7; children 3 and 10; 3 has children 1 and 6; 1 has a left child 0; 10 has a right child 16"></svg>
+  <div class="check" data-id="cse332-w3-l7-qc-height-7tree" data-grader="exact" data-answer="3" data-miscon='{"4":"height-counts-nodes","2":"height-short"}'>
+    <p>Quick check: what is the height of this tree?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l7-cyu-name-traversal" data-grader="mc">
+    <p>Quick check: which traversal is this?</p>
+    <pre class="code">aOrder(root) {
+  if (root.left != Null)
+    aOrder(root.left);
+  if (root.right != Null)
+    aOrder(root.right);
   process(root);
-}
-<span class="cm">// preOrder: process(root) first; inOrder: in the middle</span></pre>
+}</pre>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w3-l7-cyu-name-traversal"> Pre-order<span class="why" hidden>Pre-order processes the root first, before either call.</span></label>
+      <label><input type="radio" name="cse332-w3-l7-cyu-name-traversal"> In-order<span class="why" hidden>In-order processes the root between the two calls.</span></label>
+      <label data-correct><input type="radio" name="cse332-w3-l7-cyu-name-traversal"> Post-order<span class="why" hidden>Right. <code>process(root)</code> comes after both subtrees.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
   </div>
+  <nav class="pager"></nav>
+</section>
 
-  <div class="rule">
-    <p><strong>Binary search tree (slide 12).</strong> A binary tree (each node has at most 2 children) with the <strong>order property</strong>: every key in the left subtree is smaller than the node's key, and every key in the right subtree is larger. So keys can't repeat.</p>
+<!-- ================================================================ L7: BST PROPERTY -->
+<section class="page" id="l7-bst" data-title="The BST property">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span></p>
+  <h1>The BST property</h1>
+  <div class="rule"><p><strong>Binary search tree (BST).</strong> A binary tree where, at every node, <em>all</em> keys in its left subtree are smaller than its key, and <em>all</em> keys in its right subtree are larger. So keys can't repeat.</p></div>
+  <svg class="htree" data-bst="7(3(1(0,2),6),10(8,16))" role="img" aria-label="The lecture's BST: root 7; children 3 and 10; 3 has children 1 and 6; 1 has children 0 and 2; 10 has children 8 and 16"></svg>
+  <p class="line">This is the lecture's BST. Read the keys left to right, which is the in-order traversal, and they come out sorted: 0 1 2 3 6 7 8 10 16. Every BST does this, so it's a quick test.</p>
+
+  <h2>Is this a BST?</h2>
+  <svg class="htree" data-bst="7(3(1(0,),8),10(,16))" data-cmp="8" role="img" aria-label="Tree: root 7; children 3 and 10; 3 has children 1 and 8; 1 has a left child 0; 10 has a right child 16. The 8 is circled."></svg>
+  <div class="steps"><ol>
+    <li data-ask="Check 8 against its parent">8 is the right child of 3, and \(8 &gt; 3\). Fine so far.</li>
+    <li data-ask="Check 8 against 7">8 is also in 7's <em>left</em> subtree, where every key must be smaller than 7. But \(8 &gt; 7\). <strong>Not a BST.</strong></li>
+    <li data-ask="Check with in-order">In-order reads 0 1 3 8 7 10 16. Not sorted: same verdict.</li>
+  </ol></div>
+  <div class="rule warn"><p><strong>Common mistake.</strong> Checking only each parent and its children. Compare a key with every node above it, or just check that in-order is sorted.</p></div>
+
+  <svg class="htree" data-bst="16(10(7(3(1(0,),),),),)" role="img" aria-label="Tree: a chain going left: 16, then 10, 7, 3, 1, 0, each the left child of the one before"></svg>
+  <div class="check" data-id="cse332-w3-l7-qc-chain-bst" data-grader="yesno" data-answer="yes" data-miscon='{"no":"chain-not-bst"}'>
+    <p>Quick check: is this chain a BST?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
   </div>
-  <div class="treeview" data-shape="7(3(1(0,2),6),10(8,16))"><figcaption>Slide 12's BST. Its in-order traversal is sorted: 0 1 2 3 6 7 8 10 16.</figcaption></div>
+  <nav class="pager"></nav>
+</section>
 
-  <h2>Are these BSTs? (slides 13–14)</h2>
-  <div class="tree-grid">
-    <figure class="treeview" data-shape="7(3(1(0,),),10(,16))"><figcaption>Yes</figcaption></figure>
-    <figure class="treeview" data-shape="7(3(1(0,),7),10(,16))" data-mark="7"><figcaption>No: a second 7</figcaption></figure>
-    <figure class="treeview" data-shape="7(3(1(0,),8),10(,16))" data-mark="8"><figcaption>No: 8 is in 7's left subtree</figcaption></figure>
-    <figure class="treeview" data-shape="16(10(7(3(1(0,),),),),)"><figcaption>Yes: a chain is still a BST</figcaption></figure>
+<!-- ================================================================ L7: FIND AND INSERT -->
+<section class="page" id="l7-find" data-title="Find and insert">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span></p>
+  <h1>Find and insert</h1>
+  <div class="prose"><p>To <strong>find</strong> a key, start at the root and compare. Smaller: go left. Larger: go right. Equal: found. If you step onto an empty child, the key isn't in the tree. <strong>Insert</strong> runs the same loop, then puts the new key in the empty spot where find fell off.</p></div>
+  <p class="line">Step through the lecture's insert code, adding 5 to the lecture's tree:</p>
+  <p class="bt-key"><span class="k-cur">root (where the loop is)</span><span class="k-path">already passed</span><span class="k-new">new node</span></p>
+  <div class="panel bst-step" data-kind="insert" data-shape="7(3(1(0,),6),10(,16))" data-key="5"></div>
+  <div class="rule"><p><strong>The rule.</strong> Find and insert walk one path from the root, one node per level. So each costs time proportional to the tree's height. Insert only adds a leaf; it never moves a key that's already there.</p></div>
+
+  <p class="where">These checks start from the same tree (before 5 was added):</p>
+  <svg class="htree" data-bst="7(3(1(0,),6),10(,16))" role="img" aria-label="Tree: root 7; children 3 and 10; 3 has children 1 and 6; 1 has a left child 0; 10 has a right child 16"></svg>
+  <div class="check" data-id="cse332-w3-l7-qc-find16" data-grader="text" data-answer="7 10 16|7, 10, 16|7,10,16" data-miscon='{"10 16":"path-skips-root","16":"path-skips-root"}'>
+    <p>Quick check: run <code>find(16)</code>. Type the keys it compares with, in order, separated by spaces.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
   </div>
-  <div class="prose"><p>The third tree is the trap: 8 is bigger than its parent 3, which is fine locally, but it sits in the <em>left subtree of 7</em>, where every key must be smaller than 7.</p></div>
-
-  <h2>Binary trees: some numbers (slides 15–16)</h2>
-  <div class="table-wrap">
-  <table class="plain">
-    <tr><th>Binary tree of height \(h\) (edges on the longest root-to-leaf path)</th><th></th></tr>
-    <tr><td>max # of leaves</td><td>\(2^h\)</td></tr>
-    <tr><td>max # of nodes</td><td>\(2^{h+1} - 1\)</td></tr>
-    <tr><td>min # of leaves</td><td>1</td></tr>
-    <tr><td>min # of nodes</td><td>\(h + 1\)</td></tr>
-  </table>
+  <div class="check" data-id="cse332-w3-l7-qc-insert8-parent" data-grader="exact" data-answer="10" data-miscon='{"16":"wrong-direction","6":"wrong-direction","7":"wrong-direction"}'>
+    <p>Quick check: run <code>insert(8)</code>. Which key is the parent of the new node 8?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
   </div>
-  <div class="prose"><p>So with \(n\) nodes we can't do better than \(O(\log n)\) height, and we want to avoid \(O(n)\) height. BSTs use nodes and references rather than an array (slide 17): a BST can have gaps, and an array with gaps can need about \(2^n\) slots.</p></div>
+  <nav class="pager"></nav>
+</section>
 
-  <div class="check" data-id="cse332-w3-l7-qc-inorder-dusb" data-grader="text" data-answer="S U 2 D B|S, U, 2, D, B|SU2DB" data-miscon='{"d u s 2 b":"inorder-not-pre","s 2 u b d":"pre-not-post"}'>
-    <p>Quick check: type the in-order traversal of slide 9's tree (D at the root).</p>
+<!-- ================================================================ L7: DELETE -->
+<section class="page" id="l7-delete" data-title="Delete">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span></p>
+  <h1>Delete</h1>
+  <div class="prose"><p>First find the node with find's loop. What happens next depends on how many children it has. Each example below starts from this tree, the lecture's:</p></div>
+  <svg class="htree" data-bst="9(3(1(0,),6(5,7)),10(,16))" role="img" aria-label="Tree: root 9; children 3 and 10; 3 has children 1 and 6; 1 has a left child 0; 6 has children 5 and 7; 10 has a right child 16"></svg>
+
+  <h2>No children: delete 5</h2>
+  <div class="bt-pair">
+    <figure><figcaption>Before: 5 is a leaf</figcaption><svg class="htree" data-bst="9(3(1(0,),6(5,7)),10(,16))" data-cmp="5" role="img" aria-label="The tree with 5 circled"></svg></figure>
+    <figure><figcaption>After</figcaption><svg class="htree" data-bst="9(3(1(0,),6(,7)),10(,16))" role="img" aria-label="The tree without 5: 6 has only a right child 7"></svg></figure>
+  </div>
+  <p class="line">5's parent, 6, now points to Null where 5 was.</p>
+
+  <h2>One child: delete 1</h2>
+  <div class="bt-pair">
+    <figure><figcaption>Before: 1 has one child, 0</figcaption><svg class="htree" data-bst="9(3(1(0,),6(5,7)),10(,16))" data-cmp="1" role="img" aria-label="The tree with 1 circled"></svg></figure>
+    <figure><figcaption>After</figcaption><svg class="htree" data-bst="9(3(0,6(5,7)),10(,16))" data-new="0" role="img" aria-label="The tree without 1: 0 is now 3's left child"></svg></figure>
+  </div>
+  <p class="line">1's parent, 3, now points to 1's child, 0. The child moves up with everything below it.</p>
+
+  <h2>Two children: delete 3</h2>
+  <p class="line">3 has two children, so neither can simply take its place. Instead, move in the <strong>largest key in 3's left subtree</strong>: start at 3's left child and go right until you can't. (The smallest key in the right subtree works too. The lecture's code takes the largest on the left, and so does this site.)</p>
+  <p class="bt-key"><span class="k-cur">where the loop is</span><span class="k-path">already passed</span><span class="k-cmp">node being deleted</span><span class="k-new">moved into place</span></p>
+  <div class="panel bst-step" data-kind="delete" data-shape="9(3(1(0,),6(5,7)),10(,16))" data-key="3"></div>
+  <div class="rule"><p><strong>The rule.</strong> The largest key on the left is bigger than everything else on the left and smaller than everything on the right, so the order property still holds. It's the right-most node there, so it has no right child, and removing it from its old spot is the no-children or one-child case.</p></div>
+
+  <p class="where">These checks start from the same tree:</p>
+  <svg class="htree" data-bst="9(3(1(0,),6(5,7)),10(,16))" role="img" aria-label="Tree: root 9; children 3 and 10; 3 has children 1 and 6; 1 has a left child 0; 6 has children 5 and 7; 10 has a right child 16"></svg>
+  <div class="check" data-id="cse332-w3-l7-qc-delete6" data-grader="exact" data-answer="5" data-miscon='{"7":"min-of-right"}'>
+    <p>Quick check: delete 6. Which key takes 6's place?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w3-l7-qc-max-left" data-grader="mc">
+    <p>Quick check: \(m\) is the largest key in some node's left subtree. Which is always true of \(m\)?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w3-l7-qc-max-left"> It is a leaf<span class="why" hidden>It can have a left child: deleting 3 above moved 1, which had a left child 0.</span></label>
+      <label data-correct><input type="radio" name="cse332-w3-l7-qc-max-left"> It has no right child<span class="why" hidden>Right. A right child would be larger, so m wouldn't be the largest.</span></label>
+      <label><input type="radio" name="cse332-w3-l7-qc-max-left"> It has no left child<span class="why" hidden>A left child is smaller than m, so it doesn't stop m from being the largest. 1 had a left child, 0.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L7: WORST CASE -->
+<section class="page" id="l7-worst" data-title="The worst case">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span></p>
+  <h1>The worst case</h1>
+  <div class="prose"><p>Find, insert and delete each walk one path down from the root, so in the worst case their time is the tree's height. How tall can a BST with \(n\) nodes get? Insert 1, 2, 3, 4, 5 in that order. Each key is larger than every key before it, so each one goes right of the last:</p></div>
+  <svg class="htree" data-bst="1(,2(,3(,4(,5))))" role="img" aria-label="A chain going right: 1, then 2, 3, 4, 5, each the right child of the one before"></svg>
+  <p class="line">A chain. Its height is 4, which is \(n - 1\), and <code>find(5)</code> compares with all 5 keys. So in the worst case find, insert and delete are all \(\Theta(n)\): no better than a list.</p>
+
+  <h2>How short can it be?</h2>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th>binary tree of height</th><th>\(0\)</th><th>\(1\)</th><th>\(2\)</th><th>\(3\)</th><th>\(h\)</th></tr></thead>
+    <tr><th>most leaves (every level full)</th><td>1</td><td>2</td><td>4</td><td>8</td><td>\(2^h\)</td></tr>
+    <tr><th>most nodes (every level full)</th><td>1</td><td>3</td><td>7</td><td>15</td><td>\(2^{h+1} - 1\)</td></tr>
+    <tr><th>fewest nodes (a chain)</th><td>1</td><td>2</td><td>3</td><td>4</td><td>\(h + 1\)</td></tr>
+  </table></div>
+  <p class="line">The fewest leaves is always 1, a chain. A full tree packs 15 nodes into height 3, so \(n\) nodes need height at least about \(\log_2 n\). A chain stretches them to height \(n - 1\). Every BST is somewhere in between.</p>
+  <div class="rule"><p><strong>The rule.</strong> BST operations cost \(\Theta(\text{height})\). The height can be anywhere from about \(\log_2 n\) to \(n - 1\), so the worst case is \(\Theta(n)\). Random insert orders usually give short trees (expected \(\Theta(\log n)\)), but nothing guarantees it. <a href="#l8-balance">AVL trees</a> (Lecture 8) add a shape rule that keeps the height \(\Theta(\log n)\) always.</p></div>
+
+  <div class="check" data-id="cse332-w3-l7-qc-sorted-height" data-grader="exact" data-answer="9" data-miscon='{"10":"height-counts-nodes","3":"assumed-full"}'>
+    <p>Quick check: insert 1, 2, …, 10 in that order into an empty BST. What is its height?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
@@ -670,297 +819,195 @@ postOrder(root) {
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Slide 10 shows aOrder, bOrder, cOrder without names. Ask which is which before slide 11. The tell is where <code>process(root)</code> sits.</li>
-      <li>In-order on a BST prints the keys sorted. That's a quick way to check a BST drawing.</li>
-      <li>Watch for height counted in nodes. The course counts edges: a single node has height 0.</li>
-    </ul>
-  </details>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ L7: OPERATIONS -->
-<section class="page" id="l7-ops" data-title="Find, insert, delete">
-  <p class="where">Lecture 7 · slides 18–29 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span></p>
-  <h1>Find, insert, delete</h1>
-  <div class="split">
-    <pre class="code"><span class="cm">// slide 19: find (iterative)</span>
-find(key, root) {
-  while (root != Null &amp;&amp; key != root.key) {
-    if (key &lt; root.key) root = root.left;
-    else if (key &gt; root.key) root = root.right;
-  }
-  if (root == Null) return Null;
-  return root.value;
-}</pre>
-    <pre class="code"><span class="cm">// slide 20: insert (recursive)</span>
-insertHelper(key, value, root) {
-  if (root == null)
-    return new Node(key, value);
-  if (root.key &lt; key)
-    root.right = insertHelper(key, value, root.right);
-  else
-    root.left = insertHelper(key, value, root.left);
-  return root;
-}</pre>
-  </div>
-  <p class="note">Insert happens only at the leaves. (The iterative version on slide 21 overwrites the value when the key is already there.)</p>
-
-  <h2>Delete: three cases (slides 23–26)</h2>
-  <div class="rule">
-    <ul>
-      <li><strong>0 children</strong> (a leaf, e.g. delete 5): the parent points to null instead.</li>
-      <li><strong>1 child</strong> (e.g. delete 1): replace the node with its child.</li>
-      <li><strong>2 children</strong> (e.g. delete 3): replace it with the largest key to its left, or else the smallest key to its right. The recursive version on slide 26 uses <code>removeMax(root.left)</code>, the largest to the left.</li>
-    </ul>
-    <p>The max of a BST is its right-most node; the min is its left-most node (slide 24).</p>
-  </div>
-
-  <h2>Try it on the slide-22 tree</h2>
-  <div class="panel treelab" id="bst-lab" data-mode="bst" data-presets='[{"label":"Slide 22 tree","shape":"9(3(1(0,),6(5,7)),10(,16))","say":"Slide 22 tree. Try delete 5, then 1, then 3."},{"label":"Slide 12 tree","shape":"7(3(1(0,2),6),10(8,16))","say":"Slide 12 tree. Try find 8 and find 4."},{"label":"Empty","shape":"","say":"Empty tree. Insert 1, 2, 3, 4, 5 in order and watch the height."}]'>
-    <div class="controls">
-      <label>Key <input type="text" inputmode="numeric" class="tl-key" aria-label="Key"></label>
-      <button class="btn primary tl-insert" type="button">Insert</button>
-      <button class="btn tl-find" type="button">Find</button>
-      <button class="btn tl-delete" type="button">Delete</button>
-      <button class="btn quiet tl-reset" type="button">Reset</button>
-    </div>
-    <div class="controls tl-presets" role="group" aria-label="Start from"></div>
-    <div class="chart-box"><svg class="chart tl-svg" role="img"></svg></div>
-    <p class="out tl-out" role="status"></p>
-    <p class="tl-orders"></p>
-  </div>
-
-  <h2>Worst case (slides 27–29)</h2>
-  <div class="prose">
-    <p>Find, insert and delete each take time proportional to the tree's height. The maximum height of a BST with \(n\) nodes is \(n - 1\): insert keys in sorted order and you get a chain. So the worst case is \(\Theta(n)\). To do better, add shape rules that keep the tree short. That's the AVL tree, on Friday.</p>
-  </div>
-
-  <div class="check" data-id="cse332-w3-l7-qc-delete3" data-grader="exact" data-answer="1" data-miscon='{"5":"min-of-right"}'>
-    <p>Quick check: deleting 3 from the slide-22 tree with the lecture's rule, which key takes 3's place?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w3-l7-qc-sorted-height" data-grader="exact" data-answer="9" data-miscon='{"10":"height-counts-nodes","3":"bst-height"}'>
-    <p>Quick check: insert 1, 2, …, 10 in that order into an empty BST. What is its height?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>In the widget, delete 5, then 1, then 3 on the slide-22 tree: you see all three cases in order. After deleting 1, the two-child delete of 3 pulls up 0.</li>
-      <li>Why is the two-child replacement safe? The largest key on the left is bigger than everything else on the left and smaller than everything on the right, and it has no right child, so removing it from below is a 0- or 1-child delete.</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L7: PRACTICE -->
-<section class="page" id="l7-practice" data-title="Lecture 7: practice">
-  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span> · practice</p>
-  <h1>Lecture 7: practice</h1>
-  <div class="prose"><p>Six problems on the lecture's own trees (slides 9–27). Traversal boxes take keys separated by spaces or commas. Every answer was produced by running the slides' algorithms (<code>checks/cse332/w03/verify.mjs</code>).</p></div>
+<section class="page" id="l7-practice" data-title="Lecture 7 practice">
+  <p class="where">Lecture 7 · <span class="today-chip" data-date="2026-10-14">Wed Oct 14</span></p>
+  <h1>Lecture 7 practice</h1>
+  <div class="prose"><p>One group per lesson, on the lecture's own trees and keys. Draw the tree on paper as you go: that's the skill. You can check one answer at a time, and each tree solution draws the tree after every step. Traversal and path boxes take keys separated by spaces.</p></div>
+  <div data-progress-bar></div>
+
+  <h2 class="practice-group">The dictionary ADT</h2>
+  <p class="note">Lesson: <a href="#l7-dict">The dictionary ADT</a></p>
+
+  <article class="task" data-id="cse332-w3-l7-naive">
+    <h2>1. What does it cost?</h2>
+    <p class="prompt">Worst case for one operation on a dictionary holding \(n\) keys. Write a bucket like <code>n</code>, <code>log n</code> or <code>1</code>.</p>
+    <div class="answer-spec" data-part="unsorted-insert" data-grader="bigo" data-answer="n" data-miscon='{"1":"insert-checks-key"}' data-label="unsorted array: insert"></div>
+    <div class="answer-spec" data-part="sorted-find" data-grader="bigo" data-answer="log n" data-label="sorted array: find"></div>
+    <div class="answer-spec" data-part="sorted-insert" data-grader="bigo" data-answer="n" data-miscon='{"log n":"shift-on-insert"}' data-label="sorted array: insert"></div>
+    <div class="answer-spec" data-part="sortedlist-find" data-grader="bigo" data-answer="n" data-miscon='{"log n":"no-binary-search-list"}' data-label="sorted linked list: find"></div>
+    <ol class="hints">
+      <li>Keys are unique. What does insert have to check before it adds a pair?</li>
+      <li>A sorted array can binary search, but it shifts items to make room. A linked list can't jump to its middle.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Unsorted array, insert: first scan for the key, in case it must overwrite. \(\Theta(n)\).</li>
+      <li>Sorted array, find: binary search. \(\Theta(\log n)\).</li>
+      <li>Sorted array, insert: binary search finds the spot, but up to \(n\) items shift over. \(\Theta(n)\).</li>
+      <li>Sorted linked list, find: no jumping to the middle, so walk from the front. \(\Theta(n)\).</li>
+      <li class="answer">\(n\); \(\log n\); \(n\); \(n\).</li>
+    </ol></div></div>
+  </article>
+
+  <h2 class="practice-group">Trees and traversals</h2>
+  <p class="note">Lesson: <a href="#l7-trees">Trees and traversals</a></p>
 
   <article class="task" data-id="cse332-w3-l7-traversals">
-    <h2>1. Three traversals</h2>
-    <div class="treeview" data-shape="7(3(1(0,2),6),10(8,16))"></div>
-    <p class="prompt">Give the pre-order, in-order and post-order traversals of slide 12's BST.</p>
-    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="7 3 1 0 2 6 10 8 16|7, 3, 1, 0, 2, 6, 10, 8, 16" data-miscon='{"0 1 2 3 6 7 8 10 16":"inorder-not-pre","0, 1, 2, 3, 6, 7, 8, 10, 16":"inorder-not-pre"}' data-label="pre-order"></div>
+    <h2>2. Three traversals</h2>
+    <p class="prompt">Give the pre-order, in-order and post-order traversals of the lecture's BST.</p>
+    <svg class="htree" data-bst="7(3(1(0,2),6),10(8,16))" role="img" aria-label="BST: root 7; children 3 and 10; 3 has children 1 and 6; 1 has children 0 and 2; 10 has children 8 and 16"></svg>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="7 3 1 0 2 6 10 8 16|7, 3, 1, 0, 2, 6, 10, 8, 16" data-miscon='{"0 1 2 3 6 7 8 10 16":"inorder-not-pre","0 2 1 6 3 8 16 10 7":"inorder-not-pre"}' data-label="pre-order"></div>
     <div class="answer-spec" data-part="in" data-grader="text" data-answer="0 1 2 3 6 7 8 10 16|0, 1, 2, 3, 6, 7, 8, 10, 16" data-label="in-order"></div>
     <div class="answer-spec" data-part="post" data-grader="text" data-answer="0 2 1 6 3 8 16 10 7|0, 2, 1, 6, 3, 8, 16, 10, 7" data-miscon='{"7 3 1 0 2 6 10 8 16":"pre-not-post","0 1 2 3 6 7 8 10 16":"inorder-not-post"}' data-label="post-order"></div>
     <ol class="hints">
-      <li>Pre-order writes a node the first time you reach it; post-order writes it after both subtrees are done.</li>
+      <li>Pre-order writes a node the first time you reach it. Post-order writes it after both its subtrees are done.</li>
       <li>In-order of a BST is just the keys sorted.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>Pre-order: 7, then the left subtree (3 1 0 2 6), then the right (10 8 16).</li>
-      <li>In-order: sorted, 0 1 2 3 6 7 8 10 16.</li>
-      <li>Post-order: left subtree (0 2 1 6 3), right subtree (8 16 10), then 7.</li>
+      <li>Pre-order: 7, then all of 3's subtree in pre-order (3 1 0 2 6), then all of 10's (10 8 16).</li>
+      <li>In-order: the keys sorted, 0 1 2 3 6 7 8 10 16.</li>
+      <li>Post-order: 3's subtree in post-order (0 2 1 6 3), then 10's (8 16 10), then 7 last.</li>
       <li class="answer">7 3 1 0 2 6 10 8 16; 0 1 2 3 6 7 8 10 16; 0 2 1 6 3 8 16 10 7.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w3-l7-build">
-    <h2>2. Build and search</h2>
-    <p class="prompt">Insert 9, 3, 10, 1, 6, 16, 0, 5, 7 in that order into an empty BST (you get slide 22's tree). Then run <code>find(8)</code>.</p>
-    <div class="answer-spec" data-part="height" data-grader="exact" data-answer="3" data-miscon='{"4":"height-counts-nodes"}' data-label="height of the tree"></div>
-    <div class="answer-spec" data-part="parent5" data-grader="exact" data-answer="6" data-label="parent of 5"></div>
-    <div class="answer-spec" data-part="path8" data-grader="text" data-answer="9 3 6 7|9, 3, 6, 7" data-label="keys <code>find(8)</code> compares with, in order"></div>
-    <div class="answer-spec" data-part="found8" data-grader="yesno" data-answer="no" data-label="does it find 8?"></div>
-    <ol class="hints">
-      <li>Each new key walks down from the root, left if smaller, right if larger, and becomes a leaf.</li>
-      <li>8 &gt; 6, so <code>find</code> goes right from 6 to 7. What's to the right of 7?</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>The tree: 9 has children 3 and 10; 3 has 1 and 6; 1 has 0; 6 has 5 and 7; 10 has right child 16.</li>
-      <li>The longest path is 9–3–1–0 (or 9–3–6–5): 3 edges.</li>
-      <li><code>find(8)</code>: 8 &lt; 9 go left; 8 &gt; 3 go right; 8 &gt; 6 go right; 8 &gt; 7 go right to null.</li>
-      <li class="answer">Height 3; 5's parent is 6; compares 9, 3, 6, 7; not found.</li>
-    </ol></div></div>
-  </article>
-
-  <article class="task" data-id="cse332-w3-l7-delete">
-    <h2>3. Three deletes in a row</h2>
-    <div class="treeview" data-shape="9(3(1(0,),6(5,7)),10(,16))"></div>
-    <p class="prompt">On slide 22's tree, delete 5, then 1, then 3, each from the result of the last, using the lecture's rule for two children (the largest key to the left).</p>
-    <div class="answer-spec" data-part="case5" data-grader="exact" data-answer="0" data-label="children of 5 when it's deleted"></div>
-    <div class="answer-spec" data-part="case1" data-grader="exact" data-answer="1" data-label="children of 1 when it's deleted"></div>
-    <div class="answer-spec" data-part="repl3" data-grader="exact" data-answer="0" data-miscon='{"1":"missed-a-level","6":"min-of-right","7":"min-of-right"}' data-label="key that replaces 3"></div>
-    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="9 0 6 7 10 16|9, 0, 6, 7, 10, 16" data-label="pre-order of the final tree"></div>
-    <ol class="hints">
-      <li>Delete 1 first changes 3's left subtree. What's left of 3 when you delete it?</li>
-      <li>After deleting 1, 3's left subtree is just 0.</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>Delete 5: a leaf, so 6's left becomes null.</li>
-      <li>Delete 1: one child (0), so 0 takes 1's place as 3's left child.</li>
-      <li>Delete 3: two children (0 and 6). The largest key to its left is 0, so 0 moves into 3's place.</li>
-      <li>Final tree: 9 with children 0 and 10; 0's right child is 6; 6's right child is 7; 10's right child is 16.</li>
-      <li class="answer">0; 1; 0 replaces 3; pre-order 9 0 6 7 10 16.</li>
-    </ol></div></div>
-    <details class="notes" open>
-      <summary>Teaching notes</summary>
-      <ul><li>Deleting 3 straight from the original tree would pull up 1 instead (the quick check on the previous page). Order matters.</li></ul>
-    </details>
-  </article>
-
-  <article class="task" data-id="cse332-w3-l7-numbers">
-    <h2>4. Binary trees of height 5</h2>
-    <p class="prompt">Use slide 16's formulas for a binary tree of height \(h = 5\).</p>
-    <div class="answer-spec" data-part="maxleaves" data-grader="exact" data-answer="32" data-miscon='{"63":"nodes-not-leaves","64":"off-by-one-height"}' data-label="max # of leaves"></div>
-    <div class="answer-spec" data-part="maxnodes" data-grader="exact" data-answer="63" data-miscon='{"32":"leaves-not-nodes","31":"off-by-one-height","127":"off-by-one-height"}' data-label="max # of nodes"></div>
-    <div class="answer-spec" data-part="minleaves" data-grader="exact" data-answer="1" data-label="min # of leaves"></div>
-    <div class="answer-spec" data-part="minnodes" data-grader="exact" data-answer="6" data-miscon='{"5":"off-by-one-height"}' data-label="min # of nodes"></div>
-    <ol class="hints">
-      <li>The fullest tree has every level full; the emptiest is a chain.</li>
-      <li>A chain of height 5 has 5 edges. How many nodes?</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>Full tree: level 5 holds \(2^5 = 32\) leaves, and all levels hold \(2^6 - 1 = 63\) nodes.</li>
-      <li>Chain: one leaf, and \(5 + 1 = 6\) nodes.</li>
-      <li class="answer">32; 63; 1; 6.</li>
-    </ol></div></div>
-  </article>
-
-  <article class="task" data-id="cse332-w3-l7-naive">
-    <h2>5. The naïve table</h2>
-    <p class="prompt">Worst-case time for a dictionary with \(n\) keys (slide 6). Give a \(\Theta\) class.</p>
-    <div class="answer-spec" data-part="unsorted-insert" data-grader="bigo" data-answer="n" data-label="insert into an unsorted array"></div>
-    <div class="answer-spec" data-part="sorted-find" data-grader="bigo" data-answer="log n" data-label="find in a sorted array"></div>
-    <div class="answer-spec" data-part="sorted-insert" data-grader="bigo" data-answer="n" data-label="insert into a sorted array"></div>
-    <div class="answer-spec" data-part="bst-find" data-grader="bigo" data-answer="n" data-label="find in a BST (worst case)"></div>
-    <ol class="hints">
-      <li>Keys are unique. What does insert have to do before it adds a pair?</li>
-      <li>A sorted array supports binary search but has to shift to make room. A BST can be a chain.</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>Unsorted array: insert must first scan for the key (to overwrite it), \(\Theta(n)\).</li>
-      <li>Sorted array: find is binary search, \(\Theta(\log n)\); insert shifts up to \(n\) items, \(\Theta(n)\).</li>
-      <li>BST: a chain of height \(n - 1\) makes find \(\Theta(n)\).</li>
-      <li class="answer">\(\Theta(n)\); \(\Theta(\log n)\); \(\Theta(n)\); \(\Theta(n)\).</li>
-    </ol></div></div>
-  </article>
+  <h2 class="practice-group">The BST property</h2>
+  <p class="note">Lesson: <a href="#l7-bst">The BST property</a></p>
 
   <article class="task" data-id="cse332-w3-l7-is-bst">
-    <h2>6. BST or not?</h2>
-    <div class="tree-grid">
-      <figure class="treeview" data-shape="20(10(5,15(12,25)),30)"><figcaption>Tree P</figcaption></figure>
-      <figure class="treeview" data-shape="20(10(5,15(12,18)),30(,40))"><figcaption>Tree Q</figcaption></figure>
-      <figure class="treeview" data-shape="5(,8(,13(11,21)))"><figcaption>Tree R</figcaption></figure>
+    <h2>3. BST or not?</h2>
+    <p class="prompt">For each tree, is it a binary search tree? Check every key against every node above it.</p>
+    <div class="bt-pair">
+      <figure><figcaption>Tree P</figcaption><svg class="htree" data-bst="20(10(5,15(12,25)),30)" role="img" aria-label="Tree P: root 20; children 10 and 30; 10 has children 5 and 15; 15 has children 12 and 25"></svg></figure>
+      <figure><figcaption>Tree Q</figcaption><svg class="htree" data-bst="20(10(5,15(12,18)),30(,40))" role="img" aria-label="Tree Q: root 20; children 10 and 30; 10 has children 5 and 15; 15 has children 12 and 18; 30 has a right child 40"></svg></figure>
+      <figure><figcaption>Tree R</figcaption><svg class="htree" data-bst="5(,8(,13(11,21)))" role="img" aria-label="Tree R: root 5 with a right child 8; 8 has a right child 13; 13 has children 11 and 21"></svg></figure>
     </div>
-    <p class="prompt">For each tree, is it a binary search tree?</p>
     <div class="answer-spec" data-part="p" data-grader="yesno" data-answer="no" data-label="Tree P"></div>
     <div class="answer-spec" data-part="q" data-grader="yesno" data-answer="yes" data-label="Tree Q"></div>
     <div class="answer-spec" data-part="r" data-grader="yesno" data-answer="yes" data-label="Tree R"></div>
     <ol class="hints">
-      <li>Check every key against all its ancestors, not just its parent. Or list the in-order traversal: is it sorted?</li>
+      <li>List each tree's in-order traversal. Is it sorted?</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>P's in-order is 5 10 12 15 25 20 30: 25 sits in 20's left subtree, so P is not a BST.</li>
-      <li>Q's in-order is 5 10 12 15 18 20 30 40: sorted, so it's a BST.</li>
-      <li>R's in-order is 5 8 11 13 21: sorted. Mostly one-child nodes, but still a BST.</li>
-      <li class="answer">no; yes; yes.</li>
+      <li>P: 25 is 15's right child, which is fine for 15. But it's in 20's left subtree, and \(25 &gt; 20\). In-order: 5 10 12 15 25 20 30, not sorted. Not a BST.<svg class="htree" data-step data-bst="20(10(5,15(12,25)),30)" data-cmp="20,25" role="img" aria-label="Tree P with 20 and 25 circled"></svg></li>
+      <li>Q: in-order is 5 10 12 15 18 20 30 40, sorted. A BST.</li>
+      <li>R: in-order is 5 8 11 13 21, sorted. Mostly one-child nodes, but still a BST.</li>
+      <li class="answer">No; yes; yes.</li>
     </ol></div></div>
   </article>
-  <nav class="pager"></nav>
-</section>
 
-<!-- ================================================================ L7: QUIZ -->
-<section class="page" id="l7-quiz" data-title="Check your understanding: dictionaries and BSTs">
-  <p class="where">Lecture 7 wrap-up · original questions written for this site, not from the course</p>
-  <h1>Check your understanding: dictionaries and BSTs</h1>
-  <div class="prose"><p>Ten questions on Lecture 7. The score counts first tries.</p></div>
-  <div class="cyu-score" data-quiz-score="l7" role="status"></div>
-  <ol class="cyu-list" data-quiz="l7">
-    <li class="cyu" data-id="cse332-w3-l7-cyu-keys" data-kind="mc" data-topic="l7-dict">
-      <p class="q">What must be true of a dictionary's keys?</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w3-l7-cyu-keys"> They're unique (and comparable, for many implementations)<span class="why" hidden>Correct (slide 3).</span></label>
-        <label><input type="radio" name="cse332-w3-l7-cyu-keys"> They're integers<span class="why" hidden>Any comparable type works: strings, for example.</span></label>
-        <label><input type="radio" name="cse332-w3-l7-cyu-keys"> They're inserted in sorted order<span class="why" hidden>Insert order is up to the user. A BST that gets sorted inserts becomes a chain.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l7-cyu-bst-worst" data-kind="bigo" data-answer="n" data-topic="l7-ops">
-      <p class="q">Worst-case time of <code>find</code> in a BST with \(n\) nodes.</p>
-      <p class="why" hidden>The tree can be a chain of height \(n-1\): \(\Theta(n)\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l7-cyu-preorder" data-type="text" data-answer="D U S 2 B|D, U, S, 2, B|DUS2B" data-topic="l7-bst" data-miscon='{"s u 2 d b":"inorder-not-pre"}'>
-      <p class="q">Type the pre-order traversal of slide 9's tree: root D, children U (left) and B (right), and U's children S (left) and 2 (right).</p>
-      <p class="why" hidden>Root first, then the left subtree (U S 2), then the right (B): D U S 2 B.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l7-cyu-name-traversal" data-kind="mc" data-topic="l7-bst">
-      <p class="q">A traversal calls itself on the left child, then on the right child, then calls <code>process(root)</code>. Which is it?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w3-l7-cyu-name-traversal"> Pre-order<span class="why" hidden>Pre-order processes the root first.</span></label>
-        <label><input type="radio" name="cse332-w3-l7-cyu-name-traversal"> In-order<span class="why" hidden>In-order processes the root between the two subtrees.</span></label>
-        <label data-correct><input type="radio" name="cse332-w3-l7-cyu-name-traversal"> Post-order<span class="why" hidden>Correct: slide 10's aOrder.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l7-cyu-min-nodes" data-kind="num" data-answer="7" data-topic="l7-bst" data-miscon='{"6":"off-by-one-height"}'>
-      <p class="q">The fewest nodes a binary tree of height 6 can have.</p>
-      <p class="why" hidden>A chain: \(h + 1 = 7\) nodes.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l7-cyu-max-leaves" data-kind="num" data-answer="16" data-topic="l7-bst" data-miscon='{"31":"nodes-not-leaves","15":"nodes-not-leaves"}'>
-      <p class="q">The most leaves a binary tree of height 4 can have.</p>
-      <p class="why" hidden>\(2^h = 2^4 = 16\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l7-cyu-insert-leaf" data-kind="mc" data-topic="l7-ops">
-      <p class="q">Where does BST insert put a new key?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w3-l7-cyu-insert-leaf"> At the root, pushing the old root down<span class="why" hidden>No: it walks down from the root.</span></label>
-        <label data-correct><input type="radio" name="cse332-w3-l7-cyu-insert-leaf"> At a new leaf<span class="why" hidden>Correct: "insert happens only at the leaves."</span></label>
-        <label><input type="radio" name="cse332-w3-l7-cyu-insert-leaf"> In the first empty spot in level order<span class="why" hidden>That's a heap's insert. A BST puts the key where find would have looked for it.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l7-cyu-delete-root" data-kind="num" data-answer="7" data-topic="l7-ops" data-miscon='{"10":"min-of-right","16":"min-of-right"}'>
-      <p class="q">Delete 9 (the root) from slide 22's tree: 9 with children 3 and 10; 3 with 1 and 6; 1 with 0; 6 with 5 and 7; 10 with right child 16. Using the lecture's rule, what's the new root?</p>
-      <p class="why" hidden>Two children, so take the largest key to the left: the right-most node of 3's subtree, which is 7.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l7-cyu-lazy" data-kind="mc" data-topic="l7-dict">
-      <p class="q">Which is a cost of lazy deletion?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w3-l7-cyu-lazy"> Delete becomes slower than find<span class="why" hidden>The point is that delete becomes as fast as find.</span></label>
-        <label data-correct><input type="radio" name="cse332-w3-l7-cyu-lazy"> Deleted items still take space, and find depends on \(m \ge n\)<span class="why" hidden>Correct (slide 7).</span></label>
-        <label><input type="radio" name="cse332-w3-l7-cyu-lazy"> Re-adding a deleted key is impossible<span class="why" hidden>Re-adding is easy: just unmark it.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w3-l7-cyu-local-order" data-kind="mc" data-topic="l7-bst">
-      <p class="q">Every node's left child is smaller than it, and every right child is larger. Is the tree a BST?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w3-l7-cyu-local-order"> Yes, always<span class="why" hidden>Slide 13's trap: 8 can be 3's right child (fine for 3) and still be in 7's left subtree.</span></label>
-        <label data-correct><input type="radio" name="cse332-w3-l7-cyu-local-order"> Not necessarily: the rule is about whole subtrees<span class="why" hidden>Correct. Every key in the left subtree must be smaller, not just the child.</span></label>
-        <label><input type="radio" name="cse332-w3-l7-cyu-local-order"> Only if it's balanced<span class="why" hidden>Balance is a separate question. A chain can be a BST.</span></label>
-      </div>
-    </li>
-  </ol>
-  <div class="cyu-score" data-quiz-summary="l7" role="status"></div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul><li>Question 10 is the one to discuss: the order property is about whole subtrees.</li></ul>
-  </details>
+  <h2 class="practice-group">Find and insert</h2>
+  <p class="note">Lesson: <a href="#l7-find">Find and insert</a></p>
+
+  <article class="task" data-id="cse332-w3-l7-build">
+    <h2>4. Build it, then search it</h2>
+    <p class="prompt">Insert 9, 3, 10, 1, 6, 16, 0, 5, 7 in that order into an empty BST. Then run <code>find(8)</code>.</p>
+    <div class="answer-spec" data-part="height" data-grader="exact" data-answer="3" data-miscon='{"4":"height-counts-nodes"}' data-label="height of the finished tree"></div>
+    <div class="answer-spec" data-part="parent5" data-grader="exact" data-answer="6" data-label="parent of 5"></div>
+    <div class="answer-spec" data-part="path8" data-grader="text" data-answer="9 3 6 7|9, 3, 6, 7" data-miscon='{"3 6 7":"path-skips-root"}' data-label="keys <code>find(8)</code> compares with, in order"></div>
+    <div class="answer-spec" data-part="found8" data-grader="yesno" data-answer="no" data-label="does it find 8?"></div>
+    <ol class="hints">
+      <li>Each new key walks down from the root, left if smaller, right if larger, and becomes a leaf.</li>
+      <li>\(8 &gt; 6\), so <code>find</code> goes right from 6 to 7. What's to the right of 7?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Insert 9, 3, 10, 1, 6: 3 and 10 go left and right of 9; 1 and 6 go left and right of 3.<svg class="htree" data-step data-bst="9(3(1,6),10)" role="img" aria-label="9 with children 3 and 10; 3 with children 1 and 6"></svg></li>
+      <li>Insert 16, 0, 5, 7: 16 goes right of 10, 0 left of 1, 5 left of 6, 7 right of 6.<svg class="htree" data-step data-bst="9(3(1(0,),6(5,7)),10(,16))" data-new="16,0,5,7" role="img" aria-label="The finished tree: 16, 0, 5 and 7 added as leaves"></svg></li>
+      <li>The longest root-to-leaf path is 9, 3, 1, 0 (or 9, 3, 6, 5): 3 edges. 5's parent is 6.</li>
+      <li><code>find(8)</code>: \(8 &lt; 9\) go left; \(8 &gt; 3\) go right; \(8 &gt; 6\) go right; \(8 &gt; 7\) go right, to an empty child. Not found.<svg class="htree" data-step data-bst="9(3(1(0,),6(5,7)),10(,16))" data-path="9,3,6,7" role="img" aria-label="The path 9, 3, 6, 7 highlighted"></svg></li>
+      <li class="answer">Height 3; 5's parent is 6; compares 9, 3, 6, 7; no, 8 isn't found.</li>
+    </ol></div></div>
+  </article>
+
+  <div class="check" data-id="cse332-w3-l7-cyu-insert-leaf" data-grader="mc">
+    <p>Quick check: where does BST insert put a new key?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w3-l7-cyu-insert-leaf"> At the root, pushing the old root down<span class="why" hidden>No: it walks down from the root, like find.</span></label>
+      <label data-correct><input type="radio" name="cse332-w3-l7-cyu-insert-leaf"> At a new leaf, where find fell off the tree<span class="why" hidden>Right. Insert only ever adds a leaf.</span></label>
+      <label><input type="radio" name="cse332-w3-l7-cyu-insert-leaf"> In the first empty spot in level order<span class="why" hidden>That's a heap's insert. A BST puts the key where find would have looked for it.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group">Delete</h2>
+  <p class="note">Lesson: <a href="#l7-delete">Delete</a></p>
+
+  <article class="task" data-id="cse332-w3-l7-delete">
+    <h2>5. Three deletes in a row</h2>
+    <p class="prompt">Delete 5, then 1, then 3 from this tree, each from the result of the one before. For two children, use the lecture's rule: the largest key in the left subtree takes the node's place.</p>
+    <svg class="htree" data-bst="9(3(1(0,),6(5,7)),10(,16))" role="img" aria-label="Tree: root 9; children 3 and 10; 3 has children 1 and 6; 1 has a left child 0; 6 has children 5 and 7; 10 has a right child 16"></svg>
+    <div class="answer-spec" data-part="case5" data-grader="exact" data-answer="0" data-label="how many children 5 has when it's deleted"></div>
+    <div class="answer-spec" data-part="case1" data-grader="exact" data-answer="1" data-label="how many children 1 has when it's deleted"></div>
+    <div class="answer-spec" data-part="repl3" data-grader="exact" data-answer="0" data-miscon='{"1":"missed-earlier-delete","6":"min-of-right","7":"min-of-right"}' data-label="the key that takes 3's place"></div>
+    <div class="answer-spec" data-part="pre" data-grader="text" data-answer="9 0 6 7 10 16|9, 0, 6, 7, 10, 16" data-label="pre-order of the final tree"></div>
+    <ol class="hints">
+      <li>Redraw the tree after each delete. Deleting 1 changes 3's left subtree.</li>
+      <li>After deleting 1, what's in 3's left subtree?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Delete 5: a leaf, 0 children. 6's left becomes Null.<svg class="htree" data-step data-bst="9(3(1(0,),6(,7)),10(,16))" role="img" aria-label="After deleting 5"></svg></li>
+      <li>Delete 1: 1 child, 0. 0 takes 1's place as 3's left child.<svg class="htree" data-step data-bst="9(3(0,6(,7)),10(,16))" data-new="0" role="img" aria-label="After deleting 1: 0 is 3's left child"></svg></li>
+      <li>Delete 3: two children, 0 and 6. Its left subtree is just 0, so the largest key there is 0. 0 moves into 3's place.<svg class="htree" data-step data-bst="9(0(,6(,7)),10(,16))" data-new="0" role="img" aria-label="After deleting 3: 0 in 3's place, with right child 6"></svg></li>
+      <li>Pre-order of the final tree: 9, then 0's subtree (0 6 7), then 10's (10 16).</li>
+      <li class="answer">0; 1; 0 takes 3's place; pre-order 9 0 6 7 10 16. Deleting 3 from the starting tree would move 1 up instead: the order of deletes matters.</li>
+    </ol></div></div>
+  </article>
+
+  <svg class="htree" data-bst="9(3(1(0,),6(5,7)),10(,16))" role="img" aria-label="Tree: root 9; children 3 and 10; 3 has children 1 and 6; 1 has a left child 0; 6 has children 5 and 7; 10 has a right child 16"></svg>
+  <div class="check" data-id="cse332-w3-l7-cyu-delete-root" data-grader="exact" data-answer="7" data-miscon='{"10":"min-of-right","3":"left-child-not-max","6":"stopped-early"}'>
+    <p>Quick check: delete 9, the root of this tree, with the lecture's rule. What is the new root?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group">The worst case</h2>
+  <p class="note">Lesson: <a href="#l7-worst">The worst case</a></p>
+
+  <article class="task" data-id="cse332-w3-l7-numbers">
+    <h2>6. Binary trees of height 5</h2>
+    <p class="prompt">Height counts edges on the longest root-to-leaf path. For a binary tree of height \(h = 5\):</p>
+    <div class="answer-spec" data-part="maxleaves" data-grader="exact" data-answer="32" data-miscon='{"63":"nodes-not-leaves","64":"off-by-one-height"}' data-label="the most leaves"></div>
+    <div class="answer-spec" data-part="maxnodes" data-grader="exact" data-answer="63" data-miscon='{"32":"leaves-not-nodes","31":"off-by-one-height","127":"off-by-one-height"}' data-label="the most nodes"></div>
+    <div class="answer-spec" data-part="minleaves" data-grader="exact" data-answer="1" data-label="the fewest leaves"></div>
+    <div class="answer-spec" data-part="minnodes" data-grader="exact" data-answer="6" data-miscon='{"5":"off-by-one-height"}' data-label="the fewest nodes"></div>
+    <ol class="hints">
+      <li>The fullest tree has every level full. The emptiest is a chain.</li>
+      <li>A chain of height 5 has 5 edges. How many nodes is that?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Every level full: levels 0 to 5 hold 1, 2, 4, 8, 16, 32 nodes. The bottom level is the leaves: \(2^5 = 32\). All levels: \(2^6 - 1 = 63\).</li>
+      <li>A chain: one leaf at the bottom, and \(5 + 1 = 6\) nodes.</li>
+      <li class="answer">32; 63; 1; 6.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w3-l7-order">
+    <h2>7. Same keys, different order</h2>
+    <p class="prompt">Insert the keys 1 to 7 into an empty BST twice: once in sorted order 1, 2, 3, 4, 5, 6, 7, and once in the order 4, 2, 6, 1, 3, 5, 7.</p>
+    <div class="answer-spec" data-part="h-sorted" data-grader="exact" data-answer="6" data-miscon='{"7":"height-counts-nodes","2":"assumed-full"}' data-label="height after the sorted order"></div>
+    <div class="answer-spec" data-part="h-mixed" data-grader="exact" data-answer="2" data-miscon='{"3":"height-counts-nodes"}' data-label="height after 4, 2, 6, 1, 3, 5, 7"></div>
+    <div class="answer-spec" data-part="f-sorted" data-grader="exact" data-answer="7" data-label="sorted tree: how many keys <code>find(7)</code> compares with"></div>
+    <div class="answer-spec" data-part="f-mixed" data-grader="exact" data-answer="3" data-label="other tree: how many keys <code>find(7)</code> compares with"></div>
+    <ol class="hints">
+      <li>Sorted order: each new key is larger than all the others. Where does it go?</li>
+      <li>4 first makes 4 the root. 2 and 6 split the rest into two halves.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Sorted order: each key goes right of the last, a chain of height 6. <code>find(7)</code> compares with all 7 keys.<svg class="htree" data-step data-bst="1(,2(,3(,4(,5(,6(,7))))))" data-path="1,2,3,4,5,6,7" role="img" aria-label="A chain 1 to 7 going right, the whole chain highlighted"></svg></li>
+      <li>4, 2, 6, 1, 3, 5, 7: 4 is the root, 2 and 6 its children, and 1, 3, 5, 7 the leaves. Every level is full: height 2. <code>find(7)</code> compares with 4, 6, 7.<svg class="htree" data-step data-bst="4(2(1,3),6(5,7))" data-path="4,6,7" role="img" aria-label="Full tree: root 4; children 2 and 6; leaves 1, 3, 5, 7; path 4, 6, 7 highlighted"></svg></li>
+      <li class="answer">6; 2; 7; 3. Same keys, but the insert order decides the height, and the height decides the cost.</li>
+    </ol></div></div>
+  </article>
+
+  <div class="check" data-id="cse332-w3-l7-cyu-bst-worst" data-grader="bigo" data-answer="n">
+    <p>Quick check: the worst-case time of <code>find</code> in a BST with \(n\) nodes, as a bucket.</p>
+    <div class="row"><input type="text" aria-label="Your answer" placeholder="e.g. log n"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <nav class="pager"></nav>
 </section>
 

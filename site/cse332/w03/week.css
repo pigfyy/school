@@ -68,3 +68,54 @@ table.vals td.lvc { text-align: left; }
 .lvnote { display: block; font-size: 0.82rem; color: var(--ink-soft); }
 pre.code.wrap, pre.code.wrap .ln .src { white-space: pre-wrap; overflow-wrap: anywhere; }
 .tm-table tr.fill td { font-family: var(--font); }
+
+/* ---------------------------------------------------------------- L7: goals, practice groups, tree pictures, steppers */
+#l7-goals .goals li { margin-bottom: 0.45rem; }
+#l7-practice .practice-group { margin-top: 2.75rem; padding-top: 1.1rem; border-top: 2px solid var(--line); }
+#l7-practice .practice-group + .note { margin-top: -0.4rem; }
+svg.htree { display: block; width: 100%; height: auto; margin: 0.25rem auto 0.5rem; }
+.task svg.htree, .check svg.htree { margin-left: 0; }
+.bt-edge { stroke: var(--line-strong); stroke-width: 2; }
+.bt-edge.on { stroke: var(--accent); stroke-width: 3.5; }
+.bt-node circle { fill: var(--surface); stroke: var(--ink); stroke-width: 1.75; }
+.bt-node text { font-family: var(--mono); font-size: 15px; font-weight: 600; fill: var(--ink); }
+.bt-node.path circle { fill: var(--accent-tint); stroke: var(--accent); }
+.bt-node.cur circle { fill: var(--accent); stroke: var(--accent-deep); }
+.bt-node.cur text { fill: #fff; }
+.bt-node.cmp circle { stroke: var(--amber); stroke-width: 3.5; }
+.bt-node.new circle { fill: var(--right-tint); stroke: var(--right); stroke-width: 3; }
+.bt-key { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; font-size: 0.85rem; color: var(--ink-soft); margin: 0 0 0.5rem; }
+.bt-key span::before { content: ""; display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 50%; vertical-align: -0.1rem; margin-right: 0.35rem; border: 2px solid var(--ink); background: var(--surface); }
+.bt-key .k-cur::before { background: var(--accent); border-color: var(--accent-deep); }
+.bt-key .k-path::before { background: var(--accent-tint); border-color: var(--accent); }
+.bt-key .k-cmp::before { border: 3px solid var(--amber); }
+.bt-key .k-new::before { background: var(--right-tint); border-color: var(--right); }
+.bt-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 0.75rem 1.25rem; margin: 0.5rem 0 1rem; }
+.bt-pair figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 0.5rem 0.75rem; min-width: 0; }
+.bt-pair figcaption { font-weight: 700; font-size: 0.9rem; }
+.stepper.bt { align-items: start; }
+.stepper.bt pre.code { margin: 0; max-height: 44rem; overflow-y: auto; position: relative; }
+.stepper.bt .ln .src { white-space: pre-wrap; overflow-wrap: anywhere; }
+.stepper.bt .pic { min-width: 0; }
+.stepper.bt .step-vars { font-family: var(--mono); font-size: 0.85rem; color: var(--ink-soft); margin: 0.25rem 0 0.5rem; min-height: 1.2rem; overflow-wrap: anywhere; }
+.stepper.bt .step-say { background: var(--paper); border-radius: var(--r-sm); padding: 0.6rem 0.8rem; margin: 0 0 0.6rem; min-height: 5.5rem; }
+.bt-outs { display: grid; gap: 0.25rem; margin: 0 0 0.6rem; }
+.bt-out { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0.5rem; margin: 0; padding: 0.2rem 0.5rem; border-radius: var(--r-sm); }
+.bt-out-name { font-size: 0.85rem; color: var(--ink-soft); }
+.bt-out-keys { font-family: var(--mono); font-weight: 600; letter-spacing: 0.08em; }
+.bt-out.wrote { background: var(--amber-tint); }
+@media (max-width: 860px) {
+  .split.stepper.bt { gap: 0.45rem; }
+  .split.stepper.bt .pic { display: contents; }
+  .stepper.bt pre.code { order: 1; max-height: calc(5 * 1.5em + 1.2rem); overflow: hidden; }
+  .stepper.bt svg.htree { order: 2; margin: 0 auto; }
+  .stepper.bt .bt-outs { order: 3; margin: 0; }
+  .stepper.bt .step-vars { order: 3; margin: 0; }
+  .stepper.bt .controls { order: 4; }
+  .stepper.bt .step-say { order: 5; margin: 0; min-height: 0; }
+  #l7-goals .goals li a { white-space: normal; }
+}
+@media (max-width: 600px) {
+  #l7-dict table.vals th, #l7-dict table.vals td, #l7-worst table.vals th, #l7-worst table.vals td { padding: 0.3rem 0.3rem; font-size: 0.82rem; }
+  #l7-dict table.vals th, #l7-worst table.vals th { white-space: normal; }
+}
