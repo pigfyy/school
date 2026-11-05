@@ -26,11 +26,6 @@
     nlogn: { a: 2, kind: "div", b: 2, f: "n", baseAt: 1, baseVal: 1, name: "2T(n/2) + n (slide 17)" },
     sq: { a: 2, kind: "div", b: 2, f: "n2", baseAt: 1, baseVal: 1, name: "2T(n/2) + n² (slide 18)" },
     eighth: { a: 2, kind: "div", b: 8, f: "1", baseAt: 1, baseVal: 1, name: "2T(n/8) + 1 (slide 20)" },
-    s1b: { a: 2, kind: "div", b: 2, f: "n", baseAt: 4, baseVal: 4, name: "S3 1b: base case 4" },
-    s1c: { a: 2, kind: "div", b: 2, f: "100n", baseAt: 1, baseVal: 100, name: "S3 1c: 100n" },
-    s1d: { a: 3, kind: "div", b: 2, f: "n", baseAt: 1, baseVal: 1, name: "S3 1d: 3T(n/2) + n" },
-    s1e: { a: 2, kind: "div", b: 3, f: "n", baseAt: 1, baseVal: 1, name: "S3 1e: 2T(n/3) + n" },
-    s1f: { a: 2, kind: "sub", b: 2, f: "1", baseAt: 1, baseVal: 1, name: "S3 1f: 2T(n−2) + 1" },
     exp: { a: 2, kind: "sub", b: 1, f: "1", baseAt: 1, baseVal: 1, name: "2T(n−1) + 1" },
   };
   function recTex(s) {

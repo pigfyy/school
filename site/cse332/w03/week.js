@@ -88,9 +88,7 @@ window.WEEK.widgets = function ({ $, $$, el, renderMath, REDRAW }) {
   const CLOSED = {
     bsearch: "\\(\\log_2 n + 1 \\in \\Theta(\\log n)\\)", lsearch: "\\(n \\in \\Theta(n)\\)", sum: "\\(2n - 1 \\in \\Theta(n)\\)",
     nlogn: "\\(n\\log_2 n + n \\in \\Theta(n \\log n)\\)", sq: "\\(2n^2 - n \\in \\Theta(n^2)\\)", eighth: "\\(2n^{1/3} - 1 \\in \\Theta(n^{1/3})\\)",
-    s1b: "\\(n\\log_2 n - n \\in \\Theta(n\\log n)\\)", s1c: "\\(100n\\log_2 n + 100n \\in \\Theta(n\\log n)\\)",
-    s1d: "\\(3n^{\\log_2 3} - 2n \\in \\Theta(n^{\\log_2 3})\\)", s1e: "\\(3n - 2n^{\\log_3 2} \\in \\Theta(n)\\)",
-    s1f: "\\(2^{\\lfloor n/2\\rfloor + 1} - 1 \\in \\Theta(\\sqrt{2}^{\\,n})\\)", exp: "\\(2^n - 1 \\in \\Theta(2^n)\\)",
+    exp: "\\(2^n - 1 \\in \\Theta(2^n)\\)",
   };
   function recTexHTML(s) {
     const call = s.kind === "div" ? `T\\left(\\frac{n}{${s.b}}\\right)` : `T(n-${s.b})`;
@@ -241,4 +239,34 @@ window.WEEK.widgets = function ({ $, $$, el, renderMath, REDRAW }) {
     keyIn.addEventListener("keydown", (e) => { if (e.key === "Enter") $(".tl-insert", panel).click(); });
   }
   $$(".treelab").forEach(setupLab);
+
+  /* S3 =========================================================== the worksheet's tree-method picture
+     .s3tree[data-rows]: one row per level, top down: { i, k, more, s, w, L }. k boxes are drawn ("…" after them if
+     more), each with one call's input size s (red box) and its work w (blue box); L is the work on the whole level.
+     "dots" is the ⋮ row. "?" draws an empty blank, for the template. s, w and L are TeX. */
+  $$(".s3tree[data-rows]").forEach((box) => {
+    const math = (t) => (t === "?" ? el("span", { class: "s3-blank", "aria-label": "blank" }) : el("span", { text: `\\(${t}\\)` }));
+    for (const r of JSON.parse(box.dataset.rows)) {
+      if (r === "dots") { box.append(el("div", { class: "s3-row" }, el("div", { class: "s3-boxes s3-dots", text: "⋮" }), el("div"))); continue; }
+      const boxes = el("div", { class: "s3-boxes" });
+      for (let j = 0; j < r.k; j++) boxes.append(el("span", { class: "s3-node" }, el("span", { class: "s3-size" }, math(r.s)), el("span", { class: "s3-work" }, math(r.w))));
+      if (r.more) boxes.append(el("span", { class: "s3-more", text: "…" }));
+      const level = el("div", { class: "s3-level" }, el("span", { class: "s3-i", text: r.i === "base" ? "base cases" : `level ${r.i}` }));
+      if (r.L) level.append(el("span", { text: "⟹ " }), math(r.L));
+      box.append(el("div", { class: "s3-row" }, boxes, level));
+    }
+    renderMath(box);
+  });
 };
+
+/* S3: wrong-answer feedback for Section 3 */
+Object.assign(window.WEEK.messages, {
+  "s3-mult-not-call": "2 * f(…) multiplies the result of one call. Count the calls to f, not the numbers in front of them.",
+  "s3-if-call": "The call inside the if test runs too. Count every call that runs, wherever it sits.",
+  "s3-one-branch": "Two of those calls sit in different branches of the if, and only one branch runs.",
+  "s3-stored": "The result is stored in r, and the later lines reuse r. Count only the calls that actually run.",
+  "s3-branching": "Each box has one child per recursive call: the number in front of T.",
+  "s3-base-level": "Count only the levels that do the non-recursive work. Boxes of size 4 or less are base cases.",
+  "s3-to-one": "That counts down to size 1. Here the base case starts at size 4.",
+  "s3-chip-2": "Each call subtracts 2, so a box on level i is 2i smaller than n.",
+});
