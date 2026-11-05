@@ -293,6 +293,16 @@ const l4Text = () => html.slice(html.indexOf('id="l4-goals"'), html.indexOf('id=
   ok([8, 64, 512, 4096].every((n) => { const h = Sim.heapOf([]); let w = 0; for (let v = n; v >= 1; v--) w = Math.max(w, Sim.heapInsert(h, v).swaps); return w === Math.floor(Math.log2(n)); }), "worst-case insert swaps = floor(log2 n)");
 }
 /* Section 2 */
+{
+  // the row-by-row numUnique stepper counts the same inner-loop steps as the line-by-line one (which Java checks)
+  const arrays = [["a", "b", "c", "d", "e"], ["a", "a", "a", "a", "a"], ["a", "b", "a", "b"], ["a", "a", "b", "b", "c"], ["x"], ["p", "q", "p", "r", "q", "p"]];
+  for (const a of arrays) {
+    const rows = Sim.numUniqueRows(a), steps = Sim.numUniqueSteps(a), end = steps.at(-1);
+    const sum = rows.reduce((t, r) => t + r.js.length, 0);
+    ok(sum === end.inner && rows.at(-1).inner === end.inner && rows.at(-1).out === end.out && rows.filter((r) => !r.skipped).length === end.out, `numUniqueRows ${a.join("")}: ${sum} inner steps, ${rows.at(-1).out} unique`);
+  }
+  ok(Sim.numUniqueRows(["a", "b", "c", "d", "e"]).every((r) => !r.skipped) && Sim.numUniqueRows(["a", "a", "a", "a", "a"]).filter((r) => r.skipped).length === 4, "presets: all rows run vs. rows 1-4 skipped");
+}
 // numUnique written again here, apart from sim.js: per-i inner-loop runs and the (i, j) of every inner iteration
 const numUniqueRef = (vals) => {
   const n = vals.length, seen = Array(n).fill(false), runs = Array(n).fill(0), pairs = [];
@@ -316,8 +326,9 @@ const holdsFrom = (spec, c) => { const r = G.smallestN0(spec, c); return r.n0 ==
     const ref = numUniqueRef(r.values);
     ok(ref.out === r.out && ref.inner === r.inner && r.first === r.values.length, `numUnique ${r.values.join("")}: reference ${ref.out}/${ref.inner} vs Java ${r.out}/${r.inner}`);
     const steps = Sim.numUniqueSteps(r.values);
-    ok(same(Sim.numUniqueDots(steps), ref.pairs), `stepper dots for ${r.values.join("")} are the real inner-loop (i, j)s`);
-    steps.forEach((st, k) => ok(Sim.numUniqueDots(steps.slice(0, k + 1)).length === st.inner, `${r.values.join("")} step ${k}: dots drawn = running inner count ${st.inner}`));
+    const rows = Sim.numUniqueRows(r.values);
+    ok(same(rows.flatMap((x) => x.js.map((j) => [x.i, j])), ref.pairs), `stepper dots for ${r.values.join("")} are the real inner-loop (i, j)s`);
+    ok(rows.every((x, k) => x.inner === rows.slice(0, k + 1).reduce((t, y) => t + y.js.length, 0)), `${r.values.join("")}: each row's running count = dots drawn so far`);
     for (const st of steps) for (const m of st.say.matchAll(/(\d+) \(first loop\) \+ (\d+) \(inner loop\) = (\d+)/g)) ok(Number(m[1]) === r.first && Number(m[2]) === r.inner && Number(m[1]) + Number(m[2]) === Number(m[3]), `${r.values.join("")}: "${m[0]}"`);
   }
   const abab = numUniqueRef(["a", "b", "a", "b"]), aabbc = ["a", "a", "b", "b", "c"];

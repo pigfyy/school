@@ -96,7 +96,10 @@ table.vals.verdict .reason { display: block; font-weight: 400; font-size: 0.82em
 .nu-dots .d { width: 1.5rem; height: 1.5rem; border-radius: 50%; border: 1.5px dashed var(--line-strong); transition: background 0.2s; }
 .nu-dots .d.x { border-color: transparent; }
 .nu-dots .d.on { background: var(--s1); border: 1.5px solid var(--s1); }
-.nu-dots .d.now { box-shadow: 0 0 0 3px var(--amber); }
+.nu-dots .d.pop { animation: nu-pop 0.3s ease both; animation-delay: calc(var(--k, 0) * 0.12s); }
+@keyframes nu-pop { from { transform: scale(0.2); background: transparent; } }
+.nu-dots .rl.skipped { color: var(--wrong); text-decoration: line-through; }
+@media (prefers-reduced-motion: reduce) { .nu-dots .d.pop { animation: none; } }
 .nu-count { font-family: var(--mono); font-weight: 700; margin: 0 0 0.5rem; }
 @media (prefers-reduced-motion: reduce) { .nu-dots .d { transition: none; } }
 

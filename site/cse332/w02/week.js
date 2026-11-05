@@ -602,40 +602,61 @@ function setupNumUnique() {
   const box = $("#nu");
   const code = $("#nu-code"), cells = $("#nu-cells"), dots = $("#nu-dots"), count = $("#nu-count"), say = $("#nu-say");
   const next = $("#nu-next"), back = $("#nu-back"), play = $("#nu-play");
-  let steps = [], k = 0, values = [], timer = null;
+  let rows = [], k = 0, values = [], timer = null;
   const stop = () => { clearInterval(timer); timer = null; play.textContent = "Play"; };
   function load(name) {
     stop();
     values = NU_PRESETS[name];
     $$("[data-nu]", box).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.nu === name)));
-    steps = Sim.numUniqueSteps(values); k = 0; paint();
+    rows = Sim.numUniqueRows(values); k = 0; paint();
+  }
+  function sayFor(r) {
+    const v = `"${values[r.i]}"`;
+    if (r.skipped) return `i = ${r.i}: ${v} was already seen, so the inner loop is skipped. 0 steps.`;
+    const copies = r.marked.filter((x) => x !== r.i);
+    return `i = ${r.i}: ${v} is new, so out = ${r.out}. The inner loop scans j = ${r.i} to ${values.length - 1}: ${r.js.length} step${r.js.length === 1 ? "" : "s"}${copies.length ? `, and marks its copies at ${copies.join(", ")} as seen` : ""}.`;
   }
   function paint() {
-    const st = steps[k], n = values.length;
-    code.replaceChildren(...Sim.NUMUNIQUE_CODE.map((ln, i) => el("div", { class: `ln${i + 1 === st.line || (st.line === 3 && i >= 2 && i <= 4) ? " hl" : ""}` }, el("span", { class: "no", text: String(i + 1) }), el("span", { class: "src", text: ln }))));
+    const n = values.length, r = rows[k - 1], last = k === rows.length;
+    const hl = !r ? [] : r.skipped ? [8] : [8, 9, 10, 11, 12, 13, 14];
+    code.replaceChildren(...Sim.NUMUNIQUE_CODE.map((ln, i) => el("div", { class: `ln${hl.includes(i + 1) ? " hl" : ""}` }, el("span", { class: "no", text: String(i + 1) }), el("span", { class: "src", text: ln }))));
     fitHighlight(code);
-    cells.replaceChildren(...values.map((v, i) => el("div", { class: `cell${st.visited[i] ? " seen" : ""}${i === st.i ? " mid" : ""}${i === st.j && i !== st.i ? " cmp" : ""}` }, el("span", { class: "ptr", text: [i === st.i ? "i" : "", i === st.j ? "j" : ""].filter(Boolean).join(" ") }), el("b", { text: `"${v}"` }), el("span", { class: "idx", text: st.visited[i] ? `${i} ✓` : String(i) }))));
-    const done = new Set(Sim.numUniqueDots(steps.slice(0, k + 1)).map(([i, j]) => `${i},${j}`));
-    const dot = (i, j) => el("span", { class: `d${j < i ? " x" : ""}${done.has(`${i},${j}`) ? " on" : ""}${st.i === i && st.j === j ? " now" : ""}` });
+    const seen = r ? r.visited : values.map(() => false);
+    cells.replaceChildren(...values.map((v, i) => el("div", { class: `cell${seen[i] ? " seen" : ""}${r && i === r.i ? " mid" : ""}` }, el("span", { class: "ptr", text: r && i === r.i ? "i" : "" }), el("b", { text: `"${v}"` }), el("span", { class: "idx", text: seen[i] ? `${i} ✓` : String(i) }))));
     dots.style.setProperty("--n", n);
-    dots.replaceChildren(el("span"), ...values.map((_, j) => el("span", { class: "cl", text: `j=${j}` })),
-      ...values.flatMap((_, i) => [el("span", { class: "rl", text: `i=${i}` }), ...values.map((__, j) => dot(i, j))]));
-    count.textContent = `first loop ${st.first} + inner loop ${st.inner} = ${st.first + st.inner}`;
-    say.textContent = st.say;
+    const grid = [el("span"), ...values.map((_, j) => el("span", { class: "cl", text: `j=${j}` }))];
+    for (let i = 0; i < n; i++) {
+      const row = rows[i], done = i < k, skip = done && row.skipped, now = i === k - 1;
+      grid.push(el("span", { class: `rl${skip ? " skipped" : ""}`, text: skip ? `i=${i} skipped` : `i=${i}` }));
+      for (let jj = 0; jj < n; jj++) {
+        const on = done && !row.skipped && jj >= i;
+        grid.push(el("span", { class: `d${jj < i || skip ? " x" : ""}${on ? " on" : ""}${on && now ? " pop" : ""}`, style: on && now ? `--k:${jj - i}` : null }));
+      }
+    }
+    dots.replaceChildren(...grid);
+    const inner = r ? r.inner : 0;
+    count.textContent = `inner-loop steps: ${inner}`;
+    if (!r) say.textContent = "Each click runs one value of i. Watch which rows run the inner loop.";
+    else if (!last) say.textContent = sayFor(r);
+    else {
+      const ran = rows.filter((x) => !x.skipped).length;
+      const sum = rows.map((x) => x.js.length).join(" + ");
+      say.textContent = `${sayFor(r)} Total: ${sum} = ${inner}. ${ran === n ? "Every row ran: a triangle, about n²/2 steps, so Θ(n²)." : ran === 1 ? "Only the first row ran: n steps, so Θ(n)." : ""} (The first loop adds ${n} more, on every input.)`;
+    }
     back.disabled = k === 0;
-    next.disabled = k === steps.length - 1;
+    next.disabled = last;
   }
-  const step = (d) => { const to = k + d; if (to >= 0 && to < steps.length) { k = to; paint(); } };
+  const step = (d) => { const to = k + d; if (to >= 0 && to <= rows.length) { k = to; paint(); } };
   $$("[data-nu]", box).forEach((b) => b.addEventListener("click", () => load(b.dataset.nu)));
   next.addEventListener("click", () => { stop(); step(1); });
   back.addEventListener("click", () => { stop(); step(-1); });
   play.addEventListener("click", () => {
     if (timer) { stop(); return; }
-    if (k === steps.length - 1) k = 0;
-    if (reduceMotion()) { k = steps.length - 1; paint(); return; }
+    if (k === rows.length) k = 0;
+    if (reduceMotion()) { k = rows.length; paint(); return; }
     play.textContent = "Pause";
     paint();
-    timer = setInterval(() => { step(1); if (k === steps.length - 1) stop(); }, 550);
+    timer = setInterval(() => { step(1); if (k === rows.length) stop(); }, 1100);
   });
   REDRAW.add((pid) => { if (box.closest(".page").id === pid) fitHighlight(code); });
   load("distinct");

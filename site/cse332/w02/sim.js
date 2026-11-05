@@ -371,8 +371,19 @@
     snap(17, `Return ${out}. Count: ${n} (first loop) + ${inner} (inner loop) = ${n + inner}.`, { done: true });
     return steps;
   }
-  // the (i, j) of every inner-loop iteration among these steps; the stepper draws one dot for each
-  const numUniqueDots = (steps) => steps.filter((s) => s.j !== undefined).map((s) => [s.i, s.j]);
+  // numUnique one outer iteration at a time: whether row i runs the inner loop, which j it scans, which copies it marks
+  function numUniqueRows(values) {
+    const n = values.length, visited = values.map(() => false), rows = [];
+    let out = 0, inner = 0;
+    for (let i = 0; i < n; i++) {
+      if (visited[i]) { rows.push({ i, skipped: true, js: [], marked: [], out, inner, visited: visited.slice() }); continue; }
+      out++;
+      const js = [], marked = [];
+      for (let j = i; j < n; j++) { inner++; js.push(j); if (values[i] === values[j]) { visited[j] = true; marked.push(j); } }
+      rows.push({ i, skipped: false, js, marked, out, inner, visited: visited.slice() });
+    }
+    return rows;
+  }
 
   return {
     SLIDE_SORTED, linearSearch, binarySearchTrace, binaryWorstExhaustive, worstGaps,
@@ -382,6 +393,6 @@
     LECTURE_HEAP, BUILD_INPUT, CODE, HEAP_SCENARIOS,
     percolateUp, percolateDown, heapOf, live, heapInsert, heapExtract, buildHeap, isMinHeap, heightOf, indexInfo, indexSay, heightSay,
     insertIdeaSteps, extractIdeaSteps, insertCodeSteps, extractCodeSteps, buildSteps,
-    NUMUNIQUE_CODE, numUniqueSteps, numUniqueDots,
+    NUMUNIQUE_CODE, numUniqueSteps, numUniqueRows,
   };
 });
