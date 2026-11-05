@@ -1114,12 +1114,12 @@ extract</code></pre>
 <section class="page" id="s2-sometimes" data-title="What a bound leaves open">
   <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
   <h1>What a bound leaves open</h1>
-  <div class="prose"><p>All you know is \(f \in O(n)\): \(f\) grows at most like \(n\). It could also be much smaller, even a constant. So \(f\) is in one of the shaded <a href="#compare">buckets</a>.</p></div>
+  <div class="prose"><p>All you know is \(f \in O(n)\): \(f\) grows at most like \(n\). It could also be much smaller, even a constant. The shaded <a href="#compare">buckets</a> are examples of where \(f\) can be. Growth rates in between, like \(\sqrt n\), are possible too.</p></div>
 
-  <ol class="band-ladder" aria-label="Buckets from slowest to fastest. f ∈ O(n) puts f in 1, log n or n; the ends 1 and n are circled.">
-    <li class="band end"><b>1</b><span>smallest \(f\)</span></li>
-    <li class="band"><b>log n</b><span>\(f\) can be here</span></li>
-    <li class="band end"><b>n</b><span>biggest \(f\)</span></li>
+  <ol class="band-ladder" aria-label="Buckets from slowest to fastest. f ∈ O(n) allows 1, log n, n and anything in between, like √n; the slowest and fastest, 1 and n, are circled.">
+    <li class="band end"><b>1</b><span>slowest \(f\)</span></li>
+    <li class="band"><b>log n</b><span>one example in between</span></li>
+    <li class="band end"><b>n</b><span>fastest \(f\)</span></li>
     <li><b>n log n</b><span>too big</span></li>
     <li><b>n²</b><span>too big</span></li>
     <li><b>2ⁿ</b><span>too big</span></li>
@@ -1127,28 +1127,28 @@ extract</code></pre>
 
   <div class="example">
     <p class="example-head">Worked example</p>
-    <p class="example-q">\(f \in O(n)\). Is each claim always true, sometimes true, or always false? Test the two circled ends, \(f = 1\) and \(f = n\).</p>
+    <p class="example-q">\(f \in O(n)\). Is each claim always true, sometimes true, or always false? Try the slowest and fastest \(f\), \(1\) and \(n\). Then give a reason for each "always" or "never".</p>
     <div class="table-wrap"><table class="vals verdict">
       <thead><tr><th>\(f \in\)</th><th>\(f = 1\)</th><th>\(f = n\)</th><th>true?</th></tr></thead>
-      <tr><th>\(O(n^2)\)</th><td class="yes">✓</td><td class="yes">✓</td><td>always</td></tr>
-      <tr><th>\(O(\log n)\)</th><td class="yes">✓</td><td class="no">✗</td><td>sometimes</td></tr>
-      <tr><th>\(\Omega(n)\)</th><td class="no">✗</td><td class="yes">✓</td><td>sometimes</td></tr>
-      <tr><th>\(\Omega(n^2)\)</th><td class="no">✗</td><td class="no">✗</td><td>never</td></tr>
+      <tr><th>\(O(n^2)\)</th><td class="yes">✓</td><td class="yes">✓</td><td class="said">always<span class="reason">\(f \le c\cdot n \le c\cdot n^2\)</span></td></tr>
+      <tr><th>\(O(\log n)\)</th><td class="yes">✓</td><td class="no">✗</td><td class="said">sometimes<span class="reason">\(1\) passes, \(n\) fails</span></td></tr>
+      <tr><th>\(\Omega(n)\)</th><td class="no">✗</td><td class="yes">✓</td><td class="said">sometimes<span class="reason">\(n\) passes, \(1\) fails</span></td></tr>
+      <tr><th>\(\Omega(n^2)\)</th><td class="no">✗</td><td class="no">✗</td><td class="said">never<span class="reason">\(f \le c\cdot n\), and \(n^2\) outgrows every \(c\cdot n\)</span></td></tr>
     </table></div>
   </div>
-  <div class="rule"><p><strong>The rule.</strong> Test the smallest and the biggest \(f\) the bound allows. Both pass: always true. Both fail: always false. One of each: sometimes true.</p></div>
-  <p class="line"><strong>\(f \in \Omega(g)\)</strong> has no biggest \(f\): test \(f = g\) and something huge, like \(2^n\). <strong>\(f \in \Theta(g)\)</strong> pins \(f\) to one bucket: one test is enough.</p>
+  <div class="rule"><p><strong>The rule.</strong> To show <strong>sometimes</strong>, find one allowed \(f\) that passes and one that fails. Trying the slowest and fastest \(f\) is a good way to find them. To show <strong>always</strong> or <strong>never</strong>, give the reason the bound guarantees it or rules it out. Examples alone don't prove "always" or "never".</p></div>
+  <p class="line"><strong>\(f \in \Omega(g)\)</strong> has no fastest \(f\): try \(f = g\) and something huge, like \(2^n\). <strong>\(f \in \Theta(g)\)</strong> pins \(f\) to \(g\)'s bucket, so what's true of \(g\) is true of \(f\).</p>
 
   <details class="more">
-    <summary>Why two tests are enough</summary>
-    <p>An \(O\) claim only gets harder as \(f\) grows, and an \(\Omega\) claim only gets easier. So whatever happens at the two ends also happens everywhere between them.</p>
+    <summary>Why examples can't prove "never"</summary>
+    <p>Still \(f \in O(n)\). Is \(f \in \Theta(\log n)\)? \(f = 1\) fails and \(f = n\) fails. But \(f = \log n\) is allowed, and it passes. So the answer is "sometimes", even though both ends failed.</p>
   </details>
 
   <div class="check" data-id="cse332-w2-s2-sometimes-o4n" data-grader="mc">
     <p>Quick check: \(f \in O(n)\). Is \(f \in O(4n)\)?</p>
     <div class="opts">
-      <label data-correct><input type="radio" name="cse332-w2-s2-sometimes-o4n"> Always true<span class="why" hidden>Right. 4n is bucket n, so O(4n) is the same as O(n). Both ends pass.</span></label>
-      <label><input type="radio" name="cse332-w2-s2-sometimes-o4n"> Sometimes true<span class="why" hidden>Test the biggest f, f = n. Is n ≤ c·4n for some c? The 4 is only a constant.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-s2-sometimes-o4n"> Always true<span class="why" hidden>Right. The reason: f ≤ c·n = (c/4)·4n. The 4 is only a constant.</span></label>
+      <label><input type="radio" name="cse332-w2-s2-sometimes-o4n"> Sometimes true<span class="why" hidden>Sometimes needs an allowed f that fails. Even the fastest, f = n, passes: n ≤ 1·4n.</span></label>
       <label><input type="radio" name="cse332-w2-s2-sometimes-o4n"> Always false<span class="why" hidden>Try f = 1. It's in O(4n), so the claim isn't always false.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
@@ -1158,8 +1158,8 @@ extract</code></pre>
     <p>Quick check: now suppose \(f \in \Theta(n)\) instead. Is \(f \in O(\log n)\)?</p>
     <div class="opts">
       <label><input type="radio" name="cse332-w2-s2-sometimes-theta-logn"> Always true<span class="why" hidden>Θ(n) pins f to bucket n. Does n fit under a log n ceiling?</span></label>
-      <label><input type="radio" name="cse332-w2-s2-sometimes-theta-logn"> Sometimes true<span class="why" hidden>Θ leaves no range: f is in bucket n, so there's only one thing to test.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-s2-sometimes-theta-logn"> Always false<span class="why" hidden>Right. Θ(n) pins f to bucket n, and n outgrows every c·log n.</span></label>
+      <label><input type="radio" name="cse332-w2-s2-sometimes-theta-logn"> Sometimes true<span class="why" hidden>Sometimes needs an allowed f that passes. Θ(n) pins f to bucket n, and nothing there is O(log n).</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-s2-sometimes-theta-logn"> Always false<span class="why" hidden>Right. Θ(n) means f ≥ c·n from some n on, and n outgrows every multiple of log n.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
@@ -1251,8 +1251,8 @@ extract</code></pre>
   <div class="rule"><p><strong>The rule.</strong> Pick \(f'\) as a multiple of \(f\)'s top term. Showing \(f \le f'\) usually sets \(n_0\); showing \(f' \le c\cdot g\) sets \(c\). Take the later of the two starts.</p></div>
   <p class="line"><strong>By parts or the squeeze?</strong> By parts compares each term with \(g\). The squeeze first turns \(f\) into one simple term, then compares that with \(g\). Use whichever is easier.</p>
 
-  <div class="check" data-id="cse332-w2-s2-squeeze-n0" data-grader="exact" data-answer="2" data-miscon='{"1":"log-one-zero"}'>
-    <p>Quick check: to squeeze \(n + 2n\log_2 n\) under \(3n\log_2 n\), you use \(n \le n\log_2 n\). From which \(n\) on is that true?</p>
+  <div class="check" data-id="cse332-w2-s2-squeeze-n0" data-grader="exact" data-answer="5" data-miscon='{"2":"chain-both"}'>
+    <p>Quick check: your first comparison, \(f \le f'\), holds for \(n \ge 2\). Your second, \(f' \le c\cdot g\), holds for \(n \ge 5\). What \(n_0\) makes the whole chain valid?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
@@ -1367,7 +1367,7 @@ extract</code></pre>
 <section class="page" id="s2-problems" data-title="Section 2 practice">
   <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
   <h1>Section 2 practice</h1>
-  <div class="prose"><p>One group per lesson. Problems 2 to 5 are from the section's <a href="https://docs.google.com/document/d/1g0358q2oi3J5rrVmuhcALK6zyPdfaeRn/edit" target="_blank" rel="noopener">worksheet</a>.</p><p>For a proof, type into the blanks of the proof box, then press <strong>Show solution</strong> and mark how you did. Use <strong>Your work</strong> as scratch paper for finding \(c\) and \(n_0\). Plain-text math is fine, like <code>n^2 &lt;= n^4</code>.</p></div>
+  <div class="prose"><p>One group per lesson. Problems 2 to 5 are from the section's <a href="https://docs.google.com/document/d/1g0358q2oi3J5rrVmuhcALK6zyPdfaeRn/edit" target="_blank" rel="noopener">worksheet</a>.</p><p>For a proof, type into the blanks of the proof box, then press <strong>Show solution</strong> and mark how you did. Find \(c\) and \(n_0\) on the <strong>Scratch paper</strong> under the buttons. Plain-text math is fine, like <code>n^2 &lt;= n^4</code>.</p></div>
   <div data-progress-bar></div>
 
   <h2 class="practice-group">What a bound leaves open</h2>
@@ -1381,18 +1381,19 @@ extract</code></pre>
     <div class="answer-spec" data-part="o-n" data-grader="choice" data-answer="never" data-options="always:always true|sometimes:sometimes|never:always false" data-label="\(f \in O(n)\)"></div>
     <div class="answer-spec" data-part="theta-nlogn" data-grader="choice" data-answer="sometimes" data-options="always:always true|sometimes:sometimes|never:always false" data-label="\(f \in \Theta(n\log n)\)"></div>
     <ol class="hints">
-      <li>Test the two ends. The smallest \(f\) is \(n\log n\). There's no biggest, so try something huge, like \(2^n\).</li>
+      <li>For "sometimes", find one allowed \(f\) that passes and one that fails. Try the slowest, \(f = n\log n\), and something huge, like \(2^n\).</li>
+      <li>If both pass, or both fail, look for the reason it always happens. Use what \(\Omega(n\log n)\) promises: \(f \ge c\cdot n\log n\) from some \(n\) on.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>Test \(f = n\log n\) and \(f = 2^n\):
+      <li>Try \(f = n\log n\) and \(f = 2^n\):
         <div class="table-wrap"><table class="vals verdict">
           <thead><tr><th>\(f \in\)</th><th>\(n\log n\)</th><th>\(2^n\)</th><th>true?</th></tr></thead>
-          <tr><th>\(O(n^2)\)</th><td class="yes">✓</td><td class="no">✗</td><td>sometimes</td></tr>
-          <tr><th>\(\Omega(n)\)</th><td class="yes">✓</td><td class="yes">✓</td><td>always</td></tr>
-          <tr><th>\(O(n)\)</th><td class="no">✗</td><td class="no">✗</td><td>never</td></tr>
-          <tr><th>\(\Theta(n\log n)\)</th><td class="yes">✓</td><td class="no">✗</td><td>sometimes</td></tr>
+          <tr><th>\(O(n^2)\)</th><td class="yes">✓</td><td class="no">✗</td><td class="said">sometimes<span class="reason">\(n\log n\) passes, \(2^n\) fails</span></td></tr>
+          <tr><th>\(\Omega(n)\)</th><td class="yes">✓</td><td class="yes">✓</td><td class="said">always<span class="reason">\(f \ge c\cdot n\log n \ge c\cdot n\)</span></td></tr>
+          <tr><th>\(O(n)\)</th><td class="no">✗</td><td class="no">✗</td><td class="said">never<span class="reason">\(f \ge c\cdot n\log n\), which outgrows every \(d\cdot n\)</span></td></tr>
+          <tr><th>\(\Theta(n\log n)\)</th><td class="yes">✓</td><td class="no">✗</td><td class="said">sometimes<span class="reason">\(n\log n\) passes, \(2^n\) fails</span></td></tr>
         </table></div></li>
-      <li>\(O(n)\) fails even for the smallest \(f\): \(n\log n\) outgrows every \(c\cdot n\), and every other \(f\) is bigger still.</li>
+      <li>The ✓✓ and ✗✗ rows need a reason, not just the two tries. \(\Omega(n)\): once \(n \ge 2\), \(\log n \ge 1\), so \(f \ge c\cdot n\log n \ge c\cdot n\). \(O(n)\): \(f\) is at least \(c\cdot n\log n\), and \(n\log n\) outgrows every multiple of \(n\).</li>
       <li class="answer">sometimes; always true; always false; sometimes.</li>
     </ol></div></div>
   </article>
@@ -1467,15 +1468,18 @@ extract</code></pre>
     <h2>5. numUnique's worst and best case</h2>
     <p class="prompt">The section's last worksheet question. <code>numUnique</code> counts the different strings in <code>values</code>, an array of length \(n\). Count the iterations of the <strong>first loop</strong> (lines 3–5) plus the <strong>inner loop</strong> (lines 10–14).</p>
     <pre class="code"><div class="ln"><span class="no">1</span><span class="src">int numUnique(String[] values) {</span></div><div class="ln"><span class="no">2</span><span class="src">    boolean[] visited = new boolean[values.length];</span></div><div class="ln hl"><span class="no">3</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln hl"><span class="no">4</span><span class="src">        visited[i] = false;</span></div><div class="ln hl"><span class="no">5</span><span class="src">    }</span></div><div class="ln"><span class="no">6</span><span class="src">    int out = 0;</span></div><div class="ln"><span class="no">7</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">8</span><span class="src">        if (!visited[i]) {</span></div><div class="ln"><span class="no">9</span><span class="src">            out += 1;</span></div><div class="ln hl"><span class="no">10</span><span class="src">            for (int j = i; j &lt; values.length; j++) {</span></div><div class="ln hl"><span class="no">11</span><span class="src">                if (values[i].equals(values[j])) {</span></div><div class="ln hl"><span class="no">12</span><span class="src">                    visited[j] = true;</span></div><div class="ln hl"><span class="no">13</span><span class="src">                }</span></div><div class="ln hl"><span class="no">14</span><span class="src">            }</span></div><div class="ln"><span class="no">15</span><span class="src">        }</span></div><div class="ln"><span class="no">16</span><span class="src">    }</span></div><div class="ln"><span class="no">17</span><span class="src">    return out;</span></div><div class="ln"><span class="no">18</span><span class="src">}</span></div></pre>
-    <div class="answer-spec" data-part="worst" data-grader="formula" data-answer="n + n(n+1)/2" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"n(n+1)/2":"forgot-first-loop","n + n^2":"sum-off"}' data-label="worst case (all different): the count \(f(n)\)"></div>
+    <div class="answer-spec" data-part="inputs" data-grader="self" data-label="First: which input makes the count biggest, and which makes it smallest?" data-placeholder="biggest: … smallest: …"></div>
+    <div class="answer-spec" data-part="worst" data-grader="formula" data-answer="n + n(n+1)/2" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"n(n+1)/2":"forgot-first-loop","n + n^2":"sum-off"}' data-label="worst case: the count \(f(n)\)"></div>
     <div class="answer-spec" data-part="worst-theta" data-grader="bigo" data-answer="n^2" data-label="\(f(n)\) is \(\Theta\) of"></div>
-    <div class="answer-spec" data-part="best" data-grader="formula" data-answer="2n" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"n":"forgot-first-loop"}' data-label="best case (all the same): the count \(g(n)\)"></div>
+    <div class="answer-spec" data-part="best" data-grader="formula" data-answer="2n" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"n":"forgot-first-loop"}' data-label="best case: the count \(g(n)\)"></div>
     <div class="answer-spec" data-part="best-theta" data-grader="bigo" data-answer="n" data-label="\(g(n)\) is \(\Theta\) of"></div>
     <ol class="hints">
+      <li>The inner loop runs only for an \(i\) not yet visited. Which input never marks a later \(i\)? Which marks them all at \(i = 0\)?</li>
       <li>Worst case: no \(i\) is skipped, and the inner loop runs from \(j = i\) to the end: \(n - i\) times.</li>
       <li>\(1 + 2 + \dots + n = \frac{n(n+1)}{2}\). Best case: only \(i = 0\) runs the inner loop.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
+      <li>Biggest count: all strings different, so no \(i\) is skipped. Smallest: all the same, so \(i = 0\) marks everything.</li>
       <li>Worst case: the inner loop runs \(n + (n-1) + \dots + 1 = \frac{n(n+1)}{2}\) times. Add the first loop's \(n\): \(f(n) = n + \frac{n(n+1)}{2}\).</li>
       <li>Its top term is \(\frac{n^2}{2}\), so \(f(n) \in \Theta(n^2)\).</li>
       <li>Best case: \(i = 0\) runs the inner loop \(n\) times and marks everything. Every later \(i\) is skipped. \(g(n) = n + n = 2n \in \Theta(n)\).</li>

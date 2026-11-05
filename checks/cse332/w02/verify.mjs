@@ -315,7 +315,7 @@ const holdsFrom = (spec, c) => { const r = G.smallestN0(spec, c); return r.n0 ==
   Object.assign(TRUTH, {
     "cse332-w2-s2-parts-c": S(5 + 2),
     "cse332-w2-s2-parts-n0": S(Math.max(fromN((n) => 3 * n * n <= 3 * n * n), fromN((n) => 9 <= n * n))),
-    "cse332-w2-s2-squeeze-n0": S(fromN((n) => n <= n * Math.log2(n))),
+    "cse332-w2-s2-squeeze-n0": S(Math.max(2, 5)),
     "cse332-w2-s2-theta-c1-omega": yn(holdsFrom(W_(["5", "0", "2"], ["0", "0", "4"]), "1") !== null),
     "cse332-w2-s2-numunique-abab": S(abab.inner),
     "cse332-w2-s2-numunique-skip": yn(numUniqueRef(aabbc).runs[1] > 0),
@@ -483,17 +483,28 @@ ok(heightI(9) === 3, "the lecture's 9-node heap has height 3");
   const tex2g = (t) => t.replace(/\\log\s*/g, " log ").replace(/\s+/g, " ").trim();
   const WORD = { always: "always", sometimes: "sometimes", never: "never" };
   const verdictTable = (where, src, sup, g, ends) => {
-    const rows = [...src.matchAll(/<tr><th>\\\((?:f \\in )?(O|\\Omega|\\Theta)\(([^)]*)\)\\\)<\/th><td class="(yes|no)">[✓✗]<\/td><td class="(yes|no)">[✓✗]<\/td><td>([^<]+)<\/td><\/tr>/g)];
-    ok(rows.length === 4, `${where}: 4 verdict rows (found ${rows.length})`);
-    for (const [, relTex, hTex, a, b, word] of rows) {
+    const rows = [...src.matchAll(/<tr><th>\\\((?:f \\in )?(O|\\Omega|\\Theta)\(([^)]*)\)\\\)<\/th><td class="(yes|no)">[✓✗]<\/td><td class="(yes|no)">[✓✗]<\/td><td class="said">(always|sometimes|never)<span class="reason">([\s\S]*?)<\/span><\/td><\/tr>/g)];
+    ok(rows.length === 4, `${where}: 4 verdict rows, each with a reason (found ${rows.length})`);
+    for (const [, relTex, hTex, a, b, word, reason] of rows) {
       const rel = relTex.replace("\\", ""), h = tex2g(hTex);
       ok(rel3(ends[0], h, rel) === (a === "yes") && rel3(ends[1], h, rel) === (b === "yes"), `${where}: ${rel}(${h}) marks at f = ${ends.join(", ")}`);
       ok(WORD[word] === verdict(sup, g, rel, h), `${where}: ${rel}(${h}) is "${word}"; brute force says ${verdict(sup, g, rel, h)}`);
+      // "sometimes" names one allowed f that passes and one that fails; "always" and "never" give a reason, not examples
+      const pf = /^\\\(([^)]+?)\\\) passes, \\\(([^)]+?)\\\) fails$/.exec(reason);
+      if (word === "sometimes") ok(pf && rel3(tex2g(pf[1]), g, sup) && rel3(tex2g(pf[2]), g, sup) && rel3(tex2g(pf[1]), h, rel) && !rel3(tex2g(pf[2]), h, rel), `${where}: ${rel}(${h}) "${reason}" names a passing and a failing allowed f`);
+      else ok(!pf && /\\(le|ge)|outgrows/.test(reason), `${where}: ${rel}(${h}) "${word}" gives a reason: ${reason}`);
     }
   };
   verdictTable("s2-sometimes worked example", pageOf("s2-sometimes"), "O", "n", ["1", "n"]);
   verdictTable("practice 1 solution", taskHtml("cse332-w2-s2-q0-omega"), "Omega", "n log n", ["n log n", "2^n"]);
-  ok(TEST_FS.filter((f) => rel3(f, "n", "O")).join() === "1,log n,n" && /<li class="band end"><b>1<\/b>[\s\S]*<li class="band"><b>log n<\/b>[\s\S]*<li class="band end"><b>n<\/b>[\s\S]*<li><b>n log n<\/b>/.test(pageOf("s2-sometimes")), "the ladder shades exactly the buckets in O(n), ends circled");
+  ok(TEST_FS.filter((f) => rel3(f, "n", "O")).join() === "1,log n,n" && /<li class="band end"><b>1<\/b>[\s\S]*<li class="band"><b>log n<\/b>[\s\S]*<li class="band end"><b>n<\/b>[\s\S]*<li><b>n log n<\/b>/.test(pageOf("s2-sometimes")), "the ladder shades the listed buckets in O(n), slowest and fastest circled");
+  ok(fromN((n) => Math.sqrt(n) <= n) === 1 && fromN((n) => Math.log2(n) <= Math.sqrt(n)) === 16, "√n sits between log n (from n = 16) and n, inside O(n)");
+  says("Growth rates in between, like \\(\\sqrt n\\), are possible too.", "the shaded buckets are only examples");
+  ok(!rel3("1", "log n", "Theta") && !rel3("n", "log n", "Theta") && rel3("log n", "log n", "Theta") && verdict("O", "n", "Theta", "log n") === "sometimes", "f ∈ O(n), f ∈ Θ(log n)?: 1 and n fail, log n passes, so sometimes");
+  says("\\(f = 1\\) fails and \\(f = n\\) fails. But \\(f = \\log n\\) is allowed, and it passes.", "why examples can't prove never");
+  ok(!/Both pass: always true|Why two tests are enough/.test(s2), "the old two-ends rule is gone");
+  ok(fromN((n) => n * Math.log2(n) >= n) === 2, "n log n ≥ n exactly from n = 2 (practice 1's always reason)");
+  says("once \\(n \\ge 2\\), \\(\\log n \\ge 1\\)", "practice 1's always reason");
 
   // multiple-choice quick checks: the marked option is the computed truth
   const mcRight = (id) => { const blk = sliceOf(`data-id="${id}"`, '<div class="row">'); const m = /<label data-correct>([\s\S]*?)<span class="why"/.exec(blk); return m ? m[1].replace(/<[^>]+>/g, "").trim() : null; };
@@ -533,7 +544,9 @@ ok(heightI(9) === 3, "the lecture's 9-node heap has height 3");
     ok([2, 3, 4].every((n) => n * n + 4 <= 2 * n * n && 2 * n * n <= 2 * n ** 3) && 1 + 4 > 2 * 1, "squeeze table: rows ordered from n = 2, f on top at n = 1");
   }
   says("same as \\(4 \\le n^2\\): true from \\(n = 2\\)", "squeeze n₀");
-  ok(fromN((n) => n <= n * Math.log2(n)) === 2 && 1 * Math.log2(1) === 0, "n ≤ n log n from n = 2; log 1 = 0");
+  ok(fromN((n) => n <= n * Math.log2(n)) === 2 && 1 * Math.log2(1) === 0, "n ≤ n log n from n = 2; log 1 = 0 (practice problem 3)");
+  says("your first comparison, \\(f \\le f'\\), holds for \\(n \\ge 2\\). Your second, \\(f' \\le c\\cdot g\\), holds for \\(n \\ge 5\\).", "squeeze quick check's two starts");
+  ok(!/n \\le n\\log_2 n/.test(pageOf("s2-squeeze")), "the squeeze quick check doesn't ask practice problem 3's key step");
 
   // Θ proofs: 2n² + 5 ∈ Θ(4n²) with (1, 3) and (1/2, 1), and no single c works for both parts
   const t2 = O_(["5", "0", "2"], ["0", "0", "4"]), t2w = W_(["5", "0", "2"], ["0", "0", "4"]);

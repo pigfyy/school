@@ -83,6 +83,8 @@ input.wide-script { flex: 1 1 10rem; width: auto; min-width: 0; max-width: 22rem
 .band-ladder li b { font-family: var(--mono); font-size: 0.9rem; color: var(--ink); }
 .band-ladder li.band { background: var(--accent-tint); border-color: var(--accent); }
 .band-ladder li.end { box-shadow: 0 0 0 3px var(--amber); }
+table.vals.verdict td.said { font-weight: 600; }
+table.vals.verdict .reason { display: block; font-weight: 400; font-size: 0.82em; color: var(--ink-soft); }
 
 /* ---------------------------------------------------------------- Section 2: numUnique's inner loop as dots (row i, column j) */
 .nu-cap { font-size: 0.85rem; color: var(--ink-soft); margin: 0.25rem 0; }

@@ -34,7 +34,7 @@ window.WEEK.messages = {
   "forgot-first-loop": "Don't forget the first loop (lines 3–5): it runs n times on every input.",
   "parts-forgot-term": "Every term adds its own multiple of g. Did you add the one from 2n too?",
   "parts-n0-max": "Every step has to hold at the same time. Which step needs the biggest n?",
-  "log-one-zero": "Plug in n = 1: log₂ 1 = 0, so n·log₂ n is 0 there.",
+  "chain-both": "Both comparisons have to hold at the same n. At n = 2, 3 or 4, the second one isn't true yet.",
   "times-g": "c multiplies n/10. What times n/10 gives exactly 7n?",
   "build-first-leaf": "That index is a leaf: percolateDown does nothing there. The first index that can move is the last one with a child.",
 };

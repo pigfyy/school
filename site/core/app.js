@@ -16,7 +16,9 @@
      article.task[data-id]         problem: .answer-spec[data-part] boxes, ol.hints, .solution with .steps
      .answer-spec[data-long]       a written self-check answer (data-grader="self") gets a textarea instead of one line.
                                    Add data-template="Let c = __ and n₀ = __.&#10;…" for a proof box: 8+ rows that grow to
-                                   fit, monospace, math preview; an empty answer starts as that skeleton to type into
+                                   fit, monospace, math preview; an empty answer starts as that skeleton to type into.
+                                   A task with a proof box keeps its work box folded as "Scratch paper" below the
+                                   buttons, and "Show solution" opens every step at once
      [data-progress-bar]           optional empty div: where the page's problem progress bar goes
      .steps                        step-by-step reveal. li[data-ask="plain text"] puts that question on the button
                                    that reveals the step, then heads the step with it
@@ -248,8 +250,9 @@ function setupSteps() {
     }
     steps._reveal = () => { if (shown < items.length) { shown++; render(shown - 1); } };
     steps._shown = () => shown;
+    steps._all = () => { shown = items.length; render(-1); };
     next.addEventListener("click", steps._reveal);
-    all.addEventListener("click", () => { shown = items.length; render(-1); });
+    all.addEventListener("click", steps._all);
     reset.addEventListener("click", () => { shown = 0; render(-1); });
     render(-1);
   });
@@ -587,7 +590,11 @@ function buildTask(task) {
   const workId = `${id}--work`;
   const work = el("textarea", { id: workId, rows: "4", placeholder: task.dataset.workPlaceholder || (window.katex ? "Explain how you got your answer. Math works too, e.g. \\( 10n+100 \\le 10n^2 \\)" : "Your reasoning: the lines you followed, the runs you predicted, what you'd change.") });
   const preview = mathPreview(work);
-  myWork.append(el("label", { class: "work-label", for: workId, text: "Your work" }), work, preview.box);
+  // With a proof box, the proof is the answer: the work box folds away as scratch paper below the buttons.
+  const proof = parts.some((p) => p.template);
+  const scratch = proof ? el("details", { class: "scratch" }, el("summary", { text: "Scratch paper" }), work, preview.box) : null;
+  if (proof) work.setAttribute("aria-label", "Scratch paper");
+  else myWork.append(el("label", { class: "work-label", for: workId, text: "Your work" }), work, preview.box);
   work.addEventListener("input", () => { store.put(id, "problem", { ...get(), title, work: work.value }); render(); });
   // What the student wrote in a part: an untouched proof skeleton counts as nothing.
   const written = (p) => { const v = inputs[parts.indexOf(p)].value; return v === p.template ? "" : v; };
@@ -599,7 +606,8 @@ function buildTask(task) {
   if (hintItems.length) actions.append(hintBtn);
   if (solution) actions.append(solBtn);
   actions.append(clearBtn);
-  task.insertBefore(actions, hintList || solution || null);
+  if (proof) myWork.append(actions, scratch);
+  else task.insertBefore(actions, hintList || solution || null);
   const selfMark = el("div", { class: "self-mark" });
   const gotBtn = el("button", { class: "chip", type: "button", text: "I got it" });
   const missBtn = el("button", { class: "chip", type: "button", text: "I missed something" });
@@ -713,7 +721,7 @@ function buildTask(task) {
       return;
     }
     armed = false; solutionOpen = true;
-    if (solution) $$(".steps", solution).forEach((st) => { if (st._shown && st._shown() === 0) st._reveal(); });
+    if (solution) $$(".steps", solution).forEach((st) => { if (proof) st._all(); else if (st._shown() === 0) st._reveal(); });
     if (fb.textContent.startsWith("You haven't answered")) { fb.textContent = ""; fb.className = "feedback"; }
     store.event(id, "problem", "solution", { answeredFirst: Boolean(tried) });
     store.put(id, "problem", { ...s, title, solutionViewed: true });
@@ -745,6 +753,7 @@ function buildTask(task) {
       } else if (r.correct == null && r.note && s?.result) { p.fb.textContent = r.note; }
     });
     if (document.activeElement !== work) work.value = s?.work || "";
+    if (scratch && !isBlank(work.value)) scratch.open = true;
     fb.className = "feedback"; fb.textContent = "";
     const n = auto.filter((p) => s?.parts?.[p.part]?.correct === true).length;
     if (s?.result) {
