@@ -153,13 +153,10 @@ public class Heap {
         double[] lecture = d(1, 3, 2, 4, 7, 5, 6, 5, 9);
         // the site's steppers (named as in sim.js HEAP_SCENARIOS)
         insertCase("lecture-1.5", lecture, 1.5);
-        insertCase("lecture-8", lecture, 8);
-        insertCase("small-1", d(3, 5, 4, 9, 6, 7), 1);
+        insertCase("array-insert", d(2, 4, 3, 7, 5), 1);
         extractCase("lecture-after-1.5", d(1, 1.5, 2, 4, 3, 5, 6, 5, 9, 7));
-        extractCase("stops-early", d(1, 3, 2, 4, 5, 10, 11, 6));
-        extractCase("left-only", d(1, 2, 3, 4, 5));
+        extractCase("array-extract", d(1, 4, 2, 5, 6, 9, 7));
         buildCase("lecture-build", d(5, 6, 10, 3, 15, 8, 7, 14, 2, 1));
-        buildCase("already-heap", d(1, 2, 3, 4, 5, 6, 7));
         // problems, checks and quizzes
         insertCase("p-l4-insert-4", d(2, 5, 3, 9, 6, 4, 8), 4);
         extractCase("p-l4-extract", d(2, 5, 3, 9, 6, 4, 8));
@@ -167,12 +164,9 @@ public class Heap {
         insertCase("qc-l4-insert-4", lecture, 4);
         extractCase("qc-l4-extract", d(2, 4, 3, 7, 5, 8, 6));
         insertCase("cyu-l4-insert-6", lecture, 6);
-        insertCase("p-l5-insert-0", lecture, 0);
-        extractCase("p-l5-extract", lecture);
         seqCase("p-l5-sequence", d(16, 32, 4, 57, 80, 43, 2, -1));
-        seqCase("qc-l5-sequence", d(5, 3, 8, 1, -1));
-        buildCase("p-l5-reverse", d(9, 8, 7, 6, 5, 4, 3, 2, 1));
-        seqCase("p-l5-reverse-insert", d(9, 8, 7, 6, 5, 4, 3, 2, 1));
+        buildCase("p-l5-build7", d(7, 6, 5, 4, 3, 2, 1));
+        seqCase("p-l5-build7-insert", d(7, 6, 5, 4, 3, 2, 1));
         seqCase("l4-trace-example1", d(5, 6, 1, 3, 8, -1, -1, -1, -1, -1));
         seqCase("l4-trace-example2", d(5, 6, 3, -1, 1, -1, -1, 8, -1, -1));
         seqCase("p-l4-trace", d(9, 4, 7, -1, 2, -1, -1, 6, -1, -1));

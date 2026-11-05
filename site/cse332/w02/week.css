@@ -54,6 +54,7 @@ svg.htree { display: block; width: 100%; height: auto; margin: 0.25rem 0 0.5rem;
 .tree-row figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 0.5rem 0.75rem; min-width: 0; }
 .tree-row figcaption { font-weight: 700; font-size: 0.9rem; }
 .check svg.htree, .cyu svg.htree, .task svg.htree { max-width: 24rem; }
+.tree-row.pairs { grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); }
 
 /* ---------------------------------------------------------------- the c / n0 explorer */
 .bx-sliders label { gap: 0.5rem; }
@@ -86,13 +87,8 @@ input.wide-script { flex: 1 1 10rem; width: auto; min-width: 0; max-width: 22rem
 .band-ladder li.ok span { color: var(--right); font-weight: 600; }
 .band-ladder li.no span { color: var(--wrong); font-weight: 600; }
 
-/* ---------------------------------------------------------------- buildHeap cost bars */
-.bc-bar-cell { width: 35%; }
-.bc-bar { display: block; height: 0.8rem; background: var(--accent); border-radius: 0 4px 4px 0; min-width: 2px; }
-.bc-slider input[type="range"] { width: 12rem; max-width: 55vw; accent-color: var(--accent); }
-
-.log { max-height: 10rem; }
-.vs-table td, .vs-table th { vertical-align: top; }
+/* ---------------------------------------------------------------- Lecture 5: the index picker */
+.ix-out { margin: 0.25rem 0 0; padding-left: 1.2rem; }
 
 @media (max-width: 860px) {
   .band-ladder { grid-template-columns: repeat(3, minmax(0, 1fr)); }

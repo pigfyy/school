@@ -80,20 +80,30 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 // every stepper, on every Java case: same end state, same swaps, same returned value
 for (const r of H) {
+  const swapsSaid = (say) => Number((/(\d+) swaps?\b(?![\s\S]*\d+ swaps?\b)/.exec(say) || [])[1]);
   if (r.t === "insert") for (const gen of [Sim.insertIdeaSteps, Sim.insertCodeSteps]) {
     const end = gen(r.start, r.x).at(-1);
-    ok(same(liveOf(end), r.after) && end.swaps === r.swaps && end.done, `${gen.name} ${r.name}: ${liveOf(end)} vs Java ${r.after}`);
+    ok(same(liveOf(end), r.after) && end.swaps === r.swaps && end.done && swapsSaid(end.say) === r.swaps, `${gen.name} ${r.name}: ${liveOf(end)} vs Java ${r.after}`);
   }
   if (r.t === "extract") for (const gen of [Sim.extractIdeaSteps, Sim.extractCodeSteps]) {
     const end = gen(r.start).at(-1);
-    ok(same(liveOf(end), r.after) && end.swaps === r.swaps && end.returned === r.min, `${gen.name} ${r.name}: ${liveOf(end)} vs Java ${r.after}`);
+    ok(same(liveOf(end), r.after) && end.swaps === r.swaps && end.returned === r.min && swapsSaid(end.say) === r.swaps, `${gen.name} ${r.name}: ${liveOf(end)} vs Java ${r.after}`);
   }
   if (r.t === "build") {
     const steps = Sim.buildSteps(r.start), end = steps.at(-1);
-    ok(same(liveOf(end), r.after) && end.swaps === r.swaps && r.heap, `buildSteps ${r.name}`);
-    // the array right before "percolateDown(i)" starts must equal Java's array after percolateDown(i+1)
+    ok(same(liveOf(end), r.after) && end.swaps === r.swaps && r.heap && swapsSaid(end.say) === r.swaps, `buildSteps ${r.name}`);
+    // each "percolateDown(i)" step shows Java's array after percolateDown(i), and says how many swaps that call made
     const after = Object.fromEntries(r.trace.map(([i, a]) => [i, a]));
-    steps.forEach((st, k) => { const m = /^percolateDown\((\d+)\)/.exec(st.say); if (m && k > 0) ok(same(liveOf(steps[k - 1]), after[Number(m[1]) + 1]), `buildSteps ${r.name}: state before percolateDown(${m[1]})`); });
+    let calls = 0, said = 0;
+    steps.forEach((st) => {
+      const m = /^percolateDown\((\d+)\)/.exec(st.say);
+      if (!m) return;
+      calls++;
+      const k = (st.say.match(/is true, so swap\./g) || []).length;
+      said += k;
+      ok(same(liveOf(st), after[Number(m[1])]) && swapsSaid(st.say) === k && st.mark.swap.length === k + 1, `buildSteps ${r.name}: state and swaps after percolateDown(${m[1]})`);
+    });
+    ok(calls === Math.floor(r.start.length / 2) && said === r.swaps, `buildSteps ${r.name}: one step per non-leaf call, ${said} swaps narrated`);
     const h = Sim.heapOf(r.start); const tr = Sim.buildHeap(h);
     ok(tr.every((t) => same(t.arr, after[t.i])), `Sim.buildHeap trace ${r.name}`);
   }
@@ -115,7 +125,7 @@ for (const [kind, list] of Object.entries(Sim.HEAP_SCENARIOS)) for (const sc of 
   for (const gen of gens) {
     const steps = kind === "insert" ? gen(sc.start, sc.x) : gen(sc.start);
     const code = Sim.CODE[{ insertIdeaSteps: "insertIdea", insertCodeSteps: "insert", extractIdeaSteps: "extractIdea", extractCodeSteps: "extract", buildSteps: "build" }[gen.name]];
-    ok(steps.every((s) => s.line === null || (code[s.line] !== undefined && code[s.line] !== "")), `${gen.name} ${sc.name}: every highlighted line exists`);
+    ok(steps.every((s) => s.line === null || [].concat(s.line).every((l) => code[l] !== undefined && code[l] !== "")), `${gen.name} ${sc.name}: every highlighted line exists`);
     ok(steps.every((s) => s.say && !/slide/i.test(s.say)), `${gen.name} ${sc.name}: narration has no slide references`);
     // the narrated arithmetic and comparisons are right
     for (const s of steps) {
@@ -133,25 +143,28 @@ for (const [kind, list] of Object.entries(Sim.HEAP_SCENARIOS)) for (const sc of 
     }
   }
 }
-// index arithmetic and height narration, for every i <= n <= 31
+// index arithmetic and height narration, for every i <= n <= 31 (the index widget shows the lecture's 9-item heap)
 for (let n = 1; n <= 31; n++) {
   const say = Sim.heightSay(n);
   const h = Math.ceil(Math.log2(n + 1)) - 1;
   ok(say.startsWith(`n = ${n}: height ${h}.`), `heightSay(${n})`);
   for (const m of say.matchAll(/2\^(\d+) − 1 = (\d+)/g)) ok(2 ** Number(m[1]) - 1 === Number(m[2]), `heightSay(${n}): ${m[0]}`);
+  const vals = n === 9 ? Sim.LECTURE_HEAP : Array.from({ length: n }, (_, k) => 100 + k);
   for (let i = 1; i <= n; i++) {
     const info = Sim.indexInfo(i, n);
     ok(info.parent === (i === 1 ? null : Math.floor(i / 2)) && info.left === (2 * i <= n ? 2 * i : null) && info.right === (2 * i + 1 <= n ? 2 * i + 1 : null) && info.leaf === (2 * i > n) && info.firstLeaf === Math.floor(n / 2) + 1, `indexInfo(${i}, ${n})`);
-    for (const t of Sim.indexSay(i, n)) {
+    const said = Sim.indexSay(i, vals);
+    ok(said.length === (2 * i > n ? 2 : 3) && /is a leaf/.test(said.join(" ")) === (2 * i > n), `indexSay(${i}, ${n}) names a leaf exactly when 2i > n`);
+    for (const t of said) {
       for (const m of t.matchAll(/\b(\d+)\/2 = (\d+)/g)) ok(Math.floor(Number(m[1]) / 2) === Number(m[2]), `indexSay(${i}, ${n}): ${m[0]}`);
       for (const m of t.matchAll(/\b(\d+)\*2 = (\d+)/g)) ok(Number(m[1]) * 2 === Number(m[2]), `indexSay(${i}, ${n}): ${m[0]}`);
       for (const m of t.matchAll(/\b(\d+)\*2\+1 = (\d+)/g)) ok(Number(m[1]) * 2 + 1 === Number(m[2]), `indexSay(${i}, ${n}): ${m[0]}`);
-      for (const m of t.matchAll(/(\d+) <= (\d+) is (true|false)/g)) ok(String(Number(m[1]) <= Number(m[2])) === m[3], `indexSay(${i}, ${n}): ${m[0]}`);
+      for (const m of t.matchAll(/(\d+), which holds (-?\d+(?:\.\d+)?)/g)) ok(Number(m[1]) <= n && String(vals[Number(m[1]) - 1]) === m[2], `indexSay(${i}, ${n}): ${m[0]}`);
+      for (const m of t.matchAll(/(\d+) is past n = (\d+)/g)) ok(Number(m[1]) > n && Number(m[2]) === n, `indexSay(${i}, ${n}): ${m[0]}`);
     }
   }
 }
-// buildHeap's cost table: moves on a full tree of height H total n − H − 1 < n, and real runs never exceed it
-for (let Hh = 0; Hh <= 25; Hh++) { const r = Sim.buildCost(Hh); ok(r.total === r.n - Hh - 1 && r.total < r.n, `buildCost(${Hh}) = n − H − 1`); }
+// real buildHeap runs never swap more than the sum of the subtree heights, which is below n
 for (const r of H.filter((x) => x.t === "build")) { const n = r.start.length, cap = Math.ceil(Math.log2(n + 1)) - 1; let bound = 0; for (let i = 1; i <= n; i++) { let d = 0, j = i; while (2 * j <= n) { j *= 2; d++; } bound += d; } ok(r.swaps <= bound && bound <= n, `buildHeap ${r.name}: ${r.swaps} swaps <= sum of subtree heights ${bound} <= n (height ${cap})`); }
 { let S = 0; for (let i = 0; i <= 80; i++) S += i / 2 ** (i + 1); ok(Math.abs(S - 1) < 1e-12, `sum i/2^(i+1) -> 1 (${S})`); for (let N = 1; N <= 40; N++) { let s = 0; for (let i = 0; i <= N; i++) s += i / 2 ** (i + 1); ok(Math.abs(s - (1 - (N + 2) / 2 ** (N + 1))) < 1e-12, `partial sum to ${N}`); } }
 // Section 2, question 0: the verdict rule reproduces the official answers
@@ -185,9 +198,9 @@ const taskOf = (idx) => { const before = html.slice(0, idx); const m = [...befor
 const S = (n) => String(n);
 const worst = (n) => J1("binaryWorst", (r) => r.n === n).worst;
 const yn = (b) => (b ? "yes" : "no");
-// an independent percolate (not sim.js) for the key questions that change a key in place
-const upI = (h, i) => { let n = 0; while (i > 1 && h[i] < h[i >> 1]) { [h[i], h[i >> 1]] = [h[i >> 1], h[i]]; i >>= 1; n++; } return { n, at: i }; };
-const downI = (h, i, size) => { let n = 0; while (i * 2 <= size) { let c = i * 2; if (c + 1 <= size && !(h[c] < h[c + 1])) c++; if (h[c] < h[i]) { [h[c], h[i]] = [h[i], h[c]]; i = c; n++; } else break; } return { n, at: i }; };
+// an independent percolate (not sim.js) on a 1-based array h (h[0] unused), recording the live array after every swap
+const upT = (h, i) => { const states = []; while (i > 1 && h[i] < h[i >> 1]) { [h[i], h[i >> 1]] = [h[i >> 1], h[i]]; i >>= 1; states.push(h.slice(1).join(",")); } return { at: i, states }; };
+const downT = (h, i, size = h.length - 1) => { const states = []; while (i * 2 <= size) { let c = i * 2; if (c + 1 <= size && !(h[c] < h[c + 1])) c++; if (!(h[c] < h[i])) break; [h[c], h[i]] = [h[i], h[c]]; i = c; states.push(h.slice(1, size + 1).join(",")); } return { at: i, states }; };
 const heightI = (n) => { let h = 0; while (2 ** (h + 1) - 1 < n) h++; return h; };
 const lad = (s) => Sim.LADDER.indexOf(s);
 
@@ -259,7 +272,9 @@ const l4Text = () => html.slice(html.indexOf('id="l4-goals"'), html.indexOf('id=
     const wrong = "5,3,9,7,8";
     ok(same(steps("cse332-w2-l4-larger-child"), [lc[0], wrong, ...lc.slice(1)]) && !Sim.isMinHeap(wrong.split(",").map(Number)), `larger-child pictures: ${steps("cse332-w2-l4-larger-child").join(" | ")}`);
   }
-  const notHeaps = new Set(["1,2,3,_,5,6", "5,4,6", "5,7,6,8,_,9", "2,4,3,_,_,6,5", "1,4,2,3,5,6,7", "4,6,5,7,3,8,9", "9,8,7,6,5,4,3,2,1"]);
+  // not heaps on purpose: Lecture 4's gap example, Lecture 5's trees B and D, buildHeap's input, and the Θ(n) page's
+  // picture, which labels each node with the levels below it rather than a priority
+  const notHeaps = new Set(["1,2,3,_,5,6", "5,4,6", "5,7,6,8,_,9", "7,6,5,4,3,2,1", "3,2,2,1,1,1,1,0,0,0,0,0,0,0,0"]);
   for (const t of new Set(drawn)) if (!notHeaps.has(t)) ok(!t.includes("_") && Sim.isMinHeap(t.split(",").map(Number)), `drawn tree ${t} is a valid min-heap`);
   for (const t of notHeaps) ok(drawn.includes(t) && (t.includes("_") || !Sim.isMinHeap(t.split(",").map(Number))), `drawn tree ${t} is not a heap, as the page says`);
   Object.assign(BIGO_TRUTH, {
@@ -311,33 +326,112 @@ const l4Text = () => html.slice(html.indexOf('id="l4-goals"'), html.indexOf('id=
 }
 /* Lecture 5 */
 {
-  const lec = [null, ...Sim.LECTURE_HEAP];
-  const dec9 = [...lec]; dec9[9] = 0; const r9 = upI(dec9, 9);
-  const decA = [...lec]; decA[5] = 0; const rA = upI(decA, 5);
-  const incB = [...lec]; incB[2] = 10; const rB = downI(incB, 2, 9);
-  const ins0 = HJ("p-l5-insert-0"), ext = HJ("p-l5-extract"), seq = HJ("p-l5-sequence"), rev = HJ("p-l5-reverse"), revIns = HJ("p-l5-reverse-insert");
-  const seqH = Sim.heapOf([]); const seqSwaps = [16, 32, 4, 57, 80, 43, 2].map((v) => Sim.heapInsert(seqH, v).swaps); const rootAfterInserts = seqH.arr[1];
-  const isHeapLevel = (a) => a.every((x, i) => i === 0 || a[Math.floor((i + 1) / 2) - 1] <= x);
+  const LEC = [1, 3, 2, 4, 7, 5, 6, 5, 9];
+  const text = html.replace(/<!--[\s\S]*?-->/g, "").replace(/\s+/g, " ");
+  const fresh = () => [null, ...LEC];
+  const lv = (h) => h.slice(1).join(",");
+  const blockOf = (open, close) => { const at = html.indexOf(open); return html.slice(at, html.indexOf(close, at)); };
+  const picsIn = (block) => [...block.matchAll(/<svg[^>]*\bdata-step\b[^>]*data-tree="([^"]+)"/g)].map((m) => m[1]);
+  const pics5 = (tid) => picsIn(blockOf(`data-id="${tid}"`, "</article>"));
+  const sameList = (got, want, what) => ok(same(got, want), `${what}: ${got.join(" | ")} vs ${want.join(" | ")}`);
+  const dirOf = (h, i) => (upT(h.slice(), i).states.length ? "up" : downT(h.slice(), i).states.length ? "down" : "none");
+  ok(same(Sim.LECTURE_HEAP, LEC) && Sim.isMinHeap(LEC), "the lecture's heap is the min-heap 1, 3, 2, 4, 7, 5, 6, 5, 9");
+
+  // quick checks on the lesson pages
+  const firstLeaf = (n) => { let i = 1; while (2 * i <= n) i++; return i; };
   Object.assign(TRUTH, {
-    "cse332-w2-l5-array-first-leaf-6": S((() => { let i = 1; while (2 * i <= 6) i++; return i; })()),
-    "cse332-w2-l5-array-children-of-5": S([10, 11].filter((c) => c <= 10).length),
-    "cse332-w2-l5-update-swaps-9": S(r9.n),
-    "cse332-w2-l5-trace-root": S(HJ("qc-l5-sequence").after[0]),
-    "cse332-w2-l5-build-first-i": S((() => { let i = 12; while (2 * i > 12) i--; return i; })()),
-    "cse332-w2-l5-buildtime-sum": "1",
-    "cse332-w2-l5-heap-check.a": yn(isHeapLevel([2, 4, 3, 8, 5, 9, 7])), "cse332-w2-l5-heap-check.b": yn(isHeapLevel([1, 4, 2, 3, 5, 6, 7])), "cse332-w2-l5-heap-check.c": yn(isHeapLevel([3, 5, 4, 9, 6, 7, 8, 10])), "cse332-w2-l5-heap-check.d": yn(isHeapLevel([4, 6, 5, 7, 3, 8, 9])),
-    "cse332-w2-l5-insert-extract.insert-swaps": S(ins0.swaps), "cse332-w2-l5-insert-extract.insert-root": S(ins0.after[0]), "cse332-w2-l5-insert-extract.extract-returned": S(ext.min), "cse332-w2-l5-insert-extract.extract-root": S(ext.after[0]),
-    "cse332-w2-l5-build-sequence.swaps-2": S(seqSwaps[6]), "cse332-w2-l5-build-sequence.root-after-inserts": S(rootAfterInserts), "cse332-w2-l5-build-sequence.extracted": S(seq.out[0]), "cse332-w2-l5-build-sequence.root-after-extract": S(seq.after[0]),
-    "cse332-w2-l5-buildheap.first-leaf": S(Math.floor(9 / 2) + 1), "cse332-w2-l5-buildheap.total-swaps": S(rev.swaps), "cse332-w2-l5-buildheap.final-root": S(rev.after[0]), "cse332-w2-l5-buildheap.insert-swaps": S(revIns.swaps),
-    "cse332-w2-l5-index.parent-13": S(Math.floor(13 / 2)), "cse332-w2-l5-index.left-7": S(2 * 7), "cse332-w2-l5-index.first-leaf": S(Math.floor(20 / 2) + 1), "cse332-w2-l5-index.leaf-10": yn(2 * 10 > 20),
-    "cse332-w2-l5-update-key.dir-a": "up", "cse332-w2-l5-update-key.swaps-a": S(rA.n), "cse332-w2-l5-update-key.dir-b": "down", "cse332-w2-l5-update-key.index-b": S(rB.at),
-    "cse332-w2-q2-parent-1based": S(Math.floor(11 / 2)), "cse332-w2-l5-cyu-left-child-6": S(2 * 6), "cse332-w2-l5-cyu-leaves-n12": S(Math.floor(12 / 2) + 1),
+    "cse332-w2-l5-array-parent-of-11": S(Math.floor(11 / 2)),
+    "cse332-w2-l5-array-children-of-5": S([2 * 5, 2 * 5 + 1].filter((c) => c <= 10).length),
+    "cse332-w2-l5-insert-code-first-parent-12": S(Math.floor((12 + 1) / 2)),
+    "cse332-w2-l5-build-first-i": S(firstLeaf(12) - 1),
   });
-  ok(rA.at === 1 && decA[1] === 0 && Sim.isMinHeap(decA.slice(1)) && Sim.isMinHeap(incB.slice(1)) && same(incB.slice(1), [1, 4, 2, 5, 7, 5, 6, 10, 9]), "change-key answers leave a valid heap (1,4,2,5,7,5,6,10,9 after the increase)");
-  ok(same(seq.after, [4, 32, 16, 57, 80, 43]) && same(Sim.live(seqH), [2, 32, 4, 57, 80, 43, 16]), "the lecture's 16..2 example: 2,32,4,57,80,43,16 then 4,32,16,57,80,43");
-  ok(same(rev.after, [1, 2, 3, 6, 5, 4, 7, 8, 9]) && same(ins0.after, [0, 1, 2, 4, 3, 5, 6, 5, 9, 7]) && same(ext.after, [2, 3, 5, 4, 7, 9, 6, 5]), "L5 problem solutions' arrays");
+
+  // problem 1: the lecture's four trees. Shape: no empty spot before the last node. Then order.
+  const classify = (t) => {
+    const v = t.split(",").map((x) => (x === "_" ? null : Number(x)));
+    if (v.slice(0, v.findLastIndex((x) => x !== null)).includes(null)) return "shape";
+    return v.every((x, k) => k === 0 || v[((k + 1) >> 1) - 1] <= x) ? "heap" : "order";
+  };
+  const four = [...blockOf('data-id="cse332-w2-l5-four-trees"', "</article>").matchAll(/<figcaption>([A-D])<\/figcaption><svg[^>]*data-tree="([^"]+)"/g)];
+  sameList(four.map((m) => m[2]), ["3,4,5", "5,4,6", "3,4,10,5,6", "5,7,6,8,_,9"], "problem 1 draws the lecture's four trees");
+  for (const m of four) TRUTH[`cse332-w2-l5-four-trees.${m[1].toLowerCase()}`] = classify(m[2]);
+
+  // problem 2: index math with n = 12
+  Object.assign(TRUTH, {
+    "cse332-w2-l5-index-12.parent-9": S(Math.floor(9 / 2)), "cse332-w2-l5-index-12.right-4": S(2 * 4 + 1),
+    "cse332-w2-l5-index-12.first-leaf": S(firstLeaf(12)), "cse332-w2-l5-index-12.right-of-6": yn(2 * 6 + 1 <= 12),
+  });
+
+  // problem 3: the lecture's example, with a picture after every swap
+  {
+    const h = [null], want = [];
+    const ins = (x) => { h.push(x); return upT(h, h.length - 1); };
+    const quiet = (xs) => xs.every((x) => ins(x).states.length === 0);
+    ok(quiet([16, 32]), "16 and 32 go in with no swaps"); want.push(lv(h));
+    want.push(...ins(4).states);
+    ok(quiet([57, 80, 43]), "57, 80, 43 go in with no swaps"); want.push(lv(h));
+    const r2 = ins(2); want.push(...r2.states);
+    const inserted = h.slice();
+    const min = h[1]; h[1] = h.pop(); want.push(lv(h));
+    want.push(...downT(h, 1).states);
+    sameList(pics5("cse332-w2-l5-lecture-sequence"), want, "problem 3 pictures");
+    const seq = HJ("p-l5-sequence");
+    ok(same(seq.after, h.slice(1)) && same(seq.out, [min]), "Java agrees on the lecture's example");
+    ok(lv(inserted) === "2,32,4,57,80,43,16" && lv(h) === "4,32,16,57,80,43", "the lecture's answers: 2,32,4,57,80,43,16, then 4,32,16,57,80,43 after the extract");
+    Object.assign(TRUTH, {
+      "cse332-w2-l5-lecture-sequence.swaps-2": S(r2.states.length), "cse332-w2-l5-lecture-sequence.arr3-inserts": S(inserted[3]), "cse332-w2-l5-lecture-sequence.arr7-inserts": S(inserted[7]),
+      "cse332-w2-l5-lecture-sequence.root-extract": S(h[1]), "cse332-w2-l5-lecture-sequence.arr3-extract": S(h[3]),
+    });
+    for (const arr of [inserted.slice(1), h.slice(1)]) ok(text.includes(arr.join(", ")), `problem 3's answer states ${arr.join(", ")}`);
+  }
+
+  // problem 4 and the lesson's example: change a key, picture after the change and after each swap
+  {
+    const a = fresh(); a[5] = 0; const wantA = [lv(a)], dirA = dirOf(a, 5); const ra = upT(a, 5); wantA.push(...ra.states);
+    const b = fresh(); b[3] = 8; const wantB = [lv(b)], dirB = dirOf(b, 3); const rb = downT(b, 3); wantB.push(...rb.states);
+    sameList(pics5("cse332-w2-l5-change-key"), [...wantA, ...wantB], "problem 4 pictures");
+    ok(Sim.isMinHeap(a.slice(1)) && Sim.isMinHeap(b.slice(1)), "both changed keys end in a min-heap");
+    Object.assign(TRUTH, { "cse332-w2-l5-change-key.dir-a": dirA, "cse332-w2-l5-change-key.at-a": S(ra.at), "cse332-w2-l5-change-key.dir-b": dirB, "cse332-w2-l5-change-key.at-b": S(rb.at) });
+    const u = fresh(); u[2] = 10; const wantU = [lv(u)], dirU = dirOf(u, 2); const ru = downT(u, 2); wantU.push(...ru.states);
+    sameList(picsIn(blockOf('id="l5-update"', "</section>")), wantU, "changing-a-priority example pictures");
+    ok(dirU === "down" && ru.at === 8 && 2 * ru.at > 9 && text.includes("Index 8 has no children: stop."), "the 10 sinks to index 8, a leaf");
+  }
+
+  // problem 5: buildHeap on 7..1, a picture after every swap
+  {
+    const h = [null, 7, 6, 5, 4, 3, 2, 1], want = [], per = {};
+    for (let i = 7; i >= 1; i--) { const r = downT(h, i); per[i] = r.states.length; want.push(...r.states); }
+    sameList(pics5("cse332-w2-l5-build7"), want, "problem 5 pictures");
+    const java = HJ("p-l5-build7");
+    ok(same(java.after, h.slice(1)) && java.swaps === want.length && java.heap, "Java agrees on buildHeap of 7..1");
+    Object.assign(TRUTH, {
+      "cse332-w2-l5-build7.first-i": S(Math.max(...Object.keys(per).map(Number).filter((i) => per[i] > 0))),
+      "cse332-w2-l5-build7.swaps-1": S(per[1]), "cse332-w2-l5-build7.total": S(want.length), "cse332-w2-l5-build7.at-7": S(h.indexOf(7)),
+    });
+    const one = [null]; let byInsert = 0; for (const x of [7, 6, 5, 4, 3, 2, 1]) { one.push(x); byInsert += upT(one, one.length - 1).states.length; }
+    ok(byInsert === HJ("p-l5-build7-insert").swaps && text.includes(`Inserting the same values one at a time makes ${byInsert} swaps.`), `inserting 7..1 one at a time: ${byInsert} swaps`);
+  }
+
+  // problem 6 and the Θ(n) page: the most swaps a node can make is the number of levels below it
+  const below = (i, n) => { let d = 0; while (2 * i <= n) { i *= 2; d++; } return d; };
+  const sinks = (n) => Array.from({ length: n }, (_, k) => below(k + 1, n));
+  const total = (n) => sinks(n).reduce((s, d) => s + d, 0);
+  {
+    const s = sinks(31);
+    Object.assign(TRUTH, { "cse332-w2-l5-sink-31.sink-1": S(s.filter((d) => d === 1).length), "cse332-w2-l5-sink-31.root": S(s[0]), "cse332-w2-l5-sink-31.total": S(total(31)) });
+    ok(total(31) < 31 && text.includes(`31 calls × ${s[0]} swaps" would say ${31 * s[0]}`), "31 nodes: 26 at most, and 31 × 4 = 124");
+    for (let d = 0; d <= 4; d++) { const k = s.filter((x) => x === d).length; ok(text.includes(`\\(${k} \\cdot ${d} = ${k * d}\\)`), `problem 6 board: ${k} nodes × ${d}`); }
+    const s15 = sinks(15);
+    ok(html.includes(`data-tree="${s15.join(",")}"`), "the 15-node picture shows the levels below each node");
+    const rows = [["leaves", 0], ["one up", 1], ["two up", 2], ["root", 3]].map(([name, d]) => { const k = s15.filter((x) => x === d).length; return `<tr><th>${name}</th><td>${k}</td><td>${d}</td><td>${k * d}</td></tr>`; });
+    ok(rows.every((r) => html.includes(r)) && html.includes(`<tr><th>total</th><td>15</td><td></td><td class="best">${total(15)}</td></tr>`), "the 15-node table");
+    ok(text.includes(`At most ${total(15)} swaps for 15 nodes. "15 calls × 3 swaps" would say ${15 * 3}`), "15 nodes: 11 swaps vs 45");
+    const big = [3, 9, 19].map((Hh) => { const n = 2 ** (Hh + 1) - 1; return { n, t: total(n), nh: n * Hh }; });
+    const c = (x) => x.toLocaleString("en-US");
+    ok(html.includes(big.map((b) => `<th>${c(b.n)}</th>`).join("")) && html.includes(big.map((b) => `<td class="best">${c(b.t)}</td>`).join("")) && html.includes(big.map((b) => `<td>${c(b.nh)}</td>`).join("")) && big.every((b) => b.t < b.n), `bigger full trees: ${big.map((b) => `${b.n}: ${b.t} < n, n·H = ${b.nh}`).join("; ")}`);
+  }
   ok(same(HJ("lecture-build").after, [1, 2, 7, 3, 6, 8, 10, 14, 5, 15]), "the lecture's buildHeap result 1,2,7,3,6,8,10,14,5,15");
-  Object.assign(BIGO_TRUTH, { "cse332-w2-l5-trace-n-inserts": "n log n + n" });
+  Object.assign(BIGO_TRUTH, { "cse332-w2-l5-trace-n-inserts": "n log n + n", "cse332-w2-l5-sink-31.bucket": "2n" });
   // repeated insert really is n log n-ish in the worst case, and buildHeap stays under n swaps
   ok([1 << 10, 1 << 12].every((n) => { const h = Sim.heapOf([]); let s = 0; for (let v = n; v >= 1; v--) s += Sim.heapInsert(h, v).swaps; const b = Sim.heapOf(Array.from({ length: n }, (_, i) => n - i)); const bs = Sim.buildHeap(b).reduce((x, t) => x + t.swaps, 0); return s > n * (Math.log2(n) - 3) && bs < n; }), "reverse-sorted input: ~n log n swaps by repeated insert, < n by buildHeap");
 }
