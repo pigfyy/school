@@ -72,18 +72,23 @@ the owner's saved ChatGPT account, familyopenai10916@gmail.com):
   Wait for network idle; inspect console and page errors for each page,
   confirm KaTeX elements render without .katex-error on the 332 pages,
   and check document.fonts for loaded page and KaTeX fonts.
-- On /cse332/w02/, enter a unique test marker in an empty Your work field,
-  wait at least two seconds, reload, and confirm the marker remains. Also
-  GET /api/state/cse332/w02 in that signed-in browser and confirm HTTP 200
-  and the marker in returned data, so localStorage alone cannot mask failure.
+- Never type into, click answers, hints or solutions on, or clear anything in
+  the live study pages. Everything done there is saved to the owner's real
+  study record, which Dot reads. Test saving only through the test key below.
+- In the signed-in browser, run fetch() to PUT /api/state/test/w00 with body
+  {"data":{"check":"<unique marker>"}}, then GET /api/state/test/w00. Confirm
+  both return HTTP 200 and the GET returns the marker. If it doesn't, GET
+  again after 30 seconds and after 2 minutes, and report each result and the
+  GET's response headers.
 - Call sites_read_database_overview, then sites_read_database_table_rows
   using its exact DB binding and state table names. Follow next_offset if
-  needed; report row count and columns, and only confirm marker presence.
+  needed; report row count and columns, and only confirm the marker is in
+  the test/w00 row.
 - Call sites_get_site_worker_logs with errors_only=true for this project.
   Report any errors; never change site/ as part of deployment verification.
 
 Verified latest site/ on 2026-10-14: deployment
 appgdep_6acfdeafdd348191a5add57e6a5962f9 succeeded. Landing and all four
 week URLs loaded without console/page errors; 332 math and used fonts loaded.
-Owner-signed-in Your work persisted after reload and was present in API/DB.
+Owner-signed-in save (then via a Your work field; now test/w00 only) was present in API/DB.
 Worker error query returned two /favicon.ico 404s, with no Worker exceptions.
