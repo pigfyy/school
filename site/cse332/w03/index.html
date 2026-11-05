@@ -109,15 +109,15 @@
     </div>
   </div>
   <div class="prose">
-    <p>Look at the bars. With \(+1\) the work doubles on every level, so the leaves dominate and the total is about \(2n\). With \(+n\) every level does exactly \(n\) work, and there are \(\log_2 n + 1\) levels. With \(+n^2\) the work halves on every level, so the root dominates and the total is under \(2n^2\). That's the tree method: draw the calls, add up each level, then add up the levels.</p>
+    <p>Look at the bars. With \(+1\) the work doubles on every level, so the leaves dominate and the total is about \(2n\). With \(+n\) every level does exactly \(n\) work, and there are \(\log_2 n + 1\) levels. With \(+n^2\) the work halves on every level, so the root dominates and the total is under \(2n^2\). That's the tree method: draw the calls, add up each level, then add up the levels. <a href="#l6-series">Solving the series</a> works through all three.</p>
   </div>
 
   <h2>This week</h2>
   <div class="week">
-    <a href="#l6-write" class="day"><strong>Mon, Oct 12</strong><span class="tag-today" data-date="2026-10-12">Today</span><span>Lecture 6: Recurrences</span><span>Recurrence relations for recursive code, the tree method, and summing the series.</span></a>
-    <a href="#l7-dict" class="day"><strong>Wed, Oct 14</strong><span class="tag-today" data-date="2026-10-14">Today</span><span>Lecture 7: Dictionaries (ADT &amp; BSTs)</span><span>The dictionary ADT, traversals, binary search trees: find, insert, delete. Weiss 4.1–4.3, 4.6.</span></a>
-    <a href="#s3-recur" class="day"><strong>Thu, Oct 15</strong><span class="tag-today" data-date="2026-10-15">Today</span><span>Section 3: Recurrences</span><span>Writing recurrences from code, then the tree method on six recurrences.</span></a>
-    <a href="#l8-balance" class="day"><strong>Fri, Oct 16</strong><span class="tag-today" data-date="2026-10-16">Today</span><span>Lecture 8: AVL Trees 1</span><span>The AVL balance rule, rotations, the four insert cases, and why the height is \(\Theta(\log n)\). Weiss 4.4.</span></a>
+    <a href="#l6-goals" class="day"><strong>Mon, Oct 12</strong><span class="tag-today" data-date="2026-10-12">Today</span><span>Lecture 6: Recurrences</span><span>Recurrence relations for recursive code, the tree method, and summing the series.</span></a>
+    <a href="#l7-goals" class="day"><strong>Wed, Oct 14</strong><span class="tag-today" data-date="2026-10-14">Today</span><span>Lecture 7: Dictionaries (ADT &amp; BSTs)</span><span>The dictionary ADT, traversals, binary search trees: find, insert, delete. Weiss 4.1–4.3, 4.6.</span></a>
+    <a href="#s3-goals" class="day"><strong>Thu, Oct 15</strong><span class="tag-today" data-date="2026-10-15">Today</span><span>Section 3: Recurrences</span><span>Reading recurrences off code, then the tree method, one change at a time.</span></a>
+    <a href="#l8-goals" class="day"><strong>Fri, Oct 16</strong><span class="tag-today" data-date="2026-10-16">Today</span><span>Lecture 8: AVL Trees 1</span><span>The AVL balance rule, rotations, the four insert cases, and why the height is \(\Theta(\log n)\). Weiss 4.4.</span></a>
   </div>
 
   <h2>Due</h2>
@@ -135,20 +135,12 @@
   <h2>How to use this site</h2>
   <div class="prose">
     <ul>
-      <li>Each lecture's pages follow its slides, end with a quick check, and finish with a practice page and a "Check your understanding" quiz. Section 3's practice page is the worksheet, checked against the official solutions.</li>
-      <li><strong>Teaching notes</strong> are the amber blocks: talking points, questions to ask and common mistakes.</li>
-      <li>Answer boxes take arithmetic like <code>2^10 - 1</code>, classes like <code>n log n</code> or <code>n^(1/3)</code>, and formulas in \(n\) and \(i\) like <code>3^i</code> or <code>(3/2)^i * n</code>. Key sequences (traversals) take keys separated by spaces or commas.</li>
-      <li>The three widgets run the lecture's own code: the recursion-tree explorer, the BST playground and the AVL insert stepper.</li>
+      <li>Each lecture and the section start with <strong>What this lecture is for</strong>: the point in a sentence or two, and a linked list of its pages.</li>
+      <li>Each page teaches one idea with one worked example. Steppers walk through the lecture's code or trees one step at a time: press <strong>Next</strong> and read the narration.</li>
+      <li>Each lecture and the section end with one <strong>Practice</strong> page, grouped by lesson. Choice parts are buttons, each part checks on its own, and <strong>Show solution</strong> reveals one step at a time.</li>
+      <li>Answer boxes take arithmetic like <code>2^10 - 1</code>, classes like <code>n log n</code> or <code>n^(1/3)</code>, and formulas like <code>3^i</code> or <code>(3/2)^i * n</code>. Traversal boxes take keys separated by spaces or commas.</li>
     </ul>
   </div>
-  <details class="notes" open>
-    <summary>Teaching notes: the week</summary>
-    <ul>
-      <li>Monday's tree method is the tool for EX3 (due Oct 23). Section 3 is all practice with it.</li>
-      <li>Wednesday starts dictionaries, which run through hashing in week 4. The BST's worst case, \(\Theta(n)\), motivates Friday's AVL trees.</li>
-      <li>Announcements on the slides: the midterm is Monday Nov 9, 5–6 pm; EX4 (AVL trees) comes next and is due Fri Oct 30.</li>
-    </ul>
-  </details>
 </section>
 
 <!-- ================================================================ L6: GOALS -->
@@ -1775,7 +1767,7 @@ return c</pre>
   <h2>What to read for</h2>
   <div class="prose">
     <ul>
-      <li><strong>Recurrences summary:</strong> identifying a recurrence (base case, prep, recursive calls, using the results), then the tree method for chip and conquer and for divide and conquer, and a closing section on what matters, the same as slide 22.</li>
+      <li><strong>Recurrences summary:</strong> identifying a recurrence (base case, prep, recursive calls, using the results), then the tree method for chip and conquer and for divide and conquer, and a closing section on what matters.</li>
       <li><strong>AVL summary:</strong> the balance rule, the minimum-node argument, and the rotations, with more pictures than the slides. It also covers the next lecture.</li>
       <li>Weiss isn't online, so this site doesn't summarize it.</li>
     </ul>
