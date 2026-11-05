@@ -1134,7 +1134,7 @@ extract</code></pre>
     </table></div>
   </div>
   <div class="rule"><p><strong>The rule.</strong> To show <strong>sometimes</strong>, find one allowed \(f\) that passes and one that fails. Trying the slowest and fastest \(f\) is a good way to find them. To show <strong>always</strong> or <strong>never</strong>, give the reason the bound guarantees it or rules it out. Examples alone don't prove "always" or "never".</p></div>
-  <p class="line"><strong>\(f \in \Omega(g)\)</strong> has no fastest \(f\): try \(f = g\) and something huge, like \(2^n\). <strong>\(f \in \Theta(g)\)</strong> pins \(f\) to \(g\)'s bucket, so what's true of \(g\) is true of \(f\).</p>
+  <p class="line"><strong>\(f \in \Omega(g)\)</strong> has no fastest \(f\): try \(f = g\) and a faster one, like \(f = n\cdot g\). <strong>\(f \in \Theta(g)\)</strong> pins \(f\) to \(g\)'s bucket, so what's true of \(g\) is true of \(f\).</p>
 
   <details class="more">
     <summary>Why examples can't prove "never"</summary>

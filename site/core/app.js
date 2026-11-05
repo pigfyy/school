@@ -745,7 +745,6 @@ function buildTask(task) {
       } else if (r.correct == null && r.note && s?.result) { p.fb.textContent = r.note; }
     });
     if (document.activeElement !== work) work.value = s?.work || "";
-    if (scratch && !isBlank(work.value)) scratch.open = true;
     fb.className = "feedback"; fb.textContent = "";
     const n = auto.filter((p) => s?.parts?.[p.part]?.correct === true).length;
     if (s?.result) {
@@ -815,6 +814,9 @@ function boot() {
   renderMath(document.body); // before widgets measure text
   if (WEEK.widgets) WEEK.widgets(api);
   addEventListener("hashchange", () => show(location.hash.slice(1)));
+  // A fresh load with #page lets the browser jump to that section after math and fonts change the layout.
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  addEventListener("load", () => window.scrollTo(0, 0), { once: true });
   addEventListener("resize", () => REDRAW.forEach((fn) => fn(currentId())));
   show(currentId());
   refreshCounts();
