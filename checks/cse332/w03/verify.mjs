@@ -149,6 +149,8 @@ const nodeH = (t, k) => { while (t[0] !== k) t = k < t[0] ? t[1] : t[2]; return 
 /* ---------------------------------------------------------------- 2. expected values for every key */
 const S22 = "9(3(1(0,),6(5,7)),10(,16))", S12 = "7(3(1(0,2),6),10(8,16))", S30 = "9(3(1(0,2),6(,7)),11(,16))", S39 = "9(3(1(0,2),6),11(10,16(,18)))";
 const sp = (a) => a.join(" ");
+const S7 = "7(3(1(0,),6),10(,16))", K22 = [9, 3, 10, 1, 6, 16, 0, 5, 7], K17 = [1, 2, 3, 4, 5, 6, 7], K4261 = [4, 2, 6, 1, 3, 5, 7];
+ok(str(fromKeys([7, 3, 10, 1, 16, 0, 6])) === S7 && str(fromKeys(K22)) === S22, "the find/insert tree and the delete tree from the lecture's keys");
 ok(str(fromKeys([7, 3, 10, 1, 6, 8, 16, 0, 2])) === S12 && str(fromKeys([9, 3, 10, 1, 6, 16, 0, 5, 7])) === S22, "slide 12 and 22 trees from their keys");
 const d3 = (() => { let t = parse(S22); const out = []; for (const k of [5, 1, 3]) { const [nt, c, r] = del(t, k); out.push([c, r]); t = nt; } return { t, out }; })();
 const minus1 = (() => { const t = ins(parse(S30), -1); const log = []; const r = avl(parse(S30), -1, log); return { h9: hgt(t), probs: problems(t), log, r }; })();
@@ -178,20 +180,23 @@ const EXPECT = {
   "cse332-w3-l6-cyu-halving": "log n", "cse332-w3-l6-cyu-nlogn": "n log n", "cse332-w3-l6-cyu-t8": String(R.nlogn(8n)),
   "cse332-w3-l6-cyu-quadratic": "n^2", "cse332-w3-l6-cyu-square": "n^2", "cse332-w3-l6-cyu-level3": String(3 ** 3), "cse332-w3-l6-cyu-exponential": "2^n",
   // Lecture 7
-  "cse332-w3-l7-qc-sorted-find": "log n",
-  "cse332-w3-l7-qc-inorder-dusb": ino(dusb).join(" "),
+  "cse332-w3-l7-qc-height-7tree": String(hgt(parse(S7))),
+  "cse332-w3-l7-qc-chain-bst": yn(isBst(parse("16(10(7(3(1(0,),),),),)"))),
+  "cse332-w3-l7-qc-find16": sp(findPath(parse(S7), 16).p),
+  "cse332-w3-l7-qc-insert8-parent": String(parentOf(ins(parse(S7), 8), 8)),
+  "cse332-w3-l7-qc-delete6": String(del(parse(S22), 6)[2]),
   "cse332-w3-l7-qc-max-nodes-h3": String(2 ** 4 - 1),
-  "cse332-w3-l7-qc-delete3": String(del(parse(S22), 3)[2]),
   "cse332-w3-l7-qc-sorted-height": String(hgt(fromKeys([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))),
   "cse332-w3-l7-traversals.pre": sp(pre(parse(S12))), "cse332-w3-l7-traversals.in": sp(ino(parse(S12))), "cse332-w3-l7-traversals.post": sp(post(parse(S12))),
-  "cse332-w3-l7-build.height": String(hgt(parse(S22))), "cse332-w3-l7-build.parent5": String(parentOf(parse(S22), 5)),
-  "cse332-w3-l7-build.path8": sp(findPath(parse(S22), 8).p), "cse332-w3-l7-build.found8": yn(findPath(parse(S22), 8).found),
+  "cse332-w3-l7-build.height": String(hgt(fromKeys(K22))), "cse332-w3-l7-build.parent5": String(parentOf(fromKeys(K22), 5)),
+  "cse332-w3-l7-build.path8": sp(findPath(fromKeys(K22), 8).p), "cse332-w3-l7-build.found8": yn(findPath(fromKeys(K22), 8).found),
   "cse332-w3-l7-delete.case5": String(d3.out[0][0]), "cse332-w3-l7-delete.case1": String(d3.out[1][0]), "cse332-w3-l7-delete.repl3": String(d3.out[2][1]), "cse332-w3-l7-delete.pre": sp(pre(d3.t)),
   "cse332-w3-l7-numbers.maxleaves": String(2 ** 5), "cse332-w3-l7-numbers.maxnodes": String(2 ** 6 - 1), "cse332-w3-l7-numbers.minleaves": "1", "cse332-w3-l7-numbers.minnodes": String(hgt(fromKeys([1, 2, 3, 4, 5, 6])) + 1),
-  "cse332-w3-l7-naive.unsorted-insert": "n", "cse332-w3-l7-naive.sorted-find": "log n", "cse332-w3-l7-naive.sorted-insert": "n", "cse332-w3-l7-naive.bst-find": "n",
+  "cse332-w3-l7-naive.unsorted-insert": "n", "cse332-w3-l7-naive.sorted-find": "log n", "cse332-w3-l7-naive.sorted-insert": "n", "cse332-w3-l7-naive.sortedlist-find": "n",
   "cse332-w3-l7-is-bst.p": yn(isBst(treeCheck.P)), "cse332-w3-l7-is-bst.q": yn(isBst(treeCheck.Q)), "cse332-w3-l7-is-bst.r": yn(isBst(treeCheck.R)),
-  "cse332-w3-l7-cyu-bst-worst": "n", "cse332-w3-l7-cyu-preorder": pre(dusb).join(" "), "cse332-w3-l7-cyu-min-nodes": String(hgt(fromKeys([1, 2, 3, 4, 5, 6, 7])) + 1),
-  "cse332-w3-l7-cyu-max-leaves": String(2 ** 4), "cse332-w3-l7-cyu-delete-root": String(del(parse(S22), 9)[0][0]),
+  "cse332-w3-l7-order.h-sorted": String(hgt(fromKeys(K17))), "cse332-w3-l7-order.h-mixed": String(hgt(fromKeys(K4261))),
+  "cse332-w3-l7-order.f-sorted": String(findPath(fromKeys(K17), 7).p.length), "cse332-w3-l7-order.f-mixed": String(findPath(fromKeys(K4261), 7).p.length),
+  "cse332-w3-l7-cyu-bst-worst": "n", "cse332-w3-l7-cyu-delete-root": String(del(parse(S22), 9)[0][0]),
   // Section 3
   "cse332-w3-s3-qc-0b-calls": "2", "cse332-w3-s3-qc-1e": "n",
   "cse332-w3-s3-q0a.a": "1", "cse332-w3-s3-q0a.b": "1", "cse332-w3-s3-q0a.class": "n",
@@ -285,6 +290,120 @@ has("Levels: 8, 8, 8, then 8 leaves", "T(8) why"); ok(Sim.levels(Sim.REC.nlogn, 
 has("\\(T(2) = 4\\), \\(T(4) = 12\\), \\(T(8) = 32\\)", "nlogn build-up"); ok(R.nlogn(2n) === 4n && R.nlogn(4n) === 12n, "nlogn T(2), T(4)");
 // the delete-3-first quick check really differs from the sequence answer
 ok(del(parse(S22), 3)[2] === 1 && d3.out[2][1] === 0, "deleting 3 first pulls up 1; after deleting 1 it pulls up 0");
+
+/* ---------------------------------------------------------------- L7: stepper narration and tree pictures */
+{
+  const node = (t, k) => { while (t && t[0] !== k) t = k < t[0] ? t[1] : t[2]; return t; };
+  const conv = (n) => (n ? [n.key, conv(n.left), conv(n.right)] : null);
+  const anyNode = (t, k) => (!t ? null : String(t[0]) === String(k) ? t : anyNode(t[1], k) || anyNode(t[2], k));
+  // every comparison stated in a narration is true: "5 < 7 is true", "5 > 3 is true", "5 ≠ 7", "3 == 3"
+  // the highlighted code lines do what the narration says
+  const linesMatch = (st, code, where) => {
+    const hl = st.line.map((i) => code[i]).join("\n");
+    const need = [[/go left/, "root = root.left"], [/go right/, "root = root.right"], [/parent\.left = new Node/, "parent.left = new Node"], [/parent\.right = new Node/, "parent.right = new Node"],
+      [/maxNode starts/, "maxNode(root.left)"], [/: go right to/, "root = root.right"], [/moves up into/, "move m's key into root"], [/has no children/, "parent points to Null"], [/has one child, -?\d+:/, "parent points to that child"], [/has two children/, "two children"]];
+    for (const [re, line] of need) if (re.test(st.say)) ok(hl.includes(line), `${where}: "${st.say.slice(0, 50)}" highlights ${line}`);
+    ok(st.line.every((i) => i >= 0 && i < code.length), `${where}: line numbers in range`);
+  };
+  const claimsHold = (say, where) => {
+    for (const [, a, op, b, v] of say.matchAll(/(-?\d+) ([<>]) (-?\d+) is (true|false)/g)) ok((op === "<" ? +a < +b : +a > +b) === (v === "true"), `${where}: "${a} ${op} ${b} is ${v}"`);
+    for (const [, a, b] of say.matchAll(/(-?\d+) ≠ (-?\d+)/g)) ok(+a !== +b, `${where}: "${a} ≠ ${b}"`);
+    for (const [, a, b] of say.matchAll(/(-?\d+) == (-?\d+)/g)) ok(+a === +b, `${where}: "${a} == ${b}"`);
+  };
+
+  // traversal: one visit per step; each order writes the visited node exactly at its own visit
+  const tt = Sim.traverseSteps(Sim.labelTree("D(U(S,2),B)"));
+  const S = (a) => a.map(String).join(" "), last = tt.at(-1);
+  ok(S(last.pre) === S(pre(dusb)) && S(last.in) === S(ino(dusb)) && S(last.post) === S(post(dusb)), "traversal stepper ends with the three orders");
+  ok(tt.length === 1 + 3 * 2 + 3, "traversal stepper: 3 visits per inner node, 1 per leaf, plus the start");
+  const SLOT = { pre: 1, in: 4, post: 7 };
+  tt.slice(1).forEach((st, i) => {
+    const prev = tt[i];
+    for (const o of ["pre", "in", "post"]) {
+      const wrote = st.wrote.includes(o);
+      ok(st[o].length === prev[o].length + (wrote ? 1 : 0) && (!wrote || String(st[o].at(-1)) === String(st.cur)), `traversal step ${i + 1}: ${o} list`);
+      ok(st.line.includes(SLOT[o]) === wrote, `traversal step ${i + 1}: ${o} slot highlighted iff it writes`);
+    }
+    ok(st.line.every((i) => Sim.TRAVERSE_CODE[i].includes(`${({ 1: "pre", 4: "in", 7: "post" })[i]}-order`)), `traversal step ${i + 1}: highlights only order slots`);
+    const n = anyNode(dusb, st.cur), leaf = !n[1] && !n[2];
+    ok(/is a leaf/.test(st.say) === leaf && (leaf ? st.wrote.length === 3 : st.wrote.length === 1), `traversal step ${i + 1}: leaf claim for ${st.cur}`);
+  });
+
+  // insert: the loop walks find's path; every "go left/right to K" and "no child" claim matches the tree
+  const checkInsert = (shape, k) => {
+    const t0 = parse(shape), steps = Sim.insertSteps(Sim.parseShape(shape), k), want = findPath(t0, k);
+    const curs = steps.map((s) => Object.keys(s.marks).find((x) => s.marks[x] === "cur")).filter(Boolean).map(Number);
+    ok(sp(curs) === sp(want.p), `insert ${k} into ${shape}: the loop visits ${sp(want.p)}`);
+    steps.forEach((s, i) => {
+      claimsHold(s.say, `insert ${k} step ${i}`);
+      linesMatch(s, Sim.INSERT_CODE, `insert ${k} step ${i}`);
+      const m = /parent = (-?\d+)\. .*(left|right)(?: to (-?\d+)|\. -?\d+ has no)/.exec(s.say);
+      if (m) { const c = node(t0, +m[1])[m[2] === "left" ? 1 : 2]; ok(m[3] ? c && c[0] === +m[3] : !c, `insert ${k} step ${i}: ${m[0]}`); }
+    });
+    if (!want.found) ok(steps.at(-1).shape === str(ins(t0, k)), `insert ${k} into ${shape}: final tree`);
+  };
+  checkInsert(S7, 5);
+  for (const k of [-1, 2, 4, 5, 8, 11, 17, 7, 16]) checkInsert(S7, k);
+
+  // delete: find phase, the maxNode walk down the right spine of the left subtree, and the final tree
+  const checkDelete = (shape, k) => {
+    const t0 = parse(shape), steps = Sim.deleteSteps(Sim.parseShape(shape), k), [after, kase, repl] = del(t0, k);
+    steps.forEach((s, i) => {
+      claimsHold(s.say, `delete ${k} from ${shape} step ${i}`);
+      linesMatch(s, Sim.DELETE_CODE, `delete ${k} from ${shape} step ${i}`);
+      for (const [, a, b] of s.say.matchAll(/(-?\d+)\.right is (-?\d+), not Null/g)) ok(node(t0, +a)[2]?.[0] === +b, `delete ${k}: ${a}.right is ${b}`);
+      for (const [, a] of s.say.matchAll(/(-?\d+)\.right is Null/g)) ok(!node(t0, +a)[2], `delete ${k}: ${a}.right is Null`);
+      const big = /The largest key on (-?\d+)'s left is (-?\d+)/.exec(s.say);
+      if (big) ok(+big[2] === maxKey(node(t0, +big[1])[1]) && +big[2] === repl, `delete ${k}: largest on the left is ${big[2]}`);
+      const two = /has two children, (-?\d+) and (-?\d+)/.exec(s.say);
+      if (two) ok(kase === 2 && node(t0, k)[1][0] === +two[1] && node(t0, k)[2][0] === +two[2], `delete ${k}: two children ${two[1]}, ${two[2]}`);
+      const sorted = /In-order is still sorted: ([-\d ]+)\./.exec(s.say);
+      if (sorted) ok(sorted[1] === sp(ino(after)), `delete ${k}: in-order after`);
+      for (const key of Object.keys(s.marks)) ok(Sim.parseShape(s.shape) && new RegExp(`(^|[(,])${key}([(),]|$)`).test(s.shape), `delete ${k} step ${i}: marked ${key} is in the tree`);
+    });
+    const found = findPath(t0, k).found;
+    if (found) ok(steps.at(-1).shape === str(after) && (kase === 0 ? /no children/ : kase === 1 ? /has one child/ : /moves up into/).test(steps.at(-1).say), `delete ${k} from ${shape}: final tree and case`);
+  };
+  for (const k of [3, 5, 1, 9, 6, 10, 16, 0, 7, 8]) checkDelete(S22, k);
+  {
+    let seed = 7;
+    const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+    for (let trial = 0; trial < 300; trial++) {
+      const ks = Array.from({ length: 1 + Math.floor(rnd() * 12) }, () => Math.floor(rnd() * 30));
+      const shape = str(fromKeys(ks)), k = ks[Math.floor(rnd() * ks.length)];
+      checkDelete(shape, k); checkInsert(shape, Math.floor(rnd() * 32) - 1);
+    }
+  }
+
+  // pictures: every data-bst parses, marked keys are in it, and the module and solution pictures are the real trees
+  const pics = [...html.matchAll(/<svg class="htree"[^>]*data-bst="([^"]*)"[^>]*>/g)].map((m) => ({ tag: m[0], shape: m[1], at: m.index }));
+  for (const p of pics) {
+    const keys = new Set(ino(conv(Sim.labelTree(p.shape))).map(String));
+    for (const a of ["data-cmp", "data-path", "data-new", "data-cur"]) for (const k of (attr(p.tag, a) || "").split(",").filter(Boolean)) ok(keys.has(k), `picture ${p.shape}: ${a} ${k} is a node`);
+    if (/^[-\d(),]*$/.test(p.shape)) ok(str(parse(p.shape)) === p.shape, `picture ${p.shape} is in canonical form`);
+  }
+  const solutionPics = (task) => { const a = html.indexOf(`data-id="${task}"`), b = html.indexOf("</article>", a), sol = html.indexOf('class="solution"', a); return pics.filter((p) => p.at > sol && p.at < b); };
+  const want = {
+    "cse332-w3-l7-is-bst": [[str(treeCheck.P), null]],
+    "cse332-w3-l7-build": [[str(fromKeys([9, 3, 10, 1, 6])), null], [str(fromKeys(K22)), null], [str(fromKeys(K22)), sp(findPath(fromKeys(K22), 8).p)]],
+    "cse332-w3-l7-delete": (() => { let t = parse(S22); return [5, 1, 3].map((k) => { t = del(t, k)[0]; return [str(t), null]; }); })(),
+    "cse332-w3-l7-order": [K17, K4261].map((ks) => [str(fromKeys(ks)), sp(findPath(fromKeys(ks), 7).p)]),
+  };
+  for (const [task, list] of Object.entries(want)) {
+    const got = solutionPics(task);
+    ok(got.length === list.length, `${task}: ${list.length} solution pictures`);
+    list.forEach(([shape, path], i) => ok(got[i] && got[i].shape === shape && (path === null || (attr(got[i].tag, "data-path") || "").split(",").join(" ") === path), `${task}: solution picture ${i + 1} is ${shape}${path ? ` with path ${path}` : ""}`));
+  }
+  const shapes = new Set(pics.map((p) => p.shape));
+  for (const [s, why] of [[str(del(parse(S22), 5)[0]), "delete 5"], [str(del(parse(S22), 1)[0]), "delete 1"], [str(fromKeys([1, 2, 3, 4, 5])), "sorted inserts 1..5"], [S12, "lecture BST"], [S7, "find/insert tree"], [S22, "delete tree"]]) ok(shapes.has(s), `page draws ${s} (${why})`);
+  ok(!isBst(parse("7(3(1(0,),8),10(,16))")) && isBst(parse("16(10(7(3(1(0,),),),),)")) && hgt(parse("1(,2(,3(,4(,5))))")) === 4, "BST page pictures: trap is not a BST, chain is; sorted chain height n - 1");
+  for (const [s, t] of [["0 1 2 3 6 7 8 10 16", S12], ["0 1 3 8 7 10 16", "7(3(1(0,),8),10(,16))"], ["5 10 12 15 25 20 30", treeCheck.P], ["5 10 12 15 18 20 30 40", treeCheck.Q], ["5 8 11 13 21", treeCheck.R]]) {
+    ok(sp(ino(typeof t === "string" ? parse(t) : t)) === s, `in-order of ${typeof t === "string" ? t : str(t)} is ${s}`); has(s, "in-order stated");
+  }
+  has("<td>1</td><td>2</td><td>4</td><td>8</td><td>\\(2^h\\)</td>", "most leaves row"); has("<td>1</td><td>3</td><td>7</td><td>15</td><td>\\(2^{h+1} - 1\\)</td>", "most nodes row"); has("<td>1</td><td>2</td><td>3</td><td>4</td><td>\\(h + 1\\)</td>", "chain row");
+  ok([0, 1, 2, 3].every((h) => 2 ** h === [1, 2, 4, 8][h] && 2 ** (h + 1) - 1 === [1, 3, 7, 15][h] && hgt(fromKeys(Array.from({ length: h + 1 }, (_, i) => i))) === h), "tree numbers rows");
+  ok(hgt(dusb) === 2 && ["S", "2", "B"].every((k) => { const n = anyNode(dusb, k); return !n[1] && !n[2]; }), "D U S 2 B: height 2, leaves S, 2, B");
+}
 
 console.log(`verify-answers: ${pass} passed, ${fail} failed (${keys} auto-graded answer keys, ${mcs} multiple-choice items)`);
 process.exit(fail ? 1 : 0);

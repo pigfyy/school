@@ -26,6 +26,21 @@ window.WEEK.messages = {
   "bst-height": "That's the plain BST's height for sorted inserts. The AVL rotations keep it short.",
 };
 
+/* L7 */
+Object.assign(window.WEEK.messages, {
+  "height-short": "Count the edges on the longest path, from the root down to the deepest leaf.",
+  "chain-not-bst": "Check the rule at each node: every key in its left subtree is smaller, every key in its right subtree is larger. Nothing says the tree has to be bushy.",
+  "path-skips-root": "find compares with the root first, then with each node on the way down.",
+  "wrong-direction": "Compare at every node on the way down: smaller goes left, larger goes right. The new key hangs off the node where that walk hits an empty child.",
+  "assumed-full": "That's how tall a full tree with these keys would be. Where does each new key go when it is larger than all the keys before it?",
+  "insert-checks-key": "Adding at the end is quick, but keys are unique: insert must first check whether the key is already there.",
+  "shift-on-insert": "Binary search finds the spot quickly. Then what has to happen to the items after that spot?",
+  "no-binary-search-list": "Binary search jumps to the middle. Can a linked list do that?",
+  "missed-earlier-delete": "That's the answer for the starting tree. Delete 1 first changed 3's left subtree: redraw it.",
+  "left-child-not-max": "That's the root's left child. The largest key on the left is the right-most node there: keep going right.",
+  "stopped-early": "Keep going right until the node has no right child.",
+});
+
 window.WEEK.widgets = function ({ $, $$, el, renderMath, REDRAW }) {
   const Sim = window.Sim;
   const NS = "http://www.w3.org/2000/svg";
@@ -241,4 +256,88 @@ window.WEEK.widgets = function ({ $, $$, el, renderMath, REDRAW }) {
     keyIn.addEventListener("keydown", (e) => { if (e.key === "Enter") $(".tl-insert", panel).click(); });
   }
   $$(".treelab").forEach(setupLab);
+
+  /* =========================================================== L7: tree pictures and steppers */
+  // <svg class="htree" data-bst="9(3(1(0,),6),10(,16))" data-cmp="3" data-path="9" data-cur="1" data-new="5">:
+  // a tree drawn from its shape text, nodes laid out left to right in in-order. Keys may be letters ("D(U(S,2),B)").
+  function drawBST(svg, t, marks = {}) {
+    svg.replaceChildren();
+    const keys = Sim.inOrder(t), depth = Sim.height(t);
+    const gap = 46, r = 16, dy = 54, W = keys.length * gap + 24, H = depth * dy + 2 * r + 12;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.style.maxWidth = `${W * 1.1}px`;
+    const pos = new Map(keys.map((k, i) => [k, { x: 12 + gap * (i + 0.5), y: r + 6 }]));
+    const setY = (n, d) => { if (!n) return; pos.get(n.key).y = r + 6 + d * dy; setY(n.left, d + 1); setY(n.right, d + 1); };
+    setY(t, 0);
+    const edges = svgEl("g"), nodes = svgEl("g");
+    const lit = (k) => marks[k] === "path" || marks[k] === "cur";
+    const walk = (n) => {
+      if (!n) return;
+      const p = pos.get(n.key);
+      for (const c of [n.left, n.right]) if (c) { const q = pos.get(c.key); edges.append(svgEl("line", { x1: p.x, y1: p.y, x2: q.x, y2: q.y, class: `bt-edge${lit(n.key) && lit(c.key) ? " on" : ""}` })); }
+      const g = svgEl("g", { class: `bt-node ${marks[n.key] || ""}`.trim(), transform: `translate(${p.x},${p.y})` });
+      g.append(svgEl("circle", { r }), svgEl("text", { y: 5, "text-anchor": "middle" }, String(n.key)));
+      nodes.append(g);
+      walk(n.left); walk(n.right);
+    };
+    walk(t);
+    svg.append(edges, nodes);
+  }
+  const markList = (svg) => Object.fromEntries(["path", "cur", "cmp", "new"].flatMap((m) => (svg.dataset[m] || "").split(",").filter(Boolean).map((k) => [/^-?\d+$/.test(k) ? Number(k) : k, m])));
+  $$("svg.htree[data-bst]").forEach((svg) => drawBST(svg, Sim.labelTree(svg.dataset.bst), markList(svg)));
+
+  // On phones a code panel is a short window; grow it to fit the highlighted lines and scroll them into view.
+  function fitHighlight(pre) {
+    const hls = pre.querySelectorAll(".hl");
+    pre.style.maxHeight = "";
+    if (!hls.length || getComputedStyle(pre).maxHeight === "none") return;
+    const cs = getComputedStyle(pre), pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    const base = pre.firstElementChild.offsetTop, first = hls[0], last = hls[hls.length - 1];
+    const top = (first.previousElementSibling || first).offsetTop - base;
+    const bottom = last.offsetTop + last.offsetHeight - base;
+    if (bottom - top + pad > pre.clientHeight) pre.style.maxHeight = `${bottom - top + pad}px`;
+    pre.scrollTop = top;
+  }
+
+  // <div class="panel bst-step" data-kind="traverse|insert|delete" data-shape="…" data-key="5">: one scenario, one step per press
+  const ORDER_NAMES = { pre: "pre-order", in: "in-order", post: "post-order" };
+  function setupBSTStepper(box) {
+    const kind = box.dataset.kind;
+    const t = Sim.labelTree(box.dataset.shape), key = Number(box.dataset.key);
+    const steps = kind === "traverse" ? Sim.traverseSteps(t) : kind === "insert" ? Sim.insertSteps(t, key) : Sim.deleteSteps(t, key);
+    const lines = { traverse: Sim.TRAVERSE_CODE, insert: Sim.INSERT_CODE, delete: Sim.DELETE_CODE }[kind];
+    const code = el("pre", { class: "code" });
+    const svg = svgEl("svg", { class: "htree live", role: "img" });
+    const outs = kind === "traverse" ? el("div", { class: "bt-outs" }) : null;
+    const vars = kind === "traverse" ? null : el("p", { class: "step-vars" });
+    const say = el("p", { class: "step-say", role: "status" });
+    const back = el("button", { class: "btn", type: "button", text: "← Back" });
+    const next = el("button", { class: "btn primary", type: "button", text: "Next step →" });
+    const count = el("span", { class: "note" });
+    box.append(el("div", { class: "split stepper bt" }, code, el("div", { class: "pic" }, svg, outs, vars, say, el("div", { class: "controls" }, back, next, count))));
+    let k = 0;
+    function paint() {
+      const st = steps[k];
+      const hl = new Set(st.line);
+      code.replaceChildren(...lines.map((ln, i) => el("div", { class: `ln${hl.has(i) ? " hl" : ""}` }, el("span", { class: "no", text: String(i + 1) }), el("span", { class: "src", text: ln }))));
+      fitHighlight(code);
+      if (kind === "traverse") {
+        drawBST(svg, t, st.cur == null ? {} : { [st.cur]: "cur" });
+        outs.replaceChildren(...["pre", "in", "post"].map((o) => el("p", { class: `bt-out${st.wrote.includes(o) ? " wrote" : ""}` }, el("span", { class: "bt-out-name", text: ORDER_NAMES[o] }), el("span", { class: "bt-out-keys", text: st[o].join(" ") || "·" }))));
+      } else {
+        drawBST(svg, Sim.labelTree(st.shape), st.marks);
+        vars.textContent = Object.entries(st.vars).map(([n, v]) => `${n} = ${v}`).join(" · ");
+      }
+      svg.setAttribute("aria-label", `The tree ${st.shape || box.dataset.shape}`);
+      say.textContent = st.say;
+      back.disabled = k === 0;
+      next.disabled = k === steps.length - 1;
+      count.textContent = k === 0 ? "Press Next step." : k === steps.length - 1 ? "Done." : `Step ${k} of ${steps.length - 1}.`;
+    }
+    back.addEventListener("click", () => { if (k > 0) { k--; paint(); } });
+    next.addEventListener("click", () => { if (k < steps.length - 1) { k++; paint(); } });
+    REDRAW.add((pid) => { if (box.closest(".page").id === pid) fitHighlight(code); });
+    paint();
+  }
+  $$(".bst-step").forEach(setupBSTStepper);
 };
