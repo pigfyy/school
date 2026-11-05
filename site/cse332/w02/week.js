@@ -7,7 +7,6 @@ window.WEEK.messages = {
   "rounded-up": "Check which power of 2 is just below n. The worst case is ⌊log₂ n⌋ + 1.",
   "doubled-log": "Doubling n adds one more halving, not twice as many.",
   "strict-vs-equal": "Check that exact value of n directly. Is the inequality true there, and for every n after it?",
-  "not-smallest": "That n₀ works, but it isn't the smallest. Try smaller values.",
   "bigger-in-smaller": "Which grows faster, n or log n? O asks whether the left side is eventually at most a constant times the right.",
   "c3-works": "Plug c = 3 in: the 3n terms cancel. What's left, and is it ever true?",
   "omega-best": "Ω is a lower bound on whatever function you analyze. The case (best, worst…) is a separate choice.",
@@ -33,7 +32,10 @@ window.WEEK.messages = {
   "sum-off": "Count the inner loop for each i separately: it starts at j = i and runs to the end.",
   "min-vs-max": "That's the most nodes a tree of height 5 can hold. The fewest is one more than a full tree of height 4.",
   "forgot-first-loop": "Don't forget the first loop (lines 3–5): it runs n times on every input.",
-  "power-of-power": "(3²)ⁿ: square the base. 3² is 9, not 6.",
+  "parts-forgot-term": "Every term adds its own multiple of g. Did you add the one from 2n too?",
+  "parts-n0-max": "Every step has to hold at the same time. Which step needs the biggest n?",
+  "log-one-zero": "Plug in n = 1: log₂ 1 = 0, so n·log₂ n is 0 there.",
+  "times-g": "c multiplies n/10. What times n/10 gives exactly 7n?",
   "build-first-leaf": "That index is a leaf: percolateDown does nothing there. The first index that can move is the last one with a child.",
 };
 
@@ -617,56 +619,48 @@ function setupBuildCost() {
   draw();
 }
 
-/* =========================================================== Section 2: what f ∈ O(n) leaves open */
-const BAND_STMTS = [["O", 4, "O(n²)"], ["O", 2, "O(4n)"], ["O", 1, "O(log n)"], ["O", 3, "O(n log n)"], ["O", 0, "O(1)"], ["Omega", 2, "Ω(n)"], ["Omega", 1, "Ω(log n)"], ["Omega", 4, "Ω(n²)"]];
-const LADDER_TXT = ["1", "log n", "n", "n log n", "n²", "2ⁿ"];
-function setupBand() {
-  const lad = $("#band-ladder"), out = $("#band-out");
-  let cur = 0;
-  const chips = BAND_STMTS.map(([, , label], i) => { const b = el("button", { class: "chip", type: "button", "aria-pressed": "false", text: `f ∈ ${label}` }); b.addEventListener("click", () => { cur = i; draw(); }); return b; });
-  $("#band-stmts").replaceChildren(...chips);
-  function draw() {
-    const [rel, k, label] = BAND_STMTS[cur];
-    chips.forEach((b, i) => b.setAttribute("aria-pressed", String(i === cur)));
-    const v = Sim.boundVerdict("O", 2, rel, k);
-    lad.replaceChildren(...LADDER_TXT.map((t, i) => {
-      const inBand = i <= 2;
-      const target = i === k;
-      const ok = rel === "O" ? i <= k : i >= k;
-      return el("li", { class: `${inBand ? "band" : ""}${target ? " target" : ""}${inBand ? (ok ? " ok" : " no") : ""}` }, el("b", { text: t }), el("span", { text: inBand ? (ok ? "f here: true" : "f here: false") : "f can't be here" }));
-    }));
-    const why = rel === "O"
-      ? (v === "always" ? `Everywhere f can be (from 1 up to n) is at or below ${label.slice(2, -1)}, so it's always true.` : `If f is as big as n, it isn't in ${label}. If f is small, like 1, it is. So it depends on which f: sometimes true.`)
-      : (v === "never" ? `${label} needs f at least as big as ${label.slice(2, -1)}, and f is at most about n. Never true.` : `If f is as big as n, it is in ${label}. If f is just 1, it isn't. Sometimes true.`);
-    out.replaceChildren(el("strong", { text: `f ∈ ${label}: ${v === "always" ? "always true" : v === "never" ? "always false" : "sometimes true"}. ` }), why);
-  }
-  draw();
-}
-
-/* =========================================================== Section 2: numUnique, step by step */
-const NU_PRESETS = { distinct: ["a", "b", "c", "d", "e"], same: ["a", "a", "a", "a", "a"], mixed: ["a", "b", "a", "c", "b"] };
+/* =========================================================== Section 2: numUnique, step by step
+   Each inner-loop iteration adds a dot at row i, column j, so the dots show the running count and its shape. */
+const NU_PRESETS = { distinct: ["a", "b", "c", "d", "e"], same: ["a", "a", "a", "a", "a"] };
 function setupNumUnique() {
   const box = $("#nu");
-  const code = $("#nu-code"), cells = $("#nu-cells"), vars = $("#nu-vars"), say = $("#nu-say");
-  let steps = [], k = 0, values = [];
+  const code = $("#nu-code"), cells = $("#nu-cells"), dots = $("#nu-dots"), count = $("#nu-count"), say = $("#nu-say");
+  const next = $("#nu-next"), back = $("#nu-back"), play = $("#nu-play");
+  let steps = [], k = 0, values = [], timer = null;
+  const stop = () => { clearInterval(timer); timer = null; play.textContent = "Play"; };
   function load(name) {
+    stop();
     values = NU_PRESETS[name];
     $$("[data-nu]", box).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.nu === name)));
     steps = Sim.numUniqueSteps(values); k = 0; paint();
   }
   function paint() {
-    const st = steps[k];
+    const st = steps[k], n = values.length;
     code.replaceChildren(...Sim.NUMUNIQUE_CODE.map((ln, i) => el("div", { class: `ln${i + 1 === st.line || (st.line === 3 && i >= 2 && i <= 4) ? " hl" : ""}` }, el("span", { class: "no", text: String(i + 1) }), el("span", { class: "src", text: ln }))));
     keepLineInView(code);
     cells.replaceChildren(...values.map((v, i) => el("div", { class: `cell${st.visited[i] ? " seen" : ""}${i === st.i ? " mid" : ""}${i === st.j && i !== st.i ? " cmp" : ""}` }, el("span", { class: "ptr", text: [i === st.i ? "i" : "", i === st.j ? "j" : ""].filter(Boolean).join(" ") }), el("b", { text: `"${v}"` }), el("span", { class: "idx", text: st.visited[i] ? `${i} ✓` : String(i) }))));
-    vars.textContent = `out = ${st.out} · first loop: ${st.first} · inner-loop iterations: ${st.inner}`;
+    const done = new Set(Sim.numUniqueDots(steps.slice(0, k + 1)).map(([i, j]) => `${i},${j}`));
+    const dot = (i, j) => el("span", { class: `d${j < i ? " x" : ""}${done.has(`${i},${j}`) ? " on" : ""}${st.i === i && st.j === j ? " now" : ""}` });
+    dots.style.setProperty("--n", n);
+    dots.replaceChildren(el("span"), ...values.map((_, j) => el("span", { class: "cl", text: `j=${j}` })),
+      ...values.flatMap((_, i) => [el("span", { class: "rl", text: `i=${i}` }), ...values.map((__, j) => dot(i, j))]));
+    count.textContent = `first loop ${st.first} + inner loop ${st.inner} = ${st.first + st.inner}`;
     say.textContent = st.say;
-    $("#nu-back").disabled = k === 0;
-    $("#nu-next").disabled = k === steps.length - 1;
+    back.disabled = k === 0;
+    next.disabled = k === steps.length - 1;
   }
+  const step = (d) => { const to = k + d; if (to >= 0 && to < steps.length) { k = to; paint(); } };
   $$("[data-nu]", box).forEach((b) => b.addEventListener("click", () => load(b.dataset.nu)));
-  $("#nu-back").addEventListener("click", () => { if (k > 0) { k--; paint(); } });
-  $("#nu-next").addEventListener("click", () => { if (k < steps.length - 1) { k++; paint(); } });
+  next.addEventListener("click", () => { stop(); step(1); });
+  back.addEventListener("click", () => { stop(); step(-1); });
+  play.addEventListener("click", () => {
+    if (timer) { stop(); return; }
+    if (k === steps.length - 1) k = 0;
+    if (reduceMotion()) { k = steps.length - 1; paint(); return; }
+    play.textContent = "Pause";
+    paint();
+    timer = setInterval(() => { step(1); if (k === steps.length - 1) stop(); }, 550);
+  });
   load("distinct");
 }
 
@@ -682,6 +676,5 @@ $$(".heap-step").forEach(setupHeapStepper);
 setupIndex();
 setupPlayground();
 setupBuildCost();
-setupBand();
 setupNumUnique();
 };

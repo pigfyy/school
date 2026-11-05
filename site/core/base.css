@@ -431,6 +431,8 @@ details.notes li { margin-bottom: 0.35rem; }
 .work-label { display: block; font-weight: 700; margin-bottom: 0.3rem; }
 .my-work textarea { display: block; width: 100%; min-height: 6rem; resize: vertical; font: inherit; line-height: 1.5; padding: 0.5rem 0.65rem; border: 1.5px solid var(--line); border-radius: var(--r-sm); background: var(--surface); color: var(--ink); background-image: linear-gradient(var(--surface) 1.45em, var(--grid) 1.45em, var(--grid) calc(1.45em + 1px), var(--surface) calc(1.45em + 1px)); background-size: 100% 1.5em; background-position-y: 0.5rem; }
 .work-preview { white-space: pre-wrap; background: var(--paper); border-radius: var(--r-sm); padding: 0.5rem 0.65rem; margin-top: 0.4rem; font-size: 0.95rem; }
+.my-work textarea.proof-box { font-family: var(--mono); font-size: 0.88rem; }
+.ans-row > .work-preview { flex-basis: 100%; margin-top: 0; }
 .conflict-copy { font-size: 0.9rem; background: var(--paper); border-left: 3px solid var(--amber); padding: 0.4rem 0.6rem; margin-top: 0.4rem; white-space: pre-wrap; }
 
 .task-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.9rem 0 0.5rem; }

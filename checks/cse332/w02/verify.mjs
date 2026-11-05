@@ -154,20 +154,18 @@ for (let n = 1; n <= 31; n++) {
 for (let Hh = 0; Hh <= 25; Hh++) { const r = Sim.buildCost(Hh); ok(r.total === r.n - Hh - 1 && r.total < r.n, `buildCost(${Hh}) = n − H − 1`); }
 for (const r of H.filter((x) => x.t === "build")) { const n = r.start.length, cap = Math.ceil(Math.log2(n + 1)) - 1; let bound = 0; for (let i = 1; i <= n; i++) { let d = 0, j = i; while (2 * j <= n) { j *= 2; d++; } bound += d; } ok(r.swaps <= bound && bound <= n, `buildHeap ${r.name}: ${r.swaps} swaps <= sum of subtree heights ${bound} <= n (height ${cap})`); }
 { let S = 0; for (let i = 0; i <= 80; i++) S += i / 2 ** (i + 1); ok(Math.abs(S - 1) < 1e-12, `sum i/2^(i+1) -> 1 (${S})`); for (let N = 1; N <= 40; N++) { let s = 0; for (let i = 0; i <= N; i++) s += i / 2 ** (i + 1); ok(Math.abs(s - (1 - (N + 2) / 2 ** (N + 1))) < 1e-12, `partial sum to ${N}`); } }
-// Section 2, question 0: the verdict rule reproduces the official answers
+// Section 2, "what a bound leaves open": knowing only f ∈ sup(g), a claim rel(h) is "always" true if every test
+// function the supposition allows satisfies it, "never" if none does. The test functions run past the page's
+// ladder (n³, 3ⁿ) because Ω leaves f unbounded above.
+const TEST_FS = ["1", "log n", "n", "n log n", "n^2", "n^3", "2^n", "3^n"];
+const rel3 = (f, h, rel) => { const r = G.relate(f, h); return rel === "O" ? r.o : rel === "Omega" ? r.omega : r.theta; };
+const verdict = (sup, g, rel, h) => {
+  const holds = TEST_FS.filter((f) => rel3(f, g, sup)).map((f) => rel3(f, h, rel));
+  return holds.every(Boolean) ? "always" : holds.some(Boolean) ? "sometimes" : "never";
+};
 {
-  const L = Sim.LADDER, k = (s) => L.indexOf(s);
-  const official = [["O", "n^2", "always"], ["O", "n", "always"], ["O", "log n", "sometimes"], ["O", "n log n", "always"], ["O", "1", "sometimes"], ["Omega", "n", "sometimes"], ["Omega", "log n", "sometimes"], ["Omega", "n^2", "never"]]; // O(4n) is the class of n
-  ok(official.every(([rel, g, v]) => Sim.boundVerdict("O", k("n"), rel, k(g)) === v), "boundVerdict matches the worksheet's question 0 solutions");
-  // and agrees with testing every class in the band with the exact class engine
-  for (const sup of ["O", "Omega", "Theta"]) for (let s = 0; s < L.length; s++) for (const rel of ["O", "Omega", "Theta"]) for (let t = 0; t < L.length; t++) {
-    const band = sup === "O" ? L.slice(0, s + 1) : sup === "Omega" ? L.slice(s) : [L[s]];
-    const holds = band.map((f) => { const r = G.relate(f, L[t]); return rel === "O" ? r.o : rel === "Omega" ? r.omega : r.theta; });
-    const brute = holds.every(Boolean) ? "always" : holds.some(Boolean) ? "sometimes" : "never";
-    // Ω leaves f unbounded above (it could be 3ⁿ, past the ladder), so an O or Θ statement is never "always" there
-    const want = sup === "Omega" && rel !== "Omega" && brute === "always" ? "sometimes" : brute;
-    ok(Sim.boundVerdict(sup, s, rel, t) === want, `boundVerdict ${sup}(${L[s]}) ⇒ ${rel}(${L[t]}): ${Sim.boundVerdict(sup, s, rel, t)} vs ${want}`);
-  }
+  const official = [["O", "n^2", "always"], ["O", "4n", "always"], ["O", "log n", "sometimes"], ["O", "n log n", "always"], ["O", "1", "sometimes"], ["Omega", "n", "sometimes"], ["Omega", "log n", "sometimes"], ["Omega", "n^2", "never"]];
+  for (const [rel, h, v] of official) ok(verdict("O", "n", rel, h) === v, `worksheet question 0: f ∈ O(n) ⇒ ${rel}(${h}) is ${v} (brute force: ${verdict("O", "n", rel, h)})`);
 }
 // the c / n0 explorer's claims
 for (const cl of Sim.CLAIMS) ok(cl.cs.includes(cl.c0) && cl.n00 >= 1 && cl.n00 <= cl.N, `explorer claim ${cl.id} starts on a listed c`);
@@ -189,7 +187,6 @@ const yn = (b) => (b ? "yes" : "no");
 const upI = (h, i) => { let n = 0; while (i > 1 && h[i] < h[i >> 1]) { [h[i], h[i >> 1]] = [h[i >> 1], h[i]]; i >>= 1; n++; } return { n, at: i }; };
 const downI = (h, i, size) => { let n = 0; while (i * 2 <= size) { let c = i * 2; if (c + 1 <= size && !(h[c] < h[c + 1])) c++; if (h[c] < h[i]) { [h[c], h[i]] = [h[i], h[c]]; i = c; n++; } else break; } return { n, at: i }; };
 const heightI = (n) => { let h = 0; while (2 ** (h + 1) - 1 < n) h++; return h; };
-const lad = (s) => Sim.LADDER.indexOf(s);
 
 const TRUTH = {};
 const BIGO_TRUTH = {};
@@ -281,33 +278,58 @@ const l4Text = () => html.slice(html.indexOf('id="l4-goals"'), html.indexOf('id=
   ok([8, 64, 512, 4096].every((n) => { const h = Sim.heapOf([]); let w = 0; for (let v = n; v >= 1; v--) w = Math.max(w, Sim.heapInsert(h, v).swaps); return w === Math.floor(Math.log2(n)); }), "worst-case insert swaps = floor(log2 n)");
 }
 /* Section 2 */
+// numUnique written again here, apart from sim.js: per-i inner-loop runs and the (i, j) of every inner iteration
+const numUniqueRef = (vals) => {
+  const n = vals.length, seen = Array(n).fill(false), runs = Array(n).fill(0), pairs = [];
+  let out = 0;
+  for (let i = 0; i < n; i++) {
+    if (seen[i]) continue;
+    out++;
+    for (let j = i; j < n; j++) { runs[i]++; pairs.push([i, j]); if (vals[i] === vals[j]) seen[j] = true; }
+  }
+  return { out, runs, pairs, inner: pairs.length };
+};
+// the first n from which pred holds at every n checked after it
+const fromN = (pred, top = 20000) => { let start = null; for (let n = 1; n <= top; n++) { if (!pred(n)) start = null; else if (start === null) start = n; } return start; };
+const sliceOf = (marker, end) => { const a = html.indexOf(marker); return html.slice(a, html.indexOf(end, a)); };
+const pageOf = (id) => sliceOf(`<section class="page" id="${id}"`, "</section>");
+const taskHtml = (id) => sliceOf(`data-id="${id}"`, "</article>");
+const O_ = (f, g) => ({ f, g, rel: "O" }), W_ = (f, g) => ({ f, g, rel: "Omega" });
+const holdsFrom = (spec, c) => { const r = G.smallestN0(spec, c); return r.n0 === null ? null : Number(r.n0); };
 {
-  const nu = (vals) => H.find((r) => r.t === "numUnique" && same(r.values, vals));
-  const d6 = nu(["a", "b", "c", "d", "e", "f"]), s6 = nu(["a", "a", "a", "a", "a", "a"]), abab = nu(["a", "b", "a", "b"]);
-  const first = (f, gg, c) => { for (let n = 1; n < 10000; n++) { let good = true; for (let m = n; m < n + 2000; m++) if (f(m) > c * gg(m)) { good = false; break; } if (good) return n; } };
-  const v = (rel, k) => Sim.boundVerdict("Omega", lad("n log n"), rel, lad(k));
+  for (const r of H.filter((x) => x.t === "numUnique")) {
+    const ref = numUniqueRef(r.values);
+    ok(ref.out === r.out && ref.inner === r.inner && r.first === r.values.length, `numUnique ${r.values.join("")}: reference ${ref.out}/${ref.inner} vs Java ${r.out}/${r.inner}`);
+    const steps = Sim.numUniqueSteps(r.values);
+    ok(same(Sim.numUniqueDots(steps), ref.pairs), `stepper dots for ${r.values.join("")} are the real inner-loop (i, j)s`);
+    steps.forEach((st, k) => ok(Sim.numUniqueDots(steps.slice(0, k + 1)).length === st.inner, `${r.values.join("")} step ${k}: dots drawn = running inner count ${st.inner}`));
+    for (const st of steps) for (const m of st.say.matchAll(/(\d+) \(first loop\) \+ (\d+) \(inner loop\) = (\d+)/g)) ok(Number(m[1]) === r.first && Number(m[2]) === r.inner && Number(m[1]) + Number(m[2]) === Number(m[3]), `${r.values.join("")}: "${m[0]}"`);
+  }
+  const abab = numUniqueRef(["a", "b", "a", "b"]), aabbc = ["a", "a", "b", "b", "c"];
+  ok(abab.inner === H.find((r) => r.t === "numUnique" && same(r.values, ["a", "b", "a", "b"])).inner, "abab inner count matches Java");
+  ok(Sim.numUniqueSteps(aabbc).some((st) => st.i === 1 && st.line === 8 && /skip/.test(st.say)), "the stepper skips i = 1 on aabbc too");
+  const c2a = G.div(G.Q(7n), G.Q(1n, 10n)); // 7n = c·(n/10)
+  const lin = O_(["0", "7"], ["0", "1/10"]), linW = W_(["0", "7"], ["0", "1/10"]);
+  ok(G.checkBound(lin, "70", "1").holds && G.checkBound(linW, "70", "1").holds && holdsFrom(lin, "69") === null && holdsFrom(linW, "71") === null, "7n ∈ Θ(n/10): c = 70 works both ways, and only 70 does");
+  const v = (rel, h) => verdict("Omega", "n log n", rel, h);
   Object.assign(TRUTH, {
-    "cse332-w2-s2-proofs-by-parts-c": S(5 + 2),
-    "cse332-w2-s2-theta-same-c": "no",
-    "cse332-w2-s2-theta-c1-omega": yn(G.smallestN0({ f: ["5", "0", "2"], g: ["0", "0", "4"], rel: "Omega" }, "1").n0 !== null),
+    "cse332-w2-s2-parts-c": S(5 + 2),
+    "cse332-w2-s2-parts-n0": S(Math.max(fromN((n) => 3 * n * n <= 3 * n * n), fromN((n) => 9 <= n * n))),
+    "cse332-w2-s2-squeeze-n0": S(fromN((n) => n <= n * Math.log2(n))),
+    "cse332-w2-s2-theta-c1-omega": yn(holdsFrom(W_(["5", "0", "2"], ["0", "0", "4"]), "1") !== null),
     "cse332-w2-s2-numunique-abab": S(abab.inner),
-    "cse332-w2-s2-q0-omega.o-n2": v("O", "n^2"), "cse332-w2-s2-q0-omega.omega-n": v("Omega", "n"), "cse332-w2-s2-q0-omega.o-n": v("O", "n"), "cse332-w2-s2-q0-omega.theta-nlogn": v("Theta", "n log n"), "cse332-w2-s2-q0-omega.omega-n2": v("Omega", "n^2"),
-    "cse332-w2-s2-q1c.k": S(3 ** 2),
-    "cse332-w2-s2-q1c.c1-works": yn(Array.from({ length: 300 }, (_, i) => i + 1).every((n) => 2n ** BigInt(n) <= 3n ** BigInt(2 * n))),
-    "cse332-w2-s2-smallest-n0.q1b": S(first(() => 1000, (n) => 3 * n * n, 1)), "cse332-w2-s2-smallest-n0.q1d": S(first((n) => 7 * n * n + 3 * n, (n) => n ** 4, 10)), "cse332-w2-s2-smallest-n0.q2b": S(first((n) => n ** 3 + 10 * n, (n) => 3 * n ** 3, 1)), "cse332-w2-s2-smallest-n0.q1e": S(first((n) => n + 2 * n * Math.log2(n), (n) => n * Math.log2(n), 3)),
-    "cse332-w2-s2-numunique-trace.distinct-out": S(d6.out), "cse332-w2-s2-numunique-trace.distinct-inner": S(d6.inner), "cse332-w2-s2-numunique-trace.same-out": S(s6.out), "cse332-w2-s2-numunique-trace.same-inner": S(s6.inner),
-    "cse332-w2-s2-cyu-squeeze-n0": S(first((n) => n, (n) => n * Math.log2(n), 1)),
+    "cse332-w2-s2-numunique-skip": yn(numUniqueRef(aabbc).runs[1] > 0),
+    "cse332-w2-s2-theta-2a-c": G.qToPlain(c2a),
+    "cse332-w2-s2-q0-omega.o-n2": v("O", "n^2"), "cse332-w2-s2-q0-omega.omega-n": v("Omega", "n"), "cse332-w2-s2-q0-omega.o-n": v("O", "n"), "cse332-w2-s2-q0-omega.theta-nlogn": v("Theta", "n log n"),
   });
-  ok(G.checkBound({ f: ["0", "2", "0", "5"], g: ["0", "0", "0", "1"], rel: "O" }, "7", "1").holds && !G.checkBound({ f: ["0", "2", "0", "5"], g: ["0", "0", "0", "1"], rel: "O" }, "6", "1").holds, "by parts: 5n^3 + 2n <= 7n^3 from n = 1, and 6 isn't enough there");
-  ok(G.checkBound({ f: ["5", "0", "2"], g: ["0", "0", "4"], rel: "O" }, "1", "3").holds && G.checkBound({ f: ["5", "0", "2"], g: ["0", "0", "4"], rel: "Omega" }, "1/2", "1").holds, "the section's 2n^2+5 ∈ Θ(4n^2) pairs hold");
-  ok(G.checkBound({ f: ["100", "10"], g: ["0", "0", "1"], rel: "O" }, "10", "6").holds, "the section's 10n+100 pair (10, 6) holds");
-  // numUnique: worst n + n(n+1)/2, best 2n, and two distinct strings stay linear
+  ok(fromN((n) => 5 * n ** 3 <= 5 * n ** 3 && 2 * n <= 2 * n ** 3) === 1 && G.checkBound(O_(["0", "2", "0", "5"], ["0", "0", "0", "1"]), "7", "1").holds && !G.checkBound(O_(["0", "2", "0", "5"], ["0", "0", "0", "1"]), "6", "1").holds, "by parts: 5n³ ≤ 5n³ and 2n ≤ 2n³ from n = 1, so c = 7; 6 isn't enough at n = 1");
+  ok(G.checkBound(O_(["9", "0", "3"], ["0", "0", "1"]), "4", "3").holds && !G.checkBound(O_(["9", "0", "3"], ["0", "0", "1"]), "4", "2").holds, "3n² + 9 ≤ 4n² exactly from n = 3");
+  // numUnique formulas: worst n + n(n+1)/2, best 2n, against Java for n = 1..30
   const counts = (n, kind) => H.find((r) => r.t === "numUnique" && r.values.length === n && r.values.every((x) => (kind === "d" ? x.startsWith("v") : x === "s")));
   const at = (expr, n) => G.qToNumber(G.evalExact(expr, { n: G.Q(BigInt(n)) }));
-  for (let n = 1; n <= 30; n++) { const d = counts(n, "d"), s = counts(n, "s"); ok(at("n + n(n+1)/2", n) === d.first + d.inner && at("2n", n) === s.first + s.inner && at("n(n+1)/2", n) === d.inner, `numUnique n=${n} formulas`); }
-  ok([[4, 2], [10, 3], [37, 5]].every(([n, split]) => { const vals = Array.from({ length: n }, (_, i) => (i % split === 0 ? "x" : "y")); return Sim.numUniqueSteps(vals).at(-1).inner <= 2 * n; }), "two different strings: at most 2n inner iterations");
-  Object.assign(FORMULA_TRUTH, { "cse332-w2-s2-numunique-model.worst": "n + n(n+1)/2", "cse332-w2-s2-numunique-model.best": "2n", "cse332-w2-s2-cyu-sum": "n(n+1)/2" });
-  Object.assign(BIGO_TRUTH, { "cse332-w2-q2-numunique-same-bucket": "2n" });
+  for (let n = 1; n <= 30; n++) { const d = counts(n, "d"), s = counts(n, "s"); ok(at("n + n(n+1)/2", n) === d.first + d.inner && at("2n", n) === s.first + s.inner, `numUnique n=${n} formulas`); }
+  Object.assign(FORMULA_TRUTH, { "cse332-w2-s2-numunique-model.worst": "n + n(n+1)/2", "cse332-w2-s2-numunique-model.best": "2n" });
+  Object.assign(BIGO_TRUTH, { "cse332-w2-s2-numunique-model.worst-theta": "n + n(n+1)/2", "cse332-w2-s2-numunique-model.best-theta": "2n" });
 }
 /* Lecture 5 */
 {
@@ -384,7 +406,7 @@ for (const m of html.matchAll(/<(div|li)\s[^>]*(data-answer|data-grader|data-bou
   }
 }
 for (const id of [...Object.keys(TRUTH), ...Object.keys(BIGO_TRUTH), ...Object.keys(FORMULA_TRUTH)]) ok(seen.has(id), `truth registered for an id that isn't on the page: ${id}`);
-ok(keys >= 100, `found ${keys} auto-graded keys`);
+ok(keys >= 90, `found ${keys} auto-graded keys`);
 // every misconception tag has a message
 {
   const W = {}; const ctx = { window: W }; (new Function("window", readFileSync(`${here}../../../site/cse332/w02/week.js`, "utf8").split('"use strict";')[0]))(W);
@@ -396,10 +418,6 @@ ok(keys >= 100, `found ${keys} auto-graded keys`);
 const BOUND_SOLUTIONS = [
   ["cse332-w2-l3-prove-4n8", "c", [["5", "8"], ["12", "1"], ["6", "4"]], [["5", "7"], ["4", "1000"]]],
   ["cse332-w2-l3-prove-omega", "c", [["2", "6"], ["1", "3"]], [["2", "5"], ["3", "1000"]]],
-  ["cse332-w2-s2-worksheet-pairs", "q1a-c", [["70", "1"], ["100", "1"]], [["69", "1"], ["1", "1000"]]],
-  ["cse332-w2-s2-worksheet-pairs", "q1b-c", [["1", "20"], ["1", "19"]], [["1", "18"], ["1/1000", "500"]]],
-  ["cse332-w2-s2-worksheet-pairs", "q2b-o-c", [["1", "4"], ["1", "3"]], [["1", "2"], ["1/3", "1000"]]],
-  ["cse332-w2-s2-worksheet-pairs", "q2b-omega-c", [["1/3", "1"], ["1/3", "5"]], [["1", "1000"], ["1/2", "10"]]],
 ];
 for (const [tid, part, good, bad] of BOUND_SOLUTIONS) {
   const at = html.indexOf(`data-id="${tid}"`);
@@ -456,6 +474,97 @@ for (const [f, g] of [["3n + 5", "n"], ["n^2 + 100n", "n^2"], ["4 log n + 7", "l
 ok(Math.abs(Number(58n ** 10n) / 1e17 - 4.31) < 0.01 && Math.abs(2 ** 58 / 1e17 - 2.88) < 0.01 && Math.abs(Number(59n ** 10n) / 1e17 - 5.11) < 0.01 && Math.abs(2 ** 59 / 1e17 - 5.76) < 0.01, "k = 58, 59 values in problem 9");
 ok(Math.abs(Number(43n ** 8n) / 1e13 - 1.17) < 0.01 && Math.abs(2 ** 43 / 1e12 - 8.80) < 0.01 && Math.abs(Number(44n ** 8n) / 1e13 - 1.40) < 0.01 && Math.abs(2 ** 44 / 1e13 - 1.76) < 0.01, "n = 43, 44 values in problem 8");
 ok(heightI(9) === 3, "the lecture's 9-node heap has height 3");
+/* Section 2: tables, pictures, multiple-choice keys and the numbers its proofs state */
+{
+  const s2 = ["s2-goals", "s2-sometimes", "s2-parts", "s2-squeeze", "s2-theta", "s2-numunique", "s2-problems"].map(pageOf).join("");
+  const s2text = s2.replace(/\s+/g, " ");
+  const says = (s, why) => ok(s2text.includes(s), `Section 2 states "${s}" (${why})`);
+  // always / sometimes / never tables: ✓ and ✗ from the class engine, the verdict from the brute force over test functions
+  const tex2g = (t) => t.replace(/\\log\s*/g, " log ").replace(/\s+/g, " ").trim();
+  const WORD = { always: "always", sometimes: "sometimes", never: "never" };
+  const verdictTable = (where, src, sup, g, ends) => {
+    const rows = [...src.matchAll(/<tr><th>\\\((?:f \\in )?(O|\\Omega|\\Theta)\(([^)]*)\)\\\)<\/th><td class="(yes|no)">[✓✗]<\/td><td class="(yes|no)">[✓✗]<\/td><td>([^<]+)<\/td><\/tr>/g)];
+    ok(rows.length === 4, `${where}: 4 verdict rows (found ${rows.length})`);
+    for (const [, relTex, hTex, a, b, word] of rows) {
+      const rel = relTex.replace("\\", ""), h = tex2g(hTex);
+      ok(rel3(ends[0], h, rel) === (a === "yes") && rel3(ends[1], h, rel) === (b === "yes"), `${where}: ${rel}(${h}) marks at f = ${ends.join(", ")}`);
+      ok(WORD[word] === verdict(sup, g, rel, h), `${where}: ${rel}(${h}) is "${word}"; brute force says ${verdict(sup, g, rel, h)}`);
+    }
+  };
+  verdictTable("s2-sometimes worked example", pageOf("s2-sometimes"), "O", "n", ["1", "n"]);
+  verdictTable("practice 1 solution", taskHtml("cse332-w2-s2-q0-omega"), "Omega", "n log n", ["n log n", "2^n"]);
+  ok(TEST_FS.filter((f) => rel3(f, "n", "O")).join() === "1,log n,n" && /<li class="band end"><b>1<\/b>[\s\S]*<li class="band"><b>log n<\/b>[\s\S]*<li class="band end"><b>n<\/b>[\s\S]*<li><b>n log n<\/b>/.test(pageOf("s2-sometimes")), "the ladder shades exactly the buckets in O(n), ends circled");
+
+  // multiple-choice quick checks: the marked option is the computed truth
+  const mcRight = (id) => { const blk = sliceOf(`data-id="${id}"`, '<div class="row">'); const m = /<label data-correct>([\s\S]*?)<span class="why"/.exec(blk); return m ? m[1].replace(/<[^>]+>/g, "").trim() : null; };
+  const ASN = { always: "Always true", sometimes: "Sometimes true", never: "Always false" };
+  let twoLinear = true;
+  for (let n = 2; n <= 40; n++) for (let s = 0; s < 20; s++) {
+    const vals = Array.from({ length: n }, (_, i) => ((i * 7 + s * 13 + i * i * s) % 3 === 0 ? "x" : "y"));
+    if (new Set(vals).size !== 2) continue;
+    const t = n + numUniqueRef(vals).inner;
+    if (t < n || t > 3 * n) twoLinear = false;
+  }
+  let negBigger = true; for (let n = 1; n <= 1000; n++) if (!(4 * n * n - 8 * n < 4 * n * n)) negBigger = false;
+  const MC = {
+    "cse332-w2-s2-sometimes-o4n": ASN[verdict("O", "n", "O", "4n")],
+    "cse332-w2-s2-sometimes-theta-logn": ASN[verdict("Theta", "n", "O", "log n")],
+    "cse332-w2-s2-theta-drop-negative": negBigger ? "No: dropping \\(-8n\\) makes \\(f\\) bigger" : "?",
+    "cse332-w2-s2-numunique-two-values": twoLinear ? "\\(\\Theta(n)\\)" : "?",
+  };
+  const mcIds = [...s2.matchAll(/class="check" data-id="([^"]+)" data-grader="mc"/g)].map((m) => m[1]);
+  ok(same(mcIds.sort(), Object.keys(MC).sort()), `every Section 2 multiple-choice check has a computed truth (${mcIds.join(", ")})`);
+  for (const [id, want] of Object.entries(MC)) ok(mcRight(id)?.startsWith(want), `${id}: marked "${mcRight(id)}", truth "${want}"`);
+  ok(holdsFrom(W_(["0", "-8", "4"], ["0", "0", "1"]), "3") === 8 && fromN((n) => 8 * n <= n * n) === 8, "drop-negative fix: 8n ≤ n² and 4n² − 8n ≥ 3n² exactly from n = 8");
+  says("for n ≥ 8, 8n ≤ n², so 4n² − 8n ≥ 3n². That's c = 3, n₀ = 8.", "drop-negative fix");
+
+  // Proof by parts: 4n² + 3n + 5 ≤ 12n² from n = 1, term by term
+  ok(fromN((n) => 4 * n * n <= 4 * n * n && 3 * n <= 3 * n * n && 5 <= 5 * n * n) === 1 && 4 + 3 + 5 === 12 && G.checkBound(O_(["5", "3", "4"], ["0", "0", "1"]), "12", "1").holds, "by parts: each term from n = 1, c = 12");
+  says("\\(c = 4 + 3 + 5 = 12\\); every step holds from \\(n = 1\\), so \\(n_0 = 1\\)", "by-parts sum");
+  says("\\(9 \\le n^2\\) (true for \\(n \\ge 3\\))", "parts-n0 premise");
+  ok(fromN((n) => 9 <= n * n) === 3, "9 ≤ n² exactly from n = 3");
+
+  // The squeeze: n² + 4 ≤ 2n² from n = 2, 2n² ≤ 2n³ from n = 1, and the table of values
+  ok(fromN((n) => n * n + 4 <= 2 * n * n) === 2 && fromN((n) => 2 * n * n <= 2 * n ** 3) === 1 && G.checkBound(O_(["4", "0", "1"], ["0", "0", "0", "1"]), "2", "2").holds && !G.checkBound(O_(["4", "0", "1"], ["0", "0", "0", "1"]), "2", "1").holds, "squeeze example: f ≤ f' from n = 2, f' ≤ 2n³ from n = 1, so (c, n₀) = (2, 2) and n₀ = 1 fails");
+  {
+    const tr = (label, F) => `<tr><th>${label}</th>${[1, 2, 3, 4].map((n) => `<td${n === 1 && label.startsWith("\\(f =") ? ' class="no"' : ""}>${F(n)}</td>`).join("")}</tr>`;
+    const rows = [tr("\\(f = n^2 + 4\\)", (n) => n * n + 4), tr("\\(f' = 2n^2\\)", (n) => 2 * n * n), tr("\\(c\\cdot g = 2n^3\\)", (n) => 2 * n ** 3)];
+    ok(rows.every((r) => pageOf("s2-squeeze").includes(r)), "squeeze table values");
+    ok([2, 3, 4].every((n) => n * n + 4 <= 2 * n * n && 2 * n * n <= 2 * n ** 3) && 1 + 4 > 2 * 1, "squeeze table: rows ordered from n = 2, f on top at n = 1");
+  }
+  says("same as \\(4 \\le n^2\\): true from \\(n = 2\\)", "squeeze n₀");
+  ok(fromN((n) => n <= n * Math.log2(n)) === 2 && 1 * Math.log2(1) === 0, "n ≤ n log n from n = 2; log 1 = 0");
+
+  // Θ proofs: 2n² + 5 ∈ Θ(4n²) with (1, 3) and (1/2, 1), and no single c works for both parts
+  const t2 = O_(["5", "0", "2"], ["0", "0", "4"]), t2w = W_(["5", "0", "2"], ["0", "0", "4"]);
+  ok(fromN((n) => 5 <= n * n) === 3 && 3 ** 2 === 9 && G.checkBound(t2, "1", "3").holds && G.checkBound(t2w, "1/2", "1").holds, "Θ example: 5 ≤ n² from n = 3; (1, 3) and (½, 1) hold");
+  ok(Array.from({ length: 400 }, (_, k) => `${k + 1}/40`).every((c) => holdsFrom(t2, c) === null || holdsFrom(t2w, c) === null), "Θ example: no single c works for both parts (they have to differ)");
+  says("true from \\(n = 3\\), since \\(3^2 = 9\\)", "Θ example n₀");
+
+  // numUnique's worked example, from the reference implementation (and Java ran the same two arrays)
+  {
+    const row = (name, vals) => { const r = numUniqueRef(vals); return `<li><span class="lab">${name}</span><span class="mth">\\(${r.runs.join("+")} = ${r.inner}\\)</span><span class="note">${r.runs.filter(Boolean).length === 1 ? "only \\(i = 0\\) runs it" : `inner loop for \\(i = 0\\) to \\(${vals.length - 1}\\)`}; plus the first loop's ${vals.length} makes ${vals.length + r.inner}</span></li>`; };
+    ok(pageOf("s2-numunique").includes(row("all different", ["a", "b", "c", "d", "e"])) && pageOf("s2-numunique").includes(row("all the same", ["a", "a", "a", "a", "a"])), "numUnique worked-example lines");
+    ok(["abcde", "aaaaa"].every((v) => H.some((r) => r.t === "numUnique" && r.values.join("") === v)) && s2.includes('data-nu="distinct" aria-pressed="false">all different: a b c d e') && s2.includes('data-nu="same" aria-pressed="false">all the same: a a a a a'), "the stepper's two arrays are the table's, and Java ran both");
+  }
+
+  // practice solutions: the pairs each written proof states
+  {
+    const big = (n) => BigInt(n);
+    let d1 = true, d13 = true;
+    for (let n = 1n; n <= 3000n; n++) { if (!(7n * n * n <= 7n * n ** 4n && 3n * n <= 3n * n ** 4n && 7n * n * n + 3n * n <= 10n * n ** 4n)) d1 = false; if (n >= 3n && 7n * n * n + 3n * n > n ** 4n) d13 = false; }
+    ok(d1 && d13 && 7n * big(2) ** 2n + 3n * big(2) > big(2) ** 4n, "1d: (10, 1) by parts and (1, 3) hold; (1, 2) fails at n = 2");
+    let e = true; for (let n = 2; n <= 100000; n++) if (n + 2 * n * Math.log2(n) > 3 * n * Math.log2(n) + 1e-9) e = false;
+    ok(e && 1 + 2 * Math.log2(1) > 3 * Math.log2(1), "1e: n + 2n log n ≤ 3n log n from n = 2; fails at n = 1 (1 vs 0)");
+    ok(fromN((n) => 10 <= n * n) === 4 && G.checkBound(O_(["0", "10", "0", "1"], ["0", "0", "0", "3"]), "1", "4").holds && G.checkBound(W_(["0", "10", "0", "1"], ["0", "0", "0", "3"]), "1/3", "1").holds, "2b: 10 ≤ n² from n = 4; (1, 4) and (⅓, 1) hold");
+    const t = (id) => taskHtml(id).replace(/\s+/g, " ");
+    ok(t("cse332-w2-s2-parts-1d").includes("Let \\(c = 10\\) and \\(n_0 = 1\\)") && t("cse332-w2-s2-parts-1d").includes("\\(c = 1\\), \\(n_0 = 3\\)"), "1d solution states (10, 1) and (1, 3)");
+    ok(t("cse332-w2-s2-squeeze-1e").includes("Let \\(c = 3\\) and \\(n_0 = 2\\)"), "1e solution states (3, 2)");
+    ok(t("cse332-w2-s2-write-theta-2b").includes("Let \\(c = 1\\) and \\(n_0 = 4\\)") && t("cse332-w2-s2-write-theta-2b").includes("Let \\(c = \\tfrac13\\) and \\(n_0 = 1\\)"), "2b solution states (1, 4) and (⅓, 1)");
+  }
+  const templates = [...s2.matchAll(/data-template="([^"]+)"/g)].map((m) => m[1]);
+  ok(templates.length === 3 && templates.every((t) => t.includes("Let c = __ and n₀ = __")), "the three proof boxes start with the c and n₀ blanks");
+}
 ok(!/\bslides?\b/i.test(text.replace(/files\/slides\//g, "")), "no student-facing text mentions slides");
 ok(!/details class="notes"/.test(html), "no instructor teaching notes");
 

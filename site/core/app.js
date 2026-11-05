@@ -14,6 +14,9 @@
      li.cyu[data-id]               quiz question: .opts for multiple choice, otherwise a text input. In ol.cyu-list,
                                    with .cyu-score[data-role=score|summary] around it
      article.task[data-id]         problem: .answer-spec[data-part] boxes, ol.hints, .solution with .steps
+     .answer-spec[data-long]       a written self-check answer (data-grader="self") gets a textarea instead of one line.
+                                   Add data-template="Let c = __ and n₀ = __.&#10;…" for a proof box: 8+ rows that grow to
+                                   fit, monospace, math preview; an empty answer starts as that skeleton to type into
      [data-progress-bar]           optional empty div: where the page's problem progress bar goes
      .steps                        step-by-step reveal. li[data-ask="plain text"] puts that question on the button
                                    that reveals the step, then heads the step with it
@@ -496,6 +499,21 @@ function choiceButtons(choices, onPick) {
   return { group, paint };
 }
 const YES_NO = [["yes", "Yes"], ["no", "No"]];
+// Under a textarea: its text with the \( \) and \[ \] math typeset, shown only while it has some.
+function mathPreview(area) {
+  const box = el("div", { class: "work-preview", "aria-live": "polite", hidden: true });
+  let timer;
+  const update = () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const has = window.renderMathInElement && /\\\(|\\\[/.test(area.value);
+      box.hidden = !has;
+      if (has) { box.textContent = area.value; renderMath(box); }
+    }, 300);
+  };
+  area.addEventListener("input", update);
+  return { box, update };
+}
 function buildTask(task) {
   const id = task.dataset.id;
   const title = $("h2", task).textContent.trim();
@@ -523,8 +541,11 @@ function buildTask(task) {
     let input;
     const choices = p.type === "yesno" ? YES_NO : d.options ? d.options.split("|").map((o) => { const [v, t] = o.split(":"); return [v, t || v]; }) : null;
     // Short self-check answers are one line, like the other rows; data-long gives a written one a textarea.
-    if (p.type === "self" && p.spec.hasAttribute("data-long")) input = el("textarea", { id: domId, rows: "3", spellcheck: "true", placeholder: d.placeholder || "your answer" });
-    else if (choices) {
+    p.template = d.template || "";
+    if (p.type === "self" && p.spec.hasAttribute("data-long")) {
+      const rows = p.template ? Math.max(8, p.template.split("\n").length + 1) : 3;
+      input = el("textarea", { id: domId, rows: String(rows), spellcheck: p.template ? "false" : "true", class: p.template ? "proof-box" : null, placeholder: d.placeholder || "your answer" });
+    } else if (choices) {
       input = el("input", { type: "hidden", id: domId });
       p.choice = choiceButtons(choices, (v) => { input.value = v; input.dispatchEvent(new Event("input")); check(); });
     } else input = el("input", { type: "text", id: domId, autocomplete: "off", spellcheck: "false", placeholder: d.placeholder || PLACEHOLDER[p.type] || (d.choices ? JSON.parse(d.choices).join(" or ") : ""), class: p.type === "java" ? "mono" : null });
@@ -534,6 +555,14 @@ function buildTask(task) {
     p.spec.dataset.itemId = p.pid;
     p.fb = el("p", { class: "part-fb", role: "status" });
     p.spec.append(el("label", { for: domId, text: d.label || (parts.length === 1 ? "Your answer" : `Part ${i + 1}`) }), input);
+    if (p.template) {
+      p.preview = mathPreview(input);
+      p.spec.append(p.preview.box);
+      // grow to fit the text, so no line of the proof hides below the box's edge (narrow screens wrap lines)
+      p.fit = () => { input.style.height = ""; if (input.scrollHeight > input.clientHeight) input.style.height = `${input.scrollHeight + 4}px`; };
+      input.addEventListener("input", p.fit);
+      REDRAW.add(p.fit);
+    }
     if (p.choice) p.spec.append(p.choice.group);
     if (p.type === "self") p.spec.append(el("span", { class: "where", text: "check against the solution" }));
     p.spec.append(p.fb);
@@ -557,18 +586,11 @@ function buildTask(task) {
   myWork.append(fb);
   const workId = `${id}--work`;
   const work = el("textarea", { id: workId, rows: "4", placeholder: task.dataset.workPlaceholder || (window.katex ? "Explain how you got your answer. Math works too, e.g. \\( 10n+100 \\le 10n^2 \\)" : "Your reasoning: the lines you followed, the runs you predicted, what you'd change.") });
-  const preview = el("div", { class: "work-preview", "aria-live": "polite", hidden: true });
-  myWork.append(el("label", { class: "work-label", for: workId, text: "Your work" }), work, preview);
-  let previewTimer;
-  const renderPreview = () => {
-    clearTimeout(previewTimer);
-    previewTimer = setTimeout(() => {
-      const has = window.renderMathInElement && /\\\(|\\\[/.test(work.value);
-      preview.hidden = !has;
-      if (has) { preview.textContent = work.value; renderMath(preview); }
-    }, 300);
-  };
-  work.addEventListener("input", () => { store.put(id, "problem", { ...get(), title, work: work.value }); renderPreview(); render(); });
+  const preview = mathPreview(work);
+  myWork.append(el("label", { class: "work-label", for: workId, text: "Your work" }), work, preview.box);
+  work.addEventListener("input", () => { store.put(id, "problem", { ...get(), title, work: work.value }); render(); });
+  // What the student wrote in a part: an untouched proof skeleton counts as nothing.
+  const written = (p) => { const v = inputs[parts.indexOf(p)].value; return v === p.template ? "" : v; };
 
   const actions = el("div", { class: "task-actions" });
   const hintBtn = el("button", { class: "btn hint-btn", type: "button" });
@@ -666,7 +688,7 @@ function buildTask(task) {
   function markSelf(mark) {
     const s = get();
     const answer = {};
-    self.forEach((p) => { answer[p.part] = { raw: inputs[parts.indexOf(p)].value }; });
+    self.forEach((p) => { answer[p.part] = { raw: written(p) }; });
     store.attempt(id, "problem", { type: "self-mark", answer, correct: mark === "got", hintsShown: s.hintsRevealed || 0, solutionSeen: true });
     store.put(id, "problem", { ...s, title, selfMark: mark });
     render();
@@ -683,7 +705,7 @@ function buildTask(task) {
   solBtn.addEventListener("click", () => {
     if (solutionOpen) { solutionOpen = false; render(); return; }
     const s = get();
-    const tried = inputs.some((x) => !isBlank(x.value)) || !isBlank(work.value) || liveAttempts(s).length > 0;
+    const tried = parts.some((p) => !isBlank(written(p))) || !isBlank(work.value) || liveAttempts(s).length > 0;
     if (!tried && !armed && !s.solutionViewed) {
       armed = true;
       fb.className = "feedback"; fb.textContent = "You haven't answered yet. Press the button again to see the solution anyway.";
@@ -711,7 +733,8 @@ function buildTask(task) {
     armed = false;
     parts.forEach((p, i) => {
       const r = s?.parts?.[p.part] || {};
-      if (document.activeElement !== inputs[i]) inputs[i].value = r.raw || "";
+      if (document.activeElement !== inputs[i]) inputs[i].value = r.raw || p.template;
+      if (p.preview) { p.preview.update(); p.fit(); }
       inputs[i].classList.toggle("ok", r.correct === true);
       inputs[i].classList.toggle("bad", r.correct === false);
       if (p.choice) p.choice.paint(inputs[i].value, r.correct);
@@ -730,7 +753,7 @@ function buildTask(task) {
         ? (hasSelf ? "Correct. Compare your written parts with the solution." : auto.length > 1 ? "All correct." : "Correct.")
         : auto.length > 1 ? `${n} of ${auto.length} right. The red ones need another look.` : "Not quite. Try again, or ask for a hint.";
     } else if (n) { fb.className = "feedback ok"; fb.textContent = `${n} of ${auto.length} right so far.`; }
-    renderPreview();
+    preview.update();
     render();
   }
   TASKS.set(id, { hasAuto, hasSelf });

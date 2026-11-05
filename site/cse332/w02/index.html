@@ -56,11 +56,11 @@
       <ol class="modules">
         <li><a href="#s2-goals">What this section is for</a></li>
         <li><a href="#s2-sometimes">What a bound leaves open</a></li>
-        <li><a href="#s2-proofs">Writing a Big-O proof</a></li>
-        <li><a href="#s2-theta">Writing a Θ proof</a></li>
-        <li><a href="#s2-numunique">Running time of numUnique</a></li>
-        <li><a href="#s2-problems">Section 2 problems</a></li>
-        <li><a href="#cyu-s2">Check your understanding</a></li>
+        <li><a href="#s2-parts">Proof by parts</a></li>
+        <li><a href="#s2-squeeze">The squeeze</a></li>
+        <li><a href="#s2-theta"><span>\(\Theta\) proofs</span></a></li>
+        <li><a href="#s2-numunique">numUnique: best and worst case</a></li>
+        <li><a href="#s2-problems">Section 2 practice</a></li>
       </ol>
     </div>
     <div>
@@ -149,7 +149,7 @@
       <li>Every page opens with a <strong>Key idea</strong> box, then explains why things are the way they are. Pages end with quick checks.</li>
       <li>Steppers walk through the lecture's code one line or one step at a time. Press <strong>Next</strong> and read why each line is there.</li>
       <li><strong>Problems</strong> are answerable on the page. Type an answer, write your work, ask for hints. Solutions stay hidden until you press <strong>Show solution</strong>, then show one step at a time.</li>
-      <li>Lecture 3 ends with one <strong>Practice</strong> page: concept checks and problems together, grouped by the lecture's goals. Lectures 4 and 5 and the section still end with problems and a separate <strong>Check your understanding</strong> quiz.</li>
+      <li>Lectures 3 and 4 and Section 2 each end with one <strong>Practice</strong> page: problems and quick checks together, grouped by lesson. Lecture 5 still ends with problems and a separate <strong>Check your understanding</strong> quiz.</li>
       <li>Number boxes take arithmetic like <code>2^10+1</code>. Big-O boxes take a class like <code>n log n</code>, <code>O(n^2)</code> or <code>2^n</code>. Yes/no boxes take <code>yes</code>, <code>no</code>, <code>true</code> or <code>false</code>.</li>
     </ul>
   </div>
@@ -1092,77 +1092,74 @@ extract</code></pre>
 <section class="page" id="s2-goals" data-title="What Section 2 is for">
   <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span> · Runtime</p>
   <h1>What this section is for</h1>
-  <div class="prose">
-    <p>Section 2 practices what Lecture 3 defined. Three skills: reading a bound for what it does and doesn't promise; writing \(O\), \(\Omega\) and \(\Theta\) proofs the way the course wants them; and turning a real method into a running-time function for its worst and best cases.</p>
-  </div>
   <div class="rule">
-    <p><strong>The definitions, once more.</strong> \(f(n) \in O(g(n))\) if there are positive constants \(c\) and \(n_0\) with \(f(n) \le c\cdot g(n)\) for all \(n \ge n_0\). \(\Omega\) is the same with \(\ge\). \(\Theta\) means both. Big-O is an upper bound and \(\Omega\) a lower bound; neither has to be tight.</p>
+    <p><strong>The point.</strong> Use Lecture 3's \(O\), \(\Omega\) and \(\Theta\) on harder cases: what a bound doesn't tell you, proofs for functions with several terms, and a method's best and worst case.</p>
   </div>
-  <div class="prose">
-    <ul>
-      <li><strong>Why \(c\) matters:</strong> it makes the comparison about the <em>shape</em> of the growth, not its scale.</li>
-      <li><strong>Why \(n_0\) matters:</strong> it makes the comparison about \(n\) going to infinity, by letting you ignore small values.</li>
-    </ul>
-  </div>
+  <p class="line">This section builds on Lecture 3. If \(O\), \(\Omega\), \(\Theta\) or \(c\) and \(n_0\) are new to you, read <a href="#notation">O, Ω, Θ</a> and <a href="#proofs">Proving a bound</a> first.</p>
 
-  <h2>After this section you should be able to</h2>
+  <h2>Five short pages</h2>
   <ol class="goals">
-    <li>Given \(f \in O(n)\), say which other bounds are always true, sometimes true, or always false, and why. <a href="#s2-sometimes">What a bound leaves open</a></li>
-    <li>Write a Big-O proof: find \(c\) and \(n_0\) in scratchwork, then write a proof that only states them and shows they work. Use the "by parts" and "squeeze" methods. <a href="#s2-proofs">Big-O proofs</a></li>
-    <li>Write a \(\Theta\) proof as two separate proofs, one for \(O\) and one for \(\Omega\). <a href="#s2-theta">Θ proofs</a></li>
-    <li>Model <code>numUnique</code>'s worst and best cases as sums, and simplify them to \(\Theta\). <a href="#s2-numunique">numUnique</a></li>
+    <li>From \(f \in O(n)\) alone, what else must be true? <a href="#s2-sometimes">What a bound leaves open</a></li>
+    <li>Prove a bound one term at a time. <a href="#s2-parts">Proof by parts</a></li>
+    <li>Prove a bound through a simpler middle function. <a href="#s2-squeeze">The squeeze</a></li>
+    <li>Write a \(\Theta\) proof as two proofs. <a href="#s2-theta">Θ proofs</a></li>
+    <li>Count a method's loops in its best and worst case. <a href="#s2-numunique">numUnique</a></li>
   </ol>
-  <div class="prose">
-    <p>The section ends by pointing to the course's Heaps topic summary, a video review on Panopto, and office hours. Heaps are taught here under <a href="#l4-goals">Lecture 4</a> and <a href="#l5-goals">Lecture 5</a>.</p>
-  </div>
+  <p class="line">Then <a href="#s2-problems">Section 2 practice</a>: the section's worksheet, with a box to write each proof in.</p>
+  <p class="note">The section ends by pointing to the course's heaps review. Heaps are taught here in <a href="#l4-goals">Lecture 4</a> and <a href="#l5-goals">Lecture 5</a>.</p>
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ S2: SOMETIMES -->
+<!-- ================================================================ S2: WHAT A BOUND LEAVES OPEN -->
 <section class="page" id="s2-sometimes" data-title="What a bound leaves open">
-  <p class="where">Section 2 · worksheet question 0</p>
+  <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
   <h1>What a bound leaves open</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> \(f \in O(n)\) only says \(f\) grows at most like \(n\). It doesn't say how small \(f\) is. So a statement about \(f\) is "always true" only if it holds for <em>every</em> function that fits, "always false" if it holds for none, and "sometimes true" otherwise.</p>
-  </div>
+  <div class="prose"><p>All you know is \(f \in O(n)\): \(f\) grows at most like \(n\). It could also be much smaller, even a constant. So \(f\) is in one of the shaded <a href="#compare">buckets</a>.</p></div>
 
-  <h2>The method: test the extremes</h2>
-  <div class="prose">
-    <p>Picture the growth classes in a row, slowest first. \(f \in O(n)\) puts \(f\) somewhere from the bottom (a constant, like \(f = 1\)) up to \(n\) (like \(f = n\)). Running times are at least a constant, so that's the whole range.</p>
-    <ol>
-      <li>Try the biggest \(f\) allowed, \(f = n\), and the smallest, \(f = 1\).</li>
-      <li>If the statement holds for both (and so for everything between), it's <strong>always true</strong>.</li>
-      <li>If it fails for both, it's <strong>always false</strong>.</li>
-      <li>If one passes and one fails, it's <strong>sometimes true</strong>.</li>
-    </ol>
-  </div>
+  <ol class="band-ladder" aria-label="Buckets from slowest to fastest. f ∈ O(n) puts f in 1, log n or n; the ends 1 and n are circled.">
+    <li class="band end"><b>1</b><span>smallest \(f\)</span></li>
+    <li class="band"><b>log n</b><span>\(f\) can be here</span></li>
+    <li class="band end"><b>n</b><span>biggest \(f\)</span></li>
+    <li><b>n log n</b><span>too big</span></li>
+    <li><b>n²</b><span>too big</span></li>
+    <li><b>2ⁿ</b><span>too big</span></li>
+  </ol>
 
-  <div class="panel" id="band">
-    <p>Suppose \(f(n) \in O(n)\). Pick one of the worksheet's statements. The shaded classes are where \(f\) can be.</p>
-    <div class="controls" id="band-stmts" role="group" aria-label="Statement"></div>
-    <ol class="band-ladder" id="band-ladder" aria-label="Growth classes, slowest first; shaded where f can be"></ol>
-    <p class="out" id="band-out" role="status"></p>
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">\(f \in O(n)\). Is each claim always true, sometimes true, or always false? Test the two circled ends, \(f = 1\) and \(f = n\).</p>
+    <div class="table-wrap"><table class="vals verdict">
+      <thead><tr><th>\(f \in\)</th><th>\(f = 1\)</th><th>\(f = n\)</th><th>true?</th></tr></thead>
+      <tr><th>\(O(n^2)\)</th><td class="yes">✓</td><td class="yes">✓</td><td>always</td></tr>
+      <tr><th>\(O(\log n)\)</th><td class="yes">✓</td><td class="no">✗</td><td>sometimes</td></tr>
+      <tr><th>\(\Omega(n)\)</th><td class="no">✗</td><td class="yes">✓</td><td>sometimes</td></tr>
+      <tr><th>\(\Omega(n^2)\)</th><td class="no">✗</td><td class="no">✗</td><td>never</td></tr>
+    </table></div>
   </div>
-  <div class="prose">
-    <p>Two things to notice. \(O(4n)\) is the same set as \(O(n)\), so it's always true. And the only "always false" statement is a lower bound above the top of the range: \(f \in \Omega(n^2)\) would need \(f\) to grow like \(n^2\), but it grows at most like \(n\).</p>
-  </div>
+  <div class="rule"><p><strong>The rule.</strong> Test the smallest and the biggest \(f\) the bound allows. Both pass: always true. Both fail: always false. One of each: sometimes true.</p></div>
+  <p class="line"><strong>\(f \in \Omega(g)\)</strong> has no biggest \(f\): test \(f = g\) and something huge, like \(2^n\). <strong>\(f \in \Theta(g)\)</strong> pins \(f\) to one bucket: one test is enough.</p>
 
-  <div class="check" data-id="cse332-w2-s2-sometimes-omega-o2" data-grader="mc">
-    <p>Quick check: now suppose instead that \(f(n) \in \Omega(n)\). Is \(f(n) \in O(n^2)\)?</p>
+  <details class="more">
+    <summary>Why two tests are enough</summary>
+    <p>An \(O\) claim only gets harder as \(f\) grows, and an \(\Omega\) claim only gets easier. So whatever happens at the two ends also happens everywhere between them.</p>
+  </details>
+
+  <div class="check" data-id="cse332-w2-s2-sometimes-o4n" data-grader="mc">
+    <p>Quick check: \(f \in O(n)\). Is \(f \in O(4n)\)?</p>
     <div class="opts">
-      <label><input type="radio" name="cse332-w2-s2-sometimes-omega-o2"> Always true<span class="why" hidden>Ω(n) has no upper limit: f could be 2ⁿ, which isn't O(n²).</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-s2-sometimes-omega-o2"> Sometimes true<span class="why" hidden>Right. f = n is in O(n²); f = 2ⁿ is also Ω(n) but isn't.</span></label>
-      <label><input type="radio" name="cse332-w2-s2-sometimes-omega-o2"> Always false<span class="why" hidden>f = n satisfies both.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-s2-sometimes-o4n"> Always true<span class="why" hidden>Right. 4n is bucket n, so O(4n) is the same as O(n). Both ends pass.</span></label>
+      <label><input type="radio" name="cse332-w2-s2-sometimes-o4n"> Sometimes true<span class="why" hidden>Test the biggest f, f = n. Is n ≤ c·4n for some c? The 4 is only a constant.</span></label>
+      <label><input type="radio" name="cse332-w2-s2-sometimes-o4n"> Always false<span class="why" hidden>Try f = 1. It's in O(4n), so the claim isn't always false.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <div class="check" data-id="cse332-w2-s2-sometimes-theta-log" data-grader="mc">
-    <p>Quick check: suppose \(f(n) \in \Theta(n)\). Is \(f(n) \in \Omega(\log n)\)?</p>
+  <div class="check" data-id="cse332-w2-s2-sometimes-theta-logn" data-grader="mc">
+    <p>Quick check: now suppose \(f \in \Theta(n)\) instead. Is \(f \in O(\log n)\)?</p>
     <div class="opts">
-      <label data-correct><input type="radio" name="cse332-w2-s2-sometimes-theta-log"> Always true<span class="why" hidden>Right. Θ(n) pins f to the class of n, and n grows at least as fast as log n.</span></label>
-      <label><input type="radio" name="cse332-w2-s2-sometimes-theta-log"> Sometimes true<span class="why" hidden>Θ leaves no range: f grows exactly like n, up to constants.</span></label>
-      <label><input type="radio" name="cse332-w2-s2-sometimes-theta-log"> Always false<span class="why" hidden>n ≥ log n for every n ≥ 1, so c = 1 works.</span></label>
+      <label><input type="radio" name="cse332-w2-s2-sometimes-theta-logn"> Always true<span class="why" hidden>Θ(n) pins f to bucket n. Does n fit under a log n ceiling?</span></label>
+      <label><input type="radio" name="cse332-w2-s2-sometimes-theta-logn"> Sometimes true<span class="why" hidden>Θ leaves no range: f is in bucket n, so there's only one thing to test.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-s2-sometimes-theta-logn"> Always false<span class="why" hidden>Right. Θ(n) pins f to bucket n, and n outgrows every c·log n.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
@@ -1170,407 +1167,332 @@ extract</code></pre>
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ S2: PROOFS -->
-<section class="page" id="s2-proofs" data-title="Writing a Big-O proof">
-  <p class="where">Section 2 · worksheet question 1</p>
-  <h1>Writing a Big-O proof</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> A proof of \(f \in O(g)\) declares \(c\) and \(n_0\), takes an arbitrary \(n \ge n_0\), and shows \(f(n) \le c\cdot g(n)\). How you found \(c\) and \(n_0\) is your own scratchwork, and stays out of the proof.</p>
+<!-- ================================================================ S2: PROOF BY PARTS -->
+<section class="page" id="s2-parts" data-title="Proof by parts">
+  <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
+  <h1>Proof by parts</h1>
+  <div class="prose"><p>Lecture 3 proved \(2n + 10 \in O(n)\) by solving one inequality. With several terms there's an easier way: make each term bigger until it's a multiple of \(g\), then add them up.</p></div>
+
+  <div class="proof">
+    <p class="proof-head">The template</p>
+    <p>Let \(c =\) <span class="blank">?</span> and \(n_0 =\) <span class="blank">?</span>. Let \(n \ge n_0\) be arbitrary.</p>
+    <p><span class="blank wide">each term of \(f\) is \(\le\) a multiple of \(g\), and why</span></p>
+    <p>Adding these: \(f(n) \le c\cdot g(n)\). This holds for every \(n \ge n_0\).</p>
   </div>
 
-  <h2>The shape of a proof</h2>
-  <div class="split">
-    <div class="prose">
-      <p><strong>Show:</strong> \(10n + 100 \in O(n^2)\).</p>
-      <p><strong>Technique:</strong> find \(c &gt; 0\) and \(n_0 &gt; 0\) such that for all \(n \ge n_0\), \(10n + 100 \le c\cdot n^2\).</p>
-      <p>The section picks \(n_0 = 6\) where the lecture picked 10. Both work (the smallest that works with \(c = 10\) is 4). The proof never has to say how the numbers were found.</p>
-    </div>
-    <div class="proof">
-      <p class="proof-head">Proof</p>
-      <p>Let \(c = 10\) and \(n_0 = 6\). Show that for all \(n \ge 6\), \(10n + 100 \le 10n^2\).</p>
-      <p>\[\begin{aligned} &amp;\equiv n + 10 \le n^2\\ &amp;\equiv 10 \le n^2 - n\\ &amp;\equiv 10 \le n(n-1)\end{aligned}\]</p>
-      <p>This is true because \(n(n-1)\) is strictly increasing and \(6(6-1) &gt; 10\).</p>
-    </div>
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">Prove \(4n^2 + 3n + 5 \in O(n^2)\).</p>
+    <div class="steps board"><ol>
+      <li><span class="lab">term 1</span><span class="mth">\(4n^2 \le 4n^2\)</span><span class="note">already a multiple of \(n^2\)</span></li>
+      <li><span class="lab">term 2</span><span class="mth">\(3n \le 3n^2\)</span><span class="note">because \(n \le n^2\) when \(n \ge 1\)</span></li>
+      <li><span class="lab">term 3</span><span class="mth">\(5 \le 5n^2\)</span><span class="note">because \(1 \le n^2\) when \(n \ge 1\)</span></li>
+      <li><span class="lab">add</span><span class="mth">\(4n^2 + 3n + 5 \le 12n^2\)</span><span class="note">\(c = 4 + 3 + 5 = 12\); every step holds from \(n = 1\), so \(n_0 = 1\)</span></li>
+      <li class="wide"><div class="proof">
+        <p class="proof-head">Fill in the template</p>
+        <p>Let \(c =\) <span class="blank">\(12\)</span> and \(n_0 =\) <span class="blank">\(1\)</span>. Let \(n \ge 1\) be arbitrary.</p>
+        <p>Since \(n \ge 1\): \(4n^2 \le 4n^2\), \(3n \le 3n^2\) and \(5 \le 5n^2\).</p>
+        <p>Adding these: \(4n^2 + 3n + 5 \le 12n^2 = c\cdot n^2\). This holds for every \(n \ge 1\).</p>
+      </div></li>
+    </ol></div>
   </div>
+  <div class="rule"><p><strong>The rule.</strong> Bound each term by a multiple of \(g\). Add the multiples: that's \(c\). Each step holds from some \(n\) on, and the latest start is \(n_0\).</p></div>
+  <p class="line"><strong>Scratch work stays out.</strong> How you found \(c\) and \(n_0\) is scratch work. The proof only states them and shows they work.</p>
 
-  <h2>Method 1: by parts</h2>
-  <div class="prose">
-    <p>Split \(f\) into terms and bound <em>each term</em> by a multiple of \(g\). Then add.</p>
-    <p><strong>Why it works:</strong> if \(a(n) \le c_a\, g(n)\) for \(n \ge n_a\) and \(b(n) \le c_b\, g(n)\) for \(n \ge n_b\), then \(a(n) + b(n) \le (c_a + c_b)\, g(n)\) for every \(n\) past both, so use \(c = c_a + c_b\) and \(n_0 = \max(n_a, n_b)\).</p>
-  </div>
-  <div class="split">
-    <div class="prose">
-      <p><strong>Worksheet 1d:</strong> \(7n^2 + 3n \in O(n^4)\).</p>
-      <p>Scratchwork: for \(n \ge 1\), \(n^2 \le n^4\) and \(n \le n^4\). So \(7n^2 + 3n \le 7n^4 + 3n^4 = 10n^4\). That suggests \(c = 10\), \(n_0 = 1\).</p>
-    </div>
-    <div class="proof">
-      <p class="proof-head">Proof</p>
-      <p>Let \(c = 10\) and \(n_0 = 1\), and consider an arbitrary \(n \ge n_0\). We have \(7n^2 \le 7n^4\) and \(3n \le 3n^4\), since \(n \ge 1\). Adding these, \(7n^2 + 3n \le 10n^4\), as required.</p>
-    </div>
-  </div>
-  <div class="prose">
-    <p><strong>By parts is awkward for \(\Omega\).</strong> For \(\Omega\) each term would need to be <em>at least</em> a positive multiple of \(g\). A term like \(-8n\) or a constant like \(10\) can never be at least \(c\cdot n^2\), so the split fails. For \(\Omega\), drop the terms that only make \(f\) bigger instead.</p>
-  </div>
+  <details class="more">
+    <summary>Why adding works</summary>
+    <p>If \(a(n) \le c_a\, g(n)\) from \(n_a\) on and \(b(n) \le c_b\, g(n)\) from \(n_b\) on, then \(a(n) + b(n) \le (c_a + c_b)\, g(n)\) once \(n\) is past both. So \(c = c_a + c_b\) and \(n_0 = \max(n_a, n_b)\).</p>
+  </details>
 
-  <h2>Method 2: the squeeze</h2>
-  <div class="prose">
-    <p>Find a function \(f'\) that sits between them, \(f(n) \le f'(n) \le c\cdot g(n)\), and is easy to compare with both. It's a way to choose \(c\) and \(n_0\); it may not show up in the final proof.</p>
-  </div>
-  <div class="split">
-    <div class="prose">
-      <p><strong>Worksheet 1e:</strong> \(n + 2n\log_2 n \in O(n\log_2 n)\).</p>
-      <p>Scratchwork: \(n \le n\log n\) as long as \(\log n \ge 1\), which means \(n \ge 2\). Then \(n + 2n\log n \le n\log n + 2n\log n = 3n\log n\). That's \(f' = 3n\log n\), and \(c = 3\), \(n_0 = 2\) works.</p>
-    </div>
-    <div class="proof">
-      <p class="proof-head">Proof</p>
-      <p>Let \(c = 3\) and \(n_0 = 2\). For an arbitrary \(n \ge n_0\): \(n \le n\log n\) (since \(n \ge 2\), \(\log n \ge 1\)) and \(2n\log n \le 2n\log n\). Adding, \(n + 2n\log n \le c\cdot n\log n\), as required.</p>
-    </div>
-  </div>
-
-  <div class="rule warn">
-    <p><strong>Common mistakes</strong></p>
-    <ul>
-      <li>Putting the search for \(c\) and \(n_0\) in the proof. The proof declares them, plugs them in, and explains why the inequality holds.</li>
-      <li>Saying "for large \(n\)" instead of giving a number for \(n_0\).</li>
-      <li>Forgetting where a step needs \(n_0\): "\(n \le n\log n\)" is false at \(n = 1\), which is why 1e's \(n_0\) is 2.</li>
-    </ul>
-  </div>
-
-  <div class="check" data-id="cse332-w2-s2-proofs-what-goes-in" data-grader="mc">
-    <p>Quick check: you're proving the lecture's \(13n^2 - 50n \in \Omega(n^2)\). Which of these belongs in the final proof?</p>
-    <div class="opts">
-      <label><input type="radio" name="cse332-w2-s2-proofs-what-goes-in"> "I tried c = 13 first, but that gave −50 ≥ 0, so I lowered it."<span class="why" hidden>That's how you found c: scratchwork. Keep it on your scratch paper.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-s2-proofs-what-goes-in"> "Let c = 12 and n₀ = 50. For an arbitrary n ≥ 50, …" and the steps showing the inequality<span class="why" hidden>Right. Declare the values, then show they work for every n ≥ n₀.</span></label>
-      <label><input type="radio" name="cse332-w2-s2-proofs-what-goes-in"> A plot showing the curves cross<span class="why" hidden>A plot shows a few values of n; the proof has to cover all of them.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
+  <div class="check" data-id="cse332-w2-s2-parts-c" data-grader="exact" data-answer="7" data-miscon='{"5":"parts-forgot-term"}'>
+    <p>Quick check: prove \(5n^3 + 2n \in O(n^3)\) by parts, using \(n \ge 1\). What \(c\) do you get?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <div class="check" data-id="cse332-w2-s2-proofs-by-parts-c" data-grader="exact" data-answer="7">
-    <p>Quick check: prove \(5n^3 + 2n \in O(n^3)\) by parts, bounding each term by a multiple of \(n^3\) for \(n \ge 1\). What \(c\) do you get?</p>
+  <div class="check" data-id="cse332-w2-s2-parts-n0" data-grader="exact" data-answer="3" data-miscon='{"1":"parts-n0-max"}'>
+    <p>Quick check: proving \(3n^2 + 9 \in O(n^2)\) by parts, you use \(3n^2 \le 3n^2\) (true for \(n \ge 1\)) and \(9 \le n^2\) (true for \(n \ge 3\)). What \(n_0\) does the proof need?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ S2: THETA -->
-<section class="page" id="s2-theta" data-title="Writing a Θ proof">
-  <p class="where">Section 2 · worksheet question 2</p>
-  <h1>Writing a \(\Theta\) proof</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> \(f \in \Theta(g)\) means \(f \in O(g)\) and \(f \in \Omega(g)\). So a \(\Theta\) proof is two proofs, and each one gets its own \(c\) and \(n_0\).</p>
+<!-- ================================================================ S2: THE SQUEEZE -->
+<section class="page" id="s2-squeeze" data-title="The squeeze">
+  <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
+  <h1>The squeeze</h1>
+  <div class="prose"><p>Another way to find \(c\) and \(n_0\): pick a simple middle function \(f'\) that fits between the two, \(f \le f' \le c\cdot g\). It gets squeezed in the middle.</p></div>
+
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">Prove \(n^2 + 4 \in O(n^3)\).</p>
+    <div class="steps board"><ol>
+      <li><span class="lab">pick \(f'\)</span><span class="mth">\(f' = 2n^2\)</span><span class="note">a multiple of \(f\)'s top (fastest-growing) term, \(n^2\)</span></li>
+      <li><span class="lab">\(f \le f'\)</span><span class="mth">\(n^2 + 4 \le 2n^2\)</span><span class="note">same as \(4 \le n^2\): true from \(n = 2\)</span></li>
+      <li><span class="lab">\(f' \le c\cdot g\)</span><span class="mth">\(2n^2 \le 2n^3\)</span><span class="note">true from \(n = 1\), so \(c = 2\)</span></li>
+      <li class="wide"><div class="proof">
+        <p class="proof-head">The proof</p>
+        <p>Let \(c =\) <span class="blank">\(2\)</span> and \(n_0 =\) <span class="blank">\(2\)</span>. Let \(n \ge 2\) be arbitrary.</p>
+        <p>Since \(n \ge 2\), \(4 \le n^2\), so \(n^2 + 4 \le 2n^2\). Since \(n \ge 1\), \(n^2 \le n^3\), so \(2n^2 \le 2n^3\).</p>
+        <p>So \(n^2 + 4 \le 2n^3 = c\cdot n^3\). This holds for every \(n \ge 2\).</p>
+      </div></li>
+    </ol></div>
   </div>
 
-  <h2>Worked example: \(2n^2 + 5 \in \Theta(4n^2)\)</h2>
-  <div class="split">
-    <div class="proof">
-      <p class="proof-head">Part 1: \(O\)</p>
-      <p>Let \(c = 1\) and \(n_0 = 3\). We show that for all \(n \ge n_0\), \(2n^2 + 5 \le c\cdot 4n^2\).</p>
-      <p>Start with the left side. \(2n^2 + 5 \le 3n^2\), because \(n^2 &gt; 5\) whenever \(n \ge 3\). And \(3n^2 \le 4n^2\). So \(2n^2 + 5 \in O(4n^2)\).</p>
-    </div>
-    <div class="proof">
-      <p class="proof-head">Part 2: \(\Omega\)</p>
-      <p>Let \(c = \tfrac12\) and \(n_0 = 1\). We show \(2n^2 + 5 \ge c\cdot 4n^2\).</p>
-      <p>\(c\cdot 4n^2 = 2n^2\), and \(2n^2 + 5 \ge 2n^2\) for every positive \(n\). So \(2n^2 + 5 \in \Omega(4n^2)\).</p>
-      <p>Since both hold, \(2n^2 + 5 \in \Theta(4n^2)\).</p>
-    </div>
-  </div>
-  <div class="prose">
-    <ul>
-      <li><strong>Why different constants are fine:</strong> the two parts are two separate statements. Each has its own "there exist \(c\) and \(n_0\)".</li>
-      <li><strong>Why the \(O\) part needed \(n_0 = 3\):</strong> it trades the \(+5\) for an extra \(n^2\), and \(5 \le n^2\) only from \(n = 3\) on.</li>
-      <li><strong>Why the \(\Omega\) part was easy:</strong> dropping the \(+5\) can only make \(f\) smaller, and that's the safe direction for a lower bound.</li>
-    </ul>
-  </div>
+  <h2>See it</h2>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th>\(n\)</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead>
+    <tr><th>\(f = n^2 + 4\)</th><td class="no">5</td><td>8</td><td>13</td><td>20</td></tr>
+    <tr><th>\(f' = 2n^2\)</th><td>2</td><td>8</td><td>18</td><td>32</td></tr>
+    <tr><th>\(c\cdot g = 2n^3\)</th><td>2</td><td>16</td><td>54</td><td>128</td></tr>
+  </table></div>
+  <p class="line">From \(n = 2\) on, each row is at most the row below it. At \(n = 1\), \(f\) is on top, which is why \(n_0 = 2\).</p>
 
-  <div class="check" data-id="cse332-w2-s2-theta-same-c" data-grader="yesno" data-answer="no">
-    <p>Quick check: must the \(O\) part and the \(\Omega\) part of a \(\Theta\) proof use the same \(c\)?</p>
+  <div class="rule"><p><strong>The rule.</strong> Pick \(f'\) as a multiple of \(f\)'s top term. Showing \(f \le f'\) usually sets \(n_0\); showing \(f' \le c\cdot g\) sets \(c\). Take the later of the two starts.</p></div>
+  <p class="line"><strong>By parts or the squeeze?</strong> By parts compares each term with \(g\). The squeeze first turns \(f\) into one simple term, then compares that with \(g\). Use whichever is easier.</p>
+
+  <div class="check" data-id="cse332-w2-s2-squeeze-n0" data-grader="exact" data-answer="2" data-miscon='{"1":"log-one-zero"}'>
+    <p>Quick check: to squeeze \(n + 2n\log_2 n\) under \(3n\log_2 n\), you use \(n \le n\log_2 n\). From which \(n\) on is that true?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S2: THETA PROOFS -->
+<section class="page" id="s2-theta" data-title="Θ proofs">
+  <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
+  <h1>\(\Theta\) proofs</h1>
+  <div class="prose"><p>\(f \in \Theta(g)\) means \(f \in O(g)\) and \(f \in \Omega(g)\). So a \(\Theta\) proof is two proofs, each with its own \(c\) and \(n_0\).</p></div>
+
+  <div class="proof">
+    <p class="proof-head">The template</p>
+    <p><strong>\(O\) part.</strong> Let \(c =\) <span class="blank">?</span> and \(n_0 =\) <span class="blank">?</span>. Show \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\).</p>
+    <p><strong>\(\Omega\) part.</strong> Let \(c =\) <span class="blank">?</span> and \(n_0 =\) <span class="blank">?</span>. Show \(f(n) \ge c\cdot g(n)\) for every \(n \ge n_0\).</p>
+    <p>Both parts hold, so \(f \in \Theta(g)\).</p>
+  </div>
+
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">Prove \(2n^2 + 5 \in \Theta(4n^2)\).</p>
+    <div class="steps board"><ol>
+      <li><span class="lab">\(O\): trade the 5</span><span class="mth">\(5 \le n^2\)</span><span class="note">true from \(n = 3\), since \(3^2 = 9\)</span></li>
+      <li><span class="lab"></span><span class="mth">\(2n^2 + 5 \le 3n^2 \le 4n^2\)</span><span class="note">so \(c = 1\), \(n_0 = 3\)</span></li>
+      <li><span class="lab">\(\Omega\): drop the 5</span><span class="mth">\(2n^2 + 5 \ge 2n^2\)</span><span class="note">dropping it makes \(f\) smaller: safe for \(\ge\)</span></li>
+      <li><span class="lab"></span><span class="mth">\(2n^2 = \tfrac12\cdot 4n^2\)</span><span class="note">so \(c = \tfrac12\), \(n_0 = 1\)</span></li>
+      <li class="wide"><div class="proof">
+        <p class="proof-head">Fill in the template</p>
+        <p><strong>\(O\) part.</strong> Let \(c =\) <span class="blank">\(1\)</span> and \(n_0 =\) <span class="blank">\(3\)</span>. For \(n \ge 3\), \(5 \le n^2\), so \(2n^2 + 5 \le 3n^2 \le 1\cdot 4n^2\).</p>
+        <p><strong>\(\Omega\) part.</strong> Let \(c =\) <span class="blank">\(\tfrac12\)</span> and \(n_0 =\) <span class="blank">\(1\)</span>. For \(n \ge 1\), \(2n^2 + 5 \ge 2n^2 = \tfrac12\cdot 4n^2\).</p>
+        <p>Both parts hold, so \(2n^2 + 5 \in \Theta(4n^2)\).</p>
+      </div></li>
+    </ol></div>
+  </div>
+  <div class="rule"><p><strong>The rule.</strong> The \(O\) part makes \(f\) bigger: trade small terms for a multiple of the top term. The \(\Omega\) part makes \(f\) smaller: drop terms that only add. The two \(c\)'s can differ, and here they have to.</p></div>
+
   <div class="check" data-id="cse332-w2-s2-theta-c1-omega" data-grader="yesno" data-answer="no">
-    <p>Quick check: for the \(\Omega\) part, could \(c = 1\) work instead of \(\tfrac12\), with some \(n_0\)? That is, is \(2n^2 + 5 \ge 4n^2\) for every \(n\) past some point?</p>
+    <p>Quick check: for the \(\Omega\) part, could \(c = 1\) work instead of \(\tfrac12\), with some \(n_0\)? That is, is \(2n^2 + 5 \ge 4n^2\) for every \(n\) from some point on?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w2-s2-theta-drop-negative" data-grader="mc">
+    <p>Quick check: proving \(4n^2 - 8n \in \Omega(n^2)\), can you drop the \(-8n\) and use \(4n^2 \ge 4n^2\)?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w2-s2-theta-drop-negative"> Yes: dropping a term is always safe<span class="why" hidden>Dropping −8n makes f bigger: 4n² is more than 4n² − 8n. For ≥ that's the unsafe direction.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-s2-theta-drop-negative"> No: dropping \(-8n\) makes \(f\) bigger, and \(\Omega\) needs \(f\) to stay above<span class="why" hidden>Right. Trade it instead: for n ≥ 8, 8n ≤ n², so 4n² − 8n ≥ 3n². That's c = 3, n₀ = 8.</span></label>
+      <label><input type="radio" name="cse332-w2-s2-theta-drop-negative"> No: an \(\Omega\) proof can't have negative terms<span class="why" hidden>It can. You just can't drop a negative term. Trade it for a multiple of n² instead.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ S2: NUMUNIQUE -->
-<section class="page" id="s2-numunique" data-title="Running time of numUnique">
-  <p class="where">Section 2 · worksheet question 3</p>
-  <h1>Running time of <code>numUnique</code></h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> Write the running time as a sum over the loops, for the input that makes it largest (worst case) or smallest (best case). Then simplify the sum to a \(\Theta\) class.</p>
-  </div>
+<section class="page" id="s2-numunique" data-title="numUnique: best and worst case">
+  <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
+  <h1><code>numUnique</code>: best and worst case</h1>
+  <div class="prose"><p><code>numUnique</code> counts the different strings in an array of length \(n\). For each string it hasn't seen yet, it adds 1 and marks every later copy as seen (<code>visited</code>). The section counts loop iterations: the first loop (lines 3–5) plus the inner loop (lines 10–14). Press Play.</p></div>
 
-  <h2>What the method does</h2>
-  <div class="prose">
-    <p><code>numUnique</code> counts how many different strings an array of length \(n\) holds. For each index it hasn't marked yet, it counts one new string and marks every later copy of it as visited.</p>
-    <ul>
-      <li><strong>Lines 3–5</strong> set every entry of <code>visited</code> to false: always \(n\) iterations.</li>
-      <li><strong>Line 7</strong>'s loop always runs \(n\) times.</li>
-      <li><strong>Line 8</strong> skips an index that was already marked. This is where the input matters.</li>
-      <li><strong>Lines 10–14</strong> run from <code>j = i</code> to the end: \(n - i\) iterations, but only when <code>values[i]</code> is new.</li>
-    </ul>
-  </div>
-
-  <h2>Step through it</h2>
   <div class="panel" id="nu">
     <div class="controls" role="group" aria-label="Input array">
       <button class="chip" type="button" data-nu="distinct" aria-pressed="false">all different: a b c d e</button>
       <button class="chip" type="button" data-nu="same" aria-pressed="false">all the same: a a a a a</button>
-      <button class="chip" type="button" data-nu="mixed" aria-pressed="false">mixed: a b a c b</button>
     </div>
-    <div class="split stepper">
+    <div class="split stepper idea">
       <pre class="code" id="nu-code"></pre>
       <div class="pic">
         <div class="cells" id="nu-cells"></div>
-        <p class="step-vars" id="nu-vars"></p>
-        <p class="step-say" id="nu-say" role="status"></p>
-        <div class="controls"><button class="btn" type="button" id="nu-back">← Back</button><button class="btn primary" type="button" id="nu-next">Next step →</button></div>
+        <p class="nu-cap">One dot per inner-loop step: row \(i\), column \(j\).</p>
+        <div class="nu-dots" id="nu-dots" role="img" aria-label="Inner-loop iterations so far, as dots by i and j"></div>
+        <p class="nu-count" id="nu-count" role="status"></p>
+        <p class="step-say" id="nu-say"></p>
+        <div class="controls"><button class="btn primary" type="button" id="nu-next">Next step →</button><button class="btn" type="button" id="nu-play">Play</button><button class="btn" type="button" id="nu-back">← Back</button></div>
       </div>
     </div>
-    <p class="note">Green cells are marked visited. The count is the section's: iterations of the first loop plus iterations of the inner loop.</p>
   </div>
 
-  <h2>Worst case: every string is different</h2>
-  <div class="prose">
-    <p>No index ever gets marked early, so line 8 always lets the inner loop run, over the rest of the array each time: \(n + (n-1) + (n-2) + \dots + 1 = \frac{n(n+1)}{2}\) iterations. Add the first loop:</p>
-    <p>\[f(n) = n + \frac{n(n+1)}{2} \in \Theta(n^2).\]</p>
-    <p><strong>Why still quadratic, though the inner loop shrinks:</strong> for the first half of the values of \(i\), the inner loop runs at least \(n/2\) times. That alone is at least \(\frac n2\cdot\frac n2 = \frac{n^2}{4}\), and the whole thing is at most \(n^2 + n\).</p>
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">Count the iterations for the two arrays above, then for any \(n\).</p>
+    <div class="steps board"><ol>
+      <li><span class="lab">all different</span><span class="mth">\(5+4+3+2+1 = 15\)</span><span class="note">inner loop for \(i = 0\) to \(4\); plus the first loop's 5 makes 20</span></li>
+      <li><span class="lab">all the same</span><span class="mth">\(5+0+0+0+0 = 5\)</span><span class="note">only \(i = 0\) runs it; plus the first loop's 5 makes 10</span></li>
+      <li><span class="lab">worst</span><span class="mth">\(f(n) = n + \frac{n(n+1)}{2}\)</span><span class="note">all different: the inner loop runs \(n, n-1, \dots, 1\) times</span></li>
+      <li><span class="lab"></span><span class="mth">\(f(n) \in \Theta(n^2)\)</span><span class="note">the dots fill half of an \(n \times n\) square</span></li>
+      <li><span class="lab">best</span><span class="mth">\(g(n) = n + n = 2n \in \Theta(n)\)</span><span class="note">all the same: only \(i = 0\) runs the inner loop</span></li>
+    </ol></div>
   </div>
-  <h2>Best case: every string is the same</h2>
-  <div class="prose">
-    <p>The first outer iteration runs the inner loop over the whole array and marks everything. Every later \(i\) is already visited, so the inner loop never runs again:</p>
-    <p>\[g(n) = n + n = 2n \in \Theta(n).\]</p>
-  </div>
+  <div class="rule"><p><strong>The rule.</strong> Pick the input that makes the count biggest (worst case) or smallest (best case), write the count as a formula in \(n\), then find its bucket.</p></div>
 
-  <div class="check" data-id="cse332-w2-s2-numunique-abab" data-grader="exact" data-answer="7" data-miscon='{"10":"all-distinct-count"}'>
-    <p>Quick check: run <code>numUnique</code> on <code>["a", "b", "a", "b"]</code>. How many iterations does the inner loop (lines 10–14) make in total?</p>
+  <details class="more">
+    <summary>Why \(1 + 2 + \dots + n = \frac{n(n+1)}{2}\)</summary>
+    <p>Write the sum forwards and backwards, and add the two rows: every column is \(n + 1\), and there are \(n\) columns. Two copies make \(n(n+1)\), so one copy is \(\frac{n(n+1)}{2}\).</p>
+  </details>
+
+  <div class="check" data-id="cse332-w2-s2-numunique-abab" data-grader="exact" data-answer="7" data-miscon='{"10":"all-distinct-count","11":"counted-outer"}'>
+    <p>Quick check: run <code>numUnique</code> on <code>["a", "b", "a", "b"]</code>. How many inner-loop iterations (lines 10–14) does it make in total?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
+  <div class="check" data-id="cse332-w2-s2-numunique-skip" data-grader="yesno" data-answer="no">
+    <p>Quick check: run it on <code>["a", "a", "b", "b", "c"]</code>. Does the inner loop run when \(i = 1\)?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ S2 PRACTICE -->
+<section class="page" id="s2-problems" data-title="Section 2 practice">
+  <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
+  <h1>Section 2 practice</h1>
+  <div class="prose"><p>One group per lesson. Problems 2 to 5 are from the section's <a href="https://docs.google.com/document/d/1g0358q2oi3J5rrVmuhcALK6zyPdfaeRn/edit" target="_blank" rel="noopener">worksheet</a>.</p><p>For a proof, type into the blanks of the proof box, then press <strong>Show solution</strong> and mark how you did. Use <strong>Your work</strong> as scratch paper for finding \(c\) and \(n_0\). Plain-text math is fine, like <code>n^2 &lt;= n^4</code>.</p></div>
+  <div data-progress-bar></div>
+
+  <h2 class="practice-group">What a bound leaves open</h2>
+  <p class="note">Lesson: <a href="#s2-sometimes">What a bound leaves open</a></p>
+
+  <article class="task" data-id="cse332-w2-s2-q0-omega">
+    <h2>1. Suppose \(f \in \Omega(n\log n)\)</h2>
+    <p class="prompt">The section asked this for \(f \in O(n)\). Now flip it: all you know is that \(f\) grows at least like \(n\log n\), with no upper limit. Is each claim always true, sometimes true, or always false?</p>
+    <div class="answer-spec" data-part="o-n2" data-grader="choice" data-answer="sometimes" data-options="always:always true|sometimes:sometimes|never:always false" data-label="\(f \in O(n^2)\)"></div>
+    <div class="answer-spec" data-part="omega-n" data-grader="choice" data-answer="always" data-options="always:always true|sometimes:sometimes|never:always false" data-label="\(f \in \Omega(n)\)"></div>
+    <div class="answer-spec" data-part="o-n" data-grader="choice" data-answer="never" data-options="always:always true|sometimes:sometimes|never:always false" data-label="\(f \in O(n)\)"></div>
+    <div class="answer-spec" data-part="theta-nlogn" data-grader="choice" data-answer="sometimes" data-options="always:always true|sometimes:sometimes|never:always false" data-label="\(f \in \Theta(n\log n)\)"></div>
+    <ol class="hints">
+      <li>Test the two ends. The smallest \(f\) is \(n\log n\). There's no biggest, so try something huge, like \(2^n\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Test \(f = n\log n\) and \(f = 2^n\):
+        <div class="table-wrap"><table class="vals verdict">
+          <thead><tr><th>\(f \in\)</th><th>\(n\log n\)</th><th>\(2^n\)</th><th>true?</th></tr></thead>
+          <tr><th>\(O(n^2)\)</th><td class="yes">✓</td><td class="no">✗</td><td>sometimes</td></tr>
+          <tr><th>\(\Omega(n)\)</th><td class="yes">✓</td><td class="yes">✓</td><td>always</td></tr>
+          <tr><th>\(O(n)\)</th><td class="no">✗</td><td class="no">✗</td><td>never</td></tr>
+          <tr><th>\(\Theta(n\log n)\)</th><td class="yes">✓</td><td class="no">✗</td><td>sometimes</td></tr>
+        </table></div></li>
+      <li>\(O(n)\) fails even for the smallest \(f\): \(n\log n\) outgrows every \(c\cdot n\), and every other \(f\) is bigger still.</li>
+      <li class="answer">sometimes; always true; always false; sometimes.</li>
+    </ol></div></div>
+  </article>
+
+  <h2 class="practice-group">Proof by parts</h2>
+  <p class="note">Lesson: <a href="#s2-parts">Proof by parts</a></p>
+
+  <article class="task" data-id="cse332-w2-s2-parts-1d" data-work-placeholder="Scratch work: how you found c and n₀. It stays out of the proof.">
+    <h2>2. Prove \(7n^2 + 3n \in O(n^4)\)</h2>
+    <p class="prompt">Bound each term by a multiple of \(n^4\), then add. Write the whole proof.</p>
+    <div class="answer-spec" data-part="proof" data-grader="self" data-long data-template="Let c = __ and n₀ = __.&#10;Let n ≥ n₀ be arbitrary.&#10;Show: 7n² + 3n ≤ c·n⁴.&#10;&#10;…&#10;&#10;This holds for every n ≥ n₀." data-label="Your proof"></div>
+    <ol class="hints">
+      <li>For \(n \ge 1\), \(n^2 \le n^4\). So \(7n^2 \le 7n^4\).</li>
+      <li>Do the same for \(3n\), then add the two multiples.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Scratch: for \(n \ge 1\), \(7n^2 \le 7n^4\) and \(3n \le 3n^4\). Add: \(7 + 3 = 10\).</li>
+      <li>Let \(c = 10\) and \(n_0 = 1\). Let \(n \ge 1\) be arbitrary. Since \(n \ge 1\): \(7n^2 \le 7n^4\) and \(3n \le 3n^4\).</li>
+      <li>Adding these: \(7n^2 + 3n \le 10n^4 = c\cdot n^4\). This holds for every \(n \ge 1\).</li>
+      <li class="answer">That's the section's proof. Other pairs work too, like \(c = 1\), \(n_0 = 3\). Check yours: specific numbers, an arbitrary \(n \ge n_0\), and a reason for each step.</li>
+    </ol></div></div>
+  </article>
+
+  <h2 class="practice-group">The squeeze</h2>
+  <p class="note">Lesson: <a href="#s2-squeeze">The squeeze</a></p>
+
+  <article class="task" data-id="cse332-w2-s2-squeeze-1e" data-work-placeholder="Scratch work: how you found c and n₀. It stays out of the proof.">
+    <h2>3. Prove \(n + 2n\log n \in O(n\log n)\)</h2>
+    <p class="prompt">\(\log\) is base 2. Squeeze \(f\) under a multiple of \(n\log n\), then write the whole proof.</p>
+    <div class="answer-spec" data-part="proof" data-grader="self" data-long data-template="Let c = __ and n₀ = __.&#10;Let n ≥ n₀ be arbitrary.&#10;Show: n + 2n·log n ≤ c·n·log n.&#10;&#10;…&#10;&#10;This holds for every n ≥ n₀." data-label="Your proof"></div>
+    <ol class="hints">
+      <li>\(2n\log n\) is already 2 times \(n\log n\). Make the \(n\) term a multiple of \(n\log n\) too.</li>
+      <li>\(n \le n\log n\) exactly when \(\log n \ge 1\). From which \(n\) is that true?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Scratch: \(n \le n\log n\) once \(\log n \ge 1\), which is \(n \ge 2\). Then \(f \le n\log n + 2n\log n = 3n\log n\). That's \(f' = 3n\log n\).</li>
+      <li>Let \(c = 3\) and \(n_0 = 2\). Let \(n \ge 2\) be arbitrary. Since \(n \ge 2\), \(\log n \ge 1\), so \(n \le n\log n\).</li>
+      <li>Adding \(2n\log n\) to both sides: \(n + 2n\log n \le 3n\log n = c\cdot n\log n\). This holds for every \(n \ge 2\).</li>
+      <li class="answer">That's the section's proof. \(n_0 = 1\) would fail: at \(n = 1\), \(\log n = 0\), so the left side is 1 and the right side is 0.</li>
+    </ol></div></div>
+  </article>
+
+  <h2 class="practice-group">\(\Theta\) proofs</h2>
+  <p class="note">Lesson: <a href="#s2-theta">Θ proofs</a></p>
+
+  <article class="task" data-id="cse332-w2-s2-write-theta-2b" data-work-placeholder="Scratch work: how you found each c and n₀. It stays out of the proof.">
+    <h2>4. Prove \(n^3 + 10n \in \Theta(3n^3)\)</h2>
+    <p class="prompt">Two parts, each with its own \(c\) and \(n_0\). Write both.</p>
+    <div class="answer-spec" data-part="proof" data-grader="self" data-long data-template="O part. Let c = __ and n₀ = __.&#10;Let n ≥ n₀ be arbitrary.&#10;Show: n³ + 10n ≤ c·3n³.&#10;…&#10;&#10;Ω part. Let c = __ and n₀ = __.&#10;Let n ≥ n₀ be arbitrary.&#10;Show: n³ + 10n ≥ c·3n³.&#10;…&#10;&#10;Both hold, so n³ + 10n ∈ Θ(3n³)." data-label="Your proof"></div>
+    <ol class="hints">
+      <li>\(O\) part: for which \(n\) is \(10 \le n^2\)? Then multiply both sides by \(n\).</li>
+      <li>\(\Omega\) part: drop the \(10n\), which only makes \(f\) smaller. What \(c\) turns \(3n^3\) into \(n^3\)?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>\(O\) part. Let \(c = 1\) and \(n_0 = 4\). Let \(n \ge 4\) be arbitrary. Then \(10 \le n^2\). Multiply by \(n\): \(10n \le n^3\).</li>
+      <li>Add \(n^3\): \(n^3 + 10n \le 2n^3 \le 1\cdot 3n^3\).</li>
+      <li>\(\Omega\) part. Let \(c = \tfrac13\) and \(n_0 = 1\). For any \(n \ge 1\): \(n^3 + 10n \ge n^3 = \tfrac13\cdot 3n^3\).</li>
+      <li class="answer">Both parts hold, so \(n^3 + 10n \in \Theta(3n^3)\). Other pairs work too. Check yours: each part names its own \(c\) and \(n_0\) and argues for every \(n \ge n_0\).</li>
+    </ol></div></div>
+  </article>
+
+  <div class="check" data-id="cse332-w2-s2-theta-2a-c" data-grader="exact" data-answer="70" data-miscon='{"7":"times-g","1/10":"times-g"}'>
+    <p>Quick check: from the worksheet, \(7n \in \Theta(\frac{n}{10})\). Here one \(c\) works for both the \(O\) part and the \(\Omega\) part, with \(n_0 = 1\). What is it?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group"><code>numUnique</code></h2>
+  <p class="note">Lesson: <a href="#s2-numunique">numUnique: best and worst case</a></p>
+
+  <article class="task" data-id="cse332-w2-s2-numunique-model">
+    <h2>5. numUnique's worst and best case</h2>
+    <p class="prompt">The section's last worksheet question. <code>numUnique</code> counts the different strings in <code>values</code>, an array of length \(n\). Count the iterations of the <strong>first loop</strong> (lines 3–5) plus the <strong>inner loop</strong> (lines 10–14).</p>
+    <pre class="code"><div class="ln"><span class="no">1</span><span class="src">int numUnique(String[] values) {</span></div><div class="ln"><span class="no">2</span><span class="src">    boolean[] visited = new boolean[values.length];</span></div><div class="ln hl"><span class="no">3</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln hl"><span class="no">4</span><span class="src">        visited[i] = false;</span></div><div class="ln hl"><span class="no">5</span><span class="src">    }</span></div><div class="ln"><span class="no">6</span><span class="src">    int out = 0;</span></div><div class="ln"><span class="no">7</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">8</span><span class="src">        if (!visited[i]) {</span></div><div class="ln"><span class="no">9</span><span class="src">            out += 1;</span></div><div class="ln hl"><span class="no">10</span><span class="src">            for (int j = i; j &lt; values.length; j++) {</span></div><div class="ln hl"><span class="no">11</span><span class="src">                if (values[i].equals(values[j])) {</span></div><div class="ln hl"><span class="no">12</span><span class="src">                    visited[j] = true;</span></div><div class="ln hl"><span class="no">13</span><span class="src">                }</span></div><div class="ln hl"><span class="no">14</span><span class="src">            }</span></div><div class="ln"><span class="no">15</span><span class="src">        }</span></div><div class="ln"><span class="no">16</span><span class="src">    }</span></div><div class="ln"><span class="no">17</span><span class="src">    return out;</span></div><div class="ln"><span class="no">18</span><span class="src">}</span></div></pre>
+    <div class="answer-spec" data-part="worst" data-grader="formula" data-answer="n + n(n+1)/2" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"n(n+1)/2":"forgot-first-loop","n + n^2":"sum-off"}' data-label="worst case (all different): the count \(f(n)\)"></div>
+    <div class="answer-spec" data-part="worst-theta" data-grader="bigo" data-answer="n^2" data-label="\(f(n)\) is \(\Theta\) of"></div>
+    <div class="answer-spec" data-part="best" data-grader="formula" data-answer="2n" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"n":"forgot-first-loop"}' data-label="best case (all the same): the count \(g(n)\)"></div>
+    <div class="answer-spec" data-part="best-theta" data-grader="bigo" data-answer="n" data-label="\(g(n)\) is \(\Theta\) of"></div>
+    <ol class="hints">
+      <li>Worst case: no \(i\) is skipped, and the inner loop runs from \(j = i\) to the end: \(n - i\) times.</li>
+      <li>\(1 + 2 + \dots + n = \frac{n(n+1)}{2}\). Best case: only \(i = 0\) runs the inner loop.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Worst case: the inner loop runs \(n + (n-1) + \dots + 1 = \frac{n(n+1)}{2}\) times. Add the first loop's \(n\): \(f(n) = n + \frac{n(n+1)}{2}\).</li>
+      <li>Its top term is \(\frac{n^2}{2}\), so \(f(n) \in \Theta(n^2)\).</li>
+      <li>Best case: \(i = 0\) runs the inner loop \(n\) times and marks everything. Every later \(i\) is skipped. \(g(n) = n + n = 2n \in \Theta(n)\).</li>
+      <li class="answer">\(f(n) = n + \frac{n(n+1)}{2} \in \Theta(n^2)\); \(g(n) = 2n \in \Theta(n)\).</li>
+    </ol></div></div>
+  </article>
+
   <div class="check" data-id="cse332-w2-s2-numunique-two-values" data-grader="mc">
-    <p>Quick check: if <code>values</code> holds exactly two different strings, in any arrangement, what is <code>numUnique</code>'s running time?</p>
+    <p>Quick check: <code>values</code> holds exactly two different strings, in any order. What is <code>numUnique</code>'s running time?</p>
     <div class="opts">
-      <label><input type="radio" name="cse332-w2-s2-numunique-two-values"> \(\Theta(n^2)\), because there's a nested loop<span class="why" hidden>A nested loop isn't automatically quadratic: count how often the inner one actually runs.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-s2-numunique-two-values"> \(\Theta(n)\): the inner loop runs for only two values of \(i\), at most \(n\) times each<span class="why" hidden>Right. Two new strings means two inner runs, at most 2n iterations, plus the n of the first loop.</span></label>
+      <label><input type="radio" name="cse332-w2-s2-numunique-two-values"> \(\Theta(n^2)\), because the loops are nested<span class="why" hidden>Nested loops aren't automatically n². Count how often the inner one runs.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-s2-numunique-two-values"> \(\Theta(n)\): the inner loop runs for just two values of \(i\)<span class="why" hidden>Right. Two new strings, so two inner runs of at most n each, plus the first loop's n.</span></label>
       <label><input type="radio" name="cse332-w2-s2-numunique-two-values"> \(\Theta(\log n)\)<span class="why" hidden>The first loop alone is n iterations.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ S2 PROBLEMS -->
-<section class="page" id="s2-problems" data-title="Section 2 problems">
-  <p class="where">Section 2 · <span class="today-chip" data-date="2026-10-08">Thu Oct 8</span></p>
-  <h1>Section 2 problems</h1>
-  <div class="prose"><p>From the section's <a href="https://docs.google.com/document/d/1g0358q2oi3J5rrVmuhcALK6zyPdfaeRn/edit" target="_blank" rel="noopener">worksheet</a> (the handout of practice questions used in section), checked against its <a href="https://docs.google.com/document/d/1HKruUEoMpMcAT95d2jFrr35pVZGVfCWB/edit" target="_blank" rel="noopener">official solutions</a>, plus a few variations. Write your reasoning in the work box. For a \(c\)/\(n_0\) pair, any pair that works is accepted.</p></div>
-
-  <article class="task" data-id="cse332-w2-s2-q0-omega">
-    <h2>1. Suppose \(f(n) \in \Omega(n\log n)\)</h2>
-    <p class="prompt">This practices reading a bound for what it leaves open. The section did it for \(f \in O(n)\); here the bound is a lower bound. All you know is \(f(n) \in \Omega(n\log n)\): from some point on, \(f\) is at least a constant times \(n\log n\), with no upper limit. A statement is <strong>always true</strong> if it holds for every such \(f\), <strong>always false</strong> if it holds for none, and <strong>sometimes true</strong> otherwise.</p>
-    <div class="answer-spec" data-part="o-n2" data-grader="choice" data-answer="sometimes" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="Is \(f \in O(n^2)\)?"></div>
-    <div class="answer-spec" data-part="omega-n" data-grader="choice" data-answer="always" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="Is \(f \in \Omega(n)\)?"></div>
-    <div class="answer-spec" data-part="o-n" data-grader="choice" data-answer="never" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="Is \(f \in O(n)\)?"></div>
-    <div class="answer-spec" data-part="theta-nlogn" data-grader="choice" data-answer="sometimes" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="Is \(f \in \Theta(n\log n)\)?"></div>
-    <div class="answer-spec" data-part="omega-n2" data-grader="choice" data-answer="sometimes" data-options="always:always true|sometimes:sometimes true|never:always false" data-label="Is \(f \in \Omega(n^2)\)?"></div>
-    <ol class="hints">
-      <li>\(\Omega(n\log n)\) puts \(f\) anywhere from \(n\log n\) upward, with no upper limit. Test the extremes: \(f = n\log n\) and something huge, like \(f = 2^n\).</li>
-      <li>A statement that holds for both test functions is always true; one that fails for both is always false.</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>\(O(n^2)\): \(f = n\log n\) passes, \(f = 2^n\) fails. Sometimes.</li>
-      <li>\(\Omega(n)\): \(f\) grows at least like \(n\log n\), which grows at least like \(n\). Always.</li>
-      <li>\(O(n)\): \(f \ge c\,n\log n\) eventually, and \(n\log n / n = \log n\) is unbounded, so \(f\) can't stay below \(c'n\). Always false.</li>
-      <li>\(\Theta(n\log n)\): true for \(f = n\log n\), false for \(f = 2^n\). Sometimes. \(\Omega(n^2)\): false for \(f = n\log n\), true for \(f = 2^n\). Sometimes.</li>
-      <li class="answer">sometimes; always; always false; sometimes; sometimes.</li>
-    </ol></div></div>
-  </article>
-
-  <article class="task" data-id="cse332-w2-s2-worksheet-pairs">
-    <h2>2. Your own \(c\) and \(n_0\) for four claims</h2>
-    <p class="prompt">This practices the first step of every proof in the section: choosing the constants. \(f(n) \in O(g(n))\) when there are constants \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). \(\Omega\) is the same with \(\ge\). Give a \(c\) and \(n_0\) that prove each claim below; these are four of the worksheet's claims. Any pair that works is accepted; the checker tests the inequality exactly for every \(n \ge n_0\).</p>
-    <div class="answer-spec" data-part="q1a-c" data-grader="bound" data-role="c" data-pair="q1a" data-bound='{"f":["0","7"],"g":["0","1/10"],"rel":"O"}' data-label="\(7n \in O(\frac{n}{10})\): your \(c\)"></div>
-    <div class="answer-spec" data-part="q1a-n0" data-grader="bound" data-role="n0" data-pair="q1a" data-label="\(7n \in O(\frac{n}{10})\): your \(n_0\)"></div>
-    <div class="answer-spec" data-part="q1b-c" data-grader="bound" data-role="c" data-pair="q1b" data-bound='{"f":["1000"],"g":["0","0","3"],"rel":"O"}' data-label="\(1000 \in O(3n^2)\): your \(c\)"></div>
-    <div class="answer-spec" data-part="q1b-n0" data-grader="bound" data-role="n0" data-pair="q1b" data-label="\(1000 \in O(3n^2)\): your \(n_0\)"></div>
-    <div class="answer-spec" data-part="q2b-o-c" data-grader="bound" data-role="c" data-pair="q2bo" data-bound='{"f":["0","10","0","1"],"g":["0","0","0","3"],"rel":"O"}' data-label="\(n^3+10n \in O(3n^3)\): your \(c\)"></div>
-    <div class="answer-spec" data-part="q2b-o-n0" data-grader="bound" data-role="n0" data-pair="q2bo" data-label="\(n^3+10n \in O(3n^3)\): your \(n_0\)"></div>
-    <div class="answer-spec" data-part="q2b-omega-c" data-grader="bound" data-role="c" data-pair="q2bw" data-bound='{"f":["0","10","0","1"],"g":["0","0","0","3"],"rel":"Omega"}' data-label="\(n^3+10n \in \Omega(3n^3)\): your \(c\)"></div>
-    <div class="answer-spec" data-part="q2b-omega-n0" data-grader="bound" data-role="n0" data-pair="q2bw" data-label="\(n^3+10n \in \Omega(3n^3)\): your \(n_0\)"></div>
-    <ol class="hints">
-      <li>Pick \(c\) first so the algebra is easy, then solve the inequality for \(n\). For \(7n \in O(\frac{n}{10})\), what \(c\) makes \(c\cdot\frac{n}{10}\) equal \(7n\)?</li>
-      <li>For \(n^3+10n \in O(3n^3)\), when is \(10n \le n^3\)? For the \(\Omega\) claim, \(n^3 + 10n\) is never below \(n^3\).</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>\(7n \in O(\frac{n}{10})\): \(c = 70\), \(n_0 = 1\). Then \(c\cdot\frac{n}{10} = 7n\), so \(7n \le 7n\) for every \(n\).</li>
-      <li>\(1000 \in O(3n^2)\): \(c = 1\), \(n_0 = 20\). At \(n = 20\), \(3n^2 = 1200 \ge 1000\), and \(3n^2\) only grows. (The smallest \(n_0\) for \(c = 1\) is 19.)</li>
-      <li>\(n^3+10n \in O(3n^3)\): \(c = 1\), \(n_0 = 4\). For \(n \ge 4\), \(10 \le n^2\), so \(10n \le n^3\) and \(n^3 + 10n \le 2n^3 \le 3n^3\).</li>
-      <li>\(n^3+10n \in \Omega(3n^3)\): \(c = \tfrac13\), \(n_0 = 1\). \(n^3 + 10n \ge n^3 = \tfrac13\cdot 3n^3\) for every \(n \ge 1\).</li>
-      <li class="answer">Any valid pairs, e.g. (70, 1); (1, 20); (1, 4); (\(\tfrac13\), 1). These are the official choices, except that the written solution for the \(n^3+10n \in O(3n^3)\) part uses \(n_0 = 3\), which also works.</li>
-    </ol></div></div>
-  </article>
-
-  <article class="task" data-id="cse332-w2-s2-q1c">
-    <h2>3. Is \(2^n \in O(3^{2n})\)?</h2>
-    <p class="prompt">This practices a Big-O claim between two exponentials, where the base matters. \(f(n) \in O(g(n))\) when there are constants \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). \(\Omega\) is the same with \(\ge\). Rewrite \(3^{2n}\) as a single power \(k^n\), then decide whether \(c = 1\), \(n_0 = 1\) proves \(2^n \in O(3^{2n})\).</p>
-    <div class="answer-spec" data-part="k" data-grader="exact" data-answer="9" data-miscon='{"6":"power-of-power"}' data-label="the \(k\) with \(3^{2n} = k^n\)"></div>
-    <div class="answer-spec" data-part="c1-works" data-grader="yesno" data-answer="yes" data-label="Does \(c = 1\), \(n_0 = 1\) prove \(2^n \in O(3^{2n})\)?"></div>
-    <div class="answer-spec" data-part="proof" data-grader="self" data-label="your one-line reason why \(2^n \le 3^{2n}\) for all \(n \ge 1\)"></div>
-    <ol class="hints">
-      <li>\(3^{2n} = (3^2)^n\).</li>
-      <li>Compare \(2^n\) and \(9^n\) for \(n \ge 1\).</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>\(3^{2n} = (3^2)^n = 9^n\).</li>
-      <li>Since \(2 &lt; 9\), \(2^n \le 9^n\) for every \(n \ge 1\). So \(c = 1\) works from \(n_0 = 1\). (The section's solution uses \(n_0 = 2\), which also works.)</li>
-      <li class="answer">\(k = 9\); yes. Proof: let \(c = 1\), \(n_0 = 1\); for any \(n \ge 1\), \(2^n \le 9^n = 3^{2n} = c\cdot 3^{2n}\).</li>
-    </ol></div></div>
-  </article>
-
-  <article class="task" data-id="cse332-w2-s2-smallest-n0">
-    <h2>4. The smallest \(n_0\)</h2>
-    <p class="prompt">This practices finding \(n_0\) by solving the inequality. A proof only needs some \(n_0\) that works, but the smallest one shows exactly where the inequality starts to hold. Each inequality below is one of the section's Big-O proofs, with the \(c\) the section chose already filled in. Give the smallest \(n_0\) such that the inequality holds for every \(n \ge n_0\): the first \(n\) where it holds <em>and keeps holding</em>.</p>
-    <div class="answer-spec" data-part="q1b" data-grader="exact" data-answer="19" data-miscon='{"20":"not-smallest"}' data-label="smallest \(n_0\) for \(1000 \le 1\cdot 3n^2\)"></div>
-    <div class="answer-spec" data-part="q1d" data-grader="exact" data-answer="1" data-label="smallest \(n_0\) for \(7n^2+3n \le 10\,n^4\)"></div>
-    <div class="answer-spec" data-part="q2b" data-grader="exact" data-answer="3" data-label="smallest \(n_0\) for \(n^3+10n \le 1\cdot 3n^3\)"></div>
-    <div class="answer-spec" data-part="q1e" data-grader="exact" data-answer="2" data-label="smallest \(n_0\) for \(n+2n\log_2 n \le 3\,n\log_2 n\)"></div>
-    <ol class="hints">
-      <li>Write the inequality and solve it for \(n\). Then check the value just below your answer: it must fail.</li>
-      <li>For the first: \(1000 \le 3n^2\) means \(n^2 \ge 333.3\). \(18^2 = 324\) and \(19^2 = 361\).</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>\(1000 \le 3n^2\): \(3\cdot 18^2 = 972 &lt; 1000\) fails; \(3\cdot 19^2 = 1083 \ge 1000\) holds. So \(n_0 = 19\). The section takes 20, which also works but isn't the smallest.</li>
-      <li>\(7n^2+3n \le 10n^4\) already holds at \(n=1\) (10 ≤ 10). So \(n_0 = 1\).</li>
-      <li>\(n^3+10n \le 3n^3 \iff 10 \le 2n^2 \iff n \ge 3\) (\(n=2\): 28 &gt; 24 fails; \(n=3\): 57 ≤ 81 holds).</li>
-      <li>\(n + 2n\log n \le 3n\log n \iff 1 \le \log n \iff n \ge 2\).</li>
-      <li class="answer">19; 1; 3; 2. The section uses safe values (20, 1, 4, 2) rather than the smallest, and a proof only needs one that works.</li>
-    </ol></div></div>
-  </article>
-
-  <article class="task" data-id="cse332-w2-s2-write-theta-2b">
-    <h2>5. Prove \(n^3 + 10n \in \Theta(3n^3)\)</h2>
-    <p class="prompt">This practices writing a full \(\Theta\) proof the way the section does. \(\Theta\) means both \(O\) and \(\Omega\), so the proof has two parts. Each part starts "Let \(c = \dots\) and \(n_0 = \dots\)", takes an arbitrary \(n \ge n_0\), and shows the inequality for it: \(n^3 + 10n \le c\cdot 3n^3\) for \(O\), and \(n^3 + 10n \ge c\cdot 3n^3\) for \(\Omega\). The two parts may use different constants.</p>
-    <div class="answer-spec" data-part="proof" data-grader="self" data-long data-label="your two parts"></div>
-    <ol class="hints">
-      <li>For \(O\): when is \(10 \le n^2\)? Multiply both sides by \(n\).</li>
-      <li>For \(\Omega\): \(n^3 + 10n\) is never below \(n^3\). What \(c\) turns \(3n^3\) into \(n^3\)?</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>\(O\): let \(c = 1\) and \(n_0 = 4\), and let \(n \ge 4\) be arbitrary. Then \(10 \le n^2\). Multiply by \(n\): \(10n \le n^3\). Add \(n^3\): \(n^3 + 10n \le 2n^3 \le 1\cdot 3n^3\).</li>
-      <li>\(\Omega\): let \(c = \tfrac13\) and \(n_0 = 1\). For any \(n \ge 1\), \(n^3 + 10n \ge n^3 = \tfrac13\cdot 3n^3\).</li>
-      <li class="answer">Both bounds hold, so \(n^3 + 10n \in \Theta(3n^3)\). Check yours: does each part name specific values and argue for an arbitrary \(n \ge n_0\)?</li>
-    </ol></div></div>
-  </article>
-
-  <article class="task" data-id="cse332-w2-s2-numunique-trace">
-    <h2>6. Count the loops in numUnique</h2>
-    <p class="prompt">This practices the section's method for a running time: run the code on the inputs that make it slowest and fastest, and count loop iterations. <code>numUnique</code> counts how many different strings the array <code>values</code> holds. For each index it hasn't marked yet, it counts one new string and marks every later copy of it as visited. The highlighted lines are the two loops the section counts: the <strong>first loop</strong> (lines 3–5) and the <strong>inner loop</strong> (lines 10–14).</p>
-    <pre class="code"><div class="ln"><span class="no">1</span><span class="src">int numUnique(String[] values) {</span></div><div class="ln"><span class="no">2</span><span class="src">    boolean[] visited = new boolean[values.length];</span></div><div class="ln hl"><span class="no">3</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln hl"><span class="no">4</span><span class="src">        visited[i] = false;</span></div><div class="ln hl"><span class="no">5</span><span class="src">    }</span></div><div class="ln"><span class="no">6</span><span class="src">    int out = 0;</span></div><div class="ln"><span class="no">7</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">8</span><span class="src">        if (!visited[i]) {</span></div><div class="ln"><span class="no">9</span><span class="src">            out += 1;</span></div><div class="ln hl"><span class="no">10</span><span class="src">            for (int j = i; j &lt; values.length; j++) {</span></div><div class="ln hl"><span class="no">11</span><span class="src">                if (values[i].equals(values[j])) {</span></div><div class="ln hl"><span class="no">12</span><span class="src">                    visited[j] = true;</span></div><div class="ln hl"><span class="no">13</span><span class="src">                }</span></div><div class="ln hl"><span class="no">14</span><span class="src">            }</span></div><div class="ln"><span class="no">15</span><span class="src">        }</span></div><div class="ln"><span class="no">16</span><span class="src">    }</span></div><div class="ln"><span class="no">17</span><span class="src">    return out;</span></div><div class="ln"><span class="no">18</span><span class="src">}</span></div></pre>
-    <p class="prompt">Run <code>numUnique</code> on <code>["a","b","c","d","e","f"]</code> (all different) and on <code>["a","a","a","a","a","a"]</code> (all the same). For each, give what it returns and how many times the inner loop's body runs (lines 10–14 only).</p>
-    <div class="answer-spec" data-part="distinct-out" data-grader="exact" data-answer="6" data-label="what it returns on the six different values"></div>
-    <div class="answer-spec" data-part="distinct-inner" data-grader="exact" data-answer="21" data-miscon='{"36":"sum-off"}' data-label="inner-loop iterations on the six different values"></div>
-    <div class="answer-spec" data-part="same-out" data-grader="exact" data-answer="1" data-label="what it returns on the six equal values"></div>
-    <div class="answer-spec" data-part="same-inner" data-grader="exact" data-answer="6" data-label="inner-loop iterations on the six equal values"></div>
-    <ol class="hints">
-      <li>With all values different, the inner loop starts at index <code>i</code> and runs to the end for every <code>i</code>: how many iterations is that?</li>
-      <li>With all equal values, the first outer iteration visits everything. What do the later iterations do?</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>Six different values: the inner loop runs 6 + 5 + 4 + 3 + 2 + 1 = 21 times, and the method returns 6. For \(n\) values that's \(\frac{n(n+1)}{2}\).</li>
-      <li>Six equal values: the first outer iteration runs the inner loop 6 times and marks every index visited. Every later outer iteration finds <code>visited[i]</code> true and skips it. It returns 1.</li>
-      <li class="answer">6 and 21; 1 and 6.</li>
-    </ol></div></div>
-  </article>
-
-  <article class="task" data-id="cse332-w2-s2-numunique-model">
-    <h2>7. numUnique as a formula</h2>
-    <p class="prompt">This practices turning a method into a running-time function, the way the section does for its worst and best case. <code>numUnique</code> counts how many different strings the array <code>values</code> holds. For each index it hasn't marked yet, it counts one new string and marks every later copy of it as visited. The highlighted lines are the two loops the section counts: the <strong>first loop</strong> (lines 3–5) and the <strong>inner loop</strong> (lines 10–14).</p>
-    <pre class="code"><div class="ln"><span class="no">1</span><span class="src">int numUnique(String[] values) {</span></div><div class="ln"><span class="no">2</span><span class="src">    boolean[] visited = new boolean[values.length];</span></div><div class="ln hl"><span class="no">3</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln hl"><span class="no">4</span><span class="src">        visited[i] = false;</span></div><div class="ln hl"><span class="no">5</span><span class="src">    }</span></div><div class="ln"><span class="no">6</span><span class="src">    int out = 0;</span></div><div class="ln"><span class="no">7</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">8</span><span class="src">        if (!visited[i]) {</span></div><div class="ln"><span class="no">9</span><span class="src">            out += 1;</span></div><div class="ln hl"><span class="no">10</span><span class="src">            for (int j = i; j &lt; values.length; j++) {</span></div><div class="ln hl"><span class="no">11</span><span class="src">                if (values[i].equals(values[j])) {</span></div><div class="ln hl"><span class="no">12</span><span class="src">                    visited[j] = true;</span></div><div class="ln hl"><span class="no">13</span><span class="src">                }</span></div><div class="ln hl"><span class="no">14</span><span class="src">            }</span></div><div class="ln"><span class="no">15</span><span class="src">        }</span></div><div class="ln"><span class="no">16</span><span class="src">    }</span></div><div class="ln"><span class="no">17</span><span class="src">    return out;</span></div><div class="ln"><span class="no">18</span><span class="src">}</span></div></pre>
-    <p class="prompt">Let \(n\) be the length of <code>values</code>. Count iterations of the first loop plus iterations of the inner loop, and give each total as a formula in \(n\).</p>
-    <div class="answer-spec" data-part="worst" data-grader="formula" data-answer="n + n(n+1)/2" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"n(n+1)/2":"forgot-first-loop","n + n^2":"sum-off"}' data-label="\(f(n)\), the count when every string is different (worst case)"></div>
-    <div class="answer-spec" data-part="best" data-grader="formula" data-answer="2n" data-points='{"n":["1","2","3","5","10","100"]}' data-miscon='{"n":"forgot-first-loop"}' data-label="\(g(n)\), the count when every string is the same (best case)"></div>
-    <ol class="hints">
-      <li>The first loop is \(n\) every time. The inner loop runs \(n - i\) times for each \(i\) that isn't visited yet.</li>
-      <li>\(1 + 2 + \dots + n = \frac{n(n+1)}{2}\).</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>Worst case (all different): every \(i\) runs the inner loop, \(n + (n-1) + \dots + 1 = \frac{n(n+1)}{2}\) times. Add the first loop's \(n\).</li>
-      <li>Best case (all the same): only \(i = 0\) runs the inner loop, \(n\) times. Add the first loop's \(n\).</li>
-      <li class="answer">\(f(n) = n + \frac{n(n+1)}{2} \in \Theta(n^2)\); \(g(n) = 2n \in \Theta(n)\).</li>
-    </ol></div></div>
-  </article>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ CYU S2 -->
-<section class="page" id="cyu-s2" data-title="Check your understanding (Section 2)">
-  <p class="where">Section 2 wrap-up · questions written for this site</p>
-  <h1>Check your understanding</h1>
-  <div class="prose"><p>Eight questions on Section 2. The score counts first tries.</p></div>
-  <div class="cyu-score" data-quiz-score="s2" role="status"></div>
-  <ol class="cyu-list" data-quiz="s2">
-    <li class="cyu" data-id="cse332-w2-q2-section-sometimes" data-kind="mc" data-topic="s2-sometimes">
-      <p class="q">All you know about \(f\) is \(f(n)\in O(n)\). Is \(f(n)\in O(\log n)\) always true (for every such \(f\)), sometimes true, or never true?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-q2-section-sometimes"> Always<span class="why" hidden>\(f = n\) is in \(O(n)\) and not in \(O(\log n)\).</span></label>
-        <label><input type="radio" name="cse332-w2-q2-section-sometimes"> Never<span class="why" hidden>\(f = 1\) is in both.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-q2-section-sometimes"> Sometimes<span class="why" hidden>Correct: \(f=1\) is in \(O(\log n)\), \(f=n\) is not.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-s2-cyu-c-meaning" data-kind="mc" data-topic="s2-goals">
-      <p class="q">The definition: \(f(n) \in O(g(n))\) when there are \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). What does the constant \(c\) let you do?</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w2-s2-cyu-c-meaning"> Compare the shape of the growth and ignore its scale<span class="why" hidden>Correct. 5n³ and 2n³ have the same shape; c absorbs the 5/2.</span></label>
-        <label><input type="radio" name="cse332-w2-s2-cyu-c-meaning"> Ignore small inputs<span class="why" hidden>That's n₀'s job.</span></label>
-        <label><input type="radio" name="cse332-w2-s2-cyu-c-meaning"> Make the bound tight<span class="why" hidden>O doesn't have to be tight, whatever c is.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-s2-cyu-n0-meaning" data-kind="mc" data-topic="s2-goals">
-      <p class="q">Same definition: \(f(n) \in O(g(n))\) when there are \(c &gt; 0\) and \(n_0 &gt; 0\) with \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). What does \(n_0\) let you do?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-s2-cyu-n0-meaning"> Pick how many terms of \(f\) to keep<span class="why" hidden>n₀ is a starting input size, not a count of terms.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-s2-cyu-n0-meaning"> Ignore small input sizes, so the comparison is about \(n\) growing without bound<span class="why" hidden>Correct.</span></label>
-        <label><input type="radio" name="cse332-w2-s2-cyu-n0-meaning"> Choose a different \(c\) for each \(n\)<span class="why" hidden>c is fixed before n. One pair works for every n ≥ n₀.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-s2-cyu-omega-by-parts" data-kind="mc" data-topic="s2-proofs">
-      <p class="q">The section's "by parts" method proves \(f \in O(g)\) by bounding each term of \(f\) by a multiple of \(g\), then adding the bounds. Why is it a poor fit for an \(\Omega\) proof like \(4n^2 - 8n + 10 \in \Omega(n^2)\)?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w2-s2-cyu-omega-by-parts"> Because \(\Omega\) proofs never need algebra<span class="why" hidden>They need the same kind of algebra as O proofs.</span></label>
-        <label data-correct><input type="radio" name="cse332-w2-s2-cyu-omega-by-parts"> Because a term like \(-8n\) or \(10\) can't be at least a positive multiple of \(n^2\), so the split fails<span class="why" hidden>Correct. For Ω, bound f from below as a whole, for example by dropping terms that only make it bigger.</span></label>
-        <label><input type="radio" name="cse332-w2-s2-cyu-omega-by-parts"> Because by parts only works with one term<span class="why" hidden>It works with any number of terms, for O.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-s2-cyu-squeeze-n0" data-kind="num" data-answer="2" data-topic="s2-proofs" data-miscon='{"1":"strict-vs-equal"}'>
-      <p class="q">To show \(n + 5n\log_2 n \le 6n\log_2 n\), you use \(n \le n\log_2 n\). What is the smallest \(n\) from which \(n \le n\log_2 n\) is true for every larger \(n\)?</p>
-      <p class="why" hidden>\(n \le n\log_2 n \iff 1 \le \log_2 n \iff n \ge 2\). At \(n = 1\), \(\log_2 1 = 0\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w2-s2-cyu-sum" data-grader="formula" data-answer="n(n+1)/2" data-points='{"n":["1","2","3","4","10","50"]}' data-topic="s2-numunique">
-      <p class="q">Give \(1 + 2 + 3 + \dots + n\) as a formula in \(n\).</p>
-      <p class="why" hidden>\(\frac{n(n+1)}{2}\). It's the inner-loop count of numUnique's worst case, and it's \(\Theta(n^2)\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w2-s2-cyu-worst-input" data-kind="mc" data-topic="s2-numunique">
-      <p class="q">This is the section's <code>numUnique</code>, which counts the different strings in <code>values</code>. Which input of length \(n\) makes it take the longest?</p>
-      <pre class="code"><div class="ln"><span class="no">1</span><span class="src">int numUnique(String[] values) {</span></div><div class="ln"><span class="no">2</span><span class="src">    boolean[] visited = new boolean[values.length];</span></div><div class="ln"><span class="no">3</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">4</span><span class="src">        visited[i] = false;</span></div><div class="ln"><span class="no">5</span><span class="src">    }</span></div><div class="ln"><span class="no">6</span><span class="src">    int out = 0;</span></div><div class="ln"><span class="no">7</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">8</span><span class="src">        if (!visited[i]) {</span></div><div class="ln"><span class="no">9</span><span class="src">            out += 1;</span></div><div class="ln"><span class="no">10</span><span class="src">            for (int j = i; j &lt; values.length; j++) {</span></div><div class="ln"><span class="no">11</span><span class="src">                if (values[i].equals(values[j])) {</span></div><div class="ln"><span class="no">12</span><span class="src">                    visited[j] = true;</span></div><div class="ln"><span class="no">13</span><span class="src">                }</span></div><div class="ln"><span class="no">14</span><span class="src">            }</span></div><div class="ln"><span class="no">15</span><span class="src">        }</span></div><div class="ln"><span class="no">16</span><span class="src">    }</span></div><div class="ln"><span class="no">17</span><span class="src">    return out;</span></div><div class="ln"><span class="no">18</span><span class="src">}</span></div></pre>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w2-s2-cyu-worst-input"> Every string different<span class="why" hidden>Correct. Nothing is ever marked early, so the inner loop runs for every i.</span></label>
-        <label><input type="radio" name="cse332-w2-s2-cyu-worst-input"> Every string the same<span class="why" hidden>That's the best case: everything is marked on the first pass.</span></label>
-        <label><input type="radio" name="cse332-w2-s2-cyu-worst-input"> Half the strings the same<span class="why" hidden>Repeats get marked and skipped, which saves inner-loop work.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w2-q2-numunique-same-bucket" data-kind="bigo" data-answer="n" data-topic="s2-numunique">
-      <p class="q">This is the section's <code>numUnique</code>, which counts the different strings in <code>values</code>. Its best case is an array where every string is the same. What is its best-case running time, as a \(\Theta\) class in \(n\), the length of <code>values</code>?</p>
-      <pre class="code"><div class="ln"><span class="no">1</span><span class="src">int numUnique(String[] values) {</span></div><div class="ln"><span class="no">2</span><span class="src">    boolean[] visited = new boolean[values.length];</span></div><div class="ln"><span class="no">3</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">4</span><span class="src">        visited[i] = false;</span></div><div class="ln"><span class="no">5</span><span class="src">    }</span></div><div class="ln"><span class="no">6</span><span class="src">    int out = 0;</span></div><div class="ln"><span class="no">7</span><span class="src">    for (int i = 0; i &lt; values.length; i++) {</span></div><div class="ln"><span class="no">8</span><span class="src">        if (!visited[i]) {</span></div><div class="ln"><span class="no">9</span><span class="src">            out += 1;</span></div><div class="ln"><span class="no">10</span><span class="src">            for (int j = i; j &lt; values.length; j++) {</span></div><div class="ln"><span class="no">11</span><span class="src">                if (values[i].equals(values[j])) {</span></div><div class="ln"><span class="no">12</span><span class="src">                    visited[j] = true;</span></div><div class="ln"><span class="no">13</span><span class="src">                }</span></div><div class="ln"><span class="no">14</span><span class="src">            }</span></div><div class="ln"><span class="no">15</span><span class="src">        }</span></div><div class="ln"><span class="no">16</span><span class="src">    }</span></div><div class="ln"><span class="no">17</span><span class="src">    return out;</span></div><div class="ln"><span class="no">18</span><span class="src">}</span></div></pre>
-      <p class="why" hidden>The first loop is \(n\) iterations; the first outer iteration runs the inner loop \(n\) times and marks everything, so no later iteration runs it. \(2n \in \Theta(n)\).</p>
-    </li>
-  </ol>
-  <div class="cyu-score" data-quiz-summary="s2" role="status"></div>
   <nav class="pager"></nav>
 </section>
 

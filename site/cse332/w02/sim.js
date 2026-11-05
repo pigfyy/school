@@ -123,18 +123,6 @@
   function polyNum(coeffs, n) { return coeffs.reduce((s, a, k) => s + Number(eval_(a)) * n ** k, 0); }
   function eval_(s) { const m = /^(-?\d+)(?:\/(\d+))?$/.exec(s); return m ? Number(m[1]) / (m[2] ? Number(m[2]) : 1) : NaN; }
 
-  /* ---------------------------------------------------------------- Section 2, question 0: what a bound leaves open
-     Running times are taken to be at least a constant. A supposition "f ∈ O(g)" puts f anywhere from the bottom of
-     the ladder up to g; "f ∈ Ω(g)" from g up without limit; "f ∈ Θ(g)" exactly at g. */
-  const LADDER = ["1", "log n", "n", "n log n", "n^2", "2^n"];
-  function bandOf(rel, k) { return rel === "O" ? [0, k] : rel === "Omega" ? [k, Infinity] : [k, k]; }
-  function boundVerdict(supRel, supK, rel, k) {
-    const [lo, hi] = bandOf(supRel, supK);
-    if (rel === "O") return hi <= k ? "always" : lo > k ? "never" : "sometimes";
-    if (rel === "Omega") return lo >= k ? "always" : hi < k ? "never" : "sometimes";
-    return lo === k && hi === k ? "always" : k < lo || k > hi ? "never" : "sometimes"; // Theta
-  }
-
   /* ---------------------------------------------------------------- Lectures 4–5: the binary min-heap
      The lecture's pseudocode, 1-based: arr[0] is unused, the root is arr[1], size counts the items.
      checks/cse332/w02/java/heap/Heap.java runs the same pseudocode in Java and verify.mjs compares the two. */
@@ -425,16 +413,17 @@
     snap(17, `Return ${out}. Count: ${n} (first loop) + ${inner} (inner loop) = ${n + inner}.`, { done: true });
     return steps;
   }
+  // the (i, j) of every inner-loop iteration among these steps; the stepper draws one dot for each
+  const numUniqueDots = (steps) => steps.filter((s) => s.j !== undefined).map((s) => [s.i, s.j]);
 
   return {
     SLIDE_SORTED, linearSearch, binarySearchTrace, binaryWorstExhaustive, worstGaps,
     bigPow, digits, RACES, raceProfile, firstN,
     nPlusLogFails, logPlusTwoFails, threeTwoFails,
     CLAIMS, polyNum,
-    LADDER, boundVerdict,
     LECTURE_HEAP, BUILD_INPUT, CODE, HEAP_SCENARIOS,
     percolateUp, percolateDown, heapOf, live, heapInsert, heapExtract, buildHeap, isMinHeap, heightOf, indexInfo, indexSay, heightSay,
     insertIdeaSteps, extractIdeaSteps, insertCodeSteps, extractCodeSteps, buildSteps, buildCost,
-    NUMUNIQUE_CODE, numUniqueSteps,
+    NUMUNIQUE_CODE, numUniqueSteps, numUniqueDots,
   };
 });
