@@ -896,20 +896,11 @@
     </ol></div>
   </div>
   <p class="line">Insert everything, then extract everything, and the items come out sorted. That's sorting with a priority queue.</p>
+  <p class="line"><strong>Ties:</strong> items with the same priority can come out in either order.</p>
 
   <div class="check" data-id="cse332-w2-l4-pq-new-trace" data-grader="exact" data-answer="4" data-miscon='{"7":"oldest-not-smallest","1":"smallest-ever"}'>
     <p>Quick check: start empty. Insert 4, 2, 7. Extract. Insert 1. Extract. Extract. What does the <em>third</em> extract print?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l4-pq-ties" data-grader="mc">
-    <p>Quick check: two items both have priority 4, and nothing smaller is waiting. Which one does <code>extract</code> return?</p>
-    <div class="opts">
-      <label><input type="radio" name="cse332-w2-l4-pq-ties"> The one inserted first<span class="why" hidden>That's what a line of people would do, but the priority queue doesn't promise it.</span></label>
-      <label><input type="radio" name="cse332-w2-l4-pq-ties"> The one inserted last<span class="why" hidden>That's a stack, and the priority queue doesn't promise it either.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l4-pq-ties"> Either one<span class="why" hidden>Right. Ties can come out in any order, so code shouldn't depend on it.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <nav class="pager"></nav>
@@ -927,7 +918,7 @@
     <tr><th>unbalanced BST</th><td class="no">\(\Theta(n)\)</td><td class="no">\(\Theta(n)\)</td></tr>
     <tr><th>heap</th><td class="best">\(\Theta(\log n)\)</td><td class="best">\(\Theta(\log n)\)</td></tr>
   </table></div>
-  <p class="line">Worst cases, with \(n\) items stored. "List" means an array or a linked list: both give the same answers.</p>
+  <p class="line">Worst cases, with \(n\) items stored and enough array space set aside. "List" means an array or a linked list: both give the same answers.</p>
 
   <p class="line"><strong>Unsorted:</strong> adding is instant, but finding the smallest means checking everything.</p>
   <p class="line"><strong>Sorted:</strong> the smallest is right at the end, but adding means making room for it: an array shifts items over, a linked list walks to the spot.</p>
@@ -951,7 +942,7 @@
 <section class="page" id="l4-heap" data-title="What a heap is">
   <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
   <h1>What a heap is</h1>
-  <div class="prose"><p>A (min) heap is a binary tree (at most 2 children per node) that follows two rules.</p></div>
+  <div class="prose"><p>A (min) heap is a binary tree (at most 2 children per node) that follows two rules. The top node is the <strong>root</strong>. A node with no children is a <strong>leaf</strong>.</p></div>
 
   <h2>Rule 1, shape: complete</h2>
   <p class="line">Every level is full except the bottom one, which fills from the left with no gaps.</p>
@@ -968,8 +959,8 @@
 
   <h2>Rule 2, order: every node \(\le\) its children</h2>
   <svg class="htree" data-tree="1,5,2,6,7,3,4" data-cmp="2,6" role="img" aria-label="Valid min-heap: root 1; children 5 and 2; 5 has children 6 and 7; 2 has children 3 and 4. The 5 and the 3 are circled."></svg>
-  <p class="line">Walk up from any node and the values never get bigger. So the smallest item is always at the root.</p>
-  <p class="line">But it isn't sorted. The circled 3 sits a level below the circled 5. That's fine: they're in different branches, so 5 isn't above 3.</p>
+  <p class="line">Walking up toward the root, values never get bigger. So the root holds the smallest item.</p>
+  <p class="line">But it isn't sorted. The circled 3 is smaller than the circled 5, even though it sits lower. That's allowed: the rule only compares a parent with its own children, and these two are in different branches.</p>
   <div class="rule"><p><strong>The rule.</strong> Shape keeps the tree short. Order keeps the smallest on top. (A max-heap flips it: every node \(\ge\) its children.)</p></div>
 
   <div class="check" data-id="cse332-w2-l4-heap-largest-where" data-grader="mc">
@@ -1028,10 +1019,10 @@
 <section class="page" id="l4-extract" data-title="Extract: percolate down">
   <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
   <h1>Extract: percolate down</h1>
-  <div class="prose"><p>The answer is the root. To keep the shape, move the bottom-right item up into the root. Then let it sink, swapping with its <em>smaller</em> child, until it's \(\le\) both children. Step through the lecture's recipe:</p></div>
+  <div class="prose"><p>The answer is the root. To keep the shape, move the bottom-right item up into the root. Then let it sink: swap it with its <em>smaller</em> child while that child is smaller than it. Stop when no child is smaller, or it has no children. Step through the lecture's recipe:</p></div>
   <p class="tree-key"><span class="k-cur">moving item</span><span class="k-cmp">compared</span><span class="k-swap">just swapped</span></p>
   <div class="panel heap-step" data-kind="extractIdea" data-scenario="lecture-after-1.5"></div>
-  <div class="rule"><p><strong>The rule.</strong> Swap with the smaller child, so it can be the parent of the other one. At most one swap per level, and the moved item can sink the whole height, so the worst case is \(\Theta(\log n)\) too.</p></div>
+  <div class="rule"><p><strong>The rule.</strong> Swap with the smaller child, so it can be the parent of the other one. At most one swap per level, so extract is \(O(\log n)\). The moved item can sink the whole height, so the worst case is \(\Theta(\log n)\).</p></div>
 
   <div class="rule warn">
     <p><strong>Common mistakes</strong></p>
