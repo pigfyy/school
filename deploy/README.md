@@ -26,7 +26,9 @@ For the future Codex subagent told “deploy the latest site”:
    It commits/pushes the source and repackages the exact output.
 6. Call sites_save_version_and_deploy_private with its project_id, commit_sha,
    and archive. Poll sites_get_deployment_status if not terminal.
-   Check live pages, sites_read_database_overview, and Worker error logs.
+7. Stop there and report the deployment id and its final status. Pages are
+   checked locally (bun check) before every deploy, so a normal deploy does
+   no live checks. Run "Live verification" below only when the task says so.
 
 Helper: /home/pigfy/.codex/plugins/cache/openai-curated-remote/sites/1.0.0/scripts/site-workflow.mjs
 Run the helper from the checkout for both opening and packaging:
@@ -64,8 +66,10 @@ real signed-in PUT/GET test/w00 matched data and timestamp (200/200).
 Bypass tokens are identity-less: they can check pages, but API requests get 401.
 Local Worker checks also passed auth, JSON validation, body cap, and routing.
 
-Live verification after deployment (use the authenticated-browser skill and
-the owner's saved ChatGPT account, familyopenai10916@gmail.com):
+Live verification, only when the task asks for it (for example after a
+change to deploy/worker.mjs or site/core/store.js). Use the
+authenticated-browser skill and the owner's saved ChatGPT account,
+familyopenai10916@gmail.com:
 
 - Open the landing page and confirm CSE 331 and CSE 332 are listed.
 - Open /cse331/w01/, /cse331/w02/, /cse332/w01/, /cse332/w02/.

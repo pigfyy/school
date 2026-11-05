@@ -61,11 +61,14 @@ deploy. Saving works the same as live: it runs `deploy/worker.mjs` with a local 
 
 ## Deploying
 
-Send a Codex subagent (gpt-6.1-sol, medium) with this task:
+Send a Codex subagent (gpt-6.1-sol, low) with this task:
 
-> Deploy the latest `site/` of /home/pigfy/.t3/projects/school to its ChatGPT Site by following
-> /home/pigfy/.t3/projects/school/deploy/README.md exactly. Reuse the existing project; never create a Site.
-> Then open the live URL and confirm the landing page and /<course>/<week>/ for the changed week load. Report the
-> deployment id and anything that failed.
+> Deploy the latest `site/` of /home/pigfy/.t3/projects/school to its ChatGPT Site by following steps 1-7 of
+> /home/pigfy/.t3/projects/school/deploy/README.md exactly. Reuse the existing project; never create a Site. Do no
+> live checks. Report the deployment id and its final status.
+
+A deploy should take about a minute (the build, push and deploy call take about 50 s). `bun check` before the deploy
+is what checks the pages. Only after changing `deploy/worker.mjs` or `site/core/store.js`, add "Then run Live
+verification from the README" to the task.
 
 Live site (owner-only): https://cse-study.familyopenai10916.chatgpt.site
