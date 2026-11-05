@@ -21,7 +21,7 @@ const answerAll = (wrong) => {
   const S = window.Study, res = [];
   const fire = (n, ev) => n.dispatchEvent(new Event(ev, { bubbles: true }));
   const first = (spec) => String(spec.answer).split("|")[0] || "nothing";
-  const bad = (spec) => (spec.type === "yesno" ? (first(spec) === "yes" ? "no" : "yes") : spec.type === "stream" ? (first(spec) === "stdout" ? "stderr" : "stdout") : "999999937");
+  const bad = (spec) => (spec.type === "yesno" ? (first(spec) === "yes" ? "no" : "yes") : spec.type === "stream" ? (first(spec) === "stdout" ? "stderr" : "stdout") : spec.type === "bigo" && first(spec) === "1" ? "n" : "999999937");
   const pick = (node, spec) => {
     const labels = [...node.querySelectorAll(".opts label")];
     const right = labels.find((l) => l.hasAttribute("data-correct") || (l.dataset.option && String(spec.answer ?? "").split("|").includes(l.dataset.option)));

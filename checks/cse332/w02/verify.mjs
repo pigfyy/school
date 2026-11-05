@@ -292,6 +292,28 @@ const l4Text = () => html.slice(html.indexOf('id="l4-goals"'), html.indexOf('id=
   // heap insert really is floor(log2 n) swaps in the worst case (a new minimum each time)
   ok([8, 64, 512, 4096].every((n) => { const h = Sim.heapOf([]); let w = 0; for (let v = n; v >= 1; v--) w = Math.max(w, Sim.heapInsert(h, v).swaps); return w === Math.floor(Math.log2(n)); }), "worst-case insert swaps = floor(log2 n)");
 }
+/* Exercise 1 redo: count every arithmetic op and comparison, then read the growth class off doubling n */
+{
+  const q1 = (arr, denom) => { let ops = 1; if (denom === 0) return ops; let count = 0; for (let i = 0; ; i++) { ops++; if (!(i < arr.length)) break; ops += 2; if (arr[i] % denom === 0) { count++; ops++; } ops++; } return ops; };
+  const q2 = (n) => { let ops = 1, count = 0; if (n < 150) { for (let i = 0; ; i++) { ops++; if (!(i < n)) break; for (let j = i; ; j++) { ops++; if (!(j < n)) break; count++; ops += 2; } ops++; } } else { for (let i = 0; ; i++) { ops++; if (!(i < n)) break; count += n; ops += 2; } } return ops; };
+  const q3 = (n) => { let ops = 0; for (let i = 0; ; i++) { ops++; if (!(i < n)) break; for (let j = 0; ; j++) { ops += 2; if (!(j < i * i)) break; ops += 2; } ops++; } return ops; };
+  const f = (size) => 2 * size + (size + 1);
+  const q4 = (n, first) => { let ops = 1; const x = Math.min(first, n); for (let i = 0; ; i++) { ops++; if (!(i < x)) break; ops += f(n) + 1; } return ops; };
+  const fit = (T) => { const k = Math.round(Math.log2(T(600) / T(300))); return k === 0 ? "1" : k === 1 ? "n" : `n^${k}`; };
+  const arrs = (n) => [Array(n).fill(0), Array(n).fill(1), Array.from({ length: n }, (_, i) => i)];
+  const best1 = (n) => Math.min(...arrs(n).flatMap((a) => [0, 1, 2, 7].map((d) => q1(a, d))));
+  const worst1 = (n) => Math.max(...arrs(n).flatMap((a) => [0, 1, 2, 7].map((d) => q1(a, d))));
+  const firsts = (n) => [-5, 0, 1, Math.floor(n / 2), n, 2 * n];
+  const got = { "q1.best": fit(best1), "q1.worst": fit(worst1), "q2.best": fit(q2), "q2.worst": fit(q2), "q3.best": fit(q3), "q3.worst": fit(q3),
+    "q4.best": fit((n) => Math.min(...firsts(n).map((x) => q4(n, x)))), "q4.worst": fit((n) => Math.max(...firsts(n).map((x) => q4(n, x)))) };
+  ok(q2(149) > 149 * 149 / 2 && q2(150) < 4 * 150, "doStuff: the n^2 branch stops at n = 150");
+  for (const [k, cls] of Object.entries(got)) BIGO_TRUTH[`cse332-w2-ex1-${k}`] = cls;
+  // 5.1: c = 2, n0 = 2 holds (and n0 = 1 fails); 5.2: equality with c = 16; 5.3: log2(10) < 4
+  let p51 = true; for (let n = 2n; n < 2000n; n++) if (!(n ** 3n <= 2n * (n ** 3n - n))) p51 = false;
+  ok(p51 && !(1 <= 2 * (1 - 1)), "5.1: n^3 <= 2(n^3 - n) for every n >= 2, not at n = 1");
+  ok([2, 10, 1000, 123457].every((n) => Math.abs(Math.log2(n ** 4) - 16 * Math.log2(n ** 0.25)) < 1e-9), "5.2: log2(n^4) = 16 log2(n^(1/4))");
+  ok(Math.log2(10) < 4 && Math.abs(Math.log2(10) - 3.32) < 0.005 && [1, 2, 10, 999].every((n) => Math.log2(n) <= 4 * Math.log10(n) + 1e-12), "5.3: log2 n <= 4 log10 n, log2 10 = 3.32");
+}
 /* Section 2 */
 {
   // the row-by-row numUnique stepper counts the same inner-loop steps as the line-by-line one (which Java checks)

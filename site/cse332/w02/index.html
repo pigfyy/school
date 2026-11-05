@@ -4,7 +4,7 @@
   Every stateful element carries a stable semantic data-id (problems: article.task, parts: .answer-spec[data-part],
   quick checks: .check, quiz questions: li.cyu). Change the id when the question changes.
   Sources: materials/cse332/w02/ (Lecture 3 to 5 slides, Section 2 slides, worksheet and solutions, topic summaries).
-  Graded work is not reproduced: Exercise 1 (Running Time, in Gradescope) and Exercise 2 (Heaps, a Java heap).
+  Graded work is not reproduced before its deadline. Exercise 1 (Running Time) is on the page as a redo after its due date (the owner asked); Exercise 2 (Heaps, a Java heap) is not.
   Every computed answer is checked by checks/cse332/w02/verify.mjs against the lecture's code run in Java.
 -->
 <html lang="en">
@@ -74,6 +74,12 @@
         <li><a href="#l5-build">buildHeap</a></li>
         <li><a href="#l5-buildtime">Why buildHeap is Θ(n)</a></li>
         <li><a href="#l5-problems">Lecture 5 practice</a></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Exercise 1</h2>
+      <ol class="modules">
+        <li><a href="#ex1">Exercise 1, again</a></li>
       </ol>
     </div>
     <div>
@@ -181,7 +187,7 @@
   </ol>
 
   <div class="rule warn">
-    <p><strong>Exercise 1</strong> (Running Time, due Mon Oct 12, in Gradescope) uses these ideas. This site doesn't show or solve any Exercise 1 problem.</p>
+    <p><strong>Exercise 1</strong> (Running Time, due Mon Oct 12, in Gradescope) uses these ideas. After its deadline, you can redo it here: <a href="#ex1">Exercise 1, again</a>.</p>
   </div>
   <nav class="pager"></nav>
 </section>
@@ -1974,6 +1980,179 @@ if(right &gt; size || arr[left] &lt; arr[right]){
       <li><span class="lab">the root</span><span class="mth">\(1 \cdot 4 = 4\)</span><span class="note"></span></li>
       <li><span class="lab">total</span><span class="mth">\(0 + 8 + 8 + 6 + 4 = 26\)</span><span class="note">fewer than \(n = 31\)</span></li>
       <li class="wide"><p class="answer">8; 4; 26; \(n\). "31 calls × 4 swaps" would say 124, but the many low nodes can sink only a little.</p></li>
+    </ol></div></div>
+  </article>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ EXERCISE 1 (REDO) -->
+<section class="page" id="ex1" data-title="Exercise 1 redo">
+  <p class="where">Exercise 1 · Running Time · was due Mon Oct 12</p>
+  <h1>Exercise 1, again</h1>
+  <div class="prose"><p>The course's Exercise 1, after its deadline, to redo for practice. Questions 1–4: give the simplest \(\Theta\) for the best and worst case, counting arithmetic and comparisons, with \(n\) as the input size. Question 5: three Big-O proofs, written out.</p></div>
+  <div data-progress-bar></div>
+
+  <h2 class="practice-group">Best and worst case</h2>
+  <p class="note">Lessons: <a href="#cases">Case vs. bound</a>, <a href="#s2-numunique">numUnique</a></p>
+
+  <article class="task" data-id="cse332-w2-ex1-q1">
+    <h2>1. countDivisible</h2>
+    <pre class="code">// counts the elements of arr that are divisible by denom
+public static int countDivisible(int[] arr, int denom){
+    if (denom == 0)
+        return 0;
+    int count = 0;
+    for (i = 0; i &lt; arr.length; i++) {
+        if(arr[i] % denom == 0){
+            count++;
+        }
+    }
+    return count;
+}</pre>
+    <p class="prompt">Here \(n\) is <code>arr.length</code>.</p>
+    <div class="answer-spec" data-part="best" data-grader="bigo" data-answer="1" data-label="best case"></div>
+    <div class="answer-spec" data-part="worst" data-grader="bigo" data-answer="n" data-label="worst case"></div>
+    <ol class="hints">
+      <li>Is there an input of any size \(n\) that finishes right away?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Best: <code>denom = 0</code> returns after one comparison, whatever \(n\) is. \(\Theta(1)\).</li>
+      <li>Worst: any other <code>denom</code> runs the loop \(n\) times, a few operations each. \(\Theta(n)\).</li>
+      <li class="answer">\(1\); \(n\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-ex1-q2">
+    <h2>2. doStuff</h2>
+    <pre class="code">int doStuff(List&lt;Integer&gt; numbers){
+    int n = numbers.size();
+    int count = 0;
+    if(n &lt; 150){
+        for (int i = 0; i &lt; n; i++){
+            for (int j = i; j &lt; n; j++){
+                count++;
+            }
+        }
+    }
+    else{
+        for (int i = 0; i &lt; n; i++){
+            count += n;
+        }
+    }
+    return count;
+}</pre>
+    <div class="answer-spec" data-part="best" data-grader="bigo" data-answer="n" data-miscon='{"n^2":"small-n-branch","1":"too-small"}' data-label="best case"></div>
+    <div class="answer-spec" data-part="worst" data-grader="bigo" data-answer="n" data-miscon='{"n^2":"small-n-branch"}' data-label="worst case"></div>
+    <ol class="hints">
+      <li>Θ is about big \(n\). Which branch runs once \(n\) is big?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>The nested loops only run when \(n &lt; 150\). That's a bounded range of sizes, so it's ignored for big \(n\).</li>
+      <li>For every \(n \ge 150\), the <code>else</code> loop runs \(n\) times, whatever the values are. So best and worst are the same.</li>
+      <li class="answer">\(n\); \(n\). The \(n^2\) code never runs for large \(n\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-ex1-q3">
+    <h2>3. something</h2>
+    <pre class="code">public static void something(List&lt;Integer&gt; lst){
+    int x = 0;
+    int n = lst.size();
+    for (i = 0; i &lt; n; i++) {
+        for (j = 0; j &lt; i*i; j++) {
+            x++;
+        }
+    }
+}</pre>
+    <div class="answer-spec" data-part="best" data-grader="bigo" data-answer="n^3" data-miscon='{"n^2":"inner-i-squared"}' data-label="best case"></div>
+    <div class="answer-spec" data-part="worst" data-grader="bigo" data-answer="n^3" data-miscon='{"n^2":"inner-i-squared"}' data-label="worst case"></div>
+    <ol class="hints">
+      <li>The values in the list never matter here. How many times does the inner loop run for one \(i\)?</li>
+      <li>Add \(i^2\) for \(i = 0\) to \(n - 1\). The top half of those terms is already at least \(\frac{n}{2}\cdot\left(\frac{n}{2}\right)^2\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>For each \(i\), the inner loop runs \(i^2\) times. No input can change that, so best = worst.</li>
+      <li>Total: \(0 + 1 + 4 + \dots + (n-1)^2\). That's at most \(n \cdot n^2 = n^3\).</li>
+      <li>And the last \(\frac{n}{2}\) terms are each at least \(\left(\frac{n}{2}\right)^2\), so the total is at least \(\frac{n^3}{8}\). So it's \(\Theta(n^3)\).</li>
+      <li class="answer">\(n^3\); \(n^3\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-ex1-q4">
+    <h2>4. mystery</h2>
+    <pre class="code">public static int f(List&lt;Integer&gt; lst, int count){
+   for(int i = lst.size(); i &gt; 0 ; i--){
+       count++;
+   }
+   return count;
+}
+public static void mystery(List&lt;Integer&gt; lst){
+    int n = lst.size();
+    int x = Math.min(lst.get(0), n);
+    int count = 0;
+    for (i = 0; i &lt; x; i++) {
+        count = f(lst, count);
+    }
+}</pre>
+    <div class="answer-spec" data-part="best" data-grader="bigo" data-answer="1" data-miscon='{"n":"x-can-be-zero"}' data-label="best case"></div>
+    <div class="answer-spec" data-part="worst" data-grader="bigo" data-answer="n^2" data-label="worst case"></div>
+    <ol class="hints">
+      <li>One call to <code>f</code> costs \(\Theta(n)\). How many calls happen? It depends on <code>lst.get(0)</code>.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Each call to <code>f</code> loops <code>lst.size()</code> \(= n\) times: \(\Theta(n)\).</li>
+      <li><code>mystery</code> calls <code>f</code> \(x = \min(\)<code>lst.get(0)</code>\(, n)\) times.</li>
+      <li>Best: <code>lst.get(0)</code> \(\le 0\), so \(x \le 0\) and the loop never runs. \(\Theta(1)\).</li>
+      <li>Worst: <code>lst.get(0)</code> \(\ge n\), so \(x = n\): \(n\) calls of \(\Theta(n)\) each. \(\Theta(n^2)\).</li>
+      <li class="answer">\(1\); \(n^2\).</li>
+    </ol></div></div>
+  </article>
+
+  <h2 class="practice-group">Big-O proofs</h2>
+  <p class="note">Lessons: <a href="#proofs">Proving a bound</a>, <a href="#s2-parts">Proof by parts</a></p>
+
+  <article class="task" data-id="cse332-w2-ex1-q5-1">
+    <h2>5.1 \(n^3 \in O(n^3 - n)\)</h2>
+    <p class="prompt">Prove it with the definition: pick \(c\) and \(n_0\), then show \(n^3 \le c\,(n^3 - n)\) for every \(n \ge n_0\).</p>
+    <div class="answer-spec" data-part="proof" data-grader="self" data-long data-template="Let c = __ and n₀ = __.&#10;Let n ≥ n₀ be arbitrary.&#10;Show: n³ ≤ c·(n³ − n).&#10;&#10;…&#10;&#10;This holds for every n ≥ n₀." data-label="Your proof"></div>
+    <ol class="hints">
+      <li>\(c = 1\) can't work: \(n^3 - n\) is smaller than \(n^3\). Try \(c = 2\).</li>
+      <li>With \(c = 2\): \(n^3 \le 2n^3 - 2n\) is the same as \(2n \le n^3\). When is that true?</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Let \(c = 2\) and \(n_0 = 2\). Let \(n \ge 2\) be arbitrary.</li>
+      <li>\(n^3 \le 2(n^3 - n) \equiv 2n \le n^3 \equiv 2 \le n^2\) (dividing by \(n &gt; 0\)).</li>
+      <li>\(2 \le n^2\) is true because \(n \ge 2\) gives \(n^2 \ge 4\).</li>
+      <li class="answer">So \(n^3 \le c\,(n^3 - n)\) for every \(n \ge n_0\). Note \(n_0 = 1\) fails: \(n^3 - n = 0\) at \(n = 1\).</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-ex1-q5-2">
+    <h2>5.2 \(\log_2(n^4) \in O(\log_2(n^{1/4}))\)</h2>
+    <p class="prompt">Pick \(c\) and \(n_0\), then show \(\log_2(n^4) \le c\cdot\log_2(n^{1/4})\) for every \(n \ge n_0\).</p>
+    <div class="answer-spec" data-part="proof" data-grader="self" data-long data-template="Let c = __ and n₀ = __.&#10;Let n ≥ n₀ be arbitrary.&#10;Show: log₂(n⁴) ≤ c·log₂(n^(1/4)).&#10;&#10;…&#10;&#10;This holds for every n ≥ n₀." data-label="Your proof"></div>
+    <ol class="hints">
+      <li>Pull the powers out front: \(\log(a^k) = k\log a\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Let \(c = 16\) and \(n_0 = 1\). Let \(n \ge 1\) be arbitrary.</li>
+      <li>\(\log_2(n^4) = 4\log_2 n\), and \(c\cdot\log_2(n^{1/4}) = 16\cdot\frac{1}{4}\log_2 n = 4\log_2 n\).</li>
+      <li class="answer">So \(\log_2(n^4) = c\cdot\log_2(n^{1/4})\), and in particular \(\le\), for every \(n \ge n_0\). The exponents only change the constant.</li>
+    </ol></div></div>
+  </article>
+
+  <article class="task" data-id="cse332-w2-ex1-q5-3">
+    <h2>5.3 \(\log_2 n \in O(\log_{10} n)\)</h2>
+    <p class="prompt">Pick \(c\) and \(n_0\), then show \(\log_2 n \le c\cdot\log_{10} n\) for every \(n \ge n_0\).</p>
+    <div class="answer-spec" data-part="proof" data-grader="self" data-long data-template="Let c = __ and n₀ = __.&#10;Let n ≥ n₀ be arbitrary.&#10;Show: log₂ n ≤ c·log₁₀ n.&#10;&#10;…&#10;&#10;This holds for every n ≥ n₀." data-label="Your proof"></div>
+    <ol class="hints">
+      <li>Change of base: \(\log_2 n = \frac{\log_{10} n}{\log_{10} 2}\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li>Let \(c = 4\) and \(n_0 = 1\). Let \(n \ge 1\) be arbitrary.</li>
+      <li>Change of base: \(\log_2 n = \log_2 10 \cdot \log_{10} n\), and \(\log_2 10 \approx 3.32\).</li>
+      <li>\(\log_{10} n \ge 0\) for \(n \ge 1\), so \(\log_2 10 \cdot \log_{10} n \le 4\log_{10} n\).</li>
+      <li class="answer">So \(\log_2 n \le c\cdot\log_{10} n\) for every \(n \ge n_0\). (\(c = \log_2 10\) works exactly too.)</li>
     </ol></div></div>
   </article>
   <nav class="pager"></nav>
