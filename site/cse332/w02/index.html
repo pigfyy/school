@@ -1964,7 +1964,7 @@ if(right &gt; size || arr[left] &lt; arr[right]){
     <div class="answer-spec" data-part="bucket" data-grader="bigo" data-answer="n" data-label="buildHeap's worst-case time on \(n\) items, as a bucket"></div>
     <ol class="hints">
       <li>Make the lesson's table: for each level, nodes × levels below it.</li>
-      <li>The 16 leaves can't sink at all. The 8 nodes just above them can sink 1 level.</li>
+      <li>Start at the bottom: the 16 leaves have no levels below them, so they sink 0. Then go up one level at a time.</li>
     </ol>
     <div class="solution"><div class="steps board"><ol>
       <li><span class="lab">16 leaves</span><span class="mth">\(16 \cdot 0 = 0\)</span><span class="note"></span></li>

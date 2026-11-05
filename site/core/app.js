@@ -613,7 +613,7 @@ function buildTask(task) {
   const missBtn = el("button", { class: "chip", type: "button", text: "I missed something" });
   selfMark.append(el("span", { text: hasAuto ? "How did your written answers go? " : "How did you do? " }), gotBtn, missBtn);
   if (hasSelf && solution) solution.after(selfMark);
-  let armed = false, solutionOpen = false;
+  let solutionOpen = false;
 
   function render() {
     const s = store.get(id);
@@ -625,7 +625,7 @@ function buildTask(task) {
     hintBtn.textContent = k === 0 ? `Need a hint? (${n} available)` : k < n ? `Another hint (${k} of ${n} shown)` : `All ${n} hints shown`;
     hintBtn.disabled = k >= n;
     if (solution) solution.hidden = !solutionOpen;
-    solBtn.textContent = solutionOpen ? "Hide solution" : armed ? "Show solution anyway" : "Show solution";
+    solBtn.textContent = solutionOpen ? "Hide solution" : "Show solution";
     selfMark.hidden = !solutionOpen;
     gotBtn.setAttribute("aria-pressed", String(s?.selfMark === "got"));
     missBtn.setAttribute("aria-pressed", String(s?.selfMark === "missed"));
@@ -714,15 +714,8 @@ function buildTask(task) {
     if (solutionOpen) { solutionOpen = false; render(); return; }
     const s = get();
     const tried = parts.some((p) => !isBlank(written(p))) || !isBlank(work.value) || liveAttempts(s).length > 0;
-    if (!tried && !armed && !s.solutionViewed) {
-      armed = true;
-      fb.className = "feedback"; fb.textContent = "You haven't answered yet. Press the button again to see the solution anyway.";
-      render();
-      return;
-    }
-    armed = false; solutionOpen = true;
+    solutionOpen = true;
     if (solution) $$(".steps", solution).forEach((st) => { if (proof) st._all(); else if (st._shown() === 0) st._reveal(); });
-    if (fb.textContent.startsWith("You haven't answered")) { fb.textContent = ""; fb.className = "feedback"; }
     store.event(id, "problem", "solution", { answeredFirst: Boolean(tried) });
     store.put(id, "problem", { ...s, title, solutionViewed: true });
     render();
@@ -738,7 +731,6 @@ function buildTask(task) {
 
   function restore() {
     const s = store.get(id);
-    armed = false;
     parts.forEach((p, i) => {
       const r = s?.parts?.[p.part] || {};
       if (document.activeElement !== inputs[i]) inputs[i].value = r.raw || p.template;
