@@ -6,7 +6,6 @@ window.WEEK.messages = {
   "stopped-early": "Close. The loop still runs one more time when end − start is 1.",
   "rounded-up": "Check which power of 2 is just below n. The worst case is ⌊log₂ n⌋ + 1.",
   "doubled-log": "Doubling n adds one more halving, not twice as many.",
-  "log-power": "The log shrinks things a lot: log₂(n²) is far smaller than n or n². Rewrite it with log(aᵏ) = k·log a, then drop the constant.",
   "strict-vs-equal": "Check that exact value of n directly. Is the inequality true there, and for every n after it?",
   "forgot-c": "Don't drop c. Solve 3n² + 17 ≤ 4n², which is n² ≥ 17.",
   "not-smallest": "That n₀ works, but it isn't the smallest. Try smaller values.",
@@ -219,9 +218,10 @@ function setupHero() {
   update(100);
 }
 
-/* =========================================================== binary search: the gap halves */
+/* =========================================================== binary search on 16 items */
+const LIST16 = [4, 9, 15, 21, 26, 33, 38, 42, 47, 53, 58, 64, 70, 77, 83, 91];
 function setupGap() {
-  const a = Sim.SLIDE_SORTED;
+  const a = LIST16;
   let trace, shown;
   const cells = $("#gap-cells"), out = $("#gap-out"), bars = $("#gap-bars");
   function reset() {
@@ -242,13 +242,13 @@ function setupGap() {
     bars.replaceChildren(...trace.steps.slice(0, shown).map((s, i) => el("div", { class: "gap-bar" },
       el("span", { class: "gap-it", text: `#${i + 1}` }),
       el("span", { class: "gap-fill", style: `width:${(s.gap / a.length) * 100}%` }),
-      el("span", { class: "gap-num", text: `end − start = ${s.gap}` }))));
-    const lin = Sim.linearSearch(a, trace.k).comparisons;
-    if (shown === 0) out.textContent = `start = 0, end = ${a.length}: the gap is ${a.length}. Press Step.`;
-    else if (shown < trace.steps.length) out.textContent = `Iteration ${shown}: gap ${cur.gap}, mid = ${cur.mid}, a.get(mid) = ${cur.value} ${cur.outcome === "right" ? `< ${trace.k}, so start = mid+1` : `> ${trace.k}, so end = mid`}.`;
+      el("span", { class: "gap-num", text: `${s.gap} left` }))));
+    const k = trace.k, lin = Sim.linearSearch(a, k).comparisons, path = trace.gaps.join(" → ");
+    if (shown === 0) out.textContent = `${a.length} items could hold ${k}. Press Step.`;
+    else if (shown < trace.steps.length) out.textContent = `Loop ${shown}: ${cur.gap} left. The middle is ${cur.value}. ${k} is ${cur.outcome === "right" ? "bigger, so drop the left half" : "smaller, so drop the right half"}.`;
     else out.textContent = trace.found
-      ? `Found ${trace.k} in ${trace.iterations} iteration${trace.iterations === 1 ? "" : "s"} (gaps ${trace.gaps.join(", ")}). contains would use ${lin} comparison${lin === 1 ? "" : "s"}.`
-      : `The gap reached 0: the loop stops and returns false after ${trace.iterations} iterations (gaps ${trace.gaps.join(", ")}). contains would use ${lin}.`;
+      ? `Found ${k} on loop ${trace.iterations}. Items left: ${path}. Checking every item would take ${lin}.`
+      : `${k} isn't there. Stopped after ${trace.iterations} loops. Items left: ${path}. Checking every item would take ${lin}.`;
   }
   const step = () => { if (shown < trace.steps.length) { shown++; draw(); } };
   $("#gap-step").addEventListener("click", step);
@@ -256,71 +256,24 @@ function setupGap() {
   $("#gap-reset").addEventListener("click", reset);
   $("#gap-k").addEventListener("input", reset);
   reset();
-
-  const worst = () => {
-    const raw = $("#worst-n").value.trim();
-    if (!/^\d{1,10}$/.test(raw) || Number(raw) < 1 || Number(raw) > 1e9) { $("#worst-out").textContent = "Enter a whole number n from 1 to 1,000,000,000."; $("#worst-chain").replaceChildren(); return; }
-    const n = Number(raw), g = Sim.worstGaps(n);
-    $("#worst-chain").replaceChildren(...g.flatMap((x, i) => [el("span", { class: "gchip", text: fmtInt(x) }), i < g.length - 1 ? el("span", { class: "garrow", text: "→" }) : null]).filter(Boolean));
-    $("#worst-out").textContent = `n = ${fmtInt(n)}: ${g.length} gaps, so ${g.length} iterations in the worst case (⌊log₂ n⌋ + 1 = ${Math.floor(Math.log2(n)) + 1}). contains would need ${fmtInt(n)}.`;
-  };
-  $("#worst-n").addEventListener("input", worst);
-  worst();
-
-  const table = () => {
-    const c = Number($("#logb [aria-pressed=true]").dataset.base);
-    const rows = [[2, 1], [2 ** 10, 10], [2 ** 20, 20], [2 ** 30, 30], [2 ** 40, 40]];
-    const t = $("#logb-table");
-    const sub = { 2: "₂", 5: "₅", 8: "₈", 10: "₁₀" }[c];
-    t.replaceChildren(el("tr", {}, el("th", { class: "r", text: "n" }), el("th", { class: "r", text: "log₂ n" }), el("th", { class: "r", text: `log${sub} n` }), el("th", { class: "r", text: "log₂ n ÷ that" })));
-    for (const [, l2] of rows) {
-      const lc = l2 / Math.log2(c);
-      t.append(el("tr", {}, el("td", { class: "r", text: sup(`2^${l2}`) }), el("td", { class: "r", text: String(l2) }), el("td", { class: "r", text: Number.isInteger(lc) ? String(lc) : lc.toFixed(3) }), el("td", { class: "r", text: c === 2 ? "1" : Number.isInteger(Math.log2(c)) ? String(Math.log2(c)) : Math.log2(c).toFixed(3) })));
-    }
-  };
-  $$("#logb [data-base]").forEach((b) => b.addEventListener("click", () => { $$("#logb [data-base]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); table(); }));
-  table();
 }
 
-/* =========================================================== comparing A, B, C */
-function setupABC() {
-  const A = (n) => 10 * n + 900, B = (n) => 100 * n - 50, C = (n) => (n * n) / 100;
-  const N = 1500;
+/* =========================================================== 10n vs n^2 */
+function setupBuckets() {
+  const A = (n) => 10 * n, B = (n) => n * n, N = 30;
   const draw = () => {
-    const xs = Array.from({ length: 151 }, (_, i) => (i / 150) * N);
-    lineChart($("#abc-svg"), {
-      xDomain: [0, N], yDomain: [0, 30000], xLabel: "n", yLabel: "steps",
-      series: [{ color: COLORS.f, label: "A", pts: xs.map((n) => [n, A(n)]) }, { color: COLORS.g, label: "B", pts: xs.map((n) => [n, B(n)]) }, { color: COLORS.h, label: "C", pts: xs.map((n) => [n, C(n)]) }],
-      markers: [{ x: 1083, label: "n = 1,083" }],
+    const xs = Array.from({ length: 121 }, (_, i) => (i / 120) * N);
+    lineChart($("#ab-svg"), {
+      xDomain: [0, N], yDomain: [0, 900], xLabel: "n", yLabel: "steps",
+      series: [{ color: COLORS.f, label: "10n", pts: xs.map((n) => [n, A(n)]) }, { color: COLORS.g, label: "n²", pts: xs.map((n) => [n, B(n)]) }],
+      markers: [{ x: 10, label: "n = 10" }],
+      shade: { from: 10, label: "10n wins" },
       snap: (v) => Math.max(1, Math.round(v)),
-      hover: (n) => [`n = ${fmtInt(n)}`, `A = ${fmtInt(A(n))}`, `B = ${fmtInt(B(n))}`, `C = ${fmtNum(C(n))}`],
+      hover: (n) => [`n = ${n}`, `10n = ${fmtInt(A(n))}`, `n² = ${fmtInt(B(n))}`],
     });
   };
-  const run = () => {
-    const n = Math.trunc(Number($("#abc-n").value));
-    if (!(n >= 1 && n <= 1e7)) { $("#abc-out").textContent = "Enter a whole number n from 1 to 10,000,000."; return; }
-    const v = [["A", A(n)], ["B", B(n)], ["C", C(n)]];
-    const best = v.reduce((m, x) => (x[1] < m[1] ? x : m));
-    $("#abc-out").textContent = `n = ${fmtInt(n)}: A = ${fmtInt(A(n))}, B = ${fmtInt(B(n))}, C = ${fmtNum(C(n))}. Cheapest: ${best[0]}.`;
-  };
-  $("#abc-n").addEventListener("input", run);
   REDRAW.add((id) => { if (id === "compare") draw(); });
-  draw(); run();
-}
-
-/* =========================================================== the definition, one clickable part at a time */
-const QUANT = {
-  in: "f ∈ O(g(n)): O(g(n)) is a set of functions, and f is a member of it. That's why we'd never write O(n²) = 3n² + 17: the “=” people write means “is in”, and it only reads one way.",
-  c: "∃c > 0: you get to pick one constant multiplier. It absorbs coefficients and units, so 3n² and 5n² land in the same set.",
-  n0: "∃n₀ > 0: you get to pick a starting point. Every input smaller than n₀ is ignored, which is how “for large enough n” becomes precise.",
-  all: "∀n ≥ n₀: after you've picked c and n₀, the inequality must hold for every larger n, forever. One fixed pair; you can't change it for each n.",
-  le: "f(n) ≤ c·g(n): the comparison itself. Flip it to ≥ and you get Ω. Ask for both and you get Θ.",
-};
-function setupQuant() {
-  $$(".q-part").forEach((b) => b.addEventListener("click", () => {
-    $$(".q-part").forEach((x) => x.classList.toggle("on", x === b));
-    $("#q-explain").textContent = QUANT[b.dataset.q];
-  }));
+  draw();
 }
 
 /* =========================================================== the c / n0 explorer: move c and n0, see where the bound holds */
@@ -339,6 +292,7 @@ function setupBound(panel) {
   const out = el("p", { class: "out bx-verdict", role: "status" });
   panel.append(chips, el("div", { class: "controls bx-sliders" }, el("label", {}, "c = ", cIn, cOut), el("label", {}, "n₀ = ", nIn, nOut)), legend, box, out);
   let cur = ids[0];
+  if (ids.length < 2) chips.style.display = "none";
   const btns = ids.map((id) => {
     const cl = CLAIM[id];
     const b = el("button", { class: "chip", type: "button", "aria-pressed": "false", text: `${cl.fTex} ∈ ${cl.rel === "O" ? "O" : "Ω"}(${cl.gTex})` });
@@ -394,155 +348,6 @@ function setupBound(panel) {
   cIn.addEventListener("input", draw); nIn.addEventListener("input", draw);
   REDRAW.add((pid) => { if (panel.closest(".page").id === pid) draw(); });
   load(cur);
-}
-
-/* =========================================================== case × bound grid */
-const GRID = {
-  "O-worst": "Binary search's worst case is O(log n): at most about log₂ n iterations. (It's Θ(log n), and Θ includes O.)",
-  "O-best": "Linear search's best case is O(1): the item is first. A true upper bound on the best case.",
-  "Omega-worst": "Binary search is Ω(log log n) in the worst case. True, but weak: it only says it isn't really, really fast.",
-  "Omega-best": "“Every algorithm for this problem needs to look at all the elements, so it takes at least n time, even in the best case.” That's an Ω(n) statement about the best case.",
-  "Theta-worst": "Binary search is Θ(log n) in the worst case. This is the most common kind of statement.",
-  "Theta-best": "Binary search is Θ(1) in the best case: the item is in the middle, found on the first iteration.",
-};
-function setupGrid() {
-  const t = $("#grid-table");
-  t.append(el("tr", {}, el("th", { text: "" }), el("th", { text: "worst case" }), el("th", { text: "best case" })));
-  for (const [row, name] of [["O", "O (≤)"], ["Omega", "Ω (≥)"], ["Theta", "Θ (=)"]]) {
-    const tr = el("tr", {}, el("th", { text: name }));
-    for (const col of ["worst", "best"]) {
-      const b = el("button", { class: "grid-cell", type: "button", "data-cell": `${row}-${col}`, text: "✓ true statement" });
-      b.addEventListener("click", () => { $$(".grid-cell").forEach((x) => x.classList.toggle("on", x === b)); $("#grid-out").textContent = GRID[`${row}-${col}`]; });
-      tr.append(el("td", {}, b));
-    }
-    t.append(tr);
-  }
-}
-
-/* =========================================================== simplifier + category ladder */
-const LADDER_ROWS = [
-  ["1", "constant"], ["log n", "logarithmic"], ["n", "linear"], ["n log n", "log-linear"], ["n^2", "quadratic"], ["n^3", "cubic"], ["n^4", "polynomial, nᵏ (k > 1)"], ["2^n", "exponential, kⁿ (k > 1)"],
-];
-function setupSimplify() {
-  const ladder = $("#simp-ladder");
-  const rungs = LADDER_ROWS.map(([e, name]) => el("li", { "data-rung": e }, el("b", { text: `O(${sup(e)})` }), el("span", { text: name })));
-  ladder.replaceChildren(...rungs);
-  const run = () => {
-    const raw = $("#simp-in").value;
-    const r = G.parseAsym(G.stripWrapper(G.normalizeExpr(raw)));
-    rungs.forEach((x) => x.classList.remove("on", "between"));
-    if (!raw.trim()) { $("#simp-out").textContent = ""; return; }
-    if (!r.ok) { $("#simp-out").textContent = `Can't classify that for certain (${r.error}).`; return; }
-    const notes = [];
-    if (r.terms > 1) notes.push("dropped the non-dominant terms");
-    if (r.lead && !G.eq(r.lead, G.Q(1n))) notes.push(`dropped the constant factor ${G.qToString(r.lead)}`);
-    if (r.base) notes.push("ignored the log base");
-    $("#simp-out").textContent = `Θ(${sup(G.asymName(r.cls))})${notes.length ? `: ${notes.join(", ")}.` : "."}`;
-    const cls = LADDER_ROWS.map(([e]) => G.parseAsym(e).cls);
-    let placed = false;
-    cls.forEach((c, i) => { if (G.clsCmp(c, r.cls) === 0) { rungs[i].classList.add("on"); placed = true; } });
-    if (!placed) {
-      const poly = G.eq(r.cls.b, G.Q(1n)) && r.cls.l.n === 0n && r.cls.m.n === 0n && G.cmp(r.cls.d, G.Q(1n)) > 0 && r.cls.d.d === 1n;
-      const exp = G.cmp(r.cls.b, G.Q(1n)) > 0 && r.cls.d.n === 0n && r.cls.l.n === 0n;
-      if (poly) rungs[6].classList.add("on");
-      else if (exp) rungs[7].classList.add("on");
-      else {
-        const i = cls.findIndex((c) => G.clsCmp(c, r.cls) > 0);
-        if (i > 0) { rungs[i - 1].classList.add("between"); rungs[i].classList.add("between"); $("#simp-out").textContent += ` It sits between ${sup("O(" + LADDER_ROWS[i - 1][0] + ")")} and ${sup("O(" + LADDER_ROWS[i][0] + ")")}; the common categories have no name for it.`; }
-      }
-    }
-  };
-  $("#simp-in").addEventListener("input", run);
-  $$("[data-simp]").forEach((b) => b.addEventListener("click", () => { $("#simp-in").value = b.dataset.simp; run(); }));
-  run();
-}
-
-/* =========================================================== relation classifier */
-function setupRelate() {
-  const run = () => {
-    const r = G.relate(G.stripWrapper(G.normalizeExpr($("#rel-f").value)), G.stripWrapper(G.normalizeExpr($("#rel-g").value)));
-    const out = $("#rel-out");
-    if (r.error) { out.replaceChildren(el("p", { class: "note", text: `Can't classify that for certain (${r.error}).` })); return; }
-    const card = (sym, ok, why) => el("div", { class: `verdict ${ok ? "yes" : "no"}` }, el("span", { class: "v-sym", text: `f ∈ ${sym}(g)` }), el("b", { text: ok ? "True" : "False" }), el("span", { class: "v-why", text: why }));
-    const word = r.cmp < 0 ? "grows strictly slower than" : r.cmp > 0 ? "grows strictly faster than" : "grows at the same rate as";
-    out.replaceChildren(
-      el("p", { class: "v-head", text: `f is Θ(${sup(r.f)}) and g is Θ(${sup(r.g)}), so f ${word} g.` }),
-      el("div", { class: "v-row" },
-        card("O", r.o, r.o ? "f ≤ c·g eventually" : "no c works: f/g grows without bound"),
-        card("Ω", r.omega, r.omega ? "f ≥ c·g eventually" : "no c > 0 works: f/g shrinks to 0"),
-        card("Θ", r.theta, r.theta ? "both bounds hold" : "only one bound holds")));
-  };
-  $("#rel-f").addEventListener("input", run); $("#rel-g").addEventListener("input", run);
-  $$("[data-rel]").forEach((b) => b.addEventListener("click", () => { const [f, g] = JSON.parse(b.dataset.rel); $("#rel-f").value = f; $("#rel-g").value = g; run(); }));
-  run();
-}
-
-/* =========================================================== exact races */
-function setupRace() {
-  let cur = "n50";
-  const draw = () => {
-    const R = Sim.RACES[cur];
-    const runs = Sim.raceProfile(cur);
-    const last = runs[runs.length - 1];
-    const flip = cur === "threeTwo" ? runs.find((r) => r.s === "gt").from : last.from;
-    const b = R.range[1];
-    const xs = [...new Set(Array.from({ length: 201 }, (_, i) => Math.max(R.range[0], Math.round((i / 200) * b))))];
-    const gLabel = R.gText.replace("^n", "ⁿ");
-    $("#race-legend").replaceChildren(...[[sup(R.fText), COLORS.f], [gLabel, COLORS.g]].map(([t, c]) => el("span", {}, el("span", { class: "key", style: `border-color:${c}` }), t)));
-    lineChart($("#race-svg"), {
-      xDomain: [0, b], xLabel: "n", yLabel: "log₁₀ of the value",
-      series: [{ color: COLORS.f, label: sup(R.fText), pts: xs.map((n) => [n, R.log10f(n)]) }, { color: COLORS.g, label: gLabel, pts: xs.map((n) => [n, R.log10g(n)]) }],
-      markers: [{ x: flip, label: `n = ${fmtInt(flip)}` }],
-      shade: { from: flip, label: cur === "n50" ? "1.1ⁿ ahead" : "3ⁿ ahead" },
-      snap: (v) => Math.round(v),
-      hover: (n) => [`n = ${fmtInt(n)}`, `${sup(R.fText)}: ${R.digitsF(n)} digits`, `${gLabel}: ${R.digitsG(n)} digits`, R.cmp(n) > 0 ? `${sup(R.fText)} is bigger` : `${sup(R.fText)} ≤ ${gLabel}`],
-    });
-    $("#race-out").textContent = cur === "n50"
-      ? `Exact: n⁵⁰ ≤ 1.1ⁿ at n = 1, n⁵⁰ > 1.1ⁿ for every n from 2 to 4,401, and n⁵⁰ ≤ 1.1ⁿ for every n from 4,402 on (after n = 525 the ratio n⁵⁰/1.1ⁿ only shrinks). So c = 1, n₀ = 4,402 proves n⁵⁰ ∈ O(1.1ⁿ).`
-      : `Exact: 3ⁿ ≤ 1000·2ⁿ for n ≤ 17 and 3ⁿ > 1000·2ⁿ from n = 18 on (the ratio 1.5ⁿ only grows). The lecture's bound: n > log₂1000 / (log₂3 − 1) ≈ 17.04. Every c fails this way, so 3ⁿ ∉ O(2ⁿ) and 3ⁿ ∉ Θ(2ⁿ).`;
-    const ns = cur === "n50" ? [1, 2, 100, 525, 1000, 4401, 4402, 6000] : [1, 10, 17, 18, 20, 40];
-    const t = el("table", { class: "plain num" }, el("tr", {}, el("th", { class: "r", text: "n" }), el("th", { class: "r", text: sup(R.fText) }), el("th", { class: "r", text: gLabel }), el("th", { text: "bigger" })));
-    for (const n of ns) {
-      const fv = cur === "n50" ? Sim.bigPow(n, 50) : Sim.bigPow(3, n);
-      const gText = cur === "n50" ? (n <= 100 ? `≈ ${(1.1 ** n).toPrecision(5)}` : `${R.digitsG(n)}-digit integer part`) : sciBig(1000n * Sim.bigPow(2, n));
-      t.append(el("tr", { class: R.cmp(n) > 0 ? "" : "win" }, el("td", { class: "r", text: fmtInt(n) }), el("td", { class: "r", text: sciBig(fv) }), el("td", { class: "r", text: gText }), el("td", { text: R.cmp(n) > 0 ? sup(R.fText) : gLabel })));
-    }
-    $("#race-table").replaceChildren(t);
-  };
-  $$("#race [data-race]").forEach((b) => b.addEventListener("click", () => { cur = b.dataset.race; $$("#race [data-race]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); draw(); }));
-  $("#race-table-toggle").addEventListener("click", (e) => { const t = $("#race-table"); t.hidden = !t.hidden; e.currentTarget.setAttribute("aria-pressed", String(!t.hidden)); });
-  REDRAW.add((id) => { if (id === "examples") draw(); });
-  draw();
-}
-
-/* =========================================================== n^(1/10) vs log n */
-function setupTenth() {
-  const R = Sim.RACES.tenth;
-  const draw = () => {
-    const k = Number($("#tenth-k").value);
-    $("#tenth-k-out").textContent = String(k);
-    const fv = 2 ** (k / 10);
-    $("#tenth-f").textContent = fv.toFixed(2);
-    $("#tenth-g").textContent = String(k);
-    const c = R.cmp(k);
-    $("#tenth-vs").textContent = c > 0 ? ">" : c < 0 ? "<" : "=";
-    $(".duel-side.s1", $("#tenth")).classList.toggle("lead", c > 0);
-    $(".duel-side.s2", $("#tenth")).classList.toggle("lead", c < 0);
-    const nTxt = k <= 50 ? Sim.bigPow(2, k).toLocaleString("en-US") : sciBig(Sim.bigPow(2, k));
-    $("#tenth-out").textContent = `n = 2${sup("^" + k)} = ${nTxt}. ${c > 0 ? "n^(1/10) is bigger" : "log₂ n is bigger"}${k === 1 ? " (the tiny-n exception)" : k >= 59 ? ", and stays bigger for every larger k" : ", so the n^(1/10) algorithm is cheaper here"}.`;
-    const xs = Array.from({ length: 160 }, (_, i) => 1 + (i / 159) * 79);
-    lineChart($("#tenth-svg"), {
-      xDomain: [0, 80], xLabel: "k  (n = 2ᵏ)", height: (W) => (W < 520 ? 210 : 240),
-      series: [{ color: COLORS.f, label: "n^(1/10)", pts: xs.map((x) => [x, 2 ** (x / 10)]) }, { color: COLORS.g, label: "log₂ n", pts: xs.map((x) => [x, x]) }],
-      markers: [{ x: 59, label: "k = 59 (n ≈ 5.8·10¹⁷)" }], shade: { from: 59, label: "n^(1/10) ahead" },
-      dots: [{ x: k, y: Math.max(fv, k), cls: "now" }],
-      snap: (v) => Math.round(v),
-      hover: (x) => [`k = ${x}, n = 2${sup("^" + x)}`, `n^(1/10) = ${(2 ** (x / 10)).toFixed(2)}`, `log₂ n = ${x}`],
-    });
-  };
-  $("#tenth-k").addEventListener("input", draw);
-  REDRAW.add((id) => { if (id === "usage") draw(); });
-  draw();
 }
 
 /* =========================================================== heaps: drawing a tree and its array */
@@ -870,14 +675,8 @@ function setupBrute() {
 setupStaticPictures();
 setupHero();
 setupGap();
-setupABC();
-setupQuant();
+setupBuckets();
 $$(".bound").forEach(setupBound);
-setupGrid();
-setupSimplify();
-setupRelate();
-setupRace();
-setupTenth();
 setupPQRun();
 setupHeight();
 $$(".heap-step").forEach(setupHeapStepper);

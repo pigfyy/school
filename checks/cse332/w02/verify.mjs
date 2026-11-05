@@ -171,9 +171,12 @@ for (const r of H.filter((x) => x.t === "build")) { const n = r.start.length, ca
 }
 // the c / n0 explorer's claims
 for (const cl of Sim.CLAIMS) ok(cl.cs.includes(cl.c0) && cl.n00 >= 1 && cl.n00 <= cl.N, `explorer claim ${cl.id} starts on a listed c`);
-ok(Sim.CLAIMS.find((c) => c.id === "sq-vs-n").cs.every((c) => G.smallestN0({ f: ["0", "0", "1"], g: ["0", "1"], rel: "O" }, c).n0 === null), "n^2 ∈ O(n): no c on the slider works");
+{
+  const lin10 = { f: ["10", "2"], g: ["0", "1"], rel: "O" };
+  ok(G.smallestN0(lin10, "2").n0 === null && Number(G.smallestN0(lin10, "3").n0) === 10 && G.checkBound(lin10, "3", "10").holds && !G.checkBound(lin10, "3", "9").holds, "2n + 10 <= c n: c = 2 never, c = 3 exactly from n = 10");
+  ok(G.checkBound({ f: ["10", "2"], g: ["0", "1"], rel: "Omega" }, "2", "1").holds, "2n + 10 >= 2n from n = 1");
+}
 ok(G.smallestN0({ f: ["0", "-50", "13"], g: ["0", "0", "1"], rel: "Omega" }, "13").n0 === null && Number(G.smallestN0({ f: ["0", "-50", "13"], g: ["0", "0", "1"], rel: "Omega" }, "25/2").n0) === 100, "Example 2: c = 13 never; c = 12.5 from 100");
-ok(G.checkBound({ f: ["100", "10"], g: ["0", "0", "1"], rel: "O" }, "10", "10").holds, "the explorer's starting pair for Example 1 (the lecture's) holds");
 
 /* ---------------------------------------------------------------- 2. answer keys in the HTML */
 const html = readFileSync(`${here}../../../site/cse332/w02/index.html`, "utf8");
@@ -194,8 +197,7 @@ const FORMULA_TRUTH = {};
 /* Lecture 3 */
 Object.assign(TRUTH, {
   "cse332-w2-l3-search-double-n": (() => { const d = new Set(); for (let n = 1; n <= 5000; n++) d.add(Sim.worstGaps(2 * n).length - Sim.worstGaps(n).length); return d.size === 1 ? S([...d][0]) : "varies"; })(),
-  "cse332-w2-l3-notation-same-pair-n3": yn(G.checkBound({ f: ["17", "0", "3"], g: ["0", "0", "0", "1"], rel: "O" }, "4", "5").holds),
-  "cse332-w2-l3-examples-log-cube": yn(G.relate("log(n^3)", "log n").theta),
+  "cse332-w2-l3-search-64": S(Sim.binaryWorstExhaustive(64)),
   "cse332-w2-l3-gap-halving.solve-4096": S(Math.log2(4096)),
   "cse332-w2-l3-gap-halving.worst-2-to-20": S(worst(1048576)),
   "cse332-w2-l3-gap-halving.worst-million": S(worst(1000000)),
@@ -224,8 +226,6 @@ Object.assign(TRUTH, {
   "cse332-w2-l3-true-statements.n-theta-means-not-olog": yn(!G.relate("n", "log n").o),
 });
 Object.assign(BIGO_TRUTH, {
-  "cse332-w2-l3-search-log-n-squared": "2 log n",
-  "cse332-w2-l3-drop-cube-vs-n2log": "n^2 log n + n^3/1000",
   "cse332-w2-l3-intuition-buckets.four-n-plus-five": "4n + 5",
   "cse332-w2-l3-intuition-buckets.half-nlogn": "0.5nlogn + 2n + 7",
   "cse332-w2-l3-intuition-buckets.cube-plus-exp": "n^3 + 2^n + 3n",
@@ -411,43 +411,40 @@ for (const [tid, part, good, bad] of BOUND_SOLUTIONS) {
 const text = html.replace(/<!--[\s\S]*?-->/g, "").replace(/\s+/g, " ");
 const has = (s, why) => ok(text.includes(s), `page states "${s}" (${why})`);
 has("4{,}402", "n^50 crossover"); has("between 4,401 and 4,402", "home prose");
-has("first fails at \\(n = 18\\)", "3^n vs 1000*2^n");
-ok(J1("binaryWorst", (r) => r.n === 1024).worst === 11 && text.includes("\\(10 + 1 = 11\\) loops"), "n = 1024 worst case is 11");
 {
-  const A = (n) => 10n * n + 900n, B = (n) => 100n * n - 50n; // C = n^2/100 -> compare 100*A with n^2
-  let bBelowA = 0n; for (let n = 1n; n < 100n; n++) if (B(n) < A(n)) bBelowA = n;
-  let cBelowA = 0n; for (let n = 1n; n < 5000n; n++) if (n * n < 100n * A(n)) cBelowA = n;
-  let cBelowB = 0n; for (let n = 1n; n < 5000n; n++) if (n * n < 100n * B(n)) cBelowB = n;
-  ok(bBelowA === 10n && cBelowA === 1083n && cBelowB > cBelowA && text.includes("up to \\(n = 1{,}083\\)") && text.includes("only up to \\(n = 10\\)"), `A/B/C crossovers (B<A up to ${bBelowA}, C<A up to ${cBelowA}, C<B up to ${cBelowB})`);
+  const rows = [16, 1024, 1000000].map((n) => [n, Sim.binaryWorstExhaustive(n), Sim.worstGaps(n).length]);
+  ok(rows.every((r) => r[1] === r[2]) && html.includes(rows.map((r) => `<td class="best">${r[1]}</td>`).join("")), `binary search worst cases ${rows.map((r) => r[1]).join(", ")}`);
+  ok(Sim.worstGaps(16).join() === "16,8,4,2,1" && text.includes("\\(16 \\to 8 \\to 4 \\to 2 \\to 1\\)"), "16 halves to 1 in 4 steps, 5 loops");
 }
 ok(Math.abs(Math.log2(5) - 2.32) < 0.005, "log2 5 ≈ 2.32");
 {
-  const A = (n) => 10 * n + 900, B = (n) => 100 * n - 50, C = (n) => (n * n) / 100;
-  const fmt = (x) => (Number.isInteger(x) ? x.toLocaleString("en-US").replace(/,/g, "{,}") : String(x));
-  const cells = html.replace(/<td[^>]*>/g, "<td>");
-  const row = (F) => [5, 500, 2000].map((n) => `<td>${F(n).toLocaleString("en-US")}</td>`).join("");
-  for (const [name, F] of [["A", A], ["B", B], ["C", C]]) ok(cells.includes(row(F)), `table row ${name} at n = 5, 500, 2000`);
-  const best = [5, 500, 2000].map((n) => ["A", "B", "C"][[A(n), B(n), C(n)].indexOf(Math.min(A(n), B(n), C(n)))]).join("");
-  ok(best === "CCA" && /<td class="best">20,900<\/td>/.test(html) && /<td class="best">0\.25<\/td>/.test(html) && /<td class="best">2,500<\/td>/.test(html), `cheapest highlighted: ${best}`);
+  const ns = [1, 5, 10, 20, 100];
+  const cells = html.replace(/<td class="best">/g, "<td>");
+  for (const [name, F] of [["10n", (n) => 10 * n], ["n^2", (n) => n * n]]) ok(cells.includes(ns.map((n) => `<td>${F(n).toLocaleString("en-US")}</td>`).join("")), `table row ${name} at n = ${ns}`);
+  const bestA = ns.filter((n) => 10 * n < n * n).map((n) => `<td class="best">${(10 * n).toLocaleString("en-US")}</td>`).join("");
+  const bestB = ns.filter((n) => n * n < 10 * n).map((n) => `<td class="best">${n * n}</td>`).join("");
+  ok(html.includes(bestA) && html.includes(bestB), "cheaper cell highlighted, ties left plain");
+  let cross = true; for (let n = 1; n < 10000; n++) if ((10 * n <= n * n) !== (n >= 10)) cross = false;
+  ok(cross && text.includes("From \\(n = 10\\) on, A is never slower"), "10n <= n^2 exactly from n = 10");
+}
+for (const [f, g] of [["3n + 5", "n"], ["n^2 + 100n", "n^2"], ["4 log n + 7", "log n"], ["2^n + n^3", "2^n"]]) ok(G.relate(f, g).theta, `bucket of ${f} is ${g}`);
+{
+  const say = { "O(n^2)": "o", "O(n)": "o", "O(\\log n)": "o", "\\Omega(n)": "omega", "\\Omega(n^2)": "omega", "\\Theta(n)": "theta" };
+  const board = html.slice(html.indexOf("is in bucket \\(n\\). Which claims are true?"));
+  for (const [claim, key] of Object.entries(say)) {
+    const g = claim.replace(/^\\?\w+\((.*)\)$/, "$1").replace(/\\/g, "");
+    const truth = G.relate("2n + 10", g)[key];
+    const m = new RegExp(`<span class="lab">\\\\\\(${claim.replace(/[\\()^]/g, "\\$&")}\\\\\\)</span><span class="mth">(.)</span>`).exec(board);
+    ok(m && (m[1] === "✓") === truth, `2n + 10 ∈ ${claim}: page says ${m && m[1]}, truth ${truth}`);
+  }
 }
 {
-  const firstFail = (c) => { for (let n = 1n; n < 200n; n++) if (5n ** n > c * 4n ** n) return n; };
-  for (const c of [10n, 100n, 1000n]) { const f = firstFail(c); let stays = true; for (let n = f; n < f + 200n; n++) if (5n ** n <= c * 4n ** n) stays = false; ok(stays && text.includes(`\\(n = ${f}\\)</td>`), `5^n <= ${c}*4^n fails from n = ${f} and never recovers`); }
-  let ok9 = true; for (let n = 1n; n < 1000n; n++) if ((2n * n * n + 9n <= 3n * n * n) !== (n >= 3n)) ok9 = false;
-  ok(ok9, "2n^2 + 9 <= 3n^2 exactly from n = 3");
-  for (const m of html.matchAll(/data-dots="([01]+)"[^>]*>\\\(c = (\d+)\\\)/g)) { const c = BigInt(m[2]); const want = [...Array(m[1].length)].map((_, i) => { const n = BigInt(i + 1); return 2n * n * n + 9n <= c * n * n ? "1" : "0"; }).join(""); ok(m[1] === want, `try-it dots for c = ${c}: ${m[1]}`); }
-  ok((html.match(/data-dots=/g) || []).length === 4, "four try-it choices checked");
-  let lo = true; for (let n = 1n; n < 1000n; n++) if (2n * n * n + 9n < 2n * n * n) lo = false;
-  ok(lo, "2n^2 + 9 >= 2n^2 for every n");
-  ok(2 * 1024 * 10 === 20480 && 5 * 1024 === 5120 && text.includes("\\(20{,}480 + 5{,}120 + 40\\)"), "2n log n and 5n at n = 1024");
-  ok(html.replace(/<td[^>]*>/g, "<td>").includes(`<td>${(10 ** 4).toLocaleString("en-US")}</td><td>${(20 ** 4).toLocaleString("en-US")}</td>`) && html.replace(/<td[^>]*>/g, "<td>").includes(`<td>${(3 ** 10).toLocaleString("en-US")}</td><td>${(3n ** 20n).toLocaleString("en-US")}</td>`), "n^4 and 3^n at 10 and 20");
   let o6 = true; for (let n = 1n; n < 1000n; n++) { if (5n * n * n + 30n * n <= 5n * n * n) o6 = false; if ((5n * n * n + 30n * n <= 6n * n * n) !== (n >= 30n)) o6 = false; }
   ok(o6, "5n^2 + 30n: c = 5 always fails, c = 6 holds exactly from n = 30");
-  ok([10n, 11n, 12n].every((n) => text.includes(`\\(${10n * n + 100n} \\le ${10n * n * n}\\)`)), "plugged-in values in the proofs check");
+  ok([10n, 11n, 12n].every((n) => 2n * n + 10n <= 3n * n && text.includes(`\\(${2n * n + 10n} \\le ${3n * n}\\)`)), "plugged-in values in the proofs check");
 }
 ok(Math.abs(Number(58n ** 10n) / 1e17 - 4.31) < 0.01 && Math.abs(2 ** 58 / 1e17 - 2.88) < 0.01 && Math.abs(Number(59n ** 10n) / 1e17 - 5.11) < 0.01 && Math.abs(2 ** 59 / 1e17 - 5.76) < 0.01, "k = 58, 59 values in problem 9");
 ok(Math.abs(Number(43n ** 8n) / 1e13 - 1.17) < 0.01 && Math.abs(2 ** 43 / 1e12 - 8.80) < 0.01 && Math.abs(Number(44n ** 8n) / 1e13 - 1.40) < 0.01 && Math.abs(2 ** 44 / 1e13 - 1.76) < 0.01, "n = 43, 44 values in problem 8");
-ok(Math.abs(Math.log2(1000) / (Math.log2(3) - 1) - 17.04) < 0.01, "threshold 17.04 for c = 1000");
 ok(heightI(9) === 3, "the lecture's 9-node heap has height 3");
 ok(!/\bslides?\b/i.test(text.replace(/files\/slides\//g, "")), "no student-facing text mentions slides");
 ok(!/details class="notes"/.test(html), "no instructor teaching notes");

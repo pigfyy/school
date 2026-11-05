@@ -118,12 +118,7 @@
      Polynomials as coefficient strings, lowest degree first (the format Grader.checkBound takes).
      cs: the values the c slider steps through; c0 / n00: where the sliders start; N: the last n drawn. */
   const CLAIMS = [
-    { id: "sq17-o", f: ["17", "0", "3"], g: ["0", "0", "1"], rel: "O", fTex: "3n² + 17", gTex: "n²", cs: ["1", "2", "3", "7/2", "4", "5", "10", "20"], c0: "4", n00: 1, N: 15 },
-    { id: "sq17-omega", f: ["17", "0", "3"], g: ["0", "0", "1"], rel: "Omega", fTex: "3n² + 17", gTex: "n²", cs: ["1", "2", "3", "4", "5"], c0: "3", n00: 1, N: 15 },
-    { id: "ex1", f: ["100", "10"], g: ["0", "0", "1"], rel: "O", fTex: "10n + 100", gTex: "n²", cs: ["1", "2", "5", "10", "20", "50", "110"], c0: "10", n00: 10, N: 30 },
-    { id: "ex2", f: ["0", "-50", "13"], g: ["0", "0", "1"], rel: "Omega", fTex: "13n² − 50n", gTex: "n²", cs: ["1", "6", "11", "12", "25/2", "13", "14"], c0: "13", n00: 1, N: 120 },
-    { id: "lin", f: ["4", "3"], g: ["0", "1"], rel: "O", fTex: "4 + 3n", gTex: "n", cs: ["3", "4", "5", "7"], c0: "4", n00: 1, N: 15 },
-    { id: "sq-vs-n", f: ["0", "0", "1"], g: ["0", "1"], rel: "O", fTex: "n²", gTex: "n", cs: ["1", "5", "10", "20", "40"], c0: "10", n00: 1, N: 60 },
+    { id: "lin10", f: ["10", "2"], g: ["0", "1"], rel: "O", fTex: "2n + 10", gTex: "n", cs: ["1", "2", "3", "4", "5"], c0: "2", n00: 1, N: 30 },
   ];
   function polyNum(coeffs, n) { return coeffs.reduce((s, a, k) => s + Number(eval_(a)) * n ** k, 0); }
   function eval_(s) { const m = /^(-?\d+)(?:\/(\d+))?$/.exec(s); return m ? Number(m[1]) / (m[2] ? Number(m[2]) : 1) : NaN; }

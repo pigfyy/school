@@ -32,13 +32,10 @@
       <ol class="modules">
         <li><a href="#l3-goals">What this lecture is for</a></li>
         <li><a href="#search">Why binary search is log n</a></li>
-        <li><a href="#compare">Comparing running times</a></li>
+        <li><a href="#compare">Buckets</a></li>
         <li><a href="#notation"><span>\(O\), \(\Omega\), \(\Theta\)</span></a></li>
         <li><a href="#proofs">Proving a bound</a></li>
-        <li><a href="#drop">What you can drop</a></li>
-        <li><a href="#examples">True or false?</a></li>
         <li><a href="#cases">Case vs. bound</a></li>
-        <li><a href="#usage">Using the notation well</a></li>
         <li><a href="#l3-problems">Lecture 3 practice</a></li>
       </ol>
     </div>
@@ -129,7 +126,7 @@
 
   <h2>This week</h2>
   <div class="week">
-    <a href="#l3-goals"><strong>Mon, Oct 5</strong><span class="tag-today" data-date="2026-10-05">Today</span><span>Lecture 3: Algorithm Analysis 2</span><span>\(O\), \(\Omega\), \(\Theta\); proofs with \(c\) and \(n_0\); what you can drop. Weiss 2.1–2.4</span></a>
+    <a href="#l3-goals"><strong>Mon, Oct 5</strong><span class="tag-today" data-date="2026-10-05">Today</span><span>Lecture 3: Algorithm Analysis 2</span><span>Buckets; \(O\), \(\Omega\), \(\Theta\); proofs with \(c\) and \(n_0\). Weiss 2.1–2.4</span></a>
     <a href="#l4-goals"><strong>Wed, Oct 7</strong><span class="tag-today" data-date="2026-10-07">Today</span><span>Lecture 4: Priority Queues 1</span><span>The ADT, complete trees, the heap property, insert and extract. Weiss 6.1–6.3</span></a>
     <a href="#s2-goals"><strong>Thu, Oct 8</strong><span class="tag-today" data-date="2026-10-08">Today</span><span>Section 2: Runtime</span><span>What a bound promises, writing \(O\) and \(\Theta\) proofs, the running time of <code>numUnique</code></span></a>
     <a href="#l5-goals"><strong>Fri, Oct 9</strong><span class="tag-today" data-date="2026-10-09">Today</span><span>Lecture 5: Priority Queues 2</span><span>The heap in an array, the code line by line, changing a key, buildHeap. Weiss 6.4–6.5</span></a>
@@ -176,23 +173,18 @@
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span> · Algorithm Analysis 2</p>
   <h1>What this lecture is for</h1>
   <div class="rule">
-    <p><strong>The point.</strong> Lecture 2 turned code into step counts like \(10n + 900\). This lecture compares those counts the useful way: by how they grow for big inputs, ignoring constant factors. The tools are \(O\) (at most), \(\Omega\) (at least) and \(\Theta\) (both).</p>
+    <p><strong>The point.</strong> Describe how fast code is by its bucket, like \(\log n\), \(n\) or \(n^2\): how its step count grows as the input gets big. Then say it precisely with \(O\) (at most), \(\Omega\) (at least) and \(\Theta\) (exactly).</p>
   </div>
 
-  <h2>After this lecture you can</h2>
+  <h2>Five short pages</h2>
   <ol class="goals">
-    <li>Say why binary search takes about \(\log_2 n\) loops. <a href="#search">Binary search</a></li>
-    <li>Say why we compare growth and ignore constants. <a href="#compare">Comparing running times</a></li>
-    <li>Use the definitions of \(O\), \(\Omega\), \(\Theta\). <a href="#notation">The definitions</a></li>
-    <li>Prove a bound like \(10n + 100 \in O(n^2)\). <a href="#proofs">Proving a bound</a></li>
-    <li>Put a function in its simplest \(\Theta\) class. <a href="#drop">What you can drop</a></li>
-    <li>Decide claims like \(n\log n \in O(n^2)\). <a href="#examples">True or false?</a></li>
-    <li>Keep "which case" separate from "which bound". <a href="#cases">Case vs. bound</a>, <a href="#usage">Using the notation</a></li>
+    <li>Why binary search takes \(\log n\) steps. <a href="#search">Binary search</a></li>
+    <li>What a bucket is, and why the bigger one always loses. <a href="#compare">Buckets</a></li>
+    <li>\(O\), \(\Omega\), \(\Theta\) in plain words. <a href="#notation">O, Ω, Θ</a></li>
+    <li>Prove a bound by picking \(c\) and \(n_0\). <a href="#proofs">Proving a bound</a></li>
+    <li>Best or worst case is a separate question. <a href="#cases">Case vs. bound</a></li>
   </ol>
 
-  <div class="rule">
-    <p><strong>How these pages work.</strong> Each page starts with a worked example: a few lines of math (one per click, or press N), a small table, or something to tap. The rule comes right after. "Why" boxes are optional. Quick checks close each page, and <a href="#l3-problems">Lecture 3 practice</a> closes the lecture.</p>
-  </div>
   <div class="rule warn">
     <p><strong>Exercise 1</strong> (Running Time, due Mon Oct 12, in Gradescope) uses these ideas. This site doesn't show or solve any Exercise 1 problem.</p>
   </div>
@@ -202,9 +194,32 @@
 <!-- ================================================================ L3: BINARY SEARCH -->
 <section class="page" id="search" data-title="Why binary search is log n">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
-  <h1>Why binary search is \(\log_2 n\)</h1>
-  <div class="prose"><p>Binary search checks the middle of a sorted list and throws away the half that can't hold \(k\). The lecture's code:</p></div>
-  <pre class="code">public static boolean binary_contains(
+  <h1>Why binary search is \(\log n\)</h1>
+  <div class="prose"><p>Binary search checks the middle of a sorted list, then throws away the half that can't hold the target. Press Step.</p></div>
+
+  <div class="panel" id="gap">
+    <div class="controls">
+      <label>Find <input type="number" id="gap-k" value="5" aria-label="target k"></label>
+      <button class="btn primary" type="button" id="gap-step">Step</button>
+      <button class="btn" type="button" id="gap-run">Run</button>
+      <button class="btn quiet" type="button" id="gap-reset">Reset</button>
+    </div>
+    <div class="cells" id="gap-cells"></div>
+    <div class="gap-bars" id="gap-bars" aria-label="Items left at the start of each loop"></div>
+    <p class="out" id="gap-out" role="status"></p>
+  </div>
+
+  <p class="line">Each loop halves what's left: \(16 \to 8 \to 4 \to 2 \to 1\). That's 4 halvings, because \(2^4 = 16\), plus one loop for the last item.</p>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th>items \(n\)</th><th>16</th><th>1,024</th><th>a million</th></tr></thead>
+    <tr><th>binary search</th><td class="best">5</td><td class="best">11</td><td class="best">20</td></tr>
+    <tr><th>one by one</th><td>16</td><td>1,024</td><td>a million</td></tr>
+  </table></div>
+  <div class="rule"><p><strong>The rule.</strong> Halving each loop takes about \(\log_2 n\) loops (worst case). Doubling the list adds just one loop.</p></div>
+
+  <details class="more">
+    <summary>The lecture's code</summary>
+    <pre class="code">public static boolean binary_contains(
         List&lt;Integer&gt; a, int k){
     int start = 0;          <span class="cm">// k can only be in [start, end)</span>
     int end = a.size();
@@ -219,126 +234,87 @@
     }
     return false;
 }</pre>
-
-  <div class="example">
-    <p class="example-head">Worked example</p>
-    <p class="example-q">The list has \(n = 1024\) items. In the worst case, how many loops?</p>
-    <div class="steps board"><ol>
-      <li><span class="lab">start</span><span class="mth">gap \(= 1024\)</span><span class="note">items that could still hold \(k\)</span></li>
-      <li><span class="lab">each loop</span><span class="mth">gap halves</span><span class="note">worst case keeps the bigger half</span></li>
-      <li><span class="lab"></span><span class="mth">\(1024 \to 512 \to \dots \to 2 \to 1\)</span><span class="note">10 halvings</span></li>
-      <li><span class="lab"></span><span class="mth">\(10 + 1 = 11\) loops</span><span class="note">one more loop checks the last item</span></li>
-      <li><span class="lab">why log</span><span class="mth">\(\frac{n}{2^x} = 1 \Rightarrow x = \log_2 n\)</span><span class="note">\(\log_2 1024 = 10\)</span></li>
-      <li class="wide"><div class="rule"><p><strong>The rule.</strong> Halving each step takes about \(\log_2 n\) steps. Exactly \(\lfloor\log_2 n\rfloor + 1\) loops: \(\Theta(\log n)\).</p></div></li>
-    </ol></div>
-  </div>
-
-  <h2>Watch it run</h2>
-  <div class="panel" id="gap">
-    <div class="controls">
-      <label>Search for \(k\) = <input type="number" id="gap-k" value="88" aria-label="target k"></label>
-      <button class="btn primary" type="button" id="gap-step">Step</button>
-      <button class="btn" type="button" id="gap-run">Run</button>
-      <button class="btn quiet" type="button" id="gap-reset">Reset</button>
-    </div>
-    <div class="cells" id="gap-cells"></div>
-    <div class="gap-bars" id="gap-bars" aria-label="end − start at the top of each iteration"></div>
-    <p class="out" id="gap-out" role="status"></p>
-    <p class="note">Try \(k = 5\), the first item: binary search takes 4 loops, while a left-to-right search finds it in 1. Binary search wins in the worst case, not on every input.</p>
-  </div>
-  <div class="panel" id="worst">
-    <h4>Worst case for any \(n\)</h4>
-    <div class="controls">
-      <label>\(n\) = <input type="number" id="worst-n" value="1000" min="1" max="1000000000" aria-label="list size n"></label>
-    </div>
-    <p class="out" id="worst-out" role="status"></p>
-    <div class="gap-chain" id="worst-chain"></div>
-  </div>
-
-  <div class="example">
-    <p class="example-head">Worked example</p>
-    <p class="example-q">A search that splits into 5 parts takes about \(\log_5 n\) loops. Different bucket from \(\log_2 n\)?</p>
-    <div class="steps board"><ol>
-      <li><span class="lab">change base</span><span class="mth">\(\log_5 n = \dfrac{\log_2 n}{\log_2 5}\)</span><span class="note"></span></li>
-      <li><span class="lab"></span><span class="mth">\(\log_2 5 \approx 2.32\)</span><span class="note">a constant</span></li>
-      <li class="wide"><div class="rule"><p><strong>The rule.</strong> Log bases differ by a constant factor, so the base doesn\'t matter. Write \(\log n\).</p></div></li>
-    </ol></div>
-  </div>
-  <details class="more">
-    <summary>Try other bases</summary>
-    <div class="panel" id="logb">
-      <div class="controls" role="group" aria-label="Base">
-        <span>Base \(c\):</span>
-        <button class="chip" type="button" data-base="2" aria-pressed="false">2</button>
-        <button class="chip" type="button" data-base="5" aria-pressed="true">5</button>
-        <button class="chip" type="button" data-base="8" aria-pressed="false">8</button>
-        <button class="chip" type="button" data-base="10" aria-pressed="false">10</button>
-      </div>
-      <div class="table-wrap"><table class="plain num" id="logb-table"></table></div>
-      <p class="note">The last column never changes as \(n\) grows: it's the constant \(\log_2 c\).</p>
-    </div>
   </details>
 
-  <div class="check" data-id="cse332-w2-l3-search-double-n" data-grader="exact" data-answer="1" data-miscon='{"2":"doubled-log"}'>
-    <p>Quick check: the list doubles in size, from \(n\) to \(2n\) (say from 512 to 1,024). How many <em>more</em> loop iterations can binary search take in the worst case?</p>
+  <div class="check" data-id="cse332-w2-l3-search-64" data-grader="exact" data-answer="7" data-miscon='{"6":"stopped-early","64":"linear-count","32":"halved-once"}'>
+    <p>Quick check: the list has 64 items. In the worst case, how many loops does binary search take?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <div class="check" data-id="cse332-w2-l3-search-log-n-squared" data-grader="bigo" data-answer="log n" data-miscon='{"n":"log-power","n^2":"log-power"}'>
-    <p>Quick check: an algorithm takes \(\log_2(n^2)\) steps. What's its simplest bucket? You'll need the log rule \(\log(a^k) = k\log a\).</p>
+  <div class="check" data-id="cse332-w2-l3-search-double-n" data-grader="exact" data-answer="1" data-miscon='{"2":"doubled-log"}'>
+    <p>Quick check: the list doubles in size, from \(n\) to \(2n\). How many <em>more</em> loops can binary search take in the worst case?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ L3: COMPARE -->
-<section class="page" id="compare" data-title="Comparing running times">
+<!-- ================================================================ L3: BUCKETS -->
+<section class="page" id="compare" data-title="Buckets">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
-  <h1>Comparing running times</h1>
+  <h1>Buckets: the bigger one loses</h1>
 
   <div class="example">
     <p class="example-head">Worked example</p>
-    <p class="example-q">Three algorithms give the same answers: \(A = 10n + 900\), \(B = 100n - 50\), \(C = \frac{n^2}{100}\). Which is cheapest?</p>
+    <p class="example-q">Algorithm A takes \(10n\) steps. Algorithm B takes \(n^2\). Which is faster?</p>
     <div class="table-wrap"><table class="vals">
-      <thead><tr><th></th><th>\(n = 5\)</th><th>\(n = 500\)</th><th>\(n = 2{,}000\)</th></tr></thead>
-      <tr><th>A</th><td>950</td><td>5,900</td><td class="best">20,900</td></tr>
-      <tr><th>B</th><td>450</td><td>49,950</td><td>199,950</td></tr>
-      <tr><th>C</th><td class="best">0.25</td><td class="best">2,500</td><td>40,000</td></tr>
+      <thead><tr><th>\(n\)</th><th>1</th><th>5</th><th>10</th><th>20</th><th>100</th></tr></thead>
+      <tr><th>A: \(10n\)</th><td>10</td><td>50</td><td>100</td><td class="best">200</td><td class="best">1,000</td></tr>
+      <tr><th>B: \(n^2\)</th><td class="best">1</td><td class="best">25</td><td>100</td><td>400</td><td>10,000</td></tr>
     </table></div>
-    <p class="line">The winner changes. C is cheapest up to \(n = 1{,}083\), then A. B beats A only up to \(n = 10\).</p>
-    <div class="rule"><p><strong>The rule.</strong> Compare growth for large \(n\): drop constant factors and smaller terms. A and B become \(n\), C becomes \(n^2\). So C eventually loses to both.</p></div>
+    <p class="line">B is faster at first. From \(n = 10\) on, A is never slower, and the gap keeps growing.</p>
   </div>
 
-  <h2>See where they cross</h2>
-  <div class="panel" id="abc">
-    <div class="controls"><label>\(n\) = <input type="number" id="abc-n" value="500" min="1" aria-label="n"></label></div>
-    <p class="out" id="abc-out" role="status"></p>
-    <div class="legend"><span><span class="key" style="border-color:var(--s1)"></span>A = 10n + 900</span><span><span class="key" style="border-color:var(--s2)"></span>B = 100n − 50</span><span><span class="key" style="border-color:var(--s3)"></span>C = n²/100</span></div>
-    <div class="chart-box"><svg class="chart" id="abc-svg" viewBox="0 0 760 280" role="img" aria-label="The three running times for n up to 1,500"></svg></div>
+  <div class="panel" id="ab">
+    <div class="legend"><span><span class="key" style="border-color:var(--s1)"></span>A = 10n</span><span><span class="key" style="border-color:var(--s2)"></span>B = n²</span></div>
+    <div class="chart-box"><svg class="chart" id="ab-svg" viewBox="0 0 760 260" role="img" aria-label="10n and n squared for n up to 30; they cross at n = 10"></svg></div>
   </div>
 
-  <details class="more">
-    <summary>Why drop smaller terms, not just constants?</summary>
-    <p>Constant factors matter more than smaller terms: \(2n^2 &gt; n^2 + n\) for every \(n &gt; 1\). So once we've agreed to ignore constant factors, keeping the smaller terms would be inconsistent.</p>
-  </details>
+  <div class="rule"><p><strong>A bucket</strong> is the fastest-growing term, with its constant dropped. \(10n\) is in bucket \(n\), and \(n^2\) is in bucket \(n^2\). For big enough \(n\), the smaller bucket always wins, whatever the constants are.</p></div>
 
-  <div class="check" data-id="cse332-w2-l3-compare-small-inputs" data-grader="mc">
-    <p>Quick check: you know \(n\) is never more than 50. Which is cheaper for you, \(A = 10n + 900\) or \(C = \frac{n^2}{100}\)?</p>
+  <h2>Find the bucket</h2>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th>steps</th><th>bucket</th></tr></thead>
+    <tr><th>\(3n + 5\)</th><td>\(n\)</td></tr>
+    <tr><th>\(n^2 + 100n\)</th><td>\(n^2\)</td></tr>
+    <tr><th>\(4\log n + 7\)</th><td>\(\log n\)</td></tr>
+    <tr><th>\(2^n + n^3\)</th><td>\(2^n\)</td></tr>
+  </table></div>
+  <p class="line">Slowest to fastest: \(1 &lt; \log n &lt; n &lt; n\log n &lt; n^2 &lt; n^3 &lt; 2^n\).</p>
+  <div class="rule warn">
+    <p><strong>Watch out</strong></p>
+    <ul>
+      <li>Exponents and exponential bases stay: \(n^3\) isn't bucket \(n^2\), and \(3^n\) isn't bucket \(2^n\).</li>
+      <li>The log's base doesn't matter (\(\log_5 n\) is just \(\log_2 n \div 2.32\)), so write \(\log n\).</li>
+    </ul>
+  </div>
+
+  <div class="check" data-id="cse332-w2-l3-compare-small-n" data-grader="mc">
+    <p>Quick check: your inputs never go above \(n = 5\). Which is cheaper for you, \(10n\) or \(n^2\)?</p>
     <div class="opts">
-      <label><input type="radio" name="cse332-w2-l3-compare-small-inputs"> A, because it grows slower<span class="why" hidden>A grows slower, but it only wins from n = 1,084 on. Your inputs never get there.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l3-compare-small-inputs"> C<span class="why" hidden>Right. For n ≤ 50, C is at most 25 steps and A is at least 910. Growth rates are about large n; for inputs you know are small, compare the actual counts.</span></label>
-      <label><input type="radio" name="cse332-w2-l3-compare-small-inputs"> You can't tell without Big-O<span class="why" hidden>You can: plug in. Big-O answers a different question, about large n.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-compare-small-n"> \(10n\), because its bucket is smaller<span class="why" hidden>Its bucket is smaller, but 10n only wins from n = 10 on. Your inputs never get there.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l3-compare-small-n"> \(n^2\)<span class="why" hidden>Right. For n = 1 to 5, n² is always smaller (25 vs. 50 at n = 5). Buckets are about big n. For small n, compare the actual counts.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-compare-small-n"> You can't tell<span class="why" hidden>You can: plug in n = 1 to 5.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <div class="check" data-id="cse332-w2-l3-compare-same-growth-def" data-grader="mc">
-    <p>Quick check: which two have the same kind of growth? \(D = 5n^2 + n\), \(E = 1000n + 7\), \(F = \frac{n^2}{2}\).</p>
+    <p>Quick check: which two are in the same bucket? \(D = 5n^2 + n\), \(E = 1000n + 7\), \(F = \frac{n^2}{2}\).</p>
     <div class="opts">
       <label data-correct><input type="radio" name="cse332-w2-l3-compare-same-growth-def"> D and F<span class="why" hidden>Right. Drop constant factors and smaller terms and both are n².</span></label>
-      <label><input type="radio" name="cse332-w2-l3-compare-same-growth-def"> D and E<span class="why" hidden>E's 1000 is only a constant factor. E grows like n, D like n².</span></label>
-      <label><input type="radio" name="cse332-w2-l3-compare-same-growth-def"> E and F<span class="why" hidden>F's ½ is only a constant factor. F grows like n², E like n.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-compare-same-growth-def"> D and E<span class="why" hidden>E's 1000 is only a constant factor. E is bucket n, D is bucket n².</span></label>
+      <label><input type="radio" name="cse332-w2-l3-compare-same-growth-def"> E and F<span class="why" hidden>F's ½ is only a constant factor. F is bucket n², E is bucket n.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w2-l3-drop-exponent-base" data-grader="mc">
+    <p>Quick check: which one is <em>not</em> in bucket \(2^n\)?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w2-l3-drop-exponent-base"> \(5\cdot 2^n\)<span class="why" hidden>5 is a constant factor: drop it. This is bucket 2ⁿ.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-drop-exponent-base"> \(2^n + n^{10}\)<span class="why" hidden>2ⁿ eventually outgrows n¹⁰, so this is bucket 2ⁿ.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l3-drop-exponent-base"> \(4^n\)<span class="why" hidden>Right. 4ⁿ = 2ⁿ·2ⁿ, which is 2ⁿ times something that grows. The base of an exponential stays.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
@@ -351,65 +327,46 @@
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
   <h1>\(O\), \(\Omega\), \(\Theta\)</h1>
 
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th></th><th>means</th><th>like</th></tr></thead>
+    <tr><th>\(f \in O(g)\)</th><td>\(f\) grows at most like \(g\)</td><td>\(\le\)</td></tr>
+    <tr><th>\(f \in \Omega(g)\)</th><td>\(f\) grows at least like \(g\)</td><td>\(\ge\)</td></tr>
+    <tr><th>\(f \in \Theta(g)\)</th><td>both: same bucket</td><td>\(=\)</td></tr>
+  </table></div>
+  <p class="line">"Grows like" ignores constants and small \(n\), the same way buckets do.</p>
+
   <div class="example">
     <p class="example-head">Worked example</p>
-    <p class="example-q">Is \(2n^2 + 9 \in O(n^2)\)? Pick a \(c\).</p>
-    <div class="tryit">
-      <div class="chips" role="group" aria-label="Pick c">
-        <button class="chip" type="button" aria-pressed="false" data-dots="00000000" data-say="c = 1: never holds. Too small.">\(c = 1\)</button>
-        <button class="chip" type="button" aria-pressed="false" data-dots="00000000" data-say="c = 2: never holds. Always 9 short.">\(c = 2\)</button>
-        <button class="chip" type="button" aria-pressed="false" data-dots="00111111" data-say="c = 3: holds from n = 3 on. So n₀ = 3 works.">\(c = 3\)</button>
-        <button class="chip" type="button" aria-pressed="false" data-dots="00111111" data-say="c = 4: holds from n = 3 on. Also works.">\(c = 4\)</button>
-      </div>
-      <div class="tryit-dots" aria-label="One dot per n: green holds, red fails"></div>
-      <p class="tryit-out" role="status">Each dot is one \(n\). Green: \(2n^2 + 9 \le c\cdot n^2\) there.</p>
-    </div>
-    <p class="line">Lower bound: \(2n^2 + 9 \ge 2n^2\) for every \(n\), so \(c = 2\), \(n_0 = 1\) gives \(\Omega(n^2)\). Both together: \(\Theta(n^2)\).</p>
-    <div class="rule"><p><strong>The rule.</strong> \(f \in O(g)\): from some \(n_0\) on, \(f(n) \le c\cdot g(n)\) for one \(c\) you pick. Think \(O\) as \(\le\), \(\Omega\) as \(\ge\), \(\Theta\) as \(=\).</p></div>
+    <p class="example-q">\(f(n) = 2n + 10\) is in bucket \(n\). Which claims are true?</p>
+    <div class="steps board"><ol>
+      <li><span class="lab">\(O(n^2)\)</span><span class="mth">✓</span><span class="note">at most \(n^2\): true, just loose</span></li>
+      <li><span class="lab">\(O(n)\)</span><span class="mth">✓</span><span class="note">at most \(n\)</span></li>
+      <li><span class="lab">\(O(\log n)\)</span><span class="mth">✗</span><span class="note">\(n\) outgrows \(\log n\)</span></li>
+      <li><span class="lab">\(\Omega(n)\)</span><span class="mth">✓</span><span class="note">at least \(n\)</span></li>
+      <li><span class="lab">\(\Omega(n^2)\)</span><span class="mth">✗</span><span class="note">never keeps up with \(n^2\)</span></li>
+      <li><span class="lab">\(\Theta(n)\)</span><span class="mth">✓</span><span class="note">both \(O(n)\) and \(\Omega(n)\)</span></li>
+      <li class="wide"><div class="rule"><p><strong>The rule.</strong> Compare buckets. \(O\): same bucket or a bigger one. \(\Omega\): same or smaller. \(\Theta\): same. When you know the bucket, say \(\Theta\).</p></div></li>
+    </ol></div>
   </div>
 
-  <h2>The definitions</h2>
-  <div class="rule defn" id="defn">
-    <p><strong>\(O\)</strong>, at most. Click each part:</p>
-    <p class="quant" aria-label="Definition of Big-O, click a part">
-      <button class="q-part" type="button" data-q="in">\(f \in O(g(n))\)</button> \(\equiv\)
-      <button class="q-part" type="button" data-q="c">\(\exists c &gt; 0.\)</button>
-      <button class="q-part" type="button" data-q="n0">\(\exists n_0 &gt; 0.\)</button>
-      <button class="q-part" type="button" data-q="all">\(\forall n \ge n_0.\)</button>
-      <button class="q-part" type="button" data-q="le">\(f(n) \le c\cdot g(n)\)</button>
-    </p>
-    <p class="q-explain" id="q-explain" role="status">Click any part of the definition.</p>
-    <p><strong>\(\Omega\)</strong>, at least:</p>
-    <p>\[f \in \Omega(g(n)) \equiv \exists c&gt;0.\ \exists n_0&gt;0.\ \forall n\ge n_0.\ f(n) \ge c\cdot g(n)\]</p>
-    <p><strong>\(\Theta\)</strong>, both: \(\Theta(g(n)) = \Omega(g(n)) \cap O(g(n))\).</p>
-  </div>
-
-  <h2>Your turn: move \(c\) and \(n_0\)</h2>
-  <div class="prose"><p>Now \(3n^2 + 17\). Grey dots are \(n &lt; n_0\), ignored. Find a pair with no red.</p></div>
-  <div class="panel bound" id="bx-notation" data-claims="sq17-o,sq17-omega"></div>
-
-  <details class="more">
-    <summary>Why pick \(c\) and \(n_0\) before \(n\)?</summary>
-    <p>You choose one \(c\) and one \(n_0\), and then they must work for <em>every</em> \(n \ge n_0\). If you could pick a new \(c\) for each \(n\), any function would be \(O\) of any other (take \(c = f(n)/g(n)\)), and the definition would say nothing.</p>
-  </details>
-  <details class="more">
-    <summary>Why is it "\(\in\)"?</summary>
-    <p>\(O(n^2)\) is a <em>set</em> of functions, so \(3n^2 + 17 \in O(n^2)\) is membership. People also write "\(3n^2 + 17 = O(n^2)\)". That "=" means "is in", so it only reads one way: nobody writes \(O(n^2) = 3n^2 + 17\).</p>
-  </details>
-
-  <div class="check" data-id="cse332-w2-l3-notation-raise-c" data-grader="mc">
-    <p>Quick check: you have an upper bound \(f(n) \le c\cdot g(n)\) that holds from some \(n_0\) on. You make \(c\) bigger. What happens to the smallest \(n_0\) that works?</p>
+  <div class="check" data-id="cse332-w2-l3-usage-read-o" data-grader="mc">
+    <p>Quick check: a paper says its algorithm's worst case is \(O(n^2)\). What can you conclude?</p>
     <div class="opts">
-      <label><input type="radio" name="cse332-w2-l3-notation-raise-c"> It gets bigger<span class="why" hidden>A bigger c only raises the right side, so every n that worked before still works.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l3-notation-raise-c"> It stays the same or gets smaller<span class="why" hidden>Right. Raising c lifts c·g(n), so the inequality holds at least wherever it did before, maybe earlier.</span></label>
-      <label><input type="radio" name="cse332-w2-l3-notation-raise-c"> It can go either way<span class="why" hidden>g(n) is positive here, so raising c can only help an upper bound.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-usage-read-o"> It takes about \(n^2\) steps on big inputs<span class="why" hidden>O only says "at most". The algorithm might really be bucket n.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l3-usage-read-o"> Its worst case grows at most like \(n^2\), and it might be much faster<span class="why" hidden>Right. That's all an upper bound promises.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-usage-read-o"> It can't be faster than \(n^2\)<span class="why" hidden>That would be a lower bound, Ω(n²).</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <div class="check" data-id="cse332-w2-l3-notation-same-pair-n3" data-grader="yesno" data-answer="yes">
-    <p>Quick check: \(c = 4\), \(n_0 = 5\) proves \(3n^2 + 17 \in O(n^2)\). Does the same pair also prove \(3n^2 + 17 \in O(n^3)\)? (yes or no)</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+  <div class="check" data-id="cse332-w2-l3-notation-theta-from-both" data-grader="mc">
+    <p>Quick check: you know \(f \in O(n^3)\) and \(f \in \Omega(n^3)\). What else is true?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w2-l3-notation-theta-from-both"> \(f \in \Theta(n^3)\)<span class="why" hidden>Right. At most and at least the same bucket means exactly that bucket.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-notation-theta-from-both"> \(f \in O(n^2)\)<span class="why" hidden>f is bucket n³, which is bigger than n². So f is not at most n².</span></label>
+      <label><input type="radio" name="cse332-w2-l3-notation-theta-from-both"> Nothing more<span class="why" hidden>Both bounds together are exactly what Θ means.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <nav class="pager"></nav>
@@ -419,74 +376,41 @@
 <section class="page" id="proofs" data-title="Proving a bound">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
   <h1>Proving a bound</h1>
+  <div class="rule"><p><strong>What you prove.</strong> \(f \in O(g)\) means: pick a constant \(c\) and a starting point \(n_0\) so that \(f(n) \le c\cdot g(n)\) for every \(n \ge n_0\). In a picture: past \(n_0\), \(f\) stays under \(c\cdot g\).</p></div>
 
   <div class="example">
-    <p class="example-head">Worked example 1</p>
-    <p class="example-q">Prove \(10n + 100 \in O(n^2)\).</p>
+    <p class="example-head">Worked example</p>
+    <p class="example-q">Prove \(2n + 10 \in O(n)\).</p>
     <div class="steps board"><ol>
-      <li><span class="lab">need</span><span class="mth">\(10n + 100 \le c\cdot n^2\)</span><span class="note">for all \(n \ge n_0\)</span></li>
-      <li><span class="lab">\(c = 10\)</span><span class="mth">\(n + 10 \le n^2\)</span><span class="note">divide by 10</span></li>
-      <li><span class="lab">\(n \ge 10\)</span><span class="mth">\(n + 10 \le 2n \le 10n \le n^2\)</span><span class="note">so \(n_0 = 10\)</span></li>
-      <li class="wide"><div class="rule"><p>✓ \(c = 10\), \(n_0 = 10\). <strong>The rule.</strong> A proof names \(c\) and \(n_0\), then shows the inequality for any \(n \ge n_0\).</p></div></li>
+      <li><span class="lab">need</span><span class="mth">\(2n + 10 \le c\cdot n\)</span><span class="note">for every \(n \ge n_0\)</span></li>
+      <li><span class="lab">\(c = 2\)?</span><span class="mth">\(2n + 10 \le 2n\)</span><span class="note">✗ never: it's always 10 over</span></li>
+      <li><span class="lab">\(c = 3\)?</span><span class="mth">\(2n + 10 \le 3n\)</span><span class="note">take \(2n\) off both sides</span></li>
+      <li><span class="lab"></span><span class="mth">\(10 \le n\)</span><span class="note">true from \(n = 10\) on</span></li>
+      <li class="wide"><div class="rule"><p>✓ \(c = 3\), \(n_0 = 10\). <strong>The rule.</strong> Pick \(c\) a little above the leading constant, then solve for where it starts holding.</p></div></li>
     </ol></div>
   </div>
+
+  <h2>See it</h2>
+  <div class="prose"><p>At \(c = 2\) every dot is red. Raise \(c\) to 3, then move \(n_0\) to 10.</p></div>
+  <div class="panel bound" id="bx-proofs" data-claims="lin10"></div>
 
   <details class="more">
     <summary>See it written as a proof</summary>
     <div class="proof">
       <p class="proof-head">Proof</p>
-      <p>Let \(c = 10\) and \(n_0 = 10\). Show that for all \(n \ge 10\), \(10n + 100 \le 10n^2\).</p>
-      <p>\[\begin{aligned} &amp;10n+100 \le 10n^2\\ \equiv\ &amp; n + 10 \le n^2\\ \equiv\ &amp; 10 \le n^2 - n\\ \equiv\ &amp; 10 \le n(n-1)\end{aligned}\]</p>
-      <p>This is true because \(n(n-1)\) is strictly increasing and \(10(10-1) &gt; 10\).</p>
+      <p>Let \(c = 3\) and \(n_0 = 10\). Take any \(n \ge 10\). Then \(10 \le n\), so \(2n + 10 \le 2n + n = 3n = c\cdot n\).</p>
     </div>
-    <p>The last line covers every \(n \ge 10\): it holds at \(n = 10\), and \(n(n-1)\) only grows.</p>
   </details>
 
-  <div class="example">
-    <p class="example-head">Worked example 2</p>
-    <p class="example-q">Prove \(13n^2 - 50n \in \Omega(n^2)\).</p>
-    <div class="steps board"><ol>
-      <li><span class="lab">need</span><span class="mth">\(13n^2 - 50n \ge c\cdot n^2\)</span><span class="note">for all \(n \ge n_0\)</span></li>
-      <li><span class="lab">\(c = 13\)</span><span class="mth">\(-50n \ge 0\)</span><span class="note">✗ false for every \(n\)</span></li>
-      <li><span class="lab">\(c = 12\)</span><span class="mth">\(n^2 \ge 50n\)</span><span class="note">leave room for the \(-50n\)</span></li>
-      <li><span class="lab"></span><span class="mth">\(n \ge 50\)</span><span class="note">so \(n_0 = 50\)</span></li>
-      <li class="wide"><div class="rule"><p>✓ \(c = 12\), \(n_0 = 50\). <strong>The rule.</strong> If a \(c\) fails for every \(n\), change \(c\): smaller for \(\Omega\), bigger for \(O\).</p></div></li>
-    </ol></div>
-  </div>
-
-  <details class="more">
-    <summary>See it written as a proof</summary>
-    <div class="proof">
-      <p class="proof-head">Proof</p>
-      <p>Let \(c = 12\) and \(n_0 = 50\). Show that for all \(n \ge 50\), \(13n^2 - 50n \ge 12n^2\).</p>
-      <p>\[\begin{aligned} &amp;13n^2 - 50n \ge 12n^2\\ \equiv\ &amp; n^2 - 50n \ge 0\\ \equiv\ &amp; n - 50 \ge 0 \quad(\text{since } n \ge 50, n \ne 0)\\ \equiv\ &amp; n \ge 50\end{aligned}\]</p>
-      <p>Because we chose \(n_0 = 50\), the inequality holds for all \(n \ge n_0\).</p>
-    </div>
-    <p>"\(n \ne 0\)" is there because the third line divides by \(n\).</p>
-  </details>
+  <p class="line"><strong>For \(\Omega\)</strong>, flip to \(\ge\) and pick a small \(c\): \(2n + 10 \ge 2n\) for every \(n\), so \(c = 2\), \(n_0 = 1\). Both bounds together: \(2n + 10 \in \Theta(n)\).</p>
 
   <div class="rule warn">
-    <p><strong>Common mistakes</strong></p>
+    <p><strong>Not a proof</strong></p>
     <ul>
-      <li>Handing in only the scratchwork.</li>
-      <li>Checking a few values of \(n\), or reading \(n_0\) off a picture.</li>
-      <li>Letting \(c\) depend on \(n\), as in "pick \(c = n\)".</li>
-      <li>Dividing by something that might be 0 or negative.</li>
+      <li>Checking a few values of \(n\). Argue for any \(n \ge n_0\).</li>
+      <li>A \(c\) that depends on \(n\), like "pick \(c = n\)". \(c\) is one fixed number.</li>
     </ul>
   </div>
-
-  <h2>Try your own \(c\) and \(n_0\)</h2>
-  <div class="prose"><p>Any pair that works is a proof. The last claim, \(n^2 \in O(n)\), is false: watch the red dots as you raise \(c\).</p></div>
-  <div class="panel bound" id="bx-proofs" data-claims="ex1,ex2,lin,sq-vs-n"></div>
-
-  <details class="more">
-    <summary>Why does a proof have this shape?</summary>
-    <p>Big-O says "there exist \(c, n_0\) such that for all \(n \ge n_0\)…".</p>
-    <ul>
-      <li>To prove "there exists", show one that works. So you name specific values.</li>
-      <li>To prove "for all", take an arbitrary \(n \ge n_0\) that you know nothing else about. You can't check infinitely many \(n\) one at a time.</li>
-    </ul>
-  </details>
 
   <div class="check" data-id="cse332-w2-l3-proofs-o-bigger-c" data-grader="mc">
     <p>Quick check: proving \(5n^2 + 30n \in O(n^2)\), you try \(c = 5\) and get \(30n \le 0\), false for every \(n \ge 1\). What next?</p>
@@ -499,191 +423,13 @@
     <p class="feedback" role="status"></p>
   </div>
   <div class="check" data-id="cse332-w2-l3-proofs-plugging-in" data-grader="mc">
-    <p>Quick check: a "proof" of \(10n + 100 \in O(n^2)\) says: "Let \(c = 10\), \(n_0 = 10\). At \(n = 10\): \(200 \le 1000\). At \(n = 11\): \(210 \le 1210\). At \(n = 12\): \(220 \le 1440\). So it holds." What's wrong?</p>
+    <p>Quick check: a "proof" of \(2n + 10 \in O(n)\) says: "Let \(c = 3\), \(n_0 = 10\). At \(n = 10\): \(30 \le 30\). At \(n = 11\): \(32 \le 33\). At \(n = 12\): \(34 \le 36\). So it holds." What's wrong?</p>
     <div class="opts">
       <label><input type="radio" name="cse332-w2-l3-proofs-plugging-in"> Nothing: three values is enough<span class="why" hidden>There are infinitely many n ≥ 10. Three checks say nothing about n = 1,000,000.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l3-proofs-plugging-in"> It never argues for an arbitrary \(n \ge 10\)<span class="why" hidden>Right. The pair is fine; the proof has to show it works for every n ≥ n₀, not a few.</span></label>
-      <label><input type="radio" name="cse332-w2-l3-proofs-plugging-in"> \(c = 10\) is too small<span class="why" hidden>c = 10 does work (worked example 1 proves it). The problem is how this one argues.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l3-proofs-plugging-in"> It never argues for an arbitrary \(n \ge 10\)<span class="why" hidden>Right. The pair is fine. The proof has to show it works for every n ≥ n₀, not a few.</span></label>
+      <label><input type="radio" name="cse332-w2-l3-proofs-plugging-in"> \(c = 3\) is too small<span class="why" hidden>c = 3 does work (the worked example proves it). The problem is how this one argues.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ L3: DROP -->
-<section class="page" id="drop" data-title="What you can drop">
-  <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
-  <h1>What you can drop</h1>
-
-  <div class="example">
-    <p class="example-head">Worked example 1</p>
-    <p class="example-q">Simplest \(\Theta\) class of \(2n\log n + 5n + 40\)?</p>
-    <div class="steps board"><ol>
-      <li><span class="lab">\(n = 1024\)</span><span class="mth">\(20{,}480 + 5{,}120 + 40\)</span><span class="note">using \(\log_2 1024 = 10\)</span></li>
-      <li><span class="lab">keep biggest</span><span class="mth">\(2n\log n\)</span><span class="note">it pulls away: \(\frac{n\log n}{n} = \log n\) grows</span></li>
-      <li><span class="lab">drop the 2</span><span class="mth">\(\Theta(n\log n)\)</span><span class="note">\(\log n\) isn\'t a constant, so it stays</span></li>
-      <li class="wide"><div class="rule"><p><strong>The rule.</strong> Keep the fastest-growing term, then drop its constant factor.</p></div></li>
-    </ol></div>
-  </div>
-
-  <div class="example">
-    <p class="example-head">Worked example 2</p>
-    <p class="example-q">Simplest \(\Theta\) class of \(n^4 + 3^n + 100\)?</p>
-    <div class="table-wrap"><table class="vals">
-      <thead><tr><th></th><th>\(n = 10\)</th><th>\(n = 20\)</th></tr></thead>
-      <tr><th>\(n^4\)</th><td>10,000</td><td>160,000</td></tr>
-      <tr><th>\(3^n\)</th><td class="best">59,049</td><td class="best">3,486,784,401</td></tr>
-    </table></div>
-    <p class="line">\(3^n\) triples each step and leaves \(n^4\) behind: \(\Theta(3^n)\). Any exponential beats any polynomial eventually.</p>
-  </div>
-
-  <div class="rule">
-    <p><strong>The rule.</strong> Keep the fastest-growing term. Then drop:</p>
-    <ul>
-      <li>constant multipliers (\(5n^3 \to n^3\));</li>
-      <li>the bases of logs (\(\log_5 n \to \log n\)).</li>
-    </ul>
-    <p><strong>Never</strong> drop:</p>
-    <ul>
-      <li>exponents (\(n^3\) is not \(\Theta(n^2)\));</li>
-      <li>the base of an exponential (\(3^n\) is not \(\Theta(2^n)\));</li>
-      <li>a log factor (\(n\log n\) is not \(\Theta(n)\)).</li>
-    </ul>
-  </div>
-
-  <h2>Try your own</h2>
-  <div class="panel" id="simp">
-    <div class="controls">
-      <label for="simp-in">\(f(n) =\)</label>
-      <input type="text" id="simp-in" class="mono wide" value="3n^2 + 10n + 7" aria-label="expression in n" autocomplete="off" spellcheck="false">
-    </div>
-    <div class="controls presets" role="group" aria-label="Examples">
-      <span class="note">Examples:</span>
-      <button class="chip" type="button" data-simp="2nlogn + 5n + 40">2n log n + 5n + 40</button>
-      <button class="chip" type="button" data-simp="n^4 + 3^n + 100">n⁴ + 3ⁿ + 100</button>
-      <button class="chip" type="button" data-simp="3n^2 + 10n + 7">3n² + 10n + 7</button>
-    </div>
-    <p class="out" id="simp-out" role="status"></p>
-    <ol class="ladder" id="simp-ladder" aria-label="Common categories, slowest growth first"></ol>
-    <p class="note">This handles sums and products of constants, \(n^a\), \(b^n\), logs and square roots. It refuses expressions it can't classify for certain, like \(n^2 - n^2\).</p>
-  </div>
-
-  <details class="more">
-    <summary>Why may you drop these, and not the others?</summary>
-    <ul>
-      <li><strong>Constant factors</strong> are the \(c\) at work: \(5n^3 \le 3\cdot 2n^3\), and \(5n^3 \ge 1\cdot 2n^3\).</li>
-      <li><strong>Smaller terms</strong> cost at most a bigger constant: for \(n \ge 1\), \(2n^2 + 8n + 3 \le 2n^2 + 8n^2 + 3n^2 = 13n^2\).</li>
-      <li><strong>Log bases</strong>: \(\log_c n = \frac{\log_2 n}{\log_2 c}\), a constant factor again.</li>
-      <li><strong>The others fail the ratio test.</strong> If \(f(n)/g(n)\) grows without bound, no constant \(c\) keeps \(f \le c\cdot g\). \(\frac{n^3}{n^2} = n\). \(\frac{3^n}{2^n} = 1.5^n\). \(\frac{n\log n}{n} = \log n\). All unbounded.</li>
-    </ul>
-  </details>
-  <details class="more">
-    <summary>Common categories, slowest first</summary>
-    <div class="table-wrap">
-    <table class="plain cats">
-      <tr><td>\(O(1)\)</td><td>constant</td></tr>
-      <tr><td>\(O(\log n)\)</td><td>logarithmic</td></tr>
-      <tr><td>\(O(n)\)</td><td>linear</td></tr>
-      <tr><td>\(O(n\log n)\)</td><td>log-linear</td></tr>
-      <tr><td>\(O(n^2)\)</td><td>quadratic</td></tr>
-      <tr><td>\(O(n^3)\)</td><td>cubic</td></tr>
-      <tr><td>\(O(n^k)\)</td><td>polynomial (where \(k\) is a constant \(&gt; 1\))</td></tr>
-      <tr><td>\(O(k^n)\)</td><td>exponential (where \(k\) is a constant \(&gt; 1\))</td></tr>
-    </table>
-    </div>
-  </details>
-
-  <div class="check" data-id="cse332-w2-l3-drop-cube-vs-n2log" data-grader="bigo" data-answer="n^3">
-    <p>Quick check: put \(n^2\log n + \dfrac{n^3}{1000}\) in its simplest bucket.</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l3-drop-exponent-base" data-grader="mc">
-    <p>Quick check: which one is <em>not</em> in \(\Theta(2^n)\)?</p>
-    <div class="opts">
-      <label><input type="radio" name="cse332-w2-l3-drop-exponent-base"> \(5\cdot 2^n\)<span class="why" hidden>A multiplicative constant: drop it. This is \(\Theta(2^n)\).</span></label>
-      <label><input type="radio" name="cse332-w2-l3-drop-exponent-base"> \(2^n + n^{10}\)<span class="why" hidden>\(2^n\) eventually dominates \(n^{10}\), so the sum is \(\Theta(2^n)\).</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l3-drop-exponent-base"> \(4^n\)<span class="why" hidden>Right. \(4^n = 2^n\cdot 2^n\). The base of an exponential is not a multiplicative constant, so you can't drop it.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ L3: EXAMPLES -->
-<section class="page" id="examples" data-title="True or false?">
-  <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
-  <h1>True or false?</h1>
-
-  <div class="example">
-    <p class="example-head">Worked example 1</p>
-    <p class="example-q">True or false: \(n\log n \in O(n^2)\)?</p>
-    <div class="steps board"><ol>
-      <li><span class="lab">ratio</span><span class="mth">\(\frac{n\log n}{n^2} = \frac{\log n}{n} \to 0\)</span><span class="note">\(n^2\) grows faster</span></li>
-      <li><span class="lab">\(c = 1, n_0 = 1\)</span><span class="mth">\(\log n \le n\)</span><span class="note">true for every \(n \ge 1\)</span></li>
-      <li><span class="lab">\(\Theta\)?</span><span class="mth">\(\frac{n^2}{n\log n} = \frac{n}{\log n} \to \infty\)</span><span class="note">so not \(\Omega(n^2)\)</span></li>
-      <li class="wide"><div class="rule"><p><strong>True.</strong> \(n\log n \in O(n^2)\), but not \(\Theta(n^2)\).</p></div></li>
-    </ol></div>
-  </div>
-
-  <div class="example">
-    <p class="example-head">Worked example 2</p>
-    <p class="example-q">True or false: \(5^n \in O(4^n)\)?</p>
-    <p class="line">Ratio: \(\frac{5^n}{4^n} = 1.25^n\), which grows without bound. Can a big \(c\) make \(5^n \le c\cdot 4^n\) hold?</p>
-    <div class="table-wrap"><table class="vals">
-      <thead><tr><th>\(c\)</th><th>10</th><th>100</th><th>1,000</th></tr></thead>
-      <tr><th>fails from</th><td class="no">\(n = 11\)</td><td class="no">\(n = 21\)</td><td class="no">\(n = 31\)</td></tr>
-    </table></div>
-    <p class="line">A bigger \(c\) only moves the failure later. <strong>False.</strong></p>
-    <div class="rule"><p><strong>The rule.</strong> Simplify both sides, then look at \(f/g\). Stays bounded: \(f \in O(g)\). Grows without bound: no \(c\) works. Handy order: logs &lt; polynomials &lt; exponentials.</p></div>
-  </div>
-
-  <h2>Try any pair</h2>
-  <div class="panel" id="rel">
-    <div class="controls" role="group" aria-label="Examples">
-      <span class="note">Try:</span>
-      <button class="chip" type="button" data-rel='["n log n","n^2"]'>n log n vs n²</button>
-      <button class="chip" type="button" data-rel='["5^n","4^n"]'>5ⁿ vs 4ⁿ</button>
-      <button class="chip" type="button" data-rel='["100n","n^1.5"]'>100n vs n^1.5</button>
-    </div>
-    <div class="controls">
-      <label>\(f(n) =\) <input type="text" id="rel-f" class="mono" value="100n" aria-label="f(n)" autocomplete="off" spellcheck="false"></label>
-      <label>\(g(n) =\) <input type="text" id="rel-g" class="mono" value="n^1.5" aria-label="g(n)" autocomplete="off" spellcheck="false"></label>
-    </div>
-    <div class="verdicts" id="rel-out" role="status"></div>
-  </div>
-
-  <h2>"Eventually" can be far away</h2>
-  <div class="prose"><p>Pick a race. Once the second function pulls ahead for good, the claim's \(n_0\) has arrived. \(3^n \le 1000\cdot 2^n\) first fails at \(n = 18\), and never holds again.</p></div>
-  <div class="panel" id="race">
-    <div class="controls" role="group" aria-label="Race">
-      <button class="chip" type="button" data-race="n50" aria-pressed="true">\(n^{50}\) vs \(1.1^n\)</button>
-      <button class="chip" type="button" data-race="threeTwo" aria-pressed="false">\(3^n\) vs \(1000\cdot 2^n\)</button>
-    </div>
-    <div class="legend" id="race-legend"></div>
-    <div class="chart-box" id="race-box"><svg class="chart" id="race-svg" viewBox="0 0 760 280" role="img" aria-label="log10 of both functions"></svg></div>
-    <p class="out" id="race-out" role="status"></p>
-    <div class="controls">
-      <button class="chip" type="button" id="race-table-toggle" aria-pressed="false">Table view</button>
-    </div>
-    <div class="table-wrap" id="race-table" hidden></div>
-  </div>
-
-  <div class="check" data-id="cse332-w2-l3-examples-why-eventually" data-grader="mc">
-    <p>Quick check: at \(n = 100\), \(n^{50}\) is far bigger than \(1.1^n\). Why is \(n^{50} \in O(1.1^n)\) still true?</p>
-    <div class="opts">
-      <label><input type="radio" name="cse332-w2-l3-examples-why-eventually"> Because \(O\) ignores constant factors, and \(n^{50}/1.1^n\) is a constant<span class="why" hidden>The ratio isn't constant: it rises until n = 525, then falls toward 0.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l3-examples-why-eventually"> Because \(O\) only needs the inequality from some \(n_0\) on, and from \(n = 4{,}402\) on \(1.1^n\) stays ahead<span class="why" hidden>Right. c = 1, n₀ = 4,402 works. Everything before n₀ is ignored.</span></label>
-      <label><input type="radio" name="cse332-w2-l3-examples-why-eventually"> Because exponentials are always bigger than polynomials<span class="why" hidden>Not always: at n = 100 the polynomial is far bigger. Only eventually.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l3-examples-log-cube" data-grader="yesno" data-answer="yes">
-    <p>Quick check: true or false? \(\log(n^3) \in \Theta(\log n)\).</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <nav class="pager"></nav>
@@ -693,52 +439,33 @@
 <section class="page" id="cases" data-title="Case vs. bound">
   <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
   <h1>Case vs. bound</h1>
-  <div class="prose"><p>Linear search checks items left to right until it finds \(k\). The lecture's code:</p></div>
-  <pre class="code">public static boolean contains(
-        List&lt;Integer&gt; a, int k){
-    for(int i=0; i&lt; a.size(); i++){
-        if (a.get(i) == k)
-            return true;
-    }
-    return false;
-}</pre>
+  <div class="rule"><p><strong>Two separate questions.</strong> The <em>case</em> (best or worst) picks which inputs you count, which gives one step count. The <em>bound</em> (\(O\), \(\Omega\), \(\Theta\)) says what you know about that count.</p></div>
 
   <div class="example">
     <p class="example-head">Worked example</p>
-    <p class="example-q">True statements about <code>contains</code> on \(n\) items?</p>
+    <p class="example-q">Linear search checks items left to right until it finds \(k\). On \(n\) items:</p>
     <div class="table-wrap"><table class="vals">
-      <thead><tr><th></th><th>worst</th><th>best</th></tr></thead>
-      <tr><th>input</th><td>\(k\) missing</td><td>\(k\) first</td></tr>
-      <tr><th>checks</th><td>\(n\)</td><td>\(1\)</td></tr>
-      <tr><th>tight</th><td>\(\Theta(n)\)</td><td>\(\Theta(1)\)</td></tr>
-      <tr><th>also true</th><td>\(\Omega(1)\)</td><td>\(O(n)\)</td></tr>
+      <thead><tr><th></th><th>when</th><th>steps</th><th>tight</th></tr></thead>
+      <tr><th>worst</th><td>\(k\) missing</td><td>\(n\)</td><td>\(\Theta(n)\)</td></tr>
+      <tr><th>best</th><td>\(k\) first</td><td>\(1\)</td><td>\(\Theta(1)\)</td></tr>
     </table></div>
-    <div class="rule"><p><strong>The rule.</strong> The case picks which function. The bound says what you know about it. Any bound goes with any case.</p></div>
+    <div class="steps board"><ol>
+      <li><span class="lab">worst, \(\Omega(n)\)</span><span class="mth">✓</span><span class="note">even the worst case takes at least about \(n\)</span></li>
+      <li><span class="lab">best, \(O(n)\)</span><span class="mth">✓</span><span class="note">the best case takes at most \(n\): true, loose</span></li>
+      <li><span class="lab">best, \(\Omega(n)\)</span><span class="mth">✗</span><span class="note">the best case is 1 step</span></li>
+      <li class="wide"><div class="rule"><p><strong>The rule.</strong> Any bound goes with any case.</p></div></li>
+    </ol></div>
   </div>
 
   <div class="rule warn">
-    <p><strong>A common misconception</strong>: "\(\Omega\) means best case and \(O\) means worst case." It's wrong, and generated text often says it. \(O\) is "at most", \(\Omega\) is "at least", about whichever case you picked.</p>
+    <p><strong>A common mix-up.</strong> \(O\) doesn't mean worst case, and \(\Omega\) doesn't mean best case. \(O\) is "at most" and \(\Omega\) is "at least", about whichever case you picked.</p>
   </div>
-
-  <div class="panel" id="grid">
-    <p class="note">Every cell holds a true statement. Click one.</p>
-    <div class="table-wrap"><table class="plain grid6" id="grid-table"></table></div>
-    <p class="out" id="grid-out" role="status"></p>
-  </div>
-
-  <details class="more">
-    <summary>Why say \(O\) or \(\Omega\) instead of \(\Theta\)?</summary>
-    <ul>
-      <li>Sometimes you can't prove your analysis is tight. Then an upper or lower bound is what you can honestly claim.</li>
-      <li>Some claims are about every algorithm for a problem. "Every algorithm for this problem has to look at all \(n\) items" is an \(\Omega(n)\) claim, even about the best case.</li>
-    </ul>
-  </details>
 
   <div class="check" data-id="cse332-w2-l3-notation-omega-best" data-grader="mc">
     <p>Quick check: "Every sorting algorithm takes at least \(n\log n\) time in the worst case." Which pair describes this claim?</p>
     <div class="opts">
       <label><input type="radio" name="cse332-w2-l3-notation-omega-best"> \(O\), best case<span class="why" hidden>"At least" is a lower bound, so it's \(\Omega\). And the claim is about the worst case.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l3-notation-omega-best"> \(\Omega\), worst case<span class="why" hidden>Right. A lower bound (\(\Omega\)) on the worst-case function.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l3-notation-omega-best"> \(\Omega\), worst case<span class="why" hidden>Right. A lower bound (\(\Omega\)) on the worst case.</span></label>
       <label><input type="radio" name="cse332-w2-l3-notation-omega-best"> \(\Omega\), best case<span class="why" hidden>"At least" does make it \(\Omega\). But the claim is about the worst case. \(\Omega\) doesn't mean best case.</span></label>
       <label><input type="radio" name="cse332-w2-l3-notation-omega-best"> \(\Theta\), average case<span class="why" hidden>The claim gives only a lower bound, and it's about the worst case.</span></label>
     </div>
@@ -748,86 +475,9 @@
   <div class="check" data-id="cse332-w2-l3-cases-best-under-worst" data-grader="mc">
     <p>Quick check: an algorithm's worst case is \(O(n)\). What does that tell you about its best case?</p>
     <div class="opts">
-      <label data-correct><input type="radio" name="cse332-w2-l3-cases-best-under-worst"> It's \(O(n)\) too<span class="why" hidden>Right. The best case is never more than the worst case, so the same c and n₀ work.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l3-cases-best-under-worst"> It's \(O(n)\) too<span class="why" hidden>Right. The best case is never more than the worst case, so it's at most n too.</span></label>
       <label><input type="radio" name="cse332-w2-l3-cases-best-under-worst"> It's \(\Omega(n)\)<span class="why" hidden>The best case can be much faster: linear search's best case is 1 step.</span></label>
       <label><input type="radio" name="cse332-w2-l3-cases-best-under-worst"> Nothing<span class="why" hidden>It does tell you something: at every n, best ≤ worst.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ L3: USAGE -->
-<section class="page" id="usage" data-title="Using the notation well">
-  <p class="where">Lecture 3 · <span class="today-chip" data-date="2026-10-05">Mon Oct 5</span></p>
-  <h1>Using the notation well</h1>
-
-  <div class="example">
-    <p class="example-head">Worked example</p>
-    <p class="example-q">An algorithm does exactly \(3n + 4\) steps in the worst case. What do you write?</p>
-    <div class="table-wrap"><table class="vals">
-      <thead><tr><th>claim</th><th>true?</th><th>says</th></tr></thead>
-      <tr><th>\(O(n^5)\)</th><td class="yes">✓</td><td>almost nothing</td></tr>
-      <tr><th>\(O(n)\)</th><td class="yes">✓</td><td>at most linear; could be faster</td></tr>
-      <tr><th>\(\Theta(n)\)</th><td class="yes">✓</td><td class="best">exactly linear</td></tr>
-    </table></div>
-    <div class="rule"><p><strong>The rule.</strong> Say \(\Theta\) when you know it. \(O\) only promises "at most".</p></div>
-  </div>
-
-  <h2>Say what you analyzed</h2>
-  <div class="rule">
-    <p><strong>Each claim makes four choices:</strong> the problem or the algorithm (usually the algorithm); time or space (usually time); best, worst or average case (usually worst); upper, lower or tight bound (usually upper or tight).</p>
-  </div>
-  <div class="statements">
-    <div class="stmt"><span class="badge">Common</span> Binary search takes \(\Theta(\log n)\) time in the worst case.</div>
-    <div class="stmt"><span class="badge quiet">Less common</span> Binary search is \(\Theta(1)\) in the best case (the item is in the middle).</div>
-    <div class="stmt"><span class="badge quiet">Less common</span> Binary search is \(\Omega(\log\log n)\) in the worst case. True, but weak.</div>
-    <div class="stmt"><span class="badge quiet">Good to know</span> The find-in-sorted-array <em>problem</em> is \(\Omega(\log n)\) in the worst case.</div>
-  </div>
-
-  <h2>Where \(O\) can mislead</h2>
-  <div class="prose"><p>\(n^{1/10}\) grows faster than \(\log n\), but the crossover is around \(5\cdot10^{17}\). For inputs smaller than about \(2^{58}\), the \(n^{1/10}\) algorithm is the cheaper one.</p></div>
-  <div class="panel" id="tenth">
-    <div class="controls">
-      <label for="tenth-k">\(n = 2^k\), \(k\) =</label>
-      <input type="range" id="tenth-k" min="1" max="80" value="40" aria-label="k">
-      <output id="tenth-k-out">40</output>
-    </div>
-    <div class="duel compact">
-      <div class="duel-side s1"><span class="duel-label">\(n^{1/10} = 2^{k/10}\)</span><b id="tenth-f">…</b></div>
-      <div class="duel-vs" id="tenth-vs">vs</div>
-      <div class="duel-side s2"><span class="duel-label">\(\log_2 n = k\)</span><b id="tenth-g">…</b></div>
-    </div>
-    <div class="chart-box" id="tenth-box"><svg class="chart" id="tenth-svg" viewBox="0 0 760 240" role="img" aria-label="n^(1/10) and log2 n for n = 2^k"></svg></div>
-    <p class="out" id="tenth-out" role="status"></p>
-    <p class="note">Decided exactly: \(2^{k/10} &gt; k \iff 2^k &gt; k^{10}\), compared with big integers.</p>
-  </div>
-
-  <details class="more">
-    <summary>Timing vs. Big-O, and small inputs</summary>
-    <ul>
-      <li>To evaluate an <em>algorithm</em>, use asymptotic analysis: study it mathematically, as a function of \(n\). To evaluate an <em>implementation</em> (whose code is faster on this data set), timing is the right tool.</li>
-      <li>Quicksort is \(O(n\log n)\) expected and insertion sort is \(O(n^2)\), yet insertion sort is faster for small \(n\). Sorting comes later in the course.</li>
-    </ul>
-  </details>
-
-  <div class="check" data-id="cse332-w2-l3-usage-read-o" data-grader="mc">
-    <p>Quick check: a paper says its algorithm's worst case is \(O(n^2)\). What can you conclude?</p>
-    <div class="opts">
-      <label><input type="radio" name="cse332-w2-l3-usage-read-o"> It takes about \(n^2\) steps on big inputs<span class="why" hidden>O is only an upper bound. The algorithm might really be Θ(n).</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l3-usage-read-o"> For large \(n\), its worst case is at most a constant times \(n^2\), and it might be much faster<span class="why" hidden>Right. That's all an upper bound promises.</span></label>
-      <label><input type="radio" name="cse332-w2-l3-usage-read-o"> It can't be faster than \(n^2\)<span class="why" hidden>That would be a lower bound, Ω(n²).</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l3-usage-problem-lower" data-grader="mc">
-    <p>Quick check: "The find-in-sorted-array problem is \(\Omega(\log n)\) in the worst case." What does this claim?</p>
-    <div class="opts">
-      <label><input type="radio" name="cse332-w2-l3-usage-problem-lower"> Binary search takes at least \(\log n\) steps on every input<span class="why" hidden>It's about every algorithm, and only about the worst case. Binary search finds a middle item in one step.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l3-usage-problem-lower"> No algorithm for the problem (without parallelism) can have a worst case that grows slower than \(\log n\)<span class="why" hidden>Right. A lower bound on a problem is a statement about every possible algorithm.</span></label>
-      <label><input type="radio" name="cse332-w2-l3-usage-problem-lower"> Some algorithm solves it in about \(\log n\) steps<span class="why" hidden>That would be an upper bound (an algorithm that fast exists). Ω is a lower bound.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
@@ -902,7 +552,7 @@
   </article>
 
   <h2 class="practice-group">What \(O\), \(\Omega\) and \(\Theta\) mean</h2>
-  <p class="note">Lesson: <a href="#compare">Comparing running times</a>, <a href="#notation">O, Ω, Θ</a></p>
+  <p class="note">Lesson: <a href="#compare">Buckets</a>, <a href="#notation">O, Ω, Θ</a></p>
 
   <div class="check" data-id="cse332-w2-l3-cyu-timing-vs-bigo" data-grader="mc">
     <p>Quick check: You and a classmate each wrote a HashMap. You want to know whose code runs faster on one particular data set. What should you use?</p>
@@ -1006,7 +656,7 @@
   </article>
 
   <h2 class="practice-group">The simplest \(\Theta\) class</h2>
-  <p class="note">Lesson: <a href="#drop">What you can drop</a></p>
+  <p class="note">Lesson: <a href="#compare">Buckets</a></p>
 
   <div class="check" data-id="cse332-w2-l3-cyu-not-in-o-n2" data-grader="mc">
     <p>Quick check: Which function is <em>not</em> in \(O(n^2)\)?</p>
@@ -1051,7 +701,7 @@
   </article>
 
   <h2 class="practice-group">Deciding claims, and how far "eventually" is</h2>
-  <p class="note">Lesson: <a href="#examples">True or false?</a></p>
+  <p class="note">Lesson: <a href="#notation">O, Ω, Θ</a>, <a href="#proofs">Proving a bound</a></p>
 
   <article class="task" data-id="cse332-w2-l3-more-examples">
     <h2>8. True or false?</h2>
@@ -1125,7 +775,7 @@
   </article>
 
   <h2 class="practice-group">Case vs. bound, and writing it right</h2>
-  <p class="note">Lesson: <a href="#cases">Case vs. bound</a>, <a href="#usage">Using the notation well</a></p>
+  <p class="note">Lesson: <a href="#cases">Case vs. bound</a></p>
 
   <div class="check" data-id="cse332-w2-l3-cyu-set-notation" data-grader="mc">
     <p>Quick check: \(O(n^2)\) is a set of functions. Which of these ways of writing it is <em>wrong</em>?</p>
