@@ -751,16 +751,8 @@
   <div class="example">
     <p class="example-head">Worked example</p>
     <p class="example-q">Start empty. What gets printed?</p>
-    <div class="steps board"><ol>
-      <li><span class="lab">insert 5, 6, 3</span><span class="mth">\(\{3, 5, 6\}\)</span><span class="note">waiting</span></li>
-      <li><span class="lab">extract</span><span class="mth">\(\{5, 6\}\)</span><span class="note">prints <b>3</b>, the smallest</span></li>
-      <li><span class="lab">insert 1</span><span class="mth">\(\{1, 5, 6\}\)</span><span class="note">1 arrives last</span></li>
-      <li><span class="lab">extract</span><span class="mth">\(\{5, 6\}\)</span><span class="note">prints <b>1</b>: it still leaves first</span></li>
-      <li><span class="lab">extract</span><span class="mth">\(\{6\}\)</span><span class="note">prints <b>5</b></span></li>
-      <li><span class="lab">insert 8</span><span class="mth">\(\{6, 8\}\)</span><span class="note"></span></li>
-      <li><span class="lab">extract ×2</span><span class="mth">\(\{\,\}\)</span><span class="note">prints <b>6</b>, then <b>8</b></span></li>
-      <li class="wide"><div class="rule"><p><strong>The rule.</strong> Extract takes the smallest item waiting <em>right now</em>. When it arrived doesn't matter.</p></div></li>
-    </ol></div>
+    <div class="panel pqvis" id="pqvis" data-script="+5,6,3 - +1 - - +8 - -"></div>
+    <div class="rule"><p><strong>The rule.</strong> Extract takes the smallest item waiting <em>right now</em>. When it arrived doesn't matter.</p></div>
   </div>
   <p class="line">Insert everything, then extract everything, and the items come out sorted. That's sorting with a priority queue.</p>
   <p class="line"><strong>Ties:</strong> items with the same priority can come out in either order.</p>

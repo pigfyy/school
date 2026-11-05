@@ -112,3 +112,20 @@ input.wide-script { flex: 1 1 10rem; width: auto; min-width: 0; max-width: 22rem
 
 /* Lecture 4 steppers: on phones, the tree and its narration come before the recipe */
 @media (max-width: 860px) { .split.stepper.idea .pic { order: -1; } }
+
+/* Lecture 4: the priority queue, animated */
+.pq-grid { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: 1rem 1.5rem; align-items: start; }
+.pq-script { margin: 0; padding: 0; list-style: none; font-family: var(--mono); font-size: 0.88rem; }
+.pq-script li { padding: 0.2rem 0.55rem; border-radius: var(--r-sm); color: var(--ink-soft); }
+.pq-script li.done { color: var(--ink-faint); }
+.pq-script li.now { background: var(--accent-tint); color: var(--ink); font-weight: 600; }
+.pq-lanes { display: grid; gap: 0.8rem; }
+.pq-label { display: block; font-size: 0.8rem; color: var(--ink-soft); margin-bottom: 0.3rem; }
+.pq-row { display: flex; flex-wrap: wrap; gap: 0.45rem; min-height: 2.6rem; padding: 0.35rem; border: 1.5px dashed var(--line); border-radius: var(--r-lg); }
+.pq-chip { display: inline-grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 2px solid var(--ink); background: var(--surface); font-family: var(--mono); font-weight: 700; transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease; }
+.pq-chip.leaving { transform: translateY(-0.45rem) scale(1.12); box-shadow: 0 0 0 4px var(--amber); background: var(--amber-tint); }
+.pq-chip.arrive { animation: pq-in 0.4s ease; }
+@keyframes pq-in { from { transform: scale(0.3); opacity: 0; } to { transform: none; opacity: 1; } }
+.pq-say { min-height: 1.5em; font-weight: 600; margin: 0.8rem 0 0.4rem; }
+@media (max-width: 600px) { .pq-grid { grid-template-columns: minmax(0, 1fr); } .pq-script { display: flex; flex-wrap: wrap; gap: 0.25rem; } }
+@media (prefers-reduced-motion: reduce) { .pq-chip, .pq-chip.arrive { animation: none; transition: none; } }

@@ -261,6 +261,71 @@ function setupBuckets() {
   draw();
 }
 
+/* =========================================================== priority queue, animated */
+// data-script: "+5,6,3" inserts 5, 6 and 3; "-" extracts the smallest waiting.
+function pqSteps(script) {
+  const steps = script.trim().split(/\s+/).map((t) => (t === "-" ? { op: "extract" } : { op: "insert", xs: t.slice(1).split(",").map(Number) }));
+  let waiting = [];
+  const printed = [];
+  for (const st of steps) {
+    if (st.op === "insert") {
+      waiting = [...waiting, ...st.xs];
+      st.say = st.xs.length > 1 ? `${st.xs.slice(0, -1).join(", ")} and ${st.xs.at(-1)} arrive, in that order.` : printed.length ? `${st.xs[0]} arrives last.` : `${st.xs[0]} arrives.`;
+    } else {
+      const min = Math.min(...waiting), oldest = waiting[0], alone = waiting.length === 1;
+      st.out = min;
+      waiting = waiting.filter((x, i) => i !== waiting.indexOf(min));
+      printed.push(min);
+      st.say = alone ? `${min} is the only one left, so it comes out.` : `The smallest waiting is ${min}, so ${min} comes out${min !== oldest ? `, even though ${oldest} has waited longest` : ""}.`;
+    }
+    st.waiting = waiting;
+    st.printed = [...printed];
+  }
+  return steps;
+}
+function setupPQVis(box) {
+  const steps = pqSteps(box.dataset.script);
+  const script = el("ol", { class: "pq-script" }, ...steps.map((st) => el("li", { text: st.op === "insert" ? `insert ${st.xs.join(", ")}` : "extract" })));
+  const waitRow = el("div", { class: "pq-row" }), outRow = el("div", { class: "pq-row" });
+  const say = el("p", { class: "pq-say", role: "status" });
+  const next = el("button", { class: "btn primary", type: "button", text: "Next step" });
+  const back = el("button", { class: "btn", type: "button", text: "Back" });
+  const again = el("button", { class: "btn", type: "button", text: "Start over" });
+  box.append(el("div", { class: "pq-grid" }, script, el("div", { class: "pq-lanes" },
+    el("div", { class: "pq-lane" }, el("span", { class: "pq-label", text: "Waiting, in arrival order" }), waitRow),
+    el("div", { class: "pq-lane" }, el("span", { class: "pq-label", text: "Printed" }), outRow))),
+  say, el("div", { class: "controls" }, next, back, again));
+  const chip = (x, cls = "") => el("span", { class: `pq-chip ${cls}`.trim(), text: String(x) });
+  let k = 0, busy = false;
+  function paint(fresh = 0) {
+    const st = steps[k - 1];
+    waitRow.replaceChildren(...(st ? st.waiting : []).map((x, i, all) => chip(x, i >= all.length - fresh ? "arrive" : "")));
+    outRow.replaceChildren(...(st ? st.printed : []).map((x) => chip(x)));
+    [...script.children].forEach((li, i) => { li.classList.toggle("now", i === k - 1); li.classList.toggle("done", i < k - 1); });
+    say.textContent = !st ? "Start empty. Press Next step." : k === steps.length ? `${st.say} Done: it printed ${st.printed.join(", ")}.` : st.say;
+    next.disabled = k === steps.length; back.disabled = k === 0;
+  }
+  next.addEventListener("click", () => {
+    if (busy || k === steps.length) return;
+    const st = steps[k];
+    if (st.op === "insert" || reduceMotion()) { k++; paint(st.op === "insert" ? st.xs.length : 0); return; }
+    const prev = k ? steps[k - 1].waiting : [];
+    const leaving = waitRow.children[prev.indexOf(st.out)];
+    busy = true;
+    leaving.classList.add("leaving");
+    [...script.children].forEach((li, i) => { li.classList.toggle("now", i === k); li.classList.toggle("done", i < k); });
+    say.textContent = prev.length === 1 ? `${st.out} is the only one left…` : `The smallest waiting is ${st.out}…`;
+    setTimeout(() => {
+      k++; paint();
+      outRow.lastChild.classList.add("arrive");
+      busy = false;
+    }, 650);
+  });
+  back.addEventListener("click", () => { if (!busy && k > 0) { k--; paint(); } });
+  again.addEventListener("click", () => { if (!busy) { k = 0; paint(); } });
+  paint();
+}
+
 /* =========================================================== 2n + 10 between a 2n floor and a 3n ceiling */
 function setupSandwich() {
   const f = (n) => 2 * n + 10, N = 30;
@@ -610,6 +675,7 @@ setupStaticPictures();
 setupHero();
 setupGap();
 setupBuckets();
+$$(".pqvis").forEach(setupPQVis);
 setupSandwich();
 $$(".bound").forEach(setupBound);
 $$(".heap-step").forEach(setupHeapStepper);

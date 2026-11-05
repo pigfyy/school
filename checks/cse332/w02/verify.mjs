@@ -268,8 +268,9 @@ const l4Text = () => html.slice(html.indexOf('id="l4-goals"'), html.indexOf('id=
   });
   {
     const out = pqRun([5, 6, 3, -1, 1, -1, -1, 8, -1, -1]);
-    const l4pq = html.slice(html.indexOf('id="l4-pq"'), html.indexOf('id="l4-impl"'));
-    ok(same(out, [3, 1, 5, 6, 8]) && same([...l4pq.matchAll(/<b>(\d+)<\/b>/g)].map((m) => Number(m[1])), out), `PQ worked example prints ${out}`);
+    const script = /id="pqvis" data-script="([^"]+)"/.exec(html)[1];
+    const ops = script.trim().split(/\s+/).flatMap((t) => (t === "-" ? [-1] : t.slice(1).split(",").map(Number)));
+    ok(same(out, [3, 1, 5, 6, 8]) && same(pqRun(ops), out), `PQ worked example (${script}) prints ${pqRun(ops)}`);
     ok(same(pqRun([4, 2, 7, -1, 1, -1, -1]), [2, 1, 4]), "new trace prints 2, 1, 4 (a queue would print 4, 2, 7)");
     const heights = [3, 4, 7, 8, 1000000].map(heightI);
     ok(same(heights, [1, 2, 2, 3, 19]) && l4Text().includes("<td>1</td><td>2</td><td>2</td><td>3</td><td class=\"best\">19</td>"), `height table ${heights}`);
