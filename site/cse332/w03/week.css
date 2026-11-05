@@ -34,3 +34,48 @@
 .treeview figcaption { font-size: 0.9rem; color: var(--ink-soft); text-align: center; }
 .tree-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.75rem; }
 .tree-grid .treeview { margin: 0; }
+
+/* L8 */
+/* AVL trees: static pictures (svg.htree[data-shape]) and the insert stepper (.avl-step) */
+/* every tree is drawn at one scale: week.js sets each svg's max-width from its own width, so a node is the same size everywhere */
+.page[id^="l8-"] svg.htree { display: block; width: 100%; height: auto; margin: 0.25rem auto 0.5rem; }
+.page[id^="l8-"] .task svg.htree, .page[id^="l8-"] .check svg.htree { margin-left: 0; }
+.page[id^="l8-"] .tree-row.cases { grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); }
+.av-edge { stroke: var(--line-strong); stroke-width: 2; }
+.av-node circle { fill: var(--surface); stroke: var(--ink); stroke-width: 1.75; }
+.av-node text { font-family: var(--mono); font-size: 14px; font-weight: 600; fill: var(--ink); }
+.av-node text.av-h { font-family: var(--font); font-size: 11px; font-weight: 700; fill: var(--accent); }
+.av-node text.av-bal { font-family: var(--mono); font-size: 12px; font-weight: 700; fill: var(--right); }
+.av-node text.av-bal.off { fill: var(--wrong); }
+.av-node.new circle { fill: var(--accent); stroke: var(--accent-deep); }
+.av-node.new text:not(.av-h):not(.av-bal) { fill: #fff; }
+.av-node.cur circle { stroke: var(--amber); stroke-width: 3.5; fill: var(--amber-tint); }
+.av-node.bad circle { fill: var(--wrong-tint); stroke: var(--wrong); stroke-width: 3.5; }
+.av-node.cmp circle { stroke: var(--amber); stroke-width: 3.5; }
+.av-node.moved circle { fill: var(--accent-tint); stroke: var(--accent); stroke-width: 2.5; }
+.page[id^="l8-"] .tree-key { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; font-size: 0.85rem; color: var(--ink-soft); margin: 0 0 0.5rem; }
+.page[id^="l8-"] .tree-key span::before { content: ""; display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 50%; vertical-align: -0.1rem; margin-right: 0.35rem; border: 2px solid var(--ink); background: var(--surface); }
+.page[id^="l8-"] .tree-key .k-new::before { background: var(--accent); border-color: var(--accent-deep); }
+.page[id^="l8-"] .tree-key .k-cur::before { border: 3px solid var(--amber); background: var(--amber-tint); }
+.page[id^="l8-"] .tree-key .k-bad::before { border: 3px solid var(--wrong); background: var(--wrong-tint); }
+.page[id^="l8-"] .tree-key .k-cmp::before { border: 3px solid var(--amber); }
+.page[id^="l8-"] .tree-key .k-moved::before { border-color: var(--accent); background: var(--accent-tint); }
+.page[id^="l8-"] .tree-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.75rem 1.25rem; margin: 0.75rem 0 1.25rem; }
+.page[id^="l8-"] .tree-row figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 0.5rem 0.75rem; min-width: 0; }
+.page[id^="l8-"] .tree-row figcaption { font-weight: 700; font-size: 0.9rem; }
+.page[id^="l8-"] .tree-row figure p { margin: 0.2rem 0; font-size: 0.92rem; }
+.av-pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 0.25rem; }
+.av-pair .arrow { color: var(--ink-soft); font-size: 1.2rem; }
+.av-stepper { align-items: start; }
+.av-stepper pre.code { margin: 0; }
+.av-stepper .ln .src { white-space: pre-wrap; overflow-wrap: anywhere; }
+.av-stepper .pic { min-width: 0; }
+.av-stepper svg.htree { max-width: 34rem; margin: 0 auto 0.5rem; }
+.av-stepper .step-say { background: var(--paper); border-radius: var(--r-sm); padding: 0.6rem 0.8rem; margin: 0.6rem 0 0; min-height: 5.5rem; }
+.page[id^="l8-"] .goals li { margin-bottom: 0.45rem; }
+.page[id^="l8-"] .practice-group { margin-top: 2.75rem; padding-top: 1.1rem; border-top: 2px solid var(--line); }
+.page[id^="l8-"] .practice-group + .note { margin-top: -0.4rem; }
+@media (max-width: 860px) {
+  .av-stepper .pic { order: -1; }
+  .av-stepper .step-say { min-height: 7.5rem; }
+}

@@ -2,7 +2,8 @@
    independent implementations and against every answer key on the page.
    - Recurrences (Lecture 6, Section 3): exact evaluation with BigInt, and the tree method's levels.
    - BSTs (Lecture 7): insert, find, delete exactly as the slides' code (two children: replace with the max of the left).
-   - AVL trees (Lecture 8): insert with the four cases, rotating at the deepest unbalanced node. */
+   - AVL trees (Lecture 8): insert with the four cases, rotating at the deepest unbalanced node, and the same insert as
+     narrated steps for the stepper. */
 (function (root, factory) {
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.Sim = factory();
@@ -164,32 +165,118 @@
     const root = ins(t);
     return { root, ...log };
   }
-  // the plain BST insert step only, with heights updated, for showing the "before rotation" picture
-  function avlBstStep(t, key) {
-    const r = bstInsert(t, key);
-    fixHeights(r.root);
-    let problem = null;
-    for (const k of [...r.path].reverse()) { const n = findNode(r.root, k); if (unbalanced(n)) { problem = k; break; } }
-    return { root: r.root, path: r.path, dup: r.dup, problem };
-  }
-  function findNode(t, k) { while (t && t.key !== k) t = k < t.key ? t.left : t.right; return t; }
   const isAVL = (t) => !t || (!unbalanced(fixHeights(t)) && isAVL(t.left) && isAVL(t.right));
-  // deepest node whose children's heights differ by more than 1 (null if balanced)
-  function problemNodes(t) {
-    fixHeights(t);
-    const out = [];
-    const walk = (r, d) => { if (!r) return; walk(r.left, d + 1); walk(r.right, d + 1); if (unbalanced(r)) out.push({ key: r.key, depth: d }); };
-    walk(t, 0);
-    return out.sort((x, y) => y.depth - x.depth).map((x) => x.key);
-  }
-  const avlBuild = (keys) => keys.reduce((t, k) => avlInsert(t, k).root, null);
   // M(h): fewest nodes in an AVL tree of height h (slide 55)
   function minAVL(hh) { const m = [1, 2]; for (let i = 2; i <= hh; i++) m.push(m[i - 1] + m[i - 2] + 1); return m[hh]; }
+
+  /* L8 */
+  // One AVL insert as the steps the lecture walks through: the BST insert, one step per node on the way back up
+  // (stored heights stay stale until that node is reached), the case, each rotation, and the stop.
+  // recipe "single" knows only "rotate toward the shorter side" (the outside cases); "full" has all four cases.
+  const AVL_RECIPE = {
+    single: ["insert(key){", "  BST insert: key becomes a new leaf", "  walk back up the path; at each node:", "    height = 1 + max(left h, right h)",
+      "    if left h and right h differ by 2:", "      left taller: rotate right", "      right taller: rotate left", "      stop", "}"],
+    full: ["insert(key){", "  BST insert: key becomes a new leaf", "  walk back up the path; at each node:", "    height = 1 + max(left h, right h)",
+      "    if left h and right h differ by 2:", "      case = key's first two steps down", "      LL: rotate right here", "      RR: rotate left here",
+      "      LR: left at left child, right here", "      RL: right at right child, left here", "      stop", "}"],
+  };
+  const AVL_LINE = {
+    single: { bst: 1, height: [2, 3, 4], fix: { LL: 5, RR: 6 }, stop: 7, end: 8 },
+    full: { bst: 1, height: [2, 3, 4], fix: { LL: 6, RR: 7, LR: 8, RL: 9 }, case: 5, stop: 10, end: 11 },
+  };
+  const kf = (k) => (k < 0 ? `\u2212${-k}` : String(k));
+  const SIDE = { L: "left", R: "right" };
+  function avlInsertSteps(startShape, key, recipe = "full") {
+    let root = parseShape(startShape);
+    const L = AVL_LINE[recipe], steps = [];
+    const heights = () => { const m = {}; const w = (n) => { if (n) { m[n.key] = n.height; w(n.left); w(n.right); } }; w(root); return m; };
+    const before = heights();
+    const marks = {};
+    const snap = (line, say, extra = {}, mk = marks) => steps.push({ shape: shape(root), heights: heights(), marks: { ...mk }, line, say, ...extra });
+    snap(null, `An AVL tree. The small number by each node is its height. Insert ${kf(key)}.`, { kind: "start" });
+    const path = [], cmps = [];
+    let cur = root, parent = null;
+    while (cur) {
+      if (cur.key === key) throw new Error(`${key} is already in the tree`);
+      const goLeft = key < cur.key;
+      path.push(cur); cmps.push(`${kf(key)} ${goLeft ? "<" : ">"} ${kf(cur.key)}`);
+      parent = cur; cur = goLeft ? cur.left : cur.right;
+    }
+    const side = key < parent.key ? "left" : "right";
+    parent[side] = node(key);
+    marks[key] = "new";
+    snap(L.bst, `BST insert: ${cmps.join(", ")}. So ${kf(key)} becomes ${kf(parent.key)}'s ${side} child, a new leaf with height 0. The heights above it are out of date until the walk back up reaches them.`, { kind: "bst", parent: parent.key, side });
+    const rot = (x, dir) => { // dir "R": rotate right at x (slide 38); "L": rotate left (slide 45)
+      const b = dir === "R" ? x.left : x.right, moved = dir === "R" ? b.right : b.left;
+      if (dir === "R") { x.left = b.right; b.right = x; } else { x.right = b.left; b.left = x; }
+      fix(x); fix(b);
+      return { b, moved };
+    };
+    const moveMarks = ({ b, moved }) => ({ ...marks, ...(moved ? { [moved.key]: "moved" } : {}), [b.key]: "cmp" });
+    const setChild = (par, oldN, newN) => { if (!par) root = newN; else if (par.left === oldN) par.left = newN; else par.right = newN; };
+    const rotSay = (x, { b, moved }, dir) => {
+      const up = SIDE[dir === "R" ? "L" : "R"], down = SIDE[dir];
+      return `Rotate ${down} at ${kf(x.key)}: its ${up} child ${kf(b.key)} moves up into its place, and ${kf(x.key)} becomes ${kf(b.key)}'s ${down} child. `
+        + (moved ? `${kf(b.key)}'s old ${down} subtree (rooted at ${kf(moved.key)}) moves across to be ${kf(x.key)}'s ${up} subtree. ` : `${kf(b.key)} had no ${down} subtree, so nothing moves across. `)
+        + `New heights: ${kf(x.key)} is ${x.height}, ${kf(b.key)} is ${b.height}.`;
+    };
+    for (let i = path.length - 1; i >= 0; i--) {
+      const a = path[i], lh = h(a.left), rh = h(a.right);
+      a.height = 1 + Math.max(lh, rh);
+      const diff = Math.abs(lh - rh);
+      const facts = { node: a.key, lh, rh, height: a.height, diff };
+      const calc = `Node ${kf(a.key)}: its children have heights ${kf(lh)} and ${kf(rh)}. Height = 1 + max(${kf(lh)}, ${kf(rh)}) = ${a.height}.`;
+      if (diff <= 1) { snap(L.height, `${calc} They differ by ${diff}: balanced.`, { kind: "height", ...facts }, { ...marks, [a.key]: "cur" }); continue; }
+      marks[a.key] = "bad";
+      snap(L.height, `${calc} They differ by ${diff}: ${kf(a.key)} is unbalanced. It's the first unbalanced node on the way up, so the fix happens here.`, { kind: "unbalanced", ...facts });
+      const d1 = key < a.key ? "L" : "R", c1 = d1 === "L" ? a.left : a.right;
+      const d2 = key < c1.key ? "L" : "R", c2 = d2 === "L" ? c1.left : c1.right;
+      const kase = d1 + d2;
+      const par = i > 0 ? path[i - 1] : null;
+      if (recipe === "single") {
+        if (d1 !== d2) throw new Error(`the single-rotation recipe can't fix case ${kase}`);
+        snap(L.fix[kase], `${kf(a.key)}'s ${SIDE[d1]} side is taller, so rotate ${SIDE[d1 === "L" ? "R" : "L"]} at ${kf(a.key)}.`, { kind: "case", case: kase });
+      } else {
+        const fixSay = { LL: `One rotation: rotate right at ${kf(a.key)}.`, RR: `One rotation: rotate left at ${kf(a.key)}.`,
+          LR: `Two rotations: rotate left at ${kf(c1.key)}, then right at ${kf(a.key)}.`, RL: `Two rotations: rotate right at ${kf(c1.key)}, then left at ${kf(a.key)}.` }[kase];
+        snap([L.case, L.fix[kase]], `From ${kf(a.key)}, ${kf(key)} went ${SIDE[d1]} (to ${kf(c1.key)}), then ${SIDE[d2]} (to ${kf(c2.key)}): case ${kase}. ${fixSay}`, { kind: "case", case: kase });
+      }
+      let top;
+      if (d1 === d2) {
+        const dir = d1 === "L" ? "R" : "L", r = rot(a, dir);
+        setChild(par, a, r.b); delete marks[a.key]; top = r.b;
+        snap(L.fix[kase], rotSay(a, r, dir), { kind: "rotate", at: a.key, dir, up: r.b.key, moved: r.moved && r.moved.key }, moveMarks(r));
+      } else {
+        const dir1 = d1 === "L" ? "L" : "R", r1 = rot(c1, dir1);
+        setChild(a, c1, r1.b);
+        snap(L.fix[kase], rotSay(c1, r1, dir1), { kind: "rotate", at: c1.key, dir: dir1, up: r1.b.key, moved: r1.moved && r1.moved.key }, moveMarks(r1));
+        const dir2 = d1 === "L" ? "R" : "L", r2 = rot(a, dir2);
+        setChild(par, a, r2.b); delete marks[a.key]; top = r2.b;
+        snap(L.fix[kase], rotSay(a, r2, dir2), { kind: "rotate", at: a.key, dir: dir2, up: r2.b.key, moved: r2.moved && r2.moved.key }, moveMarks(r2));
+      }
+      snap(L.stop, `Balanced again. The subtree rooted at ${kf(top.key)} has height ${top.height}, the same as ${kf(a.key)}'s subtree before the insert (${before[a.key]}), so nothing above it changes. Stop.`, { kind: "done", top: top.key, height: top.height, was: before[a.key] });
+      return steps;
+    }
+    snap(L.end, "Reached the root and every node on the path is balanced. No rotation. Done.", { kind: "done" });
+    return steps;
+  }
+  // the smallest AVL tree of height hh (slide 55): a root over the smallest trees of heights hh-1 and hh-2, keys 1..M(hh) in order
+  function minAVLShape(hh) {
+    let next = 1;
+    const make = (k) => {
+      if (k < 0) return null;
+      const left = make(k - 1), n = node(next++);
+      n.left = left; n.right = make(k - 2);
+      return n;
+    };
+    return shape(fixHeights(make(hh)));
+  }
 
   return {
     REC, F, recTex, evalRec, levels, levelSum,
     node, clone, bstInsert, build, bstFind, bstDelete, maxNode, minNode, height, size,
     preOrder, inOrder, postOrder, levelOrder, shape, parseShape, isBST,
-    fix, fixHeights, rotateLeft, rotateRight, avlInsert, avlBstStep, findNode, isAVL, problemNodes, avlBuild, minAVL,
+    fix, fixHeights, rotateLeft, rotateRight, avlInsert, isAVL, minAVL,
+    /* L8 */ AVL_RECIPE, avlInsertSteps, minAVLShape,
   };
 });

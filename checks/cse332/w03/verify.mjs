@@ -163,6 +163,50 @@ const dusb = ["D", ["U", ["S", null, null], ["2", null, null]], ["B", null, null
 const yn = (b) => (b ? "yes" : "no");
 const lvl = (key, n, i) => Sim.levels(Sim.REC[key], n)[i].total; // used only to cross-check formula answers below
 
+/* L8 */
+// One AVL insert as whole-tree states, worked out here on the array trees: the BST insert, then the tree after each
+// rotation at the first unbalanced node on the path back up. cmp is the node each picture circles: the new key, then
+// whichever node a rotation lifted.
+const sub = (t, k) => (t[0] === k ? t : sub(k < t[0] ? t[1] : t[2], k));
+const replaceAt = (t, k, f) => (t[0] === k ? f(t) : k < t[0] ? [t[0], replaceAt(t[1], k, f), t[2]] : [t[0], t[1], replaceAt(t[2], k, f)]);
+function avlTrace(t, k) {
+  const t0 = ins(t, k), states = [{ t: t0, cmp: k, bst: true }];
+  const path = [];
+  for (let x = t0; x[0] !== k; x = k < x[0] ? x[1] : x[2]) path.push(x[0]);
+  const at = [...path].reverse().find((key) => unb(sub(t0, key)));
+  if (at === undefined) return { states, kase: "none", path, at: null };
+  const a = sub(t0, at), d1 = k < at ? "L" : "R", c1 = d1 === "L" ? a[1] : a[2], d2 = k < c1[0] ? "L" : "R", kase = d1 + d2;
+  if (kase === "LL") states.push({ t: replaceAt(t0, at, rotR), cmp: c1[0] });
+  else if (kase === "RR") states.push({ t: replaceAt(t0, at, rotL), cmp: c1[0] });
+  else {
+    const c = d2 === "L" ? c1[1][0] : c1[2][0];
+    const s1 = replaceAt(t0, c1[0], kase === "LR" ? rotL : rotR);
+    states.push({ t: s1, cmp: c }, { t: replaceAt(s1, at, kase === "LR" ? rotR : rotL), cmp: c });
+  }
+  return { states, kase, path, at };
+}
+const finalOf = (tr) => tr.states.at(-1).t;
+const keysOf = (n) => Array.from({ length: n }, (_, i) => i + 1);
+// brute force: every binary tree shape with up to 12 nodes, keep the AVL ones, record the fewest nodes per height
+const minNodesBrute = (() => {
+  const byN = [[null]];
+  for (let n = 1; n <= 12; n++) {
+    byN[n] = [];
+    for (let l = 0; l < n; l++) for (const L of byN[l]) for (const Rt of byN[n - 1 - l]) byN[n].push([0, L, Rt]);
+  }
+  const best = {};
+  for (let n = 1; n <= 12; n++) for (const t of byN[n]) if (isAvl(t)) { const hh = hgt(t); best[hh] = Math.min(best[hh] ?? Infinity, n); }
+  return best;
+})();
+const T_S30 = "9(3(1(0,2),6(,7)),11(,16))", T_A = "9(3(1(0,),6(5,)),10)", T_P = "20(10(5,15),30)", T_Q = "10(5,20(15,30))";
+const ins8 = avlTrace(parse(T_S30), 8), ins20 = avlTrace(parse(S39), 20), q12 = avlTrace(parse(T_Q), 12);
+const seqCases = {};
+{
+  let t = null;
+  for (const k of [10, 20, 30, 25, 28, 27]) { const tr = t ? avlTrace(t, k) : { states: [{ t: [k, null, null] }], kase: "none" }; seqCases[k] = tr; t = finalOf(tr); }
+}
+const dirOf = (kase) => ({ LL: "right", RR: "left" })[kase];
+
 const EXPECT = {
   // Lecture 6
   "cse332-w3-l6-qc-sum-calls": "2",
@@ -203,19 +247,21 @@ const EXPECT = {
   "cse332-w3-s3-q2.a": "2", "cse332-w3-s3-q2.b": "2", "cse332-w3-s3-q2.f": "n", "cse332-w3-s3-q2.class": "n log n",
   "cse332-w3-s3-cyu-1e": "n", "cse332-w3-s3-cyu-1b": "n log n", "cse332-w3-s3-cyu-1f-level": String(2 ** 4), "cse332-w3-s3-cyu-1c": "n log n",
   // Lecture 8
-  "cse332-w3-l8-qc-tree-c": String(problems(parse("9(3(,6(5,)),10(,16))"))[0]),
-  "cse332-w3-l8-qc-root-height-d": String(hgt(parse("9(3(1(0,),6(5,7)),10(,16))"))),
-  "cse332-w3-l8-qc-root-after-minus1": String(minus1.r[0]),
+  "cse332-w3-l8-qc-tree-a": String(problems(parse(T_A))[0]),
+  "cse332-w3-l8-qc-insert8-problem": String(ins8.at), "cse332-w3-l8-qc-insert8-after": String(sub(finalOf(ins8), 3)[2][0]),
   "cse332-w3-l8-qc-root-385": String(avlKeys([3, 8, 5]).t[0]),
-  "cse332-w3-l8-qc-m4": String(M(4)), "cse332-w3-l8-qc-maxh-20": String(maxH(20)),
+  "cse332-w3-l8-qc-maxh-20": String(maxH(20)), "cse332-w3-l8-qc-m7": String(M(7)),
   "cse332-w3-l8-is-avl.x": yn(isAvl(treeCheck.X)), "cse332-w3-l8-is-avl.y": yn(isAvl(treeCheck.Y)), "cse332-w3-l8-is-avl.problem": String(problems(treeCheck.Y)[0]),
-  "cse332-w3-l8-single.case123": caseOf([1, 2, 3]).toLowerCase(), "cse332-w3-l8-single.root123": String(avlKeys([1, 2, 3]).t[0]),
-  "cse332-w3-l8-single.case321": caseOf([3, 2, 1]).toLowerCase(), "cse332-w3-l8-single.root321": String(avlKeys([3, 2, 1]).t[0]),
-  "cse332-w3-l8-minus1.h9": String(minus1.h9), "cse332-w3-l8-minus1.problem": String(minus1.probs[0]), "cse332-w3-l8-minus1.case": minus1.log[0][0].toLowerCase(), "cse332-w3-l8-minus1.pre": sp(pre(minus1.r)),
-  "cse332-w3-l8-insert20.deep": String(plus20.probs[0]), "cse332-w3-l8-insert20.case": plus20.log[0][0].toLowerCase(), "cse332-w3-l8-insert20.pre": sp(pre(plus20.r)),
-  "cse332-w3-l8-double.case28": seqA.log[1][0].toLowerCase(), "cse332-w3-l8-double.case27": seqA.log[2][0].toLowerCase(), "cse332-w3-l8-double.root": String(seqA.t[0]), "cse332-w3-l8-double.pre": sp(pre(seqA.t)),
-  "cse332-w3-l8-sorted.rotations": String(seq7.log.length), "cse332-w3-l8-sorted.pre": sp(pre(seq7.t)), "cse332-w3-l8-sorted.m6": String(M(6)), "cse332-w3-l8-sorted.maxh50": String(maxH(50)),
-  "cse332-w3-l8-cyu-leaf-height": "0", "cse332-w3-l8-cyu-root-123": String(avlKeys([1, 2, 3]).t[0]), "cse332-w3-l8-cyu-m5": String(M(5)), "cse332-w3-l8-cyu-find": "log n",
+  "cse332-w3-l8-ins20.deep": String(ins20.at), "cse332-w3-l8-ins20.dir": dirOf(ins20.kase),
+  "cse332-w3-l8-ins20.parent16": String(parentOf(finalOf(ins20), 16)), "cse332-w3-l8-ins20.still11": yn(unb(sub(finalOf(ins20), 11))),
+  "cse332-w3-l8-which-case.p3": avlTrace(parse(T_P), 3).kase.toLowerCase(), "cse332-w3-l8-which-case.p17": avlTrace(parse(T_P), 17).kase.toLowerCase(),
+  "cse332-w3-l8-which-case.p25": avlTrace(parse(T_P), 25).kase.toLowerCase(), "cse332-w3-l8-which-case.q35": avlTrace(parse(T_Q), 35).kase.toLowerCase(),
+  "cse332-w3-l8-double-steps.case": q12.kase.toLowerCase(), "cse332-w3-l8-double-steps.mid": String(sub(q12.states[1].t, 10)[2][0]),
+  "cse332-w3-l8-double-steps.root": String(finalOf(q12)[0]), "cse332-w3-l8-double-steps.p12": String(parentOf(finalOf(q12), 12)),
+  "cse332-w3-l8-double.case30": seqCases[30].kase.toLowerCase(), "cse332-w3-l8-double.case28": seqCases[28].kase.toLowerCase(),
+  "cse332-w3-l8-double.case27": seqCases[27].kase.toLowerCase(), "cse332-w3-l8-double.root": String(finalOf(seqCases[27])[0]),
+  "cse332-w3-l8-cyu-find": "log n",
+  "cse332-w3-l8-how-tall.m8": String(M(8)), "cse332-w3-l8-how-tall.avl100": String(maxH(100)), "cse332-w3-l8-how-tall.bst100": String(hgt(fromKeys(keysOf(100)))),
 };
 // facts the expectations above rely on
 ok(minus1.probs.length === 1 && plus20.probs.join() === "16,11" && plus10.length === 0, "slide 31/33/40: problem nodes (none for 10; 9 for -1; 16 and 11 for 20)");
@@ -272,9 +318,7 @@ ok(/2\^\{\\\\lfloor n\/2\\\\rfloor \+ 1\}/.test(readFileSync(`${here}../../../si
 /* ---------------------------------------------------------------- 4. numbers stated in prose */
 const text = html.replace(/\s+/g, " ");
 const has = (s, why) => ok(text.includes(s), `page states "${s}" (${why})`);
-has("\\(M(h)\\)</th><td>1</td><td>2</td><td>4</td><td>7</td><td>12</td><td>20</td><td>33</td><td>54</td><td>88</td><td>143</td><td>232</td>", "M(h) row");
 ok([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(M).join() === "1,2,4,7,12,20,33,54,88,143,232" && [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(Sim.minAVL).join() === "1,2,4,7,12,20,33,54,88,143,232", "M(h) values (both implementations)");
-has("<td>1</td><td>3</td><td>7</td><td>15</td><td>31</td><td>63</td><td>127</td><td>255</td><td>511</td><td>1023</td><td>2047</td>", "2^(h+1)-1 row");
 has("gives \\(T(1024) = 11\\)", "bsearch note"); ok(R.bsearch(1024n) === 11n, "T(1024) = 11");
 has("\\(T(2) = 2 + 4 = 6\\), \\(T(4) = 12 + 16 = 28\\), \\(T(8) = 56 + 64 = 120\\)", "square steps"); ok(R.sq(2n) === 6n && R.sq(4n) === 28n, "sq T(2), T(4)");
 has("\\(T(2) = 5\\), \\(T(4) = 19\\), \\(T(8) = 65\\)", "1d steps"); ok(R.s1d(2n) === 5n && R.s1d(4n) === 19n && R.s1d(8n) === 65n, "1d T(2..8)");
@@ -285,6 +329,145 @@ has("Levels: 8, 8, 8, then 8 leaves", "T(8) why"); ok(Sim.levels(Sim.REC.nlogn, 
 has("\\(T(2) = 4\\), \\(T(4) = 12\\), \\(T(8) = 32\\)", "nlogn build-up"); ok(R.nlogn(2n) === 4n && R.nlogn(4n) === 12n, "nlogn T(2), T(4)");
 // the delete-3-first quick check really differs from the sequence answer
 ok(del(parse(S22), 3)[2] === 1 && d3.out[2][1] === 0, "deleting 3 first pulls up 1; after deleting 1 it pulls up 0");
+
+/* L8 */
+/* ---------------------------------------------------------------- 5. Lecture 8 steppers and pictures */
+{
+  const l8 = html.slice(html.indexOf('id="l8-goals"'), html.indexOf('id="readings"'));
+  const mf = (k) => (k < 0 ? `−${-k}` : String(k));
+  const sameSet = (a, b) => [...a].map(String).sort().join() === [...b].map(String).sort().join();
+  // the independent trace agrees with the independent insert on many random inserts
+  {
+    let seed = 8;
+    const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+    for (let trial = 0; trial < 300; trial++) {
+      const ks = [...new Set(Array.from({ length: 2 + Math.floor(rnd() * 12) }, () => Math.floor(rnd() * 60)))];
+      const k = ks.pop();
+      const t = avlKeys(ks).t, log = [];
+      const want = avl(t, k, log), tr = avlTrace(t, k);
+      ok(str(finalOf(tr)) === str(want) && tr.kase === (log[0]?.[0] ?? "none") && (log[0]?.[1] ?? null) === tr.at, `trace ${ks} + ${k}`);
+    }
+  }
+  // every stepper: each narrated claim against the independent trace
+  const steppers = [...l8.matchAll(/class="panel avl-step" data-start="([^"]+)" data-key="(-?\d+)" data-recipe="(\w+)"/g)];
+  ok(steppers.length === 2 && steppers.map((m) => m[3]).join() === "single,full", "Lecture 8 has the single and the double rotation steppers");
+  for (const [, start, keyS, recipe] of steppers) {
+    const key = Number(keyS), t = parse(start), tr = avlTrace(t, key), bstT = tr.states[0].t;
+    const steps = Sim.avlInsertSteps(start, key, recipe), lines = Sim.AVL_RECIPE[recipe];
+    const tag = `stepper ${start} + ${key}`;
+    ok(isAvl(t) && isBst(t), `${tag}: starts from an AVL tree`);
+    ok(recipe === "full" || tr.kase === "LL" || tr.kase === "RR", `${tag}: the single-rotation page shows an outside case`);
+    const kinds = steps.map((s) => s.kind);
+    const walked = tr.at === null ? tr.path.length : tr.path.length - tr.path.indexOf(tr.at);
+    const rots = tr.kase === "none" ? 0 : tr.kase[0] === tr.kase[1] ? 1 : 2;
+    const wantKinds = ["start", "bst", ...Array(walked - (tr.at === null ? 0 : 1)).fill("height"), ...(tr.at === null ? [] : ["unbalanced", "case", ...Array(rots).fill("rotate")]), "done"];
+    ok(kinds.join() === wantKinds.join(), `${tag}: steps ${kinds.join()} vs ${wantKinds.join()}`);
+    ok(steps[0].shape === str(t) && steps[1].shape === str(bstT), `${tag}: start and BST-insert pictures`);
+    const cmpSay = tr.path.map((x) => `${mf(key)} ${key < x ? "<" : ">"} ${mf(x)}`).join(", ");
+    ok(steps[1].say.includes(cmpSay) && steps[1].say.includes(`${mf(parentOf(bstT, key))}'s ${key < parentOf(bstT, key) ? "left" : "right"} child`), `${tag}: BST insert narration "${steps[1].say}"`);
+    const beforeH = (k) => nodeH(t, k);
+    const visited = new Set([key]);
+    for (const st of steps.filter((s) => s.kind === "height" || s.kind === "unbalanced")) {
+      const n = sub(bstT, st.node), lh = hgt(n[1]), rh = hgt(n[2]);
+      visited.add(st.node);
+      ok(st.shape === str(bstT) && st.lh === lh && st.rh === rh && st.height === 1 + Math.max(lh, rh) && st.diff === Math.abs(lh - rh), `${tag}: node ${st.node} heights`);
+      ok(st.say.includes(`Height = 1 + max(${mf(lh)}, ${mf(rh)}) = ${1 + Math.max(lh, rh)}`) && st.say.includes(`differ by ${Math.abs(lh - rh)}`), `${tag}: node ${st.node} narration "${st.say}"`);
+      ok((st.kind === "unbalanced") === (st.node === tr.at) && (st.kind === "unbalanced") === unb(n), `${tag}: node ${st.node} balanced or not`);
+      for (const [k, hv] of Object.entries(st.heights)) ok(hv === (visited.has(Number(k)) ? nodeH(bstT, Number(k)) : beforeH(Number(k))), `${tag}: at node ${st.node}, stored height of ${k} is ${hv}`);
+      ok(lines[[].concat(st.line)[1]].includes("height ="), `${tag}: height step highlights the height line`);
+    }
+    ok(steps.filter((s) => s.kind === "height" || s.kind === "unbalanced").map((s) => s.node).join() === [...tr.path].reverse().slice(0, walked).join(), `${tag}: walks up the path from the leaf`);
+    const caseStep = steps.find((s) => s.kind === "case");
+    if (caseStep) {
+      ok(caseStep.case === tr.kase, `${tag}: case ${caseStep.case} vs ${tr.kase}`);
+      ok(recipe === "single" ? caseStep.say.includes(`rotate ${dirOf(tr.kase)} at ${mf(tr.at)}`) : caseStep.say.includes(`case ${tr.kase}`), `${tag}: case narration "${caseStep.say}"`);
+      ok([].concat(caseStep.line).some((i) => lines[i].includes(recipe === "single" ? `rotate ${dirOf(tr.kase)}` : `${tr.kase}:`)), `${tag}: case step highlights its fix line`);
+    }
+    const rotSteps = steps.filter((s) => s.kind === "rotate");
+    rotSteps.forEach((st, i) => {
+      const want = tr.states[i + 1];
+      ok(st.shape === str(want.t) && st.up === want.cmp && st.marks[want.cmp] === "cmp", `${tag}: rotation ${i + 1} picture ${st.shape} vs ${str(want.t)}`);
+      ok(st.say.includes(`New heights: ${mf(st.at)} is ${nodeH(want.t, st.at)}, ${mf(st.up)} is ${nodeH(want.t, st.up)}`), `${tag}: rotation ${i + 1} heights "${st.say}"`);
+      for (const [k, hv] of Object.entries(st.heights)) ok(Number(k) === tr.at || hv === nodeH(want.t, Number(k)), `${tag}: after rotation ${i + 1}, height of ${k}`);
+    });
+    const done = steps.at(-1);
+    if (tr.at !== null) {
+      const top = finalOf(tr), topKey = rotSteps.at(-1).up;
+      ok(done.top === topKey && done.height === nodeH(top, topKey) && done.height === beforeH(tr.at) && done.say.includes(`has height ${done.height}`), `${tag}: the fixed subtree is back to its old height (${done.say})`);
+      ok(done.shape === str(top) && isAvl(top) && isBst(top) && sameSet(ino(top), ino(bstT)), `${tag}: ends balanced, same keys in order`);
+    }
+  }
+  // solution pictures (data-step): exactly the states of the real insert, in order, circling the moving node
+  const taskBlock = (tid) => { const at = html.indexOf(`data-id="${tid}"`); return html.slice(at, html.indexOf("</article>", at)); };
+  const stepPics = (tid) => [...taskBlock(tid).matchAll(/<svg class="htree" data-step[^>]*>/g)].map((m) => ({ shape: attr(m[0], "data-shape"), cmp: attr(m[0], "data-cmp"), bad: attr(m[0], "data-bad") }));
+  const plan = {
+    "cse332-w3-l8-ins20": [[ins20]],
+    "cse332-w3-l8-which-case": [[avlTrace(parse(T_P), 3)], [avlTrace(parse(T_P), 17)], [avlTrace(parse(T_P), 25)], [avlTrace(parse(T_Q), 35)]],
+    "cse332-w3-l8-double-steps": [[q12]],
+    "cse332-w3-l8-double": [[seqCases[30]], [seqCases[25]], [seqCases[28], [0, 2]], [seqCases[27]]],
+  };
+  for (const [tid, parts] of Object.entries(plan)) {
+    const want = parts.flatMap(([tr, pick]) => (pick ? pick.map((i) => tr.states[i]) : tr.states));
+    const got = stepPics(tid);
+    ok(got.map((g) => g.shape).join(" | ") === want.map((w) => str(w.t)).join(" | "), `${tid}: pictures ${got.map((g) => g.shape).join(" | ")} vs ${want.map((w) => str(w.t)).join(" | ")}`);
+    got.forEach((g, i) => {
+      const w = want[i];
+      if (!w) return;
+      ok(g.cmp === String(w.cmp), `${tid}: picture ${i + 1} circles ${g.cmp}, the moving node is ${w.cmp}`);
+      ok(w.bst ? sameSet((g.bad || "").split(",").filter(Boolean), problems(w.t)) : g.bad === null, `${tid}: picture ${i + 1} marks unbalanced ${g.bad} (really ${problems(w.t)})`);
+    });
+  }
+  // every other tree drawn on the Lecture 8 pages is a BST; marked problem nodes are exactly its unbalanced nodes
+  for (const m of l8.matchAll(/<svg class="htree"(?! data-step)[^>]*>/g)) {
+    const s = attr(m[0], "data-shape"), bad = attr(m[0], "data-bad"), t = parse(s);
+    ok(isBst(t), `drawn ${s} is a BST`);
+    if (!bad && (s === T_A || s === str(treeCheck.Y))) ok(!isAvl(t), `drawn ${s} is unmarked and not AVL: the question asks for its problem node`);
+    else if (s === "1(,2(,3(,4(,5(,6(,7))))))") ok(s === str(fromKeys(keysOf(7))) && hgt(t) === 6, "goals: the plain BST of 1..7 is a chain of height 6");
+    else ok(bad ? sameSet(bad.split(","), problems(t)) : isAvl(t), `drawn ${s}: ${bad ? `problem nodes ${bad}` : "is AVL"} (really ${problems(t)})`);
+  }
+  has('data-shape="4(2(1,3),6(5,7))"', "goals AVL picture"); ok(str(avlKeys(keysOf(7)).t) === "4(2(1,3),6(5,7))" && avlKeys(keysOf(7)).log.length === 4 && hgt(avlKeys(keysOf(7)).t) === 2, "1..7 into an AVL tree: four rotations, height 2");
+  has("Four rotations along the way keep it at height 2", "goals caption");
+  // the four-case pictures: inserting the before tree's keys (pre-order) gives the before tree, then the after tree
+  const caseFigs = [...l8.matchAll(/<figcaption>(LL|RR|LR|RL): [^<]*<\/figcaption><div class="av-pair"><svg class="htree" data-shape="([^"]+)"[^>]*><\/svg><span class="arrow">→<\/span><svg class="htree" data-shape="([^"]+)"/g)];
+  ok(caseFigs.map((m) => m[1]).join() === "LL,RR,LR,RL", "four case pictures, in order");
+  for (const [, kase, before, after] of caseFigs) {
+    const ks = pre(parse(before));
+    ok(str(fromKeys(ks)) === str(parse(before)), `${kase}: before picture is the BST of ${ks}`);
+    ok(caseOf(ks) === kase && str(avlKeys(ks).t) === after, `${kase}: ${ks} gives case ${caseOf(ks)} and ${str(avlKeys(ks).t)}`);
+  }
+  // 9, 5, 7: one right rotation leaves 5 unbalanced
+  ok(str(rotR(parse("9(5(,7),)"))) === "5(,9(7,))" && problems(parse("5(,9(7,))")).join() === "5", "9,5,7: a single right rotation fails");
+  // the smallest AVL trees: brute force over every shape up to 12 nodes
+  ok([0, 1, 2, 3, 4].map((hh) => minNodesBrute[hh]).join() === [0, 1, 2, 3, 4].map(M).join(), `brute force fewest nodes per height ${JSON.stringify(minNodesBrute)}`);
+  for (let hh = 0; hh <= 3; hh++) {
+    const s = Sim.minAVLShape(hh), t = parse(s);
+    ok(isAvl(t) && isBst(t) && hgt(t) === hh && ino(t).length === M(hh), `minimal tree of height ${hh}: ${s}`);
+    ok(l8.includes(`: ${M(hh)} node${hh ? "s" : ""}</figcaption><svg class="htree" data-shape="${s}" data-label="h">`), `the page draws the minimal tree of height ${hh}`);
+  }
+  has("\\(M(h)\\)</th><td>1</td><td>2</td><td>4</td><td>7</td><td>12</td><td>20</td><td>33</td></tr>", "M(h) row, h = 0..6");
+  has("\\(= M(1) + M(0) + 1 = 2 + 1 + 1 = 4\\)", "M(2)"); has("\\(= M(2) + M(1) + 1 = 4 + 2 + 1 = 7\\)", "M(3)"); has("\\(= 7 + 4 + 1 = 12\\)", "M(4)");
+  has("\\(= 54 + 33 + 1 = 88\\)", "M(8)"); has("\\(= 88 + 54 + 1 = 143\\)", "M(9)"); has("\\(M(5) = 20\\), \\(M(6) = 33\\) and \\(M(7) = 54\\)", "problem 6 givens");
+  ok(M(9) === 143 && M(8) <= 100 && M(9) > 100, "M(8) <= 100 < M(9)");
+  const phi = (1 + Math.sqrt(5)) / 2;
+  const Ms = [1, 2];
+  for (let hh = 2; hh <= 60; hh++) Ms.push(Ms[hh - 1] + Ms[hh - 2] + 1);
+  let grow = Ms.slice(0, 12).join() === [...Array(12).keys()].map(M).join();
+  for (let hh = 0; hh <= 60; hh++) { grow &&= Ms[hh] >= phi ** hh && Ms[hh] >= 1.6 ** hh; if (hh >= 1) grow &&= Ms[hh] / Ms[hh - 1] > 1.6; }
+  ok(grow, "M(h) >= phi^h >= 1.6^h, and each M(h) is more than 1.6 times the one before");
+  has("a plain BST can reach height 999,999. An AVL tree stays at height 27 or less. The shortest possible tree, a complete one, has height 19", "a million keys");
+  ok(maxH(1e6) === 27 && Math.floor(Math.log2(1e6)) === 19 && hgt(fromKeys(keysOf(1000))) === 999, "a million keys: AVL at most 27, complete 19, chain n - 1");
+  // balance page: the worked numbers for the non-AVL tree
+  { const c = parse("9(3(,6(5,)),10(,16))"); ok(hgt(sub(c, 3)[1]) === -1 && nodeH(c, 6) === 1 && nodeH(c, 3) === 2 && nodeH(c, 10) === 1, "tree C: 3 has −1 and 1; the root has 2 and 1"); }
+  has("3 has no left child (height \\(-1\\)) and its right child 6 has height 1: \\(-1 - 1 = -2\\). The root is fine (\\(2 - 1 = +1\\))", "tree C numbers");
+  // quick checks and multiple choice whose answers come from a tree
+  ok(problems(parse(T_A)).length === 1, "tree A has exactly one problem node");
+  ok(sameSet(problems(ins8.states[0].t), [6, 9]) && ins8.kase === "RR", "insert 8: 6 and 9 unbalanced, fix at 6 (RR)");
+  ok(problems(fromKeys([1, 2, 3])).join() === "1" && /data-correct><input type="radio" name="cse332-w3-l8-qc-chain3"> 1,/.test(l8), "chain 1, 2, 3: only 1 is a problem node, and it is the marked option");
+  ok(sameSet(problems(ins20.states[0].t), [16, 11]), "insert 20: 16 and 11 unbalanced");
+  ok(str(avlKeys([3, 8, 5]).t) === "5(3,8)" && caseOf([3, 8, 5]) === "RL", "3, 8, 5: RL, root 5");
+  { const lr = avlKeys([9, 5, 7]).t; ok(lr[0] === 7 && lr[1][0] === 5 && lr[2][0] === 9, "case LR: the middle key c ends on top, b left, a right"); }
+  ok(!/details class="notes"|slide \d|Check your understanding|id="l8-quiz"/.test(l8) && !html.includes('href="#l8-quiz"'), "Lecture 8: no teaching notes, slide numbers or quiz page");
+}
 
 console.log(`verify-answers: ${pass} passed, ${fail} failed (${keys} auto-graded answer keys, ${mcs} multiple-choice items)`);
 process.exit(fail ? 1 : 0);
