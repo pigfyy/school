@@ -34,3 +34,37 @@
 .treeview figcaption { font-size: 0.9rem; color: var(--ink-soft); text-align: center; }
 .tree-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.75rem; }
 .tree-grid .treeview { margin: 0; }
+
+/* L6 ---------------------------------------------------------------- Lecture 6: goals list, template blanks, tree-method stepper, level bars */
+.goals li { margin-bottom: 0.45rem; }
+.proof .blank { display: inline-block; min-width: 2.2em; padding: 0 0.4em; text-align: center; font-weight: 600; background: var(--accent-tint); border-bottom: 2px solid var(--accent); border-radius: 4px 4px 0 0; }
+.steps.board .proof { margin-top: 0.25rem; }
+table.vals td.tm-blank, table.vals td .blank { color: var(--ink-soft); }
+table.vals td .blank { display: inline-block; min-width: 2.2em; background: var(--accent-tint); border-bottom: 2px solid var(--accent); border-radius: 4px 4px 0 0; }
+.tm-svg { max-width: 640px; margin: 0 auto; }
+.tm-box rect { fill: var(--surface); stroke: var(--s2); stroke-width: 1.6; }
+.tm-box.now rect { fill: var(--s2-tint); stroke-width: 2.4; }
+.chart .tm-box text { font-family: var(--mono); font-size: 13px; font-weight: 600; fill: var(--ink); }
+.tm-edge { stroke: var(--line-strong); stroke-width: 1.2; }
+.tm-box.ghost rect { fill: none; stroke: var(--line); stroke-dasharray: 3 3; }
+.tm-edge.ghost { stroke: var(--line); stroke-dasharray: 2 3; }
+.tm-step .step-say { background: var(--paper); border-radius: var(--r-sm); padding: 0.6rem 0.8rem; margin: 0.25rem 0 0.6rem; min-height: 3.2rem; }
+.tm-table td { font-family: var(--mono); }
+.tm-table tr.now td, .tm-table tr.now th { background: var(--s2-tint); }
+.tm-table tr.tm-total th, .tm-table tr.tm-total td { border-top: 2px solid var(--line-strong); font-weight: 700; }
+.lvbars { margin: 0.35rem 0 0.25rem; }
+.lv-row { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr) 2.6rem; gap: 0.45rem; align-items: center; margin: 0.2rem 0; }
+.lv-i { font: 600 0.75rem var(--mono); color: var(--ink-soft); }
+.lv-track { height: 0.8rem; background: var(--paper); border-radius: 2px; }
+.lv-bar { display: block; height: 100%; min-width: 2px; background: var(--s1); border-radius: 2px; }
+.lv-n { font: 600 0.8rem var(--mono); text-align: right; }
+.shape-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.75rem; margin: 0.75rem 0 1.25rem; }
+.shape-row figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 0.6rem 0.8rem; min-width: 0; }
+.shape-row figcaption { font-weight: 700; font-size: 0.95rem; }
+.shape-row p { font-size: 0.9rem; margin: 0.3rem 0 0; }
+.tm-table thead th { white-space: normal; overflow-wrap: normal; word-break: normal; hyphens: none; vertical-align: bottom; }
+@media (max-width: 600px) { .tm-table th, .tm-table td { padding: 0.3rem 0.3rem; font-size: 0.8rem; } }
+table.vals td.lvc { text-align: left; }
+.lvnote { display: block; font-size: 0.82rem; color: var(--ink-soft); }
+pre.code.wrap, pre.code.wrap .ln .src { white-space: pre-wrap; overflow-wrap: anywhere; }
+.tm-table tr.fill td { font-family: var(--font); }
