@@ -211,24 +211,21 @@
   function insertIdeaSteps(levelOrder, x) {
     const h = heapOf(levelOrder);
     const { steps, snap } = recorder(h);
-    snap(null, `Before: a min-heap of ${h.size} items. Every node is ≤ its children, and the smallest item, ${fmt(h.arr[1])}, is at the root.`);
+    snap(null, `A min-heap of ${h.size} items. The smallest, ${fmt(h.arr[1])}, is at the root.`);
     h.size++; h.arr[h.size] = x;
     let i = h.size;
     const newLevel = (i & (i - 1)) === 0;
-    snap(1, `Put ${fmt(x)} in the next open spot: ${newLevel ? "the bottom level is full, so it starts a new level at the far left" : "the leftmost empty place on the bottom level"}. The tree is still complete. Only one thing can be wrong now: ${fmt(x)} might be smaller than its parent${i > 1 ? `, ${fmt(h.arr[Math.floor(i / 2)])}` : ""}.`, { mark: { cur: i } });
+    snap(1, `Put ${fmt(x)} in the next open spot${newLevel ? " (the bottom level was full, so it starts a new one)" : ""}. The shape is still complete.${i > 1 ? ` Is ${fmt(x)} smaller than its parent, ${fmt(h.arr[Math.floor(i / 2)])}?` : ""}`, { mark: { cur: i } });
     let swaps = 0;
     while (true) {
-      if (i === 1) { snap(2, `${fmt(x)} is at the root, so it has no parent. The loop stops.`, { mark: { cur: i } }); break; }
+      if (i === 1) { snap(2, `${fmt(x)} is at the root. Nothing above it: stop.`, { mark: { cur: i } }); break; }
       const p = Math.floor(i / 2), pv = h.arr[p];
-      const less = x < pv;
-      if (!less) { snap(2, `${fmt(x)} < ${fmt(pv)} is false: ${fmt(x)} is not smaller than its parent, so every parent is ≤ its children again. The loop stops.`, { mark: { cur: i, cmp: [p] } }); break; }
-      snap(2, `${fmt(x)} < ${fmt(pv)} is true: ${fmt(x)} is smaller than its parent. That breaks the heap property, so keep going.`, { mark: { cur: i, cmp: [p] } });
-      const sib = (i ^ 1) <= h.size ? h.arr[i ^ 1] : null;
+      if (!(x < pv)) { snap(2, `${fmt(x)} < ${fmt(pv)} is false. The parent is smaller or equal: stop.`, { mark: { cur: i, cmp: [p] } }); break; }
       h.arr[i] = pv; h.arr[p] = x; swaps++;
-      snap(3, `Swap: ${fmt(x)} moves up, ${fmt(pv)} moves down. ${fmt(pv)} was already ≤ everything below it, so it is fine in its new spot.${sib !== null ? ` And ${fmt(x)} < ${fmt(pv)} ≤ ${fmt(sib)}, so ${fmt(x)} is a fine parent for ${fmt(sib)} too.` : ""} The only link left to check is ${fmt(x)} and its new parent.`, { mark: { cur: p, swap: [i, p] } });
+      snap(3, `${fmt(x)} < ${fmt(pv)} is true, so swap: ${fmt(x)} moves up a level.`, { mark: { cur: p, swap: [i, p] } });
       i = p;
     }
-    snap(5, `Done: ${swaps} swap${swaps === 1 ? "" : "s"}. ${fmt(x)} only ever moved up one path from the bottom toward the root, so the work is at most the height of the tree.`, { mark: { cur: i }, done: true, swaps });
+    snap(5, `Done: ${swaps} swap${swaps === 1 ? "" : "s"}, at most one per level.`, { mark: { cur: i }, done: true, swaps });
     return steps;
   }
 
@@ -236,31 +233,25 @@
   function extractIdeaSteps(levelOrder) {
     const h = heapOf(levelOrder);
     const { steps, snap } = recorder(h);
-    snap(null, `Before: a min-heap of ${h.size} items. The item to return is the smallest, and it's at the root.`);
+    snap(null, `A min-heap of ${h.size} items. The answer is the smallest, ${fmt(h.arr[1])}, at the root.`);
     const min = h.arr[1];
-    snap(1, `min = ${fmt(min)}. Save the root now, because the next lines write over it.`, { mark: { cur: 1 }, vars: { min } });
     const last = h.size, cv = h.arr[last];
-    snap(2, `curr = ${fmt(cv)}, the bottom-right item. A tree with one fewer item has to lose exactly this spot to stay complete.`, { mark: { cur: last }, vars: { min } });
     h.arr[1] = cv; h.size--;
     let i = 1, swaps = 0;
-    snap(3, `Move ${fmt(cv)} into the root, over ${fmt(min)}. The tree has ${h.size} item${h.size === 1 ? "" : "s"} and is complete again. But ${fmt(cv)} came from the bottom, so it is probably too big to sit at the top.`, { mark: { cur: 1 }, vars: { min }, stale: last });
+    snap(3, `Save min = ${fmt(min)}. Move the bottom-right item, ${fmt(cv)}, into the root, so the shape stays complete. ${fmt(cv)} is probably too big up there.`, { mark: { cur: 1 }, vars: { min }, stale: last });
     while (true) {
       const l = 2 * i, r = 2 * i + 1;
-      if (l > h.size) { snap(4, `${fmt(cv)} has no children here: it's a leaf, so it can't be bigger than a child. The loop stops.`, { mark: { cur: i }, vars: { min }, stale: last }); break; }
+      if (l > h.size) { snap(4, `${fmt(cv)} is a leaf now: stop.`, { mark: { cur: i }, vars: { min }, stale: last }); break; }
       const lv = h.arr[l], rv = r <= h.size ? h.arr[r] : null;
       const gl = cv > lv, gr = rv !== null && cv > rv;
-      const cmpText = rv === null ? `${fmt(cv)} > ${fmt(lv)} is ${tf(gl)}, and there is no right child` : `${fmt(cv)} > ${fmt(lv)} is ${tf(gl)} and ${fmt(cv)} > ${fmt(rv)} is ${tf(gr)}`;
-      if (!gl && !gr) { snap(4, `${cmpText}. ${fmt(cv)} is ≤ ${rv === null ? "its child" : "both children"}, so the heap property holds everywhere. The loop stops.`, { mark: { cur: i, cmp: rv === null ? [l] : [l, r] }, vars: { min }, stale: last }); break; }
-      snap(4, `${cmpText}. ${fmt(cv)} is bigger than a child, so it has to go down.`, { mark: { cur: i, cmp: rv === null ? [l] : [l, r] }, vars: { min }, stale: last });
-      const c = rv === null || lv < rv ? l : r, sv = h.arr[c], ov = c === l ? rv : lv;
+      const cmpText = rv === null ? `${fmt(cv)} > ${fmt(lv)} is ${tf(gl)} (no right child)` : `${fmt(cv)} > ${fmt(lv)} is ${tf(gl)}, ${fmt(cv)} > ${fmt(rv)} is ${tf(gr)}`;
+      if (!gl && !gr) { snap(4, `${cmpText}. ${fmt(cv)} is ≤ ${rv === null ? "its child" : "both children"}: stop.`, { mark: { cur: i, cmp: rv === null ? [l] : [l, r] }, vars: { min }, stale: last }); break; }
+      const c = rv === null || lv < rv ? l : r, sv = h.arr[c];
       h.arr[i] = sv; h.arr[c] = cv; swaps++;
-      snap(5, rv === null
-        ? `Only one child, ${fmt(sv)}: swap with it. ${fmt(sv)} moves up, ${fmt(cv)} moves down.`
-        : `Swap with the smaller child, ${fmt(sv)}. It becomes the parent of ${fmt(ov)}, which is fine because ${fmt(sv)} ≤ ${fmt(ov)}. Had we swapped with ${fmt(Math.max(sv, ov))} instead, it would sit above ${fmt(Math.min(sv, ov))}, a smaller value: a new violation.`,
-      { mark: { cur: c, swap: [i, c] }, vars: { min }, stale: last });
+      snap(5, `${cmpText}. Swap ${fmt(cv)} with ${fmt(sv)}, ${rv === null ? "its only child" : "the smaller child"}.`, { mark: { cur: c, swap: [i, c] }, vars: { min }, stale: last });
       i = c;
     }
-    snap(7, `Return ${fmt(min)}. ${swaps} swap${swaps === 1 ? "" : "s"}: ${fmt(cv)} only moved down one path, so the work is at most the height of the tree.`, { mark: { cur: i }, vars: { min }, done: true, swaps, returned: min, stale: last });
+    snap(7, `Return ${fmt(min)}. ${swaps} swap${swaps === 1 ? "" : "s"}, at most one per level.`, { mark: { cur: i }, vars: { min }, done: true, swaps, returned: min, stale: last });
     return steps;
   }
 

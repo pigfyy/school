@@ -109,3 +109,6 @@ input.wide-script { flex: 1 1 10rem; width: auto; min-width: 0; max-width: 22rem
 .proof .blank { display: inline-block; min-width: 2.2em; padding: 0 0.4em; text-align: center; font-weight: 600; background: var(--accent-tint); border-bottom: 2px solid var(--accent); border-radius: 4px 4px 0 0; }
 .proof .blank.wide { font-weight: 400; font-style: italic; color: var(--ink-soft); }
 .steps.board .proof { margin-top: 0.25rem; }
+
+/* Lecture 4 steppers: on phones, the tree and its narration come before the recipe */
+@media (max-width: 860px) { .split.stepper.idea .pic { order: -1; } }

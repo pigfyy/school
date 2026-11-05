@@ -232,17 +232,18 @@ Object.assign(BIGO_TRUTH, {
   "cse332-w2-l3-intuition-buckets.nlog-10n2": "n log(10n^2)",
 });
 /* Lecture 4 */
+const l4Text = () => html.slice(html.indexOf('id="l4-goals"'), html.indexOf('id="l4-problems"'));
 {
   const ins4 = HJ("qc-l4-insert-4"), at4 = (ins4.start.length + 1) >> ins4.swaps;
   const ext6 = HJ("qc-l4-extract"), at6 = ext6.after.indexOf(6) + 1;
   const pIns = HJ("p-l4-insert-4"), pExt = HJ("p-l4-extract"), at8 = pExt.after.indexOf(8) + 1;
   const wrong = [null, 1, 3, 5, 7, 8, 9]; wrong[1] = wrong.pop(); { const big = wrong[2] > wrong[3] ? 2 : 3; [wrong[1], wrong[big]] = [wrong[big], wrong[1]]; }
   const trace = HJ("p-l4-trace").out, ex2 = HJ("l4-trace-example2").out;
+  const pqRun = (ops) => { const w = [], out = []; for (const op of ops) { if (op < 0) { w.sort((a, b) => a - b); out.push(w.shift()); } else w.push(op); } return out; };
   const minNodes5 = (() => { let n = 1; while (heightI(n) < 5) n++; return n; })();
   Object.assign(TRUTH, {
-    "cse332-w2-l4-qc-example2-third": S(ex2[2]),
+    "cse332-w2-l4-pq-new-trace": S(pqRun([4, 2, 7, -1, 1, -1, -1])[2]),
     "cse332-w2-l4-shape-min-nodes-h5": S(minNodes5),
-    "cse332-w2-l4-qc-heap-leaf-ancestor": (() => { const h = [1, 5, 2, 6, 7, 3, 4]; return Sim.isMinHeap(h) && h[1] > h[5] ? "no" : "yes"; })(),
     "cse332-w2-l4-insert-parent-of-4": S(ins4.after[(at4 >> 1) - 1]),
     "cse332-w2-l4-extract-parent-of-6": S(ext6.after[(at6 >> 1) - 1]),
     "cse332-w2-l4-pq-trace.first": S(trace[0]), "cse332-w2-l4-pq-trace.second": S(trace[1]), "cse332-w2-l4-pq-trace.third": S(trace[2]), "cse332-w2-l4-pq-trace.fifth": S(trace[4]),
@@ -258,13 +259,23 @@ Object.assign(BIGO_TRUTH, {
   ok(same(pIns.after, [2, 4, 3, 5, 6, 4, 8, 9]) && same(pExt.after, [3, 5, 4, 9, 6, 8]) && same(HJ("p-l4-larger-child").after, [3, 7, 5, 9, 8]), "L4 problem solutions' level orders");
   // every heap drawn on the page as a starting state is a valid min-heap, except the ones asked about
   const drawn = [...html.matchAll(/data-tree="([^"]+)"/g)].map((m) => m[1]);
-  const notHeaps = new Set(["5,4,6", "5,7,6,8,_,9", "2,4,3,_,_,6,5", "1,4,2,3,5,6,7", "4,6,5,7,3,8,9", "9,8,7,6,5,4,3,2,1"]);
+  const notHeaps = new Set(["1,2,3,_,5,6", "5,4,6", "5,7,6,8,_,9", "2,4,3,_,_,6,5", "1,4,2,3,5,6,7", "4,6,5,7,3,8,9", "9,8,7,6,5,4,3,2,1"]);
   for (const t of new Set(drawn)) if (!notHeaps.has(t)) ok(!t.includes("_") && Sim.isMinHeap(t.split(",").map(Number)), `drawn tree ${t} is a valid min-heap`);
   for (const t of notHeaps) ok(drawn.includes(t) && (t.includes("_") || !Sim.isMinHeap(t.split(",").map(Number))), `drawn tree ${t} is not a heap, as the page says`);
   Object.assign(BIGO_TRUTH, {
     "cse332-w2-l4-pq-costs.unsorted-extract": "n", "cse332-w2-l4-pq-costs.sorted-insert": "n + 1", "cse332-w2-l4-pq-costs.sorted-extract": "1", "cse332-w2-l4-pq-costs.heap-insert": "log n + 1",
     "cse332-w2-l4-cyu-sort-with-pq": "2 n log n",
   });
+  {
+    const out = pqRun([5, 6, 3, -1, 1, -1, -1, 8, -1, -1]);
+    const l4pq = html.slice(html.indexOf('id="l4-pq"'), html.indexOf('id="l4-impl"'));
+    ok(same(out, [3, 1, 5, 6, 8]) && same([...l4pq.matchAll(/<b>(\d+)<\/b>/g)].map((m) => Number(m[1])), out), `PQ worked example prints ${out}`);
+    ok(same(pqRun([4, 2, 7, -1, 1, -1, -1]), [2, 1, 4]), "new trace prints 2, 1, 4 (a queue would print 4, 2, 7)");
+    const heights = [3, 4, 7, 8, 1000000].map(heightI);
+    ok(same(heights, [1, 2, 2, 3, 19]) && l4Text().includes("<td>1</td><td>2</td><td>2</td><td>3</td><td class=\"best\">19</td>"), `height table ${heights}`);
+    const h7 = Sim.heapOf([2, 3, 4, 5, 6, 7, 8]); ok(heightI(7) === 2 && Sim.heapInsert(h7, 1).swaps === 3 && heightI(8) === 3, "insert into 7 items: at most 3 swaps");
+    ok(Math.ceil(Math.log2(1000000)) === 20 && heightI(1000000) === 19, "a million items: about 20 steps");
+  }
   // heap insert really is floor(log2 n) swaps in the worst case (a new minimum each time)
   ok([8, 64, 512, 4096].every((n) => { const h = Sim.heapOf([]); let w = 0; for (let v = n; v >= 1; v--) w = Math.max(w, Sim.heapInsert(h, v).swaps); return w === Math.floor(Math.log2(n)); }), "worst-case insert swaps = floor(log2 n)");
 }

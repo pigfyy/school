@@ -43,10 +43,9 @@
       <h2>Lecture 4 <span class="today" data-date="2026-10-07">Wed Oct 7</span></h2>
       <ol class="modules">
         <li><a href="#l4-goals">What this lecture is for</a></li>
-        <li><a href="#l4-pq">The priority queue ADT</a></li>
-        <li><a href="#l4-impl">Lists make one operation slow</a></li>
-        <li><a href="#l4-shape">Complete trees are short</a></li>
-        <li><a href="#l4-heap">The heap property</a></li>
+        <li><a href="#l4-pq">Priority queues</a></li>
+        <li><a href="#l4-impl">Why not a list</a></li>
+        <li><a href="#l4-heap">What a heap is</a></li>
         <li><a href="#l4-insert">Insert: percolate up</a></li>
         <li><a href="#l4-extract">Extract: percolate down</a></li>
         <li><a href="#l4-problems">Lecture 4 problems</a></li>
@@ -850,100 +849,65 @@
 <section class="page" id="l4-goals" data-title="What Lecture 4 is for">
   <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span> · Priority Queues 1</p>
   <h1>What this lecture is for</h1>
-  <div class="prose">
-    <p>A queue serves the oldest item first. Lots of real problems need the <strong>most important</strong> item first instead: an emergency room, an operating system choosing which program runs next. That's a new ADT, the <strong>priority queue</strong>.</p>
-    <p>The obvious data structures, arrays and linked lists kept sorted or unsorted, make one of its two operations take \(\Theta(n)\). Lecture 4 builds a better one, the <strong>binary heap</strong>. It keeps only <em>some</em> order (each node is at most its children) in a tree that's always as short as possible. Then insert and extract each make one trip along one path of the tree, so both are \(\Theta(\log n)\).</p>
-  </div>
-  <div class="grid-2">
-    <div class="rule"><p><strong>The shape rule.</strong> A complete binary tree, so the height is about \(\log_2 n\).</p></div>
-    <div class="rule"><p><strong>The order rule.</strong> Every node \(\le\) its children, so the minimum is at the root.</p></div>
+  <div class="rule">
+    <p><strong>The point.</strong> A priority queue always hands back the most urgent item. Lists make that slow on one side, so this lecture builds a <strong>heap</strong>: a short tree where insert and extract are both \(\Theta(\log n)\) in the worst case.</p>
   </div>
 
-  <h2>After this lecture you should be able to</h2>
+  <h2>Five short pages</h2>
   <ol class="goals">
-    <li>Describe the priority queue ADT and trace a sequence of inserts and extracts. <a href="#l4-pq">The ADT</a></li>
-    <li>Give the worst-case insert and extract times for sorted and unsorted arrays and lists, and explain the trade-off. <a href="#l4-impl">Lists</a></li>
-    <li>Say what a complete binary tree is and why its height is \(\Theta(\log n)\). <a href="#l4-shape">Complete trees</a></li>
-    <li>State the min-heap property, say why it puts the minimum at the root, and say what it does <em>not</em> require. <a href="#l4-heap">The heap property</a></li>
-    <li>Insert into a heap: put the item in the next open spot, then percolate up, and say why each swap keeps the heap valid. <a href="#l4-insert">Insert</a></li>
-    <li>Extract the minimum: move the last item to the root, then percolate down, always swapping with the smaller child. <a href="#l4-extract">Extract</a></li>
+    <li>What a priority queue does. <a href="#l4-pq">Priority queues</a></li>
+    <li>Why a sorted or unsorted list is slow. <a href="#l4-impl">Why not a list</a></li>
+    <li>The heap's two rules: shape and order. <a href="#l4-heap">What a heap is</a></li>
+    <li>Insert: drop it in, let it climb. <a href="#l4-insert">Insert</a></li>
+    <li>Extract: take the top, sink the replacement. <a href="#l4-extract">Extract</a></li>
   </ol>
-  <div class="prose">
-    <p>The lecture goes on to store the heap in an array and to show the code for insert and extract. Lecture 5 starts by reviewing exactly that, so this site teaches the array and the code once, under <a href="#l5-goals">Lecture 5</a>.</p>
-  </div>
+  <p class="line">Storing the heap in an array, and the Java code, come in <a href="#l5-goals">Lecture 5</a>.</p>
+
   <div class="rule warn">
-    <p><strong>Exercise 2</strong> (Heaps, due Fri Oct 16) has you implement a binary min-heap, a max-heap and a new structure built on them, in Java. This site traces heaps by hand and walks through the lecture's pseudocode, but writes no Exercise 2 code.</p>
+    <p><strong>Exercise 2</strong> (Heaps, due Fri Oct 16) has you implement heaps in Java. This site traces heaps by hand but writes no Exercise 2 code.</p>
   </div>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L4: PQ ADT -->
-<section class="page" id="l4-pq" data-title="The priority queue ADT">
-  <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span> · Weiss 6.1</p>
-  <h1>The priority queue ADT</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> A priority queue hands back the most important item, by convention the one with the <em>smallest</em> priority value, no matter when it arrived.</p>
-  </div>
+<section class="page" id="l4-pq" data-title="Priority queues">
+  <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
+  <h1>Priority queues</h1>
+  <div class="prose"><p>A pharmacy line is a queue: first come, first served. An emergency room is a <strong>priority queue</strong>: the most urgent goes first, whenever they arrived. Each item has a priority number, and <em>smaller</em> means more urgent. In our examples, each number is its own priority.</p></div>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th>operation</th><th>does</th></tr></thead>
+    <tr><th><code>insert(x)</code></th><td>add \(x\)</td></tr>
+    <tr><th><code>extract()</code></th><td>remove and return the smallest</td></tr>
+    <tr><th><code>isEmpty()</code></th><td>is it empty?</td></tr>
+  </table></div>
 
-  <h2>Pharmacy vs. emergency room</h2>
-  <div class="grid-2">
-    <div class="rule"><p><strong>Pharmacy: a queue.</strong> First come, first served. The next person is whoever has waited longest.</p></div>
-    <div class="rule"><p><strong>Emergency room: a priority queue.</strong> Patients are seen by need. Someone who just arrived with an emergency goes first.</p></div>
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">Start empty. What gets printed?</p>
+    <div class="steps board"><ol>
+      <li><span class="lab">insert 5, 6, 3</span><span class="mth">\(\{3, 5, 6\}\)</span><span class="note">waiting</span></li>
+      <li><span class="lab">extract</span><span class="mth">\(\{5, 6\}\)</span><span class="note">prints <b>3</b>, the smallest</span></li>
+      <li><span class="lab">insert 1</span><span class="mth">\(\{1, 5, 6\}\)</span><span class="note">1 arrives last</span></li>
+      <li><span class="lab">extract</span><span class="mth">\(\{5, 6\}\)</span><span class="note">prints <b>1</b>: it still leaves first</span></li>
+      <li><span class="lab">extract</span><span class="mth">\(\{6\}\)</span><span class="note">prints <b>5</b></span></li>
+      <li><span class="lab">insert 8</span><span class="mth">\(\{6, 8\}\)</span><span class="note"></span></li>
+      <li><span class="lab">extract ×2</span><span class="mth">\(\{\,\}\)</span><span class="note">prints <b>6</b>, then <b>8</b></span></li>
+      <li class="wide"><div class="rule"><p><strong>The rule.</strong> Extract takes the smallest item waiting <em>right now</em>. When it arrived doesn't matter.</p></div></li>
+    </ol></div>
   </div>
+  <p class="line">Insert everything, then extract everything, and the items come out sorted. That's sorting with a priority queue.</p>
 
-  <h2>The ADT</h2>
-  <div class="prose">
-    <p><strong>Notion:</strong> a collection of items and their priorities, with quick access to (and removal of) the top-priority item.</p>
-    <ul>
-      <li><code>insert(item, priority)</code>: add a new item with the given priority.</li>
-      <li><code>extract</code>: remove and return the top-priority item, usually the one with the <strong>smallest</strong> priority value.</li>
-      <li><code>isEmpty</code>: are there items left?</li>
-    </ul>
-    <p><strong>Why smallest?</strong> Priorities are like rankings: "you're my number one priority" means most important. Making the largest value most important instead takes only small changes.</p>
-    <p><strong>Priorities must be comparable.</strong> Unlike a stack or a queue, a priority queue has to compare items: is \(x\) less than, equal to, or greater than \(y\)? Any type works as long as you can use <code>&lt;</code> or <code>compareTo</code>. In lecture the item is often just an <code>int</code> that is also its own priority.</p>
-    <p><strong>Ties:</strong> two items with the same priority may come out in either order. An ER line would probably serve them first come, first served; the ADT doesn't promise that.</p>
-  </div>
-
-  <h2>A trace</h2>
-  <pre class="code"><code>insert(5,5)  insert(6,6)  insert(3,3)
-print(extract)
-insert(1,1)
-print(extract)
-print(extract)
-insert(8,8)
-print(extract)
-print(extract)</code></pre>
-  <div class="prose">
-    <p>Keep a list of what's waiting. Each <code>extract</code> takes the smallest item <em>in the queue right now</em>, not the smallest ever inserted and not the oldest. Note the <code>1</code>: it arrives after 5 and 6, and still leaves before them.</p>
-    <p><strong>Uses:</strong> treating patients by severity; running programs ("critical" before "interactive" before "compute-intensive"); forwarding network packets by urgency; data compression; graph algorithms later in the course; and <strong>sorting</strong>: insert everything, then extract repeatedly.</p>
-  </div>
-
-  <h2>Same script, two ADTs</h2>
-  <div class="panel" id="pqrun">
-    <p><code>+5</code> inserts 5 (with priority 5) and <code>-</code> removes one item. The queue and the priority queue get the same script. Predict, then run.</p>
-    <div class="controls">
-      <label>Script <input type="text" id="pq-script" class="wide-script" value="+5 +6 +1 +3 +8 - - - - -" aria-label="Operation script" autocomplete="off" spellcheck="false"></label>
-      <button class="btn primary" type="button" id="pq-run">Run</button>
-      <button class="chip" type="button" data-pq="+5 +6 +1 +3 +8 - - - - -">Insert all, then extract all</button>
-    </div>
-    <div class="pq-cols">
-      <div><h4>Queue (oldest first)</h4><p class="out" id="pq-q-out" role="status"></p></div>
-      <div><h4>Priority queue (smallest first)</h4><p class="out" id="pq-pq-out" role="status"></p></div>
-    </div>
-    <p class="note">"Insert all, then extract all" prints the items in sorted order. That's sorting with a priority queue.</p>
-  </div>
-
-  <div class="check" data-id="cse332-w2-l4-qc-example2-third" data-grader="exact" data-answer="5" data-miscon='{"3":"oldest-not-smallest"}'>
-    <p>Quick check: in the trace above (insert 5, 6, 3; print extract; insert 1; print extract; print extract; insert 8; print extract; print extract), what is the <em>third</em> value printed?</p>
+  <div class="check" data-id="cse332-w2-l4-pq-new-trace" data-grader="exact" data-answer="4" data-miscon='{"7":"oldest-not-smallest","1":"smallest-ever"}'>
+    <p>Quick check: start empty. Insert 4, 2, 7. Extract. Insert 1. Extract. Extract. What does the <em>third</em> extract print?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <div class="check" data-id="cse332-w2-l4-pq-ties" data-grader="mc">
-    <p>Quick check: two items both have priority 4, and nothing smaller is in the priority queue. Which one does <code>extract</code> return?</p>
+    <p>Quick check: two items both have priority 4, and nothing smaller is waiting. Which one does <code>extract</code> return?</p>
     <div class="opts">
-      <label><input type="radio" name="cse332-w2-l4-pq-ties"> The one inserted first<span class="why" hidden>That's what a line of people would do, but the priority queue ADT doesn't promise it.</span></label>
-      <label><input type="radio" name="cse332-w2-l4-pq-ties"> The one inserted last<span class="why" hidden>That's stack behavior, and the ADT doesn't promise it either.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l4-pq-ties"> Either one: equal priorities may come out in any order<span class="why" hidden>Right. Code that uses a priority queue shouldn't depend on the order of ties.</span></label>
+      <label><input type="radio" name="cse332-w2-l4-pq-ties"> The one inserted first<span class="why" hidden>That's what a line of people would do, but the priority queue doesn't promise it.</span></label>
+      <label><input type="radio" name="cse332-w2-l4-pq-ties"> The one inserted last<span class="why" hidden>That's a stack, and the priority queue doesn't promise it either.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l4-pq-ties"> Either one<span class="why" hidden>Right. Ties can come out in any order, so code shouldn't depend on it.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
@@ -952,52 +916,30 @@ print(extract)</code></pre>
 </section>
 
 <!-- ================================================================ L4: IMPLEMENTATIONS -->
-<section class="page" id="l4-impl" data-title="Lists make one operation slow">
+<section class="page" id="l4-impl" data-title="Why not a list">
   <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
-  <h1>Lists make one operation slow</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> Keeping items unsorted makes <code>insert</code> cheap and <code>extract</code> expensive. Keeping them sorted does the opposite. A heap keeps just enough order to make both \(\Theta(\log n)\).</p>
-  </div>
+  <h1>Why not a list?</h1>
 
-  <h2>Worst-case times</h2>
-  <p class="where">Assume the maximum size is known in advance. Otherwise you'd do an amortized analysis, and get the same answers.</p>
-  <div class="table-wrap">
-  <table class="plain vs-table">
-    <tr><th>Data structure</th><th>insert</th><th>extract</th><th>Why</th></tr>
-    <tr><td>Unsorted array</td><td>\(\Theta(1)\)</td><td>\(\Theta(n)\)</td><td>Insert writes at the back. Extract has to scan everything for the smallest, then shift the items after it over.</td></tr>
-    <tr><td>Unsorted linked list</td><td>\(\Theta(1)\)</td><td>\(\Theta(n)\)</td><td>Insert adds a node at the front. Extract still has to scan for the smallest.</td></tr>
-    <tr><td>Sorted array</td><td>\(\Theta(n)\)</td><td>\(\Theta(1)\)</td><td>Keep it in descending order, smallest at the back. Insert has to find the spot and shift everything after it. Extract takes the back item.</td></tr>
-    <tr><td>Sorted linked list</td><td>\(\Theta(n)\)</td><td>\(\Theta(1)\)</td><td>Insert walks the list to find the spot. Extract removes the first node.</td></tr>
-    <tr><td>Binary search tree</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>In the worst case the tree is one long chain (for example, if items arrive already sorted).</td></tr>
-    <tr><td>Binary heap</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(\log n)\)</td><td>The rest of this lecture.</td></tr>
-  </table>
-  </div>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th>kept as</th><th>insert</th><th>extract</th></tr></thead>
+    <tr><th>unsorted list</th><td class="best">\(\Theta(1)\)</td><td class="no">\(\Theta(n)\)</td></tr>
+    <tr><th>sorted list</th><td class="no">\(\Theta(n)\)</td><td class="best">\(\Theta(1)\)</td></tr>
+    <tr><th>unbalanced BST</th><td class="no">\(\Theta(n)\)</td><td class="no">\(\Theta(n)\)</td></tr>
+    <tr><th>heap</th><td class="best">\(\Theta(\log n)\)</td><td class="best">\(\Theta(\log n)\)</td></tr>
+  </table></div>
+  <p class="line">Worst cases, with \(n\) items stored. "List" means an array or a linked list: both give the same answers.</p>
 
-  <h2>The trade-off, and the way out</h2>
-  <div class="prose">
-    <ul>
-      <li><strong>Stricter order</strong> (fully sorted) makes extract easy, because you know exactly where the smallest item is. But every insert has to find its exact place.</li>
-      <li><strong>No order</strong> makes insert easy, but then extract has no idea where the smallest item is.</li>
-      <li><strong>The heap's idea:</strong> keep some order, but not entirely sorted. Just enough that the smallest item is always in a known place, and that fixing things after a change only touches one path of a short tree.</li>
-    </ul>
-  </div>
+  <p class="line"><strong>Unsorted:</strong> adding is instant, but finding the smallest means checking everything.</p>
+  <p class="line"><strong>Sorted:</strong> the smallest is right at the end, but adding means making room for it: an array shifts items over, a linked list walks to the spot.</p>
+  <p class="line"><strong>Unbalanced BST</strong> (binary search tree): it can turn into one long chain, for example if you insert 1, 2, 3, … in order.</p>
+  <div class="rule"><p><strong>The rule.</strong> No order makes extract slow. Full order makes insert slow. A heap keeps just enough order: with a million items, a trip through it is about 20 levels, not a million steps.</p></div>
 
   <div class="check" data-id="cse332-w2-l4-impl-pick" data-grader="mc">
-    <p>Quick check: a program inserts a million items, then calls <code>extract</code> just once at the end. Which of the list structures above is cheapest in total?</p>
+    <p>Quick check: a program inserts a million items, then calls <code>extract</code> just once at the end. Which is cheapest in total?</p>
     <div class="opts">
-      <label data-correct><input type="radio" name="cse332-w2-l4-impl-pick"> Unsorted array<span class="why" hidden>Right. A million Θ(1) inserts, then one Θ(n) scan. The sorted structures would pay Θ(n) on every insert.</span></label>
-      <label><input type="radio" name="cse332-w2-l4-impl-pick"> Sorted array<span class="why" hidden>Its cheap operation is extract, which happens once. Its expensive one, insert, happens a million times.</span></label>
-      <label><input type="radio" name="cse332-w2-l4-impl-pick"> Sorted linked list<span class="why" hidden>Each insert walks the list to find its spot: Θ(n) a million times.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l4-impl-why-back" data-grader="mc">
-    <p>Quick check: the sorted array keeps its items in descending order, so the smallest is at the <em>back</em>. Why the back and not the front?</p>
-    <div class="opts">
-      <label><input type="radio" name="cse332-w2-l4-impl-why-back"> So that insert is faster<span class="why" hidden>Insert still has to find the spot and shift items: Θ(n) either way.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l4-impl-why-back"> So extract can remove it without shifting the other items<span class="why" hidden>Right. Removing from the back of an array is one step. Removing from the front would shift every other item left.</span></label>
-      <label><input type="radio" name="cse332-w2-l4-impl-why-back"> Because arrays can only be read from the back<span class="why" hidden>Any index of an array can be read in one step.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l4-impl-pick"> Unsorted list<span class="why" hidden>Right. A million Θ(1) inserts, then one Θ(n) scan. A sorted list pays Θ(n) on every insert.</span></label>
+      <label><input type="radio" name="cse332-w2-l4-impl-pick"> Sorted list<span class="why" hidden>Its cheap operation is extract, which happens once. Its slow one, insert, happens a million times.</span></label>
+      <label><input type="radio" name="cse332-w2-l4-impl-pick"> Unbalanced BST<span class="why" hidden>In the worst case each insert walks a long chain: Θ(n) a million times.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
@@ -1005,119 +947,44 @@ print(extract)</code></pre>
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ L4: SHAPE -->
-<section class="page" id="l4-shape" data-title="Complete trees are short">
-  <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span> · Weiss 6.2</p>
-  <h1>Complete trees are short</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> A heap is always a <em>complete</em> binary tree: every level is full except the bottom one, which fills from the left. That shape forces the height to be about \(\log_2 n\).</p>
-  </div>
-
-  <h2>Binary and complete</h2>
-  <div class="split">
-    <div class="prose">
-      <ul>
-        <li><strong>Binary tree:</strong> every node has at most 2 children.</li>
-        <li><strong>Complete tree:</strong> all levels are full, except the bottom one, and the bottom level is filled left to right with no gaps.</li>
-        <li><strong>Height:</strong> the number of edges on the path from a node down to its deepest descendant. A tree's height is its root's height. The tree here has height 3.</li>
-      </ul>
-    </div>
-    <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" role="img" aria-label="A complete binary tree of 9 nodes: 1 at the root; 3 and 2 below it; 4, 7, 5, 6 on the next level; 5 and 9 on the bottom level at the far left"></svg>
-  </div>
-
-  <h2>Why the height is \(\Theta(\log n)\)</h2>
-  <div class="prose">
-    <p>Count the most nodes a binary tree of height \(h\) can hold: one root, then at most twice as many on each next level.</p>
-    <p>\[1 + 2 + 4 + \dots + 2^h = 2^{h+1} - 1.\]</p>
-    <p>So a tree with \(n\) nodes needs a height \(h\) with \(n \le 2^{h+1} - 1\). The smallest such \(h\) is \(\lceil\log_2(n+1)\rceil - 1\), which is \(\Theta(\log n)\). A complete tree fills each level before starting the next, so it always has exactly that smallest height.</p>
-  </div>
-
-  <h2>Why insist on this shape</h2>
-  <div class="prose">
-    <ol>
-      <li><strong>Speed.</strong> Insert and extract will each make one trip between the root and a leaf. A short tree means a short trip: \(\Theta(\log n)\).</li>
-      <li><strong>Storage.</strong> Every complete tree with \(n\) nodes has the same shape, with no gaps. Lecture 5 uses that to store the tree in an array.</li>
-    </ol>
-  </div>
-
-  <h2>Watch the height grow</h2>
-  <div class="panel" id="ht">
-    <div class="controls bc-slider">
-      <label for="ht-n">\(n\) =</label>
-      <input type="range" id="ht-n" min="1" max="31" value="12" aria-label="number of nodes">
-      <output id="ht-n-out">12</output>
-    </div>
-    <svg class="htree" id="ht-svg" role="img" aria-label="A complete binary tree with n nodes, numbered level by level"></svg>
-    <p class="out" id="ht-out" role="status"></p>
-    <p class="note">Nodes are numbered in the order a complete tree fills: level by level, left to right. The height goes up only when a level is full and one more node arrives.</p>
-  </div>
-
-  <div class="check" data-id="cse332-w2-l4-shape-min-nodes-h5" data-grader="exact" data-answer="32" data-miscon='{"63":"min-vs-max","31":"full-tree-off-by-one"}'>
-    <p>Quick check: a complete binary tree has height 5. What is the <em>fewest</em> nodes it can have?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l4-shape-why-left" data-grader="mc">
-    <p>Quick check: why must the bottom level fill from the left, with no gaps?</p>
-    <div class="opts">
-      <label><input type="radio" name="cse332-w2-l4-shape-why-left"> So the smallest item ends up on the left<span class="why" hidden>The shape rule says nothing about values. Where values go is the heap property's job.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l4-shape-why-left"> So every heap with n items has the same shape: no gaps, as short as possible, and easy to store in an array<span class="why" hidden>Right. One fixed shape per n is what makes the next open spot, the last item and the array layout all well defined.</span></label>
-      <label><input type="radio" name="cse332-w2-l4-shape-why-left"> Because binary trees can't have a right child without a left one<span class="why" hidden>Ordinary binary trees can. Heaps choose not to, for the reasons above.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ L4: HEAP PROPERTY -->
-<section class="page" id="l4-heap" data-title="The heap property">
+<!-- ================================================================ L4: WHAT A HEAP IS -->
+<section class="page" id="l4-heap" data-title="What a heap is">
   <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
-  <h1>The heap property</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> The min-heap property: every node's priority is \(\le\) its children's. That alone puts the minimum at the root, and it says nothing about siblings or cousins.</p>
-  </div>
+  <h1>What a heap is</h1>
+  <div class="prose"><p>A (min) heap is a binary tree (at most 2 children per node) that follows two rules.</p></div>
 
-  <h2>The two rules of a (min) heap</h2>
-  <div class="prose">
-    <ol>
-      <li>Keep the items in a <strong>complete binary tree</strong>.</li>
-      <li>Maintain the <strong>min-heap property</strong>: every node's priority is \(\le\) its children's priorities. (A <em>max</em>-heap flips it: every node \(\ge\) its children.)</li>
-    </ol>
+  <h2>Rule 1, shape: complete</h2>
+  <p class="line">Every level is full except the bottom one, which fills from the left with no gaps.</p>
+  <div class="tree-row">
+    <figure><figcaption>✓ complete</figcaption><svg class="htree" data-tree="1,2,3,4,5,6" role="img" aria-label="Complete: root 1; children 2 and 3; 2 has 4 and 5; 3 has 6"></svg></figure>
+    <figure><figcaption>✗ gap on the bottom level</figcaption><svg class="htree" data-tree="1,2,3,_,5,6" role="img" aria-label="Not complete: root 1; children 2 and 3; 2 has only a right child 5; 3 has 6"></svg></figure>
   </div>
+  <p class="line">Why: a complete tree is as short as possible. Each level doubles the room.</p>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th>nodes \(n\)</th><th>3</th><th>4</th><th>7</th><th>8</th><th>a million</th></tr></thead>
+    <tr><th>height</th><td>1</td><td>2</td><td>2</td><td>3</td><td class="best">19</td></tr>
+  </table></div>
+  <p class="line">Height counts the edges from the root down to the bottom. A new level starts only when the one above is full: 7 nodes fill height 2, so the 8th starts height 3. Height is about \(\log_2 n\), so a trip from the root to a leaf is short.</p>
 
-  <h2>Why the minimum is at the root</h2>
-  <div class="prose">
-    <p>Start at any node and walk up toward the root. Each step goes to a parent, and a parent is \(\le\) its child. So the values never go up as you climb, and the root is \(\le\) every node. The same argument works for any subtree: each node holds the smallest value in its own subtree.</p>
-  </div>
+  <h2>Rule 2, order: every node \(\le\) its children</h2>
+  <svg class="htree" data-tree="1,5,2,6,7,3,4" data-cmp="2,6" role="img" aria-label="Valid min-heap: root 1; children 5 and 2; 5 has children 6 and 7; 2 has children 3 and 4. The 5 and the 3 are circled."></svg>
+  <p class="line">Walk up from any node and the values never get bigger. So the smallest item is always at the root.</p>
+  <p class="line">But it isn't sorted. The circled 3 sits a level below the circled 5. That's fine: they're in different branches, so 5 isn't above 3.</p>
+  <div class="rule"><p><strong>The rule.</strong> Shape keeps the tree short. Order keeps the smallest on top. (A max-heap flips it: every node \(\ge\) its children.)</p></div>
 
-  <h2>What it does not require</h2>
-  <div class="split">
-    <div class="prose">
-      <p>The property only compares a node with its own children, and so with its own ancestors. It says nothing about nodes in other branches. In this valid min-heap, the 3 on the bottom level is smaller than the 5 a level above it. That's fine: 5 isn't an ancestor of 3.</p>
-      <p>This is why a heap is cheaper to maintain than a sorted list. Fixing a sorted list after a change can mean moving everything. Fixing a heap only means fixing one path.</p>
-    </div>
-    <svg class="htree" data-tree="1,5,2,6,7,3,4" role="img" aria-label="Valid min-heap: root 1; children 5 and 2; 5 has children 6 and 7; 2 has children 3 and 4"></svg>
-  </div>
-
-  <h2>Three questions</h2>
-  <div class="prose">
-    <p>Where is the minimum? At the root. How do I insert? <a href="#l4-insert">Next page</a>. How do I extract? <a href="#l4-extract">The page after</a>. How do I do it in Java? <a href="#l5-array">Lecture 5</a>.</p>
-  </div>
-
-  <div class="check" data-id="cse332-w2-l4-qc-heap-leaf-ancestor" data-grader="yesno" data-answer="no">
-    <p>Quick check: in a min-heap, must every node on one level be smaller than every node on the level below it? (yes or no)</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
   <div class="check" data-id="cse332-w2-l4-heap-largest-where" data-grader="mc">
     <p>Quick check: a min-heap holds all different values. Where can the <em>largest</em> value be?</p>
     <div class="opts">
-      <label><input type="radio" name="cse332-w2-l4-heap-largest-where"> Always at the bottom-right<span class="why" hidden>Nothing fixes it to one spot. Look at which nodes it could not be.</span></label>
+      <label><input type="radio" name="cse332-w2-l4-heap-largest-where"> Always at the bottom-right<span class="why" hidden>Nothing fixes it to one spot. Think about which nodes it can't be.</span></label>
       <label data-correct><input type="radio" name="cse332-w2-l4-heap-largest-where"> At any leaf, but never at a node that has a child<span class="why" hidden>Right. A node with a child is smaller than that child, so it isn't the largest. Any leaf could be.</span></label>
-      <label><input type="radio" name="cse332-w2-l4-heap-largest-where"> One level below the root<span class="why" hidden>Those nodes have children (if the heap has more than 3 items), and each is smaller than its children.</span></label>
+      <label><input type="radio" name="cse332-w2-l4-heap-largest-where"> One level below the root<span class="why" hidden>Depth alone doesn't decide it. A node with a child is smaller than that child, so the largest value has no children.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w2-l4-shape-min-nodes-h5" data-grader="exact" data-answer="32" data-miscon='{"63":"min-vs-max","31":"full-tree-off-by-one"}'>
+    <p>Quick check: a complete tree has height 5. What is the <em>fewest</em> nodes it can have?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <nav class="pager"></nav>
@@ -1125,32 +992,18 @@ print(extract)</code></pre>
 
 <!-- ================================================================ L4: INSERT -->
 <section class="page" id="l4-insert" data-title="Insert: percolate up">
-  <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span> · Weiss 6.3</p>
+  <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
   <h1>Insert: percolate up</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> Put the new item in the next open spot, so the tree stays complete. Then swap it with its parent while it's smaller. Only the path from the new spot up to the root can be broken, so that path is all you fix.</p>
-  </div>
+  <div class="prose"><p>Shape first, then order. Drop the new item in the next open spot, then let it climb while it's smaller than its parent. Step through the lecture's recipe, inserting 1.5:</p></div>
+  <p class="tree-key"><span class="k-cur">moving item</span><span class="k-cmp">compared</span><span class="k-swap">just swapped</span></p>
+  <div class="panel heap-step" data-kind="insertIdea" data-scenario="lecture-1.5"></div>
+  <div class="rule"><p><strong>The rule.</strong> At most one swap per level, so insert is \(O(\log n)\). A new smallest item climbs the whole height, so the worst case is \(\Theta(\log n)\).</p></div>
 
-  <h2>Why each step</h2>
-  <div class="prose">
-    <ul>
-      <li><strong>Next open spot first.</strong> The shape rule decides where the tree grows: the leftmost empty place on the bottom level (or a new level, if the bottom is full). Fix the shape first, the order second.</li>
-      <li><strong>Compare only with the parent.</strong> Before the insert, everything was a valid heap. The new item is a leaf with no children, so the only rule it can break is "parent \(\le\) child" with its own parent.</li>
-      <li><strong>Swapping up is safe.</strong> Say the new item \(x\) is below parent \(P\), with sibling \(S\). The old parent \(P\) moves down; it was already \(\le\) everything below it, so it's fine there. And \(x &lt; P \le S\), so \(x\) is a fine parent for \(S\). The only link that can still be wrong is \(x\) and its <em>new</em> parent.</li>
-      <li><strong>Stop</strong> when \(x\) is not smaller than its parent, or when \(x\) reaches the root.</li>
-    </ul>
-    <p>This is called <strong>percolate up</strong>: take a node that may be smaller than its parent and repeatedly swap it with its parent until it isn't.</p>
-  </div>
+  <details class="more">
+    <summary>Why compare only with the parent, never the sibling?</summary>
+    <p>The old parent was already no bigger than the sibling. The new item is smaller than the old parent, so it's smaller than the sibling too, and can take the parent's place. The old parent moves down safely, because it was already no bigger than anything below it.</p>
+  </details>
 
-  <h2>Step through it</h2>
-  <p class="tree-key"><span class="k-cur">the moving item</span><span class="k-cmp">being compared</span><span class="k-swap">just swapped</span></p>
-  <div class="panel heap-step" data-kind="insertIdea"></div>
-
-  <div class="prose">
-    <p><strong>Cost.</strong> Each swap moves the item up one level, so there are at most \(h\) swaps, where \(h\) is the height: \(\Theta(\log n)\) in the worst case. The worst case is a new item smaller than everything, which climbs all the way to the root.</p>
-  </div>
-
-  <h2>Check yourself</h2>
   <p class="where">This check starts from the lecture's heap:</p>
   <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" role="img" aria-label="Min-heap: root 1; children 3 and 2; 3 has children 4 and 7; 2 has children 5 and 6; 4 has children 5 and 9"></svg>
   <div class="check" data-id="cse332-w2-l4-insert-parent-of-4" data-grader="exact" data-answer="3" data-miscon='{"7":"start-spot"}'>
@@ -1158,12 +1011,12 @@ print(extract)</code></pre>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <div class="check" data-id="cse332-w2-l4-insert-no-sibling" data-grader="mc">
-    <p>Quick check: percolate up compares the new item only with its parent, never with its sibling. Why is that enough?</p>
+  <div class="check" data-id="cse332-w2-l4-insert-worst" data-grader="mc">
+    <p>Quick check: a heap has 7 items (height 2). What's the most swaps one insert can need?</p>
     <div class="opts">
-      <label><input type="radio" name="cse332-w2-l4-insert-no-sibling"> Siblings are always equal<span class="why" hidden>Siblings can be any two values. The heap property doesn't relate them.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l4-insert-no-sibling"> If the item is smaller than its parent, and the parent was ≤ the sibling, the item is smaller than the sibling too<span class="why" hidden>Right. After the swap the item is the sibling's parent, and x &lt; P ≤ S keeps that link valid.</span></label>
-      <label><input type="radio" name="cse332-w2-l4-insert-no-sibling"> The sibling gets checked later, when it percolates<span class="why" hidden>The sibling never moves during this insert. It's fine because of the parent's value.</span></label>
+      <label><input type="radio" name="cse332-w2-l4-insert-worst"> 7<span class="why" hidden>The new item only moves along one path, not past every item.</span></label>
+      <label data-correct><input type="radio" name="cse332-w2-l4-insert-worst"> 3<span class="why" hidden>Right. 7 items fill height 2, so the 8th starts a new level: height 3. A new smallest item climbs 3 levels to the root.</span></label>
+      <label><input type="radio" name="cse332-w2-l4-insert-worst"> 2<span class="why" hidden>The new item goes in a new bottom level first (7 items fill height 2). Count from there.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
@@ -1173,57 +1026,26 @@ print(extract)</code></pre>
 
 <!-- ================================================================ L4: EXTRACT -->
 <section class="page" id="l4-extract" data-title="Extract: percolate down">
-  <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span> · Weiss 6.3</p>
+  <p class="where">Lecture 4 · <span class="today-chip" data-date="2026-10-07">Wed Oct 7</span></p>
   <h1>Extract: percolate down</h1>
-  <div class="rule">
-    <p><strong>Key idea.</strong> The minimum is the root, so save it. To keep the tree complete, move the bottom-right item into the root. Then swap that item down with its <em>smaller</em> child until it's \(\le\) both children.</p>
-  </div>
+  <div class="prose"><p>The answer is the root. To keep the shape, move the bottom-right item up into the root. Then let it sink, swapping with its <em>smaller</em> child, until it's \(\le\) both children. Step through the lecture's recipe:</p></div>
+  <p class="tree-key"><span class="k-cur">moving item</span><span class="k-cmp">compared</span><span class="k-swap">just swapped</span></p>
+  <div class="panel heap-step" data-kind="extractIdea" data-scenario="lecture-after-1.5"></div>
+  <div class="rule"><p><strong>The rule.</strong> Swap with the smaller child, so it can be the parent of the other one. At most one swap per level, and the moved item can sink the whole height, so the worst case is \(\Theta(\log n)\) too.</p></div>
 
-  <h2>Why each step</h2>
-  <div class="prose">
-    <ul>
-      <li><strong>Save the root first.</strong> It's the answer, and the next step writes over it.</li>
-      <li><strong>Why the bottom-right item.</strong> A tree with one fewer item has to lose exactly that spot to stay complete. So that item has to move somewhere, and the root just became empty.</li>
-      <li><strong>Why it goes down.</strong> It came from the bottom, so it's probably too big for the top. Everything else is still in heap order; only the moved item can be out of place.</li>
-      <li><strong>Why the smaller child.</strong> The child that moves up becomes the parent of the other child. The smaller one can do that. The larger one would end up above a smaller value: a new violation.</li>
-      <li><strong>Stop</strong> when the item is \(\le\) both children, or when it's a leaf.</li>
-    </ul>
-    <p>This is called <strong>percolate down</strong>: take a node that may be larger than a child and repeatedly swap it with its smallest child until both children are larger.</p>
-  </div>
-
-  <h2>Step through it</h2>
-  <p class="tree-key"><span class="k-cur">the moving item</span><span class="k-cmp">being compared</span><span class="k-swap">just swapped</span></p>
-  <div class="panel heap-step" data-kind="extractIdea"></div>
-
-  <h2>Why both operations are \(\Theta(\log n)\)</h2>
-  <div class="prose">
-    <p>Both percolates move one item along one path between the root and a leaf, one level per swap. So each does at most \(h\) swaps, and \(h \in \Theta(\log n)\) because the tree is complete. Percolate up makes one comparison per level (with the parent); percolate down makes two (with both children), so it does up to \(2h\) comparisons. A constant factor doesn't change the class: both are \(\Theta(\log n)\) in the worst case.</p>
-  </div>
   <div class="rule warn">
     <p><strong>Common mistakes</strong></p>
     <ul>
-      <li>Swapping with the left child, or the larger child, instead of the smaller one.</li>
-      <li>Moving the root's smaller child up into the root instead of moving the last item. That leaves a hole and breaks the shape.</li>
-      <li>Forgetting that the moved item can stop partway down, above two larger children.</li>
+      <li>Swapping with the larger child, or always the left one.</li>
+      <li>Moving a child up into the empty root instead of the bottom-right item. That leaves a hole in the shape.</li>
     </ul>
   </div>
 
-  <h2>Check yourself</h2>
   <p class="where">This check starts from this heap:</p>
   <svg class="htree" data-tree="2,4,3,7,5,8,6" role="img" aria-label="Min-heap: root 2; children 4 and 3; 4 has children 7 and 5; 3 has children 8 and 6"></svg>
   <div class="check" data-id="cse332-w2-l4-extract-parent-of-6" data-grader="exact" data-answer="3" data-miscon='{"4":"larger-child"}'>
-    <p>Quick check: call <code>extract()</code> on this heap. The 6 moves to the root and percolates down. When it stops, what value is its parent?</p>
+    <p>Quick check: call <code>extract()</code> on this heap. The 6 moves to the root and sinks. When it stops, what value is its parent?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w2-l4-extract-why-last" data-grader="mc">
-    <p>Quick check: why does extract move the <em>bottom-right</em> item into the root, instead of just moving the root's smaller child up?</p>
-    <div class="opts">
-      <label><input type="radio" name="cse332-w2-l4-extract-why-last"> The bottom-right item is always the largest<span class="why" hidden>It isn't always the largest; any leaf can be.</span></label>
-      <label data-correct><input type="radio" name="cse332-w2-l4-extract-why-last"> Removing that one spot is the only way the tree stays complete<span class="why" hidden>Right. Moving a child up leaves a hole somewhere inside the tree. Fix the shape first, then the order.</span></label>
-      <label><input type="radio" name="cse332-w2-l4-extract-why-last"> It saves a comparison<span class="why" hidden>Percolating it down costs comparisons. The reason is the shape.</span></label>
-    </div>
-    <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <nav class="pager"></nav>
@@ -1382,7 +1204,7 @@ print(extract)</code></pre>
         <label><input type="radio" name="cse332-w2-q2-pq-vs-queue"> Any item, chosen at random<span class="why" hidden>It's always the top priority. Only ties may come out in any order.</span></label>
       </div>
     </li>
-    <li class="cyu" data-id="cse332-w2-q2-heap-shape" data-kind="mc" data-topic="l4-shape">
+    <li class="cyu" data-id="cse332-w2-q2-heap-shape" data-kind="mc" data-topic="l4-heap">
       <p class="q">A binary min-heap must be…</p>
       <div class="opts">
         <label data-correct><input type="radio" name="cse332-w2-q2-heap-shape"> a complete binary tree with every node ≤ its children<span class="why" hidden>Correct. Both parts: the shape keeps the height near \(\log n\), the order puts the minimum at the root.</span></label>
@@ -1422,7 +1244,7 @@ print(extract)</code></pre>
       <svg class="htree" data-tree="1,3,2,4,7,5,6,5,9" role="img" aria-label="Min-heap: root 1; children 3 and 2; 3 has children 4 and 7; 2 has children 5 and 6; 4 has children 5 and 9"></svg>
       <p class="why" hidden>6 goes under 7 (the next open spot). 6 &lt; 7: swap. Its parent is now 3, and 6 &lt; 3 is false: stop. One swap.</p>
     </li>
-    <li class="cyu" data-id="cse332-w2-l4-cyu-height-100" data-kind="num" data-answer="6" data-topic="l4-shape" data-miscon='{"7":"full-tree-off-by-one","100":"height-not-count"}'>
+    <li class="cyu" data-id="cse332-w2-l4-cyu-height-100" data-kind="num" data-answer="6" data-topic="l4-heap" data-miscon='{"7":"full-tree-off-by-one","100":"height-not-count"}'>
       <p class="q">What is the height (edges on the longest path down from the root) of a complete binary tree with 100 nodes?</p>
       <p class="why" hidden>Height 5 holds at most \(2^6 - 1 = 63\) nodes, too few. Height 6 holds up to 127. So 6.</p>
     </li>

@@ -439,7 +439,7 @@ function drawCells(box, arr, size, opts = {}) {
 
 /* static pictures for questions: <svg class="htree" data-tree="1,3,2,_,4"> and <div class="cells heap-cells" data-cells="…"> */
 function setupStaticPictures() {
-  $$("svg.htree[data-tree]").forEach((svg) => drawTree(svg, parseList(svg.dataset.tree), { idx: svg.hasAttribute("data-idx") }));
+  $$("svg.htree[data-tree]").forEach((svg) => drawTree(svg, parseList(svg.dataset.tree), { idx: svg.hasAttribute("data-idx"), mark: svg.dataset.cmp ? { cmp: svg.dataset.cmp.split(",").map(Number) } : undefined }));
   $$("[data-cells]").forEach((box) => { const vals = parseList(box.dataset.cells); drawCells(box, [null, ...vals], vals.length); });
 }
 
@@ -447,7 +447,7 @@ function setupStaticPictures() {
 const STEP_GEN = { insertIdea: Sim.insertIdeaSteps, extractIdea: Sim.extractIdeaSteps, insert: Sim.insertCodeSteps, extract: Sim.extractCodeSteps, build: Sim.buildSteps };
 function setupHeapStepper(box) {
   const kind = box.dataset.kind;
-  const scenarios = Sim.HEAP_SCENARIOS[kind.replace("Idea", "")];
+  const scenarios = Sim.HEAP_SCENARIOS[kind.replace("Idea", "")].filter((sc) => !box.dataset.scenario || sc.name === box.dataset.scenario);
   const lines = Sim.CODE[kind];
   const idea = kind.endsWith("Idea"); // Lecture 4 works on the tree only; the array comes in Lecture 5
   const chips = el("div", { class: "controls", role: "group", "aria-label": "Pick a starting heap" });
@@ -459,8 +459,9 @@ function setupHeapStepper(box) {
   const back = el("button", { class: "btn", type: "button", text: "← Back" });
   const next = el("button", { class: "btn primary", type: "button", text: kind === "build" || kind.endsWith("Idea") ? "Next step →" : "Next line →" });
   const count = el("span", { class: "note" });
-  box.append(chips, el("div", { class: "split stepper" }, code, el("div", { class: "pic" }, svg, idea ? null : cells, vars, say, el("div", { class: "controls" }, back, next, count))));
+  box.append(chips, el("div", { class: `split stepper${idea ? " idea" : ""}` }, code, el("div", { class: "pic" }, svg, idea ? null : cells, vars, say, el("div", { class: "controls" }, back, next, count))));
   let steps = [], k = 0;
+  if (scenarios.length < 2) chips.style.display = "none";
   const btns = scenarios.map((sc, i) => {
     const b = el("button", { class: "chip", type: "button", "aria-pressed": "false", text: sc.label });
     b.addEventListener("click", () => load(i));
@@ -496,37 +497,8 @@ function setupHeapStepper(box) {
 }
 
 /* =========================================================== queue vs priority queue on the same script */
-function setupPQRun() {
-  const run = () => {
-    const toks = $("#pq-script").value.trim().split(/\s+/).filter(Boolean);
-    const q = [], pq = [], qOut = [], pqOut = [];
-    for (const t of toks) {
-      if (/^\+-?\d+(\.\d+)?$/.test(t)) { const v = Number(t.slice(1)); q.push(v); pq.push(v); }
-      else if (t === "-") {
-        qOut.push(q.length ? q.shift() : "empty");
-        if (pq.length) { const m = Math.min(...pq); pq.splice(pq.indexOf(m), 1); pqOut.push(m); } else pqOut.push("empty");
-      } else { $("#pq-q-out").textContent = `Can't read "${t}". Use +5 to insert 5 and - to remove.`; $("#pq-pq-out").textContent = ""; return; }
-    }
-    $("#pq-q-out").textContent = `prints ${qOut.join(", ") || "nothing"} · still waiting: ${q.join(", ") || "none"}`;
-    $("#pq-pq-out").textContent = `prints ${pqOut.join(", ") || "nothing"} · still waiting: ${[...pq].sort((a, b) => a - b).join(", ") || "none"}`;
-  };
-  $("#pq-run").addEventListener("click", run);
-  $("#pq-script").addEventListener("keydown", (e) => { if (e.key === "Enter") run(); });
-  $$("[data-pq]").forEach((b) => b.addEventListener("click", () => { $("#pq-script").value = b.dataset.pq; run(); }));
-  run();
-}
 
 /* =========================================================== complete tree: height grows only when a level fills */
-function setupHeight() {
-  const draw = () => {
-    const n = Number($("#ht-n").value);
-    $("#ht-n-out").textContent = String(n);
-    drawTree($("#ht-svg"), Array.from({ length: n }, (_, i) => i + 1));
-    $("#ht-out").textContent = Sim.heightSay(n);
-  };
-  $("#ht-n").addEventListener("input", draw);
-  draw();
-}
 
 /* =========================================================== index arithmetic, 1-based */
 function setupIndex() {
@@ -696,8 +668,6 @@ setupGap();
 setupBuckets();
 setupSandwich();
 $$(".bound").forEach(setupBound);
-setupPQRun();
-setupHeight();
 $$(".heap-step").forEach(setupHeapStepper);
 setupIndex();
 setupPlayground();
