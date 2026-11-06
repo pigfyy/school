@@ -122,8 +122,13 @@ const titleOf = (node) => (($(".q, h2, p", node) || node).textContent || "").rep
 const PAGES = $$(".page").map((p) => ({ id: p.id, title: p.dataset.title || $("h1", p)?.textContent || p.id }));
 const WEEK_TITLE = `${COURSE.toUpperCase().replace(/(\D)(\d)/, "$1 $2")} ${WEEK_ID.replace(/^w0?/, "week ")}`;
 const REDRAW = new Set(); // widgets that need a visible page to measure themselves
+const SCROLL = new Map(); // page id -> where the reader left it, so coming back doesn't jump to the top
+let shownId = null;
 function show(id) {
   if (!PAGES.some((p) => p.id === id)) id = PAGES[0].id;
+  if (shownId) SCROLL.set(shownId, window.scrollY);
+  shownId = id;
+  const y = SCROLL.get(id) || 0;
   $$(".page").forEach((p) => p.classList.toggle("is-active", p.id === id));
   $$(".rail a[href^='#']").forEach((a) => {
     if (a.classList.contains("brand")) return;
@@ -132,8 +137,8 @@ function show(id) {
   });
   document.title = `${PAGES.find((p) => p.id === id).title} · ${WEEK_TITLE}`;
   closeMenu();
-  window.scrollTo(0, 0);
-  requestAnimationFrame(() => window.scrollTo(0, 0));
+  window.scrollTo(0, y);
+  requestAnimationFrame(() => window.scrollTo(0, y));
   REDRAW.forEach((fn) => fn(id));
 }
 const currentId = () => location.hash.slice(1) || PAGES[0].id;
