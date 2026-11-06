@@ -655,7 +655,7 @@ insertHelper(key, value, root) {
     <p><strong>The rule.</strong> With a good hash and chains as linked lists:</p>
     <ul>
       <li>an <strong>unsuccessful</strong> find walks a whole chain: about \(\lambda\) comparisons;</li>
-      <li>a <strong>successful</strong> find stops partway: about \(\frac{\lambda}{2}\) comparisons.</li>
+      <li>a <strong>successful</strong> find stops partway: about \(\frac{\lambda}{2}\) comparisons. That's the course's estimate; counting the key it stops on as well, it's about \(1 + \frac{\lambda}{2}\).</li>
     </ul>
     <p>To keep that \(\Theta(1)\), pick a constant and make the array bigger whenever \(\lambda\) goes over it (Lecture 11 does this). With chaining, \(\lambda\) can be more than 1: 15 keys in 10 slots is \(\lambda = 1.5\).</p>
   </div>
@@ -665,8 +665,8 @@ insertHelper(key, value, root) {
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <div class="check" data-id="cse332-w4-l10-qc-success" data-grader="exact" data-answer="0.75" data-miscon='{"1.5":"lambda-not-half"}'>
-    <p>Quick check: with \(\lambda = 1.5\), about how many comparisons does a successful find expect?</p>
+  <div class="check" data-id="cse332-w4-l10-qc-success" data-grader="exact" data-answer="0.75" data-miscon='{"1.5":"lambda-not-half","1.75":"plus-one"}'>
+    <p>Quick check: with \(\lambda = 1.5\), what is the course's estimate for the comparisons in a successful find?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
@@ -804,13 +804,13 @@ insertHelper(key, value, root) {
     <div class="answer-spec" data-part="ex1" data-grader="exact" data-answer="0.3" data-miscon='{"10/3":"lambda-flipped"}' data-label="\(\lambda\) with 3 keys"></div>
     <div class="answer-spec" data-part="ex3" data-grader="exact" data-answer="1.5" data-miscon='{"10/15":"lambda-flipped"}' data-label="\(\lambda\) with 15 keys"></div>
     <div class="answer-spec" data-part="miss3" data-grader="exact" data-answer="1.5" data-miscon='{"0.75":"half-not-lambda"}' data-label="15 keys: expected comparisons, unsuccessful find"></div>
-    <div class="answer-spec" data-part="hit3" data-grader="exact" data-answer="0.75" data-miscon='{"1.5":"lambda-not-half"}' data-label="15 keys: expected comparisons, successful find"></div>
+    <div class="answer-spec" data-part="hit3" data-grader="exact" data-answer="0.75" data-miscon='{"1.5":"lambda-not-half","1.75":"plus-one"}' data-label="15 keys: the course's estimate for a successful find"></div>
     <div class="answer-spec" data-part="why" data-grader="self" data-long data-template="An unsuccessful find walks ____.&#10;The average chain has ____ keys, so ____." data-label="Explain why an unsuccessful find expects about \(\lambda\) comparisons."></div>
     <ol class="hints"><li>\(\lambda = \frac{n}{\text{length}}\). Unsuccessful: the whole chain. Successful: half of it on average.</li></ol>
     <div class="solution"><div class="steps"><ol>
       <li>\(\frac{3}{10} = 0.3\) and \(\frac{15}{10} = 1.5\). More than 1 is fine with chaining.</li>
       <li>An unsuccessful find walks the whole chain at its slot. A good hash makes that chain average length \(\lambda\): 1.5 comparisons.</li>
-      <li>A successful find stops at its key, about halfway along on average: \(\frac{1.5}{2} = 0.75\).</li>
+      <li>A successful find stops at its key, about halfway along on average. The course's estimate is \(\frac{1.5}{2} = 0.75\). (Counting the key itself too, it's about 1.75.)</li>
       <li class="answer">0.3; 1.5; 1.5; 0.75.</li>
     </ol></div></div>
   </article>
@@ -1183,7 +1183,7 @@ c.left = p</pre>
     <div class="panel hx-step" data-size="7" data-mode="quadratic" data-ops="76 40 48 5 55 47"></div>
   </div>
   <div class="rule">
-    <p><strong>The rule.</strong> After length probes the slots repeat, so some empty slots may never be reached: 47 failed with 2 of 7 slots free. If the length is prime and \(\lambda &lt; \frac{1}{2}\), quadratic probing always finds an empty slot within length/2 probes. Here \(\lambda\) was \(\frac{5}{7}\).</p>
+    <p><strong>The rule.</strong> After length probes the slots repeat, so some empty slots may never be reached: 47 failed with 2 of 7 slots free. If the length is prime and \(\lambda &lt; \frac{1}{2}\), quadratic probing always finds an empty slot within \(\frac{\text{length} + 1}{2}\) probes. Here \(\lambda\) was \(\frac{5}{7}\).</p>
     <p>It also fixes primary clustering: keys jump away from a block instead of growing it. But keys with the <em>same</em> home still follow the same path. 76, 48 and 55 all start at 6 and walk 6, 0, 3. That's <strong>secondary clustering</strong>.</p>
   </div>
 
@@ -1326,13 +1326,16 @@ c.left = p</pre>
     <div class="answer-spec" data-part="found34" data-grader="yesno" data-answer="yes" data-miscon='{"no":"tomb-is-empty"}' data-label="Does find(34) find 34?"></div>
     <div class="answer-spec" data-part="find34" data-grader="exact" data-answer="4" data-label="slots looked at by find(34)"></div>
     <div class="answer-spec" data-part="find44" data-grader="exact" data-answer="5" data-miscon='{"2":"tomb-is-empty"}' data-label="slots looked at by find(44)"></div>
-    <div class="answer-spec" data-part="ins44" data-grader="exact" data-answer="5" data-miscon='{"8":"home-taken","4":"home-taken"}' data-label="slot where insert(44) puts 44"></div>
+    <div class="answer-spec" data-part="ins44" data-grader="exact" data-answer="5" data-miscon='{"8":"tomb-skip","4":"home-taken"}' data-label="slot where insert(44) puts 44"></div>
     <div class="answer-spec" data-part="hole" data-grader="yesno" data-answer="no" data-label="If delete had just emptied 14's slot instead, would find(34) find 34?"></div>
     <ol class="hints">
       <li>The four keys fill slots 4 to 7. Deleting 14 puts a tombstone in slot 5.</li>
       <li>Find walks past a tombstone. Insert remembers the first tombstone and uses it once it knows the key isn't there.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="1" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="2" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="3" data-say></div></li>
       <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="4" data-say></div></li>
       <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="5" data-say></div></li>
       <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="6" data-say></div></li>
@@ -1381,7 +1384,7 @@ c.left = p</pre>
     <div class="answer-spec" data-part="i7" data-grader="exact" data-answer="3" data-miscon='{"2":"quad-not-double"}' data-label="slot of 7"></div>
     <div class="answer-spec" data-part="why" data-grader="self" data-long data-template="In problem 3 every key probed ____ because ____.&#10;Here each key steps by ____, so ____." data-label="Problems 3 and 4 insert the same keys. Explain why the quadratic keys shared one path and these didn't."></div>
     <ol class="hints">
-      <li>Work out \(g\) for each key first: \(21 \bmod 5 = 1\), so \(g(21) = 4\).</li>
+      <li>Work out \(g\) for each key first, then probe \(h(k) + i \cdot g(k)\).</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
       <li><div class="hx-table" data-size="7" data-mode="double" data-r="5" data-ops="14 21 28 7" data-at="1" data-say></div></li>

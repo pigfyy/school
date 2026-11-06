@@ -270,8 +270,7 @@ const attr = (tag, name) => { const m = new RegExp(`\\s${name}='([^']*)'|\\s${na
     if (!pics.length) continue;
     const sc = scOf(pics[0]), n = tableRun(sc).length - 1;
     ok(pics.every((p) => JSON.stringify(scOf(p)) === JSON.stringify(sc) && p.includes("data-say")), `${m[1]}: every solution picture is the same scenario, with narration`);
-    const from = { "cse332-w4-l11-tomb2": 4 }[m[1]] ?? 1;
-    ok(pics.map((p) => attr(p, "data-at")).join() === Array.from({ length: n - from + 1 }, (_, i) => i + from).join(), `${m[1]}: pictures show states ${from} to ${n} in order`);
+    ok(pics.map((p) => attr(p, "data-at")).join() === Array.from({ length: n }, (_, i) => i + 1).join(), `${m[1]}: pictures show states 1 to ${n} in order`);
     const prompt = /<p class="prompt">[\s\S]*?<div class="hx-table"([^>]*)>/.exec(m[0]);
     ok(prompt && attr(prompt[0], "data-ops") === "" && +attr(prompt[0], "data-size") === sc.size && attr(prompt[0], "data-mode") === sc.mode, `${m[1]}: the prompt draws the empty starting table`);
   }
@@ -339,7 +338,7 @@ const attr = (tag, name) => { const m = new RegExp(`\\s${name}='([^']*)'|\\s${na
   ok([...new Set([...Array(7).keys()].map((i) => (5 + i * i) % 7))].sort().join() === "0,2,5,6" && [...new Set([...Array(7).keys()].map((i) => (i * i) % 7))].sort().join() === "0,1,2,4", "squares mod 7, and the probes from 5");
   for (let p = 3; p <= 31; p++) if (prime(p)) {
     const half = [...Array((p + 1) / 2).keys()].map((i) => (i * i) % p);
-    ok(new Set(half).size === half.length, `prime ${p}: the first (p+1)/2 quadratic probes are distinct, so λ < 1/2 always finds a slot within length/2 probes`);
+    ok(new Set(half).size === half.length, `prime ${p}: the first (p+1)/2 quadratic probes are distinct, so λ < 1/2 always finds a slot within (length + 1)/2 probes`);
     ok([...Array(p - 1).keys()].every((g) => new Set([...Array(p).keys()].map((i) => (i * (g + 1)) % p)).size === p), `prime ${p}: every step 1..${p - 1} visits all slots`);
   }
   ok([...Array(100).keys()].every((k) => { const g = 5 - (k % 5); return g >= 1 && g <= 5 && g % 7 !== 0; }), "g(k) = 5 − k % 5 is 1 to 5");
