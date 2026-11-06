@@ -231,7 +231,7 @@
   <p class="tree-key"><span class="k-cmp">root</span><span class="k-lsub">taller side, height \(h-1\)</span><span class="k-rsub">shorter side, height \(h-2\)</span></p>
   <div class="panel min-step" data-h="4"></div>
 
-  <div class="rule"><p><strong>The rule.</strong> \(M(h) = M(h-1) + M(h-2) + 1\), with \(M(0) = 1\) and \(M(1) = 2\). It grows like the Fibonacci numbers: each value is more than 1.6 times the one before. So an AVL tree of height \(h\) has at least \(1.6^h\) nodes, and a tree with \(n\) nodes has height at most about \(\log_{1.6} n \approx 1.44\log_2 n\). Find, insert and delete are \(\Theta(\log n)\).</p></div>
+  <div class="rule"><p><strong>The rule.</strong> \(M(h) = M(h-1) + M(h-2) + 1\), with \(M(0) = 1\) and \(M(1) = 2\). It grows like the Fibonacci numbers: each value is more than 1.6 times the one before. So an AVL tree of height \(h\) has at least \(1.6^h\) nodes, and a tree with \(n\) nodes has height at most about \(\log_{1.6} n \approx 1.47\log_2 n\). Find, insert and delete are \(\Theta(\log n)\).</p></div>
 
   <div class="example">
     <p class="example-head">Using it</p>
@@ -248,7 +248,7 @@
     <div class="opts">
       <label data-correct><input type="radio" name="cse332-w4-l9-cyu-why-h2"> The other subtree has height \(h-1\), and heights may differ by 1<span class="why" hidden>Right. \(h-3\) would differ by 2 and break the rule at the root.</span></label>
       <label><input type="radio" name="cse332-w4-l9-cyu-why-h2"> Because Fibonacci numbers skip a term<span class="why" hidden>The Fibonacci comparison comes after. The reason is the balance rule at the root.</span></label>
-      <label><input type="radio" name="cse332-w4-l9-cyu-why-h2"> Every AVL tree has subtrees of heights \(h-1\) and \(h-2\)<span class="why" hidden>A full tree has both subtrees at \(h-1\). Only the smallest ones use \(h-2\).</span></label>
+      <label><input type="radio" name="cse332-w4-l9-cyu-why-h2"> Every AVL tree has subtrees of heights \(h-1\) and \(h-2\)<span class="why" hidden>A full tree has both subtrees at \(h-1\). The smallest trees always use \(h-1\) and \(h-2\); other AVL trees may or may not.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
@@ -890,7 +890,7 @@
     <p>Quick check: in the same picture, the insert went into \(X\), the right subtree of \(p\)'s left child \(b\). Which rotations, in order?</p>
     <div class="opts">
       <label data-correct><input type="radio" name="cse332-w4-s4-qc-x"> Left at \(b\), then right at \(p\)<span class="why" hidden>Right: case 2. The first rotation turns the zig-zag into a straight left-left path, and the second fixes that.</span></label>
-      <label><input type="radio" name="cse332-w4-s4-qc-x"> Right at \(b\), then left at \(p\)<span class="why" hidden>That's the mirror image, for \(Y\) on the right side.</span></label>
+      <label><input type="radio" name="cse332-w4-s4-qc-x"> Right at \(b\), then left at \(p\)<span class="why" hidden>Those are the mirror case's directions, but in the wrong place. The mirror case, an insert into \(Y\), rotates right at \(c\) and then left at \(p\). For \(X\), the first rotation is left at \(b\).</span></label>
       <label><input type="radio" name="cse332-w4-s4-qc-x"> Right at \(p\) only<span class="why" hidden>One rotation fixes only a straight path. \(X\) is on the inside, so one right rotation would just move the problem to the other side.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>

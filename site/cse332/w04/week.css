@@ -26,7 +26,7 @@
 .av-node.lsub circle { fill: var(--accent-tint); stroke: var(--accent); }
 .av-node.rsub circle { fill: var(--s1-tint); stroke: var(--s1); }
 :is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; font-size: 0.85rem; color: var(--ink-soft); margin: 0 0 0.5rem; }
-:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key span::before { content: ""; display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 50%; vertical-align: -0.1rem; margin-right: 0.35rem; border: 2px solid var(--ink); background: var(--surface); }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key > span::before { content: ""; display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 50%; vertical-align: -0.1rem; margin-right: 0.35rem; border: 2px solid var(--ink); background: var(--surface); }
 :is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-new::before { background: var(--accent); border-color: var(--accent-deep); }
 :is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-bad::before { border: 3px solid var(--wrong); background: var(--wrong-tint); }
 :is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-cmp::before { border: 3px solid var(--amber); }
