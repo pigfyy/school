@@ -360,7 +360,7 @@ Object.assign(window.WEEK.messages, {
   "lambda-flipped": "λ is n / length: the number of keys divided by the number of slots.",
   "lambda-not-half": "That's λ itself. A successful find stops partway along the chain: about λ/2.",
   "half-not-lambda": "An unsuccessful find has to look at the whole chain: about λ, not λ/2.",
-  "plus-one": "That also counts the key it stops on, which is the exact count. The course's estimate is λ/2.",
+  "plus-one": "That's the estimate that also counts the matching key. This question asks for the course's λ/2 estimate.",
   "tomb-skip": "Slot 8 is the first empty slot, but insert doesn't need an empty one. It reuses the first tombstone it passed, once it knows the key isn't in the table.",
   "home-taken": "That's the key's home slot, and it is already taken. Follow the probes i = 1, 2, … to the first empty slot.",
   "tomb-reused": "53 already went into the tombstone's slot. Use the table as it is after the last step.",
