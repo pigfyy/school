@@ -1,6 +1,5 @@
 /* CSE 332 w04: misconception feedback and this week's widgets.
-   - .treelab     AVL insert stepper (week 3's: shows the deepest unbalanced node, then the rotation)
-   - .treeview    a static drawing of one tree from data-shape, e.g. "9(3(1(0,),6),10(,16))"
+   - svg.htree    AVL tree pictures, and the Lecture 9 / Section 4 steppers .avl-seq, .min-step, .rewire-step
    - .hashcalc    the string hashes h1-h4 of slide 18 for any string, with Horner's rule
    - .hashlab     a hash table of integer keys: separate chaining or linear / quadratic / double-hashing probes */
 "use strict";
@@ -23,6 +22,24 @@ window.WEEK.messages = {
   "forgot-double": "h4 doubles h3. Recompute, or just multiply h3 by 2.",
 };
 
+/* AVL */
+Object.assign(window.WEEK.messages, {
+  "balanced-node": "Work out that node's two child heights again: they differ by at most 1, so it's fine. Look for children that differ by 2.",
+  "before-rotation": "That's how the tree looks before the rotation. Which node moves up into that spot?",
+  "no-rotation": "That would be the answer with no rotation. Walk back up from the new leaf: some node ends up with children that differ by 2.",
+  "subtree-stays": "In the last rotation, the node that moves up hands its inner subtree across to the node that moves down.",
+  "forgot-root": "Add 1 for the root: M(h) = M(h−1) + M(h−2) + 1.",
+  "bst-not-avl": "That's the AVL tree's limit. A plain BST has no balance rule, so it can be a chain.",
+  "full-not-tallest": "That's the shortest a tree with this many nodes can be. The question asks for the tallest an AVL tree can get.",
+  "over-m": "An AVL tree that tall needs more nodes than that. Find the largest h with M(h) at most the number of nodes.",
+  "height-counts-nodes": "Height counts edges on the longest root-to-leaf path, not nodes.",
+  "count-all-bad": "Check every node on the path back up, not just the first: compare each one's two children's heights.",
+  "first-two-steps": "The case uses only the key's first two steps down from the unbalanced node. Where did it go at that node, and then at its child?",
+  "taller-subtree": "That's the taller subtree, of height h − 1. The shorter one has height h − 2.",
+  "max-not-min": "That's the most nodes a tree of height 4 can have: a full tree. The question asks for the fewest.",
+  "chain-not-avl": "A chain that tall isn't balanced: each node's two subtrees must differ in height by at most 1.",
+});
+
 window.WEEK.widgets = function ({ $, $$, el, REDRAW }) {
   const Sim = window.Sim;
   const NS = "http://www.w3.org/2000/svg";
@@ -34,129 +51,206 @@ window.WEEK.widgets = function ({ $, $$, el, REDRAW }) {
   }
   const fmt = (x) => BigInt(x).toLocaleString("en-US");
 
-  /* =========================================================== drawing a tree */
-  // marks: { key: "path" | "new" | "problem" | "found" | "repl" }; opts.heights shows each node's height
-  function drawTree(svg, t, marks = {}, opts = {}) {
+  /* AVL =========================================================== Lecture 9 and Section 4: tree pictures and steppers
+     svg.htree[data-shape] draws one tree, its nodes placed left to right in key order. Keys are numbers or letters;
+     the capitals V-Z are whole subtrees, drawn as triangles. data-new / data-bad / data-cmp / data-cur mark keys (the
+     new key, unbalanced nodes, the node a rotation lifted, nodes being updated), data-label="h" writes each height,
+     and data-bad-edges / data-new-edges ("a>p,p>b") draw the references a rotation removes or adds, numbered in order.
+     Steppers: .avl-seq[data-keys] inserts the keys one step at a time and fills in the insert recipe
+     (Sim.avlSeqSteps); .min-step[data-h] builds the smallest AVL trees (Sim.minSteps); .rewire-step walks Section 4's
+     right rotation as three reference changes (Sim.rewireSteps). */
+  const kf = (k) => (typeof k === "number" && k < 0 ? `−${-k}` : String(k));
+  const keyOf = (s) => (/^-?\d+$/.test(s) ? Number(s) : s);
+  const isSub = (k) => typeof k === "string" && /^[V-Z]$/.test(k);
+  const avlDims = () => (innerWidth < 600 ? { gap: 38, dy: 56, r: 15, pad: 26, top: 24 } : { gap: 48, dy: 62, r: 17, pad: 30, top: 26 });
+  // pixel spots in a box wide enough for `cols` nodes and `depth` levels: x by in-order rank, y by depth
+  function avlGeom(t, cols, depth) {
+    const d = avlDims(), spots = new Map();
+    let rank = 0;
+    const off = ((cols - Sim.size(t)) * d.gap) / 2;
+    const walk = (x, dep) => { if (!x) return; walk(x.left, dep + 1); spots.set(x.key, { x: d.pad + off + (rank++ + 0.5) * d.gap, y: d.top + dep * d.dy }); walk(x.right, dep + 1); };
+    walk(t, 0);
+    return { d, spots, W: Math.max(cols, 3) * d.gap + 2 * d.pad, H: d.top + Math.max(depth, 0) * d.dy + d.r * 1.5 + 12 };
+  }
+  function avlPaint(svg, t, spots, geom, { marks = {}, heights = null, edges = {} } = {}) {
+    const { d } = geom;
     svg.replaceChildren();
-    if (!t) {
-      svg.setAttribute("viewBox", "0 0 760 70");
-      svg.append(svgEl("text", { x: 380, y: 40, "text-anchor": "middle", class: "tl-empty" }, "(empty tree)"));
-      return;
-    }
-    const keys = Sim.inOrder(t), depth = Sim.height(t);
-    const narrow = innerWidth < 600;
-    const W = narrow ? Math.max(300, Math.min(420, keys.length * 36 + 30)) : Math.max(360, Math.min(760, keys.length * 64 + 40)), gap = (W - 40) / Math.max(1, keys.length);
-    const r = Math.min(17, Math.max(11, gap * 0.36)), dy = narrow ? 50 : 58, H = (depth + 1) * dy + 18;
-    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-    const pos = new Map();
-    const place = (n, d) => { if (!n) return; place(n.left, d + 1); pos.set(n.key, { x: 20 + gap * (pos.size + 0.5), y: 26 + d * dy }); place(n.right, d + 1); };
-    place(t, 0);
-    const edges = svgEl("g"), nodes = svgEl("g");
-    const walk = (n) => {
-      if (!n) return;
-      const p = pos.get(n.key);
-      for (const c of [n.left, n.right]) if (c) { const q = pos.get(c.key); edges.append(svgEl("line", { x1: p.x, y1: p.y, x2: q.x, y2: q.y, class: `tl-edge${marks[c.key] === "path" || marks[c.key] === "new" || marks[c.key] === "found" ? " on" : ""}` })); }
-      const g = svgEl("g", { class: `tl-node ${marks[n.key] || ""}`.trim() });
-      g.append(svgEl("circle", { cx: p.x, cy: p.y, r }));
-      g.append(svgEl("text", { x: p.x, y: p.y + 4.5, "text-anchor": "middle" }, String(n.key)));
-      if (opts.heights) g.append(svgEl("text", { x: p.x + r + 2, y: p.y - r + 4, class: "tl-h" }, `h=${n.height}`));
+    svg.setAttribute("viewBox", `0 0 ${geom.W} ${geom.H}`);
+    svg.style.maxWidth = `${geom.W}px`;
+    if (!t) { svg.append(svgEl("text", { x: geom.W / 2, y: geom.H / 2 + 5, "text-anchor": "middle", class: "av-empty" }, "(empty tree)")); return; }
+    const lines = svgEl("g"), tags = svgEl("g"), nodes = svgEl("g");
+    const walk = (x) => {
+      if (!x) return;
+      const p = spots.get(x.key);
+      for (const c of [x.left, x.right]) {
+        if (!c) continue;
+        const q = spots.get(c.key), e = `${x.key}>${c.key}`, n = (edges.bad || {})[e] || (edges.add || {})[e];
+        const kind = (edges.bad || {})[e] ? " bad" : (edges.add || {})[e] ? " add" : "";
+        lines.append(svgEl("line", { x1: p.x, y1: p.y, x2: q.x, y2: isSub(c.key) ? q.y - d.r : q.y, class: `av-edge${kind}` }));
+        if (n) {
+          const g = svgEl("g", { class: `av-tag${kind}`, transform: `translate(${((p.x + q.x) / 2).toFixed(1)},${((p.y + q.y) / 2).toFixed(1)})` });
+          g.append(svgEl("circle", { r: 9 }), svgEl("text", { y: 4, "text-anchor": "middle" }, String(n)));
+          tags.append(g);
+        }
+      }
+      const g = svgEl("g", { class: `av-node${isSub(x.key) ? " sub" : ""} ${marks[x.key] || ""}`.trim(), transform: `translate(${p.x.toFixed(1)},${p.y.toFixed(1)})` });
+      if (isSub(x.key)) {
+        const r = d.r;
+        g.append(svgEl("polygon", { points: `0,${-r} ${-r * 1.15},${r * 1.4} ${r * 1.15},${r * 1.4}` }), svgEl("text", { y: r * 0.85, "text-anchor": "middle" }, x.key));
+      } else {
+        g.append(svgEl("circle", { r: d.r }), svgEl("text", { y: 5, "text-anchor": "middle" }, kf(x.key)));
+        if (heights && heights[x.key] != null) g.append(svgEl("text", { x: d.r + 1, y: -d.r + 4, class: "av-h" }, `h=${kf(heights[x.key])}`));
+      }
       nodes.append(g);
-      walk(n.left); walk(n.right);
+      walk(x.left); walk(x.right);
     };
     walk(t);
-    svg.append(edges, nodes);
-    svg.setAttribute("aria-label", `Tree: ${Sim.shape(t)}`);
+    svg.append(lines, nodes, tags);
   }
-
-  /* =========================================================== static tree views */
-  $$(".treeview[data-shape]").forEach((box) => {
-    const t = Sim.parseShape(box.dataset.shape);
-    const svg = svgEl("svg", { class: "chart tl-svg", role: "img" });
-    box.prepend(svg);
-    const marks = {};
-    (box.dataset.mark || "").split(",").filter(Boolean).forEach((k) => { marks[Number(k)] = box.dataset.markAs || "problem"; });
-    const paint = () => drawTree(svg, t, marks, { heights: box.hasAttribute("data-heights") });
-    paint();
-    let wasNarrow = innerWidth < 600;
-    REDRAW.add(() => { if ((innerWidth < 600) !== wasNarrow) { wasNarrow = !wasNarrow; paint(); } });
-  });
-
-  /* =========================================================== BST / AVL playground */
-  function setupLab(panel) {
-    const avl = panel.dataset.mode === "avl";
-    const svg = $(".tl-svg", panel), out = $(".tl-out", panel), orders = $(".tl-orders", panel), keyIn = $(".tl-key", panel);
-    const nextBtn = $(".tl-next", panel), queueOut = $(".tl-queue", panel);
-    const presets = JSON.parse(panel.dataset.presets || "[]");
-    let tree = null, pending = null, queue = [];
-    const load = (p) => { tree = p.shape ? Sim.parseShape(p.shape) : null; queue = [...(p.seq || [])]; pending = null; render({}, p.say || "Loaded. Type a key, or press Insert to add the next key in the queue."); };
-    let lastMarks = {};
-    let wasNarrow = innerWidth < 600;
-    REDRAW.add(() => { if ((innerWidth < 600) !== wasNarrow) { wasNarrow = !wasNarrow; drawTree(svg, tree, lastMarks, { heights: avl }); } });
-    function render(marks, msg) {
-      lastMarks = marks;
-      drawTree(svg, tree, marks, { heights: avl });
-      out.textContent = msg;
-      if (orders) orders.textContent = tree ? `In-order: ${Sim.inOrder(tree).join(" ")} · Pre-order: ${Sim.preOrder(tree).join(" ")} · Post-order: ${Sim.postOrder(tree).join(" ")} · Height: ${Sim.height(tree)}` : "";
-      if (nextBtn) nextBtn.disabled = !pending;
-      if (queueOut) queueOut.textContent = queue.length ? `Queue: ${queue.join(", ")}` : "";
-    }
-    const readKey = () => {
-      const v = keyIn.value.trim();
-      if (v === "" && queue.length) return queue.shift();
-      if (!/^-?\d+$/.test(v)) { out.textContent = "Type a whole number as the key."; return null; }
-      keyIn.value = "";
-      return Number(v);
+  function avlSay(t) {
+    if (!t) return "An empty tree.";
+    const parts = [`Root ${kf(t.key)}.`];
+    const w = (x) => { if (!x || (!x.left && !x.right)) return; parts.push(`${kf(x.key)}: left ${x.left ? kf(x.left.key) : "empty"}, right ${x.right ? kf(x.right.key) : "empty"}.`); w(x.left); w(x.right); };
+    w(t);
+    return parts.join(" ");
+  }
+  const heightsOf = (t) => { const m = {}; const w = (x) => { if (x) { m[x.key] = x.height; w(x.left); w(x.right); } }; w(t); return m; };
+  const onNarrowChange = (fn) => { let was = innerWidth < 600; REDRAW.add(() => { if ((innerWidth < 600) !== was) { was = !was; fn(); } }); };
+  // Back / Next buttons and a step counter; paint(k) draws step k
+  function stepControls(n, paint) {
+    const back = el("button", { class: "btn", type: "button", text: "← Back" });
+    const next = el("button", { class: "btn primary", type: "button", text: "Next step →" });
+    const count = el("span", { class: "note" });
+    let k = 0;
+    const go = (to) => {
+      k = to;
+      back.disabled = k === 0;
+      next.disabled = k === n - 1;
+      count.textContent = k === 0 ? "Press Next step." : k === n - 1 ? "Done." : `Step ${k} of ${n - 1}.`;
+      paint(k);
     };
-    const marksFor = (path, k, kind) => Object.fromEntries([...path.map((x) => [x, "path"]), [k, kind]]);
-    $(".tl-insert", panel).addEventListener("click", () => {
-      if (pending) finish();
-      const k = readKey(); if (k === null) return;
-      if (!avl) {
-        const r = Sim.bstInsert(tree, k); tree = r.root;
-        return render(marksFor(r.path, k, r.dup ? "found" : "new"), r.dup ? `${k} is already a key, so insert just overwrites its value. The tree doesn't change.` : `Inserted ${k} as a leaf after comparing with ${r.path.length ? r.path.join(", ") : "nothing (empty tree)"}.`);
-      }
-      const before = Sim.clone(tree);
-      const step = Sim.avlBstStep(Sim.clone(tree), k);
-      if (step.dup) return render(marksFor(step.path, k, "found"), `${k} is already a key. Nothing changes.`);
-      const after = Sim.avlInsert(Sim.clone(before), k);
-      if (!step.problem) { tree = after.root; return render(marksFor(step.path, k, "new"), `BST insert put ${k} at a leaf. Every node on the path back to the root is still balanced, so no rotation.`); }
-      tree = step.root;
-      const all = Sim.problemNodes(Sim.clone(step.root));
-      pending = { after, k };
-      const how = { LL: "the left subtree of its left child: rotate right at it", RR: "the right subtree of its right child: rotate left at it", LR: "the right subtree of its left child: rotate left at the left child, then right at it", RL: "the left subtree of its right child: rotate right at the right child, then left at it" }[after.case];
-      const m = marksFor(step.path, k, "new"); m[step.problem] = "problem";
-      render(m, `BST insert put ${k} at a leaf. Heights updated: node ${step.problem} is the deepest unbalanced node${all.length > 1 ? ` (${all.join(" and ")} are both unbalanced)` : ""}. Case ${after.case}: ${k} went into ${how}. Press Rotate.`);
-    });
-    function finish() {
-      const { after, k } = pending; pending = null; tree = after.root;
-      render({ [k]: "new" }, `Case ${after.case} at ${after.problem}: ${after.case.length === 2 && after.case[0] === after.case[1] ? "one rotation" : "two rotations"}. The tree is balanced again; root is ${tree.key}.`);
-    }
-    if (nextBtn) nextBtn.addEventListener("click", () => pending && finish());
-    const find = $(".tl-find", panel);
-    if (find) find.addEventListener("click", () => {
-      const k = readKey(); if (k === null) return;
-      const r = Sim.bstFind(tree, k);
-      render(Object.fromEntries(r.path.map((x) => [x, x === k ? "found" : "path"])), r.found ? `Found ${k} after comparing with ${r.path.join(", ")}.` : `${k} isn't in the tree. Compared with ${r.path.join(", ") || "nothing"} and fell off at an empty child.`);
-    });
-    const del = $(".tl-delete", panel);
-    if (del) del.addEventListener("click", () => {
-      const k = readKey(); if (k === null) return;
-      if (!Sim.bstFind(tree, k).found) return render({}, `${k} isn't in the tree, so delete does nothing.`);
-      const r = Sim.bstDelete(tree, k); tree = r.root;
-      const say = [`${k} was a leaf: its parent now points to null.`, `${k} had one child: ${r.replacement} takes its place.`, `${k} had two children: the largest key to its left, ${r.replacement}, moves up into its place and is removed from below.`][r.case];
-      render(r.case === 2 ? { [r.replacement]: "repl" } : r.case === 1 ? { [r.replacement]: "repl" } : {}, say);
-    });
-    const chips = $(".tl-presets", panel);
-    presets.forEach((p, i) => {
-      const c = el("button", { class: "chip", type: "button", text: p.label });
-      c.addEventListener("click", () => load(p));
-      chips.append(c);
-      if (i === 0) load(p);
-    });
-    $(".tl-reset", panel).addEventListener("click", () => load(presets[0]));
-    keyIn.addEventListener("keydown", (e) => { if (e.key === "Enter") $(".tl-insert", panel).click(); });
+    back.addEventListener("click", () => { if (k > 0) go(k - 1); });
+    next.addEventListener("click", () => { if (k < n - 1) go(k + 1); });
+    return { box: el("div", { class: "controls" }, back, next, count), go, now: () => k };
   }
-  $$(".treelab").forEach(setupLab);
+  // slide the nodes from where they were drawn last to their new spots
+  function slider(svg) {
+    let shown = null, raf = 0;
+    return {
+      reset() { shown = null; },
+      draw(t, geom, opts) {
+        cancelAnimationFrame(raf);
+        const from = shown, to = geom.spots;
+        if (!from || !t || matchMedia("(prefers-reduced-motion: reduce)").matches) { avlPaint(svg, t, to, geom, opts); shown = to; return; }
+        const t0 = performance.now(), ms = 700;
+        const frame = (now) => {
+          const u = Math.min(1, (now - t0) / ms), e = u < 0.5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2;
+          const at = new Map([...to].map(([key, p]) => { const f = from.get(key) || p; return [key, { x: f.x + (p.x - f.x) * e, y: f.y + (p.y - f.y) * e }]; }));
+          avlPaint(svg, t, at, geom, opts);
+          shown = at;
+          if (u < 1) raf = requestAnimationFrame(frame);
+        };
+        raf = requestAnimationFrame(frame);
+      },
+    };
+  }
+
+  const AVL_PAGES = '.page[id^="l9-"], .page[id^="s4-"]';
+  $$(AVL_PAGES).forEach((page) => $$("svg.htree[data-shape]", page).forEach((svg) => {
+    const t = Sim.parseShape(svg.dataset.shape);
+    const marks = {};
+    for (const role of ["new", "bad", "cmp", "cur", "moved", "lsub", "rsub"]) (svg.dataset[role] || "").split(",").filter(Boolean).forEach((k) => { marks[keyOf(k)] = marks[keyOf(k)] ? `${marks[keyOf(k)]} ${role}` : role; });
+    const nums = (s) => Object.fromEntries((s || "").split(",").filter(Boolean).map((e, i) => [e, i + 1]));
+    const opts = { marks, heights: (svg.dataset.label || "").includes("h") ? heightsOf(t) : null, edges: { bad: nums(svg.dataset.badEdges), add: nums(svg.dataset.newEdges) } };
+    if (!svg.hasAttribute("aria-label")) svg.setAttribute("aria-label", avlSay(t));
+    const paint = () => { const g = avlGeom(t, Sim.size(t), Sim.height(t)); avlPaint(svg, t, g.spots, g, opts); };
+    paint();
+    onNarrowChange(paint);
+  }));
+
+  // L9: the insert recipe as a card of blanks, filled in by each step of the sequence stepper
+  const CASES = [["LL", "left, then left", "rotate right at it"], ["RR", "right, then right", "rotate left at it"],
+    ["LR", "left, then right", "rotate left at its left child, then right at it"], ["RL", "right, then left", "rotate right at its right child, then left at it"]];
+  function recipeCard() {
+    const blank = (f) => el("span", { class: "blank", "data-f": f });
+    const rows = [
+      el("li", {}, "BST insert: ", blank("key"), " becomes ", blank("where"), "."),
+      el("li", {}, "Walk back up from the new leaf, updating heights. The first unbalanced node: ", blank("problem"), "."),
+      el("li", {}, "From that node, the key went ", blank("path"), ". Case ", blank("kase"), "."),
+      el("li", { "data-row": "fix" }, "Fix it: ", blank("fix"), ". Then stop."),
+    ];
+    const table = el("table", { class: "plain av-cases" }, el("tr", {}, ...["Case", "The key went", "Fix"].map((x) => el("th", { text: x }))),
+      ...CASES.map(([c, path, fixText]) => el("tr", { "data-case": c }, el("td", { text: c }), el("td", { text: path }), el("td", { text: fixText }))));
+    return el("div", { class: "proof av-recipe" }, el("p", { class: "proof-head", text: "The insert recipe" }), el("ol", {}, ...rows), el("div", { class: "table-wrap" }, table));
+  }
+  function fillCard(card, c) {
+    $$(".blank", card).forEach((b) => { b.textContent = c[b.dataset.f] || ""; });
+    $$("[data-row]", card).forEach((r) => r.classList.toggle("now", c.now === r.dataset.row));
+    $$("tr[data-case]", card).forEach((r) => r.classList.toggle("now", r.dataset.case === c.kase));
+  }
+  function setupSeq(box) {
+    const steps = Sim.avlSeqSteps(box.dataset.keys.split(",").map(Number));
+    const trees = steps.map((s) => (s.shape ? Sim.parseShape(s.shape) : null));
+    const cols = Math.max(...trees.map(Sim.size)), depth = Math.max(...trees.map(Sim.height));
+    const svg = svgEl("svg", { class: "htree av-live", role: "img" });
+    const say = el("p", { class: "step-say", role: "status" });
+    const card = recipeCard(), slide = slider(svg);
+    const ctl = stepControls(steps.length, (k) => {
+      const st = steps[k], t = trees[k];
+      say.textContent = st.say;
+      svg.setAttribute("aria-label", avlSay(t));
+      fillCard(card, st.card);
+      slide.draw(t, avlGeom(t, cols, depth), { marks: st.marks, heights: st.heights });
+    });
+    box.append(el("div", { class: "av-stepper" }, el("div", { class: "pic" }, svg, ctl.box, say), card));
+    onNarrowChange(() => { slide.reset(); ctl.go(ctl.now()); });
+    ctl.go(0);
+  }
+  $$(".avl-seq[data-keys]").forEach(setupSeq);
+
+  // L9: the smallest AVL tree of each height, a root over the two smaller ones, with M(h) filled in as it goes
+  function setupMin(box) {
+    const steps = Sim.minSteps(Number(box.dataset.h));
+    const svg = svgEl("svg", { class: "htree", role: "img" });
+    const say = el("p", { class: "step-say", role: "status" });
+    const cells = steps.map(() => el("td", { class: "blank-cell" }));
+    const table = el("table", { class: "vals" }, el("tr", {}, el("th", { text: "h" }), ...steps.map((s) => el("td", { text: String(s.h) }))), el("tr", {}, el("th", { text: "M(h)" }), ...cells));
+    const ctl = stepControls(steps.length, (k) => {
+      const st = steps[k], t = Sim.parseShape(st.shape);
+      const marks = { ...Object.fromEntries(st.left.map((x) => [x, "lsub"])), ...Object.fromEntries(st.right.map((x) => [x, "rsub"])), [st.root]: "cmp" };
+      const g = avlGeom(t, Sim.size(t), Sim.height(t));
+      avlPaint(svg, t, g.spots, g, { marks });
+      svg.setAttribute("aria-label", `The smallest AVL tree of height ${st.h}: ${st.M} node${st.M === 1 ? "" : "s"}. ${avlSay(t)}`);
+      say.textContent = st.say;
+      cells.forEach((c, i) => { c.textContent = i <= k ? String(steps[i].M) : "?"; c.classList.toggle("now", i === k); });
+    });
+    box.append(el("div", { class: "chart-box" }, svg), ctl.box, say, el("div", { class: "table-wrap" }, table));
+    onNarrowChange(() => ctl.go(ctl.now()));
+    ctl.go(0);
+  }
+  $$(".min-step[data-h]").forEach(setupMin);
+
+  // S4: Section 4's right rotation at p, as the three references it changes
+  function setupRewire(box) {
+    const steps = Sim.rewireSteps(), lines = Sim.REFS.right;
+    const trees = steps.map((s) => Sim.parseShape(s.shape));
+    const cols = Sim.size(trees[0]), depth = Math.max(...trees.map(Sim.height));
+    const code = el("pre", { class: "code" });
+    const svg = svgEl("svg", { class: "htree av-live", role: "img" });
+    const say = el("p", { class: "step-say", role: "status" });
+    const slide = slider(svg);
+    const ctl = stepControls(steps.length, (k) => {
+      const st = steps[k], t = trees[k];
+      code.replaceChildren(...lines.map((ln, i) => el("div", { class: `ln${st.line.includes(i) ? " hl" : ""}` }, el("span", { class: "no", text: "①②③"[i] }), el("span", { class: "src", text: ln }))));
+      say.textContent = st.say;
+      svg.setAttribute("aria-label", avlSay(t));
+      slide.draw(t, avlGeom(t, cols, depth), { marks: st.marks, edges: st.edges });
+    });
+    box.append(el("div", { class: "av-stepper rw" }, el("div", { class: "pic" }, svg, ctl.box, say), code));
+    onNarrowChange(() => { slide.reset(); ctl.go(ctl.now()); });
+    ctl.go(0);
+  }
+  $$(".rewire-step").forEach(setupRewire);
 
   /* =========================================================== string hashes (slide 18) */
   $$(".hashcalc").forEach((panel) => {

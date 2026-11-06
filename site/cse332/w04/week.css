@@ -1,26 +1,68 @@
-/* CSE 332 week 4 widgets: AVL drawings (.treelab, .treeview, as in week 3), the string-hash calculator (.hashcalc)
+/* CSE 332 week 4 widgets: AVL pictures and steppers, the string-hash calculator (.hashcalc)
    and the hash table lab (.hashlab). Base tokens only. */
-.tl-svg { max-width: 760px; margin: 0 auto; }
-.tl-edge { stroke: var(--line-strong); stroke-width: 1.5; }
-.tl-edge.on { stroke: var(--s1); stroke-width: 2.5; }
-.tl-node circle { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; }
-.chart .tl-node text { font-family: var(--mono); font-size: 13px; font-weight: 600; fill: var(--ink); }
-.chart .tl-node text.tl-h { font-size: 10.5px; font-weight: 600; fill: var(--accent); }
-.chart .tl-empty { fill: var(--ink-soft); }
-.tl-node.path circle { fill: var(--s1-tint); stroke: var(--s1); }
-.tl-node.new circle { fill: var(--s3); stroke: var(--s3); }
-.tl-node.found circle { fill: var(--s1); stroke: var(--s1); }
-.chart .tl-node.new text:not(.tl-h), .chart .tl-node.found text:not(.tl-h) { fill: #fff; }
-.tl-node.problem circle { fill: var(--s2-tint); stroke: var(--s2); stroke-width: 3; }
-.tl-node.repl circle { fill: var(--amber-tint); stroke: var(--amber); stroke-width: 3; }
-.tl-key { width: 6rem; }
-.tl-orders { font-family: var(--mono); font-size: 0.82rem; overflow-wrap: anywhere; }
-.tl-queue { font-family: var(--mono); font-size: 0.85rem; color: var(--ink-soft); }
-
-.treeview { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 0.5rem 0.75rem; margin: 0.5rem 0 1rem; }
-.treeview figcaption { font-size: 0.9rem; color: var(--ink-soft); text-align: center; }
-.tree-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.75rem; }
-.tree-grid .treeview { margin: 0; }
+/* AVL ---------------------------------------------------------------- Lecture 9 and Section 4: tree pictures, the
+   sequence stepper with its recipe card, the smallest-tree builder and the rewiring stepper. Every tree is drawn at
+   one scale: week.js sets each svg's max-width from its own width, so a node is the same size everywhere. */
+:is(.page[id^="l9-"], .page[id^="s4-"]) svg.htree { display: block; width: 100%; height: auto; margin: 0.25rem auto 0.5rem; }
+:is(.page[id^="l9-"], .page[id^="s4-"]) :is(.task, .check) svg.htree { margin-left: 0; }
+.av-edge { stroke: var(--line-strong); stroke-width: 2; }
+.av-edge.bad { stroke: var(--wrong); stroke-width: 3; stroke-dasharray: 6 4; }
+.av-edge.add { stroke: var(--right); stroke-width: 3.5; }
+.av-tag circle { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; }
+.av-tag.bad circle { stroke: var(--wrong); }
+.av-tag.add circle { stroke: var(--right); }
+.av-tag text { font: 700 11px var(--font); fill: var(--ink); }
+.av-node circle, .av-node polygon { fill: var(--surface); stroke: var(--ink); stroke-width: 1.75; }
+.av-node.sub polygon { fill: var(--paper); stroke: var(--line-strong); }
+.av-node text { font-family: var(--mono); font-size: 14px; font-weight: 600; fill: var(--ink); }
+.av-node text.av-h { font-family: var(--font); font-size: 11px; font-weight: 700; fill: var(--accent); }
+.av-empty { font-family: var(--font); font-size: 14px; fill: var(--ink-soft); }
+.av-node.new circle, .av-node.new polygon { fill: var(--accent); stroke: var(--accent-deep); }
+.av-node.new text:not(.av-h) { fill: #fff; }
+.av-node.cur circle { stroke: var(--amber); stroke-width: 3.5; fill: var(--amber-tint); }
+.av-node.bad circle { fill: var(--wrong-tint); stroke: var(--wrong); stroke-width: 3.5; }
+.av-node.cmp circle { stroke: var(--amber); stroke-width: 3.5; }
+.av-node.moved circle, .av-node.moved polygon { fill: var(--accent-tint); stroke: var(--accent); stroke-width: 2.5; }
+.av-node.lsub circle { fill: var(--accent-tint); stroke: var(--accent); }
+.av-node.rsub circle { fill: var(--s1-tint); stroke: var(--s1); }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; font-size: 0.85rem; color: var(--ink-soft); margin: 0 0 0.5rem; }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key span::before { content: ""; display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 50%; vertical-align: -0.1rem; margin-right: 0.35rem; border: 2px solid var(--ink); background: var(--surface); }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-new::before { background: var(--accent); border-color: var(--accent-deep); }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-bad::before { border: 3px solid var(--wrong); background: var(--wrong-tint); }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-cmp::before { border: 3px solid var(--amber); }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-cur::before { border: 3px solid var(--amber); background: var(--amber-tint); }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-moved::before { border-color: var(--accent); background: var(--accent-tint); }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-lsub::before { border-color: var(--accent); background: var(--accent-tint); }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-rsub::before { border-color: var(--s1); background: var(--s1-tint); }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-badedge::before, :is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-newedge::before { width: 1.2rem; height: 0; border-radius: 0; border: 0; border-top: 3px dashed var(--wrong); vertical-align: 0.2rem; background: none; }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-key .k-newedge::before { border-top: 3.5px solid var(--right); }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.75rem 1.25rem; margin: 0.75rem 0 1.25rem; }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-row figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 0.5rem 0.75rem; min-width: 0; }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-row figcaption { font-weight: 700; font-size: 0.9rem; }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .tree-row figure p { margin: 0.2rem 0; font-size: 0.92rem; }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .goals li { margin-bottom: 0.45rem; }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .practice-group { margin-top: 2.75rem; padding-top: 1.1rem; border-top: 2px solid var(--line); }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .practice-group + .note { margin-top: -0.4rem; }
+:is(.page[id^="l9-"], .page[id^="s4-"]) .step-say { background: var(--paper); border-radius: var(--r-sm); padding: 0.6rem 0.8rem; margin: 0.6rem 0 0; min-height: 4.5rem; }
+.av-stepper { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1rem 1.25rem; align-items: start; margin: 0.5rem 0 1rem; }
+.av-stepper .pic { min-width: 0; }
+.av-stepper svg.htree { max-width: 34rem; margin: 0 auto 0.5rem; }
+.av-stepper pre.code { margin: 0; }
+.av-stepper .ln .src { white-space: pre-wrap; overflow-wrap: anywhere; }
+.av-recipe ol { margin: 0 0 0.6rem; padding-left: 1.3rem; }
+.av-recipe li { margin: 0.3rem 0; line-height: 1.7; }
+.av-recipe li.now { font-weight: 600; }
+.av-recipe .blank { display: inline-block; min-width: 2.4em; padding: 0 0.35em; text-align: center; font-weight: 600; background: var(--accent-tint); border-bottom: 2px solid var(--accent); border-radius: 4px 4px 0 0; line-height: 1.4; }
+.av-cases { font-size: 0.85rem; }
+.av-cases th { white-space: nowrap; }
+.av-cases td:first-child { font-family: var(--mono); font-weight: 700; }
+.av-cases tr.now td { background: var(--amber-tint); }
+.min-step table.vals td.now { background: var(--amber-tint); font-weight: 700; }
+.min-step .controls { margin-top: 0.25rem; }
+@media (max-width: 860px) {
+  .av-stepper { grid-template-columns: minmax(0, 1fr); gap: 0.6rem; }
+  :is(.page[id^="l9-"], .page[id^="s4-"]) .step-say { min-height: 6.5rem; }
+}
 
 .hc-table td, .hc-table th { font-family: var(--mono); font-size: 0.88rem; }
 .hc-horner, .hc-out { font-family: var(--mono); font-size: 0.85rem; overflow-wrap: anywhere; }
