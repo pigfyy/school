@@ -38,11 +38,13 @@
     <div>
       <h2>Lecture 10: Hashing <span class="today" data-date="2026-10-21">Wed Oct 21</span></h2>
       <ol class="modules">
-        <li><a href="#l10-idea">From arrays to hash tables</a></li>
+        <li><a href="#l10-goals">What this lecture is for</a></li>
+        <li><a href="#l10-idea">Key to slot</a></li>
         <li><a href="#l10-hashfn">Good hash functions</a></li>
+        <li><a href="#l10-strings">Hashing a string</a></li>
         <li><a href="#l10-chain">Separate chaining</a></li>
-        <li><a href="#l10-practice">Practice</a></li>
-        <li><a href="#l10-quiz">Check your understanding</a></li>
+        <li><a href="#l10-load">Load factor</a></li>
+        <li><a href="#l10-practice">Lecture 10 practice</a></li>
       </ol>
     </div>
     <div>
@@ -56,11 +58,13 @@
     <div>
       <h2>Lecture 11: Hashing 2 <span class="today" data-date="2026-10-23">Fri Oct 23</span></h2>
       <ol class="modules">
+        <li><a href="#l11-goals">What this lecture is for</a></li>
         <li><a href="#l11-linear">Linear probing</a></li>
-        <li><a href="#l11-quad">Quadratic and double hashing</a></li>
+        <li><a href="#l11-delete">Delete and tombstones</a></li>
+        <li><a href="#l11-quad">Quadratic probing</a></li>
+        <li><a href="#l11-double">Double hashing</a></li>
         <li><a href="#l11-rehash">Rehashing</a></li>
-        <li><a href="#l11-practice">Practice</a></li>
-        <li><a href="#l11-quiz">Check your understanding</a></li>
+        <li><a href="#l11-practice">Lecture 11 practice</a></li>
       </ol>
     </div>
     <div>
@@ -408,349 +412,408 @@ insertHelper(key, value, root) {
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ L10: IDEA -->
-<section class="page" id="l10-idea" data-title="From arrays to hash tables">
-  <p class="where">Lecture 10 · slides 3–14 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span> · Weiss 5.1–5.5</p>
-  <h1>From arrays to hash tables</h1>
-  <div class="table-wrap">
-  <table class="plain">
-    <tr><th>Dictionary data structure (slide 7)</th><th>insert</th><th>find</th><th>delete</th></tr>
-    <tr><td>Sorted array</td><td>\(\Theta(n)\)</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(n)\)</td></tr>
-    <tr><td>Binary search tree</td><td>\(\Theta(\text{height})\)</td><td>\(\Theta(\text{height})\)</td><td>\(\Theta(\text{height})\)</td></tr>
-    <tr><td>AVL tree</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(\log n)\)</td></tr>
-    <tr><td>Hash table (worst case)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
-    <tr><td>Hash table (average)</td><td>\(\Theta(1)\)</td><td>\(\Theta(1)\)</td><td>\(\Theta(1)\)</td></tr>
-  </table>
-  </div>
-  <div class="prose">
-    <p>The AVL tree is an <em>ordered</em> dictionary: keys must be comparable. A hash table is <em>unordered</em>: instead of comparing keys, each key has a <strong>hash function</strong> (slide 8). AVL delete is "not covered this quarter" (slide 5); Java's <code>TreeMap</code> uses a red-black tree, a cousin with a more relaxed shape (slide 6).</p>
-    <p><strong>A "really big array" (slides 9–10).</strong> Treat each key as a number and give it its own index: <code>arr[key] = value</code>. Every operation is \(\Theta(1)\). The problem: the array has to be as big as the range of keys.</p>
-  </div>
+<!-- ================================================================ L10: GOALS -->
+<section class="page" id="l10-goals" data-title="What Lecture 10 is for">
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span> · Hashing 1</p>
+  <h1>What this lecture is for</h1>
   <div class="rule">
-    <p><strong>Hash tables (slide 11).</strong> Use a small array. A hash function turns the key into an integer, and it should "scatter" the keys as if assigning them randomly. Store the key and value at <code>hash % table.length</code>. When two keys land on the same index, that's a <strong>collision</strong>, and we need a collision-resolution strategy.</p>
-  </div>
-  <div class="prose">
-    <p><strong>Caller ID (slide 12).</strong> Key: a phone number as a string. Hash: the number as an integer, \(h(\text{"2068675309"}) = 2068675309\). With table size 10 it goes to index \(2068675309 \bmod 10 = 9\).</p>
-    <p><strong>What influences running time (slide 13):</strong> how long hashing takes; how likely collisions are (the hash function's quality, and the array size compared to the number of values); and what we do on a collision.</p>
-    <p><strong>Keys that are objects (slide 14).</strong> Equal objects must hash the same: if <code>a.equals(b)</code>, then <code>a.hashCode() == b.hashCode()</code>. If you override <code>equals()</code>, override <code>hashCode()</code> consistently too.</p>
+    <p><strong>The point.</strong> A <strong>hash table</strong> is a dictionary that keeps its keys in a small array. A <strong>hash function</strong> turns each key into a number, and the key goes in slot \(\text{hash} \bmod \text{length}\). So insert, find and delete jump straight to one slot: \(\Theta(1)\) on average, where an AVL tree needs \(\Theta(\log n)\).</p>
   </div>
 
-  <div class="check" data-id="cse332-w4-l10-qc-callerid-7" data-grader="exact" data-answer="1" data-miscon='{"9":"no-mod","2068675309":"no-mod"}'>
-    <p>Quick check: with table size 7 instead of 10, at what index does "2068675309" go?</p>
+  <h2>Five short pages</h2>
+  <ol class="goals">
+    <li>Turn a key into a slot, and see why two keys can land in the same one. <a href="#l10-idea">Key to slot</a></li>
+    <li>The four properties of a good hash function. <a href="#l10-hashfn">Good hash functions</a></li>
+    <li>Hash a string so that order matters, and compute it with one loop. <a href="#l10-strings">Hashing a string</a></li>
+    <li>When two keys share a slot, keep a list there. <a href="#l10-chain">Separate chaining</a></li>
+    <li>How full the table is decides how long a find takes. <a href="#l10-load">Load factor</a></li>
+  </ol>
+  <p class="line">Then <a href="#l10-practice">Lecture 10 practice</a>. Lecture 11 handles collisions without lists.</p>
+  <div class="rule warn">
+    <p><strong>Exercise 5</strong> (Hashing, due Fri Nov 6) has you implement a chaining hash table and write a hash function. This site traces tables by hand and writes no Exercise 5 code.</p>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L10: KEY TO SLOT -->
+<section class="page" id="l10-idea" data-title="Key to slot">
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span></p>
+  <h1>Key to slot</h1>
+  <div class="prose">
+    <p>Imagine one giant array with a slot for every possible key: <code>arr[key] = value</code>. Every operation is one array access. The catch is size: a slot for every possible key is far more memory than any computer has.</p>
+    <p>A hash table keeps that one-jump idea in a small array. A <strong>hash function</strong> \(h\) turns the key into an integer, and the slot is that integer mod the array's length:</p>
+  </div>
+  <pre class="code">insert(key, value) {
+  h = key.hash();
+  arr[h % arr.length] = (key, value);
+}</pre>
+
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">Caller ID. The key is a phone number as a string; the value is the person. The hash is the number itself: \(h(\text{"2068675309"}) = 2068675309\). The table has 10 slots.</p>
+    <div class="steps board"><ol>
+      <li><span class="lab">hash</span><span class="mth">\(h = 2068675309\)</span><span class="note">the phone number as an integer</span></li>
+      <li><span class="lab">slot</span><span class="mth">\(2068675309 \bmod 10 = 9\)</span><span class="note">mod 10 keeps the last digit</span></li>
+      <li class="wide"><p>"2068675309" and its person go in slot 9. A find for it computes the same slot and looks only there.</p></li>
+    </ol></div>
+  </div>
+
+  <p class="line">The rest of the lecture uses small whole-number keys with \(h(k) = k\), so the slot is just \(k \bmod \text{length}\). Here are 12, 7 and 5 in a table of size 10:</p>
+  <div class="hx-table" data-size="10" data-mode="linear" data-ops="12 7 5"></div>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th>key</th><th>\(k \bmod 10\)</th><th>slot</th></tr></thead>
+    <tr><th>12</th><td>2</td><td>2</td></tr>
+    <tr><th>7</th><td>7</td><td>7</td></tr>
+    <tr><th>5</th><td>5</td><td>5</td></tr>
+    <tr><th>22</th><td>2</td><td>2, but 12 is there</td></tr>
+  </table></div>
+  <div class="rule"><p><strong>The rule.</strong> A key's slot is \(h(k) \bmod \text{length}\). There are more possible keys than slots, so two different keys can get the same slot: a <strong>collision</strong>. A good hash function makes collisions rare, and the table needs a plan for when they happen anyway.</p></div>
+
+  <div class="check" data-id="cse332-w4-l10-qc-callerid-100" data-grader="exact" data-answer="9" data-miscon='{"2068675309":"no-mod"}'>
+    <p>Quick check: the same phone number in a table of 100 slots. Which slot does "2068675309" go in?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <div class="check" data-id="cse332-w4-l10-qc-equals">
-    <p>Quick check: you override <code>equals</code> on <code>Point</code> so points with the same x and y are equal, but keep <code>Object</code>'s <code>hashCode</code>. What goes wrong in a hash table?</p>
+  <div class="check" data-id="cse332-w4-l10-qc-big-array">
+    <p>Quick check: why not use the giant array with one slot per possible key?</p>
     <div class="opts">
-      <label data-correct><input type="radio" name="cse332-w4-l10-qc-equals"> Two equal points can hash to different indices, so <code>find</code> misses one that's there<span class="why" hidden>Right: equal objects must hash the same, or find looks in the wrong place.</span></label>
-      <label><input type="radio" name="cse332-w4-l10-qc-equals"> Nothing; <code>hashCode</code> only affects speed<span class="why" hidden>It affects correctness: find computes the index from the hash.</span></label>
-      <label><input type="radio" name="cse332-w4-l10-qc-equals"> Every point collides at index 0<span class="why" hidden><code>Object</code>'s hash differs per object, which is exactly the problem for equal ones.</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-big-array"> Its operations are slow<span class="why" hidden>Each one is a single array access, \(\Theta(1)\).</span></label>
+      <label data-correct><input type="radio" name="cse332-w4-l10-qc-big-array"> It needs a slot for every possible key, not just the keys we store<span class="why" hidden>Right. Its size is the number of possible keys, which is huge.</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-big-array"> Two keys can land in the same slot<span class="why" hidden>Not in the giant array: every key has its own slot. Collisions start when the array is small.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Ask the room for the problems with the really big array before slide 11: memory for every possible key, and keys that aren't small integers at all.</li>
-      <li>Average \(\Theta(1)\) versus worst \(\Theta(n)\): the worst case is every key colliding. The rest of the two lectures is about making that unlikely and cheap.</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ L10: HASH FUNCTIONS -->
+<!-- ================================================================ L10: GOOD HASH FUNCTIONS -->
 <section class="page" id="l10-hashfn" data-title="Good hash functions">
-  <p class="where">Lecture 10 · slides 15–20 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span></p>
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span></p>
   <h1>Good hash functions</h1>
-  <div class="rule">
-    <p><strong>Properties of a "good" hash function (slide 15).</strong> It maps objects to integers and is:</p>
-    <ul>
-      <li><strong>Consistent:</strong> equal keys hash to the same integer; hashing the same key twice gives the same result (deterministic).</li>
-      <li><strong>Uniform:</strong> it can use every index of a fixed-size array, at roughly equal rates.</li>
-      <li><strong>Effective:</strong> it's hard to find two unequal keys with the same hash; a small change to the key gives a big change in the hash (the "avalanche effect").</li>
-      <li><strong>Efficient:</strong> it's fast to compute.</li>
-    </ul>
-  </div>
-  <div class="prose">
-    <p><strong>A bad one (slides 16–17):</strong> the first digit of a phone number. Consistent, yes. Uniform, no: no US number starts with 0 or 1, and in this class 2 is by far the most likely. Effective, no: \(h(\text{"2068675309"}) = h(\text{"2068675305"}) = 2\). Efficient, yes.</p>
-  </div>
+  <div class="prose"><p>A hash function maps keys to integers. The lecture asks four things of a good one:</p></div>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th>property</th><th>means</th></tr></thead>
+    <tr><th>consistent</th><td>Equal keys hash to the same integer, every time.</td></tr>
+    <tr><th>uniform</th><td>It uses every slot of the array, at roughly equal rates.</td></tr>
+    <tr><th>effective</th><td>Different keys rarely hash the same. A small change to the key changes the hash a lot.</td></tr>
+    <tr><th>efficient</th><td>It is fast to compute.</td></tr>
+  </table></div>
 
-  <h2>Four hashes for strings (slides 18–19)</h2>
-  <div class="prose"><p>For \(s = s_0 s_1 \dots s_{m-1}\) with ASCII codes \(a(s_i)\):</p></div>
-  <div class="table-wrap">
-  <table class="plain">
-    <tr><th>Hash</th><th>Properties (slide 19)</th></tr>
-    <tr><td>\(h_1(s) = a(s_0)\)</td><td>consistent, efficient</td></tr>
-    <tr><td>\(h_2(s) = \sum_{i=0}^{m-1} a(s_i)\)</td><td>consistent, efficient, possibly uniform</td></tr>
-    <tr><td>\(h_3(s) = \sum_{i=0}^{m-1} a(s_i)\cdot 31^i\)</td><td>consistent, efficient, uniform, effective</td></tr>
-    <tr><td>\(h_4(s) = 2\cdot\sum_{i=0}^{m-1} a(s_i)\cdot 31^i\)</td><td>consistent, efficient, effective</td></tr>
-  </table>
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">A bad hash: \(h(\text{phone})\) is the phone number's first digit. Check it against each property.</p>
+    <div class="steps board"><ol>
+      <li><span class="lab">consistent</span><span class="mth">yes</span><span class="note">the same number always has the same first digit</span></li>
+      <li><span class="lab">uniform</span><span class="mth">no</span><span class="note">no US number starts with 0 or 1, and around here most start with 2</span></li>
+      <li><span class="lab">effective</span><span class="mth">no</span><span class="note">"2068675309" and "2068675305" both hash to 2, and so does every 206 number</span></li>
+      <li><span class="lab">efficient</span><span class="mth">yes</span><span class="note">it reads one character</span></li>
+    </ol></div>
   </div>
-  <div class="prose"><p>\(h_2\) gives every anagram the same hash ("cat" and "act"). \(h_4\) is always even, so with an even table size it never uses an odd index: not uniform.</p></div>
-  <div class="panel hashcalc" id="hc">
-    <div class="controls">
-      <label>String <input type="text" class="hc-s" value="cat" aria-label="String" spellcheck="false"></label>
-      <label>Table size <input type="number" class="hc-m" value="10" min="1" aria-label="Table size"></label>
+  <div class="rule"><p><strong>The rule.</strong> A good hash is all four. Consistency is not optional: if equal keys could hash differently, find would look in the wrong slot. So when a Java class overrides <code>equals</code>, it must override <code>hashCode</code> to match: if <code>a.equals(b)</code>, then <code>a.hashCode() == b.hashCode()</code>.</p></div>
+
+  <div class="check" data-id="cse332-w4-l10-qc-equals">
+    <p>Quick check: you override <code>equals</code> on <code>Point</code> so points with the same x and y are equal, but keep <code>Object</code>'s <code>hashCode</code>. What goes wrong in a hash table?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w4-l10-qc-equals"> Two equal points can hash to different slots, so <code>find</code> misses one that's there<span class="why" hidden>Right: equal objects must hash the same, or find looks in the wrong place.</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-equals"> Nothing; <code>hashCode</code> only affects speed<span class="why" hidden>It affects correctness: find computes the slot from the hash.</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-equals"> Every point collides in slot 0<span class="why" hidden><code>Object</code>'s hash differs per object, which is exactly the problem for equal ones.</span></label>
     </div>
-    <p class="hc-out"></p>
-    <div class="table-wrap"><table class="plain num hc-table"></table></div>
-    <p class="hc-horner"></p>
-    <p class="note">Exact integers. Java's <code>int</code> would wrap around for long strings; the indices here use the true values.</p>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
   </div>
-  <div class="rule">
-    <p><strong>Computing \(h_3\) quickly (slide 20).</strong> Don't call <code>Math.pow</code>. For \(m = 4\), \(h_3 = s_0 + 31(s_1 + 31(s_2 + 31\cdot s_3))\), which is a loop from the last character down:</p>
-    <pre class="code">for (i = m-1; i &gt;= 0; i--) {
-  h = 31*h + s[i];
-}</pre>
+  <div class="check" data-id="cse332-w4-l10-qc-random">
+    <p>Quick check: \(h(\text{phone})\) picks one of the number's digits at random. Which property does it break that the first-digit hash keeps?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w4-l10-qc-random"> Consistent<span class="why" hidden>Right. Hash the same number twice and you can get two different digits, so find can look in the wrong slot.</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-random"> Uniform<span class="why" hidden>The first-digit hash isn't uniform either. Which property did the first-digit hash have?</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-random"> Efficient<span class="why" hidden>Picking a digit is still fast.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L10: HASHING A STRING -->
+<section class="page" id="l10-strings" data-title="Hashing a string">
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span></p>
+  <h1>Hashing a string</h1>
+  <div class="prose"><p>A string \(s = s_0 s_1 \dots s_{m-1}\) is a row of characters, and each character has an ASCII code \(a(s_i)\): a = 97, b = 98, c = 99. The lecture compares four hashes:</p></div>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th>hash</th><th>is</th><th>but</th></tr></thead>
+    <tr><th>\(h_1(s) = a(s_0)\)</th><td>consistent, efficient</td><td>every string starting with the same letter collides</td></tr>
+    <tr><th>\(h_2(s) = \sum a(s_i)\)</th><td>consistent, efficient, maybe uniform</td><td>anagrams collide: order doesn't count</td></tr>
+    <tr><th>\(h_3(s) = \sum a(s_i)\cdot 31^i\)</th><td>all four</td><td></td></tr>
+    <tr><th>\(h_4(s) = 2 \cdot h_3(s)\)</th><td>consistent, efficient, effective</td><td>always even: not uniform</td></tr>
+  </table></div>
+
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">Hash the anagrams "ab" and "ba" with \(h_2\) and \(h_3\).</p>
+    <div class="table-wrap"><table class="vals">
+      <thead><tr><th></th><th>"ab"</th><th>"ba"</th></tr></thead>
+      <tr><th>\(h_2\)</th><td>\(97 + 98 = 195\)</td><td>\(98 + 97 = 195\)</td></tr>
+      <tr><th>\(h_3\)</th><td>\(97 + 98 \cdot 31 = 3135\)</td><td>\(98 + 97 \cdot 31 = 3105\)</td></tr>
+    </table></div>
+    <p>\(h_2\) collides; \(h_3\) doesn't, because each position gets its own power of 31.</p>
   </div>
 
-  <div class="check" data-id="cse332-w4-l10-qc-h2-cat" data-grader="exact" data-answer="312">
-    <p>Quick check: \(h_2(\text{"cat"})\), with c = 99, a = 97, t = 116.</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+  <h2>Computing \(h_3\) with one loop</h2>
+  <p class="line">Powers of 31 are slow to compute one by one. Factor them out instead: \(s_0 + 31\big(s_1 + 31(s_2 + \dots)\big)\). That's a loop from the last character to the first. Step through it on "abc":</p>
+  <div class="code-step">
+    <pre class="code"><div class="ln"><span class="no">1</span><span class="src">int h = 0;</span></div><div class="ln"><span class="no">2</span><span class="src">for (int i = m - 1; i &gt;= 0; i--) {</span></div><div class="ln"><span class="no">3</span><span class="src">  h = 31 * h + s[i];</span></div><div class="ln"><span class="no">4</span><span class="src">}</span></div></pre>
+    <ol>
+      <li data-line="1-2"><span class="lab">start</span><span class="mth">\(h = 0,\ i = 2\)</span><span class="note">\(m = 3\), so the loop starts at the last character, c</span></li>
+      <li data-line="3"><span class="lab">\(i = 2\)</span><span class="mth">\(h = 31 \cdot 0 + 99 = 99\)</span><span class="note">c is 99</span></li>
+      <li data-line="3"><span class="lab">\(i = 1\)</span><span class="mth">\(h = 31 \cdot 99 + 98 = 3167\)</span><span class="note">b is 98</span></li>
+      <li data-line="3"><span class="lab">\(i = 0\)</span><span class="mth">\(h = 31 \cdot 3167 + 97 = 98274\)</span><span class="note">a is 97. Then \(i = -1\) ends the loop</span></li>
+      <li class="wide" data-line="1-4"><div class="proof">
+        <p class="proof-head">Same as the sum</p>
+        <p>\(h_3(\text{"abc"}) = 97 + 98 \cdot 31 + 99 \cdot 31^2 = 97 + 3038 + 95139 = 98274\).</p>
+      </div></li>
+    </ol>
+  </div>
+  <div class="rule"><p><strong>The rule.</strong> Use every part of the key, in a way where order matters, like \(h_3\). Compute it with one multiply and one add per character. (Java's <code>int</code> wraps around for long strings; short strings like these stay exact.)</p></div>
+
+  <div class="check" data-id="cse332-w4-l10-qc-anagram">
+    <p>Quick check: which hash gives "dog" and "god" the same value?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w4-l10-qc-anagram"> \(h_1\)<span class="why" hidden>\(h_1\) looks at the first character: d versus g.</span></label>
+      <label data-correct><input type="radio" name="cse332-w4-l10-qc-anagram"> \(h_2\)<span class="why" hidden>Right: a sum doesn't care about order.</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-anagram"> \(h_3\)<span class="why" hidden>Each position has its own power of 31, so order matters.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
   <div class="check" data-id="cse332-w4-l10-qc-h4-property">
     <p>Quick check: which property does \(h_4\) lose compared with \(h_3\)?</p>
     <div class="opts">
       <label><input type="radio" name="cse332-w4-l10-qc-h4-property"> Consistent<span class="why" hidden>Doubling is deterministic; equal strings still hash the same.</span></label>
-      <label data-correct><input type="radio" name="cse332-w4-l10-qc-h4-property"> Uniform<span class="why" hidden>Right: it's always even, so half the indices of an even-sized table are never used.</span></label>
+      <label data-correct><input type="radio" name="cse332-w4-l10-qc-h4-property"> Uniform<span class="why" hidden>Right: it's always even, so half the slots of an even-sized table are never used.</span></label>
       <label><input type="radio" name="cse332-w4-l10-qc-h4-property"> Effective<span class="why" hidden>Two strings collide under \(h_4\) exactly when they collide under \(h_3\).</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Type "cat" then "act" in the calculator: \(h_1\) and \(h_3\) differ, \(h_2\) doesn't. Then set the table size to 10 and look at \(h_4\)'s index column.</li>
-      <li>Why 31: an odd prime, so multiplying spreads bits without losing them. The slides don't dwell on it; Java's <code>String.hashCode</code> uses the same polynomial, highest power first.</li>
-    </ul>
-  </details>
   <nav class="pager"></nav>
 </section>
 
-<!-- ================================================================ L10: CHAINING -->
+<!-- ================================================================ L10: SEPARATE CHAINING -->
 <section class="page" id="l10-chain" data-title="Separate chaining">
-  <p class="where">Lecture 10 · slides 21–30 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span></p>
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span></p>
   <h1>Separate chaining</h1>
-  <div class="prose">
-    <p>The ideal insert just does <code>arr[h % table.length] = (key, value)</code>, but two different keys can map to the same index: a <strong>collision</strong> (slide 21). Two strategies (slide 22): <strong>separate chaining</strong>, where each index holds a secondary data structure such as a linked list, and <strong>open addressing</strong>, where we use a different spot in the table (Friday).</p>
-  </div>
-  <div class="rule">
-    <p><strong>Separate chaining (slides 23–25).</strong> Compute \(i = h(k) \bmod \text{table.length}\), then call insert, find or delete on the structure at <code>table[i]</code>. (Insert checks for the key first: no duplicates.)</p>
-  </div>
-  <div class="panel hashlab" id="hl-chain" data-presets='[{"label":"Size 10, keys 12, 22, 7, 42, 5, 17","mode":"chain","size":10,"seq":[12,22,7,42,5,17],"say":"Press Insert to add each key. Then find 32."},{"label":"Size 7, keys 10, 24, 3, 17, 31, 5, 12","mode":"chain","size":7,"seq":[10,24,3,17,31,5,12],"say":"A bad mix: five keys share one bucket."}]'>
-    <div class="controls">
-      <label>Key <input type="text" inputmode="numeric" class="hl-key" aria-label="Key" placeholder="next in queue"></label>
-      <button class="btn primary hl-insert" type="button">Insert</button>
-      <button class="btn hl-find" type="button">Find</button>
-      <button class="btn hl-delete" type="button">Delete</button>
-      <button class="btn hl-rehash" type="button">Rehash</button>
-      <button class="btn quiet hl-reset" type="button">Clear</button>
-    </div>
-    <div class="controls">
-      <label>Collisions <select class="hl-mode" aria-label="Collision resolution"><option value="chain">separate chaining</option><option value="linear">linear probing</option><option value="quadratic">quadratic probing</option></select></label>
-      <label>Table size <input type="number" class="hl-size" min="2" max="31" value="10" aria-label="Table size"></label>
-    </div>
-    <div class="controls hl-presets" role="group" aria-label="Examples"></div>
-    <div class="hl-grid" aria-label="Hash table"></div>
-    <p class="hl-stat"></p>
-    <p class="out hl-out" role="status"></p>
-  </div>
-
-  <h2>Load factor (slides 26–30)</h2>
-  <div class="rule">
-    <p>The <strong>load factor</strong> \(\lambda = \frac{n}{\text{length}}\) is the average number of items per bucket. With a linked list per bucket, an <strong>unsuccessful</strong> find expects \(\lambda\) comparisons (it scans the whole bucket), and a <strong>successful</strong> find expects \(\frac{\lambda}{2}\). To keep the expected time \(\Theta(1)\), pick a constant and resize the array whenever \(\lambda\) exceeds it.</p>
-  </div>
-  <div class="prose"><p>Slides 28–30 draw three tables of length 10 holding 3, 8 and 15 items: \(\lambda = 0.3\), \(0.8\) and \(1.5\). A load factor above 1 is fine for chaining.</p></div>
-
-  <div class="check" data-id="cse332-w4-l10-qc-lambda" data-grader="exact" data-answer="0.6">
-    <p>Quick check: after inserting 12, 22, 7, 42, 5, 17 into the size-10 table, what is \(\lambda\)?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <div class="check" data-id="cse332-w4-l10-qc-success" data-grader="exact" data-answer="0.75" data-miscon='{"1.5":"lambda-not-half"}'>
-    <p>Quick check: with \(\lambda = 1.5\), how many comparisons does a successful find expect?</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
+  <div class="prose"><p>Collisions will happen, so each slot holds a <strong>chain</strong>: a linked list of every key that hashed there. All three operations find the slot, then work on its chain:</p></div>
+  <div class="proof">
+    <p class="proof-head">The template</p>
+    <p><code>i = h(k) % table.length</code>, then on the chain at <code>table[i]</code>:</p>
     <ul>
-      <li>The size-7 preset shows why the average-case claim needs a good hash: 10, 24, 3, 17 and 31 all leave remainder 3. \(\lambda = 1\), but finding 31 takes 5 comparisons.</li>
-      <li>The buckets don't have to be lists. With an AVL tree per bucket, operations cost what the tree costs (Lecture 11, slide 33).</li>
+      <li><strong>insert</strong>: walk the chain. If \(k\) is there, update its value. If not, add \(k\) on the end.</li>
+      <li><strong>find</strong>: walk the chain until \(k\) or the end.</li>
+      <li><strong>delete</strong>: walk the chain and unlink \(k\).</li>
     </ul>
-  </details>
+  </div>
+
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">Size 10, \(h(k) = k\). Insert 12, 22, 7, 42, 5, 17. Then find 42 and find 32.</p>
+    <p class="hx-key"><span class="k-hit">this step's key</span><span class="k-look">chain looked at</span></p>
+    <div class="panel hx-step" data-size="10" data-mode="chain" data-ops="12 22 7 42 5 17 f42 f32"></div>
+  </div>
+  <div class="rule"><p><strong>The rule.</strong> Every operation costs one hash plus a walk along one chain. Short chains mean fast operations. If every key landed in one chain, find would walk all \(n\) of them.</p></div>
+
+  <div class="check" data-id="cse332-w4-l10-qc-insert52" data-grader="exact" data-answer="3" data-miscon='{"0":"insert-no-check"}'>
+    <p>Quick check: continue the example and insert 52. How many keys does insert compare 52 with before adding it?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w4-l10-qc-worst" data-grader="bigo" data-answer="n">
+    <p>Quick check: a chained table holds \(n\) keys, and a bad hash sends all of them to one slot. What is the \(\Theta\) class of an unsuccessful find?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L10: LOAD FACTOR -->
+<section class="page" id="l10-load" data-title="Load factor">
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span></p>
+  <h1>Load factor</h1>
+  <div class="prose"><p>The <strong>load factor</strong> is the number of keys per slot: \(\lambda = \frac{n}{\text{length}}\). With chaining it is also the average chain length.</p></div>
+
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">The table from the last page: 6 keys in 10 slots.</p>
+    <div class="hx-table" data-size="10" data-mode="chain" data-ops="12 22 7 42 5 17"></div>
+    <div class="steps board"><ol>
+      <li><span class="lab">\(\lambda\)</span><span class="mth">\(\frac{6}{10} = 0.6\)</span><span class="note">6 keys, 10 slots</span></li>
+      <li><span class="lab">chains</span><span class="mth">\(0, 0, 3, 0, 0, 1, 0, 2, 0, 0\)</span><span class="note">the length of each slot's chain</span></li>
+      <li><span class="lab">average</span><span class="mth">\(\frac{3 + 1 + 2}{10} = 0.6\)</span><span class="note">the same number: \(\lambda\) is the average chain length</span></li>
+    </ol></div>
+  </div>
+  <div class="rule">
+    <p><strong>The rule.</strong> With a good hash and chains as linked lists:</p>
+    <ul>
+      <li>an <strong>unsuccessful</strong> find walks a whole chain: about \(\lambda\) comparisons;</li>
+      <li>a <strong>successful</strong> find stops partway: about \(\frac{\lambda}{2}\) comparisons. That's the course's estimate; counting the key it stops on as well, it's about \(1 + \frac{\lambda}{2}\).</li>
+    </ul>
+    <p>To keep that \(\Theta(1)\), pick a constant and make the array bigger whenever \(\lambda\) goes over it (Lecture 11 does this). With chaining, \(\lambda\) can be more than 1: 15 keys in 10 slots is \(\lambda = 1.5\).</p>
+  </div>
+
+  <div class="check" data-id="cse332-w4-l10-qc-lambda-20" data-grader="exact" data-answer="5/2" data-miscon='{"8/20":"lambda-flipped"}'>
+    <p>Quick check: a chained table has 8 slots and holds 20 keys. What is \(\lambda\)? A fraction or a decimal is fine.</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w4-l10-qc-success" data-grader="exact" data-answer="0.75" data-miscon='{"1.5":"lambda-not-half","1.75":"plus-one"}'>
+    <p>Quick check: with \(\lambda = 1.5\), what is the course's estimate for the comparisons in a successful find?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L10: PRACTICE -->
-<section class="page" id="l10-practice" data-title="Lecture 10: practice">
-  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span> · practice</p>
-  <h1>Lecture 10: practice</h1>
-  <div class="prose"><p>Five problems on the lecture's examples. Every number was computed by running the hashes and the table (<code>checks/cse332/w04/verify.mjs</code>). ASCII: a = 97, c = 99, t = 116.</p></div>
+<section class="page" id="l10-practice" data-title="Lecture 10 practice">
+  <p class="where">Lecture 10 · <span class="today-chip" data-date="2026-10-21">Wed Oct 21</span></p>
+  <h1>Lecture 10 practice</h1>
+  <div class="prose"><p>One group per lesson, on the lecture's hashes and new keys. Unless a problem says otherwise, keys are whole numbers with \(h(k) = k\), so a key's slot is \(k \bmod \text{length}\). Draw the table on paper as you go. Each part checks on its own.</p></div>
+  <div data-progress-bar></div>
 
-  <article class="task" data-id="cse332-w4-l10-caller">
-    <h2>1. Caller ID</h2>
-    <p class="prompt">Slide 12's hash: the phone number as an integer, stored at hash % table size.</p>
-    <div class="answer-spec" data-part="a10" data-grader="exact" data-answer="4" data-miscon='{"2065551234":"no-mod"}' data-label="index of “2065551234”, size 10"></div>
-    <div class="answer-spec" data-part="a7" data-grader="exact" data-answer="5" data-label="index of “2065551234”, size 7"></div>
-    <div class="answer-spec" data-part="first" data-grader="exact" data-answer="2" data-label="slide 16's first-digit hash of “2065551234”"></div>
-    <div class="answer-spec" data-part="collide" data-grader="yesno" data-answer="yes" data-label="does it collide with “2068675309” under the first-digit hash?"></div>
+  <h2 class="practice-group">Key to slot</h2>
+  <p class="note">Lesson: <a href="#l10-idea">Key to slot</a></p>
+
+  <article class="task" data-id="cse332-w4-l10-slots">
+    <h2>1. Which slot?</h2>
+    <p class="prompt">The lecture's slot rule: slot \(= h(k) \bmod \text{length}\), with \(h(k) = k\).</p>
+    <div class="answer-spec" data-part="s10" data-grader="exact" data-answer="7" data-miscon='{"47":"no-mod"}' data-label="slot of 47 in a table of size 10"></div>
+    <div class="answer-spec" data-part="s7" data-grader="exact" data-answer="5" data-miscon='{"47":"no-mod","6":"no-mod"}' data-label="slot of 47 in a table of size 7"></div>
+    <div class="answer-spec" data-part="collide" data-grader="yesno" data-answer="yes" data-label="In the size-10 table, do 47 and 17 collide?"></div>
+    <div class="answer-spec" data-part="collide7" data-grader="yesno" data-answer="no" data-label="In the size-7 table, do 47 and 17 collide?"></div>
     <ol class="hints">
-      <li>Mod 10 is the last digit. For mod 7, divide (or reduce piece by piece).</li>
+      <li>\(k \bmod m\) is the remainder after dividing by \(m\). Mod 10 is the last digit.</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>\(2065551234 \bmod 10 = 4\).</li>
-      <li>\(2065551234 = 7 \cdot 295078747 + 5\), so index 5.</li>
-      <li>Both numbers start with 2, so the first-digit hash sends both to 2: a collision, which is why that hash isn't effective.</li>
-      <li class="answer">4; 5; 2; yes.</li>
+      <li>\(47 \bmod 10 = 7\), and \(47 = 6 \cdot 7 + 5\), so \(47 \bmod 7 = 5\).</li>
+      <li>\(17 \bmod 10 = 7\): the same slot as 47, a collision. \(17 \bmod 7 = 3\): a different slot from 47's 5.</li>
+      <li class="answer">7; 5; yes; no. Whether two keys collide depends on the table size too.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w4-l10-strings">
-    <h2>2. Hashing "cat"</h2>
-    <p class="prompt">Compute slide 18's hashes of "cat" (\(s_0\) = c, \(s_1\) = a, \(s_2\) = t).</p>
-    <div class="answer-spec" data-part="h1" data-grader="exact" data-answer="99" data-label="\(h_1\)"></div>
-    <div class="answer-spec" data-part="h2" data-grader="exact" data-answer="312" data-label="\(h_2\)"></div>
-    <div class="answer-spec" data-part="h3" data-grader="exact" data-answer="114582" data-miscon='{"99*961+97*31+116":"ascii-sum-order"}' data-label="\(h_3\)"></div>
-    <div class="answer-spec" data-part="h4idx" data-grader="exact" data-answer="4" data-miscon='{"2":"forgot-double"}' data-label="\(h_4\) index in a table of size 10"></div>
-    <ol class="hints">
-      <li>\(h_3 = a(s_0) + a(s_1)\cdot 31 + a(s_2)\cdot 31^2\), with \(31^2 = 961\).</li>
-      <li>Or Horner from the last character: \(h = 116\), then \(31\cdot 116 + 97\), then \(31\cdot h + 99\).</li>
-    </ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>\(h_1 = 99\). \(h_2 = 99 + 97 + 116 = 312\).</li>
-      <li>\(h_3 = 99 + 97\cdot 31 + 116\cdot 961 = 99 + 3007 + 111476 = 114582\). Horner: 116 → 3693 → 114582.</li>
-      <li>\(h_4 = 229164\), and \(229164 \bmod 10 = 4\). Always even, so only even indices.</li>
-      <li class="answer">99; 312; 114582; 4.</li>
-    </ol></div></div>
-  </article>
+  <div class="check" data-id="cse332-w4-l10-qc-avg">
+    <p>Quick check: a hash table has a good hash function and its load factor stays below a constant. What is the average time of <code>find</code>?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w4-l10-qc-avg"> \(\Theta(1)\)<span class="why" hidden>Right. One hash, then a short chain.</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-avg"> \(\Theta(\log n)\)<span class="why" hidden>That's an AVL tree. A hash table jumps straight to one slot.</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-avg"> \(\Theta(n)\)<span class="why" hidden>That's the worst case, when every key lands in one slot.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
 
-  <article class="task" data-id="cse332-w4-l10-props">
-    <h2>3. The first-digit hash</h2>
-    <p class="prompt">Slide 16: \(h(\text{phone})\) is the phone number's first digit. Is it…</p>
+  <h2 class="practice-group">Good hash functions</h2>
+  <p class="note">Lesson: <a href="#l10-hashfn">Good hash functions</a></p>
+
+  <article class="task" data-id="cse332-w4-l10-lastdigit">
+    <h2>2. The last digit</h2>
+    <p class="prompt">The worked example tested the first-digit hash. Now \(h(\text{phone})\) is the phone number's <em>last</em> digit, in a table of size 10. Recall: consistent (equal keys, same hash), uniform (every slot used about equally), effective (different keys rarely collide), efficient (fast).</p>
     <div class="answer-spec" data-part="consistent" data-grader="yesno" data-answer="yes" data-label="consistent?"></div>
-    <div class="answer-spec" data-part="uniform" data-grader="yesno" data-answer="no" data-label="uniform?"></div>
+    <div class="answer-spec" data-part="uniform" data-grader="yesno" data-answer="yes" data-label="uniform?"></div>
     <div class="answer-spec" data-part="effective" data-grader="yesno" data-answer="no" data-label="effective?"></div>
     <div class="answer-spec" data-part="efficient" data-grader="yesno" data-answer="yes" data-label="efficient?"></div>
-    <ol class="hints"><li>Go through slide 15's four definitions one at a time. Which first digits can a US number have?</li></ol>
+    <div class="answer-spec" data-part="why" data-grader="self" data-long data-template="Two numbers that collide: ____ and ____.&#10;They collide because ____." data-label="Show it isn't effective: give two phone numbers that collide, and say why."></div>
+    <ol class="hints">
+      <li>Take each property in turn. Last digits run 0 to 9 about equally often. How many numbers share a last digit?</li>
+    </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>The same number always gives the same digit: consistent. One character to read: efficient.</li>
-      <li>No US number starts with 0 or 1, and most here start with 2: not uniform.</li>
-      <li>Changing any digit but the first leaves the hash alone: not effective.</li>
-      <li class="answer">yes; no; no; yes (slide 17).</li>
+      <li>The same number always ends in the same digit: consistent. Reading one digit is fast: efficient.</li>
+      <li>Phone numbers end in every digit 0–9 about equally often, so all 10 slots fill evenly: uniform. That's better than the first-digit hash.</li>
+      <li>Every number ending in 9 collides, such as "2068675309" and "2065550009". Changing any other digit leaves the hash alone: not effective.</li>
+      <li class="answer">yes; yes; no; yes. Uniform alone isn't enough: a good hash uses every part of the key.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w4-l10-chain">
-    <h2>4. A chained table</h2>
-    <p class="prompt">Separate chaining, table size 7, \(h(k) = k\), each bucket an unsorted linked list. Insert 10, 24, 3, 17, 31, 5, 12.</p>
-    <div class="answer-spec" data-part="bucket3" data-grader="exact" data-answer="5" data-label="number of keys in bucket 3"></div>
-    <div class="answer-spec" data-part="lambda" data-grader="exact" data-answer="1" data-label="\(\lambda\)"></div>
-    <div class="answer-spec" data-part="miss" data-grader="exact" data-answer="5" data-miscon='{"1":"counted-index"}' data-label="comparisons for <code>find(38)</code> (not present)"></div>
-    <div class="answer-spec" data-part="hit" data-grader="exact" data-answer="5" data-label="comparisons for <code>find(31)</code>, if new keys go at the end of the list"></div>
-    <ol class="hints"><li>Work out each key mod 7. Five of them agree.</li></ol>
+  <h2 class="practice-group">Hashing a string</h2>
+  <p class="note">Lesson: <a href="#l10-strings">Hashing a string</a></p>
+
+  <article class="task" data-id="cse332-w4-l10-no-on">
+    <h2>3. "no" and "on"</h2>
+    <p class="prompt">The lecture's string hashes on the anagrams "no" and "on". ASCII: n = 110, o = 111. \(h_2(s) = \sum a(s_i)\), \(h_3(s) = \sum a(s_i) \cdot 31^i\), \(h_4(s) = 2 \cdot h_3(s)\). The loop is <code>h = 0; for (i = m-1; i &gt;= 0; i--) h = 31*h + s[i];</code></p>
+    <div class="answer-spec" data-part="h2same" data-grader="yesno" data-answer="yes" data-label="Do “no” and “on” have the same \(h_2\)?"></div>
+    <div class="answer-spec" data-part="loop1" data-grader="exact" data-answer="111" data-miscon='{"110":"start-first-char"}' data-label="the loop on “no”: \(h\) after its first iteration"></div>
+    <div class="answer-spec" data-part="h3no" data-grader="exact" data-answer="3551" data-miscon='{"3521":"ascii-sum-order","221":"ascii-sum-order"}' data-label="\(h_3(\text{“no”})\)"></div>
+    <div class="answer-spec" data-part="h3on" data-grader="exact" data-answer="3521" data-miscon='{"3551":"ascii-sum-order","221":"ascii-sum-order"}' data-label="\(h_3(\text{“on”})\)"></div>
+    <div class="answer-spec" data-part="h4slot" data-grader="exact" data-answer="2" data-label="slot of “no” under \(h_4\), table size 10"></div>
+    <div class="answer-spec" data-part="h4odd" data-grader="yesno" data-answer="no" data-label="Can \(h_4\) put any string in slot 3 of a size-10 table?"></div>
+    <ol class="hints">
+      <li>\(h_3\) of a two-letter string is \(a(s_0) + a(s_1) \cdot 31\). In "no", \(s_0\) is n.</li>
+      <li>The loop starts at \(i = m - 1\), the last character.</li>
+    </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>10, 24, 3, 17, 31 all give 3. 5 and 12 give 5.</li>
-      <li>\(\lambda = 7/7 = 1\).</li>
-      <li>38 mod 7 = 3: compare with all 5 keys in bucket 3, then fail. 31 is the fifth key in bucket 3: 5 comparisons.</li>
-      <li class="answer">5; 1; 5; 5. The averages \(\lambda\) and \(\lambda/2\) assume a hash that spreads keys out; this one doesn't.</li>
+      <li>\(h_2\): \(110 + 111 = 221\) for both. A sum ignores order.</li>
+      <li>The loop on "no" starts at o: \(h = 31 \cdot 0 + 111 = 111\). Then \(h = 31 \cdot 111 + 110 = 3551\).</li>
+      <li>\(h_3(\text{"no"}) = 110 + 111 \cdot 31 = 110 + 3441 = 3551\), the loop's answer. \(h_3(\text{"on"}) = 111 + 110 \cdot 31 = 111 + 3410 = 3521\).</li>
+      <li>\(h_4(\text{"no"}) = 7102\), and \(7102 \bmod 10 = 2\). \(h_4\) is always even, and an even number mod 10 is even, so slot 3 is never used.</li>
+      <li class="answer">yes; 111; 3551; 3521; 2; no.</li>
     </ol></div></div>
   </article>
+
+  <h2 class="practice-group">Separate chaining</h2>
+  <p class="note">Lesson: <a href="#l10-chain">Separate chaining</a></p>
+
+  <article class="task" data-id="cse332-w4-l10-chain7">
+    <h2>4. A chained table of size 7</h2>
+    <p class="prompt">Separate chaining, size 7, \(h(k) = k\), new keys on the end of their chain. Insert 15, 8, 22, 4, 11 into this empty table.</p>
+    <div class="hx-table" data-size="7" data-mode="chain" data-ops=""></div>
+    <div class="answer-spec" data-part="chain1" data-grader="text" data-answer="15 8 22|15, 8, 22|15,8,22" data-miscon='{"22 8 15":"new-at-front"}' data-label="chain 1, front to end, separated by spaces"></div>
+    <div class="answer-spec" data-part="miss29" data-grader="exact" data-answer="3" data-miscon='{"1":"counted-index"}' data-label="comparisons for find(29)"></div>
+    <div class="answer-spec" data-part="hit11" data-grader="exact" data-answer="2" data-label="comparisons for find(11)"></div>
+    <div class="answer-spec" data-part="lambda" data-grader="exact" data-answer="5/7" data-miscon='{"7/5":"lambda-flipped"}' data-label="\(\lambda\) at the end"></div>
+    <ol class="hints">
+      <li>Work out each key mod 7 first. Three of them agree.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><div class="hx-table" data-size="7" data-mode="chain" data-ops="15 8 22 4 11 f29 f11" data-at="1" data-say></div></li>
+      <li><div class="hx-table" data-size="7" data-mode="chain" data-ops="15 8 22 4 11 f29 f11" data-at="2" data-say></div></li>
+      <li><div class="hx-table" data-size="7" data-mode="chain" data-ops="15 8 22 4 11 f29 f11" data-at="3" data-say></div></li>
+      <li><div class="hx-table" data-size="7" data-mode="chain" data-ops="15 8 22 4 11 f29 f11" data-at="4" data-say></div></li>
+      <li><div class="hx-table" data-size="7" data-mode="chain" data-ops="15 8 22 4 11 f29 f11" data-at="5" data-say></div></li>
+      <li><div class="hx-table" data-size="7" data-mode="chain" data-ops="15 8 22 4 11 f29 f11" data-at="6" data-say></div></li>
+      <li><div class="hx-table" data-size="7" data-mode="chain" data-ops="15 8 22 4 11 f29 f11" data-at="7" data-say></div></li>
+      <li class="answer">15 8 22; 3; 2; \(\frac{5}{7}\). Three of five keys share chain 1, much longer than the average \(\lambda \approx 0.7\).</li>
+    </ol></div></div>
+  </article>
+
+  <div class="check" data-id="cse332-w4-l10-qc-resize">
+    <p>Quick check: keys keep arriving. How does a chained table keep its expected find time \(\Theta(1)\)?</p>
+    <div class="opts">
+      <label><input type="radio" name="cse332-w4-l10-qc-resize"> Sort each chain<span class="why" hidden>Sorting helps a little inside one chain, but the chains still grow as keys arrive.</span></label>
+      <label data-correct><input type="radio" name="cse332-w4-l10-qc-resize"> Make the array bigger whenever \(\lambda\) goes over a chosen constant<span class="why" hidden>Right. That keeps the average chain length below the constant.</span></label>
+      <label><input type="radio" name="cse332-w4-l10-qc-resize"> Refuse inserts once \(\lambda = 1\)<span class="why" hidden>Chaining can go past 1. The fix is a bigger array, not refusing keys.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+
+  <h2 class="practice-group">Load factor</h2>
+  <p class="note">Lesson: <a href="#l10-load">Load factor</a></p>
 
   <article class="task" data-id="cse332-w4-l10-load">
-    <h2>5. Load factors</h2>
-    <p class="prompt">Slides 28–30: tables of length 10 holding 3, 8 and 15 items. Decimals or fractions are fine.</p>
-    <div class="answer-spec" data-part="ex1" data-grader="exact" data-answer="0.3" data-label="\(\lambda\), example 1"></div>
-    <div class="answer-spec" data-part="ex3" data-grader="exact" data-answer="1.5" data-label="\(\lambda\), example 3"></div>
-    <div class="answer-spec" data-part="miss3" data-grader="exact" data-answer="1.5" data-miscon='{"0.75":"half-not-lambda"}' data-label="expected comparisons, unsuccessful find, example 3"></div>
-    <div class="answer-spec" data-part="hit3" data-grader="exact" data-answer="0.75" data-miscon='{"1.5":"lambda-not-half"}' data-label="expected comparisons, successful find, example 3"></div>
-    <ol class="hints"><li>\(\lambda = n / \text{length}\). Unsuccessful: \(\lambda\). Successful: \(\lambda/2\).</li></ol>
+    <h2>5. Three load factors</h2>
+    <p class="prompt">Three chained tables of length 10 hold 3, 8 and 15 keys. Assume a good hash. A fraction or a decimal is fine.</p>
+    <div class="answer-spec" data-part="ex1" data-grader="exact" data-answer="0.3" data-miscon='{"10/3":"lambda-flipped"}' data-label="\(\lambda\) with 3 keys"></div>
+    <div class="answer-spec" data-part="ex3" data-grader="exact" data-answer="1.5" data-miscon='{"10/15":"lambda-flipped"}' data-label="\(\lambda\) with 15 keys"></div>
+    <div class="answer-spec" data-part="miss3" data-grader="exact" data-answer="1.5" data-miscon='{"0.75":"half-not-lambda"}' data-label="15 keys: expected comparisons, unsuccessful find"></div>
+    <div class="answer-spec" data-part="hit3" data-grader="exact" data-answer="0.75" data-miscon='{"1.5":"lambda-not-half","1.75":"plus-one"}' data-label="15 keys: the course's estimate for a successful find"></div>
+    <div class="answer-spec" data-part="why" data-grader="self" data-long data-template="An unsuccessful find walks ____.&#10;The average chain has ____ keys, so ____." data-label="Explain why an unsuccessful find expects about \(\lambda\) comparisons."></div>
+    <ol class="hints"><li>\(\lambda = \frac{n}{\text{length}}\). Unsuccessful: the whole chain. Successful: half of it on average.</li></ol>
     <div class="solution"><div class="steps"><ol>
-      <li>\(3/10 = 0.3\); \(15/10 = 1.5\).</li>
-      <li>An unsuccessful find scans a whole bucket: 1.5 on average. A successful one stops halfway on average: 0.75.</li>
+      <li>\(\frac{3}{10} = 0.3\) and \(\frac{15}{10} = 1.5\). More than 1 is fine with chaining.</li>
+      <li>An unsuccessful find walks the whole chain at its slot. A good hash makes that chain average length \(\lambda\): 1.5 comparisons.</li>
+      <li>A successful find stops at its key, about halfway along on average. The course's estimate is \(\frac{1.5}{2} = 0.75\). (Counting the key itself too, it's about 1.75.)</li>
       <li class="answer">0.3; 1.5; 1.5; 0.75.</li>
     </ol></div></div>
   </article>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ L10: QUIZ -->
-<section class="page" id="l10-quiz" data-title="Check your understanding: hashing 1">
-  <p class="where">Lecture 10 wrap-up · original questions written for this site, not from the course</p>
-  <h1>Check your understanding: hashing 1</h1>
-  <div class="prose"><p>Ten questions on Lecture 10. The score counts first tries.</p></div>
-  <div class="cyu-score" data-quiz-score="l10" role="status"></div>
-  <ol class="cyu-list" data-quiz="l10">
-    <li class="cyu" data-id="cse332-w4-l10-cyu-avg" data-kind="mc" data-topic="l10-idea">
-      <p class="q">Average-case time of <code>find</code> in a hash table with a good hash and a bounded load factor.</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w4-l10-cyu-avg"> \(\Theta(1)\)<span class="why" hidden>Correct (slide 7).</span></label>
-        <label><input type="radio" name="cse332-w4-l10-cyu-avg"> \(\Theta(\log n)\)<span class="why" hidden>That's an AVL tree. A hash table jumps straight to a bucket.</span></label>
-        <label><input type="radio" name="cse332-w4-l10-cyu-avg"> \(\Theta(n)\)<span class="why" hidden>That's the worst case, when everything collides.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l10-cyu-worst" data-kind="bigo" data-answer="n" data-topic="l10-idea">
-      <p class="q">Worst-case time of <code>find</code> in a hash table with \(n\) keys.</p>
-      <p class="why" hidden>Every key can collide into one bucket: \(\Theta(n)\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l10-cyu-big-array" data-kind="mc" data-topic="l10-idea">
-      <p class="q">What's wrong with the "really big array" dictionary?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w4-l10-cyu-big-array"> Its operations are slow<span class="why" hidden>They're all \(\Theta(1)\).</span></label>
-        <label data-correct><input type="radio" name="cse332-w4-l10-cyu-big-array"> It needs an index for every possible key<span class="why" hidden>Correct: the memory is the size of the key range, not the number of keys.</span></label>
-        <label><input type="radio" name="cse332-w4-l10-cyu-big-array"> Keys collide<span class="why" hidden>Every key has its own index, so nothing collides.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l10-cyu-consistent" data-kind="mc" data-topic="l10-hashfn">
-      <p class="q">"Consistent" means…</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w4-l10-cyu-consistent"> equal keys always hash to the same integer<span class="why" hidden>Correct.</span></label>
-        <label><input type="radio" name="cse332-w4-l10-cyu-consistent"> different keys never hash to the same integer<span class="why" hidden>That would be effectiveness taken to the extreme; collisions are still allowed.</span></label>
-        <label><input type="radio" name="cse332-w4-l10-cyu-consistent"> every index is used equally often<span class="why" hidden>That's uniform.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l10-cyu-anagram" data-kind="mc" data-topic="l10-hashfn">
-      <p class="q">Which hash gives "dog" and "god" the same value?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w4-l10-cyu-anagram"> \(h_1\)<span class="why" hidden>\(h_1\) looks at the first character: d versus g.</span></label>
-        <label data-correct><input type="radio" name="cse332-w4-l10-cyu-anagram"> \(h_2\)<span class="why" hidden>Correct: a sum doesn't care about order.</span></label>
-        <label><input type="radio" name="cse332-w4-l10-cyu-anagram"> \(h_3\)<span class="why" hidden>Each position has its own power of 31, so order matters.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l10-cyu-h1-ab" data-kind="num" data-answer="97" data-topic="l10-hashfn">
-      <p class="q">\(h_1(\text{"ab"})\), with a = 97 and b = 98.</p>
-      <p class="why" hidden>The first character's code: 97.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l10-cyu-h3-ab" data-kind="num" data-answer="3135" data-topic="l10-hashfn" data-miscon='{"3105":"ascii-sum-order","195":"ascii-sum-order"}'>
-      <p class="q">\(h_3(\text{"ab"})\), with a = 97 and b = 98.</p>
-      <p class="why" hidden>\(97 + 98\cdot 31 = 97 + 3038 = 3135\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l10-cyu-lambda" data-kind="num" data-answer="2.5" data-topic="l10-chain">
-      <p class="q">A chained table of length 8 holds 20 keys. What is \(\lambda\)?</p>
-      <p class="why" hidden>\(20/8 = 2.5\). Above 1 is possible with chaining.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l10-cyu-unsuccessful" data-kind="mc" data-topic="l10-chain">
-      <p class="q">With linked-list chaining, an unsuccessful find expects how many comparisons?</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w4-l10-cyu-unsuccessful"> \(\lambda\)<span class="why" hidden>Correct: the whole bucket.</span></label>
-        <label><input type="radio" name="cse332-w4-l10-cyu-unsuccessful"> \(\lambda/2\)<span class="why" hidden>That's a successful find, which stops partway.</span></label>
-        <label><input type="radio" name="cse332-w4-l10-cyu-unsuccessful"> \(n\)<span class="why" hidden>That's the worst case, when everything shares a bucket.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l10-cyu-keep-1" data-kind="mc" data-topic="l10-chain">
-      <p class="q">How does chaining keep the expected time \(\Theta(1)\) as keys are added?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w4-l10-cyu-keep-1"> Sort each bucket<span class="why" hidden>That speeds up a bucket a little but doesn't bound its length.</span></label>
-        <label data-correct><input type="radio" name="cse332-w4-l10-cyu-keep-1"> Resize whenever \(\lambda\) exceeds a chosen constant<span class="why" hidden>Correct (slide 27).</span></label>
-        <label><input type="radio" name="cse332-w4-l10-cyu-keep-1"> Refuse inserts once \(\lambda = 1\)<span class="why" hidden>Chaining can go past 1; the fix is a bigger array.</span></label>
-      </div>
-    </li>
-  </ol>
-  <div class="cyu-score" data-quiz-summary="l10" role="status"></div>
   <nav class="pager"></nav>
 </section>
 
@@ -1001,122 +1064,166 @@ c.left = p</pre>
   <nav class="pager"></nav>
 </section>
 
+<!-- ================================================================ L11: GOALS -->
+<section class="page" id="l11-goals" data-title="What Lecture 11 is for">
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span> · Hashing 2</p>
+  <h1>What this lecture is for</h1>
+  <div class="rule">
+    <p><strong>The point.</strong> <strong>Open addressing</strong> handles collisions without chains: every key lives in the array itself. When a key's slot is taken, it <strong>probes</strong> other slots in a fixed order until one is free. Three probe orders, one way to delete, and rehashing to keep the table from filling up.</p>
+  </div>
+  <div class="proof">
+    <p class="proof-head">One template for all three probe orders</p>
+    <p>probe \(i = 0, 1, 2, \dots\) looks at slot \(\big(h(k) +\) <span class="blank">\(f(i)\)</span>\(\big) \bmod \text{length}\)</p>
+    <p>Linear probing fills the blank with \(i\), quadratic probing with \(i^2\), double hashing with \(i \cdot g(k)\).</p>
+  </div>
+
+  <h2>Five short pages</h2>
+  <ol class="goals">
+    <li>Try the next slot, then the next. <a href="#l11-linear">Linear probing</a></li>
+    <li>Why delete leaves a tombstone instead of a hole. <a href="#l11-delete">Delete and tombstones</a></li>
+    <li>Jump by squares to avoid clusters. <a href="#l11-quad">Quadratic probing</a></li>
+    <li>Let the key choose its own step. <a href="#l11-double">Double hashing</a></li>
+    <li>Grow the table when it gets too full. <a href="#l11-rehash">Rehashing</a></li>
+  </ol>
+  <p class="line">Then <a href="#l11-practice">Lecture 11 practice</a>. Hash functions and separate chaining are <a href="#l10-goals">Lecture 10</a>.</p>
+  <nav class="pager"></nav>
+</section>
+
 <!-- ================================================================ L11: LINEAR PROBING -->
 <section class="page" id="l11-linear" data-title="Linear probing">
-  <p class="where">Lecture 11 · slides 16–27 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span> · Weiss 5.1–5.5</p>
-  <h1>Open addressing: linear probing</h1>
-  <div class="rule">
-    <p><strong>Linear probing (slides 17–20).</strong> On a collision, use the next open space. Insert tries \(i = h(k) \bmod \text{length}\), then \((i+1)\), \((i+2)\), \((i+3)\), …, all mod the length. Find follows the same path until it finds \(k\) or reaches an <em>empty</em> cell.</p>
-  </div>
-  <div class="panel hashlab" id="hl-linear" data-presets='[{"label":"Size 10: 38, 19, 8, 109, 10","mode":"linear","size":10,"seq":[38,19,8,109,10],"say":"Press Insert five times. Watch 8, 109 and 10 wrap around."},{"label":"A–E all map to 3 (slide 21)","mode":"linear","size":10,"seq":[3,13,23,33,43],"say":"Keys 3, 13, 23, 33, 43 play A–E: all hash to 3. Insert them, delete 13, then find 43."}]'>
-    <div class="controls">
-      <label>Key <input type="text" inputmode="numeric" class="hl-key" aria-label="Key" placeholder="next in queue"></label>
-      <button class="btn primary hl-insert" type="button">Insert</button>
-      <button class="btn hl-find" type="button">Find</button>
-      <button class="btn hl-delete" type="button">Delete</button>
-      <button class="btn hl-rehash" type="button">Rehash</button>
-      <button class="btn quiet hl-reset" type="button">Clear</button>
-    </div>
-    <div class="controls">
-      <label>Collisions <select class="hl-mode" aria-label="Collision resolution"><option value="chain">separate chaining</option><option value="linear">linear probing</option><option value="quadratic">quadratic probing</option></select></label>
-      <label>Table size <input type="number" class="hl-size" min="2" max="31" value="10" aria-label="Table size"></label>
-    </div>
-    <div class="controls hl-presets" role="group" aria-label="Examples"></div>
-    <div class="hl-grid" aria-label="Hash table"></div>
-    <p class="hl-stat"></p>
-    <p class="out hl-out" role="status"></p>
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span></p>
+  <h1>Linear probing</h1>
+  <div class="prose"><p>On a collision, try the next slot, then the one after, wrapping from the end back to slot 0. Insert stops at the first empty slot. Find follows the same path and stops when it finds the key or reaches an empty slot: the key would have gone there, so it isn't in the table.</p></div>
+  <div class="proof">
+    <p class="proof-head">The template, filled in</p>
+    <p>probe \(i\) looks at slot \(\big(h(k) +\) <span class="blank">\(i\)</span>\(\big) \bmod \text{length}\), for \(i = 0, 1, 2, \dots\)</p>
   </div>
 
-  <h2>Delete is hard (slides 21–24)</h2>
-  <div class="prose">
-    <p>Insert A, B, C, D, E, all mapping to 3: they fill 3–7. Simply emptying B's slot breaks finds for C, D and E, because a find would stop at the hole. Slide 21 fills the hole by sliding C, D, E down. But slide 22 (A, B, E map to 3; C, D to 5) can't move C or D into index 4: that's <em>before</em> their home, so only E moves. Slide 23 shows wrap-around: with A, B, E mapping to 8 and C, D to 0, E moves from 2 up to 9.</p>
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">Size 10, \(h(k) = k\). Insert 38, 19, 8, 109, 10. Then find 29.</p>
+    <p class="hx-key"><span class="k-hit">where this step's key ends</span><span class="k-look">probed and taken</span><span class="k-empty">empty</span></p>
+    <p class="note">The small number under a slot is the probe \(i\) that looked at it.</p>
+    <div class="panel hx-step" data-size="10" data-mode="linear" data-ops="38 19 8 109 10 f29"></div>
   </div>
-  <div class="rule">
-    <p><strong>Option 1 (harder):</strong> plug the hole with a later key whose probe path passes the hole, and repeat from where that key was. <strong>Option 2 (easier): tombstones.</strong> Leave a marker meaning "something was deleted here". A find doesn't stop at a tombstone; an insert may reuse the first tombstone it passed (slides 25–26).</p>
-  </div>
-  <div class="prose">
-    <p><strong>Downsides (slide 27).</strong> As \(\lambda\) approaches 1, contiguous blocks grow; any collision with a block makes it bigger, and bigger blocks get more collisions. That feedback loop is <strong>primary clustering</strong>. And \(\lambda\) can't exceed 1: there's nowhere left to put anything.</p>
-  </div>
+  <div class="rule"><p><strong>The rule.</strong> Slots 8, 9, 0, 1, 2 are now one solid block. Any key whose home is in the block probes to its end and makes it longer, and a longer block catches more keys. That feedback loop is <strong>primary clustering</strong>, and it gets bad as \(\lambda\) nears 1. \(\lambda\) can't pass 1: every key needs its own slot.</p></div>
 
-  <div class="check" data-id="cse332-w4-l11-qc-109" data-grader="exact" data-answer="1" data-miscon='{"9":"no-mod","3":"first-free-not-probe"}'>
-    <p>Quick check: size 10, linear probing, insert 38, 19, 8, 109. At what index does 109 end up?</p>
+  <div class="check" data-id="cse332-w4-l11-qc-ins20" data-grader="exact" data-answer="3" data-miscon='{"0":"home-taken","20":"no-mod"}'>
+    <p>Quick check: continue the example and insert 20. Which slot does it end in?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
+  <div class="check" data-id="cse332-w4-l11-qc-lambda-max" data-grader="exact" data-answer="1">
+    <p>Quick check: what is the largest load factor \(\lambda = \frac{n}{\text{length}}\) an open-addressing table can have?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L11: DELETE AND TOMBSTONES -->
+<section class="page" id="l11-delete" data-title="Delete and tombstones">
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span></p>
+  <h1>Delete and tombstones</h1>
+  <div class="prose"><p>Insert 3, 13, 23, 33, 43 into a size-10 table with linear probing. All five have home slot 3, so they fill slots 3 to 7. Now delete 13 by simply emptying its slot, and look for 43:</p></div>
+  <div class="hx-table" data-size="10" data-mode="linear" data-ops="3 13 23 33 43 x13 f43" data-say></div>
+  <p class="line">Wrong: 43 is in slot 7. The find stopped at the hole that the delete left behind.</p>
+
+  <div class="rule">
+    <p><strong>Tombstones.</strong> Delete leaves a marker (✝) that means "a key was here".</p>
+    <ul>
+      <li><strong>find</strong> treats a tombstone as taken: it keeps probing past it.</li>
+      <li><strong>insert</strong> probes until it finds the key or an empty slot, remembering the first tombstone it passed. If the key isn't there, it goes in that tombstone's slot.</li>
+    </ul>
+  </div>
+
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">The same five inserts. Then delete 13 with a tombstone, find 43, and insert 53.</p>
+    <p class="hx-key"><span class="k-hit">where this step's key ends</span><span class="k-look">probed</span><span class="k-tomb">tombstone</span></p>
+    <div class="panel hx-step" data-size="10" data-mode="linear" data-ops="3 13 23 33 43 d13 f43 53"></div>
+  </div>
+  <details class="more">
+    <summary>The other way: fill the hole</summary>
+    <p>Instead of a tombstone, delete can move a later key back into the hole, then fix the hole that move leaves, and so on until an empty slot. A key may move back only if the hole is on its probe path before its current slot. Keys from a different home that sit later in the block can't move into the hole. This works but is harder to get right, so the lecture uses tombstones.</p>
+  </details>
+
   <div class="check" data-id="cse332-w4-l11-qc-tomb">
     <p>Quick check: a find reaches a tombstone. What does it do?</p>
     <div class="opts">
       <label><input type="radio" name="cse332-w4-l11-qc-tomb"> Stops: the key isn't there<span class="why" hidden>The key may have been placed past the deleted one, before the delete.</span></label>
       <label data-correct><input type="radio" name="cse332-w4-l11-qc-tomb"> Keeps probing<span class="why" hidden>Right: tombstones don't count as empty.</span></label>
-      <label><input type="radio" name="cse332-w4-l11-qc-tomb"> Removes the tombstone and stops<span class="why" hidden>Find doesn't modify the table.</span></label>
+      <label><input type="radio" name="cse332-w4-l11-qc-tomb"> Removes the tombstone and stops<span class="why" hidden>Find doesn't change the table.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>In the second preset, delete 13 then find 43: the probe walks past the tombstone (✝). Then insert 53: it lands in the tombstone's slot, after the find part confirms 53 isn't already there.</li>
-      <li>Slide 26's insert keeps searching past a tombstone before reusing it, because the key might already be further along. Ask why that matters (duplicates).</li>
-    </ul>
-  </details>
-  <nav class="pager"></nav>
-</section>
-
-<!-- ================================================================ L11: QUADRATIC AND DOUBLE -->
-<section class="page" id="l11-quad" data-title="Quadratic and double hashing">
-  <p class="where">Lecture 11 · slides 28–32 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span></p>
-  <h1>Quadratic probing and double hashing</h1>
-  <div class="rule">
-    <p><strong>Quadratic probing (slide 28).</strong> Try \(i = h(k)\), then \((i + 1^2)\), \((i + 2^2)\), \((i + 3^2)\), \((i + 4^2)\), …, all mod the length.</p>
-  </div>
-  <h2>Slide 29: size 7, insert 76, 40, 48, 5, 55, 47</h2>
-  <div class="table-wrap">
-  <table class="plain">
-    <tr><th>Key</th><th>\(k \bmod 7\)</th><th>Probes</th><th>Index</th></tr>
-    <tr><td>76</td><td>6</td><td>6</td><td>6</td></tr>
-    <tr><td>40</td><td>5</td><td>5</td><td>5</td></tr>
-    <tr><td>48</td><td>6</td><td>6, 6+1 = 0</td><td>0</td></tr>
-    <tr><td>5</td><td>5</td><td>5, 6, 5+4 = 2</td><td>2</td></tr>
-    <tr><td>55</td><td>6</td><td>6, 0, 6+4 = 3</td><td>3</td></tr>
-    <tr><td>47</td><td>5</td><td>5, 6, 2, 0, 0, 2, 6, …</td><td>none</td></tr>
-  </table>
-  </div>
-  <p class="note">The slide leaves the table blank to fill in; these indices were computed by running the probe sequence.</p>
-  <div class="rule">
-    <p><strong>Using quadratic probing (slide 30).</strong> After table.length probes, the indices repeat. If table.length is prime and \(\lambda &lt; \frac12\), you're guaranteed to find an open spot within table.length/2 probes. It helps with linear probing's clustering, but not when many keys hash to the same index.</p>
-  </div>
-  <div class="prose">
-    <p><strong>Secondary clustering (slide 31).</strong> Quadratic probing jumps \(i^2\) away, so it doesn't grow big blobs (no primary clustering). But two keys that start at the same index follow exactly the same probe sequence. That's <strong>secondary clustering</strong>, and a probe that depends on the key avoids it:</p>
-  </div>
-  <div class="rule">
-    <p><strong>Double hashing (slide 32).</strong> With two good hash functions \(h\) and \(g\): try \(i = h(k)\), then \(i + g(k)\), \(i + 2g(k)\), \(i + 3g(k)\), …, mod the length.</p>
-  </div>
-  <div class="panel hashlab" id="hl-double" data-r="7" data-presets='[{"label":"Size 11, g(k) = 7 − (k mod 7)","mode":"double","size":11,"seq":[13,24,35,2],"say":"13, 24, 35 and 2 all have k mod 11 = 2. Insert them and compare the probe paths."},{"label":"Same keys, quadratic","mode":"quadratic","size":11,"seq":[13,24,35,2],"say":"The same four keys with quadratic probing: they share one probe sequence."}]'>
-    <div class="controls">
-      <label>Key <input type="text" inputmode="numeric" class="hl-key" aria-label="Key" placeholder="next in queue"></label>
-      <button class="btn primary hl-insert" type="button">Insert</button>
-      <button class="btn hl-find" type="button">Find</button>
-      <button class="btn hl-delete" type="button">Delete</button>
-      <button class="btn hl-rehash" type="button">Rehash</button>
-      <button class="btn quiet hl-reset" type="button">Clear</button>
-    </div>
-    <div class="controls">
-      <label>Collisions <select class="hl-mode" aria-label="Collision resolution"><option value="chain">separate chaining</option><option value="linear">linear probing</option><option value="quadratic">quadratic probing</option><option value="double">double hashing</option></select></label>
-      <label>Table size <input type="number" class="hl-size" min="2" max="31" value="11" aria-label="Table size"></label>
-    </div>
-    <div class="controls hl-presets" role="group" aria-label="Examples"></div>
-    <div class="hl-grid" aria-label="Hash table"></div>
-    <p class="hl-stat"></p>
-    <p class="out hl-out" role="status"></p>
-    <p class="note">The slides leave \(g\) open. This widget uses \(g(k) = 7 - (k \bmod 7)\), which is never 0.</p>
-  </div>
-
-  <div class="check" data-id="cse332-w4-l11-qc-55" data-grader="exact" data-answer="3" data-miscon='{"1":"linear-not-quadratic","6":"no-mod"}'>
-    <p>Quick check: in slide 29's example, where does 55 go?</p>
+  <div class="check" data-id="cse332-w4-l11-qc-ins63" data-grader="exact" data-answer="8" data-miscon='{"4":"tomb-reused","3":"home-taken"}'>
+    <p>Quick check: continue the example and insert 63. Which slot does it end in?</p>
     <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L11: QUADRATIC PROBING -->
+<section class="page" id="l11-quad" data-title="Quadratic probing">
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span></p>
+  <h1>Quadratic probing</h1>
+  <div class="prose"><p>To stop blocks from growing, jump farther each time: 1 slot, then 4, then 9.</p></div>
+  <div class="proof">
+    <p class="proof-head">The template, filled in</p>
+    <p>probe \(i\) looks at slot \(\big(h(k) +\) <span class="blank">\(i^2\)</span>\(\big) \bmod \text{length}\), for \(i = 0, 1, 2, \dots\)</p>
+  </div>
+
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">The lecture's example. Size 7, \(h(k) = k\). Insert 76, 40, 48, 5, 55, 47.</p>
+    <p class="hx-key"><span class="k-hit">where this step's key ends</span><span class="k-look">probed and taken</span><span class="k-empty">empty</span></p>
+    <div class="panel hx-step" data-size="7" data-mode="quadratic" data-ops="76 40 48 5 55 47"></div>
+  </div>
+  <div class="rule">
+    <p><strong>The rule.</strong> After length probes the slots repeat, so some empty slots may never be reached: 47 failed with 2 of 7 slots free. If the length is prime and \(\lambda &lt; \frac{1}{2}\), quadratic probing always finds an empty slot within \(\frac{\text{length} + 1}{2}\) probes. Here \(\lambda\) was \(\frac{5}{7}\).</p>
+    <p>It also fixes primary clustering: keys jump away from a block instead of growing it. But keys with the <em>same</em> home still follow the same path. 76, 48 and 55 all start at 6 and walk 6, 0, 3. That's <strong>secondary clustering</strong>.</p>
+  </div>
+
+  <div class="check" data-id="cse332-w4-l11-qc-q62" data-grader="exact" data-answer="1" data-miscon='{"6":"home-taken","62":"no-mod"}'>
+    <p>Quick check: go back to the table before 47 was tried (76, 40, 48, 5, 55 inserted) and insert 62 instead. Which slot does it end in?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <div class="check" data-id="cse332-w4-l11-qc-47why">
+    <p>Quick check: slots 1 and 4 were empty. Why did inserting 47 fail?</p>
+    <div class="opts">
+      <label data-correct><input type="radio" name="cse332-w4-l11-qc-47why"> The probes from slot 5 only ever reach 5, 6, 2 and 0<span class="why" hidden>Right. \(i^2 \bmod 7\) is only ever 0, 1, 2 or 4, so from 5 the probes land on 5, 6, 0 and 2, over and over.</span></label>
+      <label><input type="radio" name="cse332-w4-l11-qc-47why"> The table was full<span class="why" hidden>Two slots were still empty. The probes just never landed on them.</span></label>
+      <label><input type="radio" name="cse332-w4-l11-qc-47why"> 47 was already in the table<span class="why" hidden>Then insert would have stopped at it and updated its value.</span></label>
+    </div>
+    <div class="row"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
+  <nav class="pager"></nav>
+</section>
+
+<!-- ================================================================ L11: DOUBLE HASHING -->
+<section class="page" id="l11-double" data-title="Double hashing">
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span></p>
+  <h1>Double hashing</h1>
+  <div class="prose"><p>Secondary clustering happens because the probe path depends only on the home slot. Double hashing uses a second hash function \(g\) to pick each key's step size, so keys with the same home still take different paths.</p></div>
+  <div class="proof">
+    <p class="proof-head">The template, filled in</p>
+    <p>probe \(i\) looks at slot \(\big(h(k) +\) <span class="blank">\(i \cdot g(k)\)</span>\(\big) \bmod \text{length}\), for \(i = 0, 1, 2, \dots\)</p>
+    <p>The lecture leaves \(g\) open. Here \(g(k) = 5 - (k \bmod 5)\), which is always 1 to 5: never 0 and never a multiple of 7.</p>
+  </div>
+
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">The same keys as the quadratic example: size 7, insert 76, 40, 48, 5, 55, 47.</p>
+    <p class="hx-key"><span class="k-hit">where this step's key ends</span><span class="k-look">probed and taken</span><span class="k-empty">empty</span></p>
+    <div class="panel hx-step" data-size="7" data-mode="double" data-r="5" data-ops="76 40 48 5 55 47"></div>
+  </div>
+  <div class="rule"><p><strong>The rule.</strong> 48 and 55 share home 6 but step by 2 and 5: no secondary clustering. And 47 fits this time. When the length is prime and \(g(k)\) is never a multiple of it, the probes visit every slot, so insert fails only when the table is full. \(g(k)\) must never be 0, or every probe would look at the home slot.</p></div>
+
   <div class="check" data-id="cse332-w4-l11-qc-secondary">
     <p>Quick check: which strategy avoids secondary clustering?</p>
     <div class="opts">
@@ -1127,226 +1234,215 @@ c.left = p</pre>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Fill in slide 29 together. The punch line is 47: the squares mod 7 are 0, 1, 4, 2, 2, 4, 1, so from 5 the probes only ever reach 5, 6, 2 and 0. Slots 1 and 4 are empty but unreachable. \(\lambda = 5/7\) broke the \(&lt; \frac12\) condition.</li>
-      <li>The double-hashing preset makes secondary clustering visible: with quadratic probing the four keys walk the same path; with double hashing each takes its own step.</li>
-    </ul>
-  </details>
+  <div class="check" data-id="cse332-w4-l11-qc-d62" data-grader="exact" data-answer="2" data-miscon='{"1":"quad-not-double","6":"home-taken"}'>
+    <p>Quick check: go back to the table before 47 (76, 40, 48, 5, 55 inserted) and insert 62 with double hashing. Which slot does it end in?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L11: REHASHING -->
 <section class="page" id="l11-rehash" data-title="Rehashing">
-  <p class="where">Lecture 11 · slides 33–35 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span></p>
-  <h1>Rehashing, and the summary</h1>
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span></p>
+  <h1>Rehashing</h1>
+  <div class="prose"><p>Every strategy slows down as \(\lambda\) grows. <strong>Rehashing</strong> keeps \(\lambda\) small: when it gets too big, make a new array about twice as long, with a prime length, and insert every key again. A key's slot is \(h(k) \bmod \text{length}\), and the length just changed, so keys can't stay at their old slot numbers.</p></div>
+
+  <div class="example">
+    <p class="example-head">Worked example</p>
+    <p class="example-q">Linear probing, size 5. Insert 7, 12, 22. Now \(\lambda = \frac{3}{5}\), over the open-addressing limit of \(\frac{1}{2}\): rehash.</p>
+    <p class="hx-key"><span class="k-hit">where this step's key ends</span><span class="k-look">probed and taken</span><span class="k-empty">empty</span></p>
+    <div class="panel hx-step" data-size="5" data-mode="linear" data-ops="7 12 22 r"></div>
+  </div>
   <div class="rule">
-    <p><strong>Rehashing (slide 34).</strong> When \(\lambda\) gets too large, make a new array roughly twice as long (probably still prime) and re-insert every item by applying the hash function again: items map to different indices in the new table. "Too large" means about \(\lambda &lt; 2\) for separate chaining, and \(\lambda &lt; \frac12\) for open addressing.</p>
+    <p><strong>The rule.</strong> Rehash when \(\lambda\) passes the limit for the table type, about \(\lambda &lt; 2\) for separate chaining and \(\lambda &lt; \frac{1}{2}\) for open addressing. The new length is about double, and prime.</p>
   </div>
-  <div class="prose">
-    <p><strong>Summary so far (slide 33).</strong> Separate chaining is easy: with unsorted linked lists, find, insert and delete are proportional to the load factor on average; with another structure per bucket (say an AVL tree) they cost what that structure costs. Open addressing uses probing and has clustering issues as the table fills. Why use it? Less memory allocation (no list nodes), which can make it faster, and a simpler data representation.</p>
-    <p><strong>Final word (slide 35).</strong> The hash table is one of the most important data structures: efficient find, insert and delete, but operations based on sorted order are not efficient. Use a good hash function (good distribution, uses enough of the key, cheap to compute) and keep the table a good size (prime; the preferred \(\lambda\) depends on the type of table). Hash functions have uses beyond tables, such as cryptography and checksums.</p>
-  </div>
-  <div class="check" data-id="cse332-w4-l11-qc-rehash-size" data-grader="exact" data-answer="17" data-miscon='{"14":"no-mod","13":"no-mod"}'>
-    <p>Quick check: an open-addressing table of size 7 needs rehashing. With "roughly double, and prime", what is the new size? (Take the first prime at least \(2 \times 7\).)</p>
-    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
-    <p class="feedback" role="status"></p>
-  </div>
+  <div class="table-wrap"><table class="vals">
+    <thead><tr><th></th><th>separate chaining</th><th>open addressing</th></tr></thead>
+    <tr><th>collisions go</th><td>in a chain at the slot</td><td>in another slot, by probing</td></tr>
+    <tr><th>\(\lambda\)</th><td>can pass 1; rehash near 2</td><td>at most 1; rehash at \(\frac{1}{2}\)</td></tr>
+    <tr><th>delete</th><td>unlink from the chain</td><td>leave a tombstone</td></tr>
+    <tr><th>why pick it</th><td>simple</td><td>no list nodes to allocate, so it can be faster</td></tr>
+  </table></div>
+  <p class="line">Either way, find, insert and delete are \(\Theta(1)\) on average. What hash tables can't do quickly is anything about order, like finding the smallest key: that's what AVL trees are for.</p>
+
   <div class="check" data-id="cse332-w4-l11-qc-reapply">
-    <p>Quick check: when rehashing, why not copy each item to the same index in the new array?</p>
+    <p>Quick check: when rehashing, why not copy each key to the same slot number in the new array?</p>
     <div class="opts">
-      <label data-correct><input type="radio" name="cse332-w4-l11-qc-reapply"> Its index is \(h(k)\) mod the <em>new</em> length, which is usually different<span class="why" hidden>Right: a later find computes the index with the new length.</span></label>
-      <label><input type="radio" name="cse332-w4-l11-qc-reapply"> Copying is slower than re-inserting<span class="why" hidden>Speed isn't the issue; correctness is.</span></label>
+      <label data-correct><input type="radio" name="cse332-w4-l11-qc-reapply"> Its slot is \(h(k)\) mod the <em>new</em> length, which is usually different<span class="why" hidden>Right: a later find computes the slot with the new length.</span></label>
+      <label><input type="radio" name="cse332-w4-l11-qc-reapply"> Copying is slower than inserting again<span class="why" hidden>Speed isn't the issue; correctness is.</span></label>
       <label><input type="radio" name="cse332-w4-l11-qc-reapply"> The hash function changes when the table grows<span class="why" hidden>\(h\) stays the same; the mod changes.</span></label>
     </div>
     <div class="row"><button class="btn primary">Check</button></div>
     <p class="feedback" role="status"></p>
   </div>
-  <details class="notes" open>
-    <summary>Teaching notes</summary>
-    <ul>
-      <li>Rehashing is \(\Theta(n)\) once, but doubling means it happens rarely: the same amortized argument as a growing array.</li>
-      <li>In any of the hash widgets, the Rehash button goes to the first prime at least twice the size and clears tombstones as a side effect.</li>
-    </ul>
-  </details>
+  <div class="check" data-id="cse332-w4-l11-qc-rehash-size" data-grader="exact" data-answer="17" data-miscon='{"14":"not-prime","13":"below-double"}'>
+    <p>Quick check: an open-addressing table of size 7 needs rehashing. The new size is the first prime at least \(2 \times 7\). What is it?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <nav class="pager"></nav>
 </section>
 
 <!-- ================================================================ L11: PRACTICE -->
-<section class="page" id="l11-practice" data-title="Lecture 11: practice">
-  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span> · practice</p>
-  <h1>Lecture 11: practice</h1>
-  <div class="prose"><p>Six problems. Unless stated, \(h(k) = k\) and the index is \(k \bmod \text{size}\). Every index and probe count was computed by running the probes (<code>checks/cse332/w04/verify.mjs</code>). "Slots looked at" counts every index a probe examines, including the first and the last.</p></div>
+<section class="page" id="l11-practice" data-title="Lecture 11 practice">
+  <p class="where">Lecture 11 · <span class="today-chip" data-date="2026-10-23">Fri Oct 23</span></p>
+  <h1>Lecture 11 practice</h1>
+  <div class="prose"><p>One group per lesson, with new keys. Keys are whole numbers with \(h(k) = k\), so a key's home slot is \(k \bmod \text{length}\), and probe \(i\) looks at \(\big(h(k) + f(i)\big) \bmod \text{length}\). "Slots looked at" counts every probe, the first and the last included. Draw the table on paper as you go; each solution draws it after every step.</p></div>
+  <div data-progress-bar></div>
 
-  <article class="task" data-id="cse332-w4-l11-linear">
-    <h2>1. Linear probing</h2>
-    <p class="prompt">Size 10, linear probing. Insert 38, 19, 8, 109, 10.</p>
-    <div class="answer-spec" data-part="i8" data-grader="exact" data-answer="0" data-miscon='{"8":"no-mod"}' data-label="index of 8"></div>
-    <div class="answer-spec" data-part="i10" data-grader="exact" data-answer="2" data-miscon='{"0":"no-mod","3":"first-free-not-probe"}' data-label="index of 10"></div>
-    <div class="answer-spec" data-part="find29" data-grader="exact" data-answer="5" data-miscon='{"4":"counted-index"}' data-label="slots looked at by <code>find(29)</code>"></div>
-    <ol class="hints"><li>38 → 8 and 19 → 9 without collisions. 8 starts at 8 and wraps around.</li></ol>
-    <div class="solution"><div class="steps"><ol>
-      <li>8: 8 taken, 9 taken, 0 free → 0. 109: 9, 0 taken, 1 free → 1. 10: 0, 1 taken, 2 free → 2.</li>
-      <li><code>find(29)</code>: 9, 0, 1, 2 hold other keys, 3 is empty → stop. 5 slots.</li>
-      <li class="answer">0; 2; 5. Indices 8, 9, 0, 1, 2 now form one cluster.</li>
-    </ol></div></div>
-  </article>
+  <h2 class="practice-group">Linear probing</h2>
+  <p class="note">Lesson: <a href="#l11-linear">Linear probing</a></p>
 
-  <article class="task" data-id="cse332-w4-l11-tomb">
-    <h2>2. Tombstones</h2>
-    <p class="prompt">Size 10, linear probing, tombstone deletion. Insert 3, 13, 23, 33, 43 (all map to 3, like slide 21's A–E). Delete 13. Then find 43, find 53, and insert 53.</p>
-    <div class="answer-spec" data-part="find43" data-grader="exact" data-answer="5" data-label="slots looked at by <code>find(43)</code>"></div>
-    <div class="answer-spec" data-part="found43" data-grader="yesno" data-answer="yes" data-miscon='{"no":"tomb-is-empty"}' data-label="does it find 43?"></div>
-    <div class="answer-spec" data-part="find53" data-grader="exact" data-answer="6" data-miscon='{"2":"tomb-is-empty"}' data-label="slots looked at by <code>find(53)</code>"></div>
-    <div class="answer-spec" data-part="ins53" data-grader="exact" data-answer="4" data-miscon='{"8":"first-free-not-probe"}' data-label="index where <code>insert(53)</code> puts 53"></div>
-    <ol class="hints"><li>The keys sit at 3–7; deleting 13 leaves a tombstone at 4. Finds don't stop at it; inserts may reuse it.</li></ol>
-    <div class="solution"><div class="steps"><ol>
-      <li><code>find(43)</code>: 3, 4 (tombstone, keep going), 5, 6, 7 → found. 5 slots.</li>
-      <li><code>find(53)</code>: 3, 4, 5, 6, 7, then 8 is empty → not found. 6 slots.</li>
-      <li><code>insert(53)</code> does that same search, remembers the tombstone at 4, and since 53 isn't present, puts it there.</li>
-      <li class="answer">5; yes; 6; 4.</li>
-    </ol></div></div>
-  </article>
-
-  <article class="task" data-id="cse332-w4-l11-quad">
-    <h2>3. Slide 29, quadratic probing</h2>
-    <p class="prompt">Size 7, quadratic probing. Insert 76, 40, 48, 5, 55, then try 47.</p>
-    <div class="answer-spec" data-part="i48" data-grader="exact" data-answer="0" data-label="index of 48"></div>
-    <div class="answer-spec" data-part="i5" data-grader="exact" data-answer="2" data-miscon='{"0":"linear-not-quadratic","1":"linear-not-quadratic"}' data-label="index of 5"></div>
-    <div class="answer-spec" data-part="i55" data-grader="exact" data-answer="3" data-miscon='{"1":"linear-not-quadratic"}' data-label="index of 55"></div>
-    <div class="answer-spec" data-part="fits47" data-grader="yesno" data-answer="no" data-label="can 47 be inserted?"></div>
-    <div class="answer-spec" data-part="lambda" data-grader="exact" data-answer="5/7" data-label="\(\lambda\) when 47 is tried"></div>
+  <article class="task" data-id="cse332-w4-l11-linear2">
+    <h2>1. A growing block</h2>
+    <p class="prompt">Size 10, linear probing (\(f(i) = i\)). Insert 15, 25, 35, 18, 26 into this empty table, then find 45.</p>
+    <div class="hx-table" data-size="10" data-mode="linear" data-ops=""></div>
+    <div class="answer-spec" data-part="i35" data-grader="exact" data-answer="7" data-miscon='{"5":"home-taken"}' data-label="slot of 35"></div>
+    <div class="answer-spec" data-part="i26" data-grader="exact" data-answer="9" data-miscon='{"6":"home-taken"}' data-label="slot of 26"></div>
+    <div class="answer-spec" data-part="find45" data-grader="exact" data-answer="6" data-miscon='{"5":"counted-index"}' data-label="slots looked at by find(45)"></div>
     <ol class="hints">
-      <li>Probe \(h, h+1, h+4, h+9, \dots\) mod 7.</li>
-      <li>For 47 (home 5), list \(5 + i^2 \bmod 7\) for \(i = 0, \dots, 6\). Which slots are still empty?</li>
+      <li>15, 25 and 35 share home 5. Each one probes to the end of the block.</li>
+      <li>A find stops only at the key or at an empty slot. Where is the first empty slot after 5, wrapping around?</li>
     </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>48: 6 taken → 0. 5: 5, 6 taken → 5+4 = 9 → 2. 55: 6, 0 taken → 6+4 = 10 → 3.</li>
-      <li>47: \(5 + i^2 \bmod 7\) gives 5, 6, 2, 0, 0, 2, 6. The empty slots are 1 and 4, never reached.</li>
-      <li>\(\lambda = 5/7 &gt; 1/2\), so slide 30's guarantee doesn't apply.</li>
-      <li class="answer">0; 2; 3; no; 5/7.</li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="15 25 35 18 26 f45" data-at="1" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="15 25 35 18 26 f45" data-at="2" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="15 25 35 18 26 f45" data-at="3" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="15 25 35 18 26 f45" data-at="4" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="15 25 35 18 26 f45" data-at="5" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="15 25 35 18 26 f45" data-at="6" data-say></div></li>
+      <li class="answer">7; 9; 6. Slots 5 to 9 are one block, and 26 joined it though its home was 6: primary clustering.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w4-l11-double">
-    <h2>4. Double hashing</h2>
-    <p class="prompt">Size 11, \(h(k) = k \bmod 11\), \(g(k) = 7 - (k \bmod 7)\). Probe \(h(k) + j\cdot g(k)\) for \(j = 0, 1, 2, \dots\), mod 11. Insert 13, 24, 35, 2 (all have \(h = 2\)).</p>
-    <div class="answer-spec" data-part="g24" data-grader="exact" data-answer="4" data-label="\(g(24)\)"></div>
-    <div class="answer-spec" data-part="i24" data-grader="exact" data-answer="6" data-miscon='{"3":"linear-not-quadratic"}' data-label="index of 24"></div>
-    <div class="answer-spec" data-part="i35" data-grader="exact" data-answer="9" data-label="index of 35"></div>
-    <div class="answer-spec" data-part="i2" data-grader="exact" data-answer="7" data-label="index of 2"></div>
-    <ol class="hints"><li>13 takes index 2. Each later key starts at 2 and steps by its own \(g\).</li></ol>
+  <h2 class="practice-group">Delete and tombstones</h2>
+  <p class="note">Lesson: <a href="#l11-delete">Delete and tombstones</a></p>
+
+  <article class="task" data-id="cse332-w4-l11-tomb2">
+    <h2>2. Past the tombstone</h2>
+    <p class="prompt">Size 10, linear probing, delete with tombstones. Insert 4, 14, 24, 34. Delete 14. Then find 34, find 44, and insert 44.</p>
+    <div class="hx-table" data-size="10" data-mode="linear" data-ops=""></div>
+    <div class="answer-spec" data-part="found34" data-grader="yesno" data-answer="yes" data-miscon='{"no":"tomb-is-empty"}' data-label="Does find(34) find 34?"></div>
+    <div class="answer-spec" data-part="find34" data-grader="exact" data-answer="4" data-label="slots looked at by find(34)"></div>
+    <div class="answer-spec" data-part="find44" data-grader="exact" data-answer="5" data-miscon='{"2":"tomb-is-empty"}' data-label="slots looked at by find(44)"></div>
+    <div class="answer-spec" data-part="ins44" data-grader="exact" data-answer="5" data-miscon='{"8":"tomb-skip","4":"home-taken"}' data-label="slot where insert(44) puts 44"></div>
+    <div class="answer-spec" data-part="hole" data-grader="yesno" data-answer="no" data-label="If delete had just emptied 14's slot instead, would find(34) find 34?"></div>
+    <ol class="hints">
+      <li>The four keys fill slots 4 to 7. Deleting 14 puts a tombstone in slot 5.</li>
+      <li>Find walks past a tombstone. Insert remembers the first tombstone and uses it once it knows the key isn't there.</li>
+    </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>24: \(g = 7 - 3 = 4\); 2 taken → 6.</li>
-      <li>35: \(g = 7 - 0 = 7\); 2 taken → 9.</li>
-      <li>2: \(g = 7 - 2 = 5\); 2 taken → 7.</li>
-      <li class="answer">4; 6; 9; 7. Same starting index, three different probe paths: no secondary clustering.</li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="1" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="2" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="3" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="4" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="5" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="6" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="7" data-say></div></li>
+      <li><div class="hx-table" data-size="10" data-mode="linear" data-ops="4 14 24 34 d14 f34 f44 44" data-at="8" data-say></div></li>
+      <li>With a plain hole in slot 5 instead, <code>find(34)</code> would look at 4, then stop at the empty slot 5 and report 34 missing.</li>
+      <li class="answer">yes; 4; 5; 5; no.</li>
     </ol></div></div>
   </article>
 
-  <article class="task" data-id="cse332-w4-l11-rehash">
-    <h2>5. Time to rehash</h2>
-    <p class="prompt">A linear-probing table of size 7 holds 76, 40, 48 and 5.</p>
-    <div class="answer-spec" data-part="lambda" data-grader="exact" data-answer="4/7" data-label="\(\lambda\)"></div>
-    <div class="answer-spec" data-part="should" data-grader="yesno" data-answer="yes" data-label="past slide 34's threshold for open addressing?"></div>
-    <div class="answer-spec" data-part="size" data-grader="exact" data-answer="17" data-label="new size (first prime ≥ 14)"></div>
-    <div class="answer-spec" data-part="i76" data-grader="exact" data-answer="8" data-miscon='{"6":"no-mod"}' data-label="index of 76 in the new table"></div>
-    <ol class="hints"><li>Open addressing wants \(\lambda &lt; \frac12\). Re-insert by applying \(k \bmod 17\).</li></ol>
+  <h2 class="practice-group">Quadratic probing</h2>
+  <p class="note">Lesson: <a href="#l11-quad">Quadratic probing</a></p>
+
+  <article class="task" data-id="cse332-w4-l11-quad2">
+    <h2>3. Four keys, one home</h2>
+    <p class="prompt">Size 7, quadratic probing (\(f(i) = i^2\)). Insert 14, 21, 28, 7 into this empty table. All four have home slot 0.</p>
+    <div class="hx-table" data-size="7" data-mode="quadratic" data-ops=""></div>
+    <div class="answer-spec" data-part="i21" data-grader="exact" data-answer="1" data-label="slot of 21"></div>
+    <div class="answer-spec" data-part="i28" data-grader="exact" data-answer="4" data-miscon='{"2":"linear-not-quadratic"}' data-label="slot of 28"></div>
+    <div class="answer-spec" data-part="i7" data-grader="exact" data-answer="2" data-miscon='{"3":"linear-not-quadratic","0":"home-taken"}' data-label="slot of 7"></div>
+    <div class="answer-spec" data-part="lambda" data-grader="exact" data-answer="4/7" data-label="\(\lambda\) at the end"></div>
+    <div class="answer-spec" data-part="guarantee" data-grader="yesno" data-answer="no" data-label="Does the “prime length and \(\lambda &lt; \frac{1}{2}\)” guarantee cover the next insert?"></div>
+    <ol class="hints">
+      <li>Every key starts at 0, then tries \(0 + 1\), \(0 + 4\), \(0 + 9\), … mod 7.</li>
+    </ol>
     <div class="solution"><div class="steps"><ol>
-      <li>\(\lambda = 4/7 \approx 0.57 &gt; 0.5\): rehash.</li>
-      <li>14, 15 and 16 aren't prime; 17 is.</li>
-      <li>\(76 = 4\cdot 17 + 8\), so 76 goes to 8 (no collision: 40 → 6, 48 → 14, 5 → 5).</li>
-      <li class="answer">4/7; yes; 17; 8.</li>
+      <li><div class="hx-table" data-size="7" data-mode="quadratic" data-ops="14 21 28 7" data-at="1" data-say></div></li>
+      <li><div class="hx-table" data-size="7" data-mode="quadratic" data-ops="14 21 28 7" data-at="2" data-say></div></li>
+      <li><div class="hx-table" data-size="7" data-mode="quadratic" data-ops="14 21 28 7" data-at="3" data-say></div></li>
+      <li><div class="hx-table" data-size="7" data-mode="quadratic" data-ops="14 21 28 7" data-at="4" data-say></div></li>
+      <li>\(\lambda = \frac{4}{7}\), which is more than \(\frac{1}{2}\), so the guarantee no longer applies. Each key walked the same path 0, 1, 4, 2 a little farther: secondary clustering.</li>
+      <li class="answer">1; 4; 2; \(\frac{4}{7}\); no.</li>
+    </ol></div></div>
+  </article>
+
+  <h2 class="practice-group">Double hashing</h2>
+  <p class="note">Lesson: <a href="#l11-double">Double hashing</a></p>
+
+  <article class="task" data-id="cse332-w4-l11-double2">
+    <h2>4. The same keys, double hashing</h2>
+    <p class="prompt">Size 7, double hashing (\(f(i) = i \cdot g(k)\)) with \(g(k) = 5 - (k \bmod 5)\). Insert the same keys as problem 3: 14, 21, 28, 7.</p>
+    <div class="hx-table" data-size="7" data-mode="double" data-r="5" data-ops=""></div>
+    <div class="answer-spec" data-part="g21" data-grader="exact" data-answer="4" data-label="\(g(21)\)"></div>
+    <div class="answer-spec" data-part="i21" data-grader="exact" data-answer="4" data-miscon='{"1":"quad-not-double"}' data-label="slot of 21"></div>
+    <div class="answer-spec" data-part="i28" data-grader="exact" data-answer="2" data-miscon='{"4":"quad-not-double"}' data-label="slot of 28"></div>
+    <div class="answer-spec" data-part="i7" data-grader="exact" data-answer="3" data-miscon='{"2":"quad-not-double"}' data-label="slot of 7"></div>
+    <div class="answer-spec" data-part="why" data-grader="self" data-long data-template="In problem 3 every key probed ____ because ____.&#10;Here each key steps by ____, so ____." data-label="Problems 3 and 4 insert the same keys. Explain why the quadratic keys shared one path and these didn't."></div>
+    <ol class="hints">
+      <li>Work out \(g\) for each key first, then probe \(h(k) + i \cdot g(k)\).</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><div class="hx-table" data-size="7" data-mode="double" data-r="5" data-ops="14 21 28 7" data-at="1" data-say></div></li>
+      <li><div class="hx-table" data-size="7" data-mode="double" data-r="5" data-ops="14 21 28 7" data-at="2" data-say></div></li>
+      <li><div class="hx-table" data-size="7" data-mode="double" data-r="5" data-ops="14 21 28 7" data-at="3" data-say></div></li>
+      <li><div class="hx-table" data-size="7" data-mode="double" data-r="5" data-ops="14 21 28 7" data-at="4" data-say></div></li>
+      <li>Quadratic probing's path depends only on the home slot, so four keys with home 0 shared it. Here the step \(g(k)\) depends on the key (4, 2 and 3), so each of the last three found a free slot on its first extra probe.</li>
+      <li class="answer">4; 4; 2; 3.</li>
     </ol></div></div>
   </article>
 
   <article class="task" data-id="cse332-w4-l11-cluster">
-    <h2>6. Which problem is it?</h2>
-    <p class="prompt">Match each strategy to its clustering problem.</p>
+    <h2>5. Which clustering?</h2>
+    <p class="prompt">Primary clustering: filled blocks that grow, because any key landing in a block extends it. Secondary clustering: keys with the same home slot follow the same probe path. Match each strategy to its problem.</p>
     <div class="answer-spec" data-part="linear" data-grader="choice" data-answer="primary" data-options="primary:primary clustering|secondary:secondary clustering|none:neither" data-label="linear probing"></div>
     <div class="answer-spec" data-part="quadratic" data-grader="choice" data-answer="secondary" data-options="primary:primary clustering|secondary:secondary clustering|none:neither" data-label="quadratic probing"></div>
     <div class="answer-spec" data-part="double" data-grader="choice" data-answer="none" data-options="primary:primary clustering|secondary:secondary clustering|none:neither" data-label="double hashing (with a good \(g\))"></div>
-    <ol class="hints"><li>Primary: blocks of filled cells that grow. Secondary: keys with the same home share a probe path.</li></ol>
+    <ol class="hints"><li>Problems 1, 3 and 4 each show one of the three.</li></ol>
     <div class="solution"><div class="steps"><ol>
-      <li>Linear probing grows contiguous blocks: primary clustering (slide 27).</li>
-      <li>Quadratic probing jumps away, but equal homes share a path: secondary clustering (slide 31).</li>
-      <li>Double hashing's step depends on the key, which avoids secondary clustering.</li>
+      <li>Linear probing grows solid blocks (problem 1): primary clustering.</li>
+      <li>Quadratic probing jumps away from blocks, but keys with the same home share a path (problem 3): secondary clustering.</li>
+      <li>Double hashing's step depends on the key (problem 4), which avoids both.</li>
       <li class="answer">primary; secondary; neither.</li>
     </ol></div></div>
   </article>
-  <nav class="pager"></nav>
-</section>
 
-<!-- ================================================================ L11: QUIZ -->
-<section class="page" id="l11-quiz" data-title="Check your understanding: hashing 2">
-  <p class="where">Lecture 11 wrap-up · original questions written for this site, not from the course</p>
-  <h1>Check your understanding: hashing 2</h1>
-  <div class="prose"><p>Ten questions on Lecture 11. The score counts first tries.</p></div>
-  <div class="cyu-score" data-quiz-score="l11" role="status"></div>
-  <ol class="cyu-list" data-quiz="l11">
-    <li class="cyu" data-id="cse332-w4-l11-cyu-open" data-kind="mc" data-topic="l11-linear">
-      <p class="q">"Open addressing" means…</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w4-l11-cyu-open"> on a collision, use a different spot in the table itself<span class="why" hidden>Correct.</span></label>
-        <label><input type="radio" name="cse332-w4-l11-cyu-open"> each index holds a list<span class="why" hidden>That's separate chaining.</span></label>
-        <label><input type="radio" name="cse332-w4-l11-cyu-open"> the table has no fixed size<span class="why" hidden>It's a fixed array; rehashing makes a new one.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l11-cyu-linear-idx" data-kind="num" data-answer="5" data-topic="l11-linear" data-miscon='{"3":"no-mod"}'>
-      <p class="q">Size 10, linear probing, indices 3 and 4 are taken. Where does 23 go?</p>
-      <p class="why" hidden>Home 3, then 4, then 5.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l11-cyu-empty-delete" data-kind="mc" data-topic="l11-linear">
-      <p class="q">Why can't linear probing just empty a deleted key's slot?</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w4-l11-cyu-empty-delete"> Later finds would stop at the hole and miss keys placed past it<span class="why" hidden>Correct.</span></label>
-        <label><input type="radio" name="cse332-w4-l11-cyu-empty-delete"> The load factor would be wrong<span class="why" hidden>\(n\) goes down either way; the issue is find.</span></label>
-        <label><input type="radio" name="cse332-w4-l11-cyu-empty-delete"> Inserts would never reuse it<span class="why" hidden>An empty slot is the easiest to reuse.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l11-cyu-primary" data-kind="mc" data-topic="l11-linear">
-      <p class="q">Primary clustering is…</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w4-l11-cyu-primary"> filled blocks growing, which makes them collide more<span class="why" hidden>Correct: a feedback loop (slide 27).</span></label>
-        <label><input type="radio" name="cse332-w4-l11-cyu-primary"> keys with the same home following the same path<span class="why" hidden>That's secondary clustering.</span></label>
-        <label><input type="radio" name="cse332-w4-l11-cyu-primary"> a bucket's list getting long<span class="why" hidden>That's chaining with a poor hash.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l11-cyu-lambda-max" data-kind="num" data-answer="1" data-topic="l11-linear">
-      <p class="q">What is the largest load factor an open-addressing table can have?</p>
-      <p class="why" hidden>1: every slot holds one item. You can't insert more.</p>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l11-cyu-quad-third" data-kind="num" data-answer="2" data-topic="l11-quad" data-miscon='{"0":"linear-not-quadratic","9":"no-mod"}'>
-      <p class="q">Size 7, quadratic probing, a key with home 5. What is the third index it tries (after 5 and 6)?</p>
-      <p class="why" hidden>The third try is \(i = 2\): \(5 + 2^2 = 9\), and \(9 \bmod 7 = 2\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l11-cyu-guarantee" data-kind="mc" data-topic="l11-quad">
-      <p class="q">When is quadratic probing guaranteed to find an open spot?</p>
-      <div class="opts">
-        <label data-correct><input type="radio" name="cse332-w4-l11-cyu-guarantee"> When the size is prime and \(\lambda &lt; \frac12\)<span class="why" hidden>Correct (slide 30).</span></label>
-        <label><input type="radio" name="cse332-w4-l11-cyu-guarantee"> Whenever any slot is empty<span class="why" hidden>Slide 29's 47 shows otherwise.</span></label>
-        <label><input type="radio" name="cse332-w4-l11-cyu-guarantee"> When the size is a power of 2<span class="why" hidden>Prime sizes are what the guarantee needs.</span></label>
-      </div>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l11-cyu-double-step" data-kind="num" data-answer="9" data-topic="l11-quad">
-      <p class="q">Double hashing, size 11, \(h(k) = 3\), \(g(k) = 6\). Index 3 is taken. What's the next index tried?</p>
-      <p class="why" hidden>\(3 + 6 = 9\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l11-cyu-chain-threshold" data-kind="num" data-answer="2" data-topic="l11-rehash">
-      <p class="q">Slide 34: for separate chaining, we typically keep \(\lambda\) below what number?</p>
-      <p class="why" hidden>2. For open addressing, \(\frac12\).</p>
-    </li>
-    <li class="cyu" data-id="cse332-w4-l11-cyu-sorted" data-kind="mc" data-topic="l11-rehash">
-      <p class="q">Which operation is a hash table bad at?</p>
-      <div class="opts">
-        <label><input type="radio" name="cse332-w4-l11-cyu-sorted"> find<span class="why" hidden>Average \(\Theta(1)\).</span></label>
-        <label data-correct><input type="radio" name="cse332-w4-l11-cyu-sorted"> listing keys in sorted order<span class="why" hidden>Correct (slide 35): the keys are scattered.</span></label>
-        <label><input type="radio" name="cse332-w4-l11-cyu-sorted"> insert<span class="why" hidden>Average \(\Theta(1)\).</span></label>
-      </div>
-    </li>
-  </ol>
-  <div class="cyu-score" data-quiz-summary="l11" role="status"></div>
+  <h2 class="practice-group">Rehashing</h2>
+  <p class="note">Lesson: <a href="#l11-rehash">Rehashing</a></p>
+
+  <article class="task" data-id="cse332-w4-l11-rehash2">
+    <h2>6. Time to rehash</h2>
+    <p class="prompt">Linear probing, size 5. Insert 6, 11, 16. The table rehashes when \(\lambda\) passes \(\frac{1}{2}\), into the first prime at least twice the size, re-inserting keys in old-slot order.</p>
+    <div class="hx-table" data-size="5" data-mode="linear" data-ops=""></div>
+    <div class="answer-spec" data-part="lambda" data-grader="exact" data-answer="3/5" data-miscon='{"5/3":"lambda-flipped"}' data-label="\(\lambda\) after the three inserts"></div>
+    <div class="answer-spec" data-part="should" data-grader="yesno" data-answer="yes" data-label="past the open-addressing limit of \(\frac{1}{2}\)?"></div>
+    <div class="answer-spec" data-part="size" data-grader="exact" data-answer="11" data-miscon='{"10":"not-prime"}' data-label="new size"></div>
+    <div class="answer-spec" data-part="i16" data-grader="exact" data-answer="5" data-miscon='{"3":"no-mod","1":"no-mod"}' data-label="slot of 16 in the new table"></div>
+    <div class="answer-spec" data-part="i11" data-grader="exact" data-answer="0" data-miscon='{"2":"no-mod"}' data-label="slot of 11 in the new table"></div>
+    <ol class="hints">
+      <li>All three keys have home 1 in the old table. In the new one, take each key mod 11.</li>
+    </ol>
+    <div class="solution"><div class="steps"><ol>
+      <li><div class="hx-table" data-size="5" data-mode="linear" data-ops="6 11 16 r" data-at="1" data-say></div></li>
+      <li><div class="hx-table" data-size="5" data-mode="linear" data-ops="6 11 16 r" data-at="2" data-say></div></li>
+      <li><div class="hx-table" data-size="5" data-mode="linear" data-ops="6 11 16 r" data-at="3" data-say></div></li>
+      <li><div class="hx-table" data-size="5" data-mode="linear" data-ops="6 11 16 r" data-at="4" data-say></div></li>
+      <li><div class="hx-table" data-size="5" data-mode="linear" data-ops="6 11 16 r" data-at="5" data-say></div></li>
+      <li><div class="hx-table" data-size="5" data-mode="linear" data-ops="6 11 16 r" data-at="6" data-say></div></li>
+      <li><div class="hx-table" data-size="5" data-mode="linear" data-ops="6 11 16 r" data-at="7" data-say></div></li>
+      <li class="answer">\(\frac{3}{5}\); yes; 11; 5; 0. The block of three in the old table is gone: no collisions in the new one.</li>
+    </ol></div></div>
+  </article>
+
+  <div class="check" data-id="cse332-w4-l11-qc-chain-threshold" data-grader="exact" data-answer="2" data-miscon='{"0.5":"open-limit"}'>
+    <p>Quick check: a separate-chaining table rehashes when \(\lambda\) passes about what number?</p>
+    <div class="row"><input type="text" aria-label="Your answer"><button class="btn primary">Check</button></div>
+    <p class="feedback" role="status"></p>
+  </div>
   <nav class="pager"></nav>
 </section>
 

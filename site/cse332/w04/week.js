@@ -1,8 +1,7 @@
 /* CSE 332 w04: misconception feedback and this week's widgets.
    - .treelab     AVL insert stepper (week 3's: shows the deepest unbalanced node, then the rotation)
    - .treeview    a static drawing of one tree from data-shape, e.g. "9(3(1(0,),6),10(,16))"
-   - .hashcalc    the string hashes h1-h4 of slide 18 for any string, with Horner's rule
-   - .hashlab     a hash table of integer keys: separate chaining or linear / quadratic / double-hashing probes */
+   - HASH: .hx-step / .hx-table hash tables one operation at a time, .code-step code stepper (Lectures 10-11) */
 "use strict";
 window.WEEK = window.WEEK || {};
 window.WEEK.messages = {
@@ -12,15 +11,6 @@ window.WEEK.messages = {
   "off-by-one-height": "Check the definition: height counts edges, and an empty tree has height −1, a single node height 0.",
   "bst-height": "That's a plain BST's height. The AVL rule keeps it much shorter.",
   "nodes-not-leaves": "That's the number of nodes. Count only the nodes with no children.",
-  "no-mod": "That's the hash value itself. The index is the hash value % table size.",
-  "first-free-not-probe": "Follow the probe sequence: h, h+1, h+2, … (wrapping around), not the first empty slot overall.",
-  "linear-not-quadratic": "That's where linear probing would put it. Quadratic probing tries h+1², h+2², h+3², …",
-  "lambda-not-half": "That's λ itself. A successful find expects to look at half the bucket, λ/2.",
-  "half-not-lambda": "An unsuccessful find has to look at the whole bucket: λ on average, not λ/2.",
-  "tomb-is-empty": "A tombstone doesn't end a find. Keep probing past it until a truly empty slot.",
-  "counted-index": "Count the slots looked at, including the first one and the one where the search ends.",
-  "ascii-sum-order": "Order matters in h3: each character is multiplied by its own power of 31.",
-  "forgot-double": "h4 doubles h3. Recompute, or just multiply h3 by 2.",
 };
 
 window.WEEK.widgets = function ({ $, $$, el, REDRAW }) {
@@ -32,7 +22,6 @@ window.WEEK.widgets = function ({ $, $$, el, REDRAW }) {
     if (text != null) e.textContent = text;
     return e;
   }
-  const fmt = (x) => BigInt(x).toLocaleString("en-US");
 
   /* =========================================================== drawing a tree */
   // marks: { key: "path" | "new" | "problem" | "found" | "repl" }; opts.heights shows each node's height
@@ -158,87 +147,137 @@ window.WEEK.widgets = function ({ $, $$, el, REDRAW }) {
   }
   $$(".treelab").forEach(setupLab);
 
-  /* =========================================================== string hashes (slide 18) */
-  $$(".hashcalc").forEach((panel) => {
-    const sIn = $(".hc-s", panel), mIn = $(".hc-m", panel), out = $(".hc-out", panel), tbl = $(".hc-table", panel), hor = $(".hc-horner", panel);
-    function draw() {
-      const s = sIn.value, m = Math.max(1, Math.min(100000, parseInt(mIn.value, 10) || 10));
-      const codes = [...s].map((c) => c.charCodeAt(0));
-      out.textContent = s ? `a(sᵢ): ${[...s].map((c, i) => `${c}=${codes[i]}`).join(", ")}` : "Type a string.";
-      tbl.replaceChildren(el("tr", {}, ...["", "value", `index (mod ${m})`].map((t) => el("th", { text: t }))));
-      for (const [k, name] of [["h1", "h₁: first character"], ["h2", "h₂: sum of characters"], ["h3", "h₃: Σ a(sᵢ)·31ⁱ"], ["h4", "h₄: 2·Σ a(sᵢ)·31ⁱ"]]) {
-        const v = Sim.H[k](s);
-        tbl.append(el("tr", {}, el("td", { text: name }), el("td", { text: fmt(v) }), el("td", { text: String(Sim.mod(v, m)) })));
-      }
-      const steps = Sim.horner(s);
-      hor.textContent = s ? `Horner (slide 20), from the last character: h = 31·h + a(sᵢ) gives ${steps.map(fmt).join(" → ")}` : "";
+  /* HASH ======================================================== hash tables (Lectures 10 and 11)
+     <div class="panel hx-step" data-size="10" data-mode="linear" data-ops="38 19 8 f29"> a stepper, one operation per
+     step: the list of operations, the table, n and λ, and Sim.hashRun's narration.
+     <div class="hx-table" data-size data-mode data-ops [data-r] [data-at] [data-say]> the table after those operations
+     (or after state data-at of them), with that step's probes marked and, with data-say, its narration under it.
+     .code-step: a pre.code of .ln lines, then an ol whose li[data-line="2-3"] are the steps (week 3's code stepper). */
+  {
+    const scenario = (box) => ({ size: Number(box.dataset.size), mode: box.dataset.mode, R: Number(box.dataset.r || 0), ops: box.dataset.ops || "" });
+    const opName = (op) => (op.kind === "rehash" ? "rehash" : `${op.kind === "empty" ? "empty-delete" : op.kind} ${op.key}`);
+    function drawTable(grid, st, fresh = false) {
+      const badges = new Map();
+      for (const p of st.probes) badges.set(p.at, [...(badges.get(p.at) || []), p.i]);
+      grid.style.setProperty("--cols", String(st.size));
+      grid.classList.toggle("chain", st.mode === "chain");
+      grid.setAttribute("aria-label", `Table of size ${st.size}: ${st.slots.map((v, j) => `${j}: ${Array.isArray(v) ? (v.length ? v.join(" then ") : "empty") : v === null ? "empty" : v === Sim.TOMB ? "tombstone" : v}`).join("; ")}`);
+      grid.replaceChildren(...st.slots.map((v, j) => {
+        const hit = j === st.at, looked = badges.has(j);
+        const col = el("div", { class: "hx-col" }, el("span", { class: "hx-idx", text: String(j) }));
+        if (st.mode === "chain") {
+          col.append(el("b", { class: `hx-cell head${v.length ? "" : " empty"}${looked ? " look" : ""}`, text: v.length ? "↓" : "/" }));
+          col.append(...v.map((k) => el("b", { class: `hx-cell node${k === st.hit && st.result !== "missing" ? ` hit${fresh && st.result === "placed" ? " arrive" : ""}` : looked && st.op?.kind === "find" ? " look" : ""}`, text: String(k) })));
+          return col;
+        }
+        const kind = v === null ? " empty" : v === Sim.TOMB ? " tomb" : "";
+        const cls = hit ? ` hit${fresh && st.result === "placed" ? " arrive" : ""}` : looked ? " look" : "";
+        col.append(el("b", { class: `hx-cell${kind}${cls}`, text: v === null ? "" : String(v) }));
+        col.append(el("span", { class: "hx-badge", text: looked ? badges.get(j).join(",") : "" }));
+        return col;
+      }));
     }
-    sIn.addEventListener("input", draw); mIn.addEventListener("input", draw);
-    draw();
-  });
+    const statText = (st) => `n = ${st.n} · λ = ${st.n}/${st.size}`;
+    // one sentence per line: the hash, then one line per probe
+    const sayLines = (say) => say.split(/(?<=\.) (?=i = |[A-Z])/).map((t) => el("span", { class: "hx-line", text: t }));
 
-  /* =========================================================== hash table lab */
-  $$(".hashlab").forEach((panel) => {
-    const grid = $(".hl-grid", panel), out = $(".hl-out", panel), stat = $(".hl-stat", panel), keyIn = $(".hl-key", panel);
-    const modeSel = $(".hl-mode", panel), sizeIn = $(".hl-size", panel);
-    const presets = JSON.parse(panel.dataset.presets || "[]");
-    const gOf = (size) => { const r = Number(panel.dataset.r || 0); return r ? (k) => r - Sim.mod(k, r) : undefined; };
-    let t = null, queue = [];
-    function fresh(size, mode) { t = Sim.table(size, mode, mode === "double" ? gOf(size) : undefined); }
-    function draw(mark = {}, msg = "") {
-      grid.replaceChildren();
-      grid.style.setProperty("--cols", String(t.size));
-      t.slots.forEach((v, i) => {
-        const cell = el("div", { class: `hl-cell${mark.path && mark.path.includes(i) ? " path" : ""}${mark.at === i ? " at" : ""}` });
-        if (t.mode === "chain") { const ch = el("div", { class: "hl-chain" }); v.forEach((k) => ch.append(el("b", { class: mark.key === k ? "hit" : null, text: String(k) }))); cell.append(ch); }
-        else cell.append(el("b", { class: v === Sim.TOMB ? "tomb" : v === null ? "empty" : mark.key === v ? "hit" : null, text: v === null ? "" : v === Sim.TOMB ? "✝" : String(v) }));
-        if (mark.path) { const n = mark.path.indexOf(i); if (n >= 0) cell.append(el("span", { class: "hl-step", text: String(n + 1) })); }
-        cell.append(el("span", { class: "hl-idx", text: String(i) }));
-        grid.append(cell);
-      });
-      const lam = `${t.n}/${t.size}`;
-      stat.textContent = `${{ chain: "Separate chaining", linear: "Linear probing", quadratic: "Quadratic probing", double: `Double hashing, g(k) = ${panel.dataset.r} − (k mod ${panel.dataset.r})` }[t.mode]} · h(k) = k mod ${t.size} · n = ${t.n} · λ = ${lam} = ${(t.n / t.size).toFixed(2)}${queue.length ? ` · queue: ${queue.join(", ")}` : ""}`;
-      out.textContent = msg;
+    $$(".hx-table[data-ops]").forEach((box) => {
+      const steps = Sim.hashRun(scenario(box)), st = steps[box.dataset.at ? Number(box.dataset.at) : steps.length - 1];
+      const grid = el("div", { class: "hx-grid", role: "img" });
+      box.replaceChildren(grid);
+      drawTable(grid, st);
+      if (box.hasAttribute("data-say")) box.append(el("p", { class: "hx-say" }, ...sayLines(st.say)));
+    });
+
+    function setupHashStepper(box) {
+      const sc = scenario(box), steps = Sim.hashRun(sc), ops = Sim.parseOps(sc.ops);
+      const script = el("ol", { class: "hx-script" }, ...ops.map((op) => el("li", { text: opName(op) })));
+      const grid = el("div", { class: "hx-grid", role: "img" });
+      const stat = el("p", { class: "hx-stat" });
+      const say = el("p", { class: "step-say", role: "status" });
+      const back = el("button", { class: "btn", type: "button", text: "← Back" });
+      const next = el("button", { class: "btn primary", type: "button", text: "Next step →" });
+      const count = el("span", { class: "note" });
+      box.append(script, grid, stat, el("div", { class: "controls" }, back, next, count), say);
+      let k = 0;
+      function paint(fresh) {
+        const st = steps[k];
+        [...script.children].forEach((li, i) => { li.classList.toggle("now", i === st.opi); li.classList.toggle("done", i < st.opi); });
+        drawTable(grid, st, fresh && !matchMedia("(prefers-reduced-motion: reduce)").matches);
+        stat.textContent = statText(st);
+        say.replaceChildren(...sayLines(k === 0 ? `${st.say} Press Next step.` : st.say));
+        back.disabled = k === 0;
+        next.disabled = k === steps.length - 1;
+        count.textContent = k === 0 ? "" : k === steps.length - 1 ? "Done." : `Step ${k} of ${steps.length - 1}.`;
+      }
+      back.addEventListener("click", () => { if (k > 0) { k--; paint(false); } });
+      next.addEventListener("click", () => { if (k < steps.length - 1) { k++; paint(true); } });
+      paint(false);
     }
-    const readKey = () => {
-      const v = keyIn.value.trim();
-      if (v === "" && queue.length) return queue.shift();
-      if (!/^-?\d+$/.test(v)) { out.textContent = "Type a whole number as the key."; return null; }
-      keyIn.value = ""; return Number(v);
-    };
-    const where = (p) => p.join(" → ");
-    $(".hl-insert", panel).addEventListener("click", () => {
-      const k = readKey(); if (k === null) return;
-      const r = Sim.insert(t, k);
-      if (t.mode === "chain") return draw({ path: r.probes, at: r.index, key: k }, r.dup ? `${k} is already in bucket ${r.index}; insert overwrites its value.` : `${k} % ${t.size} = ${r.index}: added to bucket ${r.index}${r.compares ? ` after checking ${r.compares} key${r.compares === 1 ? "" : "s"} for a duplicate` : ""}.`);
-      if (!r.ok) return draw({ path: r.probes, key: k }, `${k} doesn't fit: probed ${r.probes.length} times (${where(r.probes)}) without finding an open slot. λ is ${t.n}/${t.size}; quadratic probing only guarantees a spot when λ < 1/2 and the size is prime.`);
-      draw({ path: r.probes, at: r.index, key: k }, r.dup ? `${k} is already at index ${r.index}.` : `${k} % ${t.size} = ${r.probes[0]}. Probed ${where(r.probes)}; stored at index ${r.index}${r.probes.length > 1 ? ` (${r.probes.length - 1} collision${r.probes.length > 2 ? "s" : ""})` : ""}.`);
-    });
-    $(".hl-find", panel).addEventListener("click", () => {
-      const k = readKey(); if (k === null) return;
-      const r = Sim.find(t, k);
-      if (t.mode === "chain") return draw({ path: r.probes, key: k }, `Bucket ${r.index}: ${r.found ? `found ${k} after ${r.compares} comparison${r.compares === 1 ? "" : "s"}` : `not found after ${r.compares} comparison${r.compares === 1 ? "" : "s"} (the whole bucket)`}.`);
-      draw({ path: r.probes, at: r.found ? r.index : undefined, key: k }, r.found ? `Found ${k} at index ${r.index}, looking at ${where(r.probes)}.` : `Not found: looked at ${where(r.probes)} and stopped at an empty slot. Tombstones don't stop a find.`);
-    });
-    $(".hl-delete", panel).addEventListener("click", () => {
-      const k = readKey(); if (k === null) return;
-      const r = Sim.remove(t, k);
-      if (!r.found) return draw({ path: r.probes }, `${k} isn't in the table.`);
-      draw({ path: r.probes, at: r.index }, t.mode === "chain" ? `Removed ${k} from bucket ${r.index}.` : `Deleted ${k}: index ${r.index} now holds a tombstone (✝), so later finds keep probing past it.`);
-    });
-    $(".hl-rehash", panel).addEventListener("click", () => {
-      const size = Sim.nextPrime(2 * t.size);
-      const old = t.size;
-      t = Sim.rehash(t, size, t.mode === "double" ? gOf(size) : undefined);
-      sizeIn.value = String(size);
-      draw({}, `Rehashed: a new table of size ${size} (the first prime ≥ 2·${old}), every key re-inserted with k mod ${size}. Tombstones are gone.`);
-    });
-    const reset = () => { fresh(Math.max(2, Math.min(31, parseInt(sizeIn.value, 10) || 10)), modeSel.value); queue = []; draw({}, "Empty table."); };
-    $(".hl-reset", panel).addEventListener("click", reset);
-    modeSel.addEventListener("change", reset); sizeIn.addEventListener("change", reset);
-    keyIn.addEventListener("keydown", (e) => { if (e.key === "Enter") $(".hl-insert", panel).click(); });
-    const chips = $(".hl-presets", panel);
-    const load = (p) => { modeSel.value = p.mode; sizeIn.value = String(p.size); fresh(p.size, p.mode); for (const k of p.keys || []) Sim.insert(t, k); queue = [...(p.seq || [])]; draw({}, p.say || ""); };
-    presets.forEach((p, i) => { const c = el("button", { class: "chip", type: "button", text: p.label }); c.addEventListener("click", () => load(p)); chips.append(c); if (i === 0) load(p); });
-  });
+    $$(".hx-step").forEach(setupHashStepper);
+
+    // On phones a code panel is a short window; grow it to fit the highlighted lines and scroll them into view.
+    function fitHighlight(pre) {
+      const hls = pre.querySelectorAll(".hl");
+      pre.style.maxHeight = "";
+      if (!hls.length || getComputedStyle(pre).maxHeight === "none") return;
+      const cs = getComputedStyle(pre), pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+      const base = pre.firstElementChild.offsetTop, first = hls[0], last = hls[hls.length - 1];
+      const top = (first.previousElementSibling || first).offsetTop - base;
+      const bottom = last.offsetTop + last.offsetHeight - base;
+      if (bottom - top + pad > pre.clientHeight) pre.style.maxHeight = `${bottom - top + pad}px`;
+      pre.scrollTop = top;
+    }
+    function setupCodeStepper(box) {
+      const code = $("pre.code", box), lines = $$(".ln", code), items = $$(":scope > ol > li", box);
+      const board = $(":scope > ol", box);
+      board.className = "cs-board";
+      code.classList.toggle("long", lines.length > 8);
+      const lit = items.map((li) => new Set(li.dataset.line.split(",").flatMap((r) => { const [a, b = a] = r.split("-").map(Number); return Array.from({ length: b - a + 1 }, (_, j) => a + j - 1); })));
+      const back = el("button", { class: "btn", type: "button", text: "← Back" });
+      const next = el("button", { class: "btn primary", type: "button", text: "Next step →" });
+      const count = el("span", { class: "note" });
+      box.append(el("div", { class: "split stepper cs" }, code, el("div", { class: "pic" }, el("div", { class: "controls" }, back, next, count), board)));
+      let k = 0;
+      function show() {
+        if (k) fitHighlight(code); else { code.style.maxHeight = ""; code.scrollTop = 0; }
+      }
+      function paint() {
+        lines.forEach((ln, i) => ln.classList.toggle("hl", k > 0 && lit[k - 1].has(i)));
+        items.forEach((li, i) => { li.hidden = i >= k; li.classList.toggle("now", i === k - 1); });
+        show();
+        back.disabled = k === 0;
+        next.disabled = k === items.length;
+        count.textContent = k === 0 ? "Press Next step." : k === items.length ? "Done." : `Step ${k} of ${items.length}.`;
+      }
+      back.addEventListener("click", () => { if (k > 0) { k--; paint(); } });
+      next.addEventListener("click", () => { if (k < items.length) { k++; paint(); } });
+      REDRAW.add((pid) => { if (box.closest(".page").id === pid) show(); });
+      paint();
+    }
+    $$(".code-step").forEach(setupCodeStepper);
+  }
 };
+
+/* HASH: wrong-answer feedback for Lectures 10 and 11 */
+Object.assign(window.WEEK.messages, {
+  "no-mod": "That's the key itself. The index is the key % table size.",
+  "insert-no-check": "Insert first walks the chain to make sure the key isn't already there. Count those comparisons.",
+  "lambda-flipped": "λ is n / length: the number of keys divided by the number of slots.",
+  "lambda-not-half": "That's λ itself. A successful find stops partway along the chain: about λ/2.",
+  "half-not-lambda": "An unsuccessful find has to look at the whole chain: about λ, not λ/2.",
+  "plus-one": "That also counts the key it stops on, which is the exact count. The course's estimate is λ/2.",
+  "tomb-skip": "Slot 8 is the first empty slot, but insert doesn't need an empty one. It reuses the first tombstone it passed, once it knows the key isn't in the table.",
+  "home-taken": "That's the key's home slot, and it is already taken. Follow the probes i = 1, 2, … to the first empty slot.",
+  "tomb-reused": "53 already went into the tombstone's slot. Use the table as it is after the last step.",
+  "tomb-is-empty": "A tombstone doesn't end a find. Keep probing past it until a truly empty slot.",
+  "counted-index": "Count every slot looked at, the first one and the one where the search stops included.",
+  "linear-not-quadratic": "That's where linear probing would put it. Quadratic probing tries h + 1², h + 2², h + 3², …",
+  "quad-not-double": "That's quadratic probing's answer. Double hashing steps by g(k) each time.",
+  "not-prime": "That's double the size, but it isn't prime. Take the first prime at least that big.",
+  "below-double": "That's prime but less than double the old size. The new array should be at least twice as long.",
+  "start-first-char": "The loop starts at the last character, i = m − 1, and works toward the first.",
+  "ascii-sum-order": "Order matters in h₃: each character is multiplied by its own power of 31.",
+  "new-at-front": "Here new keys go on the end of the chain, after insert has walked it.",
+  "open-limit": "That's the limit for open addressing. With chaining a slot can hold several keys, so λ can go higher.",
+});
